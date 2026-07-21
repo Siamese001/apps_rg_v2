@@ -1,0 +1,171 @@
+{
+  "schema": "apps_rg.review_lane_policy.v1",
+  "evaluated_at_utc": "2026-07-20T00:11:55.191987+00:00",
+  "policy_rules": {
+    "ALLOW": "X3_ALLOW + REAL_LLM — eligible for product ALLOW rollup",
+    "REVIEW": "X3_REVIEW* — structural package permitted; product_review_required=true; not product ALLOW",
+    "BLOCKED": "X3_BLOCK* / BLOCKED — fails structural assembly",
+    "MOCK_PLUMBING_ONLY": "mock/plumbing-only — not product ALLOW; product_review_required=true"
+  },
+  "per_lane": [
+    {
+      "lane": "headline",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "executive_summary",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "unify_narrative",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "unify_bullets",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "ibm_narrative",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "ibm_bullets",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "insurtech_narrative",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "insurtech_bullets",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "ey_narrative",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "ey_bullets",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    },
+    {
+      "lane": "competencies",
+      "disposition_class": "MOCK_PLUMBING_ONLY",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "MOCKED",
+      "authorization_scope": "PHASE0_SYNTHETIC",
+      "product_quality_status": "PHASE0_SYNTHETIC",
+      "can_structural_package": true,
+      "product_review_required": true,
+      "supports_product_allow": false,
+      "reason": "mock_or_plumbing_only_lane"
+    }
+  ],
+  "summary": {
+    "allow_lanes": [],
+    "review_lanes": [],
+    "blocked_lanes": [],
+    "mock_plumbing_lanes": [
+      "headline",
+      "executive_summary",
+      "unify_narrative",
+      "unify_bullets",
+      "ibm_narrative",
+      "ibm_bullets",
+      "insurtech_narrative",
+      "insurtech_bullets",
+      "ey_narrative",
+      "ey_bullets",
+      "competencies"
+    ],
+    "all_lanes_allow": false,
+    "product_review_required": true,
+    "structural_package_ok": true,
+    "product_allow_claimed": false
+  },
+  "explicit_non_claims": [
+    "REVIEW lanes are not hidden; they are labeled product_review_required.",
+    "MOCK/plumbing-only lanes cannot support product ALLOW.",
+    "JD/briefing remain targeting-only; not proof."
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "artifact_hash": "sha256:9bf61c0ac741511cb6190129bb4e9d269ca7acd3f6c147ee61dbda0b3c2626eb",
+  "emitted_at": "2026-07-20T22:04:47Z",
+  "payload": {
+    "chain_kind": "R4_SINGLE_ACTION",
+    "l2_executed": true,
+    "l2_fault": "L2_EXECUTION_ERROR:L2AuthorityError:V0_U0_AUTHORITY_RECEIPT_INVALID: ValidatedRequest must carry a passing U0 authority validation receipt",
+    "l5_certification_refs": [
+      "l5:runtime_certification_binding:dfdabb276d114d51"
+    ],
+    "request_id": "req-07d2206c490e4991901be012c41c4edd",
+    "reviewed_at_utc": "2026-07-20T22:04:47Z",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "1f3d31b7-5e59-4d33-829d-2ac54292a6f3",
+    "trace_root": "trace-592451d51c4a4ad5923ed553ec54fd8e",
+    "x1_sub_stages": [
+      {
+        "duration_ms": 0.014,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "PASS",
+        "sub_stage_id": "X1A",
+        "sub_stage_name": "Policy Manifest + Threshold + Grader Roster"
+      },
+      {
+        "duration_ms": 0.006,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 1.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "PASS",
+        "sub_stage_id": "X1B",
+        "sub_stage_name": "Task Completion + Format + Instruction-Follow"
+      },
+      {
+        "duration_ms": 0.004,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "PASS",
+        "sub_stage_id": "X1C",
+        "sub_stage_name": "Sandbox + Mutation + Side-Effect + Egress"
+      },
+      {
+        "duration_ms": 0.003,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "X1D",
+        "sub_stage_name": "Groundedness + Faithfulness + Citation + Support"
+      },
+      {
+        "duration_ms": 0.004,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "PASS",
+        "sub_stage_id": "X1E",
+        "sub_stage_name": "Process / Tool / Retry / Handoff"
+      },
+      {
+        "duration_ms": 0.009,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "PASS",
+        "sub_stage_id": "X1F",
+        "sub_stage_name": "Latency / Cost / Token Budget"
+      },
+      {
+        "duration_ms": 0.002,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "X1G",
+        "sub_stage_name": "Consistency Modifier (pass^k)"
+      },
+      {
+        "duration_ms": 0.003,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "PASS",
+        "sub_stage_id": "X1H",
+        "sub_stage_name": "Replay & Determinism Integrity"
+      },
+      {
+        "duration_ms": 0.004,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [
+            "SPAN_COVERAGE_GAP"
+          ],
+          "score": 0.0,
+          "severity": "warn",
+          "threshold": 0.0
+        },
+        "status": "WARN",
+        "sub_stage_id": "X1I",
+        "sub_stage_name": "OTEL Span Completeness"
+      },
+      {
+        "duration_ms": 0.002,
+        "meta": {
+          "confidence": 1.0,
+          "reason_codes": [
+            "NO_STATE_DIFF_OR_ANSWER_ONLY_PATH"
+          ],
+          "score": 0.0,
+          "severity": "info",
+          "threshold": 0.0
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "X1J",
+        "sub_stage_name": "Write Eligibility (UWG Pre-Commit)"
+      }
+    ],
+    "x3_disposition": "X3A"
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:b2c286cc033e24dc569088fba95cc0fa65edd694c7c136b7c3727f1605044b60"
+}

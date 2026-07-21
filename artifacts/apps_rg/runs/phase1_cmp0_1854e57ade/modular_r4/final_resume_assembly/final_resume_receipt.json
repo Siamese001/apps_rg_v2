@@ -1,0 +1,233 @@
+{
+  "receipt_id": "final_resume_assembly_receipt_v2",
+  "emitted_at_utc": "2026-07-20T00:11:42.705327+00:00",
+  "final_resume_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/final_resume.json",
+  "final_resume_manifest_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/final_resume_manifest.json",
+  "final_resume_x2_gate_outputs_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json",
+  "full_resume_llm_coherence_review_json": null,
+  "cross_section_x2_gate_outputs_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/cross_section_x2_gate_outputs.json",
+  "orchestration_fingerprint_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/orchestration_fingerprint.json",
+  "kept_removed_claims_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/kept_removed_claims.json",
+  "overlap_decisions_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/overlap_decisions.json",
+  "aggregation_preflight_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/aggregation_preflight.json",
+  "coherent_rollup_policy_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/coherent_rollup_policy.json",
+  "review_lane_policy_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/review_lane_policy.json",
+  "whole_resume_graph_evidence_contract_json": "artifacts/apps_rg/runs/phase1_cmp0_1854e57ade/modular_r4/final_resume_assembly/whole_resume_graph_evidence_contract.json",
+  "whole_resume_graph_evidence_contract_digest": "e7d40ca4e19bd9c0ba05a2072251d318f4a7079958daaa60d9e08ab955533200",
+  "whole_resume_graph_evidence_release_pass": false,
+  "final_resume_hash": "588156238c2e33865c956c1d96113af723a9727539d0b9a11433137cac462226",
+  "gates_all_pass": true,
+  "failed_gate_ids": [
+    "x2_cross_section_overlap_ledger_emitted"
+  ],
+  "structural_x2_all_pass": true,
+  "cross_section_x2_all_pass": true,
+  "cross_section_x2_structural_only": true,
+  "cross_section_x2_product_pass": false,
+  "warn_policy": {
+    "schema": "apps_rg.aggregation_warn_policy.v1",
+    "evaluated_at_utc": "2026-07-20T00:11:42.685616+00:00",
+    "rules": {
+      "WARN_never_counts_as_PASS_for_product": true,
+      "WARN_permitted_for_structural_assembly": false,
+      "FAIL_and_UNKNOWN_block_structural_and_product": true
+    },
+    "warn_gate_ids": [
+      "x2_cross_section_section_intent_conflict",
+      "x2_cross_section_graph_coherence"
+    ],
+    "fail_gate_ids": [],
+    "unknown_gate_ids": [
+      "x2_cross_section_overlap_ledger_emitted"
+    ],
+    "structural_cross_section_eligible": false,
+    "product_allow_blocked_by_cross_section": true
+  },
+  "coherent_rollup_policy": {
+    "same_run_policy": {
+      "same_run_coherent": false,
+      "same_date_prefix_coherent": false,
+      "acceptable_for_structural_assembly": true,
+      "coherent_rollup_policy_reason": "advisory: mixed run_id date prefixes without coherent pin; section lane proof gates control structural assembly",
+      "require_single_orchestration_pass": false,
+      "advisory_only": true
+    },
+    "digest_coherence": {
+      "base_resume_digest": "9face50d51a8b881619f81a541fd8f8ab2b906dd888f46e741cd41a15feacba6",
+      "jd_digest_coherent": "UNKNOWN",
+      "briefing_digest_coherent": "UNKNOWN",
+      "proof_pool_policy_coherent": true,
+      "unique_proof_pool_refs": [],
+      "per_lane_proof_pool_ref": {},
+      "per_lane_proof_pool_digest": {},
+      "note": "Per-lane proof_pool_digest may differ; shared proof_pool_ref is the SRFS policy anchor."
+    },
+    "structural_assembly_eligible": false
+  },
+  "review_lane_policy_summary": {
+    "allow_lanes": [],
+    "review_lanes": [],
+    "blocked_lanes": [],
+    "mock_plumbing_lanes": [
+      "headline",
+      "executive_summary",
+      "unify_narrative",
+      "unify_bullets",
+      "ibm_narrative",
+      "ibm_bullets",
+      "insurtech_narrative",
+      "insurtech_bullets",
+      "ey_narrative",
+      "ey_bullets",
+      "competencies"
+    ],
+    "all_lanes_allow": false,
+    "product_review_required": true,
+    "structural_package_ok": true,
+    "product_allow_claimed": false
+  },
+  "orchestration_fingerprint": {
+    "schema": "apps_rg.orchestration_run_fingerprint.v1",
+    "orchestration_id": "23b1dafa8985902b542869bb56f52de4",
+    "rollup_id": "phase0_generated_lane_rollup_20260720T001142Z",
+    "created_at_utc": "2026-07-20T00:11:42.613080+00:00",
+    "base_resume_digest": "9face50d51a8b881619f81a541fd8f8ab2b906dd888f46e741cd41a15feacba6",
+    "jd_digest": "UNKNOWN",
+    "briefing_digest": "UNKNOWN",
+    "jd_digest_coherent": "UNKNOWN",
+    "briefing_digest_coherent": "UNKNOWN",
+    "lane_run_ids": {
+      "headline": "phase0_headline_synthetic",
+      "executive_summary": "phase0_executive_summary_synthetic",
+      "unify_narrative": "phase0_unify_narrative_synthetic",
+      "unify_bullets": "phase0_unify_bullets_synthetic",
+      "ibm_narrative": "phase0_ibm_narrative_synthetic",
+      "ibm_bullets": "phase0_ibm_bullets_synthetic",
+      "insurtech_narrative": "phase0_insurtech_narrative_synthetic",
+      "insurtech_bullets": "phase0_insurtech_bullets_synthetic",
+      "ey_narrative": "phase0_ey_narrative_synthetic",
+      "ey_bullets": "phase0_ey_bullets_synthetic",
+      "competencies": "phase0_competencies_synthetic"
+    },
+    "lane_artifact_digests": {
+      "headline": "1dc476fbb3370b031199ec1f6746d7362385ad6848370697ab1090dd9fdf468b",
+      "executive_summary": "f36f30355cc0ab1bcf5ff8ad31b042bc619d4dca331578e517c7fa214036972d",
+      "unify_narrative": "a8c568b2c6c3c9b3b9a2084c2f4e7ad1bc95a6e056a85c84fdf678389b447188",
+      "unify_bullets": "093fd1704dcaaaceed409c4b966de8bffff41c9f4ac0c914ce819955dace460e",
+      "ibm_narrative": "fabd742aaae35f1e7927b9800be8f214951bb35355634029358094450aaa1050",
+      "ibm_bullets": "e8a64332716a03fdae8d9d35fc54445b98f41e39579bd4c3fa83d3d441cbf0fa",
+      "insurtech_narrative": "8b2549d77fcc8a666ccd4e4670a9f7242a8c17f9d97ac5676070b5d330f4e0c8",
+      "insurtech_bullets": "61452c9551dcf403aef251ef377d328a590d2965d34a5a7caa5890b1d545ff22",
+      "ey_narrative": "4fdb481a6e0ecf7ece881f4591261d361f8dc4d091e90350bd09189a48a8a96d",
+      "ey_bullets": "05e01196e4671d83c911b84c72134b0e123908fdf7707ac128e593454cd9e378",
+      "competencies": "97d40a60841b4fcebda63b42691b41109927da6bf87fc8429f6ae65913e5fc3c"
+    },
+    "lane_x3_codes": {
+      "headline": "X3_ALLOW",
+      "executive_summary": "X3_ALLOW",
+      "unify_narrative": "X3_ALLOW",
+      "unify_bullets": "X3_ALLOW",
+      "ibm_narrative": "X3_ALLOW",
+      "ibm_bullets": "X3_ALLOW",
+      "insurtech_narrative": "X3_ALLOW",
+      "insurtech_bullets": "X3_ALLOW",
+      "ey_narrative": "X3_ALLOW",
+      "ey_bullets": "X3_ALLOW",
+      "competencies": "X3_ALLOW"
+    },
+    "lane_x2_status": {
+      "headline": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "executive_summary": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "unify_narrative": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "unify_bullets": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "ibm_narrative": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "ibm_bullets": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "insurtech_narrative": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "insurtech_bullets": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "ey_narrative": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "ey_bullets": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      },
+      "competencies": {
+        "x2_failed": 0,
+        "x2_passed": 1
+      }
+    },
+    "same_run_coherent": false,
+    "same_date_prefix_coherent": false,
+    "review_lanes": [],
+    "blocked_lanes": [],
+    "generated_lane_ids": [
+      "headline",
+      "executive_summary",
+      "unify_narrative",
+      "unify_bullets",
+      "ibm_narrative",
+      "ibm_bullets",
+      "insurtech_narrative",
+      "insurtech_bullets",
+      "ey_narrative",
+      "ey_bullets",
+      "competencies"
+    ]
+  },
+  "kept_claims": [],
+  "removed_claims": [],
+  "rewritten_claims": [],
+  "overlap_decisions": [],
+  "per_lane_claim_ledger_digests": {},
+  "product_allow_claimed": false,
+  "product_review_required": true,
+  "explicit_non_claims": [
+    "Structural final_resume_x2 and cross_section WARN-permitted pass do not constitute product ALLOW.",
+    "Section-level X3 pass is necessary but not sufficient; full-resume aggregate judge quorum required for product_release_eligible.",
+    "REVIEW and MOCK/plumbing-only lanes are labeled in review_lane_policy.json; not hidden.",
+    "JD/briefing digests are targeting coherence only; not runtime proof.",
+    "final_resume.json with judge_calls_made=false is structural-only or pre-aggregate-review — not product release."
+  ],
+  "assembly_proof_semantics": {
+    "assembly_mode": "structural_package_only",
+    "structural_only": true,
+    "aggregate_judge_required": false,
+    "aggregate_judge_executed": false,
+    "aggregate_judge_artifacts": {
+      "full_resume_llm_coherence_review_json": null,
+      "x1d_full_resume_judge_outputs_json": null
+    },
+    "full_resume_coherence_pass": null,
+    "product_release_eligible": false,
+    "explicit_non_claims": [
+      "Section-level X2/X3 pass is necessary but not sufficient for product release.",
+      "structural_package_only assembly may emit final_resume.json without product authorization.",
+      "product_release_eligible is set false here and updated only when all product gates pass."
+    ]
+  }
+}

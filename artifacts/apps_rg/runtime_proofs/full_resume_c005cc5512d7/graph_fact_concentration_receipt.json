@@ -1,0 +1,68 @@
+{
+  "schema_version": "graph_fact_concentration_receipt_v1",
+  "producer": "apps_rg.runtime.sections.competencies_lane_execution",
+  "section_id": "competencies",
+  "input_artifact_paths": [
+    "artifacts/apps_rg/runtime_proofs/full_resume_c005cc5512d7/competencies_graph_sufficiency_receipt.json"
+  ],
+  "source_fact_usage": {
+    "fact_engineering_platform_001": {
+      "category_count": 2,
+      "category_labels": [
+        "ai platform leadership",
+        "governance, risk & compliance"
+      ]
+    },
+    "fact_engineering_platform_002": {
+      "category_count": 1,
+      "category_labels": [
+        "data & analytics modernization"
+      ]
+    },
+    "fact_engineering_platform_003": {
+      "category_count": 2,
+      "category_labels": [
+        "technology strategy & innovation",
+        "llmops & reliability"
+      ]
+    },
+    "reb_ibm_data_modeling_bi_decision_support": {
+      "category_count": 1,
+      "category_labels": [
+        "engineering & delivery leadership"
+      ]
+    },
+    "reb_ibm_presales_solution_engineering": {
+      "category_count": 1,
+      "category_labels": [
+        "engineering & delivery leadership"
+      ]
+    },
+    "reb_unify_agentic_platform_architecture": {
+      "category_count": 2,
+      "category_labels": [
+        "cloud & partner ecosystems",
+        "commercial & operating impact"
+      ]
+    },
+    "reb_unify_distributed_ecosystem_engineering": {
+      "category_count": 1,
+      "category_labels": [
+        "engineering & delivery leadership"
+      ]
+    },
+    "reb_unify_partner_channel_cosell": {
+      "category_count": 1,
+      "category_labels": [
+        "commercial & operating impact"
+      ]
+    }
+  },
+  "dominant_source_fact_id": "reb_unify_agentic_platform_architecture",
+  "dominant_source_fact_category_share": 0.25,
+  "threshold": 0.75,
+  "deterministic_gate_id": "x2_competencies_source_fact_concentration_limit",
+  "deterministic_gate_verdict": "PASS",
+  "failure_reason": null,
+  "pass": true
+}

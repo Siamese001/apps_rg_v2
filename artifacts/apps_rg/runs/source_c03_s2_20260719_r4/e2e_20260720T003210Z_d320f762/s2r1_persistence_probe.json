@@ -1,0 +1,109 @@
+{
+  "schema_version": "apps_rg.s2r1_persistence_probe.v1",
+  "classification": "DIRECTORY_FSYNC_PLATFORM_FAILURE",
+  "failed_s2_run_id": "e2e_20260720T003210Z_d320f762",
+  "execution_identity": "bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9",
+  "artifact_runs_root": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs",
+  "staging_directory": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.staging-s2r1-probe-a31dbadf81d34627a45b438723043935",
+  "committed_run_directory": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9",
+  "parent_exists": true,
+  "root_exists": true,
+  "root_writable_os_access": true,
+  "windows_file_attributes": 16,
+  "committed_run_collision": false,
+  "staging_collision_before_probe": false,
+  "root_under_active_s2_run": false,
+  "root_configuration": "REPOSITORY_DEFAULT_NO_EXPLICIT_INJECTION",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "machine": "AMD64",
+    "python": "3.12.10"
+  },
+  "operations": [
+    {
+      "operation": "root_mkdir",
+      "status": "PASS",
+      "path": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs"
+    },
+    {
+      "operation": "stage_mkdir",
+      "status": "PASS",
+      "path": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.staging-s2r1-probe-a31dbadf81d34627a45b438723043935"
+    },
+    {
+      "operation": "file_creation_flush_fsync",
+      "status": "PASS",
+      "path": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.staging-s2r1-probe-a31dbadf81d34627a45b438723043935\\write_probe.bin",
+      "byte_length": 23
+    },
+    {
+      "operation": "directory_fsync_stage",
+      "status": "FAIL",
+      "path": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.staging-s2r1-probe-a31dbadf81d34627a45b438723043935",
+      "exception_type": "PermissionError",
+      "errno": 13,
+      "filename": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.staging-s2r1-probe-a31dbadf81d34627a45b438723043935",
+      "message": "[Errno 13] Permission denied: 'C:\\\\Git\\\\Agentic-Workflow-FRESH-worktrees\\\\codex-apps-rg-source-refreeze\\\\artifacts\\\\apps_research\\\\runs\\\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.staging-s2r1-probe-a31dbadf81d34627a45b438723043935'"
+    },
+    {
+      "operation": "atomic_rename",
+      "status": "PASS",
+      "source": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.staging-s2r1-probe-a31dbadf81d34627a45b438723043935",
+      "target": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.commit-s2r1-probe-a31dbadf81d34627a45b438723043935"
+    },
+    {
+      "operation": "directory_fsync_root",
+      "status": "FAIL",
+      "path": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs",
+      "exception_type": "PermissionError",
+      "errno": 13,
+      "filename": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs",
+      "message": "[Errno 13] Permission denied: 'C:\\\\Git\\\\Agentic-Workflow-FRESH-worktrees\\\\codex-apps-rg-source-refreeze\\\\artifacts\\\\apps_research\\\\runs'"
+    },
+    {
+      "operation": "cleanup_owned_probe",
+      "status": "PASS",
+      "path": "C:\\Git\\Agentic-Workflow-FRESH-worktrees\\codex-apps-rg-source-refreeze\\artifacts\\apps_research\\runs\\.bridge_rg_research_bridge_98c30cc6_2c936430-7dec-44bb-a968-3150ca59daa9.commit-s2r1-probe-a31dbadf81d34627a45b438723043935",
+      "exists_after": false
+    }
+  ],
+  "acl": {
+    "owner": "AGENTIC01\\amita",
+    "protected": false,
+    "access": [
+      {
+        "identity": "BUILTIN\\Administrators",
+        "FileSystemRights": 2032127,
+        "AccessControlType": 0,
+        "IsInherited": true
+      },
+      {
+        "identity": "NT AUTHORITY\\SYSTEM",
+        "FileSystemRights": 2032127,
+        "AccessControlType": 0,
+        "IsInherited": true
+      },
+      {
+        "identity": "BUILTIN\\Users",
+        "FileSystemRights": 1179817,
+        "AccessControlType": 0,
+        "IsInherited": true
+      },
+      {
+        "identity": "NT AUTHORITY\\Authenticated Users",
+        "FileSystemRights": 1245631,
+        "AccessControlType": 0,
+        "IsInherited": true
+      },
+      {
+        "identity": "NT AUTHORITY\\Authenticated Users",
+        "FileSystemRights": -536805376,
+        "AccessControlType": 0,
+        "IsInherited": true
+      }
+    ]
+  },
+  "live_conflicting_process_count": 0
+}

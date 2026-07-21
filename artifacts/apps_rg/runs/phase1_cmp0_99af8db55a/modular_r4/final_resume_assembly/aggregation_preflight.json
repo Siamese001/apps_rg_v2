@@ -1,0 +1,117 @@
+{
+  "schema": "apps_rg.aggregation_preflight.v1",
+  "results": [
+    {
+      "gate_id": "x2_preflight_mixed_run_ids_recorded",
+      "pass": true,
+      "decisive_reason": "mixed run_id date prefixes",
+      "observed": {
+        "same_date_prefix_coherent": false,
+        "lane_run_ids": {
+          "headline": "phase0_headline_synthetic",
+          "executive_summary": "phase0_executive_summary_synthetic",
+          "unify_narrative": "phase0_unify_narrative_synthetic",
+          "unify_bullets": "phase0_unify_bullets_synthetic",
+          "ibm_narrative": "phase0_ibm_narrative_synthetic",
+          "ibm_bullets": "phase0_ibm_bullets_synthetic",
+          "insurtech_narrative": "phase0_insurtech_narrative_synthetic",
+          "insurtech_bullets": "phase0_insurtech_bullets_synthetic",
+          "ey_narrative": "phase0_ey_narrative_synthetic",
+          "ey_bullets": "phase0_ey_bullets_synthetic",
+          "competencies": "phase0_competencies_synthetic"
+        },
+        "mixed_run": true
+      }
+    },
+    {
+      "gate_id": "x2_preflight_jd_digest_coherence",
+      "pass": true,
+      "decisive_reason": null,
+      "observed": {
+        "digest_coherent": "UNKNOWN",
+        "advisory_only": true
+      }
+    },
+    {
+      "gate_id": "x2_preflight_briefing_digest_coherence",
+      "pass": true,
+      "decisive_reason": null,
+      "observed": {
+        "digest_coherent": "UNKNOWN",
+        "advisory_only": true
+      }
+    },
+    {
+      "gate_id": "x2_preflight_required_proof_artifacts_present",
+      "pass": false,
+      "decisive_reason": "missing: ['headline:section_input_usage_ledger.json', 'headline:x2_source_fact_pool_receipt.json', 'executive_summary:section_input_usage_ledger.json', 'executive_summary:x2_source_fact_pool_receipt.json', 'unify_narrative:section_input_usage_ledger.json', 'unify_narrative:x2_source_fact_pool_receipt.json', 'unify_bullets:section_input_usage_ledger.json', 'unify_bullets:x2_source_fact_pool_receipt.json']",
+      "observed": [
+        "headline:section_input_usage_ledger.json",
+        "headline:x2_source_fact_pool_receipt.json",
+        "executive_summary:section_input_usage_ledger.json",
+        "executive_summary:x2_source_fact_pool_receipt.json",
+        "unify_narrative:section_input_usage_ledger.json",
+        "unify_narrative:x2_source_fact_pool_receipt.json",
+        "unify_bullets:section_input_usage_ledger.json",
+        "unify_bullets:x2_source_fact_pool_receipt.json",
+        "ibm_narrative:section_input_usage_ledger.json",
+        "ibm_narrative:x2_source_fact_pool_receipt.json",
+        "ibm_bullets:section_input_usage_ledger.json",
+        "ibm_bullets:x2_source_fact_pool_receipt.json",
+        "insurtech_narrative:section_input_usage_ledger.json",
+        "insurtech_narrative:x2_source_fact_pool_receipt.json",
+        "insurtech_bullets:section_input_usage_ledger.json",
+        "insurtech_bullets:x2_source_fact_pool_receipt.json",
+        "ey_narrative:section_input_usage_ledger.json",
+        "ey_narrative:x2_source_fact_pool_receipt.json",
+        "ey_bullets:section_input_usage_ledger.json",
+        "ey_bullets:x2_source_fact_pool_receipt.json",
+        "competencies:section_input_usage_ledger.json",
+        "competencies:x2_source_fact_pool_receipt.json"
+      ]
+    },
+    {
+      "gate_id": "x2_preflight_section_x2_all_pass",
+      "pass": true,
+      "decisive_reason": null,
+      "observed": []
+    },
+    {
+      "gate_id": "x2_preflight_final_materialized_acceptance_contracts_pass",
+      "pass": true,
+      "decisive_reason": null,
+      "observed": []
+    },
+    {
+      "gate_id": "x2_preflight_pool_receipt_pass",
+      "pass": false,
+      "decisive_reason": "pool receipt fail/missing: ['headline:missing_pool_receipt', 'executive_summary:missing_pool_receipt', 'unify_narrative:missing_pool_receipt', 'unify_bullets:missing_pool_receipt', 'ibm_narrative:missing_pool_receipt', 'ibm_bullets:missing_pool_receipt', 'insurtech_narrative:missing_pool_receipt', 'insurtech_bullets:missing_pool_receipt', 'ey_narrative:missing_pool_receipt', 'ey_bullets:missing_pool_receipt', 'competencies:missing_pool_receipt']",
+      "observed": [
+        "headline:missing_pool_receipt",
+        "executive_summary:missing_pool_receipt",
+        "unify_narrative:missing_pool_receipt",
+        "unify_bullets:missing_pool_receipt",
+        "ibm_narrative:missing_pool_receipt",
+        "ibm_bullets:missing_pool_receipt",
+        "insurtech_narrative:missing_pool_receipt",
+        "insurtech_bullets:missing_pool_receipt",
+        "ey_narrative:missing_pool_receipt",
+        "ey_bullets:missing_pool_receipt",
+        "competencies:missing_pool_receipt"
+      ]
+    },
+    {
+      "gate_id": "x2_preflight_no_blocked_x3",
+      "pass": true,
+      "decisive_reason": null,
+      "observed": []
+    },
+    {
+      "gate_id": "x2_preflight_no_review_without_product_pass",
+      "pass": true,
+      "decisive_reason": null,
+      "observed": []
+    }
+  ],
+  "all_pass": false
+}

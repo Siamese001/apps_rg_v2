@@ -1,0 +1,173 @@
+{
+  "gate_family": "final_resume_cross_section_x2",
+  "evaluated_at_utc": "2026-07-20T00:11:55.191987+00:00",
+  "all_pass": true,
+  "failed_gate_ids": [
+    "x2_cross_section_overlap_ledger_emitted"
+  ],
+  "gates": [
+    {
+      "gate_id": "x2_cross_section_exact_duplicate",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": "advisory",
+      "observed": 0,
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_near_duplicate",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": "jaccard>=0.85",
+      "observed": 0,
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_same_claim_different_wording",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": 0,
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_repeated_metric",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": 3,
+      "observed": {},
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_unsupported_carryover",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": [],
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_section_intent_conflict",
+      "verdict": "WARN",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": "conflicts: ['unify_narrative_vs_unify_bullets_substring', 'ibm_narrative_vs_ibm_bullets_substring', 'insurtech_narrative_vs_insurtech_bullets_substring', 'ey_narrative_vs_ey_bullets_substring']",
+      "threshold": null,
+      "observed": [
+        "unify_narrative_vs_unify_bullets_substring",
+        "ibm_narrative_vs_ibm_bullets_substring",
+        "insurtech_narrative_vs_insurtech_bullets_substring",
+        "ey_narrative_vs_ey_bullets_substring"
+      ],
+      "evidence_refs": [],
+      "pass": false
+    },
+    {
+      "gate_id": "x2_cross_section_no_em_dash",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": null,
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_x3_review_present",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": [],
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_overlap_ledger_emitted",
+      "verdict": "UNKNOWN",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": "no claim rows extracted from generated sections",
+      "threshold": null,
+      "observed": {
+        "kept": 0,
+        "removed": 0,
+        "rewritten": 0
+      },
+      "evidence_refs": [],
+      "pass": false
+    },
+    {
+      "gate_id": "x2_cross_section_graph_coherence",
+      "verdict": "WARN",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": "no generated section graph metadata available for cross-section coherence",
+      "threshold": {
+        "min_active_sections": 3,
+        "min_unique_graph_skill_node_ids": 4
+      },
+      "observed": {
+        "schema": "apps_rg.cross_section_graph_coherence_receipt.v1",
+        "status": "UNKNOWN",
+        "active_section_count": 0,
+        "native_c03_section_count": 0,
+        "role_episode_section_count": 0,
+        "unique_graph_skill_node_count": 0,
+        "unique_source_fact_id_count": 0,
+        "unique_role_episode_bundle_count": 0,
+        "active_section_ids": [],
+        "native_c03_section_ids": [],
+        "role_episode_section_ids": [],
+        "unique_graph_skill_node_ids": [],
+        "unique_role_episode_bundle_ids": [],
+        "sections": [],
+        "warnings": [],
+        "thresholds": {
+          "min_active_sections": 3,
+          "min_unique_graph_skill_node_ids": 4
+        }
+      },
+      "evidence_refs": [
+        "cross_section_x2_gate_outputs.json::graph_coherence_receipt"
+      ],
+      "pass": false
+    }
+  ],
+  "warn_policy": {
+    "schema": "apps_rg.aggregation_warn_policy.v1",
+    "evaluated_at_utc": "2026-07-20T00:11:55.191987+00:00",
+    "rules": {
+      "WARN_never_counts_as_PASS_for_product": true,
+      "WARN_permitted_for_structural_assembly": false,
+      "FAIL_and_UNKNOWN_block_structural_and_product": true
+    },
+    "warn_gate_ids": [
+      "x2_cross_section_section_intent_conflict",
+      "x2_cross_section_graph_coherence"
+    ],
+    "fail_gate_ids": [],
+    "unknown_gate_ids": [
+      "x2_cross_section_overlap_ledger_emitted"
+    ],
+    "structural_cross_section_eligible": false,
+    "product_allow_blocked_by_cross_section": true
+  }
+}

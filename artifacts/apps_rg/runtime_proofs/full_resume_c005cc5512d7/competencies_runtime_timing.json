@@ -1,0 +1,70 @@
+{
+  "section_id": "competencies",
+  "run_id": "competencies_20260721_010127",
+  "runtime_generation_status": "REAL_LLM",
+  "e2e_closeout_mode": false,
+  "max_regen_rounds_allowed": 2,
+  "lane_phases": [
+    {
+      "phase": "load_section_proof_for_lane",
+      "duration_s": 3.063,
+      "at": "2026-07-21T01:01:27.772889+00:00"
+    },
+    {
+      "phase": "compile_prompt",
+      "duration_s": 5.546,
+      "at": "2026-07-21T01:01:33.317260+00:00"
+    },
+    {
+      "phase": "prepare_l2_before_provider",
+      "duration_s": 0.125,
+      "at": "2026-07-21T01:01:33.441292+00:00"
+    },
+    {
+      "phase": "self_consistency_generation_and_selector",
+      "duration_s": 122.547,
+      "at": "2026-07-21T01:03:35.990544+00:00"
+    },
+    {
+      "phase": "deterministic_repairs",
+      "duration_s": 0.016,
+      "at": "2026-07-21T01:03:36.014897+00:00"
+    },
+    {
+      "phase": "x1d",
+      "duration_s": 49.234,
+      "at": "2026-07-21T01:04:25.237182+00:00"
+    },
+    {
+      "phase": "x2",
+      "duration_s": 0.172,
+      "at": "2026-07-21T01:04:25.420522+00:00"
+    },
+    {
+      "phase": "x3_and_l2_finalize",
+      "duration_s": 0.297,
+      "at": "2026-07-21T01:04:25.706186+00:00"
+    },
+    {
+      "phase": "l6_shadow",
+      "duration_s": 0.031,
+      "at": "2026-07-21T01:04:25.748040+00:00"
+    }
+  ],
+  "generation_selector_phases": [
+    {
+      "phase": "self_consistency_generation_round_0",
+      "started_at": "2026-07-21T01:01:33.441292+00:00",
+      "duration_s": 88.532,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 8
+    },
+    {
+      "phase": "selector_round_0",
+      "started_at": "2026-07-21T01:03:01.981974+00:00",
+      "duration_s": 34.0,
+      "selection_mode": "openai_competencies_adaptive_6_8_pass"
+    }
+  ]
+}
