@@ -61,3 +61,27 @@ chat-changed files inside the approved import surface match the source head by
 exact SHA-256 file bytes. The 22 source-only paths outside that surface are
 listed explicitly in the receipt. No source-only authority was silently copied
 into this repository.
+
+## Evaluation convergence sync
+
+The original `SOURCE_SYNC_RECEIPT.json` remains the immutable receipt for the
+initial transplant. The evaluator was subsequently advanced from Agentic
+Workflow local-main commit
+`38796dc6cb66b273c682182cd7ed3fc5c14c84c8` into
+`src/apps_rg/evals`.
+
+The sync adds the completed W1-W6 measurement surface: six independent gates,
+seven score groups, modular resume-graph evaluation, finite-universe retrieval,
+exact binding and grounding, five section-quality lanes, whole-resume/W9
+evaluation, stored-run repeatability, critical-grader mutation evaluation, and
+sealed-receipt CI ratcheting.
+
+Of 120 source evaluator files, 119 match after deterministic newline
+normalization. The sole intentional source difference removes an unused local
+from `resume_graph/metrics/retrieval.py` to satisfy standalone Ruff; it does not
+change metrics or runtime behavior. The v2-only graph-embedding qualifier is
+preserved. Exact counts, tree digests, validation results, and authority limits
+are recorded in `src/apps_rg/evals/EVALUATION_SYNC_RECEIPT.json`.
+
+This sync does not import `agentic_core` or `ops_scripts`, change Apps RG
+runtime behavior, create human-review evidence, or claim release authority.
