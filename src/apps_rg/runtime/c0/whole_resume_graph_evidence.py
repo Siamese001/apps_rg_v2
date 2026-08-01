@@ -103,7 +103,7 @@ def _official_w6_status(
     trusted_receipt = str(authority.get("trusted_receipt_sha256") or "").strip()
     trusted_full = str(authority.get("trusted_full_report_sha256") or "").strip()
     try:
-        from ops_scripts.ci.check_apps_rg_resume_graph_w6 import validate_artifact
+        from apps_rg.evals.receipt_validation import validate_artifact
 
         errors = validate_artifact(
             receipt_path,

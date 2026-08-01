@@ -11,7 +11,7 @@ from apps_rg.evals.c03_proxy_eval import (
     validate_proxy_report,
     validate_proxy_summary,
 )
-from ops_scripts.ci.check_apps_rg_resume_graph_w6 import validate_artifact
+from apps_rg.evals.receipt_validation import validate_artifact
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 PROFILE = REPO_ROOT / "apps_rg/config/domain_contract/resume_graph_evaluation_profile.yaml"

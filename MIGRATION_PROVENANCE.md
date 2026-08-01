@@ -85,3 +85,17 @@ are recorded in `src/apps_rg/evals/EVALUATION_SYNC_RECEIPT.json`.
 
 This sync does not import `agentic_core` or `ops_scripts`, change Apps RG
 runtime behavior, create human-review evidence, or claim release authority.
+
+## Source-bound measurement remediation
+
+The evaluator convergence code was later hardened in-place on the standalone
+v2 branch. `src/apps_rg/evals/authoritative` separates externally pinned truth,
+system output, authority, scoring, controller execution, and CI receipts. It
+reuses the existing C0.3 human-review authority receipt as the trust root and
+does not import excluded monorepo packages.
+
+Legacy self-sealed evaluator functions remain compatibility and synthetic-test
+surfaces. Qualification claims must use the authoritative APIs and provide the
+owner-pinned artifacts listed in
+`src/apps_rg/evals/MEASUREMENT_VALIDITY_PLAN.md`. No real labels, corpus
+qualification, or release authority are created by the implementation alone.

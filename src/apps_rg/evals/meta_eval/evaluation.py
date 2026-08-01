@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -255,11 +256,118 @@ def _observations() -> list[dict[str, Any]]:
     return observations
 
 
+def _isolation_row(
+    case_id: str,
+    *,
+    statuses: Mapping[str, str],
+    expected_nonpass: set[str],
+) -> dict[str, Any]:
+    observed_nonpass = {grader for grader, status in statuses.items() if status != "PASS"}
+    return {
+        "case_id": f"isolation::{case_id}",
+        "grader": "CROSS_GRADER_MATRIX",
+        "case_class": "ISOLATION_CHECK",
+        "observed_status": "PASS" if observed_nonpass == expected_nonpass else "FAIL",
+        "expected_code": None,
+        "observed_codes": [],
+        "detected_or_accepted": observed_nonpass == expected_nonpass,
+        "unrelated_grader_isolation": (
+            "ACTUALLY_EXECUTED_AND_VERIFIED"
+            if observed_nonpass == expected_nonpass
+            else "UNEXPECTED_GRADER_IMPACT"
+        ),
+        "grader_statuses": dict(sorted(statuses.items())),
+        "expected_nonpass_graders": sorted(expected_nonpass),
+        "observed_nonpass_graders": sorted(observed_nonpass),
+    }
+
+
+def _cross_grader_isolation_checks() -> list[dict[str, Any]]:
+    grounding = _load("grounding_mutations.v1.json")
+    base_record = seal_claim_evidence_record(grounding["base_record"])
+    retrieval = _load("retrieval_hard_negatives.v1.json")
+    base_query = seal_retrieval_query(retrieval["query_template"])
+    rows: list[dict[str, Any]] = []
+    for mutation_id, mutation in grounding["mutations"].items():
+        record = copy.deepcopy(grounding["base_record"])
+        _assign_path(record, mutation["path"], mutation["value"])
+        record = seal_claim_evidence_record(record)
+        expected = {"G3_GROUNDING"} if mutation_id == "unsupported_entailment" else {
+            "G2_BINDING",
+            "G3_GROUNDING",
+        }
+        rows.append(
+            _isolation_row(
+                f"grounding::{mutation_id}",
+                statuses={
+                    "G1_RETRIEVAL": evaluate_retrieval_query(base_query)["status"],
+                    "G2_BINDING": evaluate_binding_gate([record])["status"],
+                    "G3_GROUNDING": evaluate_grounding_gate([record])["status"],
+                },
+                expected_nonpass=expected,
+            )
+        )
+    for candidate_id in retrieval["critical_hard_negative_candidate_ids"]:
+        rows.append(
+            _isolation_row(
+                f"retrieval::promote::{candidate_id}",
+                statuses={
+                    "G1_RETRIEVAL": evaluate_retrieval_query(
+                        _promote_candidate(base_query, candidate_id)
+                    )["status"],
+                    "G2_BINDING": evaluate_binding_gate([base_record])["status"],
+                    "G3_GROUNDING": evaluate_grounding_gate([base_record])["status"],
+                },
+                expected_nonpass={"G1_RETRIEVAL"},
+            )
+        )
+    omitted = copy.deepcopy(base_query)
+    omitted["gate_k"] = 2
+    rows.append(
+        _isolation_row(
+            "retrieval::relevant_outside_top_k",
+            statuses={
+                "G1_RETRIEVAL": evaluate_retrieval_query(seal_retrieval_query(omitted))["status"],
+                "G2_BINDING": evaluate_binding_gate([base_record])["status"],
+                "G3_GROUNDING": evaluate_grounding_gate([base_record])["status"],
+            },
+            expected_nonpass={"G1_RETRIEVAL"},
+        )
+    )
+    leaked = copy.deepcopy(base_query)
+    leaked["split"] = "HOLDOUT"
+    rows.append(
+        _isolation_row(
+            "retrieval::holdout_leakage",
+            statuses={
+                "G1_SPLIT_LEAKAGE": evaluate_retrieval_gate(
+                    [base_query, seal_retrieval_query(leaked)]
+                )["status"],
+                "G2_BINDING": evaluate_binding_gate([base_record])["status"],
+                "G3_GROUNDING": evaluate_grounding_gate([base_record])["status"],
+            },
+            expected_nonpass={"G1_SPLIT_LEAKAGE"},
+        )
+    )
+    return rows
+
+
+def _wilson_upper(errors: int, total: int, *, z: float = 1.959963984540054) -> float | None:
+    if total <= 0:
+        return None
+    proportion = errors / total
+    denominator = 1 + z * z / total
+    center = proportion + z * z / (2 * total)
+    margin = z * math.sqrt(proportion * (1 - proportion) / total + z * z / (4 * total * total))
+    return (center + margin) / denominator
+
+
 def run_meta_evaluation() -> dict[str, Any]:
     """Return a deterministic G6 receipt; no human labels or thresholds are inferred."""
 
     observations = _observations()
     repeated = _observations()
+    isolation_checks = _cross_grader_isolation_checks()
     critical = [row for row in observations if row["case_class"] == "CRITICAL_MUTATION"]
     clean = [row for row in observations if row["case_class"] == "CLEAN_CONTROL"]
     grounding = [row for row in critical if row["grader"] in {"G2_BINDING", "G3_GROUNDING"}]
@@ -273,6 +381,22 @@ def run_meta_evaluation() -> dict[str, Any]:
         for row in observations
     )
     stability = float(canonical_digest(observations) == canonical_digest(repeated))
+    isolation_failures = sum(not row["detected_or_accepted"] for row in isolation_checks)
+    declared_graders = {
+        row["grader_id"]
+        for row in yaml.safe_load(_GRADER_CARDS.read_text(encoding="utf-8"))["graders"]
+    }
+    observed_graders = {row["grader"] for row in observations}
+    slice_coverage = len(declared_graders & observed_graders) / len(declared_graders)
+    leakage_rows = [row for row in critical if row["case_id"] == "retrieval::holdout_leakage"]
+    leakage_incidents = sum(not row["detected_or_accepted"] for row in leakage_rows)
+    base_query = seal_retrieval_query(_load("retrieval_hard_negatives.v1.json")["query_template"])
+    boundary = copy.deepcopy(base_query)
+    boundary["gate_k"] = 2
+    threshold_sensitivity = float(
+        evaluate_retrieval_query(base_query)["status"] == "PASS"
+        and evaluate_retrieval_query(seal_retrieval_query(boundary))["status"] == "FAIL"
+    )
     failures: list[str] = []
     if critical_recall != 1.0:
         failures.append("CRITICAL_MUTATION_RECALL_BELOW_ONE")
@@ -282,6 +406,8 @@ def run_meta_evaluation() -> dict[str, Any]:
         failures.append("REQUIRED_GRADER_UNKNOWN")
     if stability != 1.0:
         failures.append("GRADER_SCORE_INSTABILITY")
+    if isolation_failures:
+        failures.append("CROSS_GRADER_ISOLATION_FAILURE")
     body: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "gate_id": "G6",
@@ -306,14 +432,20 @@ def run_meta_evaluation() -> dict[str, Any]:
             "reviewer_agreement_rate": None,
             "adjudication_overturn_rate": None,
             "score_stability": stability,
-            "threshold_sensitivity": None,
-            "slice_coverage": 1.0,
+            "threshold_sensitivity": threshold_sensitivity,
+            "slice_coverage": slice_coverage,
             "unmeasured_dimension_count": 6,
             "required_gate_unknown_count": unexpected_unknown,
-            "holdout_leakage_incident_count": 0,
+            "holdout_leakage_incident_count": leakage_incidents,
             "mutation_failure_count": sum(not row["detected_or_accepted"] for row in critical),
+            "cross_grader_isolation_rate": 1 - isolation_failures / len(isolation_checks),
+            "cross_grader_isolation_failure_count": isolation_failures,
+            "clean_control_count": len(clean),
+            "clean_control_false_positive_rate_upper_95": _wilson_upper(
+                sum(not row["detected_or_accepted"] for row in clean), len(clean)
+            ),
         },
-        "observations": observations,
+        "observations": observations + isolation_checks,
         "failure_codes": failures,
         "unknown_reasons": [],
         "authority": {

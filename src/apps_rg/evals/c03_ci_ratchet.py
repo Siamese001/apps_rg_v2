@@ -179,6 +179,7 @@ def build_ratchet_receipt(
     base_commit: str,
     evaluation_receipts: Mapping[str, Mapping[str, Any]] | None = None,
     expected_baselines: Mapping[str, str] | None = None,
+    evaluation_receipts_source_bound: bool = False,
 ) -> dict[str, Any]:
     strict = _junit(strict_junit)
     baseline = _junit(baseline_junit)
@@ -256,7 +257,11 @@ def build_ratchet_receipt(
         },
         "failure_codes": sorted(failures),
         "evaluation_receipt_mode": (
-            "SEALED_ALL_SCORE_GROUPS" if evaluation_receipts is not None else "LEGACY_JUNIT_ONLY"
+            "SOURCE_BOUND_ALL_SCORE_GROUPS"
+            if evaluation_receipts is not None and evaluation_receipts_source_bound
+            else "SEALED_ALL_SCORE_GROUPS"
+            if evaluation_receipts is not None
+            else "LEGACY_JUNIT_ONLY"
         ),
         "evaluation_receipts": evaluation_summaries,
         "documentation_gates_included": False,
@@ -273,9 +278,13 @@ def main() -> int:
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--base-commit", required=True)
     parser.add_argument("--evaluation-receipts", type=Path)
+    parser.add_argument("--native-receipts", type=Path)
+    parser.add_argument("--expected-source-receipt-digests", type=Path)
     parser.add_argument("--expected-baselines", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
+    if args.evaluation_receipts and args.native_receipts:
+        parser.error("--evaluation-receipts and --native-receipts are mutually exclusive")
     evaluation_receipts = (
         json.loads(args.evaluation_receipts.read_text(encoding="utf-8"))
         if args.evaluation_receipts
@@ -286,6 +295,32 @@ def main() -> int:
         if args.expected_baselines
         else None
     )
+    source_bound = False
+    if args.native_receipts:
+        if args.expected_source_receipt_digests is None or expected_baselines is None:
+            parser.error(
+                "--native-receipts requires --expected-source-receipt-digests and --expected-baselines"
+            )
+        from apps_rg.evals.authoritative.native_receipts import (
+            normalize_native_receipt_bundle,
+        )
+
+        native_paths = json.loads(args.native_receipts.read_text(encoding="utf-8"))
+        if not isinstance(native_paths, Mapping):
+            parser.error("--native-receipts must contain a score-group to file-path object")
+        native_receipts = {
+            score_group: json.loads(Path(path).read_text(encoding="utf-8"))
+            for score_group, path in native_paths.items()
+        }
+        expected_source_digests = json.loads(
+            args.expected_source_receipt_digests.read_text(encoding="utf-8")
+        )
+        evaluation_receipts = normalize_native_receipt_bundle(
+            native_receipts,
+            expected_source_digests=expected_source_digests,
+            baseline_signatures=expected_baselines,
+        )
+        source_bound = True
     receipt = build_ratchet_receipt(
         strict_junit=args.strict_junit,
         baseline_junit=args.baseline_junit,
@@ -293,6 +328,7 @@ def main() -> int:
         base_commit=args.base_commit,
         evaluation_receipts=evaluation_receipts,
         expected_baselines=expected_baselines,
+        evaluation_receipts_source_bound=source_bound,
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")

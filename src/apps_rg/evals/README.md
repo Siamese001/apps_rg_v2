@@ -139,3 +139,15 @@ and governed failure counter. Missing receipts, invalid digests, required
 `UNKNOWN`, critical regression, unsupported material claims, holdout leakage,
 mutation failures, and unexpected baseline signatures fail the ratchet. This
 is an evaluator-owned aggregation surface only; workflow files are unchanged.
+
+## Source-bound authoritative path
+
+The evaluators above remain useful calculators and synthetic regression
+surfaces. Real measurement uses
+[`authoritative/`](authoritative/README.md), which prevents the scorer from
+creating its own truth, reviewer authority, execution independence, or CI
+source receipts. The implementation and remaining real-evidence prerequisites
+are recorded in
+[`MEASUREMENT_VALIDITY_PLAN.md`](MEASUREMENT_VALIDITY_PLAN.md).
+The code-only completion and validation commands are sealed in
+[`MEASUREMENT_VALIDITY_IMPLEMENTATION_RECEIPT.json`](MEASUREMENT_VALIDITY_IMPLEMENTATION_RECEIPT.json).

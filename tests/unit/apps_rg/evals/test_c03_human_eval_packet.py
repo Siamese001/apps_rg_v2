@@ -50,7 +50,7 @@ from apps_rg.evals.resume_graph_evaluation import (
     build_sanitized_ci_receipt,
     evaluate_file,
 )
-from ops_scripts.ci.check_apps_rg_resume_graph_w6 import validate_artifact
+from apps_rg.evals.receipt_validation import validate_artifact
 
 REPO = Path(__file__).resolve().parents[4]
 SECTION_COUNTS = {

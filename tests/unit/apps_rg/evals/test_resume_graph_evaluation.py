@@ -31,8 +31,8 @@ from apps_rg.evals.resume_graph_evaluation import (
     reciprocal_rank,
     report_digest_is_valid,
 )
-from ops_scripts.calibration.apps_rg_resume_graph_w6 import main
-from ops_scripts.ci.check_apps_rg_resume_graph_w6 import validate_artifact
+from apps_rg.evals.receipt_validation import validate_artifact
+from apps_rg.evals.resume_graph_calibration import main
 
 
 def _profile(tmp_path: Path | None = None) -> dict:
@@ -1480,7 +1480,7 @@ def test_ci_checker_rejects_canonical_profile_proof_split_policy_drift(
         yaml.safe_dump(canonical_profile, sort_keys=True), encoding="utf-8"
     )
     monkeypatch.setattr(
-        "ops_scripts.ci.check_apps_rg_resume_graph_w6.CANONICAL_PROFILE",
+        "apps_rg.evals.receipt_validation.CANONICAL_PROFILE",
         drifted_profile,
     )
     errors = validate_artifact(
@@ -1700,7 +1700,7 @@ def test_cli_rehashes_controlled_inputs_after_evaluation_before_writing(
         )
 
     monkeypatch.setattr(
-        "ops_scripts.calibration.apps_rg_resume_graph_w6.evaluate_file",
+        "apps_rg.evals.resume_graph_calibration.evaluate_file",
         mutate_input_during_evaluation,
     )
     assert main(["--profile", str(profile_path)]) == 2
