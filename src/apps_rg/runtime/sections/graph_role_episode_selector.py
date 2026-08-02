@@ -15,6 +15,7 @@ from apps_rg.fact_inventory.augmented_skills_graph import (
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     skill_row_eligible_for_external_claim,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.c0.c03_resume_graph_contracts import (
     TraversalRecorder,
     build_candidate_decision,
@@ -212,7 +213,7 @@ _WORD_RE = re.compile(r"[a-z0-9]+")
 
 
 def _load_bundle_doc(repo_root: Path, filename: str) -> dict[str, Any]:
-    path = repo_root / "apps_rg" / "fact_inventory" / filename
+    path = resolve_apps_rg_path(repo_root, "fact_inventory", filename)
     import json
 
     return json.loads(path.read_text(encoding="utf-8"))

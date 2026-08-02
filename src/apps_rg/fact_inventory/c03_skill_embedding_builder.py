@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
+from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
@@ -100,7 +102,9 @@ def encode_bge_m3(
         )
     runtime = {
         "device": str(model.device),
+        "python_major_minor": f"{sys.version_info.major}.{sys.version_info.minor}",
         "torch_version": str(torch.__version__),
+        "sentence_transformers_version": version("sentence-transformers"),
         "cuda_available": bool(torch.cuda.is_available()),
         "cuda_device_name": (
             str(torch.cuda.get_device_name(0)) if torch.cuda.is_available() else None
@@ -234,6 +238,7 @@ def build_assertion_embedding_generation(
             "artifact_sha256": model_manifest["artifact_sha256"],
             "manifest_file_sha256": model_manifest_file_sha256,
             "dimension": model_manifest["dimension"],
+            "normalization": model_manifest["normalization"],
         },
         "projection": {
             "path": projection_path.name,

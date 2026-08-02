@@ -15,6 +15,7 @@ from apps_rg.fact_inventory.c03_skill_assertion_corpus import canonical_sha256
 
 QUERY_QREL_SCHEMA_VERSION = "apps_rg.c03_graph_embedding_query_qrels.v1"
 QUALIFICATION_SCHEMA_VERSION = "apps_rg.c03_graph_embedding_qualification.v1"
+DEFAULT_DIAGNOSTIC_KS: tuple[int, ...] = (10, 20, 50)
 
 QUALIFICATION_THRESHOLDS: dict[str, float | int] = {
     "retrieval_k": 100,
@@ -252,6 +253,60 @@ def _recall_metrics(
     )
 
 
+def ranking_diagnostics(
+    rankings: Mapping[str, Sequence[str]],
+    queries: Sequence[Mapping[str, Any]],
+    *,
+    ks: Sequence[int] = DEFAULT_DIAGNOSTIC_KS,
+) -> dict[str, dict[str, float | int]]:
+    """Return cutoff-sensitive recall, reciprocal-rank, and binary nDCG metrics."""
+
+    diagnostics: dict[str, dict[str, float | int]] = {}
+    for raw_k in sorted(set(int(value) for value in ks)):
+        if raw_k <= 0:
+            raise GraphEmbeddingQualificationError("diagnostic cutoffs must be positive")
+        recall, _ = _recall_metrics(rankings, queries, k=raw_k)
+        reciprocal_ranks: list[float] = []
+        normalized_gains: list[float] = []
+        for query in queries:
+            query_id = str(query.get("query_id") or "")
+            relevant = {
+                str(value) for value in query.get("relevant_assertion_ids") or []
+            }
+            top = list(rankings.get(query_id) or [])[:raw_k]
+            first_relevant_rank = next(
+                (rank for rank, candidate_id in enumerate(top, start=1) if candidate_id in relevant),
+                None,
+            )
+            reciprocal_ranks.append(
+                1.0 / first_relevant_rank if first_relevant_rank is not None else 0.0
+            )
+            observed_gain = math.fsum(
+                1.0 / math.log2(rank + 1)
+                for rank, candidate_id in enumerate(top, start=1)
+                if candidate_id in relevant
+            )
+            ideal_gain = math.fsum(
+                1.0 / math.log2(rank + 1)
+                for rank in range(1, min(len(relevant), raw_k) + 1)
+            )
+            normalized_gains.append(observed_gain / ideal_gain if ideal_gain else 0.0)
+        diagnostics[str(raw_k)] = {
+            **recall,
+            "mean_reciprocal_rank": (
+                math.fsum(reciprocal_ranks) / len(reciprocal_ranks)
+                if reciprocal_ranks
+                else 0.0
+            ),
+            "mean_ndcg_at_k": (
+                math.fsum(normalized_gains) / len(normalized_gains)
+                if normalized_gains
+                else 0.0
+            ),
+        }
+    return diagnostics
+
+
 def _validate_query_qrels(query_qrels: Mapping[str, Any]) -> bool:
     unsigned = dict(query_qrels)
     digest = str(unsigned.pop("query_qrel_sha256", ""))
@@ -386,6 +441,7 @@ def evaluate_graph_embedding_qualification(
     }
     k = int(thresholds["retrieval_k"])
     retrieval_metrics: dict[str, dict[str, float | int]] = {}
+    retrieval_diagnostics: dict[str, dict[str, dict[str, float | int]]] = {}
     per_query: dict[str, list[dict[str, Any]]] = {}
     for name, rankings in (
         ("exact", exact_rankings),
@@ -394,6 +450,7 @@ def evaluate_graph_embedding_qualification(
         ("hybrid", hybrid_rankings),
     ):
         retrieval_metrics[name], per_query[name] = _recall_metrics(rankings, queries, k=k)
+        retrieval_diagnostics[name] = ranking_diagnostics(rankings, queries)
 
     structural_metrics: dict[str, float | int] = {
         "authority_eligibility_accuracy": (
@@ -448,6 +505,7 @@ def evaluate_graph_embedding_qualification(
         "thresholds": dict(thresholds),
         "thresholds_sha256": canonical_sha256(dict(thresholds)),
         "retrieval_metrics": retrieval_metrics,
+        "retrieval_diagnostics": retrieval_diagnostics,
         "structural_metrics": structural_metrics,
         "per_query": per_query,
         "projection_issues": list(projection_issues),
@@ -459,10 +517,12 @@ def evaluate_graph_embedding_qualification(
 
 __all__ = [
     "GraphEmbeddingQualificationError",
+    "DEFAULT_DIAGNOSTIC_KS",
     "QUALIFICATION_SCHEMA_VERSION",
     "QUALIFICATION_THRESHOLDS",
     "QUERY_QREL_SCHEMA_VERSION",
     "evaluate_graph_embedding_qualification",
     "freeze_query_qrels",
+    "ranking_diagnostics",
     "reciprocal_rank_fusion",
 ]
