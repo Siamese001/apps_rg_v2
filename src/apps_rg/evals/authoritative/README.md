@@ -21,6 +21,12 @@ The principal APIs are:
 - `evaluate_authoritative_cluster_retrieval`: cluster-only candidate identities,
   exact graph/registry/corpus/model/projection/query/runtime bindings, a bounded
   production `top_k`, and completed QRELs. Wave 1 remains non-release-authorizing.
+- `build_cluster_qrel_prelabel_packet`: builds a deterministic blinded reviewer
+  packet plus a separately sealed identity/split manifest. It creates no labels,
+  QRELs, evaluation result, or release authority.
+- `validate_completed_cluster_qrel_reviews`: requires two distinct rostered human
+  reviewers and an independent rostered human adjudicator for every blinded
+  query/candidate item. Unknown or incomplete judgments are non-passing.
 - `evaluate_authoritative_grounding`: source bytes + graph paths + system
   claims + completed human truth.
 - `evaluate_authoritative_sections`: two rostered human reviews, one
