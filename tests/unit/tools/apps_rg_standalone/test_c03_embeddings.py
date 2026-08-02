@@ -10,6 +10,9 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.runtime.c0.graph_skill_embedding_allocation import (
+    GraphSkillEmbeddingAllocationError,
+)
 from tools.apps_rg_standalone import c03_embeddings
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -18,6 +21,23 @@ ACTIVE = ROOT / "artifacts/apps_rg/c03/graph_skill_embeddings"
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _historical_generation_payload(candidate: Path) -> dict[str, object]:
+    """Bypass only the intentionally stale graph binding for qualification tests."""
+    generation = json.loads(
+        (candidate / c03_embeddings.GENERATION_MANIFEST_NAME).read_bytes()
+    )
+    corpus_path = candidate / generation["assertion_corpus"]["path"]
+    model_path = candidate / generation["model"]["path"]
+    projection_path = candidate / generation["projection"]["path"]
+    return {
+        "generation": generation,
+        "generation_digest": generation["manifest_sha256"],
+        "corpus": json.loads(corpus_path.read_bytes()),
+        "referenced_paths": [corpus_path, model_path, projection_path],
+        "runtime_contract": c03_embeddings.verify_embedding_runtime_contract(ROOT),
+    }
 
 
 def test_script_bootstraps_src_without_preconfigured_pythonpath() -> None:
@@ -58,7 +78,9 @@ def test_standalone_source_paths_use_src_owned_inputs() -> None:
 
 
 @pytest.mark.parametrize("output", [ACTIVE, ACTIVE / "candidate"])
-def test_build_rejects_active_artifact_directory_before_model_load(output: Path) -> None:
+def test_build_rejects_active_artifact_directory_before_model_load(
+    output: Path,
+) -> None:
     with pytest.raises(
         c03_embeddings.StandaloneEmbeddingError,
         match="must not be the active artifact directory",
@@ -127,7 +149,9 @@ def test_build_passes_repository_root_and_src_inputs(
 
 
 def test_active_bundle_is_standalone_bound_and_regression_only() -> None:
-    generation = json.loads((ACTIVE / "graph_skill_embedding_manifest.json").read_bytes())
+    generation = json.loads(
+        (ACTIVE / "graph_skill_embedding_manifest.json").read_bytes()
+    )
     qualification = json.loads(
         (ACTIVE / "graph_embedding_qualification_manifest.json").read_bytes()
     )
@@ -136,9 +160,10 @@ def test_active_bundle_is_standalone_bound_and_regression_only() -> None:
     assert generation["base_resume"]["path"].startswith("src/apps_rg/")
     assert qualification["qualification_scope"] == "REGRESSION_ONLY"
     assert qualification["release_authorizing"] is False
-    assert qualification["embedding_generation_manifest_sha256"] == generation[
-        "manifest_sha256"
-    ]
+    assert (
+        qualification["embedding_generation_manifest_sha256"]
+        == generation["manifest_sha256"]
+    )
     assert generation["runtime_proof"]["sentence_transformers_version"] == "5.2.3"
     assert generation["runtime_proof"]["python_major_minor"] == "3.12"
     report = json.loads((ACTIVE / qualification["qualification"]["path"]).read_bytes())
@@ -161,7 +186,9 @@ def test_runtime_contract_pins_promoted_cuda_dependencies() -> None:
 def test_runtime_contract_rejects_cpu_proof() -> None:
     contract = c03_embeddings.verify_embedding_runtime_contract(ROOT)
 
-    with pytest.raises(c03_embeddings.StandaloneEmbeddingError, match="device mismatch"):
+    with pytest.raises(
+        c03_embeddings.StandaloneEmbeddingError, match="device mismatch"
+    ):
         c03_embeddings._validate_runtime_proof(
             contract,
             {
@@ -188,12 +215,14 @@ def test_active_activation_receipt_binds_current_manifests() -> None:
     receipt_digest = receipt.pop("activation_receipt_sha256")
     assert receipt_digest == receipt_ref["sha256"]
     assert receipt_digest == c03_embeddings.canonical_sha256(receipt)
-    assert receipt["active_generation_manifest_sha256"] == activation[
-        "active_generation_manifest_sha256"
-    ]
-    assert receipt["active_qualification_sha256"] == activation[
-        "active_qualification_sha256"
-    ]
+    assert (
+        receipt["active_generation_manifest_sha256"]
+        == activation["active_generation_manifest_sha256"]
+    )
+    assert (
+        receipt["active_qualification_sha256"]
+        == activation["active_qualification_sha256"]
+    )
     for key in ("generation_manifest", "qualification_manifest"):
         assert receipt[key] == activation[key]
         immutable_path = ACTIVE / receipt[key]["path"]
@@ -203,7 +232,7 @@ def test_active_activation_receipt_binds_current_manifests() -> None:
     assert receipt["graph_mutated"] is False
 
 
-def test_preflight_is_read_only_and_exactly_rehydrates_active_bundle() -> None:
+def test_preflight_is_read_only_and_rejects_stale_legacy_bundle() -> None:
     watched = [
         ACTIVE / "graph_skill_embedding_manifest.json",
         ACTIVE / "graph_embedding_qualification_manifest.json",
@@ -211,25 +240,25 @@ def test_preflight_is_read_only_and_exactly_rehydrates_active_bundle() -> None:
     ]
     before = {path: _sha256(path) for path in watched}
 
-    result = c03_embeddings.preflight(repository_root=ROOT)
+    with pytest.raises(
+        GraphSkillEmbeddingAllocationError,
+        match="graph file digest mismatch",
+    ):
+        c03_embeddings.preflight(repository_root=ROOT)
 
     after = {path: _sha256(path) for path in watched}
     assert before == after
-    assert result["status"] == "PASS"
-    assert result["vector_count"] == 198
-    assert result["dimension"] == 1024
-    assert result["release_authorizing"] is False
 
 
-def test_candidate_validator_accepts_active_bytes_but_activation_rejects_active_dir() -> None:
-    validated = c03_embeddings.validate_candidate_bundle(
-        repository_root=ROOT,
-        candidate_dir=ACTIVE,
-    )
-
-    assert validated["status"] == "PASS"
-    assert validated["qualification_scope"] == "REGRESSION_ONLY"
-    assert validated["release_authorizing"] is False
+def test_candidate_validator_rejects_stale_active_bytes_and_active_dir() -> None:
+    with pytest.raises(
+        c03_embeddings.StandaloneEmbeddingError,
+        match="graph digest mismatch",
+    ):
+        c03_embeddings.validate_candidate_bundle(
+            repository_root=ROOT,
+            candidate_dir=ACTIVE,
+        )
     with pytest.raises(
         c03_embeddings.StandaloneEmbeddingError,
         match="must differ from active directory",
@@ -240,9 +269,17 @@ def test_candidate_validator_accepts_active_bytes_but_activation_rejects_active_
         )
 
 
-def test_candidate_validator_rejects_release_authorizing_manifest(tmp_path: Path) -> None:
+def test_candidate_validator_rejects_release_authorizing_manifest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     candidate = tmp_path / "candidate"
     shutil.copytree(ACTIVE, candidate)
+    monkeypatch.setattr(
+        c03_embeddings,
+        "_load_generation",
+        lambda _root, generation_dir: _historical_generation_payload(generation_dir),
+    )
     manifest_path = candidate / "graph_embedding_qualification_manifest.json"
     manifest = json.loads(manifest_path.read_bytes())
     manifest["release_authorizing"] = True
@@ -260,9 +297,17 @@ def test_candidate_validator_rejects_release_authorizing_manifest(tmp_path: Path
         )
 
 
-def test_candidate_validator_cross_binds_report_to_query_qrels(tmp_path: Path) -> None:
+def test_candidate_validator_cross_binds_report_to_query_qrels(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     candidate = tmp_path / "candidate"
     shutil.copytree(ACTIVE, candidate)
+    monkeypatch.setattr(
+        c03_embeddings,
+        "_load_generation",
+        lambda _root, generation_dir: _historical_generation_payload(generation_dir),
+    )
     manifest_path = candidate / c03_embeddings.QUALIFICATION_MANIFEST_NAME
     manifest = json.loads(manifest_path.read_bytes())
     qrel_ref = manifest["query_qrels"]
@@ -288,7 +333,9 @@ def test_candidate_validator_cross_binds_report_to_query_qrels(tmp_path: Path) -
         )
 
 
-def test_candidate_validator_requires_canonical_standalone_sources(tmp_path: Path) -> None:
+def test_candidate_validator_requires_canonical_standalone_sources(
+    tmp_path: Path,
+) -> None:
     repository = tmp_path / "repo"
     repository.mkdir()
     candidate = repository / "candidate"
