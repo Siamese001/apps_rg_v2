@@ -241,7 +241,15 @@ def _validate_retrieval_query(query: Mapping[str, Any]) -> list[str]:
     if query.get("split") not in {"CALIBRATION", "HOLDOUT"}:
         reasons.append("SPLIT_INVALID")
     k_values = query.get("k_values")
-    if not isinstance(k_values, list) or k_values != [1, 3, 5, 10]:
+    if (
+        not isinstance(k_values, list)
+        or not k_values
+        or any(
+            not isinstance(value, int) or isinstance(value, bool) or value <= 0
+            for value in k_values
+        )
+        or k_values != sorted(set(k_values))
+    ):
         reasons.append("K_VALUES_INVALID")
     gate_k = query.get("gate_k")
     if not isinstance(gate_k, int) or isinstance(gate_k, bool) or gate_k <= 0 or gate_k > len(candidates):
@@ -395,7 +403,7 @@ def evaluate_retrieval_query(query: Mapping[str, Any], *, positive_floor: float 
     ]
 
     metrics: dict[str, Any] = {}
-    for k in (1, 3, 5, 10):
+    for k in query["k_values"]:
         metrics[f"recall_at_{k}"] = recall_at_k(ranked_ids, relevance, k, positive_floor=positive_floor)
         metrics[f"ndcg_at_{k}"] = ndcg_at_k(ranked_ids, relevance, k, ranks=ranks)
     metrics.update(
@@ -534,7 +542,15 @@ def evaluate_retrieval_gate(
         for name in metric_names
         if any(result["metrics"].get(name) is not None for result in valid_results)
     }
-    for k in (1, 3, 5, 10):
+    observed_k_values = sorted(
+        {
+            int(k)
+            for query in queries
+            for k in query.get("k_values", [])
+            if isinstance(k, int) and not isinstance(k, bool) and k > 0
+        }
+    )
+    for k in observed_k_values:
         relevant_total = 0
         recovered_total = 0
         for query, result in zip(queries, results):

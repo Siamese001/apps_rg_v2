@@ -66,6 +66,8 @@ def _build_query(
     universe: Mapping[str, Any],
     ranking: Mapping[str, Any],
     qrels: Mapping[str, Any],
+    *,
+    k_values: Sequence[int],
 ) -> tuple[dict[str, Any] | None, list[str]]:
     reasons: list[str] = []
     if not (
@@ -139,7 +141,7 @@ def _build_query(
             "candidate_count": len(expected_ids),
             "manifest_digest": "",
         },
-        "k_values": [1, 3, 5, 10],
+        "k_values": sorted(set(k_values)),
         "gate_k": ranking["gate_k"],
         "candidates": candidates,
         "query_digest": "",
@@ -152,6 +154,8 @@ def evaluate_authoritative_retrieval(
     *,
     authority_receipt_path: Any,
     expected_authority_file_sha256: str,
+    positive_floor: float = 2.0,
+    k_values: Sequence[int] = (1, 3, 5, 10),
 ) -> dict[str, Any]:
     """Compare system rankings with externally pinned candidate universes and QRELs."""
 
@@ -226,7 +230,12 @@ def evaluate_authoritative_retrieval(
                 )
             )
         try:
-            query, query_reasons = _build_query(universe, ranking, qrels)
+            query, query_reasons = _build_query(
+                universe,
+                ranking,
+                qrels,
+                k_values=k_values,
+            )
         except (KeyError, TypeError, ValueError):
             query, query_reasons = None, ["RETRIEVAL_ARTIFACT_CONTENT_INVALID"]
         reasons.extend(f"case[{index}]::{reason}" for reason in query_reasons)
@@ -239,7 +248,7 @@ def evaluate_authoritative_retrieval(
             }
     if reasons:
         return _unknown(reasons)
-    result = evaluate_retrieval_gate(queries)
+    result = evaluate_retrieval_gate(queries, positive_floor=positive_floor)
     return seal_record(
         {
             "schema_version": RECEIPT_SCHEMA,

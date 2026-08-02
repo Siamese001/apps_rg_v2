@@ -7,6 +7,7 @@ from .artifacts import (
     validate_authorized_reviewer,
     validate_pinned_record,
 )
+from .cluster_retrieval import evaluate_authoritative_cluster_retrieval
 from .manifest import seal_evaluation_manifest, validate_evaluation_manifest
 from .grounding import evaluate_authoritative_grounding
 from .retrieval import evaluate_authoritative_retrieval
@@ -19,6 +20,7 @@ from .validity import evaluate_authoritative_validity
 __all__ = [
     "file_sha256",
     "evaluate_authoritative_grounding",
+    "evaluate_authoritative_cluster_retrieval",
     "evaluate_authoritative_retrieval",
     "evaluate_authoritative_sections",
     "evaluate_authoritative_whole_resume",

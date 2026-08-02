@@ -18,6 +18,9 @@ The principal APIs are:
 
 - `evaluate_authoritative_retrieval`: independent universe + system ranking +
   completed QRELs.
+- `evaluate_authoritative_cluster_retrieval`: cluster-only candidate identities,
+  exact graph/registry/corpus/model/projection/query/runtime bindings, a bounded
+  production `top_k`, and completed QRELs. Wave 1 remains non-release-authorizing.
 - `evaluate_authoritative_grounding`: source bytes + graph paths + system
   claims + completed human truth.
 - `evaluate_authoritative_sections`: two rostered human reviews, one
@@ -65,11 +68,11 @@ python -m apps_rg.evals.authoritative evaluate \
   --output retrieval-receipt.json
 ```
 
-Supported lanes are `retrieval`, `grounding`, `sections`, `whole-resume`,
-`repeatability`, and `validity`. The request object uses the corresponding
-Python API keyword names. Paths to authority receipts remain filesystem paths;
-truth and system artifacts are embedded with their independently supplied
-expected digests.
+Supported lanes are `retrieval`, `cluster-retrieval`, `grounding`, `sections`,
+`whole-resume`, `repeatability`, and `validity`. The request object uses the
+corresponding Python API keyword names. Paths to authority receipts remain
+filesystem paths; truth and system artifacts are embedded with their
+independently supplied expected digests.
 
 ## CI
 
