@@ -749,6 +749,12 @@ def collect_canonical_graph_issues(ledger: dict[str, Any]) -> list[str]:
         )
 
         issues.extend(collect_graph_node_semantic_issues(ledger))
+    if graph_metadata.get("edge_semantic_contract_version"):
+        from apps_rg.fact_inventory.c03_graph_edge_semantic_hardening import (
+            collect_graph_edge_semantic_issues,
+        )
+
+        issues.extend(collect_graph_edge_semantic_issues(ledger))
     return issues
 
 

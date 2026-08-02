@@ -810,9 +810,19 @@ def collect_graph_node_semantic_issues(graph_payload: Mapping[str, Any]) -> list
     if marker.get("wave_id") != NODE_SEMANTIC_HARDENING_WAVE:
         marker_mismatches.append("wave_id")
     edge_digest = canonical_sha256(graph_payload.get("graph_edges") or [])
-    if marker.get("graph_edges_sha256_before") != edge_digest:
+    edge_marker = (
+        graph_metadata.get("edge_semantic_hardening")
+        if isinstance(graph_metadata, Mapping)
+        else None
+    )
+    expected_w1_edge_digest = (
+        str(edge_marker.get("source_graph_edges_sha256") or "")
+        if isinstance(edge_marker, Mapping)
+        else edge_digest
+    )
+    if marker.get("graph_edges_sha256_before") != expected_w1_edge_digest:
         marker_mismatches.append("graph_edges_sha256_before")
-    if marker.get("graph_edges_sha256_after") != edge_digest:
+    if marker.get("graph_edges_sha256_after") != expected_w1_edge_digest:
         marker_mismatches.append("graph_edges_sha256_after")
     if marker.get("production_promotion_authorized") is not False:
         marker_mismatches.append("production_promotion_authorized")
