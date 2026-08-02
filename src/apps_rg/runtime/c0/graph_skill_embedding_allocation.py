@@ -14,6 +14,7 @@ from apps_rg.fact_inventory.c03_skill_assertion_corpus import (
     canonical_sha256,
     validate_skill_assertion_corpus,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.graph_skill_embedding_projection import (
     GraphSkillEmbeddingContractError,
     GraphSkillEmbeddingIndex,
@@ -49,6 +50,8 @@ NARRATIVE_AUTHORITY_SECTIONS: Mapping[str, str] = {
 _ACTIVE_ARTIFACT_DIR = Path("artifacts/apps_rg/c03/graph_skill_embeddings")
 _ACTIVE_MANIFEST = "graph_skill_embedding_manifest.json"
 _QUALIFICATION_MANIFEST = "graph_embedding_qualification_manifest.json"
+_RUNTIME_CONTRACT = Path("tools/apps_rg_standalone/c03_embedding_runtime_contract.json")
+_REGRESSION_QUALIFICATION_SCOPE = "REGRESSION_ONLY"
 _TRUE_VALUES = frozenset({"1", "true", "yes", "on"})
 _FALSE_VALUES = frozenset({"0", "false", "no", "off", ""})
 
@@ -133,12 +136,78 @@ def graph_skill_embeddings_required() -> bool:
     )
 
 
+def _load_runtime_contract(repo_root: Path) -> dict[str, Any]:
+    path = (repo_root / _RUNTIME_CONTRACT).resolve()
+    contract = _load_json_object(path)
+    contract_sha256 = _assert_self_digest(
+        contract,
+        "contract_sha256",
+        label="embedding runtime contract",
+    )
+    packages = contract.get("packages")
+    model = contract.get("model")
+    if not isinstance(packages, Mapping) or not isinstance(model, Mapping):
+        raise GraphSkillEmbeddingAllocationError(
+            "embedding runtime contract package/model bindings are missing"
+        )
+    if (
+        contract.get("local_files_only") is not True
+        or contract.get("network_allowed") is not False
+        or contract.get("fallback_allowed") is not False
+    ):
+        raise GraphSkillEmbeddingAllocationError(
+            "embedding runtime contract weakens offline execution"
+        )
+    return {
+        "path": _RUNTIME_CONTRACT.as_posix(),
+        "contract_sha256": contract_sha256,
+        "python_major_minor": str(contract.get("python_major_minor") or ""),
+        "packages": dict(packages),
+        "promoted_device": str(contract.get("promoted_device") or ""),
+        "_model": dict(model),
+    }
+
+
+def _validate_runtime_proof(
+    runtime_proof: object,
+    *,
+    runtime_contract: Mapping[str, Any],
+    label: str,
+) -> None:
+    if not isinstance(runtime_proof, Mapping):
+        raise GraphSkillEmbeddingAllocationError(f"{label} runtime proof is missing")
+    if runtime_proof.get("python_major_minor") != runtime_contract.get(
+        "python_major_minor"
+    ):
+        raise GraphSkillEmbeddingAllocationError(f"{label} Python proof mismatch")
+    packages = runtime_contract.get("packages") or {}
+    if runtime_proof.get("torch_version") != packages.get("torch"):
+        raise GraphSkillEmbeddingAllocationError(f"{label} Torch proof mismatch")
+    if runtime_proof.get("sentence_transformers_version") != packages.get(
+        "sentence-transformers"
+    ):
+        raise GraphSkillEmbeddingAllocationError(
+            f"{label} Sentence Transformers proof mismatch"
+        )
+    promoted_device = str(runtime_contract.get("promoted_device") or "")
+    if runtime_proof.get("device") != promoted_device:
+        raise GraphSkillEmbeddingAllocationError(f"{label} device proof mismatch")
+    if promoted_device.startswith("cuda") and runtime_proof.get("cuda_available") is not True:
+        raise GraphSkillEmbeddingAllocationError(f"{label} CUDA proof is missing")
+    expected_dimension = int((runtime_contract.get("_model") or {}).get("dimension") or 0)
+    if int(runtime_proof.get("dimension") or 0) != expected_dimension:
+        raise GraphSkillEmbeddingAllocationError(f"{label} dimension proof mismatch")
+    if runtime_proof.get("fallback_used") is not False:
+        raise GraphSkillEmbeddingAllocationError(f"{label} used a fallback")
+
+
 def _validate_qualification_artifacts(
     artifact_dir: Path,
     *,
     embedding_manifest_sha256: str,
     corpus_sha256: str,
     graph_sha256: str,
+    runtime_contract: Mapping[str, Any],
 ) -> dict[str, Any]:
     manifest_path = artifact_dir / _QUALIFICATION_MANIFEST
     manifest = _load_json_object(manifest_path)
@@ -151,6 +220,14 @@ def _validate_qualification_artifacts(
         raise GraphSkillEmbeddingAllocationError("graph embedding qualification is not PASS")
     if manifest.get("completion_marker") != "GRAPH_EMBEDDINGS_QUALIFIED":
         raise GraphSkillEmbeddingAllocationError("graph embedding qualification marker is missing")
+    if manifest.get("qualification_scope") != _REGRESSION_QUALIFICATION_SCOPE:
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification scope is not regression-only"
+        )
+    if manifest.get("release_authorizing") is not False:
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification must be non-release-authorizing"
+        )
     if manifest.get("embedding_generation_manifest_sha256") != embedding_manifest_sha256:
         raise GraphSkillEmbeddingAllocationError(
             "qualification/embedding generation manifest digest mismatch"
@@ -180,6 +257,13 @@ def _validate_qualification_artifacts(
         loaded[key] = payload
 
     report = loaded["qualification"]
+    query_qrels = loaded["query_qrels"]
+    thresholds_payload = loaded["thresholds"]
+    thresholds = thresholds_payload.get("thresholds")
+    if not isinstance(thresholds, Mapping):
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification thresholds payload is malformed"
+        )
     if report.get("status") != "PASS" or report.get("failures") not in ([], None):
         raise GraphSkillEmbeddingAllocationError("graph embedding qualification report failed")
     if report.get("projection_issues") not in ([], None):
@@ -202,18 +286,55 @@ def _validate_qualification_artifacts(
         raise GraphSkillEmbeddingAllocationError(
             "qualification report permits network or embedding fallback"
         )
+    if report.get("qualification_scope") != _REGRESSION_QUALIFICATION_SCOPE:
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification report scope is not regression-only"
+        )
+    if report.get("release_authorizing") is not False:
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification report must be non-release-authorizing"
+        )
+    if report.get("query_qrel_sha256") != query_qrels.get("query_qrel_sha256"):
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification report/query QREL digest mismatch"
+        )
+    if report.get("thresholds") != dict(thresholds):
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification report/threshold payload mismatch"
+        )
+    if report.get("thresholds_sha256") != canonical_sha256(dict(thresholds)):
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification report threshold digest mismatch"
+        )
+    expected_runtime_contract = {
+        key: value
+        for key, value in runtime_contract.items()
+        if not str(key).startswith("_")
+    }
+    if report.get("runtime_contract") != expected_runtime_contract:
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification report runtime contract mismatch"
+        )
+    _validate_runtime_proof(
+        report.get("runtime_proof"),
+        runtime_contract=runtime_contract,
+        label="graph embedding qualification",
+    )
     return {
         "manifest_path": str(manifest_path),
         "manifest_file_sha256": _file_sha256(manifest_path),
         "manifest_sha256": manifest_sha256,
         "qualification_sha256": str(report.get("qualification_sha256") or ""),
         "status": "PASS",
+        "qualification_scope": _REGRESSION_QUALIFICATION_SCOPE,
+        "release_authorizing": False,
     }
 
 
 def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any]:
     """Validate the complete immutable graph/assertion/projection authority chain."""
     root = Path(repo_root).resolve()
+    runtime_contract = _load_runtime_contract(root)
     artifact_dir = (root / _ACTIVE_ARTIFACT_DIR).resolve()
     manifest_path = artifact_dir / _ACTIVE_MANIFEST
     manifest = _load_json_object(manifest_path)
@@ -226,14 +347,41 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
         raise GraphSkillEmbeddingAllocationError(
             "embedding generation manifest permits network or fallback"
         )
+    _validate_runtime_proof(
+        manifest.get("runtime_proof"),
+        runtime_contract=runtime_contract,
+        label="embedding generation",
+    )
 
     source_payloads: dict[str, dict[str, Any]] = {}
     source_paths: dict[str, Path] = {}
+    canonical_source_paths = {
+        "graph": resolve_apps_rg_path(
+            root,
+            "fact_inventory",
+            "master_skills_arsenal_ledger.json",
+        ).resolve(),
+        "candidate_fact_ledger": (
+            root
+            / "artifacts/apps_rg/fact_inventory/"
+            "master_candidate_skills_fact_ledger_20260518T1100Z.json"
+        ).resolve(),
+        "base_resume": resolve_apps_rg_path(
+            root,
+            "resume",
+            "base",
+            "amit_ayer_base_resume_v1.json",
+        ).resolve(),
+    }
     for key in ("graph", "candidate_fact_ledger", "base_resume"):
         ref = manifest.get(key)
         if not isinstance(ref, Mapping):
             raise GraphSkillEmbeddingAllocationError(f"embedding manifest lacks {key} binding")
         path = _resolve_within(root, str(ref.get("path") or ""), label=key)
+        if path != canonical_source_paths[key]:
+            raise GraphSkillEmbeddingAllocationError(
+                f"{key} does not bind the canonical repository source"
+            )
         _assert_file_digest(path, str(ref.get("file_sha256") or ""), label=key)
         payload = _load_json_object(path)
         if canonical_sha256(payload) != str(ref.get("canonical_sha256") or ""):
@@ -299,9 +447,13 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
         expected=str(model_ref.get("artifact_sha256") or ""),
         label="model manifest",
     )
-    for field in ("model_id", "revision", "dimension"):
+    for field in ("model_id", "revision", "dimension", "normalization"):
         if model_manifest.get(field) != model_ref.get(field):
             raise GraphSkillEmbeddingAllocationError(f"model {field} binding mismatch")
+        if model_manifest.get(field) != runtime_contract["_model"].get(field):
+            raise GraphSkillEmbeddingAllocationError(
+                f"model {field} does not match embedding runtime contract"
+            )
 
     projection_ref = manifest.get("projection")
     if not isinstance(projection_ref, Mapping):
@@ -353,6 +505,7 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
         embedding_manifest_sha256=manifest_sha256,
         corpus_sha256=corpus_sha256,
         graph_sha256=graph_sha256,
+        runtime_contract=runtime_contract,
     )
 
     return {
@@ -386,7 +539,14 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
             projection_ref.get("generation_sha256") or ""
         ),
         "qualification_status": qualification["status"],
+        "qualification_scope": qualification["qualification_scope"],
+        "release_authorizing": qualification["release_authorizing"],
         "qualification": qualification,
+        "runtime_contract": {
+            key: value
+            for key, value in runtime_contract.items()
+            if not str(key).startswith("_")
+        },
         "projection_read_only": True,
         "network_used": False,
         "fallback_used": False,
@@ -414,6 +574,14 @@ def _authority_pins(authority: Mapping[str, Any]) -> dict[str, Any]:
         "model_artifact_sha256": str(authority.get("model_artifact_sha256") or ""),
         "qualification_sha256": str(
             (authority.get("qualification") or {}).get("qualification_sha256") or ""
+        ),
+        "qualification_scope": str(authority.get("qualification_scope") or ""),
+        "release_authorizing": authority.get("release_authorizing") is True,
+        "runtime_contract_sha256": str(
+            (authority.get("runtime_contract") or {}).get("contract_sha256") or ""
+        ),
+        "runtime_contract_packages": dict(
+            (authority.get("runtime_contract") or {}).get("packages") or {}
         ),
     }
 
@@ -473,6 +641,13 @@ def build_whole_resume_graph_embedding_candidates(
         raise GraphSkillEmbeddingAllocationError(
             f"{GRAPH_SKILL_EMBEDDING_DEVICE_ENV} must be set for mandatory graph embeddings"
         )
+    runtime_contract = authority["runtime_contract"]
+    promoted_device = str(runtime_contract.get("promoted_device") or "")
+    if resolved_device != promoted_device:
+        raise GraphSkillEmbeddingAllocationError(
+            f"mandatory graph embedding device mismatch: expected {promoted_device}, "
+            f"observed {resolved_device}"
+        )
 
     query_texts = [
         _query_text(
@@ -495,10 +670,15 @@ def build_whole_resume_graph_embedding_candidates(
         raise GraphSkillEmbeddingAllocationError(
             f"mandatory BGE-M3 query encoding failed: {exc}"
         ) from exc
-    if runtime_proof.get("fallback_used") is not False:
-        raise GraphSkillEmbeddingAllocationError("BGE-M3 query encoding used a fallback")
-    if int(runtime_proof.get("dimension") or 0) != int(authority["model_dimension"]):
-        raise GraphSkillEmbeddingAllocationError("BGE-M3 query dimension mismatch")
+    live_runtime_contract = {
+        **runtime_contract,
+        "_model": {"dimension": authority["model_dimension"]},
+    }
+    _validate_runtime_proof(
+        runtime_proof,
+        runtime_contract=live_runtime_contract,
+        label="BGE-M3 query",
+    )
 
     projection_path = Path(str(authority["projection_path"]))
     projection_before = _file_sha256(projection_path)

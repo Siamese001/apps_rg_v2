@@ -8,6 +8,7 @@ from apps_rg.evals.c03_graph_embedding_qualification import (
     QUALIFICATION_THRESHOLDS,
     evaluate_graph_embedding_qualification,
     freeze_query_qrels,
+    ranking_diagnostics,
     reciprocal_rank_fusion,
 )
 from apps_rg.fact_inventory.c03_skill_assertion_corpus import canonical_sha256
@@ -102,6 +103,27 @@ def test_reciprocal_rank_fusion_is_deterministic() -> None:
     assert fused == ["skill_a", "skill_b"]
 
 
+def test_ranking_diagnostics_measure_realistic_cutoffs() -> None:
+    queries = [
+        {
+            "query_id": "role",
+            "relevant_assertion_ids": ["skill_a", "skill_c"],
+        }
+    ]
+
+    diagnostics = ranking_diagnostics(
+        {"role": ["skill_b", "skill_a", "skill_c"]},
+        queries,
+        ks=(1, 2, 3),
+    )
+
+    assert diagnostics["1"]["macro_recall_at_k"] == 0.0
+    assert diagnostics["2"]["macro_recall_at_k"] == 0.5
+    assert diagnostics["2"]["mean_reciprocal_rank"] == 0.5
+    assert diagnostics["3"]["macro_recall_at_k"] == 1.0
+    assert 0.0 < diagnostics["3"]["mean_ndcg_at_k"] < 1.0
+
+
 def test_qualification_requires_exact_authority_and_vector_parity() -> None:
     graph, corpus = _authority()
     query_qrels = {
@@ -146,6 +168,7 @@ def test_qualification_requires_exact_authority_and_vector_parity() -> None:
     )
 
     assert report["status"] == "PASS"
+    assert set(report["retrieval_diagnostics"]["dense"]) == {"10", "20", "50"}
     assert report["structural_metrics"] == {
         "authority_eligibility_accuracy": 1.0,
         "exact_path_accuracy": 1.0,

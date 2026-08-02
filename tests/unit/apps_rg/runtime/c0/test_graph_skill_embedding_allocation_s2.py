@@ -9,11 +9,13 @@ from apps_rg.runtime.c0.graph_skill_embedding_allocation import (
     ALL_EMBEDDING_LANES,
     GraphSkillEmbeddingAllocationError,
     build_lane_embedding_allowlists,
+    build_whole_resume_graph_embedding_candidates,
     graph_skill_embeddings_required,
     load_graph_skill_embedding_authority,
     load_lane_embedding_allowlists,
     write_graph_skill_embedding_runtime_bundle,
 )
+from apps_rg.runtime.c0 import graph_skill_embedding_allocation as embedding_allocation
 from apps_rg.runtime.c0.resume_graph_allocation import (
     ALLOCATION_PLAN_ENV,
     SECTION_EVIDENCE_CONTRACTS_ENV,
@@ -64,6 +66,82 @@ def test_requirement_flag_is_explicit_and_fail_closed(
         graph_skill_embeddings_required()
 
 
+def test_mandatory_runtime_rejects_non_promoted_device_before_provider_call(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    model_path = tmp_path / "model"
+    model_path.mkdir()
+    model_manifest = {"artifact_sha256": "m" * 64}
+    monkeypatch.setattr(
+        embedding_allocation,
+        "load_graph_skill_embedding_authority",
+        lambda _root: {
+            "_model_manifest": model_manifest,
+            "runtime_contract": {
+                "promoted_device": "cuda:0",
+                "packages": {
+                    "torch": "2.12.0.dev20260228+cu128",
+                    "sentence-transformers": "5.2.3",
+                },
+            },
+        },
+    )
+    monkeypatch.setattr(
+        "apps_rg.fact_inventory.c03_skill_embedding_builder.build_local_model_manifest",
+        lambda _path: model_manifest,
+    )
+    provider_called = False
+
+    def fail_if_called(*_args: object, **_kwargs: object) -> tuple[dict, list]:
+        nonlocal provider_called
+        provider_called = True
+        raise AssertionError("provider must not run")
+
+    monkeypatch.setattr(
+        "apps_rg.fact_inventory.c03_skill_embedding_builder.encode_bge_m3",
+        fail_if_called,
+    )
+
+    with pytest.raises(GraphSkillEmbeddingAllocationError, match="device mismatch"):
+        build_whole_resume_graph_embedding_candidates(
+            repo_root=tmp_path,
+            target_company="Example",
+            target_role="VP AI",
+            jd_text="AI transformation",
+            briefing_text="regulated cloud",
+            model_path=model_path,
+            device="cpu",
+        )
+
+    assert provider_called is False
+
+
+def test_stored_runtime_proof_rejects_non_promoted_device() -> None:
+    with pytest.raises(GraphSkillEmbeddingAllocationError, match="device proof mismatch"):
+        embedding_allocation._validate_runtime_proof(
+            {
+                "python_major_minor": "3.12",
+                "torch_version": "2.12.0.dev20260228+cu128",
+                "sentence_transformers_version": "5.2.3",
+                "device": "cpu",
+                "cuda_available": True,
+                "dimension": 1024,
+                "fallback_used": False,
+            },
+            runtime_contract={
+                "python_major_minor": "3.12",
+                "packages": {
+                    "torch": "2.12.0.dev20260228+cu128",
+                    "sentence-transformers": "5.2.3",
+                },
+                "promoted_device": "cuda:0",
+                "_model": {"dimension": 1024},
+            },
+            label="test",
+        )
+
+
 def test_current_embedding_authority_is_exact_and_qualified() -> None:
     repo = Path(__file__).resolve().parents[5]
     authority = load_graph_skill_embedding_authority(repo)
@@ -82,6 +160,11 @@ def test_current_embedding_authority_is_exact_and_qualified() -> None:
         "38ccc2e093252ab0416eee16837c75c641f055b4f3def12091fba8ed94e2b263"
     )
     assert authority["qualification_status"] == "PASS"
+    assert authority["qualification_scope"] == "REGRESSION_ONLY"
+    assert authority["release_authorizing"] is False
+    assert authority["runtime_contract"]["contract_sha256"] == (
+        "ab2cacbff73801b52ab31a8f9016f3cec11e3e60551a16d4a2411cd6e2bb5c79"
+    )
     assert authority["assertion_count"] == 198
     assert authority["projection_read_only"] is True
 

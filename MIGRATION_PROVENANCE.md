@@ -99,3 +99,22 @@ surfaces. Qualification claims must use the authoritative APIs and provide the
 owner-pinned artifacts listed in
 `src/apps_rg/evals/MEASUREMENT_VALIDITY_PLAN.md`. No real labels, corpus
 qualification, or release authority are created by the implementation alone.
+
+## Standalone C0.3 embedding refreeze
+
+The initial transplant retained a valid historical BGE-M3 projection, but its
+active generation manifest still named monorepo paths under `apps_rg/**` while
+this repository owns those sources under `src/apps_rg/**`. The standalone
+operator in `tools/apps_rg_standalone/c03_embeddings.py` rebuilds and
+requalifies candidates against the standalone paths before replacing the
+active manifests. It does not restore the excluded monorepo `ops_scripts`
+surface or import `agentic_core`.
+
+The bundled seven-query qualification is explicitly `REGRESSION_ONLY` and
+non-release-authorizing. Authoritative empirical qualification remains bound
+to the independent human-QREL and source-evidence requirements in the
+measurement-validity plan.
+
+The standalone refreeze also binds the exact Python, Torch, Sentence
+Transformers, model revision, CUDA target, and offline/no-fallback requirements
+in `tools/apps_rg_standalone/c03_embedding_runtime_contract.json`.

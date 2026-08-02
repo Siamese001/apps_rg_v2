@@ -8,6 +8,8 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import resolve_apps_rg_path
+
 REPO_REL = Path("apps_rg") / "fact_inventory" / "master_skills_arsenal_ledger.json"
 
 REQUIRED_TOP_LEVEL: tuple[str, ...] = (
@@ -705,7 +707,11 @@ def _repo_root() -> Path:
 
 
 def default_arsenal_ledger_path(repo_root: Path | None = None) -> Path:
-    return (repo_root or _repo_root()) / REPO_REL
+    return resolve_apps_rg_path(
+        repo_root or _repo_root(),
+        "fact_inventory",
+        "master_skills_arsenal_ledger.json",
+    )
 
 
 def load_master_skills_arsenal_ledger(

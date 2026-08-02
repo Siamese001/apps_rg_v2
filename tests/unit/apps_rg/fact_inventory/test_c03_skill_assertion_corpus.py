@@ -11,6 +11,9 @@ from apps_rg.fact_inventory.c03_skill_assertion_corpus import (
     canonical_sha256,
     validate_skill_assertion_corpus,
 )
+from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
+    default_arsenal_ledger_path,
+)
 
 ROOT = Path(__file__).resolve().parents[4]
 
@@ -21,19 +24,25 @@ def _load(path: str) -> dict:
 
 def _corpus() -> tuple[dict, dict]:
     graph = reconcile_graph_authority(
-        _load("apps_rg/fact_inventory/master_skills_arsenal_ledger.json")
+        _load("src/apps_rg/fact_inventory/master_skills_arsenal_ledger.json")
     )
     facts = _load(
         "artifacts/apps_rg/fact_inventory/"
         "master_candidate_skills_fact_ledger_20260518T1100Z.json"
     )
-    resume = _load("apps_rg/resume/base/amit_ayer_base_resume_v1.json")
+    resume = _load("src/apps_rg/resume/base/amit_ayer_base_resume_v1.json")
     corpus = build_skill_assertion_corpus(
         graph_payload=graph,
         candidate_fact_payload=facts,
         base_resume_payload=resume,
     )
     return graph, corpus
+
+
+def test_default_graph_path_resolves_standalone_src_layout() -> None:
+    assert default_arsenal_ledger_path(ROOT) == (
+        ROOT / "src/apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+    )
 
 
 def test_corpus_has_one_assertion_per_eligible_skill_and_explicit_exclusions() -> None:
@@ -75,4 +84,3 @@ def test_corpus_is_deterministic_and_self_validating() -> None:
     unsigned = dict(first)
     digest = unsigned.pop("corpus_sha256")
     assert digest == canonical_sha256(unsigned)
-

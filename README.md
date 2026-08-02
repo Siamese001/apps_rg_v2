@@ -31,3 +31,43 @@ convergence sync and its single lint-only source difference.
 source-bound measurement remediation and remaining real-evidence gates;
 `src/apps_rg/evals/MEASUREMENT_VALIDITY_IMPLEMENTATION_RECEIPT.json` seals its
 code-only validation evidence.
+
+## C0.3 graph embeddings
+
+The canonical C0.3 ledger remains the only claim authority. Dense retrieval is
+a derived, read-only ranking surface: it returns assertion IDs and similarity,
+then rehydrates those IDs through the current graph, source facts, section
+authority, and allowlists before they can affect allocation.
+
+The standalone operator builds into an isolated candidate directory, performs
+offline regression qualification, and only then replaces the active manifests:
+
+```powershell
+$env:APPS_RG_EMBEDDING_MODEL_PATH = 'C:\path\to\bge-m3\snapshots\5617a9f61b028005a4858fdac845db406aefb181'
+$env:APPS_RG_GRAPH_SKILL_EMBEDDING_DEVICE = 'cuda:0'
+$candidate = '.runtime\c03-embedding-candidate'
+$qrels = 'artifacts\apps_rg\c03\graph_skill_embeddings\graph_embedding_query_qrels.08f8865fcf693606fb0ee1d1cfff9b7c63ffef2dc2e7eef4ec4e5ee96340ba85.json'
+
+python tools\apps_rg_standalone\c03_embeddings.py rebuild `
+  --candidate-dir $candidate `
+  --query-qrels $qrels `
+  --activate
+
+python tools\apps_rg_standalone\c03_embeddings.py preflight
+python tools\apps_rg_standalone\c03_embeddings.py smoke `
+  --query 'regulated insurance AI transformation and cloud modernization' `
+  --section competencies `
+  --k 10
+```
+
+`tools/apps_rg_standalone/c03_embedding_runtime_contract.json` pins the
+promoted Python 3.12, Torch `2.12.0.dev20260228+cu128`, Sentence Transformers
+`5.2.3`, BGE-M3 revision, and offline/no-fallback rules. `preflight`, `build`,
+`qualify`, and `smoke` fail closed when that runtime contract is not satisfied.
+
+Set `APPS_RG_GRAPH_SKILL_EMBEDDINGS_REQUIRED=true` only for an explicit shadow
+or governed runtime run. It remains false by default. The bundled seven-query
+QREL artifact supports `REGRESSION_ONLY` qualification; it does not create
+human labels or authorize release. Empirical promotion still requires the
+externally pinned candidate universe, full ranking, two authorized reviewers,
+and adjudication described by `src/apps_rg/evals/MEASUREMENT_VALIDITY_PLAN.md`.
