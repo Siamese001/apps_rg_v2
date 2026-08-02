@@ -6,9 +6,11 @@ Sanity tests (pass today) prove divergence is transport/packet, not _make_model_
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
+
 import pytest
+
+from apps_rg.repository_layout import resolve_repository_path
 
 from apps_rg.runtime.judges.executive_summary_judge_packet import (
     REQUIRED_JUDGE_OUTPUT_SCHEMA,
@@ -462,12 +464,27 @@ def test_rollup_and_operator_tools_do_not_restore_anthropic_proof_slot() -> None
     forbidden_panel = ",".join(("gemini_pro", "openai_chatgpt", "anthropic_claude"))
     forbidden_rollup_column = "anthropic" + "_provider_status"
     checked = (
-        _REPO / "apps_rg/runtime/internal/generated_lane_rollup.py",
-        _REPO / "apps_rg/l2_recipe/modular_resume_generation.py",
-        _REPO / "tools/apps_rg/audit_blocked_lanes.py",
-        _REPO / "tools/apps_rg/emit_regenerated_lane_matrix.py",
+        "apps_rg/runtime/internal/generated_lane_rollup.py",
+        "apps_rg/l2_recipe/modular_resume_generation.py",
     )
-    for path in checked:
+    for ref in checked:
+        path = resolve_repository_path(_REPO, ref)
         text = path.read_text(encoding="utf-8")
         assert forbidden_panel not in text
         assert forbidden_rollup_column not in text
+
+
+@pytest.mark.parametrize(
+    "ref",
+    (
+        "tools/apps_rg/audit_blocked_lanes.py",
+        "tools/apps_rg/emit_regenerated_lane_matrix.py",
+    ),
+)
+def test_optional_operator_tools_do_not_restore_anthropic_proof_slot(ref: str) -> None:
+    path = _REPO / ref
+    if not path.is_file():
+        pytest.skip(f"standalone source baseline excludes monorepo operator tool: {ref}")
+    text = path.read_text(encoding="utf-8")
+    assert ",".join(("gemini_pro", "openai_chatgpt", "anthropic_claude")) not in text
+    assert "anthropic_provider_status" not in text

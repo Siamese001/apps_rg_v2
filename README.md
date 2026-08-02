@@ -65,9 +65,13 @@ promoted Python 3.12, Torch `2.12.0.dev20260228+cu128`, Sentence Transformers
 `5.2.3`, BGE-M3 revision, and offline/no-fallback rules. `preflight`, `build`,
 `qualify`, and `smoke` fail closed when that runtime contract is not satisfied.
 
-Set `APPS_RG_GRAPH_SKILL_EMBEDDINGS_REQUIRED=true` only for an explicit shadow
-or governed runtime run. It remains false by default. The bundled seven-query
-QREL artifact supports `REGRESSION_ONLY` qualification; it does not create
-human labels or authorize release. Empirical promotion still requires the
+Set `APPS_RG_GRAPH_SKILL_EMBEDDINGS_REQUIRED=true` only for a controlled
+non-production embedding-treatment run. It remains false by default and is not
+a production activation. The bundled seven-query QREL artifact supports
+`REGRESSION_ONLY` qualification; it does not create human labels or authorize
+release. Empirical promotion still requires the
 externally pinned candidate universe, full ranking, two authorized reviewers,
 and adjudication described by `src/apps_rg/evals/MEASUREMENT_VALIDITY_PLAN.md`.
+The exact production boundary, open gates, proposed `off|shadow|production`
+activation design, and canary/rollback requirements are recorded in
+[`C03_EMBEDDING_PRODUCTION_PROMOTION.md`](C03_EMBEDDING_PRODUCTION_PROMOTION.md).

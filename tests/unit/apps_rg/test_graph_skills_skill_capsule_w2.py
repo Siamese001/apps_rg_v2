@@ -131,7 +131,7 @@ def test_compiled_prompt_contains_skill_phrase_capsule_marker(section_id: str) -
         "run_id": f"w2_{section_id}",
         "target_title": "SVP IT Strategy & Innovation",
         "target_company": "Brown & Brown",
-        "jd_text": (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(encoding="utf-8"),
+        "jd_text": (REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(encoding="utf-8"),
         "briefing": "Enterprise IT strategy targeting.",
         "proof_pool_metadata": meta,
         "allowed_fact_ids": ["bul_unify_001"],

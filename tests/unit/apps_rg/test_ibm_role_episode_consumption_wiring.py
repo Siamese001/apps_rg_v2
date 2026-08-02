@@ -1,14 +1,17 @@
 """IBM role episode consumption wiring — C0, proof pool, config, and X2 guards."""
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
 import yaml
 
+from apps_rg.repository_layout import resolve_apps_rg_path
+
 REPO = Path(__file__).resolve().parents[3]
-PROFILE_PATH = REPO / "apps_rg" / "config" / "domain_contract" / "section_retrieval_profile.yaml"
+PROFILE_PATH = resolve_apps_rg_path(
+    REPO, "config", "domain_contract", "section_retrieval_profile.yaml"
+)
 
 
 def _section_profiles(section_id: str) -> list[dict]:

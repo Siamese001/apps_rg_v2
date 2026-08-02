@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
 from apps_rg.runtime.sections.section_product_shape_ssot import (
     all_generated_lane_shapes,
@@ -32,7 +33,9 @@ def test_product_shape_required_gates_subset_of_lane_critical(lane: str) -> None
 @pytest.mark.parametrize("lane", list(GENERATED_LANES))
 def test_product_shape_template_ref_exists(lane: str) -> None:
     shape = section_product_shape(lane)
-    path = REPO_ROOT / shape.template_ref
+    logical = Path(shape.template_ref)
+    assert logical.parts and logical.parts[0] == "apps_rg", shape.template_ref
+    path = resolve_apps_rg_path(REPO_ROOT, *logical.parts[1:])
     assert path.is_file(), f"{lane} template missing: {shape.template_ref}"
 
 

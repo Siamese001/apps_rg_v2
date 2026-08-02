@@ -16,6 +16,7 @@ from apps_rg.runtime.providers.external_provider import ExternalProvider
 from apps_rg.runtime.providers.provider_contract import ProviderResult
 from apps_rg.runtime.providers.provider_gateway import ProviderProfile
 from apps_rg.runtime.section_model_limits import resolve_section_generation_model
+from apps_rg.repository_layout import resolve_apps_rg_path
 
 
 class _FakeGateway:
@@ -104,7 +105,9 @@ def test_legacy_bullet_lanes_pass_explicit_section_model_pin_to_section_request(
         "apps_rg/runtime/sections/unify_bullets_lane.py",
         "apps_rg/runtime/sections/ibm_bullets_lane.py",
     ):
-        source = (repo_root / lane_relpath).read_text(encoding="utf-8")
+        source = resolve_apps_rg_path(
+            repo_root, *Path(lane_relpath).parts[1:]
+        ).read_text(encoding="utf-8")
         assert "resolve_section_generation_model(LANE_KEY)" in source
         assert "external_openai_generation_model(section_id=LANE_KEY)" in source
         assert "model=section_model" in source

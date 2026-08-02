@@ -13,10 +13,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
+
 REPO_APPS_REL = Path("artifacts") / "apps_rg" / "fact_inventory" / (
     "master_candidate_skills_fact_ledger_20260518T1100Z.json"
 )
-TAXONOMY_REL = Path("apps_rg") / "config" / "domain_contract" / "master_role_family_taxonomy.yaml"
 
 REQUIRED_LEDGER_FACT_FIELDS: tuple[str, ...] = (
     "candidate_fact_id",
@@ -56,7 +57,7 @@ def jd_briefing_cannot_create_facts_note() -> str:
 
 
 def _repo_root_from_here() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return repository_root(Path(__file__))
 
 
 def default_ledger_path(repo_root: Path | None = None) -> Path:
@@ -66,7 +67,12 @@ def default_ledger_path(repo_root: Path | None = None) -> Path:
 
 def default_taxonomy_path(repo_root: Path | None = None) -> Path:
     root = repo_root or _repo_root_from_here()
-    return root / TAXONOMY_REL
+    return resolve_apps_rg_path(
+        root,
+        "config",
+        "domain_contract",
+        "master_role_family_taxonomy.yaml",
+    )
 
 
 def load_master_candidate_fact_ledger(

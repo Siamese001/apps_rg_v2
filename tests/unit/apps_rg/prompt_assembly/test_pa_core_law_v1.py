@@ -12,12 +12,12 @@ from apps_rg.prompt_assembly.pa_core_law import (
     load_pa_core_law_document,
     s0_truth_oath_reference_line,
 )
+from apps_rg.repository_layout import apps_rg_package_root
 
 REPO = Path(__file__).resolve().parents[4]
-CONTRACT_PATH = REPO / "apps_rg" / "prompt_assembly" / "pa_core_law_v1.yaml"
-TEMPLATE = (
-    REPO / "apps_rg" / "prompt_assembly" / "templates" / "executive_summary.generate_scratch_v1.yaml"
-)
+APP_ROOT = apps_rg_package_root(REPO)
+CONTRACT_PATH = APP_ROOT / "prompt_assembly" / "pa_core_law_v1.yaml"
+TEMPLATE = APP_ROOT / "prompt_assembly" / "templates" / "executive_summary.generate_scratch_v1.yaml"
 
 
 def test_pa_core_law_v1_file_loads_all_contract_ids():

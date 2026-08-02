@@ -30,8 +30,6 @@ def inspect_no_two_path_lane(artifact_dir: Path) -> dict[str, Any]:
     if not fec:
         fec = _load_json(artifact_dir / "final_evidence_contract.json")
     compiled = _load_json(artifact_dir / "compiled_prompt_artifact.json")
-    l2_pkt = _load_json(artifact_dir / "l2_execution_packet.json")
-    sealed = _load_json(artifact_dir / "sealed_l2_artifact.json")
     edr = _load_json(artifact_dir / "exit_disposition_receipt.json")
     exhaust = _load_json(artifact_dir / "runtime_exhaust_bundle.json")
     l6_handoff = _load_json(artifact_dir / "l6_shadow_handoff_receipt.json")
@@ -64,12 +62,14 @@ def inspect_no_two_path_lane(artifact_dir: Path) -> dict[str, Any]:
         or fec_receipt.get("raw_proof_pool_direct_to_pa")
     )
 
-    l2_refs_compiled_fec = (
-        l2_pkt.get("compiled_prompt_artifact_ref") == "compiled_prompt_artifact.json"
-        and bool(
-            l2_pkt.get("route_contract_ref") == "route_contract.json"
-            or compiled.get("fec_bridge_mode") == "section_fec_bridge"
-        )
+    chain_refs = {
+        str(row.get("check")): bool(row.get("ok"))
+        for row in chain.get("ref_checks", [])
+        if isinstance(row, dict)
+    }
+    l2_refs_compiled_fec = all(
+        chain_refs.get(name, False)
+        for name in ("l2_pkt_refs_route", "l2_pkt_refs_compiled")
     )
     exit_refs_sealed = edr.get("sealed_l2_artifact_ref") == "sealed_l2_artifact.json"
     exhaust_refs_exit = exhaust.get("exit_disposition_receipt_ref") == "exit_disposition_receipt.json"

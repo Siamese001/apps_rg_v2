@@ -4,11 +4,13 @@ import copy
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 
 import pytest
 import yaml
 
+from apps_rg.evals.c03_human_eval import _io as io_helpers
 from apps_rg.evals.c03_human_eval.split_policy import (
     PROOF_SPLIT_POLICY_ID,
     proof_split_for_digest,
@@ -31,8 +33,22 @@ from apps_rg.evals.resume_graph_evaluation import (
     reciprocal_rank,
     report_digest_is_valid,
 )
-from apps_rg.evals.receipt_validation import validate_artifact
+from apps_rg.evals.receipt_validation import CANONICAL_PROFILE, validate_artifact
 from apps_rg.evals.resume_graph_calibration import main
+
+
+def _symlink_or_skip(
+    alias: Path,
+    target: Path,
+    *,
+    target_is_directory: bool = False,
+) -> None:
+    try:
+        alias.symlink_to(target, target_is_directory=target_is_directory)
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip("Windows symlink privilege is unavailable")
+        raise
 
 
 def _profile(tmp_path: Path | None = None) -> dict:
@@ -1100,7 +1116,7 @@ def test_official_evaluator_rejects_dataset_symlink_before_reading(
     )
     actual.chmod(0o600)
     alias = tmp_path / "dataset-alias.jsonl"
-    alias.symlink_to(actual)
+    _symlink_or_skip(alias, actual)
     report = evaluate_file(alias, _profile())
     assert report["status"] == INSUFFICIENT
     assert "DATASET_PRIVACY_INVALID:must not be a symlink" in report["reasons"]
@@ -1148,6 +1164,22 @@ def _evaluate_dummy_official_inputs(inputs: dict[str, Path]) -> dict:
     )
 
 
+def test_official_evaluator_fails_closed_when_owner_security_is_unavailable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    inputs = _dummy_official_inputs(tmp_path)
+    monkeypatch.delattr(io_helpers.os, "getuid", raising=False)
+
+    report = _evaluate_dummy_official_inputs(inputs)
+
+    assert report["status"] == INSUFFICIENT
+    assert report["official_evidence_chain_validated"] is False
+    assert any(
+        "PLATFORM_SECURITY_UNSUPPORTED" in reason for reason in report["reasons"]
+    )
+
+
 @pytest.mark.parametrize(
     ("controlled_input", "reason_prefix"),
     [
@@ -1172,6 +1204,16 @@ def test_official_evaluator_rejects_controlled_inputs_inside_checkout(
     monkeypatch.setattr(
         "apps_rg.evals.resume_graph_evaluation.repo_root_from_module",
         lambda: checkout,
+    )
+    # This selector is about the checkout boundary.  Isolate it from the
+    # platform-specific owner/ACL capability, which has its own fail-closed test.
+    monkeypatch.setattr(
+        "apps_rg.evals.resume_graph_evaluation.private_path_error",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        "apps_rg.evals.resume_graph_evaluation._secure_private_file_bytes",
+        lambda path: Path(path).read_bytes(),
     )
     inputs = _dummy_official_inputs(tmp_path)
     destination = checkout / inputs[controlled_input].name
@@ -1203,7 +1245,7 @@ def test_official_evaluator_rejects_controlled_input_ancestor_symlinks(
     inputs = _dummy_official_inputs(tmp_path)
     controlled = tmp_path / "controlled"
     alias = tmp_path / "controlled-alias"
-    alias.symlink_to(controlled, target_is_directory=True)
+    _symlink_or_skip(alias, controlled, target_is_directory=True)
     inputs[controlled_input] = alias / inputs[controlled_input].relative_to(controlled)
     report = _evaluate_dummy_official_inputs(inputs)
     assert report["status"] == INSUFFICIENT
@@ -1226,6 +1268,7 @@ def test_official_evaluator_rejects_controlled_input_ancestor_symlinks(
 def test_official_evaluator_rejects_hardlinked_controlled_input_inodes(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    emulated_posix_private_paths: None,
     controlled_input: str,
     reason_prefix: str,
 ) -> None:
@@ -1292,7 +1335,7 @@ def test_official_evaluator_rejects_controlled_root_symlink_before_resolve(
     }
     target = inputs[aliased_input]
     alias = tmp_path / f"{aliased_input}-alias"
-    alias.symlink_to(target, target_is_directory=target.is_dir())
+    _symlink_or_skip(alias, target, target_is_directory=target.is_dir())
     inputs[aliased_input] = alias
     report = evaluate_file(
         dataset,
@@ -1380,7 +1423,9 @@ def test_evaluator_rejects_proof_retrieval_reviewer_cohort_overlap() -> None:
 
 
 def test_cli_materializes_prelabel_unknown_receipt_and_returns_nonpass(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    emulated_posix_private_paths: None,
 ) -> None:
     profile = _profile(tmp_path)
     profile_path = tmp_path / "profile.yaml"
@@ -1404,6 +1449,26 @@ def test_cli_materializes_prelabel_unknown_receipt_and_returns_nonpass(
     assert json.loads(capsys.readouterr().out)["status"] == UNKNOWN
 
 
+def test_cli_fails_closed_when_owner_security_is_unavailable(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = _profile(tmp_path)
+    profile_path = tmp_path / "profile.yaml"
+    profile_path.write_text(yaml.safe_dump(profile, sort_keys=True), encoding="utf-8")
+    monkeypatch.delattr(io_helpers.os, "getuid", raising=False)
+
+    assert main(["--profile", str(profile_path)]) == 2
+
+    result = json.loads(capsys.readouterr().out)
+    assert result["status"] == "INSUFFICIENT"
+    assert "PLATFORM_SECURITY_UNSUPPORTED" in result["error"]
+    assert not Path(profile["output"]["artifact_path"]).exists()
+    assert not Path(profile["output"]["protected_artifact_path"]).exists()
+
+
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="POSIX mode contract")
 def test_cli_protected_report_is_owner_only_under_permissive_umask(
     tmp_path: Path,
 ) -> None:
@@ -1466,12 +1531,7 @@ def test_ci_checker_rejects_canonical_profile_proof_split_policy_drift(
     artifact, receipt_sha, protected_sha = _write_sanitized_receipt(
         tmp_path, report, name="profile-policy-drift.json"
     )
-    canonical_profile = yaml.safe_load(
-        (
-            Path(__file__).resolve().parents[4]
-            / "apps_rg/config/domain_contract/resume_graph_evaluation_profile.yaml"
-        ).read_text(encoding="utf-8")
-    )
+    canonical_profile = yaml.safe_load(CANONICAL_PROFILE.read_text(encoding="utf-8"))
     canonical_profile["dataset"]["proof_split_policy_id"] = (
         "c03-proof-identity-stratified-sha256-v1"
     )
@@ -1516,12 +1576,7 @@ def test_forged_sanitized_pass_cannot_self_authorize_with_known_full_digest(
     tmp_path: Path,
 ) -> None:
     report = evaluate_rows(_valid_rows(), _profile(), allow_internal_rows=True)
-    canonical_profile = yaml.safe_load(
-        (
-            Path(__file__).resolve().parents[4]
-            / "apps_rg/config/domain_contract/resume_graph_evaluation_profile.yaml"
-        ).read_text(encoding="utf-8")
-    )
+    canonical_profile = yaml.safe_load(CANONICAL_PROFILE.read_text(encoding="utf-8"))
     report["profile_digest"] = canonical_digest(canonical_profile)
     report["evaluation_mode"] = "OFFICIAL"
     report["official_evidence_chain_validated"] = True
@@ -1552,12 +1607,7 @@ def test_pinned_pass_cannot_omit_canonical_metrics_or_release_gates(
     tmp_path: Path,
 ) -> None:
     report = evaluate_rows(_valid_rows(), _profile(), allow_internal_rows=True)
-    canonical_profile = yaml.safe_load(
-        (
-            Path(__file__).resolve().parents[4]
-            / "apps_rg/config/domain_contract/resume_graph_evaluation_profile.yaml"
-        ).read_text(encoding="utf-8")
-    )
+    canonical_profile = yaml.safe_load(CANONICAL_PROFILE.read_text(encoding="utf-8"))
     report["profile_digest"] = canonical_digest(canonical_profile)
     report["evaluation_id"] = canonical_profile["profile_id"]
     report["policy_version"] = canonical_profile["policy_version"]

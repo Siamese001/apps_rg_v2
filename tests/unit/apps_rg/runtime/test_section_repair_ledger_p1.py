@@ -271,17 +271,20 @@ def test_regen_with_authoritative_bump_allows_product_pass(
 
 def test_all_generated_lanes_have_repair_ledger_wiring() -> None:
     """Static guard: every generated lane must init section_repair_ledger."""
+    from apps_rg.repository_layout import apps_rg_package_root
+
     repo = Path(__file__).resolve().parents[4]
+    sections = apps_rg_package_root(repo) / "runtime" / "sections"
     checks = {
-        "headline": repo / "apps_rg/runtime/sections/headline_lane.py",
-        "executive_summary": repo / "apps_rg/runtime/sections/executive_summary_lane.py",
-        "competencies": repo / "apps_rg/runtime/sections/competencies_lane_execution.py",
-        "unify_bullets": repo / "apps_rg/runtime/sections/unify_bullets_lane.py",
-        "unify_narrative": repo / "apps_rg/runtime/sections/unify_narrative_lane.py",
-        "ibm_bullets": repo / "apps_rg/runtime/sections/ibm_bullets_lane.py",
+        "headline": sections / "headline_lane.py",
+        "executive_summary": sections / "executive_summary_lane.py",
+        "competencies": sections / "competencies_lane_execution.py",
+        "unify_bullets": sections / "unify_bullets_lane.py",
+        "unify_narrative": sections / "unify_narrative_lane.py",
+        "ibm_bullets": sections / "ibm_bullets_lane.py",
         "ibm_narrative": (
-            repo / "apps_rg/runtime/sections/ibm_narrative_lane_execution.py",
-            repo / "apps_rg/runtime/sections/ibm_narrative_lane_runtime.py",
+            sections / "ibm_narrative_lane_execution.py",
+            sections / "ibm_narrative_lane_runtime.py",
         ),
     }
     for section_id, paths in checks.items():

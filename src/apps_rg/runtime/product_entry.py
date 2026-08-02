@@ -87,24 +87,32 @@ def run_product_whole_run_from_primitives(
         run_whole_run_with_route_governance,
     )
 
-    os.environ["APPS_RG_WHOLE_RUN_ENVELOPE"] = "1"
-    result = run_whole_run_with_route_governance(
-        target_company=target_company,
-        target_role=target_role,
-        target_level=target_level,
-        jd=jd,
-        job_description_ref=job_description_ref,
-        job_description_text=job_description_text,
-        manual_brief=manual_brief,
-        resume_path=resume_path,
-        source_resume_text=source_resume_text,
-        generation_mode=generation_mode,
-        artifact_dir=str(art),
-        preflight_continuation_ref=str(
-            art / E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME
-        ),
-        require_fresh_preflight=True,
-    )
+    envelope_env = "APPS_RG_WHOLE_RUN_ENVELOPE"
+    prior_envelope = os.environ.get(envelope_env)
+    os.environ[envelope_env] = "1"
+    try:
+        result = run_whole_run_with_route_governance(
+            target_company=target_company,
+            target_role=target_role,
+            target_level=target_level,
+            jd=jd,
+            job_description_ref=job_description_ref,
+            job_description_text=job_description_text,
+            manual_brief=manual_brief,
+            resume_path=resume_path,
+            source_resume_text=source_resume_text,
+            generation_mode=generation_mode,
+            artifact_dir=str(art),
+            preflight_continuation_ref=str(
+                art / E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME
+            ),
+            require_fresh_preflight=True,
+        )
+    finally:
+        if prior_envelope is None:
+            os.environ.pop(envelope_env, None)
+        else:
+            os.environ[envelope_env] = prior_envelope
     result["authority_contract_id"] = "apps_research_rg_e2e_authority"
     return result
 

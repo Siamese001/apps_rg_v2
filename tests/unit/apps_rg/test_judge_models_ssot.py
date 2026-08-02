@@ -6,13 +6,16 @@ from pathlib import Path
 
 import yaml
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.judges.section_judge_profile import (
     SectionJudgeProfileSSOTError,
     _ENHANCED_PROFILE,
     _STANDARD_PROFILE,
 )
 
-_YAML = Path(__file__).resolve().parents[3] / "apps_rg" / "config" / "provider_profiles.yaml"
+_YAML = resolve_apps_rg_path(
+    Path(__file__).resolve().parents[3], "config", "provider_profiles.yaml"
+)
 
 
 def _judge_models() -> dict:

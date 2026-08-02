@@ -14,7 +14,6 @@ from apps_rg.runtime.validators.companion_bullet_finalization import (
 from apps_rg.runtime.validators.ibm_bullets_x2 import IBM_BULLET_IDS
 from apps_rg.runtime.validators.unify_bullets_x2 import UNIFY_BULLET_IDS
 from tests.unit.apps_rg.section_rigor.unify_ibm_lane_fixtures import (
-    REPO,
     companion_bullets_l2_fixture,
     gate_results_map,
     ibm_bullets_parsed_from_mock,
@@ -141,22 +140,18 @@ def test_load_companion_unify_from_latest_successful_pointer(tmp_path: Path, mon
         MODULAR_R4_SECTIONS_ROOT_ENV,
         finalize_runtime_proof_run,
     )
-    from apps_rg.runtime.sections.unify_narrative_lane import load_companion_unify_bullets_context
+    import apps_rg.runtime.sections.unify_narrative_lane as unify_narrative_lane
     from apps_rg.runtime.sections_root_manifest import emit_sections_root_manifest
 
     monkeypatch.delenv("APPS_RG_TEST_HARNESS", raising=False)
     parsed, _allowed = unify_bullets_parsed_from_mock()
-    msr = (
-        REPO
-        / "artifacts"
-        / "apps_rg"
-        / "runtime_proofs"
-        / "contract_harness"
-        / "_test_companion_chain_unify_modular"
-    )
+    repo_root = tmp_path / "r"
+    repo_root.mkdir()
+    monkeypatch.setattr(unify_narrative_lane, "REPO_ROOT", repo_root)
+    msr = repo_root / "sections"
     msr.mkdir(parents=True, exist_ok=True)
     emit_sections_root_manifest(
-        repo_root=REPO,
+        repo_root=repo_root,
         sections_root_abs=msr,
         source_env_literal=MODULAR_R4_SECTIONS_ROOT_ENV,
         correlation_id="test-companion-chain",
@@ -164,7 +159,7 @@ def test_load_companion_unify_from_latest_successful_pointer(tmp_path: Path, mon
         run_links_ref=None,
     )
     monkeypatch.setenv(MODULAR_R4_SECTIONS_ROOT_ENV, str(msr))
-    art = msr / "unify_bullets" / "real" / "unify_bullets_test_chain"
+    art = msr / "unify_bullets" / "real" / "r"
     art.mkdir(parents=True, exist_ok=True)
     l2 = {
         "section_id": "unify_bullets",
@@ -182,11 +177,11 @@ def test_load_companion_unify_from_latest_successful_pointer(tmp_path: Path, mon
         encoding="utf-8",
     )
     finalize_runtime_proof_run(
-        REPO,
+        repo_root,
         "unify_bullets",
         "external_claude",
         art,
-        run_id="unify_bullets_test_chain",
+        run_id="r",
         section_id="unify_bullets",
         runtime_generation_status="REAL_LLM",
         provider_requested="external_claude",
@@ -194,7 +189,7 @@ def test_load_companion_unify_from_latest_successful_pointer(tmp_path: Path, mon
     )
     ptr = msr / "unify_bullets" / LATEST_SUCCESSFUL_REAL_FILENAME
     assert ptr.is_file()
-    ctx = load_companion_unify_bullets_context()
+    ctx = unify_narrative_lane.load_companion_unify_bullets_context()
     assert ctx["status"] == ACCEPTED_FINALIZED_COMPANION_STATUS
     assert ctx["x3_code"] == "X3_REVIEW_JUDGE_PROVIDER_BLOCKED"
     assert len(ctx.get("bullet_ids") or []) == len(UNIFY_BULLET_IDS)

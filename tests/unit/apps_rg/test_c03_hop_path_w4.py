@@ -6,7 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from apps_rg.fact_inventory.track_weighted_graph_expansion import GRAPH_EXPANSION_MODE_TRACK_WEIGHTED
+from apps_rg.fact_inventory.track_weighted_graph_expansion import (
+    GRAPH_EXPANSION_MODE_TRACK_WEIGHTED,
+    TrackWeightedExpansionContractError,
+)
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.c03_graphrag_bound import build_section_c03_graphrag_bound
 from apps_rg.runtime.c0.c03_hop_path_materialization import (
     GraphHopPathAllowlistError,
@@ -21,12 +25,17 @@ from apps_rg.runtime.section_spine_terminology import (
 )
 from apps_rg.runtime.spine.c0_graph_lane_receipt import build_c0_graph_lane_receipt_from_bridge
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = repository_root(Path(__file__))
 
 
 @pytest.fixture
 def brown_jd() -> str:
-    path = REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
+    path = resolve_apps_rg_path(
+        REPO,
+        "config",
+        "targeting",
+        "brown_brown_svp_it_strategy_innovation_jd.txt",
+    )
     if not path.is_file():
         pytest.skip("Brown JD fixture missing")
     return path.read_text(encoding="utf-8")
@@ -73,7 +82,19 @@ def test_materialize_hop_paths_fails_when_allowed_ids_do_not_match() -> None:
         )
 
 
-def test_attach_hop_paths_updates_c03_bound_and_evidence() -> None:
+def test_attach_hop_paths_updates_c03_bound_and_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(
+        "APPS_RG_AUGMENTED_SKILLS_GRAPH_SQLITE_PATH",
+        str(tmp_path / "augmented_skills_graph.sqlite"),
+    )
+    receipt_dir = tmp_path / "c03_context_receipts"
+    monkeypatch.setenv(
+        "APPS_RG_C03_GRAPH_SQLITE_CONTEXT_RECEIPT_DIR",
+        str(receipt_dir),
+    )
     c03 = build_section_c03_graphrag_bound(
         section_id="executive_summary",
         graph={"graph_edges": []},
@@ -99,6 +120,7 @@ def test_attach_hop_paths_updates_c03_bound_and_evidence() -> None:
     assert bound.get("graph_hop_paths_count", 0) >= 1
     items = bound["final_evidence_contract_snapshot"]["evidence_items"]
     assert any(isinstance(it.get("graph_hop_path"), list) and it["graph_hop_path"] for it in items)
+    assert list(receipt_dir.glob("c03_graph_sqlite_context_*.json"))
 
 
 def test_incident_edge_when_no_track_hops() -> None:
@@ -128,44 +150,47 @@ def test_c0_graph_lane_receipt_from_bridge_includes_hop_paths() -> None:
     assert receipt["graph_hop_paths_count"] == 1
 
 
-def test_brown_exec_summary_pool_keeps_role_episode_bundle_fallback_non_proof(
+def test_brown_exec_summary_pool_fails_closed_for_unmapped_role_episode_seeds(
     brown_jd: str,
 ) -> None:
-    pool = resolve_section_proof_pool(
-        section="executive_summary",
-        target_company="Brown & Brown",
-        target_role="SVP IT Strategy & Innovation",
-        jd_text=brown_jd,
-        product_visible=False,
+    with pytest.raises(
+        TrackWeightedExpansionContractError,
+        match="seed_fact_ids have no matching track-weighted graph hop paths",
+    ):
+        resolve_section_proof_pool(
+            section="executive_summary",
+            target_company="Brown & Brown",
+            target_role="SVP IT Strategy & Innovation",
+            jd_text=brown_jd,
+            product_visible=False,
+        )
+
+
+def test_anthropic_exec_summary_pool_fails_closed_for_unmapped_role_episode_seeds() -> None:
+    jd_path = resolve_apps_rg_path(
+        REPO,
+        "config",
+        "targeting",
+        "anthropic_manager_applied_ai_architecture_partnerships_jd.txt",
+    )
+    briefing_path = (
+        REPO
+        / "tests"
+        / "fixtures"
+        / "apps_rg"
+        / "anthropic_manager_applied_ai_architecture_partnerships_briefing.md"
     )
 
-    meta = pool.proof_pool_metadata
-    assert meta["track_weighted_seed_fallback_used"] is True
-    assert meta["track_weighted_seed_namespace"] == "role_episode_bundle"
-    assert meta["track_weighted_hop_paths_attached_to_c03"] is False
-    assert (meta.get("graph_targeting_capsule") or {}).get("skill_ids")
-    assert (meta.get("c03_graphrag_bound") or {}).get("graph_hop_paths_count") == 0
-
-
-def test_anthropic_exec_summary_pool_falls_back_for_role_episode_bundle_seeds() -> None:
-    jd_path = REPO / "apps_rg/config/targeting/anthropic_manager_applied_ai_architecture_partnerships_jd.txt"
-    briefing_path = REPO / "artifacts/apps_research/runs/research-run-266d27c0bed5/briefing.md"
-    if not jd_path.is_file() or not briefing_path.is_file():
-        pytest.skip("Anthropic JD or briefing fixture missing")
-
-    pool = resolve_section_proof_pool(
-        section="executive_summary",
-        target_company="Anthropic",
-        target_role="Manager of Applied AI Architecture, Partnerships",
-        jd_text=jd_path.read_text(encoding="utf-8"),
-        briefing_text=briefing_path.read_text(encoding="utf-8"),
-        repo_root=REPO,
-        product_visible=False,
-    )
-
-    meta = pool.proof_pool_metadata
-    assert meta["track_weighted_seed_fallback_used"] is True
-    assert meta["track_weighted_seed_namespace"] == "role_episode_bundle"
-    assert meta["track_weighted_hop_paths_attached_to_c03"] is False
-    assert (meta.get("graph_targeting_capsule") or {}).get("skill_ids")
-    assert (meta.get("c03_graphrag_bound") or {}).get("graph_hop_paths_count") == 0
+    with pytest.raises(
+        TrackWeightedExpansionContractError,
+        match="seed_fact_ids have no matching track-weighted graph hop paths",
+    ):
+        resolve_section_proof_pool(
+            section="executive_summary",
+            target_company="Anthropic",
+            target_role="Manager of Applied AI Architecture, Partnerships",
+            jd_text=jd_path.read_text(encoding="utf-8"),
+            briefing_text=briefing_path.read_text(encoding="utf-8"),
+            repo_root=REPO,
+            product_visible=False,
+        )

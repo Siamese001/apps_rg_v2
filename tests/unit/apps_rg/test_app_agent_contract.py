@@ -7,8 +7,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-APPS_RG_ROOT = REPO_ROOT / "apps_rg"
+from apps_rg.repository_layout import apps_rg_package_root, repository_root
+
+REPO_ROOT = repository_root(Path(__file__))
+APPS_RG_ROOT = apps_rg_package_root(REPO_ROOT)
 
 
 def test_apps_rg_agent_contract_is_codex_owned() -> None:

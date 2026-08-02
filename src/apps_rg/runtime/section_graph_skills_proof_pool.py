@@ -5,10 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from apps_rg.fact_inventory.candidate_fact_ledger import (
-    load_master_candidate_fact_ledger,
-    load_master_role_family_taxonomy,
-)
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.graph_evidence_contract import SECTION_KEYS
 from apps_rg.runtime.sections.unify_bullets_graph_evidence import _UNIFY_METRIC_LEDGER_IDS
 
@@ -45,6 +42,207 @@ _ROLE_BUNDLE_FILE_BY_SECTION: dict[str, str] = {
     "ey_bullets": "ey_role_episode_bundles.json",
     "ey_narrative": "ey_role_episode_bundles.json",
 }
+
+_ROLE_EPISODE_SKILL_BINDING_SECTIONS: frozenset[str] = frozenset(
+    {
+        "unify_bullets",
+        "unify_narrative",
+        "ibm_bullets",
+        "ibm_narrative",
+        "insurtech_bullets",
+        "insurtech_narrative",
+        "ey_bullets",
+        "ey_narrative",
+    }
+)
+
+
+class GraphSkillSelectorBindingError(ValueError):
+    """Fail-closed selector/section-plan parity error with a stable receipt."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        section_id: str,
+        unsatisfied_constraint: str,
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.receipt = {
+            "schema": "graph_skill_selector_binding_failure_v1",
+            "section_id": section_id,
+            "unsatisfied_constraints": [unsatisfied_constraint],
+            "fail_closed": True,
+            **(details or {}),
+        }
+
+
+def bind_selector_selected_skills_to_section_plan(
+    plan: dict[str, Any],
+    *,
+    repo_root: Path,
+    section_id: str,
+    target_role: str,
+    jd_text: str,
+    briefing_text: str,
+) -> dict[str, Any]:
+    """Bind only graph-selector-authorized skills to exact role-episode roots.
+
+    Some older bullet allocations still preserve canonical surface slots and ledger
+    ranking, but section-only graph allocation requires root-bound ``selected_skills``.
+    Skill ids must never be inferred from those flat facts: the canonical graph role
+    episode selector is the authority, and every selected skill root must already be
+    present in the section plan.  A missing or mismatched root therefore blocks the
+    product path instead of being rebound heuristically.
+
+    The original selection identity and exact fact rows are retained for every
+    authority-passing root.  An over-inclusive role-bundle plan is narrowed before
+    C0.3 context construction so roots backed only by DRAFT skills never enter the
+    product allowlist.
+    """
+    if section_id not in _ROLE_EPISODE_SKILL_BINDING_SECTIONS:
+        return dict(plan)
+
+    from apps_rg.runtime.sections.graph_role_episode_selector import (
+        build_selected_graph_evidence_plan_for_section,
+    )
+
+    source_fact_count = sum(
+        1 for row in plan.get("facts") or [] if isinstance(row, dict)
+    )
+    selector_plan, _ordered, _allowed = build_selected_graph_evidence_plan_for_section(
+        repo_root=repo_root,
+        section_id=section_id,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+        limit=source_fact_count or None,
+    )
+    selector_skills = [
+        dict(row)
+        for row in selector_plan.get("selected_skills") or []
+        if isinstance(row, dict) and str(row.get("skill_id") or "").strip()
+    ]
+    if not selector_skills:
+        raise GraphSkillSelectorBindingError(
+            f"{section_id}: graph role-episode selector produced no selected skills",
+            section_id=section_id,
+            unsatisfied_constraint="selector_selected_skill_coverage",
+        )
+
+    fact_roots = {
+        str(row.get("role_episode_bundle_id") or "").strip()
+        for row in plan.get("facts") or []
+        if isinstance(row, dict)
+        and str(row.get("role_episode_bundle_id") or "").strip()
+    }
+    if not fact_roots:
+        raise GraphSkillSelectorBindingError(
+            f"{section_id}: section fact plan has no role_episode_bundle_id bindings; "
+            "selector-selected skills cannot be attached without inventing roots",
+            section_id=section_id,
+            unsatisfied_constraint="section_fact_role_episode_root_coverage",
+            details={
+                "selector_root_ids": sorted(
+                    str(row.get("role_episode_bundle_id") or "").strip()
+                    for row in selector_skills
+                    if str(row.get("role_episode_bundle_id") or "").strip()
+                ),
+                "section_fact_root_ids": [],
+            },
+        )
+
+    malformed_skill_ids = sorted(
+        {
+            str(row.get("skill_id") or "").strip()
+            for row in selector_skills
+            if not str(row.get("role_episode_bundle_id") or "").strip()
+        }
+    )
+    if malformed_skill_ids:
+        raise GraphSkillSelectorBindingError(
+            f"{section_id}: graph role-episode selector selected skills without roots: "
+            f"{malformed_skill_ids}",
+            section_id=section_id,
+            unsatisfied_constraint="selector_skill_role_episode_root_coverage",
+            details={"malformed_skill_ids": malformed_skill_ids},
+        )
+
+    selector_roots = {
+        str(row.get("role_episode_bundle_id") or "").strip()
+        for row in selector_skills
+    }
+    missing_roots = sorted(selector_roots - fact_roots)
+    if missing_roots:
+        raise GraphSkillSelectorBindingError(
+            f"{section_id}: selector-selected skill roots are absent from the section "
+            f"fact plan: {missing_roots}",
+            section_id=section_id,
+            unsatisfied_constraint="selector_root_section_fact_parity",
+            details={
+                "missing_section_fact_root_ids": missing_roots,
+                "selector_root_ids": sorted(selector_roots),
+                "section_fact_root_ids": sorted(fact_roots),
+            },
+        )
+
+    bound_facts = [
+        dict(row)
+        for row in plan.get("facts") or []
+        if isinstance(row, dict)
+        and str(row.get("role_episode_bundle_id") or "").strip() in selector_roots
+    ]
+    if not bound_facts:
+        raise GraphSkillSelectorBindingError(
+            f"{section_id}: selector-selected skills have no exact section fact rows",
+            section_id=section_id,
+            unsatisfied_constraint="selector_root_exact_fact_binding",
+            details={
+                "selector_root_ids": sorted(selector_roots),
+                "section_fact_root_ids": sorted(fact_roots),
+            },
+        )
+
+    # Carry the selector's complete authority/traversal receipts so the merged
+    # plan remains a canonical, digest-bound C0.3 plan.  The source plan then
+    # restores lane-facing identity fields (for example canonical slot ranking),
+    # while exact selector rows remain authoritative for graph selection.
+    out = dict(selector_plan)
+    out.update(plan)
+    out.pop("plan_id", None)
+    out.pop("plan_digest", None)
+    out["facts"] = bound_facts
+    out["required_fact_ids"] = [
+        str(row.get("fact_id") or "").strip()
+        for row in bound_facts
+        if str(row.get("fact_id") or "").strip()
+    ]
+    out["selected_skills"] = selector_skills
+    out["selected_skill_ids"] = list(
+        dict.fromkeys(str(row["skill_id"]) for row in selector_skills)
+    )
+    out["selected_skills_authority"] = {
+        "source": "graph_role_episode_selector",
+        "selector_plan_id": str(selector_plan.get("plan_id") or ""),
+        "selector_plan_digest": str(selector_plan.get("plan_digest") or ""),
+        "selector_selection_method": str(selector_plan.get("selection_method") or ""),
+        "selector_root_ids": sorted(selector_roots),
+        "source_fact_root_ids": sorted(fact_roots),
+        "source_required_fact_ids": [
+            str(value) for value in plan.get("required_fact_ids") or []
+        ],
+        "authority_narrowed_root_ids": sorted(fact_roots - selector_roots),
+        "skills_synthesized_from_facts": False,
+    }
+    out["selected_skills_source_authority_contract"] = dict(
+        selector_plan.get("source_authority_contract") or {}
+    )
+    from apps_rg.runtime.c0.c03_resume_graph_contracts import (
+        finalize_canonical_section_plan,
+    )
+
+    return finalize_canonical_section_plan(out)
 
 
 def _ledger_rows_matching_company_hints(ledger: dict[str, Any], hints: tuple[str, ...]) -> list[dict[str, Any]]:
@@ -106,7 +304,7 @@ def _role_episode_bundle_plan(
     bundle_file = _ROLE_BUNDLE_FILE_BY_SECTION.get(section_id)
     if not bundle_file:
         return None
-    path = repo_root / "apps_rg" / "fact_inventory" / bundle_file
+    path = resolve_apps_rg_path(repo_root, "fact_inventory", bundle_file)
     if not path.is_file():
         return None
     try:
@@ -498,11 +696,7 @@ def allocate_section_facts_from_graph_substrate(
     taxonomy_path: Path,
 ) -> tuple[dict[str, Any], list[str], set[str]]:
     """Role-targeted fact slice for graph-skills proof (substrate ledger is not skills authority)."""
-    from apps_rg.runtime.proof_pool_resolver import (
-        _sanitize_plan,
-        _slice_to_plan_fact,
-        _stamp_unify_canonical_bullet_ids,
-    )
+    from apps_rg.runtime.proof_pool_resolver import _sanitize_plan
 
     assert_graph_skills_section(section_id)
     if section_id == "competencies":
@@ -589,9 +783,11 @@ def allocate_section_facts_from_graph_substrate(
 
 
 __all__ = [
+    "GraphSkillSelectorBindingError",
     "GRAPH_SKILLS_AUTHORITY_SECTIONS",
     "allocate_section_facts_from_graph_substrate",
     "assert_graph_skills_section",
+    "bind_selector_selected_skills_to_section_plan",
     "_graph_ranked_ibm_bullets_plan",
     "_graph_ranked_unify_bullets_plan",
 ]

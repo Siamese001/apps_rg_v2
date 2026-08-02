@@ -6,6 +6,7 @@ import json
 import uuid
 from pathlib import Path
 from unittest.mock import patch
+from tests.helpers.standalone_repo_view import materialize_standalone_repo_view
 
 import pytest
 
@@ -15,7 +16,6 @@ from apps_rg.l2_recipe.modular_resume_generation import (
     run_modular_resume_generation,
 )
 from apps_rg.l2_recipe.steps import _phase1_allow_flag_from_recipe_context
-from apps_rg.runtime.locked_copy.locked_copy_manifest import find_repo_root
 from apps_rg.runtime.section_cli_defaults import resolve_phase1_lane_allow_non_allow_exit_zero
 
 
@@ -62,6 +62,7 @@ def test_resolve_phase1_lane_allow_denied_on_product_fail_closed(
 
 def test_phase1_dispatch_passes_lane_allow_when_harness_and_profile_intent(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setenv("APPS_RG_TEST_HARNESS", "1")
     captured: list[dict[str, object]] = []
@@ -70,8 +71,8 @@ def test_phase1_dispatch_passes_lane_allow_when_harness_and_profile_intent(
         captured.append(dict(kwargs))
         return {"exit_status": "success", "fault": ""}
 
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_allow_{uuid.uuid4().hex[:10]}"
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase1_allow_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
 
     with patch(
@@ -100,6 +101,7 @@ def test_phase1_dispatch_passes_lane_allow_when_harness_and_profile_intent(
 
 def test_phase1_dispatch_lane_allow_false_on_product_despite_profile_intent(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.delenv("APPS_RG_TEST_HARNESS", raising=False)
     monkeypatch.delenv("APPS_RG_ALLOW_PRODUCT_SHORTCUTS", raising=False)
@@ -110,8 +112,8 @@ def test_phase1_dispatch_lane_allow_false_on_product_despite_profile_intent(
         captured.append(dict(kwargs))
         return {"exit_status": "success", "fault": ""}
 
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_allow_{uuid.uuid4().hex[:10]}"
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase1_allow_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
 
     with patch(

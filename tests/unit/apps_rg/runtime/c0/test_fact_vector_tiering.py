@@ -1,9 +1,18 @@
 """W1 tier metadata tests for c0-grounded-fact-writeback-spine-4f8e2a."""
+# ruff: noqa: E402
 from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 import yaml
+
+REPO = Path(__file__).resolve().parents[5]
+if not (REPO / "ops_scripts" / "maintenance" / "backfill_fact_vectors_tier.py").is_file():
+    pytest.skip(
+        "the monorepo maintenance backfill tool is outside the standalone source boundary",
+        allow_module_level=True,
+    )
 
 from apps_rg.runtime.bindings.c0_binding import _metadata_match_for_chunk
 from apps_rg.runtime.c0.c02_fact_vector_ingest import chunk_to_chroma_document

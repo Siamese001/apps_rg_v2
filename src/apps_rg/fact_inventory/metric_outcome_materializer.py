@@ -34,6 +34,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import apps_rg_package_root
+
 #: Edge types introduced by W2.0. They do not collide with the canonical
 #: ledger taxonomy and are admitted through the projected signature authority.
 METRIC_OUTCOME_EDGE_TYPES: frozenset[str] = frozenset(
@@ -78,7 +80,7 @@ def _required_unique_string_list(
 
 def discover_role_episode_bundle_files(repo_root: Path) -> list[Path]:
     """Return all ``*_role_episode_bundles.json`` under ``apps_rg/fact_inventory/``."""
-    base = (repo_root / "apps_rg/fact_inventory").resolve()
+    base = (apps_rg_package_root(repo_root) / "fact_inventory").resolve()
     if not base.is_dir():
         return []
     return sorted(base.glob(ROLE_EPISODE_BUNDLE_GLOB))

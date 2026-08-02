@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from apps_rg.fact_inventory.track_weighted_graph_expansion import resolve_career_track_weights
 from apps_rg.runtime.graph_selection_rationale import (
     emit_graph_selection_rationale,
@@ -15,7 +13,7 @@ from apps_rg.runtime.graph_selection_rationale import (
 
 REPO = Path(__file__).resolve().parents[3]
 BROWN_JD = (
-    REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
+    REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
 ).read_text(encoding="utf-8")
 
 
@@ -74,3 +72,4 @@ def test_emit_rationale_fixture_executive_summary() -> None:
     assert payload["jd_subgraph_policy"]["jd_shapes_ranking_only"] is True
     assert payload["track_weight_audit"]["jd_boost_monotonic"] is True
     assert payload["neg1_all_selected_skills_have_fact_links"] is True
+    assert payload["graph_ref"] == "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"

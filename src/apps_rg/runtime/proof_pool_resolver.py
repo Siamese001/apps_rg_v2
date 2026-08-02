@@ -14,23 +14,22 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import repository_root
 from apps_rg.fact_inventory.candidate_fact_ledger import (
     default_ledger_path,
     default_taxonomy_path,
     load_master_candidate_fact_ledger,
     load_master_role_family_taxonomy,
 )
-from apps_rg.runtime.resume_resolution import ResumeResolutionError, load_lane_base_resume_json
+from apps_rg.runtime.resume_resolution import load_lane_base_resume_json
 from apps_rg.fact_inventory.augmented_skills_graph import (
     CLAIM_EVIDENCE_SOURCE_TYPE_AUGMENTED_SKILLS_GRAPH,
-    CLAIM_EVIDENCE_SOURCE_TYPE_BASE_RESUME,
     CLAIM_EVIDENCE_SOURCE_TYPE_CANDIDATE_FACT_LEDGER,
     claim_evidence_fields,
     load_augmented_skills_graph,
     merge_dual_source_proof_pool_metadata,
     resolve_augmented_skills_graph_authority,
 )
-from apps_rg.runtime.legacy_proof_sources import PROOF_SOURCE_BROAD_SKILLS_LEDGER
 from apps_rg.runtime.sections.graph_evidence_contract import (
     SECTION_KEYS,
     build_allowed_fact_ids_for_plan_facts,
@@ -49,7 +48,10 @@ def _merge_dual_source_metadata(
     claim_evidence: dict[str, Any],
 ) -> dict[str, Any]:
     """Attach explicit claim-evidence + skills-authority fields; never alias ledger as skills SSOT."""
-    skills = resolve_augmented_skills_graph_authority(repo_root=repo_root)
+    skills = _stable_graph_authority_refs(
+        resolve_augmented_skills_graph_authority(repo_root=repo_root),
+        repo_root=repo_root,
+    )
     return merge_dual_source_proof_pool_metadata(
         meta,
         claim_evidence=claim_evidence,
@@ -86,6 +88,41 @@ class SectionProofPool:
 def _sha256_hex(text: str | bytes) -> str:
     data = text.encode("utf-8") if isinstance(text, str) else text
     return hashlib.sha256(data).hexdigest()
+
+
+def _stable_logical_repo_ref(value: str | Path, *, repo_root: Path) -> str:
+    """Return receipt-facing refs without exposing standalone ``src/`` layout."""
+
+    path = Path(value)
+    if path.is_absolute():
+        try:
+            path = path.resolve().relative_to(repo_root.resolve())
+        except ValueError:
+            return str(path)
+    parts = path.parts
+    if len(parts) >= 2 and parts[0].casefold() == "src" and parts[1].casefold() == "apps_rg":
+        path = Path("apps_rg", *parts[2:])
+    return path.as_posix()
+
+
+def _stable_graph_authority_refs(
+    authority: dict[str, Any],
+    *,
+    repo_root: Path,
+) -> dict[str, Any]:
+    """Normalize graph authority refs while preserving the physical load root."""
+
+    normalized = dict(authority)
+    for key in (
+        "skills_authority_graph_ref",
+        "augmented_skills_graph_ref",
+        "graph_ref",
+        "legacy_skills_ledger_ref",
+    ):
+        value = normalized.get(key)
+        if value:
+            normalized[key] = _stable_logical_repo_ref(str(value), repo_root=repo_root)
+    return normalized
 
 
 def _maybe_apply_hybrid_informed_fact_plan_reorder(
@@ -287,18 +324,18 @@ def _resolve_executive_summary_graph_only_proof_pool(
     targeting: dict[str, bool],
 ) -> SectionProofPool:
     """Executive summary product proof: augmented skills graph + section graph binding shim only."""
-    graph_auth = resolve_augmented_skills_graph_authority(repo_root=root)
+    graph_auth = _stable_graph_authority_refs(
+        resolve_augmented_skills_graph_authority(repo_root=root),
+        repo_root=root,
+    )
     if str(graph_auth.get("skills_authority_status") or "") != "PASS":
         reason = graph_auth.get("skills_authority_block_reason") or "augmented_skills_graph_unavailable"
         raise ValueError(f"executive_summary graph-only authority BLOCKED: {reason}")
 
     ledger_path = _ledger_path_explicit(broad_skills_ledger_path, repo_root=root)
-    ledger_ref_str = (
-        str(ledger_path.relative_to(root)) if ledger_path.is_relative_to(root) else str(ledger_path)
-    )
+    ledger_ref_str = _stable_logical_repo_ref(ledger_path, repo_root=root)
     ledger = load_master_candidate_fact_ledger(path=ledger_path)
     taxonomy = load_master_role_family_taxonomy(repo_root=root)
-    tax_path = default_taxonomy_path(root)
     graph = load_augmented_skills_graph(repo_root=root)
     graph_ref = str(graph_auth.get("graph_ref") or "")
     graph_digest = str(graph_auth.get("graph_digest") or "")
@@ -540,17 +577,19 @@ def _resolve_generic_section_graph_skills_proof_pool(
     from apps_rg.runtime.c03_graphrag_bound import build_section_c03_graphrag_bound
     from apps_rg.runtime.section_graph_skills_proof_pool import (
         allocate_section_facts_from_graph_substrate,
+        bind_selector_selected_skills_to_section_plan,
     )
 
-    graph_auth = resolve_augmented_skills_graph_authority(repo_root=root)
+    graph_auth = _stable_graph_authority_refs(
+        resolve_augmented_skills_graph_authority(repo_root=root),
+        repo_root=root,
+    )
     if str(graph_auth.get("skills_authority_status") or "") != "PASS":
         reason = graph_auth.get("skills_authority_block_reason") or "augmented_skills_graph_unavailable"
         raise ValueError(f"{section_id} graph-skills proof pool BLOCKED: {reason}")
 
     ledger_path = default_ledger_path(root)
-    ledger_ref_str = (
-        str(ledger_path.relative_to(root)) if ledger_path.is_relative_to(root) else str(ledger_path)
-    )
+    ledger_ref_str = _stable_logical_repo_ref(ledger_path, repo_root=root)
     ledger = load_master_candidate_fact_ledger(path=ledger_path)
     taxonomy = load_master_role_family_taxonomy(repo_root=root)
     tax_path = default_taxonomy_path(root)
@@ -569,7 +608,16 @@ def _resolve_generic_section_graph_skills_proof_pool(
         ledger_path=ledger_path,
         taxonomy_path=tax_path,
     )
+    plan = bind_selector_selected_skills_to_section_plan(
+        plan,
+        repo_root=root,
+        section_id=section_id,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
     facts = list(plan.get("facts") or [])
+    ordered, allowed = build_allowed_fact_ids_for_plan_facts(facts)
     root_fact_ids = [str(f.get("fact_id") or "") for f in facts if f.get("fact_id")]
     bullet_rows = [plan_fact_to_employment_bullet_row(f) for f in facts]
 
@@ -722,7 +770,10 @@ def _resolve_competencies_graph_skills_proof_pool(
         build_competencies_graph_skills_proof_payload,
     )
 
-    graph_auth = resolve_augmented_skills_graph_authority(repo_root=root)
+    graph_auth = _stable_graph_authority_refs(
+        resolve_augmented_skills_graph_authority(repo_root=root),
+        repo_root=root,
+    )
     if str(graph_auth.get("skills_authority_status") or "") != "PASS":
         reason = graph_auth.get("skills_authority_block_reason") or "augmented_skills_graph_unavailable"
         raise ValueError(f"competencies graph-skills proof pool BLOCKED: {reason}")
@@ -752,12 +803,13 @@ def _resolve_competencies_graph_skills_proof_pool(
     ordered, allowed = build_allowed_fact_ids_for_plan_facts(facts)
     bullet_rows = [plan_fact_to_employment_bullet_row(f) for f in facts]
 
-    graph_ref = str(payload.get("graph_source") or graph_auth.get("graph_ref") or "")
+    graph_ref = _stable_logical_repo_ref(
+        str(payload.get("graph_source") or graph_auth.get("graph_ref") or ""),
+        repo_root=root,
+    )
     graph_digest = str(graph_auth.get("graph_digest") or "")
     ledger_path = default_ledger_path(root)
-    ledger_ref_str = (
-        str(ledger_path.relative_to(root)) if ledger_path.is_relative_to(root) else str(ledger_path)
-    )
+    ledger_ref_str = _stable_logical_repo_ref(ledger_path, repo_root=root)
     ledger = load_master_candidate_fact_ledger(path=ledger_path)
     ledger_digest = _sha256_hex(
         json.dumps(ledger, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
@@ -930,7 +982,7 @@ def resolve_section_proof_pool(
     )
     if section not in SECTION_KEYS:
         raise ValueError(f"unknown section: {section!r}")
-    root = repo_root or Path(__file__).resolve().parents[2]
+    root = repo_root or repository_root(Path(__file__))
     role_eff = str(target_role or target_title or "").strip()
     company_eff = str(target_company or "").strip()
     jd_eff = str(jd_text or "").strip()
@@ -941,22 +993,15 @@ def resolve_section_proof_pool(
     }
 
     resume_ref = str(base_resume_ref or "").strip() or None
-    try:
+    if resume_ref:
         base_dict, base_path, base_hash = load_lane_base_resume_json(
             source_resume_ref=resume_ref,
             repo_root=root,
         )
-    except ResumeResolutionError:
+    else:
         base_dict, base_path, base_hash = load_lane_base_resume_json(repo_root=root)
-    base_ref_str = str(base_path.relative_to(root)) if base_path.is_relative_to(root) else str(base_path)
+    base_ref_str = _stable_logical_repo_ref(base_path, repo_root=root)
     override_used = bool(resume_ref)
-
-    cand_ledger_default = default_ledger_path(root)
-    cand_ledger_ref = (
-        str(cand_ledger_default.relative_to(root))
-        if cand_ledger_default.is_relative_to(root)
-        else str(cand_ledger_default)
-    )
 
     from apps_rg.runtime.product_evidence_authority import (
         ProductEvidenceAuthorityError,

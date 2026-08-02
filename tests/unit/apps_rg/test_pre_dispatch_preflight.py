@@ -25,12 +25,13 @@ from apps_rg.runtime.section_cli_defaults import (
     CLI_PROVIDER_RESOLUTION_DEV_DEFAULT_EXTERNAL_CLAUDE,
     CLI_PROVIDER_RESOLUTION_DEV_DEFAULT_EXTERNAL_OPENAI,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
 from tests.unit.apps_research.test_apps_rg_handoff_canonical_exit import _record
 from tests.unit.apps_rg.section_rigor.unify_ibm_lane_fixtures import unify_bullets_parsed_from_mock
 
 REPO = Path(__file__).resolve().parents[3]
 _FRESH_JD = REPO / "tests" / "_fixtures" / "ci-probe-jd.txt"
-_DEFAULT_JD = REPO / "apps_rg" / "config" / "default_jd_targeting.txt"
+_DEFAULT_JD = resolve_apps_rg_path(REPO, "config", "default_jd_targeting.txt")
 
 
 def test_fresh_jd_fixture_passes() -> None:
@@ -134,7 +135,9 @@ def test_apps_research_handoff_receipts_written(tmp_path: Path) -> None:
 
 def test_strict_apps_research_handoff_blocks_static_json() -> None:
     brief = REPO / "tests" / "fixtures" / "apps_rg" / "brief_anthropic_partnerships_2026.json"
-    jd = REPO / "apps_rg" / "config" / "targeting" / "jd_anthropic_partnerships_2026.json"
+    jd = resolve_apps_rg_path(
+        REPO, "config", "targeting", "jd_anthropic_partnerships_2026.json"
+    )
 
     result = run_pre_dispatch_preflight(
         section="competencies",

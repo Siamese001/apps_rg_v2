@@ -120,23 +120,50 @@ def inspect_one_spine_chain(artifact_dir: Path) -> dict[str, Any]:
         "section_fec_bridge consumed",
         f"{compiled.get('fec_bridge_mode')}/{compiled.get('evidence_contract_consumed')}",
     )
+    packet_digest = str(l2_pkt.get("packet_digest") or "")
+    signed_route_bound = bool(
+        packet_digest
+        and l2_pkt.get("packet_signature")
+        and l2_pkt.get("route_id") == route.get("route_id")
+    )
+    legacy_route_ref = l2_pkt.get("route_contract_ref") == "route_contract.json"
     chk(
         "l2_pkt_refs_route",
-        l2_pkt.get("route_contract_ref") == "route_contract.json",
-        "route_contract.json",
-        str(l2_pkt.get("route_contract_ref")),
+        legacy_route_ref or signed_route_bound,
+        "route_contract.json or signed packet route_id binding",
+        str(l2_pkt.get("route_contract_ref") or l2_pkt.get("route_id")),
     )
+    prompt_digest = str(l2_pkt.get("compiled_prompt_artifact_ref") or "")
+    signed_prompt_bound = bool(
+        len(prompt_digest) == 64
+        and prompt_digest == str(l2_pkt.get("prompt_hash") or "")
+        and prompt_digest == str(sealed.get("prompt_artifact_digest") or "")
+    )
+    legacy_prompt_ref = prompt_digest == "compiled_prompt_artifact.json"
     chk(
         "l2_pkt_refs_compiled",
-        l2_pkt.get("compiled_prompt_artifact_ref") == "compiled_prompt_artifact.json",
-        "compiled_prompt_artifact.json",
-        str(l2_pkt.get("compiled_prompt_artifact_ref")),
+        legacy_prompt_ref or signed_prompt_bound,
+        "compiled_prompt_artifact.json or matching signed prompt digest",
+        prompt_digest,
+    )
+    signed_seal_bound = bool(
+        packet_digest
+        and sealed.get("sovereign_execution_receipt")
+        == f"l2_packet:{packet_digest}"
+        and sealed.get("canonical_l2_receipt_bundle_ref")
+        == "l2_receipt_bundle.json"
+    )
+    legacy_packet_ref = (
+        sealed.get("l2_execution_packet_ref") == "l2_execution_packet.json"
     )
     chk(
         "sealed_refs_l2_pkt",
-        sealed.get("l2_execution_packet_ref") == "l2_execution_packet.json",
-        "l2_execution_packet.json",
-        str(sealed.get("l2_execution_packet_ref")),
+        legacy_packet_ref or signed_seal_bound,
+        "l2_execution_packet.json or packet-digest-bound sovereign receipt",
+        str(
+            sealed.get("l2_execution_packet_ref")
+            or sealed.get("sovereign_execution_receipt")
+        ),
     )
     chk(
         "exit_refs_sealed",

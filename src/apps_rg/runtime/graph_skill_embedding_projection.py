@@ -206,7 +206,8 @@ def validate_embedding_projection(
         with _open_read_only(db_path) as conn:
             metadata = dict(conn.execute("SELECT key, value FROM metadata ORDER BY key"))
             rows = conn.execute(
-                "SELECT assertion_id, assertion_document_sha256, vector_sha256, vector "
+                "SELECT assertion_id, skill_id, assertion_document_sha256, "
+                "authority_envelope_sha256, allowed_sections_json, vector_sha256, vector "
                 "FROM assertion_vectors ORDER BY assertion_id"
             ).fetchall()
     except sqlite3.Error as exc:
@@ -219,12 +220,29 @@ def validate_embedding_projection(
         issues.append("ASSERTION_VECTOR_PARITY_MISMATCH")
     if int(metadata.get("vector_count") or -1) != len(rows):
         issues.append("VECTOR_COUNT_MISMATCH")
-    for assertion_id, document_digest, vector_digest, blob in rows:
+    for (
+        assertion_id,
+        skill_id,
+        document_digest,
+        authority_envelope_digest,
+        allowed_sections_json,
+        vector_digest,
+        blob,
+    ) in rows:
         assertion = expected.get(str(assertion_id))
         if assertion is None:
             continue
+        if skill_id != assertion.get("skill_id"):
+            issues.append(f"SKILL_ID_MISMATCH:{assertion_id}")
         if document_digest != assertion.get("assertion_document_sha256"):
             issues.append(f"ASSERTION_DOCUMENT_DIGEST_MISMATCH:{assertion_id}")
+        if authority_envelope_digest != assertion.get("authority_envelope_sha256"):
+            issues.append(f"AUTHORITY_ENVELOPE_DIGEST_MISMATCH:{assertion_id}")
+        expected_allowed_sections = _canonical_json(
+            sorted(str(value) for value in assertion.get("allowed_sections") or [])
+        )
+        if allowed_sections_json != expected_allowed_sections:
+            issues.append(f"ALLOWED_SECTIONS_MISMATCH:{assertion_id}")
         if hashlib.sha256(blob).hexdigest() != vector_digest:
             issues.append(f"VECTOR_DIGEST_MISMATCH:{assertion_id}")
         try:

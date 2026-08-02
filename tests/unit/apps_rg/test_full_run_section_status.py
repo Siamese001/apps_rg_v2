@@ -275,7 +275,9 @@ def test_collect_rows_support_flat_single_section_run_root(tmp_path: Path):
 
 
 def test_persist_infers_repo_root_for_modular_pointers(tmp_path: Path):
-    (tmp_path / "apps_rg" / "resume" / "base").mkdir(parents=True)
+    package_root = tmp_path / "src" / "apps_rg"
+    package_root.mkdir(parents=True)
+    (package_root / "__init__.py").write_text("", encoding="utf-8")
     run_root = tmp_path / "artifacts" / "apps_rg" / "runs" / "whole_run"
     lane_base = run_root / "modular_r4" / "sections" / "competencies"
     lane_base.mkdir(parents=True, exist_ok=True)
@@ -415,8 +417,10 @@ def test_persist_writes_md_and_json(tmp_path: Path):
     assert (run_root / "full_run_section_status.json").is_file()
     payload = json.loads((run_root / "full_run_section_status.json").read_text(encoding="utf-8"))
     assert payload["schema_version"] == "apps_rg.full_run_section_status.v1"
-    assert any(l["lane"] == "unify_bullets" for l in payload["lanes"])
-    aggregate = next(l for l in payload["lanes"] if l["lane"] == FINAL_AGGREGATION_LANE)
+    assert any(lane["lane"] == "unify_bullets" for lane in payload["lanes"])
+    aggregate = next(
+        lane for lane in payload["lanes"] if lane["lane"] == FINAL_AGGREGATION_LANE
+    )
     assert aggregate["aggregation_method"] == "quorum_majority_model_backed"
     assert len(aggregate["judges"]) == 2
     assert out["markdown_path"].name == FULL_RUN_SECTION_STATUS_MD

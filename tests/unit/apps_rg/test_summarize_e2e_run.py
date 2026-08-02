@@ -10,7 +10,14 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
+if not (REPO_ROOT / "tools" / "apps_rg" / "summarize_e2e_run.py").is_file():
+    pytest.skip(
+        "the source-only E2E summarizer was excluded from the standalone tools boundary",
+        allow_module_level=True,
+    )
 
 
 def _load_tool():

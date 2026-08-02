@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import resolve_repository_path
 from apps_rg.runtime.proof.x3_disposition_normalize import normalize_x3_disposition
 
 PLAN_ID = "graph-skills-quality-enhancement-c4e8a1"
@@ -93,7 +94,7 @@ def brown_fixture_digests(repo_root: Path) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     all_ok = True
     for rel, pinned in BROWN_FIXTURE_PINS.items():
-        path = repo_root / Path(rel)
+        path = resolve_repository_path(repo_root, rel)
         if not path.is_file():
             all_ok = False
             rows.append({"path": rel, "pinned_sha256": pinned, "actual_sha256": None, "pass": False})

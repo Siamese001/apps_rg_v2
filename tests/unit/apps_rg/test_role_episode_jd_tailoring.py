@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from apps_rg.repository_layout import repository_root, resolve_repository_path
 from apps_rg.runtime.sections.role_episode_lane import (
     _ROLE_LANES,
     _compiled_prompt,
@@ -105,13 +106,17 @@ def test_insurtech_and_ey_narrative_prompts_are_role_thesis_not_recap() -> None:
 
 
 def test_insurtech_ey_templates_match_unify_ibm_methodology_contract() -> None:
+    repo = repository_root(Path(__file__))
     template_paths = [
         Path("apps_rg/prompt_assembly/templates/insurtech_bullets_tailor_v1.yaml"),
         Path("apps_rg/prompt_assembly/templates/ey_bullets_tailor_v1.yaml"),
         Path("apps_rg/prompt_assembly/templates/insurtech_narrative_v1.yaml"),
         Path("apps_rg/prompt_assembly/templates/ey_narrative_v1.yaml"),
     ]
-    texts = {path.name: path.read_text(encoding="utf-8") for path in template_paths}
+    texts = {
+        path.name: resolve_repository_path(repo, path).read_text(encoding="utf-8")
+        for path in template_paths
+    }
 
     for name in ("insurtech_bullets_tailor_v1.yaml", "ey_bullets_tailor_v1.yaml"):
         text = texts[name]

@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.dispatch.headline_pa import compile_headline_prompt
 from apps_rg.runtime.sections.graph_role_episode_selector import (
     build_selected_graph_evidence_plan_for_section,
@@ -16,7 +17,7 @@ from apps_rg.runtime.sections.headline_pa import load_headline_template_slots
 from apps_rg.runtime.sections.executive_summary_token_budget import estimate_tokens_approximate
 
 REPO = Path(__file__).resolve().parents[3]
-TEMPLATE = REPO / "apps_rg" / "prompt_assembly" / "templates" / "headline_tailor_v1.yaml"
+TEMPLATE = resolve_apps_rg_path(REPO, "prompt_assembly", "templates", "headline_tailor_v1.yaml")
 
 _X2_GATE_ID = re.compile(r"\bx2_headline_[a-z0-9_]+\b")
 

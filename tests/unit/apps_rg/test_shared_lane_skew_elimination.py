@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import apps_rg_package_root
 from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool
 from apps_rg.runtime.sections.competencies_pa import build_competencies_assembly_input
 from apps_rg.runtime.sections.competency_capability_evidence import (
@@ -23,7 +24,11 @@ from apps_rg.runtime.sections.headline_positioning_evidence import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-ANTHROPIC_JD = REPO_ROOT / "apps_rg/config/targeting/anthropic_manager_applied_ai_architecture_partnerships_jd.txt"
+APP_ROOT = apps_rg_package_root(REPO_ROOT)
+ANTHROPIC_JD = (
+    APP_ROOT
+    / "config/targeting/anthropic_manager_applied_ai_architecture_partnerships_jd.txt"
+)
 ANTHROPIC_BRIEF = REPO_ROOT / "tests/fixtures/apps_rg/anthropic_manager_applied_ai_architecture_partnerships_briefing.md"
 GRAPH_BACKED_SECTIONS = (
     "executive_summary",

@@ -11,8 +11,8 @@ from apps_rg.fact_inventory.track_weighted_graph_expansion import infer_projecti
 from apps_rg.runtime.c0.c01_retrieval_plan import build_c01_retrieval_plan
 
 REPO = Path(__file__).resolve().parents[3]
-JD = REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
-BRIEF = REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
+JD = REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
+BRIEF = REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
 
 
 @pytest.mark.skipif(not JD.is_file(), reason="Brown JD fixture missing")

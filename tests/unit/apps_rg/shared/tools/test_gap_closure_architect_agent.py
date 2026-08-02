@@ -10,9 +10,15 @@ import pathlib
 
 import pytest
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
+
 pytestmark = pytest.mark.unit
 
-_SRC = pathlib.Path(__file__).parents[5] / "apps_rg" / "types" / "gap_closure_architect_agent_types.py"
+_SRC = resolve_apps_rg_path(
+    repository_root(pathlib.Path(__file__)),
+    "types",
+    "gap_closure_architect_agent_types.py",
+)
 
 
 def _tree():

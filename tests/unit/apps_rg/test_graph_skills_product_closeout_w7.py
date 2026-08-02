@@ -11,7 +11,7 @@ from apps_rg.runtime.internal.resume_package_disposition import (
     evaluate_resume_package,
     summarize_graph_skills_product_closeout,
 )
-from tests._apps_contract.test_resume_package_x3 import _write_minimal_fixture_tree
+from tests.helpers.resume_package_fixture import _write_minimal_fixture_tree
 
 
 def _graph_gate(verdict: str = "PASS", *, warnings: list[dict] | None = None) -> dict:

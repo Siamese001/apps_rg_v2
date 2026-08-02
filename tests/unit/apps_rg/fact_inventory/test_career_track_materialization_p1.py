@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
+    default_arsenal_ledger_path,
     load_master_skills_arsenal_ledger,
     validate_arsenal_ledger_shape,
 )
@@ -15,9 +16,10 @@ from apps_rg.fact_inventory.materialize_career_tracks_p1 import (
     EPOCH_TO_TRACK,
     verify_p1_invariants,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
 
 REPO = Path(__file__).resolve().parents[4]
-LEDGER_PATH = REPO / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+LEDGER_PATH = default_arsenal_ledger_path(REPO)
 
 
 @pytest.fixture
@@ -76,7 +78,12 @@ def test_career_sequence_edges_non_causal(ledger: dict) -> None:
 
 def test_employment_spine_from_base_resume(ledger: dict) -> None:
     base = json.loads(
-        (REPO / "apps_rg/resume/base/amit_ayer_base_resume_v1.json").read_text(encoding="utf-8")
+        resolve_apps_rg_path(
+            REPO,
+            "resume",
+            "base",
+            "amit_ayer_base_resume_v1.json",
+        ).read_text(encoding="utf-8")
     )
     exp_ids = {str(e["fact_id"]) for e in base["facts"]["employment"]}
     emp_nodes = {

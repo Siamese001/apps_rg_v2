@@ -13,6 +13,7 @@ from typing import Any
 
 import pytest
 
+from apps_rg.repository_layout import resolve_repository_path
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
 from apps_rg.runtime.orchestration import patch_run as pr
 from apps_rg.runtime.orchestration.patch_run import (
@@ -27,9 +28,11 @@ from apps_rg.runtime.orchestration.patch_run import (
     select_patch_lanes,
 )
 
-_GREEN_DEFAULT = tuple(l for l in GENERATED_LANES if l not in (
-    "headline", "executive_summary", "ibm_bullets", "ibm_narrative",
-))
+_GREEN_DEFAULT = tuple(
+    lane
+    for lane in GENERATED_LANES
+    if lane not in ("headline", "executive_summary", "ibm_bullets", "ibm_narrative")
+)
 
 
 @pytest.fixture(autouse=True)
@@ -43,9 +46,11 @@ def _write_json(path: Path, data: Any) -> None:
 
 
 def _seed_repo(tmp_path: Path) -> Path:
-    """Minimal repo root recognized by find_repo_root (apps_rg/resume/base marker)."""
+    """Minimal standalone repo with the package marker required by repository_root."""
     repo = tmp_path / "repo"
-    (repo / "apps_rg" / "resume" / "base").mkdir(parents=True, exist_ok=True)
+    package = repo / "src" / "apps_rg"
+    (package / "resume" / "base").mkdir(parents=True, exist_ok=True)
+    (package / "__init__.py").write_text("", encoding="utf-8")
     cfg_dir = repo / "config" / "profiles" / "apps_rg"
     cfg_dir.mkdir(parents=True, exist_ok=True)
     (cfg_dir / "pipeline_defaults.yaml").write_text(
@@ -60,10 +65,10 @@ def _seed_repo(tmp_path: Path) -> Path:
 
 
 def _seed_jd_and_brief(repo: Path) -> tuple[Path, Path]:
-    jd = repo / "apps_rg" / "config" / "targeting" / "aig_jd.txt"
+    jd = resolve_repository_path(repo, "apps_rg/config/targeting/aig_jd.txt")
     jd.parent.mkdir(parents=True, exist_ok=True)
     jd.write_text("VP Global Head of Agentic AI Solutions JD body", encoding="utf-8")
-    brief = repo / "apps_rg" / "config" / "targeting" / "aig_brief.md"
+    brief = resolve_repository_path(repo, "apps_rg/config/targeting/aig_brief.md")
     brief.write_text("AIG targeting brief", encoding="utf-8")
     return jd, brief
 
@@ -265,7 +270,7 @@ def test_derive_patch_targeting_preserves_existing_lane_briefing(tmp_path: Path)
 
 def test_derive_targeting_jd_text_fallback_when_jd_file_gone(tmp_path: Path) -> None:
     repo, run_dir = _seed_integrated_run(tmp_path)
-    (repo / "apps_rg" / "config" / "targeting" / "aig_jd.txt").unlink()
+    resolve_repository_path(repo, "apps_rg/config/targeting/aig_jd.txt").unlink()
     # Persist an app_payload JD text on one executed lane.
     lane_rd = latest_lane_run_dir_any(run_dir / "modular_r4" / "sections", "competencies")
     assert lane_rd is not None
@@ -323,7 +328,7 @@ def test_ordering_narrative_after_its_bullets_lane(tmp_path: Path) -> None:
     targets = plan.target_lanes
     assert targets.index("ibm_bullets") < targets.index("ibm_narrative")
     # Canonical dependency order overall.
-    assert targets == [l for l in GENERATED_LANES if l in set(targets)]
+    assert targets == [lane for lane in GENERATED_LANES if lane in set(targets)]
 
 
 def test_refuse_authorized_lane_without_force(tmp_path: Path) -> None:
@@ -612,8 +617,10 @@ def test_default_dispatch_threads_derived_jd_brief_into_canonical_primitives(
     assert result["exit_code"] == 0
     assert set(captured) == {"ibm_bullets", "ibm_narrative", "executive_summary", "headline"}
 
-    jd_abs = str((repo / "apps_rg" / "config" / "targeting" / "aig_jd.txt").resolve())
-    brief_abs = str((repo / "apps_rg" / "config" / "targeting" / "aig_brief.md").resolve())
+    jd_abs = str(resolve_repository_path(repo, "apps_rg/config/targeting/aig_jd.txt").resolve())
+    brief_abs = str(
+        resolve_repository_path(repo, "apps_rg/config/targeting/aig_brief.md").resolve()
+    )
     for lane, kwargs in captured.items():
         # Derived targeting — identical to the full-run CLI invocation primitives.
         assert kwargs["target_company"] == "AIG", lane
@@ -654,7 +661,7 @@ def test_default_dispatch_threads_inline_jd_text_fallback(
     """When the persisted --jd file is gone, the inline job_description_text fallback
     derived from validated_request.app_payload must reach the dispatch primitives."""
     repo, run_dir = _seed_integrated_run(tmp_path)
-    (repo / "apps_rg" / "config" / "targeting" / "aig_jd.txt").unlink()
+    resolve_repository_path(repo, "apps_rg/config/targeting/aig_jd.txt").unlink()
     lane_rd = latest_lane_run_dir_any(run_dir / "modular_r4" / "sections", "competencies")
     assert lane_rd is not None
     _write_json(

@@ -76,6 +76,21 @@ W9_DIMENSIONS = {
     "hiring_manager_usefulness": 4,
 }
 TEST_BLINDING_NONCE = "ab" * 32
+pytestmark = pytest.mark.usefixtures("emulated_posix_private_paths")
+
+
+def _symlink_or_skip(
+    alias: Path,
+    target: Path,
+    *,
+    target_is_directory: bool = False,
+) -> None:
+    try:
+        alias.symlink_to(target, target_is_directory=target_is_directory)
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip("Windows symlink privilege is unavailable")
+        raise
 
 
 def _source_bundle(*, include_w9: bool = True) -> dict[str, Any]:
@@ -178,7 +193,9 @@ def _source_bundle(*, include_w9: bool = True) -> dict[str, Any]:
 
 
 def _write_source(path: Path, source: dict[str, Any]) -> Path:
-    path.write_text(json.dumps(source, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_bytes(
+        (json.dumps(source, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    )
     path.chmod(0o600)
     return path
 
@@ -664,6 +681,7 @@ def test_non_w9_packet_omits_w9_reviewer_rubric(tmp_path: Path) -> None:
     assert validate_prelabel_packet(packet)["status"] == "PASS_TEST_ONLY"
 
 
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="POSIX owner contract")
 def test_reviewer_digest_tool_seals_and_validates_without_sealed_inputs(
     tmp_path: Path,
 ) -> None:
@@ -728,6 +746,7 @@ def test_public_target_and_reviewer_files_cannot_reveal_split_assignments(
                 assert "proof_split" not in content
 
 
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="POSIX mode contract")
 def test_sensitive_artifacts_are_owner_only_under_umask_022(tmp_path: Path) -> None:
     previous_umask = os.umask(0o022)
     try:
@@ -759,6 +778,7 @@ def test_sensitive_artifacts_are_owner_only_under_umask_022(tmp_path: Path) -> N
     assert stat.S_IMODE(receipt_path.stat().st_mode) == 0o600
 
 
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="POSIX mode contract")
 def test_validation_rejects_packet_root_symlink_and_insecure_modes(tmp_path: Path) -> None:
     packet = tmp_path / "packet"
     build_packet(
@@ -769,10 +789,19 @@ def test_validation_rejects_packet_root_symlink_and_insecure_modes(tmp_path: Pat
         require_w9=True,
     )
     alias = tmp_path / "packet-alias"
-    alias.symlink_to(packet, target_is_directory=True)
+    _symlink_or_skip(alias, packet, target_is_directory=True)
     alias_result = validate_prelabel_packet(alias, require_w9=True)
     assert alias_result["status"] == "FAIL"
     assert any("symlink alias" in error for error in alias_result["errors"])
+
+    ancestor_alias = tmp_path / "packet-parent-alias"
+    _symlink_or_skip(ancestor_alias, tmp_path, target_is_directory=True)
+    ancestor_result = validate_prelabel_packet(
+        ancestor_alias / packet.name,
+        require_w9=True,
+    )
+    assert ancestor_result["status"] == "FAIL"
+    assert any("symlink alias" in error for error in ancestor_result["errors"])
 
     packet_manifest = packet / "packet_manifest.json"
     packet_manifest.chmod(0o644)
@@ -781,6 +810,7 @@ def test_validation_rejects_packet_root_symlink_and_insecure_modes(tmp_path: Pat
     assert any("owner-only (0600)" in error for error in mode_result["errors"])
 
 
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="POSIX mode contract")
 def test_completed_validation_rejects_labels_symlink_and_insecure_modes(
     tmp_path: Path,
 ) -> None:
@@ -800,18 +830,34 @@ def test_completed_validation_rejects_labels_symlink_and_insecure_modes(
     labels.chmod(0o700)
 
     alias = tmp_path / "labels-alias"
-    alias.symlink_to(labels, target_is_directory=True)
+    _symlink_or_skip(alias, labels, target_is_directory=True)
     aliased = validate_completed_packet(packet, alias, require_w9=True)
     assert aliased["status"] == "FAIL"
     assert any("symlink alias" in error for error in aliased["errors"])
 
+    ancestor_alias = tmp_path / "labels-parent-alias"
+    _symlink_or_skip(ancestor_alias, tmp_path, target_is_directory=True)
+    ancestor_aliased = validate_completed_packet(
+        packet,
+        ancestor_alias / labels.name,
+        require_w9=True,
+    )
+    assert ancestor_aliased["status"] == "FAIL"
+    assert any("symlink alias" in error for error in ancestor_aliased["errors"])
 
+
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="POSIX owner contract")
 def test_private_path_check_rejects_wrong_owner(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     controlled = tmp_path / "controlled"
-    ensure_private_directory(controlled)
-    monkeypatch.setattr(io_helpers.os, "getuid", lambda: os.stat(controlled).st_uid + 1)
+    controlled.mkdir()
+    monkeypatch.setattr(
+        io_helpers.os,
+        "getuid",
+        lambda: os.stat(controlled).st_uid + 1,
+        raising=False,
+    )
     assert io_helpers.private_path_error(controlled, directory=True) == (
         "must be owned by the current user"
     )
@@ -1225,7 +1271,7 @@ def test_official_packet_export_and_evaluator_pass_end_to_end(tmp_path: Path) ->
     profile = yaml.safe_load(
         (
             REPO
-            / "apps_rg/config/domain_contract/resume_graph_evaluation_profile.yaml"
+            / "src/apps_rg/config/domain_contract/resume_graph_evaluation_profile.yaml"
         ).read_text(encoding="utf-8")
     )
     report = evaluate_file(
@@ -1812,6 +1858,7 @@ def test_distinct_blinding_nonces_create_distinct_packets(tmp_path: Path) -> Non
     assert first_claim["item_id"] != second_claim["item_id"]
 
 
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="POSIX mode contract")
 def test_cli_rejects_publicly_readable_nonce_file(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -1948,7 +1995,7 @@ def test_reviewer_roots_reject_every_unlisted_filesystem_entry(
     elif intruder_kind == "directory":
         intruder.mkdir()
     else:
-        intruder.symlink_to(packet / "packet_manifest.json")
+        _symlink_or_skip(intruder, packet / "packet_manifest.json")
 
     result = validate_prelabel_packet(packet, require_w9=True)
     assert result["status"] == "FAIL"
@@ -2190,7 +2237,7 @@ def test_target_manifest_rejects_path_escape_and_symlink_sources(tmp_path: Path)
     real_jd = fixture_root / "real-jd.txt"
     real_jd.write_text("symlinked content\n", encoding="utf-8")
     linked_jd = fixture_root / "linked-jd.txt"
-    linked_jd.symlink_to(real_jd)
+    _symlink_or_skip(linked_jd, real_jd)
     target["cases"][0]["jd_path"] = linked_jd.name
     target["cases"][0]["jd_sha256"] = file_digest(real_jd)
     linked_manifest = tmp_path / "linked-target.yaml"
@@ -2220,7 +2267,7 @@ def test_controlled_path_rejects_existing_hardlink_alias(tmp_path: Path) -> None
 
 
 def test_all_json_schemas_parse() -> None:
-    schema_dir = REPO / "apps_rg/evals/c03_human_eval/schemas"
+    schema_dir = REPO / "src/apps_rg/evals/c03_human_eval/schemas"
     schemas = sorted(schema_dir.glob("*.schema.json"))
     assert len(schemas) >= 7
     for path in schemas:

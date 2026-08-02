@@ -5,8 +5,10 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
+
 REPO = Path(__file__).resolve().parents[3]
-DISPATCH_DIR = REPO / "apps_rg" / "runtime" / "dispatch"
+DISPATCH_DIR = resolve_apps_rg_path(REPO, "runtime", "dispatch")
 
 RETIRED = (
     "executive_summary_dispatch.py",

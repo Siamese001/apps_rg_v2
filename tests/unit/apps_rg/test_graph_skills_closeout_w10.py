@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from apps_rg.fact_inventory.graph_skills_quality_enhancement_closeout import (
     PLAN_ID,
     SCHEMA,
@@ -11,10 +13,22 @@ from apps_rg.fact_inventory.graph_skills_quality_enhancement_closeout import (
 )
 
 REPO = Path(__file__).resolve().parents[3]
-CLOSEOUT = REPO / "docs" / "reports" / "apps_rg" / "graph_skills_quality_enhancement_closeout.json"
 
 
-def test_closeout_builder_schema() -> None:
+@pytest.fixture
+def isolated_graph_runtime(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    monkeypatch.setenv(
+        "APPS_RG_AUGMENTED_SKILLS_GRAPH_SQLITE_PATH",
+        str(tmp_path / "augmented_skills_graph.sqlite"),
+    )
+    monkeypatch.setenv(
+        "APPS_RG_C03_GRAPH_SQLITE_CONTEXT_RECEIPT_DIR",
+        str(tmp_path / "c03_graph_sqlite_context"),
+    )
+    return tmp_path
+
+
+def test_closeout_builder_schema(isolated_graph_runtime: Path) -> None:
     doc = build_closeout(REPO, git_commit="test")
     assert doc["schema"] == SCHEMA
     assert doc["plan_id"] == PLAN_ID
@@ -35,12 +49,11 @@ def test_closeout_builder_schema() -> None:
     assert d16["primary_proof_class"] == "REAL_LLM_RUNTIME_PROOF"
 
 
-def test_closeout_on_disk_after_emit() -> None:
-    if not CLOSEOUT.is_file():
-        doc = build_closeout(REPO)
-        CLOSEOUT.parent.mkdir(parents=True, exist_ok=True)
-        CLOSEOUT.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
-    doc = json.loads(CLOSEOUT.read_text(encoding="utf-8"))
+def test_closeout_on_disk_after_emit(isolated_graph_runtime: Path) -> None:
+    closeout = isolated_graph_runtime / "graph_skills_quality_enhancement_closeout.json"
+    emitted = build_closeout(REPO)
+    closeout.write_text(json.dumps(emitted, indent=2) + "\n", encoding="utf-8")
+    doc = json.loads(closeout.read_text(encoding="utf-8"))
     assert doc["wave_receipt_paths"]
     assert any(
         p.endswith("graph_skills_quality_w10_ag_receipt.json") for p in doc["wave_receipt_paths"]

@@ -17,6 +17,7 @@ import yaml
 from agentic_core.runtime.contracts.l1_plan_contract import L1PlanContract
 from agentic_core.runtime.contracts.route_contract import GraphTraversePolicy, RouteContract
 from agentic_core.runtime.contracts.route_gate_receipt import RouteGateReceipt
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 
 __all__ = [
     "APPS_RG_L0_CERT_REF",
@@ -85,18 +86,19 @@ def reset_route_profiles_cache() -> None:
 
 
 def _repo_root() -> Path:
-    here = Path(__file__).resolve()
-    for parent in [here.parent, *here.parents]:
-        if (parent / "pyproject.toml").exists():
-            return parent
-    return here.parents[4]
+    return repository_root(Path(__file__))
 
 
 def _load_profiles() -> list[dict[str, Any]]:
     global _PROFILE_CACHE
     if _PROFILE_CACHE is not None:
         return _PROFILE_CACHE
-    path = _repo_root() / _ROUTE_PROFILE_RELPATH
+    path = resolve_apps_rg_path(
+        _repo_root(),
+        "config",
+        "domain_contract",
+        "route_profiles.yaml",
+    )
     if not path.is_file():
         raise RouteProfileNotFoundError(f"Canonical route profile missing: {path}")
     raw = yaml.full_load(path.read_bytes().decode("utf-8"))
@@ -431,8 +433,13 @@ def _file_sha256(path: Path) -> str:
 
 def _snapshot_refs(row: dict[str, Any]) -> tuple[str, ...]:
     repo_root = _repo_root()
-    policy_path = repo_root / _ROUTE_PROFILE_RELPATH
-    registry_path = repo_root / "apps_rg" / "config" / "route_registry.yaml"
+    policy_path = resolve_apps_rg_path(
+        repo_root,
+        "config",
+        "domain_contract",
+        "route_profiles.yaml",
+    )
+    registry_path = resolve_apps_rg_path(repo_root, "config", "route_registry.yaml")
     policy_hash = _sha256_json(row)
     blueprint_hash = _file_sha256(policy_path)
     registry_digests = [
@@ -496,18 +503,17 @@ def l0_route_apps_rg(plan: L1PlanContract) -> RouteContract:
 
     test_mode = os.environ.get("APPS_RG_MANAGED_WORKFLOW_TEST_ENABLED", "").strip() in ("1", "true", "yes")
     if execution_form.upper() == "MANAGED_WORKFLOW" and test_mode:
-        manifest_path = (
-            _repo_root()
-            / "apps_rg"
-            / "config"
-            / "fixtures"
-            / "workflow_manifest.resume_generation.v1.minimal.yaml"
+        manifest_path = resolve_apps_rg_path(
+            _repo_root(),
+            "config",
+            "fixtures",
+            "workflow_manifest.resume_generation.v1.minimal.yaml",
         )
         digest = ""
         rel = ""
         if manifest_path.is_file():
             digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
-            rel = str(manifest_path.relative_to(_repo_root())).replace("\\", "/")
+            rel = "apps_rg/config/fixtures/workflow_manifest.resume_generation.v1.minimal.yaml"
         registry_resolution_receipt_ref = json.dumps(
             {
                 "status": "registered_not_active",

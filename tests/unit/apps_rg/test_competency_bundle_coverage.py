@@ -15,9 +15,16 @@ from pathlib import Path
 
 import yaml
 
-REPO = Path(__file__).resolve().parents[3]
-BUNDLES = REPO / "apps_rg" / "fact_inventory" / "competency_capability_bundles.json"
-TAXONOMY = REPO / "apps_rg" / "config" / "competencies" / "executive_capability_taxonomy.yaml"
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
+
+REPO = repository_root(Path(__file__))
+BUNDLES = resolve_apps_rg_path(REPO, "fact_inventory", "competency_capability_bundles.json")
+TAXONOMY = resolve_apps_rg_path(
+    REPO,
+    "config",
+    "competencies",
+    "executive_capability_taxonomy.yaml",
+)
 
 
 def _taxonomy_category_ids() -> set[str]:

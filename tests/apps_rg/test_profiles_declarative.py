@@ -10,17 +10,17 @@ import pathlib
 import pytest
 import yaml
 
+from apps_rg.repository_layout import apps_rg_package_root
+
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
+APPS_RG_ROOT = apps_rg_package_root(REPO_ROOT)
 
 PROFILE_PATHS = {
-    "rg_evidence_profile.yaml": REPO_ROOT / "apps_rg" / "rg_evidence_profile.yaml",
-    "rg_prompt_profile.yaml": REPO_ROOT / "apps_rg" / "rg_prompt_profile.yaml",
-    "rg_style_profile.yaml": REPO_ROOT / "apps_rg" / "rg_style_profile.yaml",
-    "rg_planning_profile.yaml": REPO_ROOT
-    / "apps_rg"
-    / "profiles"
-    / "rg_planning_profile.yaml",
+    "rg_evidence_profile.yaml": APPS_RG_ROOT / "rg_evidence_profile.yaml",
+    "rg_prompt_profile.yaml": APPS_RG_ROOT / "rg_prompt_profile.yaml",
+    "rg_style_profile.yaml": APPS_RG_ROOT / "rg_style_profile.yaml",
+    "rg_planning_profile.yaml": APPS_RG_ROOT / "profiles" / "rg_planning_profile.yaml",
 }
 
 ADVISORY_PROFILE_SECTIONS = {

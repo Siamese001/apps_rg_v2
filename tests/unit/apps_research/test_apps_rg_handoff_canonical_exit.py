@@ -274,7 +274,7 @@ def test_u0_signal_requires_canonical_exit_for_auto_research(tmp_path: Path) -> 
 
 
 def test_u0_binding_reaches_authorized_briefing_signal() -> None:
-    source = Path("apps_rg/runtime/bindings/u0_binding.py").read_text(
+    source = Path("src/apps_rg/runtime/bindings/u0_binding.py").read_text(
         encoding="utf-8"
     )
     assert "briefing_supplied_at_u0(app_payload)" in source

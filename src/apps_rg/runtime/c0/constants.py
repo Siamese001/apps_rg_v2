@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from apps_rg.repository_layout import repository_root
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = repository_root(__file__)
 PRIOR_RESUME_MANIFEST_REL = "artifacts/apps_rg/c0/prior_resume_variant_fact_extraction_manifest.json"
 PRIOR_RESUME_STAGING_REL = "artifacts/apps_rg/c0/_prior_resume_extract_staging"
 

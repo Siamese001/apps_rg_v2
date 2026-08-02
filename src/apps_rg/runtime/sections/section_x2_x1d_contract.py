@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
 from apps_rg.runtime.sections.section_product_shape_parity import judge_rubric_shape_constraints
 from apps_rg.runtime.sections.section_product_shape_ssot import (
@@ -24,7 +25,7 @@ from apps_rg.runtime.sections.section_product_shape_ssot import (
     section_product_shape,
 )
 
-_REPO_ROOT = Path(__file__).resolve().parents[3]
+_REPO_ROOT = repository_root(Path(__file__))
 _ALIGNMENT_MATRIX = _REPO_ROOT / "artifacts" / "apps_rg" / "prompt_authority" / "x2_x1d_alignment_matrix.json"
 
 # Lane Python modules that invoke run_*_x2_gates in the product path.

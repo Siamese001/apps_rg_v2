@@ -59,6 +59,7 @@ def test_generate_resume_step_passes_explicit_lane_provider_override_only(
     mock_modular: mock.MagicMock,
     mock_env: mock.MagicMock,
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
     env_provider: str | None,
     expected_profile_provider: str,
 ) -> None:
@@ -91,7 +92,7 @@ def test_generate_resume_step_passes_explicit_lane_provider_override_only(
         final_merge_attempted=True,
         rg_output_merge_receipt_ref="modular_r4/outputs/rg_output_merge_receipt.json",
     )
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"lane_prof_{uuid.uuid4().hex[:10]}"
+    art = tmp_path / f"lane_prof_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     cpa = SimpleNamespace(
         request_id="test-req",

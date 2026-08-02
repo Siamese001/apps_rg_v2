@@ -18,6 +18,8 @@ from typing import Any, Mapping, Sequence
 from apps_rg.evals.c03_human_eval._io import (
     controlled_path_error,
     digest_matches,
+    path_has_symlink_component,
+    private_metadata_error,
     private_path_error,
     repo_root_from_module,
     stable_digest,
@@ -83,20 +85,21 @@ def _secure_private_file_bytes(path: Path) -> bytes:
     """Read one controlled file without following a final-component symlink."""
 
     candidate = Path(path)
-    if candidate.is_symlink():
-        raise EvaluationDataError(f"{candidate}: must not be a symlink")
+    if path_has_symlink_component(candidate):
+        raise EvaluationDataError(
+            f"{candidate}: must not be a symlink alias or reparse point"
+        )
     flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
     descriptor = os.open(candidate, flags)
     try:
         metadata = os.fstat(descriptor)
         if not stat.S_ISREG(metadata.st_mode):
             raise EvaluationDataError(f"{candidate}: must be a regular file")
-        if metadata.st_uid != os.getuid():
-            raise EvaluationDataError(f"{candidate}: must be owned by the current user")
+        metadata_error = private_metadata_error(metadata, directory=False)
+        if metadata_error is not None:
+            raise EvaluationDataError(f"{candidate}: {metadata_error}")
         if metadata.st_nlink != 1:
             raise EvaluationDataError(f"{candidate}: must not be a hardlink alias")
-        if stat.S_IMODE(metadata.st_mode) & 0o077:
-            raise EvaluationDataError(f"{candidate}: must be owner-only (0600)")
         chunks: list[bytes] = []
         while True:
             chunk = os.read(descriptor, 1024 * 1024)

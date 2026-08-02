@@ -10,10 +10,11 @@ from apps_rg.fact_inventory.c03_graph_authority_reconciliation import (
 )
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     collect_canonical_graph_issues,
+    default_arsenal_ledger_path,
 )
 
 ROOT = Path(__file__).resolve().parents[4]
-LEDGER_PATH = ROOT / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+LEDGER_PATH = default_arsenal_ledger_path(ROOT)
 
 
 def _ledger() -> dict:
@@ -94,4 +95,3 @@ def test_reconciled_graph_has_no_canonical_shape_issue() -> None:
     assert collect_canonical_graph_issues(reconciled) == []
     assert reconciled["graph_metadata"]["node_count"] == len(reconciled["graph_nodes"])
     assert reconciled["graph_metadata"]["edge_count"] == len(reconciled["graph_edges"])
-

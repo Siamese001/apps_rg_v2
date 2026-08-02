@@ -6,6 +6,7 @@ import os
 import re
 from pathlib import Path
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.sections.competencies_pa import compile_competencies_prompt, load_competencies_template_slots
 from apps_rg.runtime.sections.competency_capability_evidence import (
     attach_competency_bundles_to_proof_pool_metadata,
@@ -15,8 +16,13 @@ from apps_rg.runtime.sections.graph_role_episode_selector import (
 )
 from apps_rg.runtime.sections.executive_summary_token_budget import estimate_tokens_approximate
 
-REPO = Path(__file__).resolve().parents[3]
-TEMPLATE = REPO / "apps_rg" / "prompt_assembly" / "templates" / "competency_selector_v2.pa_slots.yaml"
+REPO = repository_root(Path(__file__))
+TEMPLATE = resolve_apps_rg_path(
+    REPO,
+    "prompt_assembly",
+    "templates",
+    "competency_selector_v2.pa_slots.yaml",
+)
 
 _X2_GATE_ID = re.compile(r"\bx2_competencies_[a-z0-9_]+\b")
 _X2_COMPANION_GATE = re.compile(r"\bx2_competency_[a-z0-9_]+\b")

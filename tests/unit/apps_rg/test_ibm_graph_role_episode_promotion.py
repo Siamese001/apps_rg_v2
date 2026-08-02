@@ -17,10 +17,13 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import apps_rg_package_root
+
 REPO = Path(__file__).resolve().parents[3]
-LEDGER_PATH = REPO / "apps_rg" / "fact_inventory" / "master_skills_arsenal_ledger.json"
-BUNDLES_PATH = REPO / "apps_rg" / "fact_inventory" / "ibm_role_episode_bundles.json"
-PROFILE_PATH = REPO / "apps_rg" / "config" / "domain_contract" / "section_retrieval_profile.yaml"
+APPS_RG_ROOT = apps_rg_package_root(REPO)
+LEDGER_PATH = APPS_RG_ROOT / "fact_inventory" / "master_skills_arsenal_ledger.json"
+BUNDLES_PATH = APPS_RG_ROOT / "fact_inventory" / "ibm_role_episode_bundles.json"
+PROFILE_PATH = APPS_RG_ROOT / "config" / "domain_contract" / "section_retrieval_profile.yaml"
 IBM_TIME_WINDOW = "2017-04 to 2022-10"
 
 # Skill IDs promoted in this wave

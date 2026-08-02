@@ -20,6 +20,7 @@ from apps_rg.l2_recipe.modular_lane_adapter import (
     phase1_jd_dispatch_refs,
     phase1_manual_brief_for_dispatch,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.briefing_resolution import BriefingResolutionError, resolve_briefing_for_lanes
 from apps_rg.runtime.integrated_lane_evidence_packaging import (
     INTEGRATED_LANE_PRE_RUN_FAILURE_ARTIFACT,
@@ -43,8 +44,11 @@ def test_generated_lanes_registry_includes_executive_summary() -> None:
 
 def test_phase1_manual_brief_for_dispatch_prefers_filesystem_ref() -> None:
     repo = find_repo_root()
-    brief_path = (
-        repo / "apps_rg" / "config" / "targeting" / "brown_brown_svp_it_strategy_innovation_briefing.md"
+    brief_path = resolve_apps_rg_path(
+        repo,
+        "config",
+        "targeting",
+        "brown_brown_svp_it_strategy_innovation_briefing.md",
     )
     targeting = ModularLaneTargeting(
         target_company="Brown & Brown",
@@ -57,8 +61,11 @@ def test_phase1_manual_brief_for_dispatch_prefers_filesystem_ref() -> None:
         ModularLaneTargeting(
             jd_text="Role body",
             jd_ref_used=str(
-                (
-                    repo / "apps_rg" / "config" / "targeting" / "brown_brown_svp_it_strategy_innovation_jd.txt"
+                resolve_apps_rg_path(
+                    repo,
+                    "config",
+                    "targeting",
+                    "brown_brown_svp_it_strategy_innovation_jd.txt",
                 ).resolve()
             ),
         )
@@ -118,8 +125,8 @@ def test_executive_summary_dispatch_uses_inline_briefing_not_path_resolver() -> 
     assert captured.get("briefing") == inline_brief
 
 
-def test_emit_integrated_lane_pre_run_failure_writes_sections_tree() -> None:
-    repo = find_repo_root()
+def test_emit_integrated_lane_pre_run_failure_writes_sections_tree(tmp_path: Path) -> None:
+    repo = tmp_path
     integrated = repo / "artifacts" / "apps_rg" / "runs" / f"w8c_fail_{uuid.uuid4().hex[:8]}"
     sections = integrated / "modular_r4" / "sections"
     sections.mkdir(parents=True, exist_ok=True)
@@ -140,8 +147,10 @@ def test_emit_integrated_lane_pre_run_failure_writes_sections_tree() -> None:
     assert doc["status"] == "PRE_RUN_BLOCKED"
 
 
-def test_discover_run_links_uses_pre_run_failure_blocker_not_phase1_only() -> None:
-    repo = find_repo_root()
+def test_discover_run_links_uses_pre_run_failure_blocker_not_phase1_only(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path
     integrated = repo / "artifacts" / "apps_rg" / "runs" / f"w8c_links_{uuid.uuid4().hex[:8]}"
     sections = integrated / "modular_r4" / "sections"
     sections.mkdir(parents=True, exist_ok=True)
@@ -161,7 +170,7 @@ def test_discover_run_links_uses_pre_run_failure_blocker_not_phase1_only() -> No
 
 def test_phase1_attempts_executive_summary_under_modular_sections_root() -> None:
     repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"w8c_phase1_{uuid.uuid4().hex[:10]}"
+    art = repo / ".runtime" / "tests" / f"w8c_phase1_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     inline_brief = "Brown & Brown / SVP IT Strategy / innovation path with / slashes"
     targeting = ModularLaneTargeting(

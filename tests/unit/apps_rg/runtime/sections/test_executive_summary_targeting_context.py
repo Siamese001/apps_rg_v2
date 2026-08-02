@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.executive_summary_briefing import prepare_briefing_for_executive_summary
 from apps_rg.runtime.sections.executive_summary_targeting_context import (
     freeze_executive_summary_targeting_context,
@@ -21,12 +22,13 @@ REPO = Path(__file__).resolve().parents[5]
 
 @pytest.fixture
 def brown_material() -> tuple[str, str]:
-    jd = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(
+    targeting_root = resolve_apps_rg_path(REPO, "config", "targeting")
+    jd = (targeting_root / "brown_brown_svp_it_strategy_innovation_jd.txt").read_text(
         encoding="utf-8"
     )
-    brief = (
-        REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
-    ).read_text(encoding="utf-8")
+    brief = (targeting_root / "brown_brown_svp_it_strategy_innovation_briefing.md").read_text(
+        encoding="utf-8"
+    )
     return jd, brief
 
 

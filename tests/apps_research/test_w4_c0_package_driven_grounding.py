@@ -9,11 +9,21 @@ Validates that:
 5. C0 never answers/routes/executes/writes
 6. No apps_research retrieval policy hardcoded in agentic_core
 """
+# ruff: noqa: E402, F401, F811
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
 from typing import Dict, Any
+
+import agentic_core
+import pytest
+
+REPO = Path(__file__).resolve().parents[2]
+if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+    pytest.skip(
+        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        allow_module_level=True,
+    )
 
 from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
 from agentic_core.runtime.contracts.route_contract import RouteContract

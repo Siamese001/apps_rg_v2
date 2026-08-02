@@ -10,6 +10,7 @@ from apps_rg.fact_inventory.executive_summary_arsenal_projection import (
 )
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     W4A_TOP_LEVEL,
+    default_arsenal_ledger_path,
     load_master_skills_arsenal_ledger,
     skill_row_eligible_for_external_claim,
     validate_arsenal_ledger_shape,
@@ -17,7 +18,7 @@ from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
 )
 
 REPO = Path(__file__).resolve().parents[4]
-LEDGER_PATH = REPO / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+LEDGER_PATH = default_arsenal_ledger_path(REPO)
 
 EXPECTED_DOMAINS = {
     "domain_agentic_systems_architecture",

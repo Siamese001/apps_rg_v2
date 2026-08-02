@@ -8,7 +8,33 @@ from apps_rg.runtime.spine.l6_shadow_eval_runner import (
     maybe_run_l6_v40_shadow_eval_for_section,
     run_l6_v40_shadow_eval_for_section,
 )
-from tests.l6_observability.test_runtime_exhaust_v40_adapter import _seed_artifacts
+
+
+def _seed_artifacts(root: Path) -> None:
+    common = {
+        "run_id": "run-v40",
+        "parent_run_id": "parent-v40",
+        "child_run_id": "run-v40",
+        "section_attempt_id": "summary-attempt-v40",
+        "request_id": "req-v40",
+        "trace_root": "trace-v40",
+        "policy_hash": "policy-v40",
+        "blueprint_hash": "blueprint-v40",
+        "replay_key": "replay-v40",
+        "generated_at_utc": "2026-06-13T00:00:00+00:00",
+    }
+    payloads = {
+        "runtime_exhaust_bundle.json": {**common, "route_id": "route-v40"},
+        "exit_disposition_receipt.json": {
+            **common,
+            "x3_code": "X3D_ALLOW_FINISH",
+        },
+        "x3_disposition.json": {"x3_code": "X3D_ALLOW_FINISH", "pass": True},
+        "route_contract.json": {**common, "route_id": "route-v40"},
+        "l2_output.json": {**common, "section_id": "summary"},
+    }
+    for filename, payload in payloads.items():
+        (root / filename).write_text(json.dumps(payload), encoding="utf-8")
 
 
 def _seed_l5_receipt(root: Path) -> None:

@@ -34,6 +34,7 @@ from apps_rg.fact_inventory.graph_sqlite_path_index import (
 )
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     collect_canonical_graph_issues,
+    default_arsenal_ledger_path,
 )
 
 GENERATED_AT = "2026-07-18T16:00:00Z"
@@ -1400,7 +1401,7 @@ def test_noncanonical_operational_evidence_fails_closed(tmp_path: Path) -> None:
 
 def test_current_canonical_reconciled_graph_data_is_ready() -> None:
     repo_root = Path(__file__).resolve().parents[4]
-    canonical_path = repo_root / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+    canonical_path = default_arsenal_ledger_path(repo_root)
     sqlite_path = repo_root / "artifacts/apps_rg/fact_inventory/augmented_skills_graph.sqlite"
     receipt = build_c03_graph_health_receipt(
         canonical_path=canonical_path,

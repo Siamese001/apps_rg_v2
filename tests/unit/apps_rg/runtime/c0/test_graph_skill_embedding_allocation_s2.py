@@ -54,6 +54,90 @@ def _allocation(*assignments: dict[str, object]) -> dict[str, object]:
     }
 
 
+def _synthetic_authority_allowlists(
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[dict[str, object], dict[str, object]]:
+    graph_row = {
+        "skill_id": "skill_1",
+        "retrieval_eligible": True,
+        "fact_id_links": ["fact_1"],
+    }
+    graph = {"skill_rows": [graph_row]}
+    graph_sha256 = embedding_allocation.canonical_sha256(graph)
+    assertion = {
+        "assertion_id": "skill_1",
+        "skill_id": "skill_1",
+        "fact_links": ["fact_1"],
+        "allowed_sections": ["competencies"],
+        "assertion_document_sha256": "1" * 64,
+        "authority_envelope_sha256": "2" * 64,
+        "skill_row_sha256": embedding_allocation.canonical_sha256(graph_row),
+    }
+    corpus = {
+        "source_digests": {"graph_sha256": graph_sha256},
+        "assertions": [assertion],
+    }
+    authority: dict[str, object] = {
+        "manifest_sha256": "3" * 64,
+        "graph_sha256": graph_sha256,
+        "candidate_fact_ledger_sha256": "4" * 64,
+        "base_resume_sha256": "5" * 64,
+        "corpus_sha256": "6" * 64,
+        "embedding_generation_sha256": "7" * 64,
+        "projection_sha256": "8" * 64,
+        "model_id": "BAAI/bge-m3",
+        "model_revision": "9" * 40,
+        "model_artifact_sha256": "a" * 64,
+        "qualification": {"qualification_sha256": "b" * 64},
+        "qualification_scope": "REGRESSION_ONLY",
+        "release_authorizing": False,
+        "runtime_contract": {
+            "contract_sha256": "c" * 64,
+            "packages": {"torch": "pinned"},
+        },
+        "_graph_payload": graph,
+        "_corpus_payload": corpus,
+    }
+    allocation: dict[str, object] = {
+        "allocation_plan_digest": "d" * 64,
+        "graph_digest": graph_sha256,
+        "assignments": [
+            {
+                "section_id": "competencies",
+                "skill_id": "skill_1",
+                "fact_id": "fact_1",
+                "metric_outcome_id": "",
+            }
+        ],
+    }
+    candidates = {
+        "competencies": [
+            {
+                **assertion,
+                "similarity": 0.75,
+                "authority_section_id": "competencies",
+            }
+        ]
+    }
+    allowlists = build_lane_embedding_allowlists(
+        allocation_plan=allocation,
+        candidates_by_section=candidates,
+        authority_pins=embedding_allocation._authority_pins(authority),
+        section_order=("competencies",),
+    )
+    monkeypatch.setattr(
+        embedding_allocation,
+        "load_graph_skill_embedding_authority",
+        lambda _repo_root: authority,
+    )
+    return allowlists, allocation
+
+
+def _reseal(payload: dict[str, object], field: str) -> None:
+    payload.pop(field, None)
+    payload[field] = embedding_allocation.canonical_sha256(payload)
+
+
 def test_requirement_flag_is_explicit_and_fail_closed(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -262,7 +346,7 @@ def test_lane_proof_pool_consumes_exact_embedding_allowlists(
     allowlists = build_lane_embedding_allowlists(
         allocation_plan=graph_bundle["allocation_plan"],
         candidates_by_section=candidates,
-        authority_pins={"manifest_sha256": authority["manifest_sha256"]},
+        authority_pins=embedding_allocation._authority_pins(authority),
     )
     embedding_refs = write_graph_skill_embedding_runtime_bundle(
         {
@@ -501,3 +585,60 @@ def test_allowlist_loader_rejects_digest_drift(tmp_path: Path) -> None:
     )
     with pytest.raises(GraphSkillEmbeddingAllocationError, match="digest mismatch"):
         load_lane_embedding_allowlists(path)
+
+
+def test_allowlist_loader_rejects_lane_drift_even_when_top_is_resealed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    allowlists, _allocation_plan = _synthetic_authority_allowlists(monkeypatch)
+    lane = allowlists["lanes"]["competencies"]
+    lane["allowlists"]["fact_ids"].append("fact_injected")
+    _reseal(allowlists, "allowlists_digest")
+    path = tmp_path / "lane_graph_skill_embedding_allowlists.json"
+    path.write_text(json.dumps(allowlists), encoding="utf-8")
+
+    with pytest.raises(GraphSkillEmbeddingAllocationError, match="lane_allowlist_digest"):
+        load_lane_embedding_allowlists(path)
+
+
+def test_allowlist_authority_rejects_resealed_stale_authority(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    allowlists, allocation = _synthetic_authority_allowlists(monkeypatch)
+    allowlists["authority"]["manifest_sha256"] = "f" * 64
+    _reseal(allowlists, "allowlists_digest")
+
+    with pytest.raises(GraphSkillEmbeddingAllocationError, match="authority pins"):
+        embedding_allocation.validate_lane_embedding_allowlist_authority(
+            allowlists,
+            repo_root=Path(__file__).resolve().parents[5],
+            allocation_plan=allocation,
+            section_id="competencies",
+        )
+
+
+def test_allowlist_authority_rejects_resealed_unauthorized_accepted_assertion(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    allowlists, allocation = _synthetic_authority_allowlists(monkeypatch)
+    lane = allowlists["lanes"]["competencies"]
+    lane["accepted_assertion_bindings"][0]["assertion_id"] = "skill_injected"
+    lane["allowlists"]["assertion_ids"] = ["skill_injected"]
+    _reseal(lane, "lane_allowlist_digest")
+    _reseal(allowlists, "allowlists_digest")
+    path = tmp_path / "lane_graph_skill_embedding_allowlists.json"
+    path.write_text(json.dumps(allowlists), encoding="utf-8")
+    loaded = load_lane_embedding_allowlists(path)
+
+    with pytest.raises(
+        GraphSkillEmbeddingAllocationError,
+        match="not an authorized candidate",
+    ):
+        embedding_allocation.validate_lane_embedding_allowlist_authority(
+            loaded,
+            repo_root=Path(__file__).resolve().parents[5],
+            allocation_plan=allocation,
+            section_id="competencies",
+        )

@@ -4,14 +4,17 @@ from __future__ import annotations
 
 from typing import Any
 
-from apps_rg.runtime.bindings.c0_binding import SectionRetrievalProfile
-
 C02_VECTOR_QUERY_SCHEMA = "c02_vector_query_v1"
 RETRIEVAL_PROFILE_SSOT = "apps_rg/config/domain_contract/section_retrieval_profile.yaml"
 FORBIDDEN_RECEIPT_REASON = "spine_chroma_enrich_disabled"
 
 
 def retrieval_profile_ref(section_id: str) -> str:
+    # Keep this import lazy: ``agentic_core`` discovers the C0 evidence room
+    # while ``c0_binding`` itself is importing agentic-core contracts.  An eager
+    # reverse import here leaves ``c0_binding`` only partially initialized.
+    from apps_rg.runtime.bindings.c0_binding import SectionRetrievalProfile
+
     profile = SectionRetrievalProfile()
     row = profile.get_section_config(section_id)
     if row:

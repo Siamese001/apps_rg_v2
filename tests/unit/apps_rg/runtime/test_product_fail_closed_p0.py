@@ -16,7 +16,7 @@ from apps_rg.runtime.product_output_policy import (
 from apps_rg.runtime.runtime_proof_layout import resolve_accepted_real_rollup_run_dir
 from apps_rg.l2_recipe.modular_resume_generation import ModularResumeInputPackage, ModularResumeProfile, run_modular_resume_generation
 from apps_rg.runtime.section_proof.mock_runtime_proof_policy import infer_product_quality_blocked_or_mock
-from tests.unit.apps_rg.section_rigor.unify_ibm_lane_fixtures import REPO, unify_bullets_parsed_from_mock
+from tests.unit.apps_rg.section_rigor.unify_ibm_lane_fixtures import unify_bullets_parsed_from_mock
 
 
 @pytest.fixture
@@ -40,8 +40,9 @@ def test_infer_product_quality_fail_on_blocked_when_fail_closed(
 def test_resolve_latest_lane_run_dir_rejects_latest_real_only(
     product_fail_closed_env: None,
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
-    sections_root = REPO / "artifacts/apps_rg/runtime_proofs/contract_harness/_p0_pointer_strict"
+    sections_root = tmp_path / "sections"
     lane_base = sections_root / "headline"
     run_dir = lane_base / "real" / "headline_failed_attempt"
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -56,20 +57,21 @@ def test_resolve_latest_lane_run_dir_rejects_latest_real_only(
         ),
         encoding="utf-8",
     )
-    rel = os.path.relpath(run_dir, REPO).replace("\\", "/")
+    rel = os.path.relpath(run_dir, tmp_path).replace("\\", "/")
     (lane_base / "latest_real_run.json").write_text(json.dumps({"run_dir": rel}), encoding="utf-8")
 
     monkeypatch.setenv("APPS_RG_MODULAR_R4_SECTIONS_ROOT", str(sections_root.resolve()))
     with pytest.raises(FileNotFoundError, match="latest_successful|product bar|pointer"):
-        resolve_latest_lane_run_dir(REPO, sections_root, "headline")
+        resolve_latest_lane_run_dir(tmp_path, sections_root, "headline")
 
 
 def test_migration_scan_disabled_on_product_fail_closed(
     product_fail_closed_env: None,
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     lane = "_p0_migration_scan_headline"
-    real_root = REPO / "artifacts/apps_rg/runtime_proofs" / lane / "real"
+    real_root = tmp_path / "artifacts" / "apps_rg" / "runtime_proofs" / lane / "real"
     real_root.mkdir(parents=True, exist_ok=True)
     orphan = real_root / f"{lane}_orphan_mtime"
     orphan.mkdir(parents=True, exist_ok=True)
@@ -87,7 +89,7 @@ def test_migration_scan_disabled_on_product_fail_closed(
         json.dumps({"provider_requested": "retired_provider_profile"}),
         encoding="utf-8",
     )
-    rd, tag = resolve_accepted_real_rollup_run_dir(REPO, lane)
+    rd, tag = resolve_accepted_real_rollup_run_dir(tmp_path, lane)
     assert rd is None
     assert "product_fail_closed" in tag
 
@@ -104,12 +106,10 @@ def test_phase1_dispatch_hard_failed_detects_fault() -> None:
 
 def test_lane_run_dir_meets_product_bar_pass(
     product_fail_closed_env: None,
+    tmp_path: Path,
 ) -> None:
     parsed, _ = unify_bullets_parsed_from_mock()
-    run_dir = (
-        REPO
-        / "artifacts/apps_rg/runtime_proofs/contract_harness/_p0_lane_bar_pass/unify_bullets/real/run1"
-    )
+    run_dir = tmp_path / "unify_bullets" / "real" / "run1"
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "l2_output.json").write_text(
         json.dumps(
@@ -137,12 +137,10 @@ def test_lane_run_dir_meets_product_bar_pass(
 
 def test_lane_run_dir_accepts_external_openai_product_bar(
     product_fail_closed_env: None,
+    tmp_path: Path,
 ) -> None:
     parsed, _ = unify_bullets_parsed_from_mock()
-    run_dir = (
-        REPO
-        / "artifacts/apps_rg/runtime_proofs/contract_harness/_p0_lane_bar_pass/unify_bullets/real/run_openai"
-    )
+    run_dir = tmp_path / "unify_bullets" / "real" / "run_openai"
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "l2_output.json").write_text(
         json.dumps(
@@ -168,11 +166,11 @@ def test_lane_run_dir_accepts_external_openai_product_bar(
     assert reason == "ok"
 
 
-def test_lane_run_dir_rejects_phase0_synthetic_stub(product_fail_closed_env: None) -> None:
-    run_dir = (
-        REPO
-        / "artifacts/apps_rg/runtime_proofs/contract_harness/_p0_phase0_stub/unify_bullets/real/phase0_synthetic"
-    )
+def test_lane_run_dir_rejects_phase0_synthetic_stub(
+    product_fail_closed_env: None,
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "unify_bullets" / "real" / "phase0_synthetic"
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "l2_output.json").write_text(
         json.dumps(
@@ -196,10 +194,11 @@ def test_lane_run_dir_rejects_phase0_synthetic_stub(product_fail_closed_env: Non
 
 def test_modular_phase0_blocked_on_product_fail_closed(
     product_fail_closed_env: None,
+    tmp_path: Path,
 ) -> None:
-    art = REPO / "artifacts/apps_rg/runtime_proofs/contract_harness/_p0_phase0_modular_block"
+    art = tmp_path / "phase0_modular_block"
     art.mkdir(parents=True, exist_ok=True)
-    pkg = ModularResumeInputPackage(repo_root=REPO)
+    pkg = ModularResumeInputPackage(repo_root=tmp_path)
     result = run_modular_resume_generation(
         pkg,
         art,

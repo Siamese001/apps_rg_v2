@@ -1,13 +1,13 @@
 """P2-W1A: competencies product authority is augmented_skills_graph only."""
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
 from apps_rg.fact_inventory.competencies_graph_skills_proof_pool import (
-    DEPRECATED_LEDGER_CODE_PATHS,
     build_competencies_graph_skills_proof_payload,
     validate_p2_w1a_default_graph_authority_receipt,
     write_p2_w1a_default_graph_authority_receipt,
@@ -28,6 +28,36 @@ HYBRID_JD = (
     "Also value actuarial rigor, derivatives risk, and Basel/CCAR lineage plus "
     "AWS cloud data platform and partner GTM co-sell experience."
 )
+
+
+def _write_test_upstream_receipts(base: Path) -> tuple[Path, Path]:
+    upstream_dir = base / "upstream"
+    upstream_dir.mkdir()
+    p1_w4 = upstream_dir / "career_track_p1_w4_closeout_receipt.json"
+    p1_w5 = upstream_dir / "career_track_p1_w5_track_balanced_sections_receipt.json"
+    p1_w4.write_text(
+        json.dumps(
+            {
+                "schema": "career_track_p1_w4_closeout_receipt_v1",
+                "receipt_mode": "TEST_ONLY_NONCANONICAL_OUTPUT",
+                "certification_eligible": False,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    p1_w5.write_text(
+        json.dumps(
+            {
+                "schema": "career_track_p1_w5_track_balanced_sections_receipt_v1",
+                "receipt_mode": "TEST_ONLY_NONCANONICAL_OUTPUT",
+                "certification_eligible": False,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return p1_w4, p1_w5
 
 
 @pytest.fixture(autouse=True)
@@ -113,14 +143,48 @@ def test_graph_unavailable_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None
 def test_p2_w1a_receipt(tmp_path) -> None:
     # out_dir=tmp_path (RCA 2026-06-10): tests must never regenerate the tracked
     # docs/reports receipts — that side effect kept the tree dirty and broke a stash pop.
-    out = write_p2_w1a_default_graph_authority_receipt(repo_root=REPO, out_dir=tmp_path)
+    p1_w4, p1_w5 = _write_test_upstream_receipts(tmp_path)
+    out_dir = tmp_path / "p2"
+    out = write_p2_w1a_default_graph_authority_receipt(
+        repo_root=REPO,
+        out_dir=out_dir,
+        p1_w4_closeout_path=p1_w4,
+        p1_w5_projection_path=p1_w5,
+    )
     receipt_json = Path(out["receipt_json"])
-    assert receipt_json.is_file() and receipt_json.parent == tmp_path
+    assert receipt_json.is_file() and receipt_json.parent == out_dir
     receipt = json.loads(receipt_json.read_text(encoding="utf-8"))
-    validate_p2_w1a_default_graph_authority_receipt(receipt)
+    validate_p2_w1a_default_graph_authority_receipt(receipt, repo_root=REPO)
+    markdown = Path(out["receipt_md"]).read_text(encoding="utf-8")
+    assert "Receipt mode:** TEST_ONLY_NONCANONICAL_OUTPUT" in markdown
+    assert "Certification eligible:** False" in markdown
+    assert receipt["receipt_mode"] == "TEST_ONLY_NONCANONICAL_OUTPUT"
+    assert receipt["certification_eligible"] is False
+    assert receipt["p1_w4_closeout_receipt_ref"] == str(p1_w4.resolve())
+    assert receipt["p1_w4_closeout_receipt_raw_sha256"] == hashlib.sha256(
+        p1_w4.read_bytes()
+    ).hexdigest()
+    assert receipt["p1_w5_projection_receipt_ref"] == str(p1_w5.resolve())
+    assert receipt["p1_w5_projection_receipt_raw_sha256"] == hashlib.sha256(
+        p1_w5.read_bytes()
+    ).hexdigest()
     assert receipt["deprecated_ledger_code_reachable_from_product_path"] is False
     assert receipt["silent_fallback_possible"] is False
     assert len(receipt["deprecated_ledger_code_paths_remaining"]) >= 1
+
+
+def test_p2_w1a_validator_rejects_tampered_upstream_digest(tmp_path: Path) -> None:
+    p1_w4, p1_w5 = _write_test_upstream_receipts(tmp_path)
+    out = write_p2_w1a_default_graph_authority_receipt(
+        repo_root=REPO,
+        out_dir=tmp_path / "p2",
+        p1_w4_closeout_path=p1_w4,
+        p1_w5_projection_path=p1_w5,
+    )
+    receipt = dict(out["receipt"])
+    receipt["p1_w4_closeout_receipt_raw_sha256"] = "0" * 64
+    with pytest.raises(CompetenciesGraphProofPoolError, match="raw_sha256 mismatch"):
+        validate_p2_w1a_default_graph_authority_receipt(receipt, repo_root=REPO)
 
 
 def test_every_skill_has_graph_support() -> None:

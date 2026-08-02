@@ -17,6 +17,7 @@ from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     skill_row_eligible_for_external_claim,
     validate_arsenal_ledger_shape,
 )
+from apps_rg.repository_layout import repository_root
 
 SOURCE_AUTHORITY_AUGMENTED_SKILLS_GRAPH = "augmented_skills_graph"
 SKILLS_SOURCE_TYPE_AUGMENTED_SKILLS_GRAPH = "augmented_skills_graph"
@@ -29,7 +30,7 @@ LEGACY_SKILLS_LEDGER_ROLE = "deprecated_reference"
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return repository_root(Path(__file__))
 
 
 def _sha256_hex(text: str | bytes) -> str:

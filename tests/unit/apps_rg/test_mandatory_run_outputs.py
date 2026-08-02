@@ -44,7 +44,18 @@ from apps_rg.runtime.section_failure_forensics import (
     emit_section_failure_forensics,
     validate_section_failure_rca,
 )
-from tools.apps_rg.render_run_summary import render
+try:
+    from tools.apps_rg.render_run_summary import render
+    _RENDER_AVAILABLE = True
+except ModuleNotFoundError as exc:
+    if exc.name not in {"tools.apps_rg", "tools.apps_rg.render_run_summary"}:
+        raise
+    _RENDER_AVAILABLE = False
+
+    def render(*_args, **_kwargs):
+        pytest.skip(
+            "the source-only run-summary renderer was excluded from the standalone tools boundary"
+        )
 
 # apps-test-model: APP CONTRACT
 
@@ -1754,6 +1765,10 @@ def test_render_run_summary_can_render_without_backfilling_l7(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    if not _RENDER_AVAILABLE:
+        pytest.skip(
+            "the source-only run-summary renderer was excluded from the standalone tools boundary"
+        )
     run = tmp_path / "non_mutating_render"
     run.mkdir()
     monkeypatch.setattr(

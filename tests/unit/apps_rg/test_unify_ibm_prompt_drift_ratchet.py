@@ -6,10 +6,9 @@ import os
 import re
 from pathlib import Path
 
-from apps_rg.runtime.dispatch.ibm_bullets_pa import compile_ibm_bullets_prompt
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.dispatch.ibm_narrative_pa import compile_ibm_narrative_prompt
 from apps_rg.runtime.dispatch.unify_bullets_pa import compile_unify_bullets_prompt
-from apps_rg.runtime.dispatch.unify_narrative_pa import compile_unify_narrative_prompt
 from apps_rg.runtime.sections.ibm_bullets_pa import _legacy_i0 as ibm_bullets_i0
 from apps_rg.runtime.sections.graph_role_episode_selector import (
     build_selected_graph_evidence_plan_for_section,
@@ -99,7 +98,9 @@ def test_yaml_specs_trimmed_sovereign_oath_no_x2_in_oath_block():
         "ibm_bullet_tailor_v1.yaml",
         "ibm_position_narrative_v1.yaml",
     ):
-        raw = (REPO / "apps_rg/prompt_assembly/templates" / name).read_text(encoding="utf-8")
+        raw = resolve_apps_rg_path(REPO, "prompt_assembly", "templates", name).read_text(
+            encoding="utf-8"
+        )
         assert "UNIFY_IBM_PROMPT_CORE_LAW_V3" in raw
         assert "pa_core_law_v1.yaml" in raw
         oath_start = raw.find("sovereign_oath:")

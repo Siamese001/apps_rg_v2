@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.spine.front_contracts import (
     activate_fixture_dev_bypass,
     deactivate_fixture_dev_bypass,
@@ -32,6 +33,9 @@ from apps_rg.runtime.sections.executive_summary_token_budget import (
 )
 
 REPO = Path(__file__).resolve().parents[5]
+TARGETING_ROOT = resolve_apps_rg_path(REPO, "config", "targeting")
+_BROWN_JD = TARGETING_ROOT / "brown_brown_svp_it_strategy_innovation_jd.txt"
+_BROWN_BRIEFING = TARGETING_ROOT / "brown_brown_svp_it_strategy_innovation_briefing.md"
 
 
 @pytest.fixture(autouse=True)
@@ -42,12 +46,8 @@ def _fec_fixture_dev_bypass() -> None:
 
 
 def _brown_payload() -> dict:
-    jd = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(
-        encoding="utf-8"
-    )
-    brief = (
-        REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
-    ).read_text(encoding="utf-8")
+    jd = _BROWN_JD.read_text(encoding="utf-8")
+    brief = _BROWN_BRIEFING.read_text(encoding="utf-8")
     return {
         "product_visible": False,
         "run_id": "targeting_cap_unit",
@@ -178,9 +178,7 @@ def test_targeting_region_tokens_drop_on_brown_scale(monkeypatch: pytest.MonkeyP
 
 
 def test_brown_markdown_briefing_cap_includes_integration_theme():
-    brief = (
-        REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
-    ).read_text(encoding="utf-8")
+    brief = _BROWN_BRIEFING.read_text(encoding="utf-8")
     capped = compress_targeting_briefing_body(brief, 2600)
     assert "integration" in capped.lower() or "federated" in capped.lower()
     assert len(capped) > 1500
@@ -209,12 +207,8 @@ def test_briefing_cap_prefers_operating_model_and_leadership_sections():
 
 
 def test_default_targeting_caps_pass_full_brown_jd_and_briefing():
-    jd = (
-        REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
-    ).read_text(encoding="utf-8")
-    brief = (
-        REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
-    ).read_text(encoding="utf-8")
+    jd = _BROWN_JD.read_text(encoding="utf-8")
+    brief = _BROWN_BRIEFING.read_text(encoding="utf-8")
     payload = _brown_payload()
     payload["jd_text"] = jd
     payload["briefing"] = brief

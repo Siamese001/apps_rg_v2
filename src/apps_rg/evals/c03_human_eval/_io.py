@@ -12,6 +12,14 @@ from typing import Any, Iterable, Mapping
 
 import yaml
 
+from apps_rg.repository_layout import apps_rg_package_root, repository_root
+
+
+PLATFORM_SECURITY_UNSUPPORTED = (
+    "PLATFORM_SECURITY_UNSUPPORTED:owner-only permissions cannot be verified "
+    "on this platform"
+)
+
 
 def canonical_json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -59,21 +67,44 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def owner_only_security_error() -> str | None:
+    """Return why POSIX owner/mode checks cannot establish privacy here."""
+
+    return None if callable(getattr(os, "getuid", None)) else PLATFORM_SECURITY_UNSUPPORTED
+
+
+def private_metadata_error(metadata: os.stat_result, *, directory: bool) -> str | None:
+    """Validate owner-only metadata without treating Windows mode bits as ACL proof."""
+
+    platform_error = owner_only_security_error()
+    if platform_error is not None:
+        return platform_error
+    if metadata.st_uid != os.getuid():
+        return "must be owned by the current user"
+    if stat.S_IMODE(metadata.st_mode) & 0o077:
+        return "must be owner-only (0700)" if directory else "must be owner-only (0600)"
+    return None
+
+
 def ensure_private_directory(path: Path) -> Path:
     """Create/verify one owner-only real directory without widening ancestors."""
 
     directory = Path(path)
-    if directory.is_symlink():
-        raise ValueError(f"private directory must not be a symlink: {directory}")
+    if path_has_symlink_component(directory):
+        raise ValueError(
+            f"private directory must not use a symlink alias or reparse point: {directory}"
+        )
     if directory.exists():
         metadata = directory.stat()
         if not stat.S_ISDIR(metadata.st_mode):
             raise ValueError(f"private directory path is not a directory: {directory}")
-        if metadata.st_uid != os.getuid():
-            raise ValueError(f"private directory must be owned by the current user: {directory}")
-        if stat.S_IMODE(metadata.st_mode) & 0o077:
-            raise ValueError(f"private directory must be owner-only (0700): {directory}")
+        metadata_error = private_metadata_error(metadata, directory=True)
+        if metadata_error is not None:
+            raise ValueError(f"private directory {metadata_error}: {directory}")
         return directory
+    platform_error = owner_only_security_error()
+    if platform_error is not None:
+        raise ValueError(f"private directory {platform_error}: {directory}")
     parent = directory.parent
     if parent != directory and not parent.exists():
         ensure_private_directory(parent)
@@ -88,8 +119,8 @@ def private_path_error(path: Path, *, directory: bool) -> str | None:
     """Return why a sensitive controller path is not a real owner-only path."""
 
     candidate = Path(path)
-    if candidate.is_symlink():
-        return "must not be a symlink"
+    if path_has_symlink_component(candidate):
+        return "must not be a symlink alias or reparse point"
     try:
         metadata = candidate.stat()
     except OSError:
@@ -97,18 +128,52 @@ def private_path_error(path: Path, *, directory: bool) -> str | None:
     expected_type = stat.S_ISDIR if directory else stat.S_ISREG
     if not expected_type(metadata.st_mode):
         return "must be a directory" if directory else "must be a regular file"
-    if metadata.st_uid != os.getuid():
-        return "must be owned by the current user"
-    if stat.S_IMODE(metadata.st_mode) & 0o077:
-        return "must be owner-only (0700)" if directory else "must be owner-only (0600)"
-    return None
+    return private_metadata_error(metadata, directory=directory)
+
+
+def _path_component_is_alias(path: Path) -> bool:
+    """Detect POSIX links and Windows reparse-point aliases without following them."""
+
+    try:
+        metadata = os.lstat(path)
+    except OSError:
+        return False
+    if stat.S_ISLNK(metadata.st_mode):
+        return True
+    reparse_flag = int(getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400))
+    file_attributes = int(getattr(metadata, "st_file_attributes", 0))
+    return bool(file_attributes & reparse_flag)
 
 
 def path_has_symlink_component(path: Path) -> bool:
-    """Return whether any existing path component is a symbolic link."""
+    """Return whether any existing component is a link or reparse-point alias."""
 
     absolute = Path(path).absolute()
-    return any(component.is_symlink() for component in (absolute, *absolute.parents))
+    return any(
+        _path_component_is_alias(component)
+        for component in (absolute, *absolute.parents)
+    )
+
+
+def resolve_repository_resource(repo_root: Path, relative_path: str | Path) -> Path:
+    """Resolve a stable logical resource path in monorepo or ``src`` layouts."""
+
+    repository = Path(repo_root).resolve()
+    relative = Path(relative_path)
+    if relative.is_absolute():
+        raise ValueError("resource path must be repository-relative")
+    if relative.parts and relative.parts[0] == "apps_rg":
+        unresolved = apps_rg_package_root(repository).joinpath(*relative.parts[1:])
+    else:
+        unresolved = repository / relative
+    if path_has_symlink_component(unresolved):
+        raise ValueError("resource path must not use a symlink alias")
+    resolved = unresolved.resolve(strict=False)
+    try:
+        resolved.relative_to(repository)
+    except ValueError as exc:
+        raise ValueError("resource path escapes repo_root") from exc
+    return resolved
 
 
 def controlled_path_error(path: Path, *, repo_root: Path) -> str | None:
@@ -116,7 +181,7 @@ def controlled_path_error(path: Path, *, repo_root: Path) -> str | None:
 
     candidate = Path(path)
     if path_has_symlink_component(candidate):
-        return "must not use a symlink alias"
+        return "must not use a symlink alias or reparse point"
     resolved = candidate.resolve(strict=False)
     repository = Path(repo_root).resolve()
     try:
@@ -214,7 +279,15 @@ def write_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> int:
 
 
 def repo_root_from_module() -> Path:
-    return Path(__file__).resolve().parents[3]
+    """Return the checkout root for monorepo or standalone ``src`` layouts."""
+
+    return repository_root(Path(__file__))
+
+
+def package_root_from_module() -> Path:
+    """Return the active ``apps_rg`` package root for this checkout."""
+
+    return apps_rg_package_root(repo_root_from_module())
 
 
 __all__ = [
@@ -224,6 +297,10 @@ __all__ = [
     "digest_matches",
     "file_digest",
     "ensure_private_directory",
+    "owner_only_security_error",
+    "package_root_from_module",
+    "PLATFORM_SECURITY_UNSUPPORTED",
+    "private_metadata_error",
     "private_path_error",
     "path_has_symlink_component",
     "paths_refer_same",
@@ -233,6 +310,7 @@ __all__ = [
     "read_yaml",
     "record_with_digest",
     "repo_root_from_module",
+    "resolve_repository_resource",
     "stable_digest",
     "write_json",
     "write_jsonl",

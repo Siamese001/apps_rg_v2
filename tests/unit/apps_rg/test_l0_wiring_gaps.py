@@ -140,7 +140,6 @@ class TestMainR1AWiring:
     def test_r1a_cache_hit_exits_without_running_pipeline(self, tmp_path, monkeypatch):
         """When R1A returns a hit, pipeline is never called and sys.exit(0) fires."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: str(tmp_path))
         pipeline_called = []
@@ -167,7 +166,6 @@ class TestMainR1AWiring:
     def test_r1a_cache_miss_runs_pipeline(self, tmp_path, monkeypatch):
         """When R1A misses, pipeline is called."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setenv("SEMANTIC_CACHE_D2_ENABLED", "0")
@@ -195,7 +193,6 @@ class TestMainR1AWiring:
     def test_r1a_stamp_called_on_clean_run(self, tmp_path, monkeypatch):
         """After a clean pipeline run, stamp_r1a_cache is called."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setenv("SEMANTIC_CACHE_D2_ENABLED", "0")
@@ -228,7 +225,6 @@ class TestMainR1AWiring:
     def test_r1a_stamp_skipped_on_fault(self, tmp_path, monkeypatch):
         """When pipeline returns a fault, stamp is NOT called."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setenv("SEMANTIC_CACHE_D2_ENABLED", "0")
@@ -261,7 +257,6 @@ class TestMainR1AWiring:
     def test_r1a_stamp_skipped_on_terminal_r5(self, tmp_path, monkeypatch):
         """When pipeline returns terminal_r5=True, stamp is NOT called."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setenv("SEMANTIC_CACHE_D2_ENABLED", "0")
@@ -314,7 +309,6 @@ class TestMainR1BWiring:
     def test_r1b_disabled_by_default(self, tmp_path, monkeypatch):
         """When SEMANTIC_CACHE_D2_ENABLED is unset or 0, R1B is never called."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
         monkeypatch.setenv("SEMANTIC_CACHE_D2_ENABLED", "0")
 
         r1b_called = []
@@ -344,7 +338,6 @@ class TestMainR1BWiring:
     def test_r1b_hit_exits_without_running_pipeline(self, tmp_path, monkeypatch):
         """When R1B returns a hit and env flag is on, pipeline is never called."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setenv("SEMANTIC_CACHE_D2_ENABLED", "1")
@@ -398,7 +391,6 @@ class TestMainR1BWiring:
     def test_r1b_miss_runs_pipeline(self, tmp_path, monkeypatch):
         """When R1B misses, pipeline still runs."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setattr("apps_rg.cache.r1a_adapter.stamp_r1a_cache", lambda key, run_dir, **kwargs: None)
@@ -429,7 +421,6 @@ class TestMainR1BWiring:
     def test_r1b_store_called_on_clean_run_with_chunks(self, tmp_path, monkeypatch):
         """R1B store is called after a clean run when output chunks are available."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setattr("tests.helpers.whole_run_spine_harness.stamp_r1a_cache", lambda key, run_dir, **kwargs: None)
@@ -476,7 +467,6 @@ class TestMainR1BWiring:
     def test_r1b_store_skipped_when_no_chunks(self, tmp_path, monkeypatch):
         """R1B store is NOT called when generated_resume.json is absent."""
         from tests.helpers import whole_run_spine_harness as harness
-        from unittest.mock import patch
 
         monkeypatch.setattr("apps_rg.cache.whole_run_entrypoint_preflight.check_r1a_cache", lambda key, runs_dir, **kwargs: None)
         monkeypatch.setattr("apps_rg.cache.r1a_adapter.stamp_r1a_cache", lambda key, run_dir, **kwargs: None)
@@ -571,8 +561,8 @@ class TestLoadRouteIdForApp:
 
     def test_apps_rg_registry_resolves_correct_route_id(self):
         """Integration: actual apps_rg registry returns the declared route_id."""
-        from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
-            _load_route_id_for_app,
+        from apps_rg.runtime.orchestration.integrated_spine_runner import (
+            _load_apps_rg_route_id,
         )
-        result = _load_route_id_for_app("apps_rg")
+        result = _load_apps_rg_route_id()
         assert result == "apps_rg.resume_generation_v1"

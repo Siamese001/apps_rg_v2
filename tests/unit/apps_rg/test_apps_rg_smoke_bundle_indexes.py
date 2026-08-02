@@ -12,6 +12,11 @@ import pytest
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _GATE_SCRIPT = _REPO_ROOT / "ops_scripts" / "ci" / "check_apps_rg_smoke_bundle_indexes.py"
 
+pytestmark = pytest.mark.skipif(
+    not _GATE_SCRIPT.is_file(),
+    reason="standalone source baseline excludes the monorepo-owned smoke-bundle gate",
+)
+
 
 def test_rg_smoke_bundle_gate_cli_exits_zero() -> None:
     """Runner must stay green on fresh clones (no smoke dirs) and locally when dirs exist."""

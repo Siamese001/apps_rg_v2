@@ -4,12 +4,12 @@ Hardening ratchet: unify_bullets graph-compose must not leak legacy six-bullet t
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+from apps_rg.repository_layout import apps_rg_package_root
 from apps_rg.fact_inventory.candidate_fact_ledger import (
     default_ledger_path,
     default_taxonomy_path,
@@ -52,8 +52,9 @@ from apps_rg.runtime.validators.unify_role_episode_x2 import (
 from apps_rg.runtime.product_evidence_authority import build_evidence_authority
 
 REPO = Path(__file__).resolve().parents[3]
-JD = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(encoding="utf-8")
-BRIEF = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md").read_text(
+APP_ROOT = apps_rg_package_root(REPO)
+JD = (REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(encoding="utf-8")
+BRIEF = (REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md").read_text(
     encoding="utf-8"
 )
 
@@ -153,7 +154,7 @@ def _partner_metric_surface_payload() -> tuple[list[dict], dict, dict]:
 
 
 def test_unify_x1d_outputs_are_written_once_after_adjudication() -> None:
-    source = (REPO / "apps_rg/runtime/sections/unify_bullets_lane.py").read_text(encoding="utf-8")
+    source = (APP_ROOT / "runtime/sections/unify_bullets_lane.py").read_text(encoding="utf-8")
     write_call = 'write_json(artifact_dir / "x1d_llm_judge_outputs.json"'
 
     assert source.count(write_call) == 1

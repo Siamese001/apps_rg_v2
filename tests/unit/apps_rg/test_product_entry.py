@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -14,6 +15,7 @@ def test_product_entry_mints_preflight_before_whole_run(
 
     run_dir = tmp_path / "full_resume_product"
     calls: list[str] = []
+    monkeypatch.delenv("APPS_RG_WHOLE_RUN_ENVELOPE", raising=False)
 
     monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
     monkeypatch.setattr(
@@ -31,6 +33,7 @@ def test_product_entry_mints_preflight_before_whole_run(
 
     def _whole_run(**kwargs: object) -> dict[str, object]:
         calls.append("whole_run")
+        assert os.environ["APPS_RG_WHOLE_RUN_ENVELOPE"] == "1"
         assert kwargs["artifact_dir"] == str(run_dir)
         assert kwargs["require_fresh_preflight"] is True
         assert str(kwargs["preflight_continuation_ref"]).endswith(
@@ -54,6 +57,50 @@ def test_product_entry_mints_preflight_before_whole_run(
 
     assert calls == ["preflight", "whole_run"]
     assert result["authority_contract_id"] == "apps_research_rg_e2e_authority"
+    assert "APPS_RG_WHOLE_RUN_ENVELOPE" not in os.environ
+
+
+def test_product_entry_restores_prior_envelope_after_orchestrator_error(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime import product_entry
+
+    run_dir = tmp_path / "full_resume_error"
+    monkeypatch.setenv("APPS_RG_WHOLE_RUN_ENVELOPE", "prior-value")
+    monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
+    monkeypatch.setattr(
+        product_entry,
+        "allocate_full_resume_artifact_dir",
+        lambda repo, explicit: run_dir,
+    )
+    monkeypatch.setattr(
+        "apps_rg.runtime.e2e_preflight.run_fresh_e2e_preflight",
+        lambda **kwargs: SimpleNamespace(
+            passed=True,
+            result={},
+            receipt={},
+            bootstrap_receipt={},
+        ),
+    )
+
+    def _fail_whole_run(**kwargs: object) -> dict[str, object]:
+        assert os.environ["APPS_RG_WHOLE_RUN_ENVELOPE"] == "1"
+        raise RuntimeError("whole-run failed")
+
+    monkeypatch.setattr(
+        "apps_rg.runtime.orchestration.r3r4_whole_run_orchestration."
+        "run_whole_run_with_route_governance",
+        _fail_whole_run,
+    )
+
+    with pytest.raises(RuntimeError, match="whole-run failed"):
+        product_entry.run_product_whole_run_from_primitives(
+            target_company="Anthropic",
+            target_role="Manager",
+        )
+
+    assert os.environ["APPS_RG_WHOLE_RUN_ENVELOPE"] == "prior-value"
 
 
 def test_product_entry_stops_when_preflight_blocks(

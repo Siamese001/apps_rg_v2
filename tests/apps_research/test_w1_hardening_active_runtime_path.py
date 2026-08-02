@@ -12,10 +12,21 @@ Required checks:
 4. Contract handoff proof for v2
 5. Ownership boundary clean
 """
+# ruff: noqa: E402, F401
 from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import patch
+
+import agentic_core
+import pytest
+
+REPO = Path(__file__).resolve().parents[2]
+if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+    pytest.skip(
+        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        allow_module_level=True,
+    )
 
 from agentic_core.runtime.contracts.apps_research_runtime_package import (
     RuntimeCustomizationPackage,
@@ -41,7 +52,7 @@ class TestActiveEntrypointUsesProfileSpine:
         assert profile.app_id == "apps_research"
 
     def test_main_module_uses_spine_handoff_not_stub_l2(self):
-        main_path = Path("apps_research/__main__.py")
+        main_path = Path("src/apps_research/__main__.py")
         source = main_path.read_text(encoding="utf-8")
         assert "_run_profile_spine" in source
         assert "run_research_via_spine" in source
@@ -89,7 +100,7 @@ class TestNoParallelRetiredDispatchPath:
         )
 
     def test_runtime_entry_dispatch_module_removed(self):
-        dispatch_path = Path("apps_research/runtime/entry/dispatch.py")
+        dispatch_path = Path("src/apps_research/runtime/entry/dispatch.py")
         assert not dispatch_path.is_file(), (
             "apps_research.runtime.entry.dispatch tombstone removed; "
             "use apps_research.integrations.spine_handoff"

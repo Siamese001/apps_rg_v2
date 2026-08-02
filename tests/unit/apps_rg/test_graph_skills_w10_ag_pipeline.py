@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from agentic_core.L0_routing.c0_retrieval.c0_3_enhanced.adapter_registry import (
     AdapterResolutionStatus,
     resolve_graph_adapter,
@@ -12,9 +13,6 @@ from agentic_core.L0_routing.c0_retrieval.c0_3_enhanced.adapter_registry import 
 from agentic_core.L0_routing.c0_retrieval.c0_3_enhanced.contracts import (
     AnchorCandidate,
     AnchorType,
-    HydratedEvidence,
-    RetrievalLane,
-    AclStatus,
 )
 from agentic_core.runtime.contracts.route_contract import GraphTraversePolicy, RouteContract
 from apps_rg.integrations.c0_graph_adapter import (
@@ -182,7 +180,9 @@ def test_spine_graph_refs_not_na_with_live_policy() -> None:
 def test_route_profiles_yaml_live_graph_block() -> None:
     import yaml
 
-    path = Path(__file__).resolve().parents[3] / "apps_rg" / "config" / "domain_contract" / "route_profiles.yaml"
+    path = resolve_apps_rg_path(
+        Path(__file__).resolve().parents[3], "config", "domain_contract", "route_profiles.yaml"
+    )
     rows = yaml.safe_load(path.read_text(encoding="utf-8"))
     default = next(r for r in rows if not r.get("conditions"))
     gt = default["graph_traverse"]

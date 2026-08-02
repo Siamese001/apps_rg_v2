@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from apps_rg.repository_layout import apps_rg_package_root
 from apps_rg.runtime.validators.headline_x2 import (
     _EXTRA_HYPE_MARKERS_RE,
     _KEYWORD_STUFF_RE,
@@ -16,7 +17,7 @@ from apps_rg.runtime.validators.headline_x2 import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-TEMPLATE_PATH = REPO_ROOT / "apps_rg/prompt_assembly/templates/headline_tailor_v1.yaml"
+TEMPLATE_PATH = apps_rg_package_root(REPO_ROOT) / "prompt_assembly/templates/headline_tailor_v1.yaml"
 
 _BANNED_VOICE_FRAGMENTS = (
     "visionary",

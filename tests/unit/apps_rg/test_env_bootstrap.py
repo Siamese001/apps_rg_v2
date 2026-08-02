@@ -8,7 +8,6 @@ from pathlib import Path
 from apps_rg.runtime.env_bootstrap import (
     APPS_RG_DOTENV_ENV_VAR,
     bootstrap_apps_rg_env,
-    canonical_home_dotenv,
 )
 import apps_rg.runtime.env_bootstrap as env_bootstrap
 import apps_rg.runtime.judges.executive_summary_x1d as x1d
@@ -79,7 +78,8 @@ def test_bootstrap_falls_back_to_home_ssot_when_worktree_blank(tmp_path: Path, m
 
 
 def test_apps_rg_cli_bootstraps_env_before_production_runtime_guard() -> None:
-    src = Path("apps_rg/__main__.py").read_text(encoding="utf-8")
+    cli_path = Path(env_bootstrap.__file__).resolve().parents[1] / "__main__.py"
+    src = cli_path.read_text(encoding="utf-8")
 
     assert src.index("bootstrap_apps_rg_env(repo_root=_repo_root)") < src.index(
         "assert_production_runtime(context=\"python -m apps_rg\", args=args)"

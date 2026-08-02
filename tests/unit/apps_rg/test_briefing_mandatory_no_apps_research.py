@@ -55,12 +55,12 @@ def _payload(mode: str, **extra: object) -> dict:
 
 @pytest.mark.parametrize("mode", ["strategic_tailor", "generate_scratch"])
 def test_product_visible_full_generation_without_briefing_fails_closed(mode: str) -> None:
-    with pytest.raises(BriefingMissingError, match="apps_research delegation is disabled"):
+    with pytest.raises(BriefingMissingError, match="requires a run-specific briefing"):
         l1_plan_apps_rg(_vr(_payload(mode)))
 
 
 def test_product_visible_section_regen_without_briefing_fails_closed() -> None:
-    with pytest.raises(BriefingMissingError, match="requires an uploaded briefing"):
+    with pytest.raises(BriefingMissingError, match="requires a run-specific briefing"):
         l1_plan_apps_rg(_vr(_payload("section_regen", product_visible=True)))
 
 

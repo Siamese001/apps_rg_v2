@@ -7,10 +7,12 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any, Mapping
 
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.c0.graph_skill_embedding_allocation import (
     GRAPH_SKILL_EMBEDDING_ALLOWLISTS_ENV,
     graph_skill_embeddings_required,
     load_lane_embedding_allowlists,
+    validate_lane_embedding_allowlist_authority,
 )
 from apps_rg.runtime.c0.resume_graph_allocation import (
     ALLOCATION_PLAN_ENV,
@@ -79,13 +81,13 @@ def _active_embedding_binding(
         raise ValueError(
             f"{section_id}: embedding allowlist allocation digest mismatch"
         )
-    lanes = payload.get("lanes")
-    lane = lanes.get(section_id) if isinstance(lanes, Mapping) else None
-    if not isinstance(lane, Mapping) or lane.get("pass") is not True:
-        raise ValueError(f"{section_id}: embedding allowlist is missing or failed")
-    if str(lane.get("section_id") or "") != section_id:
-        raise ValueError(f"{section_id}: embedding allowlist section mismatch")
-    return payload, dict(lane)
+    lane = validate_lane_embedding_allowlist_authority(
+        payload,
+        repo_root=repository_root(Path(__file__)),
+        allocation_plan=allocation_plan,
+        section_id=section_id,
+    )
+    return payload, lane
 
 
 def _assert_embedding_allocation_parity(

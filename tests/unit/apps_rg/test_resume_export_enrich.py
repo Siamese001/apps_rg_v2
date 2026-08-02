@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.render.resume_export_enrich import (
     certifications_from_static_profile,
     enrich_generated_resume_for_docx,
@@ -127,7 +128,9 @@ def _walk_keys(obj: Any) -> set[str]:
 
 def test_candidate_static_profile_file_is_claim_free() -> None:
     repo = Path(__file__).resolve().parents[3]
-    profile_path = repo / "apps_rg" / "resume" / "base" / "candidate_static_profile.json"
+    profile_path = resolve_apps_rg_path(
+        repo, "resume", "base", "candidate_static_profile.json"
+    )
     profile = json.loads(profile_path.read_text(encoding="utf-8"))
     assert set(profile) == {
         "name",

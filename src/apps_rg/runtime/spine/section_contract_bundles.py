@@ -7,18 +7,20 @@ contracts so section debugging does not turn the front bridge into a mini-spine.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from apps_rg.runtime.section_spine_terminology import CANONICAL_CONTRACT_TYPES
-from apps_rg.runtime.spine_contracts import (
-    CompiledPromptArtifact,
-    FinalEvidenceContract,
-    L1PlanContract,
-    RouteContract,
-    SealedL2Artifact,
-    ValidatedRequest,
-    X3Disposition,
-)
+
+if TYPE_CHECKING:
+    from apps_rg.runtime.spine_contracts import (
+        CompiledPromptArtifact,
+        FinalEvidenceContract,
+        L1PlanContract,
+        RouteContract,
+        SealedL2Artifact,
+        ValidatedRequest,
+        X3Disposition,
+    )
 
 FRONT_SPINE_CONTRACTS: tuple[str, ...] = (
     "ValidatedRequest",

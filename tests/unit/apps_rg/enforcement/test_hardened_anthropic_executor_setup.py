@@ -22,8 +22,12 @@ from pathlib import Path
 
 import pytest
 
-_EXECUTOR_PATH = (
-    Path(__file__).resolve().parents[4] / "apps_rg" / "enforcement" / "HardenedanthropicexecutorStrategy.py"
+from apps_rg.repository_layout import resolve_apps_rg_path
+
+_EXECUTOR_PATH = resolve_apps_rg_path(
+    Path(__file__).resolve().parents[4],
+    "enforcement",
+    "HardenedanthropicexecutorStrategy.py",
 )
 
 
@@ -212,10 +216,6 @@ def test_executor_without_api_key_keeps_client_none(monkeypatch, caplog):
     monkeypatch.setattr(
         "apps_rg.enforcement.HardenedanthropicexecutorStrategy.load_dotenv",
         lambda *a, **kw: None,
-    )
-
-    from apps_rg.enforcement.HardenedanthropicexecutorStrategy import (
-        HardenedAnthropicExecutor,
     )
 
     # Use a fresh instance so we don't hit cached state

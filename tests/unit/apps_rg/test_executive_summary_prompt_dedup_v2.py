@@ -2,25 +2,22 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
-import pytest
-
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.executive_summary_evidence_capsule import (
     _capsule_enabled,
     compile_executive_summary_evidence_capsule,
 )
 from apps_rg.runtime.sections.executive_summary_pa import (
-    build_executive_summary_assembly_input,
     compile_executive_summary_prompt,
     load_executive_summary_template_slots,
 )
 from apps_rg.runtime.sections.executive_summary_token_budget import estimate_tokens_approximate
 
 REPO = Path(__file__).resolve().parents[3]
-TEMPLATE = (
-    REPO / "apps_rg" / "prompt_assembly" / "templates" / "executive_summary.generate_scratch_v1.yaml"
+TEMPLATE = resolve_apps_rg_path(
+    REPO, "prompt_assembly", "templates", "executive_summary.generate_scratch_v1.yaml"
 )
 
 

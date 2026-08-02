@@ -4,10 +4,21 @@ Tests for apps_research U0 Runtime Customization Package (W1)
 Plan: apps-research-rich-content-runtime-customization-a1b2c3
 Phase: W1 - U0 runtime customization package
 """
+# ruff: noqa: E402, F401
 from __future__ import annotations
 
-import pytest
 from datetime import datetime
+from pathlib import Path
+
+import agentic_core
+import pytest
+
+REPO = Path(__file__).resolve().parents[2]
+if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+    pytest.skip(
+        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        allow_module_level=True,
+    )
 
 from agentic_core.runtime.contracts.apps_research_runtime_package import (
     RuntimeCustomizationPackage,

@@ -10,10 +10,11 @@ from apps_rg.prompt_assembly.pa_core_law import (
     core_law_marker_for_section,
     d0_untrusted_fence_reference_line,
 )
+from apps_rg.repository_layout import apps_rg_package_root
 from apps_rg.runtime.dispatch.unify_ibm_pa_common import load_w7_shell_slot_bodies
 
 REPO = Path(__file__).resolve().parents[4]
-TEMPLATES = REPO / "apps_rg" / "prompt_assembly" / "templates"
+TEMPLATES = apps_rg_package_root(REPO) / "prompt_assembly" / "templates"
 
 
 def test_core_law_markers_stable():

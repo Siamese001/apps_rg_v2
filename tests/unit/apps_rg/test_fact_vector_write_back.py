@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -182,6 +183,19 @@ def test_promotion_mode_defaults_inline_and_accepts_deferred(monkeypatch) -> Non
 def _plain_chroma(monkeypatch):
     """Patch the precomputed-collection helper to a plain Chroma collection (explicit embeddings,
     no embedding function), so the promotion round-trip needs no BGE model."""
+    repo_root = Path(__file__).resolve().parents[3]
+    required_production_tools = (
+        repo_root / "tools" / "retrieval" / "vector_store.py",
+        repo_root / "tools" / "ledgers" / "hook_helpers.py",
+        repo_root / "tools" / "generate" / "ingestion.py",
+    )
+    missing = [path.relative_to(repo_root).as_posix() for path in required_production_tools if not path.is_file()]
+    if missing:
+        pytest.skip(
+            "standalone boundary: fact-vector promotion requires omitted production tools: "
+            + ", ".join(missing)
+        )
+
     import apps_rg.runtime.chroma_precomputed_collection as cpc
     from apps_rg.runtime.c0.chroma_persistent_client import reset_apps_rg_chroma_client_cache_for_tests
 

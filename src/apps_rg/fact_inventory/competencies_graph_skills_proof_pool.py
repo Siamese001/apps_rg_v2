@@ -6,6 +6,7 @@ No silent fallback. Graph authority failure fails closed.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,6 +33,7 @@ from apps_rg.runtime.proof_pool_resolver import PROOF_SOURCE_AUGMENTED_SKILLS_GR
 
 P1_W4_CLOSEOUT_RECEIPT_REF = "docs/reports/apps_rg/career_track_p1_w4_closeout_receipt.json"
 P1_W5_RECEIPT_REF = "docs/reports/apps_rg/career_track_p1_w5_track_balanced_sections_receipt.json"
+P2_W1_RECEIPT_REF = "docs/reports/apps_rg/competencies_graph_proof_pool_p2_w1_receipt.json"
 P2_W1_RECEIPT_JSON = REPORTS_DIR / "competencies_graph_proof_pool_p2_w1_receipt.json"
 P2_W1_RECEIPT_MD = REPORTS_DIR / "competencies_graph_proof_pool_p2_w1.md"
 P2_W1A_RECEIPT_JSON = REPORTS_DIR / "competencies_graph_proof_pool_p2_w1a_default_graph_authority_receipt.json"
@@ -49,6 +51,125 @@ DEPRECATED_LEDGER_CODE_PATHS: tuple[str, ...] = (
 
 class CompetenciesGraphProofPoolError(ValueError):
     """Competencies graph proof pool contract violation."""
+
+
+_TEST_ONLY_RECEIPT_MODE = "TEST_ONLY_NONCANONICAL_OUTPUT"
+_CANONICAL_RECEIPT_MODE = "CANONICAL"
+
+
+def _raw_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _receipt_ref(*, root: Path, path: Path) -> str:
+    resolved_root = root.resolve()
+    resolved_path = path.resolve()
+    try:
+        return resolved_path.relative_to(resolved_root).as_posix()
+    except ValueError:
+        return str(resolved_path)
+
+
+def _load_upstream_receipt(
+    *,
+    root: Path,
+    logical_ref: str,
+    override_path: Path | None,
+    expected_schema: str,
+    test_only_output: bool,
+) -> tuple[Path, str, str]:
+    if override_path is not None and not test_only_output:
+        raise CompetenciesGraphProofPoolError(
+            f"noncanonical upstream override is allowed only for TEST_ONLY output: {logical_ref}"
+        )
+    path = Path(override_path) if override_path is not None else root / logical_ref
+    if not path.is_file():
+        raise CompetenciesGraphProofPoolError(f"missing required upstream receipt: {path}")
+    if override_path is None:
+        try:
+            path.resolve(strict=True).relative_to(root.resolve(strict=True))
+        except (OSError, ValueError) as exc:
+            raise CompetenciesGraphProofPoolError(
+                f"canonical upstream receipt escapes repository authority: {logical_ref}"
+            ) from exc
+        cursor = root
+        for part in Path(logical_ref).parts:
+            cursor /= part
+            if cursor.is_symlink():
+                raise CompetenciesGraphProofPoolError(
+                    f"canonical upstream receipt path must not traverse a symlink: {logical_ref}"
+                )
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CompetenciesGraphProofPoolError(
+            f"invalid required upstream receipt {path}: {exc}"
+        ) from exc
+    if not isinstance(payload, dict):
+        raise CompetenciesGraphProofPoolError(
+            f"invalid required upstream receipt {path}: root must be a JSON object"
+        )
+    if str(payload.get("schema") or "") != expected_schema:
+        raise CompetenciesGraphProofPoolError(
+            f"invalid required upstream receipt {path}: schema must be {expected_schema}"
+        )
+    expected_mode = _TEST_ONLY_RECEIPT_MODE if override_path is not None else _CANONICAL_RECEIPT_MODE
+    expected_eligibility = override_path is None
+    if (
+        payload.get("receipt_mode") != expected_mode
+        or payload.get("certification_eligible") is not expected_eligibility
+    ):
+        raise CompetenciesGraphProofPoolError(
+            f"upstream receipt must be marked {expected_mode} and "
+            f"certification_eligible={str(expected_eligibility).lower()}: {path}"
+        )
+    receipt_ref = logical_ref if override_path is None else _receipt_ref(root=root, path=path)
+    return path, receipt_ref, _raw_sha256(path)
+
+
+def _resolve_receipt_path(*, root: Path, receipt_ref: str) -> Path:
+    path = Path(receipt_ref)
+    return path if path.is_absolute() else root / path
+
+
+def _validate_receipt_digest(
+    *,
+    root: Path,
+    receipt: dict[str, Any],
+    ref_field: str,
+    digest_field: str,
+    expected_schema: str,
+    required_mode: str | None,
+    errors: list[str],
+) -> None:
+    ref = str(receipt.get(ref_field) or "").strip()
+    digest = str(receipt.get(digest_field) or "").strip()
+    if not ref:
+        errors.append(f"missing {ref_field}")
+        return
+    path = _resolve_receipt_path(root=root, receipt_ref=ref)
+    if not path.is_file():
+        errors.append(f"missing receipt bound by {ref_field}: {ref}")
+        return
+    actual = _raw_sha256(path)
+    if digest != actual:
+        errors.append(f"{digest_field} mismatch for {ref}: expected {actual}, got {digest or '<blank>'}")
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"invalid receipt bound by {ref_field}: {exc}")
+        return
+    if not isinstance(payload, dict) or str(payload.get("schema") or "") != expected_schema:
+        errors.append(f"receipt bound by {ref_field} must use schema {expected_schema}")
+        return
+    bound_mode = str(payload.get("receipt_mode") or "")
+    bound_eligibility = payload.get("certification_eligible")
+    if bound_mode not in (_CANONICAL_RECEIPT_MODE, _TEST_ONLY_RECEIPT_MODE):
+        errors.append(f"receipt bound by {ref_field} has unexpected receipt_mode {bound_mode!r}")
+    elif bound_eligibility is not (bound_mode == _CANONICAL_RECEIPT_MODE):
+        errors.append(f"receipt bound by {ref_field} has inconsistent certification_eligible")
+    if required_mode is not None and bound_mode != required_mode:
+        errors.append(f"receipt bound by {ref_field} must use receipt_mode {required_mode}")
 
 
 def competencies_graph_skills_proof_pool_requested(
@@ -269,10 +390,17 @@ def validate_competencies_graph_skills_proof_payload(payload: dict[str, Any]) ->
         raise CompetenciesGraphProofPoolError("; ".join(errors))
 
 
-def validate_p2_w1a_default_graph_authority_receipt(receipt: dict[str, Any]) -> None:
+def validate_p2_w1a_default_graph_authority_receipt(
+    receipt: dict[str, Any],
+    *,
+    repo_root: Path | None = None,
+) -> None:
     """Fail-closed validator for P2-W1A default graph authority receipt."""
+    root = repo_root or ROOT
     errors: list[str] = []
     required = (
+        "receipt_mode",
+        "certification_eligible",
         "default_proof_pool_type",
         "competencies_product_authority",
         "broad_skills_ledger_default",
@@ -284,8 +412,11 @@ def validate_p2_w1a_default_graph_authority_receipt(receipt: dict[str, Any]) -> 
         "deprecated_ledger_code_paths_remaining",
         "deprecated_ledger_code_reachable_from_product_path",
         "p2_w1_proof_pool_receipt_ref",
+        "p2_w1_proof_pool_receipt_raw_sha256",
         "p1_w4_closeout_receipt_ref",
+        "p1_w4_closeout_receipt_raw_sha256",
         "p1_w5_projection_receipt_ref",
+        "p1_w5_projection_receipt_raw_sha256",
     )
     for key in required:
         if key not in receipt:
@@ -306,9 +437,52 @@ def validate_p2_w1a_default_graph_authority_receipt(receipt: dict[str, Any]) -> 
             errors.append(f"{flag} must be false")
     if receipt.get("fail_closed_if_graph_unavailable") is not True:
         errors.append("fail_closed_if_graph_unavailable must be true")
-    p2_w1_ref = str(receipt.get("p2_w1_proof_pool_receipt_ref") or "")
-    if p2_w1_ref and not (ROOT / p2_w1_ref).is_file():
-        errors.append(f"missing p2_w1 receipt: {p2_w1_ref}")
+    receipt_mode = str(receipt.get("receipt_mode") or "")
+    certification_eligible = receipt.get("certification_eligible")
+    if receipt_mode not in (_CANONICAL_RECEIPT_MODE, _TEST_ONLY_RECEIPT_MODE):
+        errors.append(f"unexpected receipt_mode: {receipt_mode!r}")
+    if receipt_mode == _TEST_ONLY_RECEIPT_MODE and certification_eligible is not False:
+        errors.append("TEST_ONLY receipt must set certification_eligible=false")
+    if receipt_mode == _CANONICAL_RECEIPT_MODE and certification_eligible is not True:
+        errors.append("CANONICAL receipt must set certification_eligible=true")
+    if receipt_mode == _CANONICAL_RECEIPT_MODE:
+        canonical_refs = {
+            "p2_w1_proof_pool_receipt_ref": P2_W1_RECEIPT_REF,
+            "p1_w4_closeout_receipt_ref": P1_W4_CLOSEOUT_RECEIPT_REF,
+            "p1_w5_projection_receipt_ref": P1_W5_RECEIPT_REF,
+        }
+        for field, expected_ref in canonical_refs.items():
+            if receipt.get(field) != expected_ref:
+                errors.append(f"canonical {field} must be {expected_ref}")
+    for ref_field, digest_field, expected_schema, required_mode in (
+        (
+            "p2_w1_proof_pool_receipt_ref",
+            "p2_w1_proof_pool_receipt_raw_sha256",
+            "competencies_graph_proof_pool_p2_w1_receipt_v1",
+            receipt_mode,
+        ),
+        (
+            "p1_w4_closeout_receipt_ref",
+            "p1_w4_closeout_receipt_raw_sha256",
+            "career_track_p1_w4_closeout_receipt_v1",
+            _CANONICAL_RECEIPT_MODE if receipt_mode == _CANONICAL_RECEIPT_MODE else None,
+        ),
+        (
+            "p1_w5_projection_receipt_ref",
+            "p1_w5_projection_receipt_raw_sha256",
+            "career_track_p1_w5_track_balanced_sections_receipt_v1",
+            _CANONICAL_RECEIPT_MODE if receipt_mode == _CANONICAL_RECEIPT_MODE else None,
+        ),
+    ):
+        _validate_receipt_digest(
+            root=root,
+            receipt=receipt,
+            ref_field=ref_field,
+            digest_field=digest_field,
+            expected_schema=expected_schema,
+            required_mode=required_mode,
+            errors=errors,
+        )
     if errors:
         raise CompetenciesGraphProofPoolError("; ".join(errors))
 
@@ -317,6 +491,8 @@ def write_p2_w1_competencies_graph_proof_pool_receipt(
     *,
     repo_root: Path | None = None,
     out_dir: Path | None = None,
+    p1_w4_closeout_path: Path | None = None,
+    p1_w5_projection_path: Path | None = None,
 ) -> dict[str, Any]:
     """Emit the P2-W1 receipts.
 
@@ -327,6 +503,22 @@ def write_p2_w1_competencies_graph_proof_pool_receipt(
     """
     root = repo_root or ROOT
     out_base = Path(out_dir) if out_dir is not None else REPORTS_DIR
+    test_only_output = out_dir is not None
+    receipt_mode = _TEST_ONLY_RECEIPT_MODE if test_only_output else _CANONICAL_RECEIPT_MODE
+    _, p1_w4_ref, p1_w4_digest = _load_upstream_receipt(
+        root=root,
+        logical_ref=P1_W4_CLOSEOUT_RECEIPT_REF,
+        override_path=p1_w4_closeout_path,
+        expected_schema="career_track_p1_w4_closeout_receipt_v1",
+        test_only_output=test_only_output,
+    )
+    _, p1_w5_ref, p1_w5_digest = _load_upstream_receipt(
+        root=root,
+        logical_ref=P1_W5_RECEIPT_REF,
+        override_path=p1_w5_projection_path,
+        expected_schema="career_track_p1_w5_track_balanced_sections_receipt_v1",
+        test_only_output=test_only_output,
+    )
     receipt_json_path = out_base / P2_W1_RECEIPT_JSON.name
     receipt_md_path = out_base / P2_W1_RECEIPT_MD.name
     payload = build_competencies_graph_skills_proof_payload(repo_root=root)
@@ -335,6 +527,8 @@ def write_p2_w1_competencies_graph_proof_pool_receipt(
     receipt = {
         "schema": "competencies_graph_proof_pool_p2_w1_receipt_v1",
         "generated_at": ts,
+        "receipt_mode": receipt_mode,
+        "certification_eligible": not test_only_output,
         "proof_pool_type": payload["proof_pool_type"],
         "section_id": payload["section_id"],
         "graph_source": payload["graph_source"],
@@ -355,8 +549,10 @@ def write_p2_w1_competencies_graph_proof_pool_receipt(
         "broad_skills_ledger_used_as_authority": False,
         "broad_skills_ledger_default": False,
         "c03_graph_bound_status": payload["c03_graph_bound_status"],
-        "p1_w4_closeout_receipt_ref": P1_W4_CLOSEOUT_RECEIPT_REF,
-        "p1_w5_projection_receipt_ref": P1_W5_RECEIPT_REF,
+        "p1_w4_closeout_receipt_ref": p1_w4_ref,
+        "p1_w4_closeout_receipt_raw_sha256": p1_w4_digest,
+        "p1_w5_projection_receipt_ref": p1_w5_ref,
+        "p1_w5_projection_receipt_raw_sha256": p1_w5_digest,
     }
     validate_competencies_graph_skills_proof_payload({**payload, **receipt})
 
@@ -367,6 +563,8 @@ def write_p2_w1_competencies_graph_proof_pool_receipt(
         "# P2-W1 — Competencies graph-skills proof pool",
         "",
         f"**Generated:** {ts}",
+        f"**Receipt mode:** {receipt_mode}",
+        f"**Certification eligible:** {not test_only_output}",
         "",
         f"- proof_pool_type: **{receipt['proof_pool_type']}** (default product authority P2-W1A)",
         f"- graph_source: `{receipt['graph_source']}`",
@@ -380,8 +578,8 @@ def write_p2_w1_competencies_graph_proof_pool_receipt(
         "",
         "## Part 1 refs",
         "",
-        f"- {P1_W4_CLOSEOUT_RECEIPT_REF}",
-        f"- {P1_W5_RECEIPT_REF}",
+        f"- `{p1_w4_ref}` (raw sha256 `{p1_w4_digest}`)",
+        f"- `{p1_w5_ref}` (raw sha256 `{p1_w5_digest}`)",
         "",
     ]
     for track, n in (receipt.get("selected_skill_count_by_track") or {}).items():
@@ -394,18 +592,34 @@ def write_p2_w1a_default_graph_authority_receipt(
     *,
     repo_root: Path | None = None,
     out_dir: Path | None = None,
+    p1_w4_closeout_path: Path | None = None,
+    p1_w5_projection_path: Path | None = None,
 ) -> dict[str, Any]:
     root = repo_root or ROOT
     out_base = Path(out_dir) if out_dir is not None else REPORTS_DIR
+    test_only_output = out_dir is not None
+    receipt_mode = _TEST_ONLY_RECEIPT_MODE if test_only_output else _CANONICAL_RECEIPT_MODE
     receipt_json_path = out_base / P2_W1A_RECEIPT_JSON.name
     receipt_md_path = out_base / P2_W1A_RECEIPT_MD.name
-    w1 = write_p2_w1_competencies_graph_proof_pool_receipt(repo_root=root, out_dir=out_dir)
+    w1 = write_p2_w1_competencies_graph_proof_pool_receipt(
+        repo_root=root,
+        out_dir=out_dir,
+        p1_w4_closeout_path=p1_w4_closeout_path,
+        p1_w5_projection_path=p1_w5_projection_path,
+    )
     payload = w1["payload"]
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    p2_w1_receipt_ref = (
+        str(Path(w1["receipt_json"]).resolve())
+        if out_dir is not None
+        else P2_W1_RECEIPT_REF
+    )
 
     receipt = {
         "schema": "competencies_graph_proof_pool_p2_w1a_default_graph_authority_receipt_v1",
         "generated_at": ts,
+        "receipt_mode": receipt_mode,
+        "certification_eligible": not test_only_output,
         "plan_id": "graph-skills-hardening-f3a8c1",
         "wave": "P2-W1A",
         "default_proof_pool_type": PROOF_SOURCE_AUGMENTED_SKILLS_GRAPH,
@@ -428,11 +642,18 @@ def write_p2_w1a_default_graph_authority_receipt(
         "c03_graph_bound_status": payload.get("c03_graph_bound_status", C03_STATUS_COMPETENCIES_GRAPH_PROOF),
         "c03_graph_hop_paths_count": payload.get("c03_graph_hop_paths_count", 0),
         "non_graph_evidence_items_count": payload.get("non_graph_evidence_items_count", 0),
-        "p2_w1_proof_pool_receipt_ref": "docs/reports/apps_rg/competencies_graph_proof_pool_p2_w1_receipt.json",
-        "p1_w4_closeout_receipt_ref": P1_W4_CLOSEOUT_RECEIPT_REF,
-        "p1_w5_projection_receipt_ref": P1_W5_RECEIPT_REF,
+        "p2_w1_proof_pool_receipt_ref": p2_w1_receipt_ref,
+        "p2_w1_proof_pool_receipt_raw_sha256": _raw_sha256(Path(w1["receipt_json"])),
+        "p1_w4_closeout_receipt_ref": w1["receipt"]["p1_w4_closeout_receipt_ref"],
+        "p1_w4_closeout_receipt_raw_sha256": w1["receipt"][
+            "p1_w4_closeout_receipt_raw_sha256"
+        ],
+        "p1_w5_projection_receipt_ref": w1["receipt"]["p1_w5_projection_receipt_ref"],
+        "p1_w5_projection_receipt_raw_sha256": w1["receipt"][
+            "p1_w5_projection_receipt_raw_sha256"
+        ],
     }
-    validate_p2_w1a_default_graph_authority_receipt(receipt)
+    validate_p2_w1a_default_graph_authority_receipt(receipt, repo_root=root)
     validate_competencies_graph_skills_proof_payload(payload)
 
     out_base.mkdir(parents=True, exist_ok=True)
@@ -441,6 +662,8 @@ def write_p2_w1a_default_graph_authority_receipt(
         "# P2-W1A — Competencies default graph authority (ledger removed)",
         "",
         f"**Generated:** {ts}",
+        f"**Receipt mode:** {receipt_mode}",
+        f"**Certification eligible:** {not test_only_output}",
         "",
         "GAP-P2-1 (broad_skills_ledger as competencies product authority) closed by P2-W1A.",
         "",
@@ -449,6 +672,12 @@ def write_p2_w1a_default_graph_authority_receipt(
         f"- silent_fallback_possible: **{receipt['silent_fallback_possible']}**",
         f"- fail_closed_if_graph_unavailable: **{receipt['fail_closed_if_graph_unavailable']}**",
         f"- deprecated_ledger_code_reachable_from_product_path: **{receipt['deprecated_ledger_code_reachable_from_product_path']}**",
+        f"- p2_w1_proof_pool_receipt_ref: `{receipt['p2_w1_proof_pool_receipt_ref']}`",
+        f"- p2_w1_proof_pool_receipt_raw_sha256: `{receipt['p2_w1_proof_pool_receipt_raw_sha256']}`",
+        f"- p1_w4_closeout_receipt_ref: `{receipt['p1_w4_closeout_receipt_ref']}`",
+        f"- p1_w4_closeout_receipt_raw_sha256: `{receipt['p1_w4_closeout_receipt_raw_sha256']}`",
+        f"- p1_w5_projection_receipt_ref: `{receipt['p1_w5_projection_receipt_ref']}`",
+        f"- p1_w5_projection_receipt_raw_sha256: `{receipt['p1_w5_projection_receipt_raw_sha256']}`",
         "",
     ]
     receipt_md_path.write_text("\n".join(md), encoding="utf-8")

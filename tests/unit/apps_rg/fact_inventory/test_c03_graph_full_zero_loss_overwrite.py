@@ -16,6 +16,7 @@ from apps_rg.fact_inventory.graph_metric_heterogeneity_policy import (
     infer_metric_bucket,
 )
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
+    default_arsenal_ledger_path,
     graph_node_requires_source_refs,
 )
 from apps_rg.fact_inventory.validate_c03_graph_hardening import (
@@ -26,7 +27,7 @@ from apps_rg.fact_inventory.validate_c03_graph_hardening import (
 )
 
 REPO = Path(__file__).resolve().parents[4]
-LEDGER_PATH = REPO / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+LEDGER_PATH = default_arsenal_ledger_path(REPO)
 
 
 def _provenance_complete_canonical_payload() -> dict:

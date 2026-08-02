@@ -15,9 +15,10 @@ from pathlib import Path
 import pytest
 
 from apps_rg.fact_inventory import augmented_skills_graph_sqlite as graph_sqlite_module
-from apps_rg.fact_inventory.augmented_skills_graph import load_augmented_skills_graph
 from apps_rg.fact_inventory.augmented_skills_graph_sqlite import (
     C03_SQLITE_MATERIALIZER_CODE_VERSION,
+    FORBIDDEN_SKILL_NODE_IDS,
+    POLICY_EDGE_SOURCE_KEYS,
     RAW_TO_CANONICAL_NODE_TYPE,
     apply_operator_archive_promotions,
     build_skill_rows_by_id,
@@ -33,12 +34,18 @@ from apps_rg.fact_inventory.augmented_skills_graph_sqlite import (
     materialize_augmented_skills_graph_sqlite,
     open_graph_sqlite,
     project_registered_graph_node_type,
+    projected_graph_edge_signature_report,
     resolve_confidence_grade,
+    resolve_node_type,
     validate_hardened_materialized_sqlite,
     validate_materialized_sqlite,
 )
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     REGISTERED_GRAPH_NODE_TYPES,
+    derive_registered_graph_endpoint_types,
+)
+from apps_rg.fact_inventory.metric_outcome_materializer import (
+    metric_outcome_node_and_edge_rows,
 )
 from apps_rg.runtime.c0.c03_errors import C03GraphProjectionUnavailableError
 from apps_rg.runtime.c03_graph_sqlite_context import (
@@ -319,6 +326,86 @@ def test_real_projection_preserves_exact_metric_node_type_counts(sqlite_db: Path
         node_type: sum(1 for row in graph["graph_nodes"] if row.get("node_type") == node_type)
         for node_type in ("metric", "metric_bucket")
     }
+    raw_node_types = {
+        str(row.get("node_id") or ""): str(row.get("node_type") or "")
+        for row in graph["graph_nodes"]
+        if isinstance(row, dict) and str(row.get("node_id") or "").strip()
+    }
+    skill_ids = {
+        str(row.get("skill_id") or "")
+        for row in graph["skill_rows"]
+        if isinstance(row, dict) and str(row.get("skill_id") or "").strip()
+    }
+    registered_endpoint_types = derive_registered_graph_endpoint_types(graph)
+    source_node_types: dict[str, str] = {}
+
+    def source_node_type(node_id: str) -> str:
+        raw_type = raw_node_types.get(node_id)
+        if raw_type is None and node_id in skill_ids:
+            raw_type = "skill"
+        if raw_type is None:
+            raw_type = registered_endpoint_types.get(node_id)
+        return resolve_node_type(node_id, raw_type or infer_node_type_from_id(node_id))
+
+    source_edges_by_id: dict[str, dict[str, str]] = {}
+    for row in graph["graph_edges"]:
+        assert isinstance(row, dict)
+        edge_id = str(row.get("edge_id") or "").strip()
+        source_id = str(row.get("source_node_id") or row.get("source") or "").strip()
+        target_id = str(row.get("target_node_id") or row.get("target") or "").strip()
+        edge_type = str(row.get("edge_type") or "").strip()
+        assert edge_id and source_id and target_id and edge_type
+        assert source_id not in FORBIDDEN_SKILL_NODE_IDS
+        if source_id in POLICY_EDGE_SOURCE_KEYS:
+            source_id = (
+                source_id
+                if source_id.startswith("policy_rule_")
+                else f"policy_rule_{source_id}"
+            )
+        source_node_types.setdefault(source_id, source_node_type(source_id))
+        source_node_types.setdefault(target_id, source_node_type(target_id))
+        source_edges_by_id[edge_id] = {
+            "edge_id": edge_id,
+            "source_node_id": source_id,
+            "target_node_id": target_id,
+            "edge_type": edge_type,
+        }
+
+    source_edges: list[dict[str, str]] = []
+    seen_source_triples: set[tuple[str, str, str]] = set()
+    for row in source_edges_by_id.values():
+        triple = (row["source_node_id"], row["target_node_id"], row["edge_type"])
+        if triple not in seen_source_triples:
+            seen_source_triples.add(triple)
+            source_edges.append(row)
+
+    metric_nodes, metric_edges = metric_outcome_node_and_edge_rows(
+        REPO,
+        ts="source-derived-test",
+        known_node_ids=set(source_node_types),
+    )
+    for row in metric_nodes:
+        source_node_types[str(row["node_id"])] = str(row["node_type"])
+    for row in metric_edges:
+        for field in ("source_node_id", "target_node_id"):
+            node_id = str(row[field])
+            source_node_types.setdefault(
+                node_id,
+                resolve_node_type(node_id, infer_node_type_from_id(node_id)),
+            )
+    source_edges.extend(metric_edges)
+    source_signature_report = projected_graph_edge_signature_report(
+        node_types_by_id=source_node_types,
+        edge_rows=source_edges,
+    )
+    assert source_signature_report["failure_locators"] == []
+    assert source_signature_report["unregistered_edge_count"] == 0
+    expected_edge_triples = {
+        (str(row["source_node_id"]), str(row["target_node_id"]), str(row["edge_type"]))
+        for row in source_edges
+    }
+    assert len(expected_edge_triples) == len(source_edges)
+
     conn = sqlite3.connect(sqlite_db)
     try:
         projected_counts = dict(
@@ -333,6 +420,11 @@ def test_real_projection_preserves_exact_metric_node_type_counts(sqlite_db: Path
                 "SELECT node_id,node_type FROM graph_nodes WHERE node_id IN "
                 "('fact_quant_hpc_003','section_executive_summary',"
                 "'atomic_fact_default_external_proof')"
+            ).fetchall()
+        )
+        materialized_edge_triples = set(
+            conn.execute(
+                "SELECT source_node_id,target_node_id,edge_type FROM graph_edges"
             ).fetchall()
         )
         summary = load_graph_metadata_row(conn)["graph_count_summary"]
@@ -350,8 +442,13 @@ def test_real_projection_preserves_exact_metric_node_type_counts(sqlite_db: Path
         "fact_quant_hpc_003": "fact",
         "section_executive_summary": "section",
     }
-    assert summary["projected_registered_edge_count"] == 2364
-    assert summary["projected_registered_edge_signature_valid_count"] == 2364
+    assert materialized_edge_triples == expected_edge_triples
+    assert summary["projected_registered_edge_count"] == source_signature_report[
+        "registered_edge_count"
+    ]
+    assert summary["projected_registered_edge_signature_valid_count"] == source_signature_report[
+        "valid_edge_count"
+    ]
 
 
 def test_materializer_rejects_wrong_derived_endpoint_type_before_publish(
@@ -419,10 +516,14 @@ def test_run_materialize_cli_smoke_skip_parity(tmp_path: Path) -> None:
     env = os.environ.copy()
     env["APPS_RG_AUGMENTED_SKILLS_GRAPH_SQLITE_PATH"] = str(tmp_path / "cli_graph.sqlite")
     env["APPS_RG_AUGMENTED_SKILLS_GRAPH_SQLITE_RECEIPT_DIR"] = str(tmp_path / "receipts")
+    env["APPS_RG_C03_GRAPH_SQLITE_CONTEXT_RECEIPT_DIR"] = str(
+        tmp_path / "c03_context_receipts"
+    )
     proc = subprocess.run(
         [
             sys.executable,
-            "apps_rg/fact_inventory/run_materialize_augmented_skills_graph_sqlite.py",
+            "-m",
+            "apps_rg.fact_inventory.run_materialize_augmented_skills_graph_sqlite",
             "--skip-parity",
         ],
         cwd=str(REPO),
@@ -515,6 +616,14 @@ def test_graph_path_index_tables_are_materialized(sqlite_db: Path) -> None:
             LIMIT 1
             """
         ).fetchone()
+        sibling_node_type = (
+            conn.execute(
+                "SELECT node_type FROM graph_nodes WHERE node_id = ?",
+                (sibling[0],),
+            ).fetchone()[0]
+            if sibling is not None
+            else None
+        )
         neighborhood_count = conn.execute(
             """
             SELECT COUNT(*) FROM graph_neighborhoods
@@ -536,7 +645,7 @@ def test_graph_path_index_tables_are_materialized(sqlite_db: Path) -> None:
     assert "fact_engineering_platform_001" in json.loads(skill_fact_path[1])
     assert float(skill_fact_path[2]) > 0
     assert sibling is not None
-    assert sibling[0].startswith("skill_")
+    assert sibling_node_type == "skill"
     assert sibling[1] in (
         "shared_fact",
         "shared_parent:capability_domain_contains_skill",
@@ -702,11 +811,26 @@ def test_c03_sqlite_context_keeps_resume_skill_source_trace(sqlite_db: Path) -> 
     assert all(row.get("fact_id_links") for row in resume_sourced)
 
 
-def test_enrich_c03_bound_attaches_sqlite(sqlite_db: Path) -> None:
+def test_enrich_c03_bound_attaches_sqlite(
+    sqlite_db: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    receipt_path = tmp_path / "c03_graph_sqlite_context_test.json"
+
+    def write_test_receipt(*_args: object, **_kwargs: object) -> Path:
+        receipt_path.write_text("{}\n", encoding="utf-8")
+        return receipt_path
+
+    monkeypatch.setattr(
+        "apps_rg.runtime.c03_graph_sqlite_context.write_c03_graph_sqlite_context_receipt",
+        write_test_receipt,
+    )
     doc = enrich_c03_bound_with_sqlite_context(
         {"section_id": "competencies", "c03_graphrag_bound_status": "BOUND"},
         role_family_key="SVP_ENGINEERING_AI_PLATFORM",
         repo_root=REPO,
+        db_path=sqlite_db,
     )
     assert doc.get("c03_sqlite_context_status") in ("ATTACHED", "UNAVAILABLE")
     if doc["c03_sqlite_context_status"] == "ATTACHED":

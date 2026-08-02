@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from apps_rg.prompt_assembly.e0_examples import build_executive_summary_e0
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.executive_summary_composition import (
     build_executive_summary_composition_plan,
     format_composition_plan_for_pa,
@@ -14,7 +14,6 @@ from apps_rg.runtime.sections.executive_summary_generation_grade_contract import
 )
 from apps_rg.runtime.sections.executive_summary_pa import (
     compile_executive_summary_prompt,
-    load_executive_summary_template_slots,
 )
 from apps_rg.runtime.sections.executive_summary_synthesis_contract import (
     FSA_CREDENTIAL_FACT_ID,
@@ -24,8 +23,8 @@ from apps_rg.runtime.sections.executive_summary_synthesis_contract import (
 )
 
 REPO = Path(__file__).resolve().parents[3]
-TEMPLATE = (
-    REPO / "apps_rg" / "prompt_assembly" / "templates" / "executive_summary.generate_scratch_v1.yaml"
+TEMPLATE = resolve_apps_rg_path(
+    REPO, "prompt_assembly", "templates", "executive_summary.generate_scratch_v1.yaml"
 )
 
 

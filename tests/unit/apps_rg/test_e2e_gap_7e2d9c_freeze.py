@@ -21,6 +21,14 @@ import pytest
 FIXTURE_DIR = Path(__file__).resolve().parents[2] / "fixtures" / "e2e_gap_7e2d9c"
 MANIFEST_PATH = FIXTURE_DIR / "manifest.json"
 
+pytestmark = pytest.mark.skipif(
+    not MANIFEST_PATH.is_file(),
+    reason=(
+        "standalone boundary: source-only frozen E2E GAP fixture corpus "
+        "tests/fixtures/e2e_gap_7e2d9c is not included"
+    ),
+)
+
 TARGET_IDS = ("aig", "brown")
 
 # The frozen signature (see manifest.json / README.md).

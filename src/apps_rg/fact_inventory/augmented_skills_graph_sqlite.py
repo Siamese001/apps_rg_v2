@@ -21,10 +21,12 @@ from apps_rg.fact_inventory.augmented_skills_graph import (
 )
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     REGISTERED_GRAPH_EDGE_SIGNATURES,
+    default_arsenal_ledger_path,
     derive_registered_graph_endpoint_types,
     skill_row_eligible_for_external_claim,
     validate_arsenal_ledger_shape,
 )
+from apps_rg.repository_layout import repository_root
 from apps_rg.fact_inventory.track_weighted_graph_expansion import (
     ROLE_FAMILY_TRACK_WEIGHTS,
     SENIOR_ROLE_TAXONOMY_IDS,
@@ -641,7 +643,7 @@ DDL_STATEMENTS: tuple[str, ...] = (
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return repository_root(Path(__file__))
 
 
 def _utc_now() -> str:
@@ -1666,7 +1668,7 @@ def materialize_augmented_skills_graph_sqlite(
     _require_sidecar_free_atomic_target(out_path)
     payload = graph or load_augmented_skills_graph(repo_root=root)
     validate_arsenal_ledger_shape(payload)
-    src_path = json_source_path or (root / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json")
+    src_path = json_source_path or default_arsenal_ledger_path(root)
     ledger_hash = _sha256_hex(json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")))
     gver = graph_version_from_payload(payload)
     ts = _utc_now()
@@ -2578,26 +2580,6 @@ def validate_materialized_sqlite(
             WHERE se.section_id = 'executive_summary' AND se.allowed = 1
               AND n.node_type = 'skill'
               AND n.confidence IN ('MEDIUM', 'LOW', 'BLOCKED')
-            """
-        ).fetchall()
-        exec_summary_allowed_count = conn.execute(
-            """
-            SELECT COUNT(*) FROM section_eligibility se
-            JOIN graph_nodes n ON n.node_id = se.node_id
-            WHERE se.section_id = 'executive_summary' AND se.allowed = 1
-              AND n.node_type = 'skill'
-            """
-        ).fetchone()[0]
-        skill_confidence_dist = conn.execute(
-            """
-            SELECT confidence, COUNT(*) FROM graph_nodes
-            WHERE node_type = 'skill' GROUP BY confidence ORDER BY 2 DESC
-            """
-        ).fetchall()
-        skill_support_dist = conn.execute(
-            """
-            SELECT support_level, COUNT(*) FROM graph_nodes
-            WHERE node_type = 'skill' GROUP BY support_level ORDER BY 2 DESC
             """
         ).fetchall()
         broken_links = conn.execute(

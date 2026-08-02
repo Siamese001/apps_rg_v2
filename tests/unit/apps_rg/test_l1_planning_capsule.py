@@ -6,7 +6,6 @@ import ast
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -29,6 +28,7 @@ from apps_rg.runtime.bindings.u0_profile_manifest import (
     l1_planning_profile_digest,
     l1_planning_profile_ref,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 FORBIDDEN_ROUTE_AUTHORITY_KEYS = {
@@ -206,7 +206,8 @@ def test_l1_binding_and_capsule_do_not_import_downstream_authority_modules() -> 
         "apps_rg/runtime/bindings/l1_binding.py",
         "apps_rg/runtime/bindings/l1_planning_capsule.py",
     ):
-        tree = ast.parse((REPO_ROOT / rel).read_text(encoding="utf-8"), filename=rel)
+        path = resolve_apps_rg_path(REPO_ROOT, *Path(rel).parts[1:])
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=rel)
         imports: list[str] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):

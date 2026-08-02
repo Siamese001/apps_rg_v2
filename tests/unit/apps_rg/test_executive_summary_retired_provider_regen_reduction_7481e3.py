@@ -9,13 +9,11 @@ Covers:
 """
 from __future__ import annotations
 
-import importlib
 import re
-import types
 
-import pytest
 import yaml
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -23,7 +21,13 @@ import yaml
 
 def _load_examples_yaml() -> dict:
     from pathlib import Path
-    p = Path(__file__).resolve().parents[3] / "apps_rg/prompt_assembly/examples/executive_summary_examples.yaml"
+
+    p = resolve_apps_rg_path(
+        Path(__file__).resolve().parents[3],
+        "prompt_assembly",
+        "examples",
+        "executive_summary_examples.yaml",
+    )
     return yaml.safe_load(p.read_text(encoding="utf-8")) or {}
 
 
@@ -33,7 +37,13 @@ def _examples_by_id(data: dict) -> dict:
 
 def _load_template_i0() -> str:
     from pathlib import Path
-    p = Path(__file__).resolve().parents[3] / "apps_rg/prompt_assembly/templates/executive_summary.generate_scratch_v1.yaml"
+
+    p = resolve_apps_rg_path(
+        Path(__file__).resolve().parents[3],
+        "prompt_assembly",
+        "templates",
+        "executive_summary.generate_scratch_v1.yaml",
+    )
     raw = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
     return raw.get("slot_bodies", {}).get("I0", "")
 
@@ -295,7 +305,6 @@ class TestW4JudgeRegenMaxAttempts:
         )
 
     def test_judge_regen_max_attempts_function_returns_3_by_default(self, monkeypatch):
-        import os
         monkeypatch.delenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_MAX_ATTEMPTS", raising=False)
         monkeypatch.delenv("APPS_RG_EXEC_SUMMARY_REGEN_CAPS", raising=False)
         from apps_rg.runtime.sections import executive_summary_repair_policy as rp
@@ -343,7 +352,6 @@ class TestW5GoldExampleNegative:
     def test_gold_example_not_included_in_e0_positives(self):
         from apps_rg.prompt_assembly.e0_examples import (
             build_executive_summary_e0,
-            _EXEC_SUMMARY_POSITIVE_RETIRED_FROM_COMPILE,
         )
         e0_svp = build_executive_summary_e0(strategy_executive=True)
         e0_base = build_executive_summary_e0(strategy_executive=False)

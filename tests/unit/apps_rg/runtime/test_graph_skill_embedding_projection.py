@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import sqlite3
 
 import pytest
 
@@ -98,6 +99,48 @@ def test_query_returns_only_assertion_ids_and_similarity_without_writes(tmp_path
 
     assert result == [{"assertion_id": "skill_a", "similarity": 1.0}]
     assert hashlib.sha256(path.read_bytes()).hexdigest() == before
+
+
+@pytest.mark.parametrize(
+    ("column", "tampered_value", "expected_issue"),
+    [
+        ("skill_id", "skill_injected", "SKILL_ID_MISMATCH:skill_a"),
+        (
+            "authority_envelope_sha256",
+            "f" * 64,
+            "AUTHORITY_ENVELOPE_DIGEST_MISMATCH:skill_a",
+        ),
+        ("allowed_sections_json", "[]", "ALLOWED_SECTIONS_MISMATCH:skill_a"),
+    ],
+)
+def test_projection_validator_rejects_authority_metadata_tampering(
+    tmp_path: Path,
+    column: str,
+    tampered_value: str,
+    expected_issue: str,
+) -> None:
+    corpus = _corpus()
+    path = tmp_path / "projection.sqlite"
+    build_embedding_projection(
+        path,
+        corpus,
+        {"skill_a": [1.0, 0.0, 0.0], "skill_b": [0.0, 1.0, 0.0]},
+        _model_manifest(),
+    )
+    if column not in {
+        "skill_id",
+        "authority_envelope_sha256",
+        "allowed_sections_json",
+    }:
+        raise AssertionError(f"unexpected test column: {column}")
+    with sqlite3.connect(path) as connection:
+        connection.execute(
+            f"UPDATE assertion_vectors SET {column} = ? WHERE assertion_id = ?",  # noqa: S608 - parameterized allowlisted test column
+            (tampered_value, "skill_a"),
+        )
+        connection.commit()
+
+    assert expected_issue in validate_embedding_projection(path, corpus=corpus)
 
 
 def test_projection_rejects_missing_nonfinite_or_unnormalized_vectors(tmp_path: Path) -> None:

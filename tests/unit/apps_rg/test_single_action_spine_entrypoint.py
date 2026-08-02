@@ -10,6 +10,21 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
+def _isolate_agentic_l2_cache(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    import agentic_core.L4_state.cache.gptcache_client as cache_module
+    from agentic_core.L4_state.contracts.vector_cache_layout import VectorCacheLayout
+
+    monkeypatch.setattr(
+        cache_module,
+        "VECTOR_CACHE_LAYOUT",
+        VectorCacheLayout(base_dir=tmp_path / "l2_cache"),
+    )
+    monkeypatch.setenv("CHROMA_PERSIST_DIR", str(tmp_path / "chroma"))
+
+
 def test_old_r4_module_not_importable() -> None:
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module(
@@ -25,7 +40,11 @@ def test_new_spine_module_importable() -> None:
     assert mod.ROUTE_FAMILY == "R4_SINGLE_ACTION"
 
 
-def test_apps_rg_production_requires_cache_preflight_evidence(tmp_path: Path) -> None:
+def test_apps_rg_production_requires_cache_preflight_evidence(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    _isolate_agentic_l2_cache(monkeypatch, tmp_path)
     from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
         run_integrated_single_action_spine,
     )
@@ -38,7 +57,11 @@ def test_apps_rg_production_requires_cache_preflight_evidence(tmp_path: Path) ->
     assert "CACHE_PREFLIGHT" in (result.fault or "")
 
 
-def test_direct_spine_without_cache_fails_product_proof(tmp_path: Path) -> None:
+def test_direct_spine_without_cache_fails_product_proof(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    _isolate_agentic_l2_cache(monkeypatch, tmp_path)
     from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
         run_integrated_single_action_spine,
     )
@@ -94,7 +117,7 @@ def test_r1a_hit_skips_generation_spine(
     monkeypatch.setattr(cd, "_default_artifact_dir", lambda _a: tmp_path / "art")
     monkeypatch.setattr(preflight_mod, "run_whole_run_cache_preflight", lambda **kwargs: hit)
 
-    out = cd.run_canonical_apps_rg_from_cli_primitives(
+    out = cd.run_canonical_full_resume_from_cli_primitives(
         target_company="Acme",
         target_role="Engineer",
         jd="inline jd text long enough",
@@ -144,7 +167,7 @@ def test_cache_miss_invokes_spine_once(monkeypatch: pytest.MonkeyPatch, tmp_path
     monkeypatch.setattr(cd, "_augment_r4_run_manifest_for_apps_rg_l2_fault", lambda *a, **k: None)
     monkeypatch.setattr(preflight_mod, "maybe_ingest_r1b_post_exit", lambda **k: None)
 
-    cd.run_canonical_apps_rg_from_cli_primitives(
+    cd.run_canonical_full_resume_from_cli_primitives(
         target_company="Acme",
         target_role="Engineer",
         jd="inline jd text long enough",

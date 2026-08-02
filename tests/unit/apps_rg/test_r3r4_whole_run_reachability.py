@@ -11,16 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-
-def test_product_x3_taxonomy_rejects_legacy_success_aliases() -> None:
-    from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
-        _product_x3_authorizes,
-    )
-
-    assert _product_x3_authorizes("X3D_ALLOW_FINISH") is True
-    for legacy_alias in ("X3D", "X3C", "EXIT_OK", "EXIT_PARTIAL", "ALLOW"):
-        assert _product_x3_authorizes(legacy_alias) is False
-
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.dispatch.spine_stage_receipts import (
     FILENAME_DELEGATED_BRIEFING,
     FILENAME_RESEARCH_BRIDGE_REQUEST,
@@ -30,6 +21,7 @@ from apps_rg.runtime.dispatch.spine_stage_receipts import (
 from apps_rg.runtime.mandatory_run_outputs import MANDATORY_OUTPUT_HARD_STOP_GATE_ID
 from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
     ROUTE_FAMILY_R3R4,
+    _product_x3_authorizes,
     apps_research_handoff_authorized,
     briefing_input_present,
     research_delegation_enabled,
@@ -41,6 +33,12 @@ _REQUEST_UUID = uuid_module.UUID("11111111-1111-1111-1111-111111111111")
 _RUN_UUID = uuid_module.UUID("22222222-2222-2222-2222-222222222222")
 _TRACE_UUID = uuid_module.UUID("33333333-3333-3333-3333-333333333333")
 _JD_TEXT = "Target JD text for route-decision pytest."
+
+
+def test_product_x3_taxonomy_rejects_legacy_success_aliases() -> None:
+    assert _product_x3_authorizes("X3D_ALLOW_FINISH") is True
+    for legacy_alias in ("X3D", "X3C", "EXIT_OK", "EXIT_PARTIAL", "ALLOW"):
+        assert _product_x3_authorizes(legacy_alias) is False
 
 
 @pytest.fixture(autouse=True)
@@ -195,7 +193,9 @@ def test_whole_run_static_json_is_replaced_by_delegated_brief(
     monkeypatch.setattr(orch, "_default_artifact_dir", lambda explicit: tmp_path / "static_json_run")
 
     brief_json = Path("tests/fixtures/apps_rg/brief_anthropic_partnerships_2026.json")
-    jd_json = Path("apps_rg/config/targeting/jd_anthropic_partnerships_2026.json")
+    jd_json = resolve_apps_rg_path(
+        None, "config", "targeting", "jd_anthropic_partnerships_2026.json"
+    )
     result = orch.run_whole_run_with_route_governance(
         target_company="Anthropic",
         target_role="Manager of Applied AI Architecture, Partnerships",

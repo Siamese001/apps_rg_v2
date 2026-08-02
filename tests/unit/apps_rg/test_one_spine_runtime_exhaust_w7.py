@@ -9,8 +9,7 @@ import pytest
 from apps_rg.runtime.spine.exit_lane_hooks import finalize_section_exit_after_l2
 from apps_rg.runtime.spine.exit_artifacts import EXIT_DISPOSITION_RECEIPT_ARTIFACT
 from apps_rg.runtime.spine.c0_fec_compose import (
-    FEC_BRIDGE_ARTIFACT,
-    build_spine_c0_fec_artifact,
+    wire_spine_c0_fec_for_section,
 )
 from apps_rg.runtime.spine.front_contracts import (
     activate_fixture_dev_bypass,
@@ -48,6 +47,7 @@ def _patch_spine_c0_for_w7_chain(monkeypatch: pytest.MonkeyPatch) -> None:
     from apps_rg.runtime.bindings.c0_binding import C0_GRAPH_LANE_NA_REF
 
     monkeypatch.setenv("APPS_RG_TEST_HARNESS", "1")
+    monkeypatch.setenv("APPS_RG_C0_EVIDENCE_ROOM", "0")
 
     def _fake_c0_retrieve(**_: object) -> FinalEvidenceContract:
         return FinalEvidenceContract(
@@ -125,16 +125,17 @@ def test_full_exit_then_exhaust_chain(tmp_path: Path, section_id: str):
     spine = build_section_front_spine_from_args(section_id=section_id, args=_args(), repo_root=REPO)
     pool = _minimal_pool(section_id)
     payload: dict = {"allowed_fact_ids": list(pool.allowed_fact_ids_ordered), "run_id": "w7_chain"}
-    bridge = build_spine_c0_fec_artifact(
+    wire_spine_c0_fec_for_section(
+        artifact_dir=tmp_path,
         section_id=section_id,
         front_spine=spine,
         pool=pool,
+        runtime_payload=payload,
     )
-    _write_json(tmp_path / FEC_BRIDGE_ARTIFACT, bridge.bridge_doc)
-    payload["section_fec_bridge"] = bridge.bridge_doc
-    payload["fec_bridge_ref"] = FEC_BRIDGE_ARTIFACT
     _write_json(tmp_path / "compiled_prompt_artifact.json", {"evidence_contract_consumed": True})
-    prepare_section_l2_before_provider(tmp_path, section_id, payload, provider_lane="retired_provider_profile")
+    prepare_section_l2_before_provider(
+        tmp_path, section_id, payload, provider_lane="external_claude"
+    )
     _write_json(tmp_path / "l2_output.json", {})
     _write_json(tmp_path / "x3_disposition.json", {"x3_code": "X3_ALLOW", "pass": True})
     finalize_section_l2_after_output(tmp_path, section_id, payload)

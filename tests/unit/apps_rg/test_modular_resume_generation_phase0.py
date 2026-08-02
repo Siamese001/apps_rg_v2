@@ -8,6 +8,7 @@ import uuid
 from pathlib import Path
 
 import pytest
+from tests.helpers.standalone_repo_view import materialize_standalone_repo_view
 
 from apps_rg.l2_recipe.modular_r4_generation_result import ModularR4GenerationResult
 from apps_rg.l2_recipe.modular_resume_generation import (
@@ -66,11 +67,12 @@ def test_ok_for_recipe_context_contract() -> None:
     assert bad.ok_for_recipe_context() is False
 
 
-def test_run_modular_honors_artifact_dir_under_repo() -> None:
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase0_pytest_{uuid.uuid4().hex[:10]}"
+def test_run_modular_honors_artifact_dir_under_repo(tmp_path: Path) -> None:
+    source_repo = find_repo_root()
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase0_pytest_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
-    fx = repo / "tests" / "_fixtures" / "rg_output_phase0_min_valid.json"
+    fx = source_repo / "tests" / "_fixtures" / "rg_output_phase0_min_valid.json"
     prof = ModularResumeProfile()
     inp = ModularResumeInputPackage(repo_root=repo, rg_output_fixture_path=fx)
     res = run_modular_resume_generation(inp, art, "pytest_phase0", prof)
@@ -98,11 +100,12 @@ def test_artifact_dir_outside_repo_rejected() -> None:
         )
 
 
-def test_section_provider_calls_has_current_generated_lanes() -> None:
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase0_pytest_{uuid.uuid4().hex[:10]}"
+def test_section_provider_calls_has_current_generated_lanes(tmp_path: Path) -> None:
+    source_repo = find_repo_root()
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase0_pytest_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
-    fx = repo / "tests" / "_fixtures" / "rg_output_phase0_min_valid.json"
+    fx = source_repo / "tests" / "_fixtures" / "rg_output_phase0_min_valid.json"
     res = run_modular_resume_generation(
         ModularResumeInputPackage(repo_root=repo, rg_output_fixture_path=fx),
         art,

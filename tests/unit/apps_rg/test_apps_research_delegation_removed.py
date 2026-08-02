@@ -13,6 +13,7 @@ import yaml
 from agentic_core.L0_routing.u0_intake_validator import AuthorityValidationReceipt
 from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
 
+from apps_rg.repository_layout import apps_rg_package_root, repository_root, resolve_apps_rg_path
 from apps_rg.runtime.bindings.briefing_u0_signals import BriefingMissingError
 from apps_rg.runtime.bindings.l1_binding import l1_plan_apps_rg
 from apps_rg.runtime.bindings.u0_profile_manifest import (
@@ -24,8 +25,14 @@ from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
     should_delegate_apps_research,
 )
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-ROUTE_PROFILES = REPO_ROOT / "apps_rg" / "config" / "domain_contract" / "route_profiles.yaml"
+REPO_ROOT = repository_root(Path(__file__))
+APPS_RG_ROOT = apps_rg_package_root(REPO_ROOT)
+ROUTE_PROFILES = resolve_apps_rg_path(
+    REPO_ROOT,
+    "config",
+    "domain_contract",
+    "route_profiles.yaml",
+)
 QUARANTINED = {
     "apps_rg/integrations/apps_research_bridge.py",
     "apps_rg/integrations/managed_research_delegation.py",
@@ -103,8 +110,8 @@ def test_production_modules_do_not_import_apps_research_delegation_bridges() -> 
         "apps_rg.integrations.managed_research_delegation",
     }
     offenders: list[str] = []
-    for path in sorted((REPO_ROOT / "apps_rg").rglob("*.py")):
-        rel = path.relative_to(REPO_ROOT).as_posix()
+    for path in sorted(APPS_RG_ROOT.rglob("*.py")):
+        rel = Path("apps_rg", *path.relative_to(APPS_RG_ROOT).parts).as_posix()
         if rel in QUARANTINED or "__pycache__" in path.parts:
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))

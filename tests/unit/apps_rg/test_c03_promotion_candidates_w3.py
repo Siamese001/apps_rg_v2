@@ -7,6 +7,10 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.fact_inventory.track_weighted_graph_expansion import (
+    TrackWeightedExpansionContractError,
+)
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.c0.c03_allowlist_coherence import (
     build_exec_summary_allowlist_receipt,
     filter_c03_evidence_to_allowed_pool,
@@ -22,12 +26,17 @@ from apps_rg.runtime.graph_skills_run_artifacts import (
 )
 from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = repository_root(Path(__file__))
 
 
 @pytest.fixture
 def brown_jd() -> str:
-    path = REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
+    path = resolve_apps_rg_path(
+        REPO,
+        "config",
+        "targeting",
+        "brown_brown_svp_it_strategy_innovation_jd.txt",
+    )
     if not path.is_file():
         pytest.skip("Brown JD fixture missing")
     return path.read_text(encoding="utf-8")
@@ -109,21 +118,17 @@ def test_persist_promotion_candidates_artifact(tmp_path: Path) -> None:
     assert loaded["candidate_count"] == 1
 
 
-def test_brown_pool_has_promotion_candidates(brown_jd: str) -> None:
-    pool = resolve_section_proof_pool(
-        section="executive_summary",
-        target_company="Brown & Brown",
-        target_role="SVP IT Strategy & Innovation",
-        jd_text=brown_jd,
-        product_visible=False,
-    )
-    meta = pool.proof_pool_metadata
-    promo = meta.get("c03_promotion_candidates") or (
-        (meta.get("exec_summary_allowlist_receipt") or {}).get("c03_promotion_candidates")
-    )
-    assert isinstance(promo, dict)
-    filtered = promo.get("c03_filtered_out_fact_ids") or []
-    assert filtered, "Brown graph expansion should filter neighbors for promotion receipt"
-    assert promo.get("promoted_fact_ids") == []
-    for row in promo.get("candidates") or []:
-        assert row.get("promotion_eligible") is False
+def test_brown_pool_does_not_emit_promotion_candidates_without_seed_hop_paths(
+    brown_jd: str,
+) -> None:
+    with pytest.raises(
+        TrackWeightedExpansionContractError,
+        match="seed_fact_ids have no matching track-weighted graph hop paths",
+    ):
+        resolve_section_proof_pool(
+            section="executive_summary",
+            target_company="Brown & Brown",
+            target_role="SVP IT Strategy & Innovation",
+            jd_text=brown_jd,
+            product_visible=False,
+        )

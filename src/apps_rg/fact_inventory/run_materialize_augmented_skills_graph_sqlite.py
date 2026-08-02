@@ -8,15 +8,16 @@ import sys
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+SOURCE_ROOT = Path(__file__).resolve().parents[2]
+ROOT = SOURCE_ROOT.parent if SOURCE_ROOT.name == "src" else SOURCE_ROOT
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
 
-from apps_rg.fact_inventory.augmented_skills_graph_sqlite import (
+from apps_rg.fact_inventory.augmented_skills_graph_sqlite import (  # noqa: E402
     materialize_augmented_skills_graph_sqlite,
     validate_materialized_sqlite,
 )
-from apps_rg.runtime.c03_graph_sqlite_context import (
+from apps_rg.runtime.c03_graph_sqlite_context import (  # noqa: E402
     PROOF_CLASSIFICATION,
     assemble_c03_graph_sqlite_context,
     write_c03_graph_sqlite_context_receipt,
@@ -49,7 +50,10 @@ def _run_cmd(argv: list[str]) -> dict[str, Any]:
 
 def _section_projection_parity() -> dict[str, Any]:
     """Offline parity: W4/W14 projection runner still PASS after sqlite materialization."""
-    cmd = [sys.executable, "apps_rg/fact_inventory/run_w4_w14_multilane_section_projection.py"]
+    cmd = [
+        sys.executable,
+        str(SOURCE_ROOT / "apps_rg/fact_inventory/run_w4_w14_multilane_section_projection.py"),
+    ]
     run = _run_cmd(cmd)
     status = "PASS" if run["exit_code"] == 0 else "FAIL"
     return {"status": status, "command_run": run}

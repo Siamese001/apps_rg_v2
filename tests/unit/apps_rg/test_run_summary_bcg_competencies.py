@@ -3,7 +3,18 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from tools.apps_rg.render_run_summary import render
+import pytest
+
+try:
+    from tools.apps_rg.render_run_summary import render
+except ModuleNotFoundError as exc:
+    if exc.name not in {"tools.apps_rg", "tools.apps_rg.render_run_summary"}:
+        raise
+
+    def render(*_args, **_kwargs):
+        pytest.skip(
+            "the source-only run-summary renderer was excluded from the standalone tools boundary"
+        )
 
 
 def _write_json(path: Path, payload: dict) -> None:

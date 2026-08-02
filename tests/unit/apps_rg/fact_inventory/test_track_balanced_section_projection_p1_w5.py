@@ -9,7 +9,6 @@ import pytest
 
 from apps_rg.fact_inventory.track_balanced_section_projection import (
     P1_W4_CLOSEOUT_RECEIPT_REF,
-    P1_W5_RECEIPT_JSON,
     build_p1_w5_track_balanced_sections,
     detect_cross_track_causal_prose,
     project_competencies_grouped_by_track,
@@ -25,12 +24,30 @@ from apps_rg.fact_inventory.track_weighted_graph_expansion import (
     build_track_weighted_expansion,
     infer_projection_role_family_key,
     load_augmented_skills_graph,
+    write_p1_w4_receipts,
 )
+from apps_rg.fact_inventory import track_balanced_section_projection as projection_module
 from apps_rg.fact_inventory.validate_p1_w4_track_weighted_closeout import (
     validate_p1_w4_track_weighted_closeout,
 )
 
 REPO = ROOT
+
+
+@pytest.fixture(scope="module")
+def p1_w4_closeout_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    out_dir = tmp_path_factory.mktemp("p1_w4_closeout")
+    paths = write_p1_w4_receipts(repo_root=REPO, out_dir=out_dir)
+    return Path(paths["closeout_json"])
+
+
+@pytest.fixture
+def p1_w4_closeout_test_double(
+    monkeypatch: pytest.MonkeyPatch,
+    p1_w4_closeout_path: Path,
+) -> None:
+    closeout = json.loads(p1_w4_closeout_path.read_text(encoding="utf-8"))
+    monkeypatch.setattr(projection_module, "_load_p1_w4_closeout", lambda _root: closeout)
 
 
 @pytest.fixture(scope="module")
@@ -50,10 +67,9 @@ def hybrid_expansion() -> dict:
     )
 
 
-def test_p1_w4_closeout_receipt_exists_and_bound() -> None:
-    path = REPO / P1_W4_CLOSEOUT_RECEIPT_REF
-    assert path.is_file(), "P1-W4 closeout receipt must exist before P1-W5"
-    closeout = json.loads(path.read_text(encoding="utf-8"))
+def test_p1_w4_closeout_receipt_exists_and_bound(p1_w4_closeout_path: Path) -> None:
+    assert p1_w4_closeout_path.is_file(), "P1-W4 closeout receipt must exist before P1-W5"
+    closeout = json.loads(p1_w4_closeout_path.read_text(encoding="utf-8"))
     proof = closeout.get("c03_binding_proof") or {}
     assert proof.get("c03_graph_bound_status") == "BOUND"
 
@@ -128,10 +144,21 @@ def test_broad_skills_ledger_authority_fails() -> None:
         validate_competencies_grouped_by_track(bad)
 
 
-def test_p1_w5_receipt_write_and_fields() -> None:
-    out = write_p1_w5_receipts(repo_root=REPO)
-    assert P1_W5_RECEIPT_JSON.is_file()
+def test_p1_w5_receipt_write_and_fields(
+    tmp_path: Path,
+    p1_w4_closeout_test_double: None,
+) -> None:
+    out = write_p1_w5_receipts(
+        repo_root=REPO,
+        out_dir=tmp_path,
+    )
+    assert Path(out["receipt_json"]).is_file()
+    markdown = Path(out["receipt_md"]).read_text(encoding="utf-8")
+    assert "Receipt mode:** TEST_ONLY_NONCANONICAL_OUTPUT" in markdown
+    assert "Certification eligible:** False" in markdown
     payload = out["payload"]
+    assert payload["receipt_mode"] == "TEST_ONLY_NONCANONICAL_OUTPUT"
+    assert payload["certification_eligible"] is False
     assert payload.get("p1_w4_c03_graph_bound_status") == "BOUND"
     assert payload.get("p1_w4_closeout_receipt_ref") == P1_W4_CLOSEOUT_RECEIPT_REF
     assert payload.get("every_skill_has_fact_id_links") is True
@@ -139,7 +166,10 @@ def test_p1_w5_receipt_write_and_fields() -> None:
     assert payload.get("live_competencies_runtime_modified") is False
 
 
-def test_build_p1_w5_preserves_p1_w4_validator(hybrid_expansion: dict) -> None:
+def test_build_p1_w5_preserves_p1_w4_validator(
+    hybrid_expansion: dict,
+    p1_w4_closeout_test_double: None,
+) -> None:
     validate_p1_w4_track_weighted_closeout(hybrid_expansion)
     built = build_p1_w5_track_balanced_sections(repo_root=REPO)
     assert built["executive_summary_projection"]["projection_present"] is True

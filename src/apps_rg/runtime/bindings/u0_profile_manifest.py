@@ -10,6 +10,8 @@ import hashlib
 from pathlib import Path
 from typing import Final
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
+
 _L1_PLANNING_PROFILE_RELPATH: Final[str] = "apps_rg/profiles/rg_planning_profile.yaml"
 
 
@@ -18,13 +20,12 @@ class ProfileManifestError(RuntimeError):
 
 
 def repo_root() -> Path:
-    """Resolve repository root (directory containing ``pyproject.toml``)."""
+    """Resolve the active monorepo or standalone checkout root."""
 
-    here = Path(__file__).resolve()
-    for parent in (here, *here.parents):
-        if (parent / "pyproject.toml").exists():
-            return parent
-    raise ProfileManifestError("Cannot locate repository root (pyproject.toml).")
+    try:
+        return repository_root(Path(__file__))
+    except FileNotFoundError as exc:
+        raise ProfileManifestError("Cannot locate apps_rg repository root.") from exc
 
 
 def l1_planning_profile_digest(*, allow_missing: bool = False) -> str:
@@ -37,7 +38,7 @@ def l1_planning_profile_digest(*, allow_missing: bool = False) -> str:
         full checkout layout). Runtime callers must pass ``False``.
     """
 
-    path = repo_root() / _L1_PLANNING_PROFILE_RELPATH
+    path = resolve_apps_rg_path(repo_root(), "profiles", "rg_planning_profile.yaml")
     if not path.is_file():
         if allow_missing:
             return ""

@@ -7,6 +7,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip(
+    "tools.analysis.functional_hotspot_test_gaps_report",
+    reason="the monorepo-wide hotspot analyzer is outside the standalone tools boundary",
+)
+
 from tools.analysis import functional_hotspot_test_gaps_report as report
 
 

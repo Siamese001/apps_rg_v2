@@ -14,6 +14,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
+
 # apps_rg package root (directory containing ``runtime/``, ``resume/``, …)
 _APPS_RG_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_RESUME_REL_TO_PKG = Path("resume") / "base" / "amit_ayer_base_resume_v1.json"
@@ -83,7 +85,7 @@ def u0_inline_text_from_payload(resume_payload: dict[str, Any]) -> str:
 
 
 def _repo_root() -> Path:
-    return _APPS_RG_ROOT.parent
+    return repository_root(Path(__file__))
 
 
 def _allowed_suffix(path: Path) -> None:
@@ -98,12 +100,19 @@ def _resolve_resume_path(ref: str, *, repo_root: Path) -> Path:
     p = Path(ref)
     if p.is_absolute():
         return p.resolve()
+    if p.parts and p.parts[0] == "apps_rg":
+        return resolve_apps_rg_path(repo_root, *p.parts[1:]).resolve()
     return (repo_root / ref).resolve()
 
 
 def _default_path_from_pointer(*, repo_root: Path) -> tuple[Path, str]:
-    ptr_path = repo_root / "apps_rg" / "resume" / "base" / "active_base_resume_pointer.json"
-    default = repo_root / DEFAULT_RESUME_REPO_RELPATH
+    ptr_path = resolve_apps_rg_path(
+        repo_root,
+        "resume",
+        "base",
+        "active_base_resume_pointer.json",
+    )
+    default = resolve_apps_rg_path(repo_root, *_DEFAULT_RESUME_REL_TO_PKG.parts)
     if ptr_path.is_file():
         ref_obj = json.loads(ptr_path.read_text(encoding="utf-8"))
         active = ref_obj.get("active_base_resume")
@@ -238,7 +247,11 @@ def load_candidate_static_profile_json(
     """Return ``(profile_dict, resolved_path, canonical_digest)`` for static identity anchors."""
     root = repo_root or _repo_root()
     ref = str(source_static_profile_ref or "").strip()
-    path = _resolve_resume_path(ref, repo_root=root) if ref else (root / DEFAULT_STATIC_PROFILE_REPO_RELPATH).resolve()
+    path = (
+        _resolve_resume_path(ref, repo_root=root)
+        if ref
+        else resolve_apps_rg_path(root, *_DEFAULT_STATIC_PROFILE_REL_TO_PKG.parts).resolve()
+    )
     raw, _disk_ref = _load_file_body(path)
     payload = build_canonical_resume_payload(raw)
     if payload.get("material_kind") != "json" or not isinstance(payload.get("document"), dict):

@@ -115,11 +115,11 @@ def resolve_effective_lane_l2_path(repo: Path, lane: str) -> Path | None:
 
 
 def find_repo_root(start: Path | None = None) -> Path:
-    here = (start or Path(__file__)).resolve()
-    for parent in [here.parent, *here.parents]:
-        if (parent / "apps_rg" / "resume" / "base").exists():
-            return parent
-    return Path.cwd()
+    """Return the checkout root in monorepo and standalone ``src`` layouts."""
+
+    from apps_rg.repository_layout import repository_root
+
+    return repository_root(start or Path(__file__))
 
 
 def is_integrated_whole_run_dir_name(name: str) -> bool:

@@ -4,8 +4,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from apps_rg.repository_layout import apps_rg_package_root
+
 REPO = Path(__file__).resolve().parents[3]
-FI = REPO / "apps_rg" / "fact_inventory"
+FI = apps_rg_package_root(REPO) / "fact_inventory"
 
 GRAPH_FILES = [
     FI / "unify_role_episode_bundles.json",

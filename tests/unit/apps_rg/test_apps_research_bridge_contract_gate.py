@@ -35,8 +35,8 @@ def _fetch(bridge: AppsResearchBridge):
     )
 
 
-def test_mock_bridge_default_brief_passes_contract_gate() -> None:
-    result = _fetch(MockAppsResearchBridge(confidence_score=0.9))
+def test_mock_bridge_default_brief_passes_contract_gate(tmp_path: Path) -> None:
+    result = _persist_mock_result(tmp_path)
     assert not result.is_blocked
     assert result.company_brief_text.strip()
     assert result.apps_research_handoff_envelope is not None
@@ -89,7 +89,7 @@ def _persist_mock_result(tmp_path: Path) -> ResearchResult:
     )
 
 
-def test_delegation_fails_closed_without_persisted_briefing() -> None:
+def test_delegation_fails_closed_without_persisted_briefing(tmp_path: Path) -> None:
     req = RequestForResumeBriefing(
         request_id="req-1",
         run_id="run-1",
@@ -99,7 +99,7 @@ def test_delegation_fails_closed_without_persisted_briefing() -> None:
         research_authorized=True,
     )
     in_memory_only = replace(
-        _fetch(MockAppsResearchBridge(confidence_score=0.9)),
+        _persist_mock_result(tmp_path),
         research_artifact_dir="",
         briefing_artifact_path="",
     )

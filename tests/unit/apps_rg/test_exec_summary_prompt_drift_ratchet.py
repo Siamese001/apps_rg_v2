@@ -5,14 +5,17 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import pytest
-
 from apps_rg.runtime.dispatch.executive_summary_pa import compile_executive_summary_prompt
 from apps_rg.runtime.sections.executive_summary_pa import load_executive_summary_template_slots
 
 REPO = Path(__file__).resolve().parents[3]
 TEMPLATE = (
-    REPO / "apps_rg" / "prompt_assembly" / "templates" / "executive_summary.generate_scratch_v1.yaml"
+    REPO
+    / "src"
+    / "apps_rg"
+    / "prompt_assembly"
+    / "templates"
+    / "executive_summary.generate_scratch_v1.yaml"
 )
 
 _X2_GATE_ID = re.compile(r"\bx2_[a-z0-9_]+\b")

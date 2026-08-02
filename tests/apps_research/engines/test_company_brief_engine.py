@@ -10,6 +10,7 @@ import types
 from pathlib import Path
 
 import pytest
+import apps_research
 
 from apps_research.engines.company_brief_engine import (
     APPS_RESEARCH_BRIEF_MODEL,
@@ -204,12 +205,12 @@ def test_company_brief_model_is_resolved_from_provider_profile() -> None:
 
 
 def test_apps_research_active_contracts_do_not_restore_stale_model_pins() -> None:
-    repo = Path(__file__).resolve().parents[3]
+    package_root = Path(apps_research.__file__).resolve().parent
     stale_claude = "claude-sonnet-" + "4-6"
     stale_gemini_provider = "gemini-pro-" + "3.1-preview"
     checked = (
-        repo / "apps_research/config/domain_contract/provider_profile.company_brief.v1.yaml",
-        repo / "apps_research/types/apps_rg_targeting_brief_contract.py",
+        package_root / "config/domain_contract/provider_profile.company_brief.v1.yaml",
+        package_root / "types/apps_rg_targeting_brief_contract.py",
     )
     for path in checked:
         text = path.read_text(encoding="utf-8")

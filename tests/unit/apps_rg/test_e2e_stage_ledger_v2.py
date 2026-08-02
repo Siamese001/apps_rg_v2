@@ -497,12 +497,16 @@ def test_product_v2_ledger_detects_authoritative_receipt_byte_tamper(
 
 
 def test_authority_contract_uses_external_ledger_and_pipeline_close_receipts() -> None:
+    from apps_rg.runtime.e2e_stage_ledger import DEFAULT_AUTHORITY_CONTRACT
+
     contract_path = (
         Path(__file__).resolve().parents[3]
         / "config"
         / "certification"
         / "apps_research_rg_e2e_authority_contract.v1.json"
     )
+    assert DEFAULT_AUTHORITY_CONTRACT.resolve() == contract_path.resolve()
+    assert DEFAULT_AUTHORITY_CONTRACT.is_file()
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
     stages = {row["stage_id"]: row for row in contract["stages"]}
 

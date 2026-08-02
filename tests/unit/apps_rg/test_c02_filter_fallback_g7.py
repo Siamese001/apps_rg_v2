@@ -13,11 +13,40 @@ Pure product-mode unit test: fakes the profile + embedding so only the fallback 
 
 from __future__ import annotations
 
-from types import SimpleNamespace
+import os
+from pathlib import Path
+import subprocess
+import sys
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
 from apps_rg.runtime.bindings import c0_binding
+
+
+def test_c0_binding_imports_without_prior_apps_rg_module_ordering() -> None:
+    """A fresh process must not require another apps_rg module to break the import cycle."""
+    src_root = Path(c0_binding.__file__).resolve().parents[3]
+    repo_root = src_root.parent
+    env = dict(os.environ)
+    prior_pythonpath = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = os.pathsep.join(
+        part for part in (str(src_root), str(repo_root), prior_pythonpath) if part
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "from apps_rg.runtime.bindings import c0_binding; assert c0_binding.__name__",
+        ],
+        cwd=repo_root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 class _FakeProfile:
@@ -85,9 +114,18 @@ def _isolated(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(c0_binding, "MetadataFilterProfile", _FakeMetaProfile)
     monkeypatch.setattr(c0_binding, "_get_embedding_model", lambda: object())
     monkeypatch.setattr(c0_binding, "_run_section_sparse_lane", lambda *a, **k: None)
-    monkeypatch.setattr(
-        "tools.ingestion.chroma_ingest_pipeline.embed_text",
-        lambda model, text: [0.1] * 1024,
+    # The standalone source baseline intentionally excludes the monorepo-only
+    # ``tools.ingestion`` package.  Install a fixture-scoped import shim so this
+    # unit test still exercises G7 without hiding that product runtime boundary.
+    ingestion = ModuleType("tools.ingestion")
+    chroma_pipeline = ModuleType("tools.ingestion.chroma_ingest_pipeline")
+    chroma_pipeline.embed_text = lambda model, text: [0.1] * 1024
+    ingestion.chroma_ingest_pipeline = chroma_pipeline
+    monkeypatch.setitem(sys.modules, "tools.ingestion", ingestion)
+    monkeypatch.setitem(
+        sys.modules,
+        "tools.ingestion.chroma_ingest_pipeline",
+        chroma_pipeline,
     )
     monkeypatch.setattr(
         "apps_rg.runtime.embedding_settings.resolve_apps_rg_embedding_settings",

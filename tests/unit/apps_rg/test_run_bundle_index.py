@@ -348,6 +348,8 @@ def test_render_run_summary_succeeds_on_fixture_dir(tmp_path: Path) -> None:
 
     repo_root = Path(__file__).resolve().parents[3]
     script = repo_root / "tools" / "apps_rg" / "render_run_summary.py"
+    if not script.is_file():
+        pytest.skip("standalone source baseline excludes the monorepo run-summary renderer")
     proc = subprocess.run(
         [sys.executable, str(script), str(run_dir)],
         cwd=str(repo_root),

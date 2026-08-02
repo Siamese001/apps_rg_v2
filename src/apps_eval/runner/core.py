@@ -24,6 +24,7 @@ from apps_eval.adapters.apps_rg import (
     build_source_artifact_manifest,
     source_artifact_manifest_digest,
 )
+from apps_eval.resources import resolve_apps_eval_resource
 from apps_eval.contracts import (
     CURRENT_EVAL_MANIFEST_SCHEMA_VERSION,
     CURRENT_EVAL_RECORD_SCHEMA_VERSION,
@@ -218,7 +219,6 @@ def _regression_flywheel_summary(
 ) -> RegressionFlywheelSummary:
     rollup = _failure_mode_rollup(findings)
     current_mode_counts = Counter(rollup["failure_mode_counts"])
-    current_family_counts = Counter(rollup["failure_family_counts"])
     baseline_mode_counts: Counter[str] = Counter()
     baseline_family_counts: Counter[str] = Counter()
     if baseline_payload:
@@ -269,7 +269,7 @@ def _regression_flywheel_summary(
 
 
 def _load_fixture(suite_id: str, suite: dict[str, Any], scenario_id: str) -> EvalFixture:
-    scenario_dir = Path(suite["fixture_root"]) / scenario_id
+    scenario_dir = resolve_apps_eval_resource(suite["fixture_root"]) / scenario_id
     scenario_path = scenario_dir / "scenario.yaml"
     input_path = scenario_dir / "input" / "request.json"
     expected_path = scenario_dir / "expected" / "expectations.json"

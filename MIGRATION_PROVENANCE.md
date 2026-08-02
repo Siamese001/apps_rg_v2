@@ -118,3 +118,28 @@ measurement-validity plan.
 The standalone refreeze also binds the exact Python, Torch, Sentence
 Transformers, model revision, CUDA target, and offline/no-fallback requirements
 in `tools/apps_rg_standalone/c03_embedding_runtime_contract.json`.
+
+## C0.3 human-evaluation source recovery
+
+Production-readiness repair restored three manifest-bound targeting fixtures
+that the initial source-only ADR/docs exclusion had omitted. Their source is
+commit `f42e05c6f80f26b61505a42d193dae58215bd7cb` in the
+`codex-apps-rg-source-refreeze` worktree:
+
+- `docs/reports/apps_rg/fixtures/senior_roles/anthropic_partner_applied_ai_brief.txt`
+- `docs/reports/apps_rg/fixtures/senior_roles/lincoln_insurer_it_ai_jd.txt`
+- `docs/reports/apps_rg/fixtures/senior_roles/lincoln_insurer_it_ai_brief.txt`
+
+Their exact LF byte digests are already pinned by
+`src/apps_rg/evals/c03_human_eval/target_cases.v1.yaml`. Together with
+standalone logical-path resolution and the repository LF policy, all 12 target
+JD/brief inputs now match that manifest. This recovery imports targeting
+fixtures only; it does not import source-only plans/ADRs, create human labels,
+or grant evaluation or release authority.
+
+The same source commit also supplies
+`docs/reports/apps_rg/fixtures/p1_w4_single_track_jd_fixture.json`, an
+app-owned deterministic contract fixture required by the graph concentration
+policy test. Historical W0-W9 receipts and the legacy graph-skills operator
+guide remain excluded report/documentation outputs; their absence is not
+treated as fresh qualification evidence.

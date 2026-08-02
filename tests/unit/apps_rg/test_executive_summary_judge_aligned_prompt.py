@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from apps_rg.prompt_assembly.e0_examples import build_executive_summary_e0
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.executive_summary_pa import (
     compile_executive_summary_prompt,
     is_strategy_executive_target_title,
@@ -15,8 +16,8 @@ from apps_rg.runtime.validators.executive_summary_x2 import (
 )
 
 REPO = Path(__file__).resolve().parents[3]
-TEMPLATE = (
-    REPO / "apps_rg" / "prompt_assembly" / "templates" / "executive_summary.generate_scratch_v1.yaml"
+TEMPLATE = resolve_apps_rg_path(
+    REPO, "prompt_assembly", "templates", "executive_summary.generate_scratch_v1.yaml"
 )
 
 

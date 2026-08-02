@@ -11,9 +11,13 @@ import re
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
+
 pytestmark = pytest.mark.unit
 
-_SRC = pathlib.Path(__file__).parents[4] / "apps_rg" / "types" / "AllProvidersDownError.py"
+_SRC = resolve_apps_rg_path(
+    pathlib.Path(__file__).parents[4], "types", "AllProvidersDownError.py"
+)
 
 
 def _tree():

@@ -1,6 +1,7 @@
 """P2-ACCELERATED-CLOSEOUT: all-section graph-skills authority receipts and validators."""
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -11,12 +12,18 @@ from typing import Any
 from agentic_core.L2_execution.utils import write_gateway as _wg
 
 from apps_rg.runtime.sections.graph_evidence_contract import SECTION_KEYS
-from apps_rg.fact_inventory.track_weighted_graph_expansion import ROOT, REPORTS_DIR
+from apps_rg.fact_inventory.track_weighted_graph_expansion import (
+    REPORTS_DIR,
+    ROOT,
+    TrackWeightedExpansionContractError,
+)
+from apps_rg.runtime.c0.resume_graph_allocation import ResumeGraphAllocationError
 from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool
-from apps_rg.runtime.runtime_proof_layout import find_repo_root, lane_root
-from apps_rg.runtime.section_graph_skills_proof_pool import GRAPH_SKILLS_AUTHORITY_SECTIONS
+from apps_rg.runtime.runtime_proof_layout import lane_root
+from apps_rg.runtime.section_graph_skills_proof_pool import (
+    GraphSkillSelectorBindingError,
+)
 from apps_rg.runtime.validators.graph_skills_proof_common import (
-    GraphSkillsProofError,
     validate_section_graph_pool,
 )
 
@@ -43,28 +50,367 @@ RCA_IBM_UNIFY_JSON = REPORTS_DIR / "p2_w9_ibm_unify_runtime_rca_receipt.json"
 RCA_UNIFY_BULLETS_JSON = REPORTS_DIR / "p2_w9_unify_bullets_final_rca_receipt.json"
 P2_W9_IBM_UNIFY_SECTIONS: tuple[str, ...] = ("ibm_bullets", "ibm_narrative", "unify_narrative")
 
+_CANONICAL_OUTPUT_PATHS = frozenset(
+    path.resolve()
+    for path in (
+        REBASELINE_JSON,
+        REBASELINE_MD,
+        W1A_JSON,
+        W1A_MD,
+        W2_JSON,
+        W3_JSON,
+        W4_JSON,
+        W5_JSON,
+        W6_JSON,
+        W7_JSON,
+        W8_JSON,
+        W9_JSON,
+        W10_JSON,
+        CLOSEOUT_JSON,
+        CLOSEOUT_MD,
+        RCA_IBM_UNIFY_JSON,
+        RCA_UNIFY_BULLETS_JSON,
+    )
+)
+_CANONICAL_RECEIPT_MODE = "CANONICAL"
+_TEST_ONLY_RECEIPT_MODE = "TEST_ONLY_NONCANONICAL_OUTPUT"
+_SEMANTIC_PASS = "PASS"
+_NON_PASS_STATUSES = frozenset({"BLOCKED", "FAIL", "PARTIAL", "NON_CERTIFYING"})
+
+_WAVE_SCHEMAS: dict[str, str] = {
+    "P2-REBASELINE": "graph_skills_hardening_p2_rebaseline_v1",
+    "P2-W1A": "all_sections_graph_skills_authority_p2_w1a_v1",
+    "P2-W2": "all_sections_c03_graph_binding_p2_w2_v1",
+    "P2-W3": "shared_graph_proof_infrastructure_p2_w3_v1",
+    "P2-W4": "section_x2_graph_locality_p2_w4_v1",
+    "P2-W5": "section_pa_graph_authority_p2_w5_v1",
+    "P2-W6": "graph_only_quality_repair_p2_w6_v1",
+    "P2-W7": "x1d_graph_only_judge_packets_p2_w7_v1",
+    "P2-W8": "all_sections_graph_skills_validators_p2_w8_v1",
+    "P2-W9": "canonical_live_section_proofs_p2_w9_v1",
+    "P2-W10": "cross_section_graph_authority_audit_p2_w10_v1",
+}
+
+
+class P2CloseoutValidationError(ValueError):
+    """Raised when the P2 terminal receipt is not fully source-bound."""
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _receipt_posture(path: Path, *, semantic_pass: bool) -> tuple[str, bool]:
+    canonical = path.resolve() in _CANONICAL_OUTPUT_PATHS
+    receipt_mode = _CANONICAL_RECEIPT_MODE if canonical else _TEST_ONLY_RECEIPT_MODE
+    return receipt_mode, bool(canonical and semantic_pass)
+
+
+def _semantic_status(doc: dict[str, Any]) -> str:
+    status = str(doc.get("status") or "").strip().upper()
+    if status != _SEMANTIC_PASS and status not in _NON_PASS_STATUSES:
+        raise P2CloseoutValidationError(
+            f"receipt schema {doc.get('schema')!r} must declare a semantic status"
+        )
+    return status
+
+
+def _stamp_receipt(path: Path, doc: dict[str, Any]) -> None:
+    status = _semantic_status(doc)
+    receipt_mode, certification_eligible = _receipt_posture(
+        path,
+        semantic_pass=status == _SEMANTIC_PASS,
+    )
+    doc["receipt_mode"] = receipt_mode
+    doc["certification_eligible"] = certification_eligible
+
+
 def _write_json(path: Path, doc: dict[str, Any]) -> None:
+    _stamp_receipt(path, doc)
     _wg.ensure_dir(path.parent)
     _wg.write_text(path, json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
-def _resolve_all_section_pools(*, repo_root: Path) -> dict[str, Any]:
+def _write_markdown(path: Path, text: str, *, semantic_pass: bool) -> None:
+    receipt_mode, certification_eligible = _receipt_posture(
+        path,
+        semantic_pass=semantic_pass,
+    )
+    lines = text.splitlines()
+    posture = [
+        f"**Receipt mode:** {receipt_mode}",
+        f"**Certification eligible:** {certification_eligible}",
+    ]
+    if lines:
+        lines = [lines[0], "", *posture, "", *lines[1:]]
+    else:
+        lines = posture
+    _wg.ensure_dir(path.parent)
+    _wg.write_text(path, "\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+
+def _raw_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _output_ref(path: Path, *, repo_root: Path) -> str:
+    resolved = path.resolve()
+    root = repo_root.resolve()
+    ref = resolved.relative_to(root) if resolved.is_relative_to(root) else resolved
+    return str(ref).replace("\\", "/")
+
+
+def _wave_output_paths() -> dict[str, Path]:
+    return {
+        "P2-REBASELINE": REBASELINE_JSON,
+        "P2-W1A": W1A_JSON,
+        "P2-W2": W2_JSON,
+        "P2-W3": W3_JSON,
+        "P2-W4": W4_JSON,
+        "P2-W5": W5_JSON,
+        "P2-W6": W6_JSON,
+        "P2-W7": W7_JSON,
+        "P2-W8": W8_JSON,
+        "P2-W9": W9_JSON,
+        "P2-W10": W10_JSON,
+    }
+
+
+def _resolve_output_ref(*, repo_root: Path, ref: str) -> Path:
+    path = Path(ref)
+    return path.resolve() if path.is_absolute() else (repo_root / path).resolve()
+
+
+def _build_wave_receipt_bindings(*, repo_root: Path) -> dict[str, dict[str, Any]]:
+    bindings: dict[str, dict[str, Any]] = {}
+    for wave, path in _wave_output_paths().items():
+        if not path.is_file():
+            raise P2CloseoutValidationError(f"missing required {wave} receipt: {path}")
+        payload = _read_json(path)
+        expected_schema = _WAVE_SCHEMAS[wave]
+        if payload.get("schema") != expected_schema:
+            raise P2CloseoutValidationError(
+                f"{wave} receipt schema must be {expected_schema}: {path}"
+            )
+        status = _semantic_status(payload)
+        mode = str(payload.get("receipt_mode") or "")
+        eligible = payload.get("certification_eligible")
+        expected_mode, expected_eligible = _receipt_posture(
+            path,
+            semantic_pass=status == _SEMANTIC_PASS,
+        )
+        if mode != expected_mode or eligible is not expected_eligible:
+            raise P2CloseoutValidationError(
+                f"{wave} receipt posture mismatch: mode={mode!r} eligible={eligible!r}"
+            )
+        bindings[wave] = {
+            "ref": _output_ref(path, repo_root=repo_root),
+            "raw_sha256": _raw_sha256(path),
+            "schema": expected_schema,
+            "status": status,
+            "receipt_mode": mode,
+            "certification_eligible": eligible,
+        }
+    return bindings
+
+
+def _aggregate_wave_status(bindings: dict[str, dict[str, Any]]) -> str:
+    statuses = {
+        str(binding.get("status") or "").upper() for binding in bindings.values()
+    }
+    if "FAIL" in statuses:
+        return "FAIL"
+    if "BLOCKED" in statuses:
+        return "BLOCKED"
+    if statuses != {_SEMANTIC_PASS}:
+        return "PARTIAL"
+    return _SEMANTIC_PASS
+
+
+def validate_p2_closeout_receipt(
+    receipt: dict[str, Any],
+    *,
+    repo_root: Path | None = None,
+) -> None:
+    """Validate every P2 wave binding and terminal semantic posture."""
+    root = (repo_root or ROOT).resolve()
+    errors: list[str] = []
+    try:
+        status = _semantic_status(receipt)
+    except P2CloseoutValidationError as exc:
+        errors.append(str(exc))
+        status = ""
+    mode = str(receipt.get("receipt_mode") or "")
+    eligible = receipt.get("certification_eligible")
+    expected_mode, expected_eligible = _receipt_posture(
+        CLOSEOUT_JSON,
+        semantic_pass=status == _SEMANTIC_PASS,
+    )
+    if mode != expected_mode:
+        errors.append(f"terminal receipt_mode must be {expected_mode}")
+    if eligible is not expected_eligible:
+        errors.append(
+            f"terminal certification_eligible must be {str(expected_eligible).lower()}"
+        )
+
+    waves = receipt.get("waves")
+    bindings = receipt.get("wave_receipt_bindings")
+    if not isinstance(waves, dict):
+        errors.append("waves must be an object")
+        waves = {}
+    if not isinstance(bindings, dict):
+        errors.append("wave_receipt_bindings must be an object")
+        bindings = {}
+    if set(waves) != set(_WAVE_SCHEMAS):
+        errors.append("waves must contain every P2 wave exactly once")
+    if set(bindings) != set(_WAVE_SCHEMAS):
+        errors.append("wave_receipt_bindings must contain every P2 wave exactly once")
+
+    bound_statuses: dict[str, str] = {}
+    for wave, expected_path in _wave_output_paths().items():
+        binding = bindings.get(wave)
+        if not isinstance(binding, dict):
+            continue
+        ref = str(binding.get("ref") or "")
+        if waves.get(wave) != ref:
+            errors.append(f"{wave} wave ref does not match its binding")
+        resolved = _resolve_output_ref(repo_root=root, ref=ref) if ref else Path()
+        if resolved != expected_path.resolve():
+            errors.append(f"{wave} ref does not resolve to the authoritative output path")
+            continue
+        if not resolved.is_file():
+            errors.append(f"{wave} bound receipt is missing: {ref}")
+            continue
+        actual_digest = _raw_sha256(resolved)
+        if binding.get("raw_sha256") != actual_digest:
+            errors.append(f"{wave} raw_sha256 mismatch")
+        payload = _read_json(resolved)
+        if payload.get("schema") != _WAVE_SCHEMAS[wave]:
+            errors.append(f"{wave} bound receipt schema mismatch")
+            continue
+        if binding.get("schema") != payload.get("schema"):
+            errors.append(f"{wave} binding schema mismatch")
+        try:
+            bound_status = _semantic_status(payload)
+        except P2CloseoutValidationError as exc:
+            errors.append(str(exc))
+            continue
+        bound_statuses[wave] = bound_status
+        if binding.get("status") != bound_status:
+            errors.append(f"{wave} bound status mismatch")
+        if binding.get("receipt_mode") != payload.get("receipt_mode"):
+            errors.append(f"{wave} bound receipt_mode mismatch")
+        if binding.get("certification_eligible") is not payload.get(
+            "certification_eligible"
+        ):
+            errors.append(f"{wave} bound certification_eligible mismatch")
+        expected_wave_mode, expected_wave_eligible = _receipt_posture(
+            resolved,
+            semantic_pass=bound_status == _SEMANTIC_PASS,
+        )
+        if payload.get("receipt_mode") != expected_wave_mode:
+            errors.append(f"{wave} bound receipt_mode is not authoritative")
+        if payload.get("certification_eligible") is not expected_wave_eligible:
+            errors.append(f"{wave} bound certification_eligible is not authoritative")
+        if payload.get("receipt_mode") != mode:
+            errors.append(f"{wave} receipt mode differs from terminal mode")
+
+    if len(bound_statuses) == len(_WAVE_SCHEMAS):
+        expected_status = _aggregate_wave_status(
+            {wave: {"status": wave_status} for wave, wave_status in bound_statuses.items()}
+        )
+        if status != expected_status:
+            errors.append(f"terminal status must equal bound wave status {expected_status}")
+    elif status == _SEMANTIC_PASS:
+        errors.append("terminal PASS requires every P2 wave binding to validate")
+
+    competencies_ref = str(receipt.get("competencies_p2_w1a_receipt") or "").strip()
+    competencies_digest = str(
+        receipt.get("competencies_p2_w1a_receipt_raw_sha256") or ""
+    ).strip()
+    if not competencies_ref:
+        errors.append("missing competencies_p2_w1a_receipt")
+    else:
+        competencies_path = _resolve_output_ref(
+            repo_root=root,
+            ref=competencies_ref,
+        )
+        if not competencies_path.is_file():
+            errors.append("competencies P2-W1A receipt is missing")
+        elif _raw_sha256(competencies_path) != competencies_digest:
+            errors.append("competencies P2-W1A raw_sha256 mismatch")
+        else:
+            competencies_payload = _read_json(competencies_path)
+            if competencies_payload.get("schema") != (
+                "competencies_graph_proof_pool_p2_w1a_default_graph_authority_receipt_v1"
+            ):
+                errors.append("competencies P2-W1A bound receipt schema mismatch")
+            competencies_mode = competencies_payload.get("receipt_mode")
+            competencies_eligible = competencies_payload.get("certification_eligible")
+            if receipt.get("competencies_p2_w1a_receipt_mode") != competencies_mode:
+                errors.append("competencies P2-W1A bound receipt_mode mismatch")
+            if (
+                receipt.get("competencies_p2_w1a_certification_eligible")
+                is not competencies_eligible
+            ):
+                errors.append("competencies P2-W1A bound certification_eligible mismatch")
+            if competencies_mode != mode:
+                errors.append("competencies P2-W1A receipt mode differs from terminal mode")
+            if status == _SEMANTIC_PASS and competencies_eligible is not True:
+                errors.append(
+                    "terminal PASS requires certification-eligible competencies P2-W1A"
+                )
+    if errors:
+        raise P2CloseoutValidationError("; ".join(errors))
+
+
+def _resolve_all_section_pools(
+    *,
+    repo_root: Path,
+    target_role: str | None = None,
+    jd_text: str = "",
+    briefing_text: str = "",
+) -> dict[str, Any]:
     out: dict[str, Any] = {}
     for section in ALL_SECTIONS:
-        pool = resolve_section_proof_pool(
-            section=section,
-            repo_root=repo_root,
-            product_visible=False,
-        )
+        try:
+            pool = resolve_section_proof_pool(
+                section=section,
+                repo_root=repo_root,
+                target_role=target_role,
+                jd_text=jd_text,
+                briefing_text=briefing_text,
+                product_visible=False,
+            )
+        except (
+            GraphSkillSelectorBindingError,
+            ResumeGraphAllocationError,
+            TrackWeightedExpansionContractError,
+        ) as exc:
+            failure_receipt = dict(getattr(exc, "receipt", {}) or {})
+            out[section] = {
+                "section_id": section,
+                "status": "BLOCKED",
+                "blocker": str(exc),
+                "proof_source": "augmented_skills_graph",
+                "proof_pool_type": "augmented_skills_graph",
+                "blocker_type": type(exc).__name__,
+                "failure_receipt": failure_receipt,
+                "c03_graph_bound_status": "NOT_CLAIMED",
+                "c03_graph_hop_paths_count": 0,
+                "non_graph_evidence_items_count": 0,
+                "broad_skills_ledger_used_as_authority": False,
+                "silent_fallback_possible": False,
+                "fallback_used": False,
+                "fail_closed": True,
+                "allowed_fact_count": 0,
+            }
+            continue
         summary = validate_section_graph_pool(pool)
         meta = dict(pool.proof_pool_metadata or {})
         out[section] = {
             **summary,
+            "status": "PASS",
             "proof_pool_type": meta.get("proof_pool_type") or pool.proof_source,
             "selection_method": meta.get("selection_method"),
             "c03_graph_bound_status": meta.get("c03_graph_bound_status"),
@@ -78,9 +424,9 @@ def _resolve_all_section_pools(*, repo_root: Path) -> dict[str, Any]:
 
 
 def write_p2_rebaseline(*, repo_root: Path | None = None) -> dict[str, Any]:
-    root = repo_root or ROOT
     doc = {
         "schema": "graph_skills_hardening_p2_rebaseline_v1",
+        "status": "PASS",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "sprint": SPRINT_ID,
@@ -100,7 +446,7 @@ def write_p2_rebaseline(*, repo_root: Path | None = None) -> dict[str, Any]:
         ),
     }
     _write_json(REBASELINE_JSON, doc)
-    _wg.write_text(
+    _write_markdown(
         REBASELINE_MD,
         "\n".join(
             [
@@ -117,23 +463,44 @@ def write_p2_rebaseline(*, repo_root: Path | None = None) -> dict[str, Any]:
                 "",
             ]
         ),
-        encoding="utf-8",
+        semantic_pass=doc["status"] == _SEMANTIC_PASS,
     )
     return doc
 
 
-def write_p2_w1a_all_sections(*, repo_root: Path | None = None) -> dict[str, Any]:
+def write_p2_w1a_all_sections(
+    *,
+    repo_root: Path | None = None,
+    target_role: str | None = None,
+    jd_text: str = "",
+    briefing_text: str = "",
+) -> dict[str, Any]:
     root = repo_root or ROOT
-    sections = _resolve_all_section_pools(repo_root=root)
+    sections = _resolve_all_section_pools(
+        repo_root=root,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
     ledger_any = any(s.get("broad_skills_ledger_used_as_authority") for s in sections.values())
+    blocked_sections = sorted(
+        section
+        for section, row in sections.items()
+        if str(row.get("status") or "").upper() != _SEMANTIC_PASS
+    )
+    all_graph = all(
+        s.get("proof_source") == "augmented_skills_graph"
+        and str(s.get("status") or "").upper() == _SEMANTIC_PASS
+        for s in sections.values()
+    )
     doc = {
         "schema": "all_sections_graph_skills_authority_p2_w1a_v1",
+        "status": "PASS" if all_graph and not ledger_any else "BLOCKED",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W1A",
-        "all_sections_default_to_augmented_skills_graph": all(
-            s.get("proof_source") == "augmented_skills_graph" for s in sections.values()
-        ),
+        "all_sections_default_to_augmented_skills_graph": all_graph,
+        "blocked_sections": blocked_sections,
         "graph_skills_requires_opt_in": {sec: False for sec in ALL_SECTIONS},
         "broad_skills_ledger_used_as_authority_anywhere": ledger_any,
         "fallback_to_broad_skills_ledger_possible": False,
@@ -142,37 +509,60 @@ def write_p2_w1a_all_sections(*, repo_root: Path | None = None) -> dict[str, Any
         "sections": sections,
     }
     _write_json(W1A_JSON, doc)
-    _wg.write_text(
+    _write_markdown(
         W1A_MD,
         f"# P2-W1A all-section graph authority\n\nGenerated: {doc['generated_at']}\n\n"
         f"- all_sections_default_to_augmented_skills_graph: **{doc['all_sections_default_to_augmented_skills_graph']}**\n"
-        f"- broad_skills_ledger_used_as_authority_anywhere: **{ledger_any}**\n",
-        encoding="utf-8",
+        f"- broad_skills_ledger_used_as_authority_anywhere: **{ledger_any}**\n"
+        f"- blocked_sections: **{blocked_sections}**\n",
+        semantic_pass=doc["status"] == _SEMANTIC_PASS,
     )
     return doc
 
 
-def write_p2_w2_c03_binding(*, repo_root: Path | None = None) -> dict[str, Any]:
+def write_p2_w2_c03_binding(
+    *,
+    repo_root: Path | None = None,
+    target_role: str | None = None,
+    jd_text: str = "",
+    briefing_text: str = "",
+) -> dict[str, Any]:
     root = repo_root or ROOT
-    sections = _resolve_all_section_pools(repo_root=root)
+    sections = _resolve_all_section_pools(
+        repo_root=root,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
     by_section: dict[str, Any] = {}
+    blocked_sections: list[str] = []
     for sec, row in sections.items():
         status = str(row.get("c03_graph_bound_status") or "NOT_CLAIMED")
         hops = int(row.get("c03_graph_hop_paths_count") or 0)
         if status == "BOUND" and hops <= 0:
             status = "NOT_BOUND"
         by_section[sec] = {
+            "status": row.get("status") or "BLOCKED",
             "c03_graph_bound_status": status,
             "graph_hop_paths_count": hops,
             "non_graph_evidence_items_count": int(row.get("non_graph_evidence_items_count") or 0),
             "broad_skills_ledger_used_as_authority": False,
         }
+        if (
+            str(row.get("status") or "").upper() != _SEMANTIC_PASS
+            or status != "BOUND"
+            or hops <= 0
+            or int(row.get("non_graph_evidence_items_count") or 0) != 0
+        ):
+            blocked_sections.append(sec)
     doc = {
         "schema": "all_sections_c03_graph_binding_p2_w2_v1",
+        "status": "PASS" if not blocked_sections else "BLOCKED",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W2",
         "sections": by_section,
+        "blocked_or_unbound_sections": sorted(blocked_sections),
         "broad_skills_ledger_used_as_authority_any_section": False,
     }
     _write_json(W2_JSON, doc)
@@ -180,7 +570,6 @@ def write_p2_w2_c03_binding(*, repo_root: Path | None = None) -> dict[str, Any]:
 
 
 def write_p2_w3_infrastructure(*, repo_root: Path | None = None) -> dict[str, Any]:
-    root = repo_root or ROOT
     negative_controls = {
         "missing_graph_hops_fail_closed": True,
         "missing_fact_links_fail_closed": True,
@@ -191,6 +580,7 @@ def write_p2_w3_infrastructure(*, repo_root: Path | None = None) -> dict[str, An
     }
     doc = {
         "schema": "shared_graph_proof_infrastructure_p2_w3_v1",
+        "status": "PASS" if all(negative_controls.values()) else "FAIL",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W3",
@@ -214,6 +604,7 @@ def write_p2_w4_x2(*, repo_root: Path | None = None) -> dict[str, Any]:
     }
     doc = {
         "schema": "section_x2_graph_locality_p2_w4_v1",
+        "status": "PASS",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W4",
@@ -234,6 +625,7 @@ def write_p2_w5_pa(*, repo_root: Path | None = None) -> dict[str, Any]:
     }
     doc = {
         "schema": "section_pa_graph_authority_p2_w5_v1",
+        "status": "PASS",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W5",
@@ -249,6 +641,7 @@ def write_p2_w5_pa(*, repo_root: Path | None = None) -> dict[str, Any]:
 def write_p2_w6_repair(*, repo_root: Path | None = None) -> dict[str, Any]:
     doc = {
         "schema": "graph_only_quality_repair_p2_w6_v1",
+        "status": "PASS",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W6",
@@ -266,6 +659,7 @@ def write_p2_w6_repair(*, repo_root: Path | None = None) -> dict[str, Any]:
 def write_p2_w7_x1d(*, repo_root: Path | None = None) -> dict[str, Any]:
     doc = {
         "schema": "x1d_graph_only_judge_packets_p2_w7_v1",
+        "status": "PASS",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W7",
@@ -280,6 +674,7 @@ def write_p2_w7_x1d(*, repo_root: Path | None = None) -> dict[str, Any]:
 def write_p2_w8_validators(*, repo_root: Path | None = None) -> dict[str, Any]:
     doc = {
         "schema": "all_sections_graph_skills_validators_p2_w8_v1",
+        "status": "PASS",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W8",
@@ -504,8 +899,6 @@ def run_canonical_section_live(
             "blocker": "live_run_skipped_by_flag",
             "exit_code": None,
         }
-    from apps_rg.fact_inventory.track_weighted_graph_expansion import HYBRID_JD_FIXTURE
-
     jd_eff = jd_text if jd_text is not None else CANONICAL_LIVE_JD
     cmd = [
         sys.executable,
@@ -599,6 +992,7 @@ def write_p2_w9_unify_bullets_final_rca(
     w9 = w9_sections or (_read_json(W9_JSON).get("sections") if W9_JSON.is_file() else {})
     doc = {
         "schema": "p2_w9_unify_bullets_final_rca_v1",
+        "status": "NON_CERTIFYING",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "sprint": "P2-W9-UNIFY-BULLETS-FINAL-CLOSEOUT",
@@ -636,7 +1030,6 @@ def write_p2_w9_ibm_unify_runtime_rca(
     w9_sections: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """RCA receipt for P2-W9 IBM + unify_narrative runtime closeout (prior vs post-fix)."""
-    root = repo_root or ROOT
     w9 = w9_sections or (_read_json(W9_JSON).get("sections") if W9_JSON.is_file() else {})
     prior_dirs = {
         "unify_narrative": "artifacts/apps_rg/runtime_proofs/unify_narrative/real/unify_narrative_20260519_165935",
@@ -645,6 +1038,7 @@ def write_p2_w9_ibm_unify_runtime_rca(
     }
     doc = {
         "schema": "p2_w9_ibm_unify_runtime_rca_v1",
+        "status": "NON_CERTIFYING",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "sprint": "P2-W9-IBM-UNIFY-RUNTIME-CLOSEOUT",
@@ -686,6 +1080,10 @@ def write_p2_w9_live_matrix_closeout(
     sections_to_run: tuple[str, ...] = P2_W9_REMAINING_SECTIONS,
     timeout_s: int = 600,
     run_live: bool = True,
+    target_role: str | None = None,
+    jd_text: str = "",
+    briefing_text: str = "",
+    emit_terminal_closeout: bool = True,
 ) -> dict[str, Any]:
     """Run remaining P2-W9 canonical live proofs and merge with executive_summary."""
     root = repo_root or ROOT
@@ -711,13 +1109,27 @@ def write_p2_w9_live_matrix_closeout(
             sections[section] = probe_latest_run_for_section(section, repo_root=root)
     live_allow = [s for s, r in sections.items() if r.get("live_x3_allow_claimed")]
     proof_eligible = [s for s, r in sections.items() if r.get("proof_eligible") is True]
+    section_statuses = {
+        section: str((sections.get(section) or {}).get("status") or "").upper()
+        for section in ALL_SECTIONS
+    }
     blocked = sorted(
-        s
-        for s, r in sections.items()
-        if str(r.get("status") or "").upper() in ("BLOCKED", "PARTIAL", "FAIL")
+        section for section, status in section_statuses.items() if status != _SEMANTIC_PASS
     )
+    broad_authority_used = any(
+        bool(r.get("broad_skills_ledger_used_as_authority")) for r in sections.values()
+    )
+    if broad_authority_used or "FAIL" in section_statuses.values():
+        overall = "FAIL"
+    elif "BLOCKED" in section_statuses.values():
+        overall = "BLOCKED"
+    elif blocked:
+        overall = "PARTIAL"
+    else:
+        overall = _SEMANTIC_PASS
     w9 = {
         "schema": "canonical_live_section_proofs_p2_w9_v1",
+        "status": overall,
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W9",
@@ -727,66 +1139,77 @@ def write_p2_w9_live_matrix_closeout(
         "proof_eligible_sections": proof_eligible,
         "blocked_or_partial_sections": blocked,
         "global_live_x3_allow_claimed": len(live_allow) == len(ALL_SECTIONS),
-        "broad_skills_ledger_used_as_authority_anywhere": any(
-            bool(r.get("broad_skills_ledger_used_as_authority")) for r in sections.values()
-        ),
+        "broad_skills_ledger_used_as_authority_anywhere": broad_authority_used,
         "fallback_to_broad_skills_ledger_possible": False,
     }
     _write_json(W9_JSON, w9)
 
-    w10 = write_p2_w10_audit(repo_root=root)
-    live_blocked = [s for s in blocked if s != "executive_summary" or sections[s].get("status") != "PASS"]
-    overall = "PASS"
-    if blocked:
-        overall = "PARTIAL" if any(sections[s].get("status") == "PASS" for s in ALL_SECTIONS) else "FAIL"
-    if w9["broad_skills_ledger_used_as_authority_anywhere"]:
-        overall = "FAIL"
-    pass_live = [
-        s for s in ALL_SECTIONS if (sections.get(s) or {}).get("status") == "PASS"
-    ]
-    if len(pass_live) == len(ALL_SECTIONS):
-        overall = "PASS"
-    elif pass_live and overall == "FAIL":
-        overall = "PARTIAL"
+    w10 = write_p2_w10_audit(
+        repo_root=root,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
 
-    closeout_path = CLOSEOUT_JSON
-    closeout = _read_json(closeout_path) if closeout_path.is_file() else {}
-    closeout.update(
-        {
+    closeout: dict[str, Any] = {}
+    if emit_terminal_closeout:
+        prior_closeout = _read_json(CLOSEOUT_JSON)
+        bindings = _build_wave_receipt_bindings(repo_root=root)
+        terminal_status = _aggregate_wave_status(bindings)
+        closeout = {
             "schema": "graph_skills_hardening_p2_accelerated_closeout_v1",
             "generated_at": _utc_now(),
             "plan_id": PLAN_ID,
             "sprint": "P2-W9-LIVE-MATRIX-CLOSEOUT",
-            "status": overall,
+            "status": terminal_status,
+            "waves": {wave: binding["ref"] for wave, binding in bindings.items()},
+            "wave_receipt_bindings": bindings,
             "live_proof_summary": w9,
             "package_audit": w10,
             "live_x3_allow_claimed_sections": live_allow,
             "proof_eligible_sections": proof_eligible,
             "blocked_or_partial_sections": blocked,
+            "competencies_p2_w1a_receipt": prior_closeout.get(
+                "competencies_p2_w1a_receipt"
+            ),
+            "competencies_p2_w1a_receipt_raw_sha256": prior_closeout.get(
+                "competencies_p2_w1a_receipt_raw_sha256"
+            ),
+            "competencies_p2_w1a_receipt_mode": prior_closeout.get(
+                "competencies_p2_w1a_receipt_mode"
+            ),
+            "competencies_p2_w1a_certification_eligible": prior_closeout.get(
+                "competencies_p2_w1a_certification_eligible"
+            ),
         }
-    )
-    _write_json(CLOSEOUT_JSON, closeout)
-    md_lines = [
-        "# P2 accelerated closeout (W9 live matrix)",
-        "",
-        f"**Generated:** {closeout['generated_at']}",
-        f"**Status:** {overall}",
-        "",
-        "## Live proof summary",
-        "",
-    ]
-    for sec in ALL_SECTIONS:
-        r = sections.get(sec) or {}
-        md_lines.append(
-            f"- **{sec}**: {r.get('status')} | provider={r.get('provider_classification')} | "
-            f"X3={r.get('x3_disposition')} | C0.3={r.get('c03_graph_bound_status')} | "
-            f"ledger_authority={r.get('broad_skills_ledger_used_as_authority')}"
+        _stamp_receipt(CLOSEOUT_JSON, closeout)
+        validate_p2_closeout_receipt(closeout, repo_root=root)
+        _write_json(CLOSEOUT_JSON, closeout)
+        md_lines = [
+            "# P2 accelerated closeout (W9 live matrix)",
+            "",
+            f"**Generated:** {closeout['generated_at']}",
+            f"**Status:** {terminal_status}",
+            "",
+            "## Live proof summary",
+            "",
+        ]
+        for sec in ALL_SECTIONS:
+            r = sections.get(sec) or {}
+            md_lines.append(
+                f"- **{sec}**: {r.get('status')} | provider={r.get('provider_classification')} | "
+                f"X3={r.get('x3_disposition')} | C0.3={r.get('c03_graph_bound_status')} | "
+                f"ledger_authority={r.get('broad_skills_ledger_used_as_authority')}"
+            )
+        md_lines.append("")
+        md_lines.append(f"- live_x3_allow_claimed_sections: {live_allow}")
+        md_lines.append(f"- proof_eligible_sections: {proof_eligible}")
+        md_lines.append(f"- blocked_or_partial_sections: {blocked}")
+        _write_markdown(
+            CLOSEOUT_MD,
+            "\n".join(md_lines),
+            semantic_pass=terminal_status == _SEMANTIC_PASS,
         )
-    md_lines.append("")
-    md_lines.append(f"- live_x3_allow_claimed_sections: {live_allow}")
-    md_lines.append(f"- proof_eligible_sections: {proof_eligible}")
-    md_lines.append(f"- blocked_or_partial_sections: {blocked}")
-    _wg.write_text(CLOSEOUT_MD, "\n".join(md_lines), encoding="utf-8")
     write_p2_w9_ibm_unify_runtime_rca(repo_root=root, w9_sections=sections)
     write_p2_w9_unify_bullets_final_rca(repo_root=root, w9_sections=sections)
     return {"status": overall, "w9": w9, "w10": w10, "closeout": closeout}
@@ -798,37 +1221,57 @@ def write_p2_w9_live(*, repo_root: Path | None = None, skip_live: bool = False) 
     for section in ALL_SECTIONS:
         sections[section] = run_canonical_section_live(section, repo_root=root, skip_live=skip_live)
     live_allow = [s for s, r in sections.items() if r.get("live_x3_allow_claimed")]
+    blocked = sorted(
+        section
+        for section, row in sections.items()
+        if str(row.get("status") or "").upper() != _SEMANTIC_PASS
+    )
     doc = {
         "schema": "canonical_live_section_proofs_p2_w9_v1",
+        "status": "PASS" if not blocked else "BLOCKED",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W9",
         "sections": sections,
         "live_x3_allow_claimed_sections": live_allow,
+        "blocked_or_partial_sections": blocked,
         "global_live_x3_allow_claimed": False,
     }
     _write_json(W9_JSON, doc)
     return doc
 
 
-def write_p2_w10_audit(*, repo_root: Path | None = None) -> dict[str, Any]:
+def write_p2_w10_audit(
+    *,
+    repo_root: Path | None = None,
+    target_role: str | None = None,
+    jd_text: str = "",
+    briefing_text: str = "",
+) -> dict[str, Any]:
     root = repo_root or ROOT
-    sections = _resolve_all_section_pools(repo_root=root)
+    sections = _resolve_all_section_pools(
+        repo_root=root,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
     unsupported = [
         s
         for s, r in sections.items()
-        if r.get("proof_source") != "augmented_skills_graph"
+        if str(r.get("status") or "").upper() != _SEMANTIC_PASS
+        or r.get("proof_source") != "augmented_skills_graph"
         or r.get("broad_skills_ledger_used_as_authority")
     ]
     doc = {
         "schema": "cross_section_graph_authority_audit_p2_w10_v1",
+        "status": "PASS" if not unsupported else "BLOCKED",
         "generated_at": _utc_now(),
         "plan_id": PLAN_ID,
         "wave": "P2-W10",
         "all_sections_trace_to_augmented_skills_graph": len(unsupported) == 0,
         "no_cross_section_ledger_fallback": True,
         "unsupported_or_blocked_sections": unsupported,
-        "package_audit_status": "PASS" if not unsupported else "PARTIAL",
+        "package_audit_status": "PASS" if not unsupported else "BLOCKED",
         "sections": sections,
     }
     _write_json(W10_JSON, doc)
@@ -840,48 +1283,127 @@ def run_full_closeout(
     repo_root: Path | None = None,
     skip_live: bool = False,
     preserve_w9_live_matrix: bool = True,
+    target_role: str | None = None,
+    jd_text: str = "",
+    briefing_text: str = "",
+    competencies_out_dir: Path | None = None,
+    p1_w4_closeout_path: Path | None = None,
+    p1_w5_projection_path: Path | None = None,
 ) -> dict[str, Any]:
     root = repo_root or ROOT
+    test_chain = (
+        competencies_out_dir,
+        p1_w4_closeout_path,
+        p1_w5_projection_path,
+    )
+    if any(value is not None for value in test_chain) and not all(
+        value is not None for value in test_chain
+    ):
+        raise ValueError(
+            "competencies_out_dir, p1_w4_closeout_path, and "
+            "p1_w5_projection_path must be supplied together"
+        )
+    if all(value is not None for value in test_chain) and _receipt_posture(
+        CLOSEOUT_JSON,
+        semantic_pass=False,
+    )[0] != _TEST_ONLY_RECEIPT_MODE:
+        raise ValueError("TEST_ONLY competencies upstream overrides require noncanonical P2 outputs")
+    del preserve_w9_live_matrix  # stale W9 reuse is intentionally disabled
     rebaseline = write_p2_rebaseline(repo_root=root)
-    w1a = write_p2_w1a_all_sections(repo_root=root)
-    w2 = write_p2_w2_c03_binding(repo_root=root)
+    w1a = write_p2_w1a_all_sections(
+        repo_root=root,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
+    w2 = write_p2_w2_c03_binding(
+        repo_root=root,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
     w3 = write_p2_w3_infrastructure(repo_root=root)
     w4 = write_p2_w4_x2(repo_root=root)
     w5 = write_p2_w5_pa(repo_root=root)
     w6 = write_p2_w6_repair(repo_root=root)
     w7 = write_p2_w7_x1d(repo_root=root)
     w8 = write_p2_w8_validators(repo_root=root)
-    if skip_live and preserve_w9_live_matrix and W9_JSON.is_file():
-        existing_w9 = _read_json(W9_JSON)
-        w9 = existing_w9 if isinstance(existing_w9.get("sections"), dict) else {}
-        if not w9:
-            w9 = write_p2_w9_live_matrix_closeout(run_live=False, repo_root=root)["w9"]
-    elif skip_live:
-        w9 = write_p2_w9_live_matrix_closeout(run_live=False, repo_root=root)["w9"]
+    if skip_live:
+        w9_result = write_p2_w9_live_matrix_closeout(
+            run_live=False,
+            repo_root=root,
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+            emit_terminal_closeout=False,
+        )
+        w9 = w9_result["w9"]
+        w10 = w9_result["w10"]
     else:
         w9 = write_p2_w9_live(repo_root=root, skip_live=False)
-    w10 = write_p2_w10_audit(repo_root=root)
+        w10 = write_p2_w10_audit(
+            repo_root=root,
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+        )
 
     from apps_rg.fact_inventory.competencies_graph_skills_proof_pool import (
         write_p2_w1a_default_graph_authority_receipt,
     )
 
-    competencies_p2_w1a = write_p2_w1a_default_graph_authority_receipt(repo_root=root)
+    competencies_kwargs: dict[str, Any] = {"repo_root": root}
+    if competencies_out_dir is not None:
+        competencies_kwargs.update(
+            {
+                "out_dir": competencies_out_dir,
+                "p1_w4_closeout_path": p1_w4_closeout_path,
+                "p1_w5_projection_path": p1_w5_projection_path,
+            }
+        )
+    competencies_p2_w1a = write_p2_w1a_default_graph_authority_receipt(
+        **competencies_kwargs
+    )
+    competencies_receipt_path = Path(competencies_p2_w1a["receipt_json"])
+    competencies_receipt = dict(competencies_p2_w1a.get("receipt") or {})
 
-    overall = "PASS"
-    if not w1a.get("all_sections_default_to_augmented_skills_graph"):
-        overall = "FAIL"
-    if w1a.get("broad_skills_ledger_used_as_authority_anywhere"):
-        overall = "FAIL"
-    if w10.get("package_audit_status") != "PASS":
-        overall = "PARTIAL" if overall == "PASS" else overall
-    blocked_live = [
-        s
-        for s, r in (w9.get("sections") or {}).items()
-        if r.get("status") in ("BLOCKED", "PARTIAL")
-    ]
-    if blocked_live:
-        overall = "PARTIAL" if overall == "PASS" else overall
+    wave_docs = {
+        "P2-REBASELINE": rebaseline,
+        "P2-W1A": w1a,
+        "P2-W2": w2,
+        "P2-W3": w3,
+        "P2-W4": w4,
+        "P2-W5": w5,
+        "P2-W6": w6,
+        "P2-W7": w7,
+        "P2-W8": w8,
+        "P2-W9": w9,
+        "P2-W10": w10,
+    }
+    blocked_authority_sections = sorted(
+        {
+            section
+            for source in (w1a, w10)
+            for section in (
+                source.get("blocked_sections")
+                or source.get("unsupported_or_blocked_sections")
+                or []
+            )
+        }
+    )
+    in_memory_status = _aggregate_wave_status(
+        {
+            wave: {"status": _semantic_status(doc)}
+            for wave, doc in wave_docs.items()
+        }
+    )
+
+    bindings = _build_wave_receipt_bindings(repo_root=root)
+    overall = _aggregate_wave_status(bindings)
+    if in_memory_status != overall:
+        raise P2CloseoutValidationError(
+            f"in-memory wave status {in_memory_status} disagrees with bound receipts {overall}"
+        )
 
     closeout = {
         "schema": "graph_skills_hardening_p2_accelerated_closeout_v1",
@@ -889,26 +1411,28 @@ def run_full_closeout(
         "plan_id": PLAN_ID,
         "sprint": SPRINT_ID,
         "status": overall,
-        "waves": {
-            "P2-REBASELINE": str(REBASELINE_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W1A": str(W1A_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W2": str(W2_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W3": str(W3_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W4": str(W4_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W5": str(W5_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W6": str(W6_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W7": str(W7_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W8": str(W8_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W9": str(W9_JSON.relative_to(root)).replace("\\", "/"),
-            "P2-W10": str(W10_JSON.relative_to(root)).replace("\\", "/"),
-        },
+        "waves": {wave: binding["ref"] for wave, binding in bindings.items()},
+        "wave_receipt_bindings": bindings,
+        "blocked_authority_sections": blocked_authority_sections,
         "all_sections_graph_authority": w1a,
         "live_proof_summary": w9,
         "package_audit": w10,
-        "competencies_p2_w1a_receipt": competencies_p2_w1a.get("receipt_json"),
+        "competencies_p2_w1a_receipt": _output_ref(
+            competencies_receipt_path,
+            repo_root=root,
+        ),
+        "competencies_p2_w1a_receipt_raw_sha256": _raw_sha256(
+            competencies_receipt_path
+        ),
+        "competencies_p2_w1a_receipt_mode": competencies_receipt.get("receipt_mode"),
+        "competencies_p2_w1a_certification_eligible": competencies_receipt.get(
+            "certification_eligible"
+        ),
         "live_x3_allow_claimed": False,
         "global_c03_bound_claimed": False,
     }
+    _stamp_receipt(CLOSEOUT_JSON, closeout)
+    validate_p2_closeout_receipt(closeout, repo_root=root)
     _write_json(CLOSEOUT_JSON, closeout)
     md_lines = [
         "# P2 accelerated closeout",
@@ -942,10 +1466,10 @@ def run_full_closeout(
             f"- global_c03_bound_claimed: {closeout['global_c03_bound_claimed']}",
         ]
     )
-    _wg.write_text(
+    _write_markdown(
         CLOSEOUT_MD,
         "\n".join(md_lines) + "\n",
-        encoding="utf-8",
+        semantic_pass=closeout["status"] == _SEMANTIC_PASS,
     )
     return closeout
 

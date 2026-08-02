@@ -8,6 +8,8 @@ import uuid
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 from apps_rg.l2_recipe.modular_lane_adapter import build_section_provider_call_record
 from apps_rg.l2_recipe.modular_resume_generation import (
     LANE_DISPATCH_MODULES,
@@ -22,18 +24,15 @@ from apps_rg.runtime.sections_root_manifest import (
     SECTIONS_ROOT_MANIFEST_FILENAME,
     assert_sections_root_manifest_document_shape,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
+from tests.helpers.standalone_repo_view import materialize_standalone_repo_view
 
 
-def test_section_provider_call_record_allows_sibling_runtime_proof_refs() -> None:
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_wrapper_{uuid.uuid4().hex[:10]}"
-    run_dir = (
-        repo
-        / "artifacts"
-        / "apps_rg"
-        / "runtime_proofs"
-        / f"phase1_lane_{uuid.uuid4().hex[:10]}"
-    )
+def test_section_provider_call_record_allows_sibling_runtime_proof_refs(
+    tmp_path: Path,
+) -> None:
+    art = tmp_path / f"phase1_wrapper_{uuid.uuid4().hex[:10]}"
+    run_dir = tmp_path / f"phase1_lane_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "l2_output.json").write_text(
@@ -59,17 +58,17 @@ def test_section_provider_call_record_allows_sibling_runtime_proof_refs() -> Non
         provider_profile="external_claude",
     )
 
-    assert record["output_ref"] == (
-        run_dir / "l2_output.json"
-    ).resolve().relative_to(repo.resolve()).as_posix()
+    assert record["output_ref"] == (run_dir / "l2_output.json").resolve().as_posix()
     assert record["reasoning_execution_receipt_ref"] == (
         run_dir / "prompt_selection_trace.json"
-    ).resolve().relative_to(repo.resolve()).as_posix()
+    ).resolve().as_posix()
 
 
-def test_phase1_runs_all_generated_lanes_mock_provider_no_envelope(monkeypatch: pytest.MonkeyPatch) -> None:
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_pytest_{uuid.uuid4().hex[:10]}"
+def test_phase1_runs_all_generated_lanes_mock_provider_no_envelope(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase1_pytest_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
 
     def _stub_lane_dispatch(**kwargs: object) -> dict[str, object]:
@@ -152,15 +151,16 @@ def test_phase1_runs_all_generated_lanes_mock_provider_no_envelope(monkeypatch: 
 
 def test_phase1_no_l2_envelope_import() -> None:
     """Regression: modular_resume_generation must not import l2 envelope."""
-    src = Path("apps_rg/l2_recipe/modular_resume_generation.py")
+    src = resolve_apps_rg_path(None, "l2_recipe", "modular_resume_generation.py")
     text = src.read_text(encoding="utf-8")
     assert "l2_envelope_adapter" not in text
 
 
-def test_fixture_pass_not_used_as_phase1_pass_source() -> None:
-    repo = find_repo_root()
-    fx = repo / "tests" / "_fixtures" / "rg_output_phase0_min_valid.json"
-    art0 = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_cmp0_{uuid.uuid4().hex[:10]}"
+def test_fixture_pass_not_used_as_phase1_pass_source(tmp_path: Path) -> None:
+    source_repo = find_repo_root()
+    repo = materialize_standalone_repo_view(tmp_path)
+    fx = source_repo / "tests" / "_fixtures" / "rg_output_phase0_min_valid.json"
+    art0 = repo / f"phase1_cmp0_{uuid.uuid4().hex[:10]}"
     art0.mkdir(parents=True, exist_ok=True)
     r0 = run_modular_resume_generation(
         ModularResumeInputPackage(repo_root=repo, rg_output_fixture_path=fx),
@@ -171,7 +171,7 @@ def test_fixture_pass_not_used_as_phase1_pass_source() -> None:
     assert r0.decisive_status == "PASS"
     assert r0.extras.get("pass_source") == "fixture_rg_output"
 
-    art1 = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_cmp1_{uuid.uuid4().hex[:10]}"
+    art1 = repo / f"phase1_cmp1_{uuid.uuid4().hex[:10]}"
     art1.mkdir(parents=True, exist_ok=True)
     r1 = run_modular_resume_generation(
         ModularResumeInputPackage(repo_root=repo, rg_output_fixture_path=fx),
@@ -187,10 +187,10 @@ def test_fixture_pass_not_used_as_phase1_pass_source() -> None:
     assert r1.final_schema_valid is False
 
 
-def test_modular_env_scoped_to_run() -> None:
+def test_modular_env_scoped_to_run(tmp_path: Path) -> None:
     """Env var must not leak after run_modular_resume_generation returns."""
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_env_{uuid.uuid4().hex[:10]}"
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase1_env_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     prior = os.environ.get(MODULAR_R4_SECTIONS_ROOT_ENV)
     run_modular_resume_generation(

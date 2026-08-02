@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -919,7 +920,217 @@ def load_lane_embedding_allowlists(path: Path | str) -> dict[str, Any]:
         raise GraphSkillEmbeddingAllocationError(
             "lane graph skill embedding allowlist schema mismatch"
         )
+    lanes = payload.get("lanes")
+    lane_order = payload.get("lane_order")
+    if not isinstance(lanes, Mapping) or not isinstance(lane_order, list):
+        raise GraphSkillEmbeddingAllocationError(
+            "lane graph skill embedding allowlist inventory is malformed"
+        )
+    ordered_sections = [str(value) for value in lane_order]
+    if (
+        len(ordered_sections) != len(set(ordered_sections))
+        or set(ordered_sections) != {str(value) for value in lanes}
+    ):
+        raise GraphSkillEmbeddingAllocationError(
+            "lane graph skill embedding allowlist inventory mismatch"
+        )
+    allocation_digest = str(payload.get("allocation_plan_digest") or "")
+    if not allocation_digest:
+        raise GraphSkillEmbeddingAllocationError(
+            "lane graph skill embedding allowlist allocation digest is missing"
+        )
+    if (
+        payload.get("pass") is not True
+        or payload.get("similarity_is_claim_authority") is not False
+        or payload.get("durable_graph_state_mutated") is not False
+    ):
+        raise GraphSkillEmbeddingAllocationError(
+            "lane graph skill embedding allowlist weakens authority invariants"
+        )
+    for section_id in ordered_sections:
+        lane = lanes.get(section_id)
+        if not isinstance(lane, Mapping):
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: lane graph skill embedding allowlist is malformed"
+            )
+        _assert_self_digest(
+            lane,
+            "lane_allowlist_digest",
+            label=f"{section_id} lane graph skill embedding allowlist",
+        )
+        if (
+            lane.get("schema_version")
+            != "apps_rg.lane_graph_skill_embedding_allowlist.v1"
+            or str(lane.get("section_id") or "") != section_id
+            or str(lane.get("allocation_plan_digest") or "") != allocation_digest
+            or lane.get("pass") is not True
+            or lane.get("exact_rehydration_pass") is not True
+            or lane.get("allocation_intersection_pass") is not True
+            or lane.get("similarity_is_claim_authority") is not False
+        ):
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: lane graph skill embedding authority invariants failed"
+            )
     return payload
+
+
+def validate_lane_embedding_allowlist_authority(
+    payload: Mapping[str, Any],
+    *,
+    repo_root: Path | str,
+    allocation_plan: Mapping[str, Any],
+    section_id: str,
+) -> dict[str, Any]:
+    """Bind one loaded lane to current graph authority before it can affect a pool."""
+
+    _assert_self_digest(
+        payload,
+        "allowlists_digest",
+        label="lane graph skill embedding allowlists",
+    )
+    if payload.get("schema_version") != "apps_rg.lane_graph_skill_embedding_allowlists.v1":
+        raise GraphSkillEmbeddingAllocationError(
+            "lane graph skill embedding allowlist schema mismatch"
+        )
+    allocation_digest = str(allocation_plan.get("allocation_plan_digest") or "")
+    if not allocation_digest or str(payload.get("allocation_plan_digest") or "") != (
+        allocation_digest
+    ):
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding allowlist allocation digest mismatch"
+        )
+
+    active_authority = load_graph_skill_embedding_authority(repo_root)
+    expected_authority = _authority_pins(active_authority)
+    observed_authority = payload.get("authority")
+    if not isinstance(observed_authority, Mapping) or dict(observed_authority) != (
+        expected_authority
+    ):
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding allowlist authority pins are stale or mismatched"
+        )
+    allocation_graph_digest = str(allocation_plan.get("graph_digest") or "")
+    if not allocation_graph_digest or allocation_graph_digest != expected_authority["graph_sha256"]:
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding allowlist graph authority mismatch"
+        )
+
+    lanes = payload.get("lanes")
+    lane = lanes.get(section_id) if isinstance(lanes, Mapping) else None
+    if not isinstance(lane, Mapping):
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding allowlist is missing or malformed"
+        )
+    lane_payload = dict(lane)
+    _assert_self_digest(
+        lane_payload,
+        "lane_allowlist_digest",
+        label=f"{section_id} lane graph skill embedding allowlist",
+    )
+
+    candidate_rows = lane_payload.get("candidate_assertions")
+    if not isinstance(candidate_rows, list) or not candidate_rows:
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding candidate assertion inventory is empty"
+        )
+    candidates: list[dict[str, Any]] = []
+    candidate_ids: set[str] = set()
+    for raw in candidate_rows:
+        if not isinstance(raw, Mapping) or set(raw) != {"assertion_id", "similarity"}:
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: embedding candidate payload is malformed"
+            )
+        assertion_id = str(raw.get("assertion_id") or "")
+        try:
+            similarity = float(raw.get("similarity"))
+        except (TypeError, ValueError) as exc:
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: embedding candidate similarity is invalid"
+            ) from exc
+        if not assertion_id or assertion_id in candidate_ids or not math.isfinite(similarity):
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: embedding candidate identity or similarity is invalid"
+            )
+        candidate_ids.add(assertion_id)
+        candidates.append({"assertion_id": assertion_id, "similarity": similarity})
+
+    authority_section_id = str(
+        lane_payload.get("assertion_authority_section_id") or ""
+    )
+    if not authority_section_id:
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding assertion section authority is missing"
+        )
+    try:
+        hydrated = rehydrate_assertion_candidates(
+            candidates,
+            corpus=active_authority["_corpus_payload"],
+            graph_payload=active_authority["_graph_payload"],
+            section_id=authority_section_id,
+        )
+    except (KeyError, GraphSkillEmbeddingContractError) as exc:
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding candidate authority rehydration failed: {exc}"
+        ) from exc
+    hydrated_by_id = {str(row.get("assertion_id") or ""): row for row in hydrated}
+
+    raw_bindings = lane_payload.get("accepted_assertion_bindings")
+    if not isinstance(raw_bindings, list) or not raw_bindings:
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: accepted embedding assertion bindings are empty"
+        )
+    accepted_ids: list[str] = []
+    expected_binding_fields = {
+        "assertion_id",
+        "skill_id",
+        "similarity",
+        "fact_links",
+        "assertion_document_sha256",
+        "authority_envelope_sha256",
+        "skill_row_sha256",
+    }
+    for raw in raw_bindings:
+        if not isinstance(raw, Mapping) or set(raw) != expected_binding_fields:
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: accepted embedding assertion binding is malformed"
+            )
+        assertion_id = str(raw.get("assertion_id") or "")
+        if not assertion_id or assertion_id in accepted_ids:
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: accepted embedding assertion identity is invalid"
+            )
+        assertion = hydrated_by_id.get(assertion_id)
+        if assertion is None:
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: accepted embedding assertion is not an authorized candidate"
+            )
+        expected_binding = {
+            "assertion_id": assertion_id,
+            "skill_id": str(assertion.get("skill_id") or ""),
+            "similarity": float(assertion.get("similarity") or 0.0),
+            "fact_links": _strings(list(assertion.get("fact_links") or [])),
+            "assertion_document_sha256": str(
+                assertion.get("assertion_document_sha256") or ""
+            ),
+            "authority_envelope_sha256": str(
+                assertion.get("authority_envelope_sha256") or ""
+            ),
+            "skill_row_sha256": str(assertion.get("skill_row_sha256") or ""),
+        }
+        if dict(raw) != expected_binding:
+            raise GraphSkillEmbeddingAllocationError(
+                f"{section_id}: accepted embedding assertion binding drifted from authority"
+            )
+        accepted_ids.append(assertion_id)
+
+    allowlists = lane_payload.get("allowlists")
+    if not isinstance(allowlists, Mapping) or _strings(
+        list(allowlists.get("assertion_ids") or [])
+    ) != _strings(accepted_ids):
+        raise GraphSkillEmbeddingAllocationError(
+            f"{section_id}: embedding assertion allowlist differs from authorized bindings"
+        )
+    return lane_payload
 
 
 def _write_json_atomic(path: Path, payload: Mapping[str, Any]) -> None:
@@ -967,5 +1178,6 @@ __all__ = [
     "graph_skill_embeddings_required",
     "load_graph_skill_embedding_authority",
     "load_lane_embedding_allowlists",
+    "validate_lane_embedding_allowlist_authority",
     "write_graph_skill_embedding_runtime_bundle",
 ]

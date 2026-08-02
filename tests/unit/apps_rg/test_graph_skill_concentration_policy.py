@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import load_master_skills_arsenal_ledger
 from apps_rg.fact_inventory.track_weighted_graph_expansion import (
     build_track_weighted_expansion,
@@ -19,10 +20,19 @@ from apps_rg.runtime.sections.graph_role_episode_selector import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-GRAPH_PATH = REPO_ROOT / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
-INVESCO_JD = REPO_ROOT / "apps_rg/config/targeting/invesco_global_head_advanced_engineering_jd.txt"
-INVESCO_BRIEF = REPO_ROOT / "apps_rg/config/targeting/invesco_global_head_advanced_engineering_briefing.md"
-ANTHROPIC_JD = REPO_ROOT / "apps_rg/config/targeting/anthropic_manager_applied_ai_architecture_partnerships_jd.txt"
+GRAPH_PATH = resolve_apps_rg_path(REPO_ROOT, "fact_inventory", "master_skills_arsenal_ledger.json")
+INVESCO_JD = resolve_apps_rg_path(
+    REPO_ROOT, "config", "targeting", "invesco_global_head_advanced_engineering_jd.txt"
+)
+INVESCO_BRIEF = resolve_apps_rg_path(
+    REPO_ROOT, "config", "targeting", "invesco_global_head_advanced_engineering_briefing.md"
+)
+ANTHROPIC_JD = resolve_apps_rg_path(
+    REPO_ROOT,
+    "config",
+    "targeting",
+    "anthropic_manager_applied_ai_architecture_partnerships_jd.txt",
+)
 ANTHROPIC_BRIEF = REPO_ROOT / "tests/fixtures/apps_rg/anthropic_manager_applied_ai_architecture_partnerships_briefing.md"
 SINGLE_TRACK_FIXTURE = REPO_ROOT / "docs/reports/apps_rg/fixtures/p1_w4_single_track_jd_fixture.json"
 

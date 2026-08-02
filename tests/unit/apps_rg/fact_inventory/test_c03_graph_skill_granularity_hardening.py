@@ -13,6 +13,7 @@ from apps_rg.fact_inventory.apply_c03_graph_skill_granularity_hardening import (
     validate_zero_loss,
 )
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
+    default_arsenal_ledger_path,
     graph_node_requires_source_refs,
 )
 from apps_rg.fact_inventory.validate_c03_graph_skill_granularity import (
@@ -25,11 +26,19 @@ from apps_rg.runtime.graph.graph_metric_diversity_policy import (
     build_metric_diversity_receipt,
     rank_with_metric_diversity,
 )
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
+
+REPO_ROOT = repository_root(Path(__file__))
+LEDGER_PATH = default_arsenal_ledger_path(REPO_ROOT)
+CATALOG_PATH = resolve_apps_rg_path(
+    REPO_ROOT,
+    "fact_inventory",
+    "c03_graph_skill_granularity_catalog.json",
+)
 
 
 def _catalog() -> dict:
-    path = Path("apps_rg/fact_inventory/c03_graph_skill_granularity_catalog.json")
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
 
 
 def _minimal_graph() -> dict:
@@ -151,7 +160,7 @@ def test_granularity_validator_cli_is_stdout_only_unless_output_is_explicit(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
 ) -> None:
-    graph_path = Path("apps_rg/fact_inventory/master_skills_arsenal_ledger.json").resolve()
+    graph_path = LEDGER_PATH
     monkeypatch.chdir(tmp_path)
     payload = json.loads(graph_path.read_text(encoding="utf-8"))
     for node in payload["graph_nodes"]:
@@ -190,9 +199,7 @@ def test_granularity_validator_cli_emits_structured_pass_receipt(
     capsys: pytest.CaptureFixture[str],
     tmp_path: Path,
 ) -> None:
-    canonical_path = Path(
-        "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
-    ).resolve()
+    canonical_path = LEDGER_PATH
     monkeypatch.chdir(tmp_path)
 
     validate_main(["--graph-path", str(canonical_path)])

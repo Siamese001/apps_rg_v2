@@ -4,6 +4,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip(
+    "tools.apps_rg.graph_skill_utilization_report",
+    reason="the historical report-only graph utilization tool was excluded from the standalone baseline",
+)
+
 from tools.apps_rg.graph_skill_utilization_report import build_report, render_markdown
 
 

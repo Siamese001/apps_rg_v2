@@ -8,6 +8,13 @@ single-class dense support as WEAK and blocks insurtech/ey otherwise.
 """
 from __future__ import annotations
 
+import pytest
+
+pytest.importorskip(
+    "tools.apps_rg.build_section_fact_vectors",
+    reason="the source-only fact-vector build tool has not been packaged into the standalone repository",
+)
+
 from apps_rg.runtime.c0.c02_fact_vector_ingest import c02_atom_to_fact_vector_chunk
 from apps_rg.runtime.c0.constants import SOURCE_BASE_RESUME
 from apps_rg.runtime.c0.fact_vector_write_back import EXTRACT, STAGE_FOR_FACT_VECTORS, decide_write_back

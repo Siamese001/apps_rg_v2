@@ -11,8 +11,7 @@ from apps_rg.runtime.non_product_proof_stamp import (
     package_rollup_non_product_stamp,
 )
 from apps_rg.runtime.internal.resume_package_disposition import X3_ALLOW_CODE, evaluate_resume_package
-from tests._apps_contract.test_resume_package_x3 import (
-    _mk_x2,
+from tests.helpers.resume_package_fixture import (
     _write_minimal_fixture_tree,
 )
 

@@ -18,6 +18,11 @@ from apps_rg.fact_inventory.track_weighted_graph_expansion import (
 
 REPO = Path(__file__).resolve().parents[4]
 FIXTURE_ROOT = REPO / "docs/reports/apps_rg/fixtures/senior_roles"
+if not (FIXTURE_ROOT / "senior_role_fixture_manifest.json").is_file():
+    pytest.skip(
+        "the extended senior-role fixture corpus was explicitly excluded from the standalone baseline",
+        allow_module_level=True,
+    )
 MANIFEST = json.loads((FIXTURE_ROOT / "senior_role_fixture_manifest.json").read_text(encoding="utf-8"))
 TAXONOMY = yaml.safe_load(
     (REPO / "apps_rg/config/domain_contract/master_role_family_taxonomy.yaml").read_text(encoding="utf-8")
@@ -52,7 +57,6 @@ def test_senior_taxonomy_ids_subset_of_mapping() -> None:
 
 
 def test_carrier_fixture_infers_carrier_projection() -> None:
-    entry = next(a for a in MANIFEST["archetypes"] if a["slug"] == "aig_carrier_agentic")
     jd = (FIXTURE_ROOT / "aig_carrier_agentic_jd.txt").read_text(encoding="utf-8")
     brief = (FIXTURE_ROOT / "aig_carrier_agentic_brief.txt").read_text(encoding="utf-8")
     key = infer_projection_role_family_key(
@@ -68,7 +72,6 @@ def test_carrier_fixture_infers_carrier_projection() -> None:
 
 
 def test_consulting_fixture_infers_consulting_projection() -> None:
-    entry = next(a for a in MANIFEST["archetypes"] if a["slug"] == "ai_data_platform_professional_services")
     jd = (FIXTURE_ROOT / "ai_data_platform_professional_services_jd.txt").read_text(encoding="utf-8")
     brief = (FIXTURE_ROOT / "ai_data_platform_professional_services_brief.txt").read_text(encoding="utf-8")
     key = infer_projection_role_family_key(

@@ -26,8 +26,9 @@ from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
 from apps_rg.runtime.graph.graph_skill_concentration_policy import (
     build_graph_skill_concentration_policy,
 )
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = repository_root(Path(__file__))
 REPORTS_DIR = ROOT / "docs/reports/apps_rg"
 FIXTURES_DIR = REPORTS_DIR / "fixtures"
 
@@ -393,7 +394,12 @@ def infer_projection_role_family_key(
     from apps_rg.fact_inventory.role_family_selection import infer_role_family_priorities
 
     if taxonomy is None:
-        tax_path = ROOT / "apps_rg/config/domain_contract/master_role_family_taxonomy.yaml"
+        tax_path = resolve_apps_rg_path(
+            ROOT,
+            "config",
+            "domain_contract",
+            "master_role_family_taxonomy.yaml",
+        )
         import yaml  # type: ignore[import-untyped]
 
         taxonomy = yaml.safe_load(tax_path.read_text(encoding="utf-8"))
@@ -956,6 +962,7 @@ def write_p1_w4_receipts(
     *,
     repo_root: Path | None = None,
     hybrid_jd: str = HYBRID_JD_FIXTURE,
+    out_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Run hybrid expansion and write JSON + markdown receipts."""
     root = repo_root or ROOT
@@ -972,15 +979,19 @@ def write_p1_w4_receipts(
     )
     isolation = capture_agentic_core_isolation(repo_root=root)
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    receipt_path = REPORTS_DIR / "career_track_p1_w4_track_weighted_expansion_receipt.json"
-    md_path = REPORTS_DIR / "career_track_p1_w4_track_weighted_expansion.md"
-    closeout_path = REPORTS_DIR / "career_track_p1_w4_closeout_receipt.json"
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    reports_dir = Path(out_dir) if out_dir is not None else REPORTS_DIR
+    receipt_mode = "TEST_ONLY_NONCANONICAL_OUTPUT" if out_dir is not None else "CANONICAL"
+    receipt_path = reports_dir / "career_track_p1_w4_track_weighted_expansion_receipt.json"
+    md_path = reports_dir / "career_track_p1_w4_track_weighted_expansion.md"
+    closeout_path = reports_dir / "career_track_p1_w4_closeout_receipt.json"
+    reports_dir.mkdir(parents=True, exist_ok=True)
     payload = {
         "generated_at": ts,
         "plan_id": "graph-skills-hardening-f3a8c1",
         "wave": "P1-W4",
         "closeout_wave": "P1-W4-CLOSEOUT",
+        "receipt_mode": receipt_mode,
+        "certification_eligible": out_dir is None,
         "hybrid_fixture": hybrid,
         "c03_binding_proof": {
             "c03_graph_bound_status": hybrid.get("c03_graph_bound_status"),
@@ -1003,6 +1014,8 @@ def write_p1_w4_receipts(
                 "generated_at": ts,
                 "plan_id": "graph-skills-hardening-f3a8c1",
                 "wave": "P1-W4-CLOSEOUT",
+                "receipt_mode": receipt_mode,
+                "certification_eligible": out_dir is None,
                 "c03_binding_proof": payload["c03_binding_proof"],
                 "agentic_core_isolation": isolation,
                 "hybrid_tracks_with_facts": hybrid.get("tracks_with_facts"),
@@ -1016,7 +1029,9 @@ def write_p1_w4_receipts(
         "# P1-W4 — Track-weighted graph expansion",
         "",
         f"**Generated:** {ts}",
-        f"**Plan:** graph-skills-hardening-f3a8c1",
+        f"**Receipt mode:** {receipt_mode}",
+        f"**Certification eligible:** {out_dir is None}",
+        "**Plan:** graph-skills-hardening-f3a8c1",
         f"**Role family:** {hybrid.get('role_family_key')}",
         "",
         "## Track weights",

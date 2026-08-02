@@ -33,9 +33,10 @@ from types import TracebackType
 from typing import Any
 
 from agentic_core.L2_execution.utils import write_gateway as _wg
+from agentic_core.L4_state.adapters import sqlite3_adapter as sqlite3
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.c0.constants import PROOF_ELIGIBLE, SOURCE_BASE_RESUME
 from apps_rg.runtime.cli_exit_codes import EXIT_GENERIC_FAILURE, EXIT_SUCCESS
-from agentic_core.L4_state.adapters import sqlite3_adapter as sqlite3
 
 # Generated resume lanes that draw dense enrichment from fact_vectors. Keep this in the same
 # dependency order as apps_rg.runtime.internal.generated_lane_rollup.GENERATED_LANES; this module is
@@ -78,8 +79,7 @@ _DEFAULT_EMBEDDING_MODEL_ID_SLUG = "bge-m3-v1"
 
 
 def _repo_root() -> Path:
-    # apps_rg/runtime/fact_vectors_bootstrap.py -> parents[2] == repo root
-    return Path(__file__).resolve().parents[2]
+    return repository_root(Path(__file__))
 
 
 class FactVectorHydrationRuntimeError(RuntimeError):

@@ -14,7 +14,6 @@ from agentic_core.runtime.contracts.final_evidence_contract import (
     SUPPORT_STATUS_WEAK,
 )
 
-from apps_rg.runtime.bindings.c0_binding import APPS_RG_C0_CERT_REF, _provisional_digest
 from apps_rg.runtime.c0.c02_evidence_fetch import c02_atom_to_evidence_item
 from apps_rg.runtime.c0.c02_hybrid_receipt_truth import normalize_c02_vector_query_receipt
 from apps_rg.runtime.c0.c0_section_authority import (
@@ -76,6 +75,13 @@ def build_c05_final_evidence_contract(
     product_hybrid: dict[str, Any] | None = None,
 ) -> tuple[FinalEvidenceContract, dict[str, Any]]:
     """Build section FEC — apps_rg evidence room is default authority; hybrid via profile only."""
+    # Keep the binding dependency lazy so agentic-core route discovery can
+    # import the C0 evidence room while ``c0_binding`` initializes.
+    from apps_rg.runtime.bindings.c0_binding import (
+        APPS_RG_C0_CERT_REF,
+        _provisional_digest,
+    )
+
     del front_spine  # reserved for future bounded context; no legacy spine merge
     ts = datetime.now(timezone.utc).isoformat()
     hybrid_doc = product_hybrid or {}

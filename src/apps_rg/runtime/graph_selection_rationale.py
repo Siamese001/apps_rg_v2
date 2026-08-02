@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import repository_root
 from apps_rg.fact_inventory.augmented_skills_graph import (
     default_augmented_skills_graph_path,
     graph_payload_digest,
@@ -35,6 +36,19 @@ from apps_rg.runtime.section_graph_skills_proof_pool import (
 )
 
 SCHEMA = "graph_selection_rationale_v1"
+
+
+def _stable_graph_ref(path: Path, *, repo_root: Path) -> str:
+    """Preserve the historical ``apps_rg/...`` receipt namespace in standalone."""
+
+    try:
+        relative = path.resolve().relative_to(repo_root.resolve())
+    except ValueError:
+        return str(path)
+    parts = relative.parts
+    if len(parts) >= 2 and parts[0].casefold() == "src" and parts[1].casefold() == "apps_rg":
+        relative = Path("apps_rg", *parts[2:])
+    return relative.as_posix()
 
 JD_BOOST_RULES: tuple[tuple[tuple[str, ...], str, float], ...] = (
     (("actuarial", "derivatives", "greeks", "basel", "ccar", "capital modeling"), "track_actuarial_risk_derivatives", 0.05),
@@ -198,7 +212,7 @@ def emit_graph_selection_rationale(
     graph_digest: str | None = None,
 ) -> dict[str, Any]:
     """Build rationale artifact (fixture/CLI writer — not product PASS by itself)."""
-    root = repo_root or Path(__file__).resolve().parents[2]
+    root = repo_root or repository_root(Path(__file__))
     if section_id not in GRAPH_SKILLS_AUTHORITY_SECTIONS:
         raise ValueError(f"unsupported section for graph selection rationale: {section_id!r}")
 
@@ -308,7 +322,7 @@ def emit_graph_selection_rationale(
         "briefing_signal_packet": briefing_signal_packet,
         "jd_keyword_hits": jd_hits,
         "selection_method": selection_method,
-        "graph_ref": graph_path.relative_to(root).as_posix(),
+        "graph_ref": _stable_graph_ref(graph_path, repo_root=root),
         "graph_digest": digest,
         "graph_digest_scope": "full_graph_payload",
         "selected_skill_ids": selected_skill_ids,

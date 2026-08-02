@@ -14,6 +14,10 @@ from apps_rg.runtime.section_graph_skills_proof_pool import (
     _SECTION_MIN_FACTS,
     _base_resume_role_episode_plan,
     _role_episode_bundle_plan,
+    bind_selector_selected_skills_to_section_plan,
+)
+from apps_rg.runtime.sections.graph_role_episode_selector import (
+    build_selected_graph_evidence_plan_for_section,
 )
 
 REPO = Path(__file__).resolve().parents[3]
@@ -67,10 +71,106 @@ def test_planner_not_applied_to_ibm_or_unify() -> None:
     assert "unify_bullets" not in _ROLE_EPISODE_BASE_RESUME_NEEDLES
 
 
+def test_insurtech_selected_skills_are_copied_from_graph_selector() -> None:
+    result = _role_episode_bundle_plan(
+        section_id="insurtech_bullets",
+        repo_root=REPO,
+        limit=_SECTION_MIN_FACTS["insurtech_bullets"],
+    )
+    assert result is not None
+    source_plan = result[0]
+    selector_plan, _, _ = build_selected_graph_evidence_plan_for_section(
+        repo_root=REPO,
+        section_id="insurtech_bullets",
+        target_role="VP",
+        jd_text="Lead agentic AI platform strategy.",
+        briefing_text="AIG agentic AI.",
+    )
+
+    bound = bind_selector_selected_skills_to_section_plan(
+        source_plan,
+        repo_root=REPO,
+        section_id="insurtech_bullets",
+        target_role="VP",
+        jd_text="Lead agentic AI platform strategy.",
+        briefing_text="AIG agentic AI.",
+    )
+
+    source_by_root = {
+        str(row["role_episode_bundle_id"]): row for row in source_plan["facts"]
+    }
+    assert all(
+        row == source_by_root[str(row["role_episode_bundle_id"])]
+        for row in bound["facts"]
+    )
+    assert len(bound["facts"]) == 10
+    assert bound["selection_method"] == source_plan["selection_method"]
+    assert bound["selected_skills"] == selector_plan["selected_skills"]
+    authority = bound["selected_skills_authority"]
+    assert authority["selector_plan_digest"] == selector_plan["plan_digest"]
+    assert authority["skills_synthesized_from_facts"] is False
+    assert authority["source_required_fact_ids"] == source_plan["required_fact_ids"]
+    assert authority["authority_narrowed_root_ids"] == [
+        "reb_insurtech_founder_led_gtm_revenue",
+        "reb_insurtech_insurance_regulatory_cloud_adoption_standards",
+    ]
+
+
+def test_selector_skill_binding_fails_closed_without_exact_fact_roots(monkeypatch) -> None:
+    selector_plan = {
+        "plan_id": "selector:test",
+        "plan_digest": "digest",
+        "selection_method": "selected_graph_evidence_plan_unify_bullets",
+        "selected_skills": [
+            {
+                "skill_id": "skill_graph_authorized",
+                "role_episode_bundle_id": "reb_unify_graph_authorized",
+            }
+        ],
+    }
+    monkeypatch.setattr(
+        "apps_rg.runtime.sections.graph_role_episode_selector."
+        "build_selected_graph_evidence_plan_for_section",
+        lambda **_kwargs: (selector_plan, [], set()),
+    )
+
+    with pytest.raises(ValueError, match="no role_episode_bundle_id bindings"):
+        bind_selector_selected_skills_to_section_plan(
+            {"section_id": "unify_bullets", "facts": [{"fact_id": "bul_unify_001"}]},
+            repo_root=REPO,
+            section_id="unify_bullets",
+            target_role="VP",
+            jd_text="platform",
+            briefing_text="brief",
+        )
+
+    with pytest.raises(ValueError, match="selector-selected skill roots are absent"):
+        bind_selector_selected_skills_to_section_plan(
+            {
+                "section_id": "ibm_bullets",
+                "facts": [
+                    {
+                        "fact_id": "bul_ibm_001",
+                        "role_episode_bundle_id": "reb_ibm_other_root",
+                    }
+                ],
+            },
+            repo_root=REPO,
+            section_id="ibm_bullets",
+            target_role="VP",
+            jd_text="platform",
+            briefing_text="brief",
+        )
+
+
 def test_end_to_end_proof_pool_nonempty_for_all_four_lanes() -> None:
     """Full proof resolution: insurtech/ey bullets+narrative use graph bundle ids."""
     from types import SimpleNamespace
 
+    pytest.importorskip(
+        "agentic_core.runtime.contracts.apps_rg_ingress_payload",
+        reason="standalone checkout omits the external Agentic Workflow contract runtime",
+    )
     from apps_rg.runtime.c0.section_proof_loader import load_section_proof_for_lane
 
     args = SimpleNamespace(
@@ -81,8 +181,10 @@ def test_end_to_end_proof_pool_nonempty_for_all_four_lanes() -> None:
         briefing="AIG agentic AI.", base_resume_ref="",
     )
     expectations = {
-        "insurtech_bullets": ("reb_insurtech_", 12),
-        "insurtech_narrative": ("reb_insurtech_", 12),
+        # Two bundle roots contain only DRAFT/pending-source skills, so the
+        # authority-passing selector narrows the 12 source bundles to 10.
+        "insurtech_bullets": ("reb_insurtech_", 10),
+        "insurtech_narrative": ("reb_insurtech_", 10),
         "ey_bullets": ("reb_ey_", 5),
         "ey_narrative": ("reb_ey_", 5),
     }
@@ -90,7 +192,9 @@ def test_end_to_end_proof_pool_nonempty_for_all_four_lanes() -> None:
         pool, *_ = load_section_proof_for_lane(section_id=sid, args=args, repo_root=REPO)
         facts = (pool.selected_fact_plan or {}).get("facts") or []
         allowed = pool.allowed_fact_ids_ordered or []
+        root_ids = [str(fact.get("fact_id") or "") for fact in facts]
         assert len(facts) == expected_count, f"{sid}: expected graph facts, got {len(facts)}"
-        assert len(allowed) == expected_count, f"{sid}: expected allowed fact ids, got {len(allowed)}"
+        assert set(root_ids).issubset(allowed), f"{sid}: selected roots missing from graph allowlist"
         assert pool.base_resume_fallback_used is False
-        assert all(str(fid).startswith(prefix) for fid in allowed)
+        assert all(root_id.startswith(prefix) for root_id in root_ids)
+        assert (pool.selected_fact_plan or {}).get("selected_skills")

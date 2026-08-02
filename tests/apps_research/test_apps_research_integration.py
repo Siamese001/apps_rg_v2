@@ -29,7 +29,7 @@ class TestAppsResearchIntegration:
         """Verify config has lifecycle trace contract integration."""
         from apps_research.config import agent_spec_config
 
-        assert hasattr(agent_spec_config, "_emit_applies_guardrail")
+        assert hasattr(agent_spec_config.trace_contract, "_emit_applies_guardrail")
         assert hasattr(agent_spec_config, "ResearchAgentSpecs")
 
     def test_source_discovery_service_init(self) -> None:

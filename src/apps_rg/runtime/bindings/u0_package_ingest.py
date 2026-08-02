@@ -12,11 +12,24 @@ from agentic_core.runtime.contracts.runtime_customization_package import (
     RuntimeCustomizationPackage,
 )
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.bindings.u0_binding import APPS_RG_TASK_CLASS
 from apps_rg.runtime.bindings.u0_profile_manifest import repo_root
 
 _LOGGER = logging.getLogger(__name__)
 _PACKAGE_RELPATH = "apps_rg/config/domain_contract/runtime_customization_package.yaml"
+
+
+def _resolve_repository_ref(base: Path, ref: str | Path) -> Path:
+    """Resolve a stable logical ref in either supported source layout."""
+
+    candidate = Path(ref)
+    if candidate.is_absolute():
+        return candidate
+    parts = candidate.parts
+    if parts and parts[0] == "apps_rg":
+        return resolve_apps_rg_path(base, *parts[1:])
+    return base / candidate
 
 # Map core package profile_refs keys → apps_rg ingress RuntimeCustomizationPackage fields.
 _PROFILE_REF_FIELD_MAP: dict[str, str] = {
@@ -57,7 +70,8 @@ class AppsRgRuntimePackageRegistry:
         if app_id in self._cache:
             return self._cache[app_id]
         base = self.registry_base_path or repo_root()
-        registry_path = base / app_id / "config" / "domain_contract" / "runtime_package_registry.yaml"
+        registry_ref = Path(app_id) / "config" / "domain_contract" / "runtime_package_registry.yaml"
+        registry_path = _resolve_repository_ref(base, registry_ref)
         if not registry_path.exists():
             _LOGGER.warning("No runtime package registry found for %s at %s", app_id, registry_path)
             return None
@@ -127,7 +141,7 @@ class AppsRgRuntimePackageRegistry:
         return package_ref, schema_ref, "Resolved from app-owned registry"
 
     def load_package_from_ref(self, package_ref: str) -> RuntimeCustomizationPackage | None:
-        package_path = repo_root() / package_ref
+        package_path = _resolve_repository_ref(repo_root(), package_ref)
         if not package_path.exists():
             _LOGGER.error("Package config not found: %s", package_path)
             return None
@@ -301,8 +315,11 @@ def assert_package_files_on_disk() -> None:
     """Fail-closed check that package YAML and registry exist (tests / CI)."""
 
     root = repo_root()
-    pkg = root / _PACKAGE_RELPATH
-    reg = root / "apps_rg/config/domain_contract/runtime_package_registry.yaml"
+    pkg = _resolve_repository_ref(root, _PACKAGE_RELPATH)
+    reg = _resolve_repository_ref(
+        root,
+        "apps_rg/config/domain_contract/runtime_package_registry.yaml",
+    )
     if not pkg.is_file():
         raise FileNotFoundError(pkg)
     if not reg.is_file():

@@ -4,7 +4,9 @@ Contract: product evidence authority law — canonical CLI cannot reach forbidde
 """
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
+import sys
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -171,6 +173,107 @@ def test_resolve_product_pool_has_evidence_authority(repo_root: Path | None = No
     assert ea.get("graph_ref")
     assert ea.get("ledger_ref")
     assert ea.get("skills_authority_status") == "PASS"
+
+
+def test_standalone_resolver_emits_stable_logical_graph_refs() -> None:
+    from apps_rg.runtime.proof_pool_resolver import (
+        _resolve_generic_section_graph_skills_proof_pool,
+    )
+
+    pool = _resolve_generic_section_graph_skills_proof_pool(
+        section_id="headline",
+        root=REPO,
+        target_company="Acme",
+        target_role="VP Engineering",
+        jd_text="lead platform teams",
+        briefing_text="brief",
+        base_ref_str="apps_rg/resume/base/amit_ayer_base_resume_v1.json",
+        base_hash="test-hash",
+        override_used=False,
+        targeting={"jd_title_company": True, "briefing": True},
+    )
+    expected_graph_ref = "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+    assert pool.proof_pool_ref == expected_graph_ref
+    assert pool.base_resume_json_ref == "apps_rg/resume/base/amit_ayer_base_resume_v1.json"
+    for key in (
+        "skills_authority_graph_ref",
+        "augmented_skills_graph_ref",
+        "graph_ref",
+        "claim_evidence_source_ref",
+    ):
+        assert pool.proof_pool_metadata.get(key) == expected_graph_ref
+
+
+def test_invalid_explicit_base_resume_override_fails_without_default_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from apps_rg.runtime.resume_resolution import ResumeResolutionError
+    from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool
+
+    calls: list[str | None] = []
+
+    def _reject_override(*, source_resume_ref: str | None = None, **_kwargs: object):
+        calls.append(source_resume_ref)
+        if source_resume_ref:
+            raise ResumeResolutionError("invalid explicit override")
+        raise AssertionError("default resume fallback must not run for an explicit override")
+
+    monkeypatch.setattr(
+        "apps_rg.runtime.proof_pool_resolver.load_lane_base_resume_json",
+        _reject_override,
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "apps_rg.runtime.spine.front_contracts",
+        SimpleNamespace(assert_proof_pool_front_spine_preconditions=lambda **_kwargs: None),
+    )
+    with pytest.raises(ResumeResolutionError, match="invalid explicit override"):
+        resolve_section_proof_pool(
+            section="headline",
+            base_resume_ref="missing-explicit-resume.json",
+            fixture_dev_only_bypass=True,
+            repo_root=REPO,
+        )
+    assert calls == ["missing-explicit-resume.json"]
+
+
+def test_successful_explicit_base_resume_override_is_reported_truthfully(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool
+
+    def _pool(**kwargs: object) -> SectionProofPool:
+        return replace(
+            _valid_pool(),
+            base_resume_json_ref=str(kwargs["base_ref_str"]),
+            base_resume_override_used=bool(kwargs["override_used"]),
+        )
+
+    monkeypatch.setattr(
+        "apps_rg.runtime.proof_pool_resolver._resolve_section_proof_pool_inner",
+        _pool,
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "apps_rg.runtime.spine.front_contracts",
+        SimpleNamespace(assert_proof_pool_front_spine_preconditions=lambda **_kwargs: None),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "apps_rg.runtime.c0.resume_graph_proof_pool",
+        SimpleNamespace(bind_proof_pool_to_resume_graph_allocation=lambda pool: pool),
+    )
+    physical_ref = REPO / "src/apps_rg/resume/base/amit_ayer_base_resume_v1.json"
+    pool = resolve_section_proof_pool(
+        section="headline",
+        base_resume_ref=str(physical_ref),
+        fixture_dev_only_bypass=True,
+        repo_root=REPO,
+    )
+    assert pool.base_resume_json_ref == "apps_rg/resume/base/amit_ayer_base_resume_v1.json"
+    assert pool.base_resume_override_used is True
+    assert pool.base_resume_fallback_used is False
+    assert pool.fallback_used is False
 
 
 def test_load_section_proof_for_lane_enforces_law(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -355,11 +458,8 @@ def test_product_evidence_error_is_section_cli_config_error() -> None:
     "section_id",
     [
         "headline",
-        "executive_summary",
         "competencies",
-        "unify_bullets",
         "unify_narrative",
-        "ibm_bullets",
         "ibm_narrative",
     ],
 )
@@ -382,6 +482,47 @@ def test_all_product_sections_attach_evidence_authority(section_id: str) -> None
     assert meta["selection_scope"]["is_proof_authority"] is False
     assert meta["layout_context"]["story_claim_authority"] is False
     assert meta.get("selected_role_fact_set_used") is False
+
+
+@pytest.mark.parametrize(
+    ("section_id", "blocker"),
+    [
+        (
+            "executive_summary",
+            "seed_fact_ids have no matching track-weighted graph hop paths",
+        ),
+        (
+            "unify_bullets",
+            "section fact plan has no role_episode_bundle_id bindings",
+        ),
+        (
+            "ibm_bullets",
+            "selector-selected skill roots are absent from the section fact plan",
+        ),
+    ],
+)
+def test_product_sections_fail_closed_on_unresolved_graph_bindings(
+    section_id: str,
+    blocker: str,
+) -> None:
+    pytest.importorskip(
+        "agentic_core.runtime.contracts.apps_rg_ingress_payload",
+        reason="standalone checkout omits the external Agentic Workflow contract runtime",
+    )
+    from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool
+
+    with pytest.raises(ProductEvidenceAuthorityError, match=blocker):
+        resolve_section_proof_pool(
+            section=section_id,
+            target_company="Acme",
+            target_role="VP Engineering",
+            jd_text="platform leadership",
+            briefing_text="brief",
+            repo_root=REPO,
+            product_visible=True,
+            fixture_dev_only_bypass=True,
+            non_product_certified=True,
+        )
 
 
 def test_proof_source_from_metadata_uses_evidence_authority() -> None:

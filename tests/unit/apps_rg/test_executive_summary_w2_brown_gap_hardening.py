@@ -5,9 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from apps_rg.prompt_assembly.e0_examples import example_after_text
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.executive_summary_evidence_capsule import (
     PREFERRED_DISPLAY_FRAMING_BY_FACT_ID,
     build_capsule_document,
@@ -26,12 +25,8 @@ from apps_rg.runtime.validators.executive_summary_x2 import (
 )
 
 _REPO = Path(__file__).resolve().parents[3]
-_TEMPLATE = (
-    _REPO
-    / "apps_rg"
-    / "prompt_assembly"
-    / "templates"
-    / "executive_summary.generate_scratch_v1.yaml"
+_TEMPLATE = resolve_apps_rg_path(
+    _REPO, "prompt_assembly", "templates", "executive_summary.generate_scratch_v1.yaml"
 )
 
 

@@ -10,7 +10,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Sequence
+
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -89,10 +92,14 @@ def load_ibm_base_resume_bullet_texts() -> list[str]:
     Returns claim-free reference texts (the `text` field from each bul_ibm_* bullet).
     These are used as the reference corpus for x2_base_resume_ngram_overlap.
     """
-    from pathlib import Path
     import json
 
-    base_path = Path("apps_rg/resume/base/amit_ayer_base_resume_v1.json")
+    base_path = resolve_apps_rg_path(
+        repository_root(Path(__file__)),
+        "resume",
+        "base",
+        "amit_ayer_base_resume_v1.json",
+    )
     if not base_path.exists():
         return []
     try:
@@ -110,16 +117,20 @@ def load_ibm_base_resume_bullet_texts() -> list[str]:
                 if txt:
                     ibm_texts.append(txt)
         return ibm_texts
-    except Exception:  # guardian: allow-silent-swallow -- gate fails open (WARN mode)
+    except Exception:  # guardian: allow-silent-swallow -- runner observes [] and hard mode blocks
         return []
 
 
 def load_unify_base_resume_bullet_texts() -> list[str]:
     """Load Unify employment bullet texts from the canonical base resume JSON."""
-    from pathlib import Path
     import json
 
-    base_path = Path("apps_rg/resume/base/amit_ayer_base_resume_v1.json")
+    base_path = resolve_apps_rg_path(
+        repository_root(Path(__file__)),
+        "resume",
+        "base",
+        "amit_ayer_base_resume_v1.json",
+    )
     if not base_path.exists():
         return []
     try:
@@ -138,7 +149,7 @@ def load_unify_base_resume_bullet_texts() -> list[str]:
                 if txt:
                     unify_texts.append(txt)
         return unify_texts
-    except Exception:  # guardian: allow-silent-swallow -- gate fails open (WARN mode)
+    except Exception:  # guardian: allow-silent-swallow -- runner observes [] and hard mode blocks
         return []
 
 
@@ -158,6 +169,41 @@ class NgramOverlapResult:
     failure_reason: str | None
 
 
+def _base_resume_corpus_problem(
+    base_resume_texts: object,
+    *,
+    n: int,
+) -> str | None:
+    if not isinstance(base_resume_texts, (list, tuple)):
+        return "missing_or_malformed"
+    if not base_resume_texts:
+        return "empty"
+    if any(not isinstance(text, str) or not text.strip() for text in base_resume_texts):
+        return "malformed"
+    if not any(extract_ngrams(_tokenize(text), n) for text in base_resume_texts):
+        return "malformed_no_ngram_eligible_text"
+    return None
+
+
+def _base_resume_corpus_result(
+    *,
+    bullet_id: str,
+    threshold: float,
+    warn_only: bool,
+    problem: str,
+) -> NgramOverlapResult:
+    return NgramOverlapResult(
+        gate_id=GATE_ID_BASE_RESUME,
+        passed=warn_only,
+        warn_only=warn_only,
+        bullet_id=bullet_id,
+        overlap_fraction=0.0,
+        threshold=threshold,
+        reference_source="base_resume_bullets",
+        failure_reason=f"{bullet_id}: base resume reference corpus {problem}",
+    )
+
+
 def check_bullet_base_resume_ngram_overlap(
     bullet_id: str,
     bullet_text: str,
@@ -168,6 +214,14 @@ def check_bullet_base_resume_ngram_overlap(
     warn_only: bool = True,
 ) -> NgramOverlapResult:
     """Check a single bullet against base resume reference texts."""
+    corpus_problem = _base_resume_corpus_problem(base_resume_texts, n=n)
+    if corpus_problem:
+        return _base_resume_corpus_result(
+            bullet_id=bullet_id,
+            threshold=threshold,
+            warn_only=warn_only,
+            problem=corpus_problem,
+        )
     overlap = compute_max_ngram_overlap_multi_reference(bullet_text, base_resume_texts, n=n)
     passed_gate = overlap <= threshold
     return NgramOverlapResult(
@@ -246,6 +300,17 @@ def run_bullet_ngram_overlap_gates(
     base_results: list[NgramOverlapResult] = []
     e0_results: list[NgramOverlapResult] = []
 
+    corpus_problem = _base_resume_corpus_problem(base_resume_texts, n=n)
+    if corpus_problem:
+        base_results.append(
+            _base_resume_corpus_result(
+                bullet_id="base_resume_reference_corpus",
+                threshold=base_resume_threshold,
+                warn_only=warn_only,
+                problem=corpus_problem,
+            )
+        )
+
     for b in bullets:
         if not isinstance(b, dict):
             continue
@@ -256,7 +321,7 @@ def run_bullet_ngram_overlap_gates(
         if not text:
             continue
 
-        if base_resume_texts:
+        if not corpus_problem:
             base_results.append(
                 check_bullet_base_resume_ngram_overlap(
                     bid, text, base_resume_texts,

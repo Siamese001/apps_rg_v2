@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -24,6 +25,7 @@ from apps_rg.fact_inventory.augmented_skills_graph_sqlite import (
     materialize_augmented_skills_graph_sqlite,
     open_graph_sqlite,
 )
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.c0.c03_errors import (
     C03GraphProjectionUnavailableError,
     RoleFamilyProjectionError,
@@ -149,7 +151,7 @@ _PROJECTION_POPULATION_COUNTS: dict[str, str] = {
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return repository_root(Path(__file__))
 
 
 def _utc_now() -> str:
@@ -370,7 +372,7 @@ def ensure_c03_graph_sqlite(repo_root: Path, db_path: Path | None = None) -> Pat
     return require_c03_graph_sqlite(root, path)
 
 
-from apps_rg.fact_inventory.graph_sqlite_path_index import (
+from apps_rg.fact_inventory.graph_sqlite_path_index import (  # noqa: E402
     compute_sqlite_graph_digest,
     compute_sqlite_schema_digest,
     query_best_metric_candidates,
@@ -820,7 +822,14 @@ def write_c03_graph_sqlite_context_receipt(
     """Persist C0.3 SQLite context receipt under artifacts/apps_rg/runtime_proofs/."""
     root = repo_root or _repo_root()
     rid = run_id or datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
-    out_dir = root / "artifacts/apps_rg/runtime_proofs/c03_graph_sqlite_context"
+    configured_out_dir = os.environ.get(
+        "APPS_RG_C03_GRAPH_SQLITE_CONTEXT_RECEIPT_DIR", ""
+    ).strip()
+    out_dir = (
+        Path(configured_out_dir)
+        if configured_out_dir
+        else root / "artifacts/apps_rg/runtime_proofs/c03_graph_sqlite_context"
+    )
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"c03_graph_sqlite_context_{rid}.json"
     from agentic_core.L2_execution.utils import write_gateway as _wg
@@ -846,6 +855,7 @@ def enrich_c03_bound_with_sqlite_context(
     section_id: str | None = None,
     selected_fact_ids: list[str] | None = None,
     repo_root: Path | None = None,
+    db_path: Path | None = None,
 ) -> dict[str, Any]:
     """Attach SQLite context receipt to an existing section graph binding shim document."""
     sec = section_id or str(c03_doc.get("section_id") or "executive_summary")
@@ -855,6 +865,7 @@ def enrich_c03_bound_with_sqlite_context(
             section_id=sec,
             selected_fact_ids=list(selected_fact_ids or []),
             repo_root=repo_root,
+            db_path=db_path,
         )
         receipt_path = write_c03_graph_sqlite_context_receipt(bundle, repo_root=repo_root)
         out = dict(c03_doc)

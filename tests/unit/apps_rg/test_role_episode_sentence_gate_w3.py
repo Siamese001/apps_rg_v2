@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 
+from apps_rg.repository_layout import repository_root, resolve_repository_path
 from apps_rg.runtime.sections import role_episode_lane
 from apps_rg.runtime.validators.bullet_line_discipline_x2 import check_bullet_single_thought
 
@@ -121,6 +122,7 @@ def test_role_episode_narrative_exactly_one_sentence_rejects_two_sentences() -> 
 
 
 def test_scoped_runtime_sentence_gates_do_not_use_raw_period_counts() -> None:
+    repo = repository_root(Path(__file__))
     scoped_files = [
         Path(role_episode_lane.__file__),
         Path("apps_rg/runtime/validators/unify_narrative_x2.py"),
@@ -129,7 +131,7 @@ def test_scoped_runtime_sentence_gates_do_not_use_raw_period_counts() -> None:
     ]
     offenders: list[str] = []
     for path in scoped_files:
-        text = path.read_text(encoding="utf-8")
+        text = resolve_repository_path(repo, path).read_text(encoding="utf-8")
         if 'count(".") + ' in text or "count('.') + " in text:
             offenders.append(path.as_posix())
 

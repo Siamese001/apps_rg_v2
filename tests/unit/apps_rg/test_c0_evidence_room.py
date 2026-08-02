@@ -13,6 +13,7 @@ from agentic_core.runtime.contracts.final_evidence_contract import (
     EvidenceItem,
     FinalEvidenceContract,
 )
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.fact_inventory.candidate_fact_ledger import (
     default_ledger_path,
     load_master_candidate_fact_ledger,
@@ -454,7 +455,7 @@ def test_c07_requires_unify_bullets_fact_vector_sufficiency() -> None:
 
 
 def test_c05_does_not_call_spine_c0_retrieve(monkeypatch: pytest.MonkeyPatch) -> None:
-    src = (Path(__file__).resolve().parents[3] / "apps_rg/runtime/c0/c05_fec_packet.py").read_text(
+    src = resolve_apps_rg_path(REPO, "runtime", "c0", "c05_fec_packet.py").read_text(
         encoding="utf-8"
     )
     assert "c0_retrieve_apps_rg" not in src

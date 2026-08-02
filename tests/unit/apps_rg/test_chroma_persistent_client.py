@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import pytest
 
+pytest.importorskip(
+    "tools.retrieval.vector_store",
+    reason="the production vector-store tool has not been packaged into the standalone repository",
+)
+
 from apps_rg.runtime.c0.chroma_persistent_client import (
     ensure_apps_rg_chroma_client,
     reset_apps_rg_chroma_client_cache_for_tests,
 )
-from tools.retrieval.vector_errors import VectorUnavailableError
 from tools.retrieval.vector_store import ChromaVectorStore
 
 

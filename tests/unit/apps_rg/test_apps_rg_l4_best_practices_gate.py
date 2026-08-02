@@ -9,12 +9,21 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+_GATE_SCRIPT = _REPO_ROOT / "ops_scripts" / "ci" / "check_apps_rg_l4_best_practices.py"
+
+pytestmark = pytest.mark.skipif(
+    not _GATE_SCRIPT.is_file(),
+    reason="standalone source baseline excludes the monorepo-owned L4 best-practices gate",
+)
+
 
 def test_apps_rg_l4_best_practices_gate_passes() -> None:
-    root = Path(__file__).resolve().parents[3]
     result = subprocess.run(
-        [sys.executable, "ops_scripts/ci/check_apps_rg_l4_best_practices.py"],
-        cwd=root,
+        [sys.executable, str(_GATE_SCRIPT)],
+        cwd=_REPO_ROOT,
         capture_output=True,
         text=True,
         timeout=30,

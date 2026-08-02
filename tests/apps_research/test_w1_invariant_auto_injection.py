@@ -3,10 +3,21 @@ W1 Invariant Tests for Controlled Auto-Injection
 
 Per W1 hardening requirement: Auto-injection is controlled and auditable.
 """
+# ruff: noqa: E402, F401
 from __future__ import annotations
 
-import pytest
+from pathlib import Path
 from unittest.mock import MagicMock
+
+import agentic_core
+import pytest
+
+REPO = Path(__file__).resolve().parents[2]
+if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+    pytest.skip(
+        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        allow_module_level=True,
+    )
 
 from agentic_core.runtime.entry.u0_apps_research_binding_v2 import (
     u0_validate_apps_research_v2,

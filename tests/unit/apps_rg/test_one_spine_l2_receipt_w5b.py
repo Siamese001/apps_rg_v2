@@ -29,6 +29,8 @@ from tests.unit.apps_rg.test_one_spine_fec_bridge_w5a import (
     W5A_SECTIONS,
     _args,
     _minimal_pool,
+)
+from tests.unit.apps_rg.test_one_spine_fec_bridge_w5a import (  # noqa: F401
     _patch_spine_c0_retrieve,
 )
 
@@ -54,7 +56,7 @@ def test_l2_execution_packet_contract_shape(section_id: str):
     pkt = build_l2_execution_packet_for_section(
         section_id=section_id,
         runtime_payload=payload,
-        provider_lane="retired_provider_profile",
+        provider_lane="external_claude",
         model_lane="test-model",
     )
     assert pkt["contract_type"] == "L2ExecutionPacket"
@@ -121,11 +123,13 @@ def test_prepare_finalize_emits_l2_artifacts(tmp_path: Path, section_id: str):
         tmp_path,
         section_id,
         payload,
-        provider_lane="retired_provider_profile",
+        provider_lane="external_claude",
     )
     assert (tmp_path / L2_EXECUTION_PACKET_ARTIFACT).is_file()
     pkt = json.loads((tmp_path / L2_EXECUTION_PACKET_ARTIFACT).read_text(encoding="utf-8"))
-    assert pkt["route_contract_ref"] == "route_contract.json"
+    route = json.loads((tmp_path / "route_contract.json").read_text(encoding="utf-8"))
+    assert pkt["route_id"] == route["route_id"]
+    assert pkt["packet_signature"]
     _write_json(tmp_path / "provider_request.json", {"model": "m"})
     _write_json(tmp_path / "provider_response.json", {"content": "x"})
     _write_json(tmp_path / "l2_output.json", {"section_id": section_id})
@@ -134,13 +138,14 @@ def test_prepare_finalize_emits_l2_artifacts(tmp_path: Path, section_id: str):
     finalize_section_l2_after_output(tmp_path, section_id, payload)
     sealed = json.loads((tmp_path / SEALED_L2_ARTIFACT).read_text(encoding="utf-8"))
     assert sealed["contract_type"] == "SealedL2Artifact"
-    assert sealed["l2_execution_packet_ref"] == L2_EXECUTION_PACKET_ARTIFACT
+    assert sealed["sovereign_execution_receipt"] == f"l2_packet:{pkt['packet_digest']}"
+    assert sealed["canonical_l2_receipt_bundle_ref"] == "l2_receipt_bundle.json"
     assert sealed["durable_commit_occurred"] is False
     assert sealed["canonical_exit_claimed"] is False
-    assert sealed["product_certification"] == "NOT_CLAIMED"
+    assert sealed["product_certification"] == "CANONICAL_L2_RECEIPT_BUNDLE"
     receipt = json.loads((tmp_path / L2_SPINE_RECEIPT_ARTIFACT).read_text(encoding="utf-8"))
-    assert receipt["l2_alignment_mode"] == "section_l2_spine_receipt"
-    assert receipt["spine_mode"] == "section_lane_modular"
+    assert receipt["l2_alignment_mode"] == "canonical_e1_e5_receipt_bundle"
+    assert receipt["spine_mode"] == "section_lane_canonical_l2_authority"
     assert receipt["runtime_exhaust_bundle_claimed"] is False
 
 

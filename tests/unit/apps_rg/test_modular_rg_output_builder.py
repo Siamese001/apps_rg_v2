@@ -177,9 +177,9 @@ def test_builder_positive_writes_schema_valid_final_resume(tmp_path: Path) -> No
     assert "Agentic orchestration" in skill_cat["items"]
 
 
-def test_missing_executive_summary_fails() -> None:
+def test_missing_executive_summary_fails(tmp_path: Path) -> None:
     repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"merge_neg_{uuid.uuid4().hex[:10]}"
+    art = tmp_path / f"merge_neg_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     modular_root = art / "modular_r4"
     modular_root.mkdir(parents=True, exist_ok=True)
@@ -203,9 +203,9 @@ def test_missing_executive_summary_fails() -> None:
     assert "executive" in res.failure_reason.lower() or res.failure_reason.startswith("missing_")
 
 
-def test_missing_headline_fails() -> None:
+def test_missing_headline_fails(tmp_path: Path) -> None:
     repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"merge_neg_{uuid.uuid4().hex[:10]}"
+    art = tmp_path / f"merge_neg_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     modular_root = art / "modular_r4"
     modular_root.mkdir(parents=True, exist_ok=True)
@@ -229,9 +229,9 @@ def test_missing_headline_fails() -> None:
     assert "headline" in res.failure_reason
 
 
-def test_missing_competencies_fails() -> None:
+def test_missing_competencies_fails(tmp_path: Path) -> None:
     repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"merge_neg_{uuid.uuid4().hex[:10]}"
+    art = tmp_path / f"merge_neg_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     modular_root = art / "modular_r4"
     modular_root.mkdir(parents=True, exist_ok=True)
@@ -255,9 +255,9 @@ def test_missing_competencies_fails() -> None:
     assert "competenc" in res.failure_reason
 
 
-def test_mocked_lane_rejected() -> None:
+def test_mocked_lane_rejected(tmp_path: Path) -> None:
     repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"merge_neg_{uuid.uuid4().hex[:10]}"
+    art = tmp_path / f"merge_neg_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     modular_root = art / "modular_r4"
     modular_root.mkdir(parents=True, exist_ok=True)
@@ -281,9 +281,9 @@ def test_mocked_lane_rejected() -> None:
     assert "mocked_lane_rejected" in res.failure_reason
 
 
-def test_malformed_bullet_lane_fails() -> None:
+def test_malformed_bullet_lane_fails(tmp_path: Path) -> None:
     repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"merge_neg_{uuid.uuid4().hex[:10]}"
+    art = tmp_path / f"merge_neg_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     modular_root = art / "modular_r4"
     modular_root.mkdir(parents=True, exist_ok=True)
@@ -466,9 +466,9 @@ def test_non_compact_locked_role_still_fails_below_three_bullets(tmp_path: Path)
     assert "locked_employment_insufficient_bullets:exp_other_lock_001" in res.failure_reason
 
 
-def test_load_lane_l2_from_section_refs_reads_lane_files() -> None:
-    repo = find_repo_root()
-    root = repo / "artifacts" / "apps_rg" / "runs" / f"lane_ref_load_{uuid.uuid4().hex[:10]}"
+def test_load_lane_l2_from_section_refs_reads_lane_files(tmp_path: Path) -> None:
+    repo = tmp_path
+    root = tmp_path / f"lane_ref_load_{uuid.uuid4().hex[:10]}"
     root.mkdir(parents=True, exist_ok=True)
     l2 = {"runtime_generation_status": "REAL_LLM", "headline_line": "SVP | Platforms"}
     refs: dict[str, str] = {}
@@ -505,9 +505,9 @@ def test_load_lane_l2_from_section_refs_reports_missing_ref() -> None:
     assert not loaded
 
 
-def test_all_generated_lane_ids_required() -> None:
+def test_all_generated_lane_ids_required(tmp_path: Path) -> None:
     repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"merge_neg_{uuid.uuid4().hex[:10]}"
+    art = tmp_path / f"merge_neg_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
     modular_root = art / "modular_r4"
     modular_root.mkdir(parents=True, exist_ok=True)

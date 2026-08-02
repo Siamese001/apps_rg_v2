@@ -291,11 +291,15 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    ensure_private_directory(output_path.parent)
-    write_private_text(
-        output_path,
-        json.dumps(report, allow_nan=False, indent=2, sort_keys=True) + "\n",
-    )
+    try:
+        ensure_private_directory(output_path.parent)
+        write_private_text(
+            output_path,
+            json.dumps(report, allow_nan=False, indent=2, sort_keys=True) + "\n",
+        )
+    except (OSError, ValueError) as exc:
+        print(json.dumps({"status": "INSUFFICIENT", "error": str(exc)}, sort_keys=True))
+        return 2
     full_report_sha256 = hashlib.sha256(output_path.read_bytes()).hexdigest()
     ci_receipt = build_sanitized_ci_receipt(
         report,

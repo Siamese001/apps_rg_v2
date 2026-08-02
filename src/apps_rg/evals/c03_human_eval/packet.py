@@ -34,6 +34,7 @@ from ._io import (
     read_yaml,
     record_with_digest,
     repo_root_from_module,
+    resolve_repository_resource,
     stable_digest,
     write_json,
     write_jsonl,
@@ -390,16 +391,12 @@ def _target_manifest(path: Path, repo_root: Path) -> dict[str, Any]:
             )
             if relative.is_absolute():
                 raise PacketBuildError(f"{case_id}: {kind}_path must be repository-relative")
-            unresolved_source = repo_root / relative
-            if path_has_symlink_component(unresolved_source):
-                raise PacketBuildError(f"{case_id}: frozen {kind} source must not use symlinks")
-            source = unresolved_source.resolve()
             try:
-                source.relative_to(repo_root)
+                source = resolve_repository_resource(repo_root, relative)
             except ValueError as exc:
-                raise PacketBuildError(
-                    f"{case_id}: frozen {kind} source escapes repo_root"
-                ) from exc
+                raise PacketBuildError(f"{case_id}: {kind}_path {exc}") from exc
+            if path_has_symlink_component(source):
+                raise PacketBuildError(f"{case_id}: frozen {kind} source must not use symlinks")
             expected = _require_text(case.get(f"{kind}_sha256"), f"{case_id} {kind}_sha256")
             if not source.is_file():
                 raise PacketBuildError(f"{case_id}: missing frozen {kind} source {source}")
@@ -574,8 +571,8 @@ def _source_freeze_receipt(
 
 
 def _target_context(case: Mapping[str, Any], repo_root: Path) -> dict[str, Any]:
-    jd_path = repo_root / str(case["jd_path"])
-    brief_path = repo_root / str(case["brief_path"])
+    jd_path = resolve_repository_resource(repo_root, str(case["jd_path"]))
+    brief_path = resolve_repository_resource(repo_root, str(case["brief_path"]))
     return {
         "target_profile_id": str(case["target_profile_id"]),
         "jd_text": jd_path.read_text(encoding="utf-8"),

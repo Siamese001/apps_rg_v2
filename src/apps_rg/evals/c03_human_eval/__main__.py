@@ -14,8 +14,10 @@ from .export import export_adjudicated_evaluation
 from ._io import (
     controlled_path_error,
     file_digest,
+    path_has_symlink_component,
     path_within,
     paths_refer_same,
+    private_metadata_error,
     repo_root_from_module,
     write_json,
 )
@@ -37,6 +39,10 @@ def _read_blinding_nonce_file(path: Path) -> str:
     """Read a 256-bit nonce without accepting a public/symlinked secret file."""
 
     source = path.expanduser()
+    if path_has_symlink_component(source):
+        raise ValueError(
+            "blinding nonce file must not use a symlink alias or reparse point"
+        )
     flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
     try:
         descriptor = os.open(source, flags)
@@ -48,12 +54,9 @@ def _read_blinding_nonce_file(path: Path) -> str:
         metadata = os.fstat(descriptor)
         if not stat.S_ISREG(metadata.st_mode):
             raise ValueError("blinding nonce file must be a regular file")
-        if metadata.st_uid != os.getuid():
-            raise ValueError("blinding nonce file must be owned by the current user")
-        if stat.S_IMODE(metadata.st_mode) & 0o077:
-            raise ValueError(
-                "blinding nonce file permissions must be owner-only (0600 or stricter)"
-            )
+        metadata_error = private_metadata_error(metadata, directory=False)
+        if metadata_error is not None:
+            raise ValueError(f"blinding nonce file {metadata_error}")
         with os.fdopen(descriptor, "r", encoding="utf-8") as stream:
             descriptor = -1
             nonce = stream.read().strip()

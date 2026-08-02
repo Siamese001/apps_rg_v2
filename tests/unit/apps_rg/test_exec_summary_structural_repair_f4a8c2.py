@@ -9,14 +9,17 @@ Validates four structural root-cause fixes:
 from __future__ import annotations
 
 import re
-import yaml
 from pathlib import Path
 
 import pytest
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-EXAMPLES_YAML = REPO_ROOT / "apps_rg/prompt_assembly/examples/executive_summary_examples.yaml"
-SCRATCH_TEMPLATE = REPO_ROOT / "apps_rg/prompt_assembly/templates/executive_summary.generate_scratch_v1.yaml"
+APPS_RG_ROOT = REPO_ROOT / "src" / "apps_rg"
+EXAMPLES_YAML = APPS_RG_ROOT / "prompt_assembly/examples/executive_summary_examples.yaml"
+SCRATCH_TEMPLATE = (
+    APPS_RG_ROOT / "prompt_assembly/templates/executive_summary.generate_scratch_v1.yaml"
+)
 
 
 # ─────────────────────────────────────────────────────────────────

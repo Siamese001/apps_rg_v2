@@ -13,6 +13,7 @@ from typing import Any, Mapping, Sequence
 from ._io import (
     digest_matches,
     file_digest,
+    path_has_symlink_component,
     private_path_error,
     read_json,
     read_jsonl,
@@ -334,7 +335,7 @@ def validate_prelabel_packet(
 
     report = _result("apps_rg.c03_human_eval.prelabel_validation.v1")
     packet_alias = Path(packet_dir)
-    packet_alias_valid = not packet_alias.is_symlink()
+    packet_alias_valid = not path_has_symlink_component(packet_alias)
     if not packet_alias_valid:
         _error(report, "packet root must not be a symlink alias")
     root = packet_alias.resolve()
@@ -1636,7 +1637,7 @@ def validate_completed_packet(
         **retrieval_metric_applicability,
     }
     labels_alias = Path(labels_dir)
-    labels_alias_valid = not labels_alias.is_symlink()
+    labels_alias_valid = not path_has_symlink_component(labels_alias)
     if not labels_alias_valid:
         _error(report, "completed labels root must not be a symlink alias")
     labels_root = labels_alias.resolve()

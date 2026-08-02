@@ -18,8 +18,8 @@ from apps_rg.runtime.sections.unify_bullets_graph_evidence import (
 )
 
 REPO = Path(__file__).resolve().parents[3]
-JD = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(encoding="utf-8")
-BRIEF = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md").read_text(
+JD = (REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt").read_text(encoding="utf-8")
+BRIEF = (REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md").read_text(
     encoding="utf-8"
 )
 

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import yaml
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.contracts.gate_taxonomy import (
     VALID_GATE_CLASSES,
     classify_gate_id,
@@ -24,13 +25,14 @@ from apps_rg.runtime.sections.section_product_shape_ssot import (
 )
 
 REPO = Path(__file__).resolve().parents[3]
-ASSUMPTIONS = REPO / "apps_rg" / "runtime" / "contracts" / "apps_rg_assumptions.yaml"
-RUNTIME_PROFILE = (
-    REPO
-    / "apps_rg"
-    / "config"
-    / "domain_contract"
-    / "runtime_gate_profile.resume_generation.v1.json"
+ASSUMPTIONS = resolve_apps_rg_path(
+    REPO, "runtime", "contracts", "apps_rg_assumptions.yaml"
+)
+RUNTIME_PROFILE = resolve_apps_rg_path(
+    REPO,
+    "config",
+    "domain_contract",
+    "runtime_gate_profile.resume_generation.v1.json",
 )
 
 

@@ -8,13 +8,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
-import tempfile
 from pathlib import Path
 from typing import Any, Mapping
 
 import yaml
 
+from apps_rg.evals.c03_human_eval._io import write_json
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.c0.c03_resume_graph_contracts import stable_digest
 
 REPORT_SCHEMA = "apps_rg.c03_proxy_eval.report.v1"
@@ -82,7 +82,7 @@ def _canonical_profile(profile_path: Path) -> dict[str, Any]:
         raise ValueError("canonical profile must keep UNKNOWN non-PASS")
     if not isinstance(raw.get("release_targets"), Mapping):
         raise ValueError("canonical profile release_targets missing")
-    repo_root = Path(__file__).resolve().parents[3]
+    repo_root = repository_root(Path(__file__))
     try:
         profile_ref = profile_path.resolve().relative_to(repo_root).as_posix()
     except ValueError:
@@ -268,21 +268,7 @@ def validate_proxy_summary(value: Mapping[str, Any]) -> None:
 
 
 def _atomic_private_json(path: Path, value: Mapping[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-    os.chmod(path.parent, 0o700)
-    body = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-    fd, temp_name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
-    try:
-        os.fchmod(fd, 0o600)
-        with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            handle.write(body)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temp_name, path)
-        os.chmod(path, 0o600)
-    finally:
-        if os.path.exists(temp_name):
-            os.unlink(temp_name)
+    write_json(path, value)
 
 
 def emit_proxy_artifacts(

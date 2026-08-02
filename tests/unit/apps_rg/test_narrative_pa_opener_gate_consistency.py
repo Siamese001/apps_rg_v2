@@ -12,6 +12,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.judges.ibm_narrative_x1d import NARRATIVE_RUBRIC as IBM_NARRATIVE_RUBRIC
 from apps_rg.runtime.judges.unify_narrative_x1d import NARRATIVE_RUBRIC
 from apps_rg.runtime.sections import ibm_narrative_pa, unify_narrative_pa
@@ -19,6 +20,7 @@ from apps_rg.runtime.validators.narrative_mechanical_x2 import EXEC_SUMMARY_MECH
 from apps_rg.runtime.validators.unify_narrative_x2 import run_unify_narrative_x2_gates
 
 _FORBIDDEN = {w.lower() for w in EXEC_SUMMARY_MECHANICAL_OPENERS}
+_REPO = repository_root(Path(__file__))
 
 
 def _suggested_openers(source_text: str) -> set[str]:
@@ -59,9 +61,9 @@ def test_unify_narrative_pa_is_companion_bullet_synthesis_step() -> None:
 
 
 def test_unify_narrative_template_matches_product_quality_dependency_design() -> None:
-    template = Path("apps_rg/prompt_assembly/templates/unify_position_narrative_v1.yaml").read_text(
-        encoding="utf-8"
-    )
+    template = resolve_apps_rg_path(
+        _REPO, "prompt_assembly", "templates", "unify_position_narrative_v1.yaml"
+    ).read_text(encoding="utf-8")
     assert "primary synthesis context" in template
     assert "C0 remains proof/provenance" in template
     assert "x3_disposition X3_ALLOW evidence" not in template
@@ -91,9 +93,9 @@ def test_ibm_narrative_pa_is_companion_bullet_synthesis_step() -> None:
 
 
 def test_ibm_narrative_template_matches_product_quality_dependency_design() -> None:
-    template = Path("apps_rg/prompt_assembly/templates/ibm_position_narrative_v1.yaml").read_text(
-        encoding="utf-8"
-    )
+    template = resolve_apps_rg_path(
+        _REPO, "prompt_assembly", "templates", "ibm_position_narrative_v1.yaml"
+    ).read_text(encoding="utf-8")
     assert "primary synthesis context" in template
     assert "C0 remains proof/provenance" in template
     assert "x3_disposition X3_ALLOW evidence" not in template

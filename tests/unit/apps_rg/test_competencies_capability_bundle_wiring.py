@@ -12,6 +12,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.sections import competency_capability_registry as reg
 from apps_rg.runtime.sections.competency_capability_evidence import (
     COMPETENCY_CAPABILITY_EVIDENCE_PACK_MARKER,
@@ -36,12 +37,22 @@ from apps_rg.runtime.sections.competencies_rigor import (
 )
 from apps_rg.runtime.validators import competencies_quality_x2 as q
 
-_REPO_ROOT = Path(__file__).resolve().parents[3]
-ANTHROPIC_JD = _REPO_ROOT / "apps_rg/config/targeting/anthropic_manager_applied_ai_architecture_partnerships_jd.txt"
+_REPO_ROOT = repository_root(Path(__file__))
+ANTHROPIC_JD = resolve_apps_rg_path(
+    _REPO_ROOT,
+    "config",
+    "targeting",
+    "anthropic_manager_applied_ai_architecture_partnerships_jd.txt",
+)
 ANTHROPIC_BRIEF = (
     _REPO_ROOT / "tests/fixtures/apps_rg/anthropic_manager_applied_ai_architecture_partnerships_briefing.md"
 )
-ANTHROPIC_2026_JD_JSON = _REPO_ROOT / "apps_rg/config/targeting/jd_anthropic_partnerships_2026.json"
+ANTHROPIC_2026_JD_JSON = resolve_apps_rg_path(
+    _REPO_ROOT,
+    "config",
+    "targeting",
+    "jd_anthropic_partnerships_2026.json",
+)
 ANTHROPIC_2026_BRIEF_JSON = _REPO_ROOT / "tests/fixtures/apps_rg/brief_anthropic_partnerships_2026.json"
 
 
@@ -1066,7 +1077,12 @@ def test_run_competencies_x2_omits_bundle_gates_without_bundle_mode():
 
 
 def _competencies_profile() -> dict:
-    path = _REPO_ROOT / "apps_rg" / "config" / "domain_contract" / "section_retrieval_profile.yaml"
+    path = resolve_apps_rg_path(
+        _REPO_ROOT,
+        "config",
+        "domain_contract",
+        "section_retrieval_profile.yaml",
+    )
     profile = yaml.safe_load(path.read_text(encoding="utf-8"))
     for sec in profile.get("sections", []):
         if isinstance(sec, dict) and sec.get("section_id") == "competencies":

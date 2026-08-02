@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.section_cli_defaults import (
     SectionCliConfigError,
     collect_executive_summary_mandatory_missing,
@@ -66,14 +68,12 @@ def test_stale_default_jd_and_briefing_detected() -> None:
 
 
 def test_validate_fails_when_default_ssot_paths_used(monkeypatch: pytest.MonkeyPatch) -> None:
-    from pathlib import Path
-
     repo = Path(__file__).resolve().parents[3]
     args = SimpleNamespace(
         target_company="Unify Consulting",
         target_role="SVP Engineering",
-        jd=str(repo / "apps_rg" / "config" / "default_jd_targeting.txt"),
-        manual_brief=str(repo / "apps_rg" / "config" / "default_targeting_briefing.txt"),
+        jd=str(resolve_apps_rg_path(repo, "config", "default_jd_targeting.txt")),
+        manual_brief=str(resolve_apps_rg_path(repo, "config", "default_targeting_briefing.txt")),
     )
     monkeypatch.delenv("APPS_RG_ALLOW_STALE_TARGETING_SSOT", raising=False)
     with pytest.raises(SectionCliConfigError, match="not updated"):
@@ -81,14 +81,12 @@ def test_validate_fails_when_default_ssot_paths_used(monkeypatch: pytest.MonkeyP
 
 
 def test_validate_allows_stale_when_env_waiver_set(monkeypatch: pytest.MonkeyPatch) -> None:
-    from pathlib import Path
-
     repo = Path(__file__).resolve().parents[3]
     args = SimpleNamespace(
         target_company="Unify Consulting",
         target_role="SVP Engineering",
-        jd=str(repo / "apps_rg" / "config" / "default_jd_targeting.txt"),
-        manual_brief=str(repo / "apps_rg" / "config" / "default_targeting_briefing.txt"),
+        jd=str(resolve_apps_rg_path(repo, "config", "default_jd_targeting.txt")),
+        manual_brief=str(resolve_apps_rg_path(repo, "config", "default_targeting_briefing.txt")),
     )
     monkeypatch.setenv("APPS_RG_ALLOW_STALE_TARGETING_SSOT", "1")
     validate_executive_summary_targeting_inputs_updated(args)

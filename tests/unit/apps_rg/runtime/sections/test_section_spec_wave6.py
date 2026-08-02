@@ -5,6 +5,7 @@ from pathlib import Path
 
 import yaml
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.section_spec import (
     CANONICAL_SECTION_IDS,
     SourceAuthoritySpec,
@@ -13,7 +14,12 @@ from apps_rg.runtime.sections.section_spec import (
 )
 
 REPO = Path(__file__).resolve().parents[5]
-PROFILE = REPO / "apps_rg" / "config" / "domain_contract" / "section_retrieval_profile.yaml"
+PROFILE = resolve_apps_rg_path(
+    REPO,
+    "config",
+    "domain_contract",
+    "section_retrieval_profile.yaml",
+)
 
 
 def test_source_authority_defaults_match_wave6_policy() -> None:

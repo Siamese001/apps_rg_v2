@@ -286,13 +286,35 @@ def _stub_closeout_waves(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
     monkeypatch.setattr(closeout_mod, "W9_JSON", tmp_path / "w9.json")
     monkeypatch.setattr(closeout_mod, "_write_json", lambda *_args, **_kwargs: None)
     monkeypatch.setattr(closeout_mod._wg, "write_text", lambda *_args, **_kwargs: None)
-    monkeypatch.setattr(closeout_mod, "write_p2_rebaseline", lambda **_kwargs: {})
+    monkeypatch.setattr(
+        closeout_mod,
+        "validate_p2_closeout_receipt",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        closeout_mod,
+        "_build_wave_receipt_bindings",
+        lambda **_kwargs: {
+            wave: {
+                "ref": f"{wave}.json",
+                "status": "PASS",
+            }
+            for wave in closeout_mod._WAVE_SCHEMAS
+        },
+    )
+    monkeypatch.setattr(
+        closeout_mod,
+        "write_p2_rebaseline",
+        lambda **_kwargs: {"status": "PASS"},
+    )
     monkeypatch.setattr(
         closeout_mod,
         "write_p2_w1a_all_sections",
         lambda **_kwargs: {
+            "status": "PASS",
             "all_sections_default_to_augmented_skills_graph": True,
             "broad_skills_ledger_used_as_authority_anywhere": False,
+            "blocked_sections": [],
         },
     )
     for name in (
@@ -304,19 +326,43 @@ def _stub_closeout_waves(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
         "write_p2_w7_x1d",
         "write_p2_w8_validators",
     ):
-        monkeypatch.setattr(closeout_mod, name, lambda **_kwargs: {})
+        monkeypatch.setattr(closeout_mod, name, lambda **_kwargs: {"status": "PASS"})
     monkeypatch.setattr(
         closeout_mod,
         "write_p2_w10_audit",
-        lambda **_kwargs: {"package_audit_status": "PASS"},
+        lambda **_kwargs: {
+            "status": "PASS",
+            "package_audit_status": "PASS",
+            "unsupported_or_blocked_sections": [],
+        },
+    )
+    competencies_receipt = tmp_path / "receipt.json"
+    competencies_receipt.write_text(
+        json.dumps(
+            {
+                "schema": (
+                    "competencies_graph_proof_pool_p2_w1a_"
+                    "default_graph_authority_receipt_v1"
+                ),
+                "receipt_mode": "TEST_ONLY_NONCANONICAL_OUTPUT",
+                "certification_eligible": False,
+            }
+        ),
+        encoding="utf-8",
     )
     monkeypatch.setattr(
         "apps_rg.fact_inventory.competencies_graph_skills_proof_pool.write_p2_w1a_default_graph_authority_receipt",
-        lambda **_kwargs: {"receipt_json": "receipt.json"},
+        lambda **_kwargs: {
+            "receipt_json": str(competencies_receipt),
+            "receipt": {
+                "receipt_mode": "TEST_ONLY_NONCANONICAL_OUTPUT",
+                "certification_eligible": False,
+            },
+        },
     )
 
 
-def test_closeout_preserves_valid_w9_without_refresh(
+def test_closeout_refreshes_valid_w9_instead_of_reusing_it(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -327,14 +373,22 @@ def test_closeout_preserves_valid_w9_without_refresh(
 
     def _refresh(**kwargs: Any) -> dict[str, Any]:
         refresh_calls.append(bool(kwargs["run_live"]))
-        return {"w9": {"sections": {"unexpected": {"status": "PASS"}}}}
+        return {
+            "w9": {"status": "PASS", "sections": {"refreshed": {"status": "PASS"}}},
+            "w10": {
+                "status": "PASS",
+                "package_audit_status": "PASS",
+                "unsupported_or_blocked_sections": [],
+            },
+        }
 
     monkeypatch.setattr(closeout_mod, "write_p2_w9_live_matrix_closeout", _refresh)
 
     out = closeout_mod.run_full_closeout(repo_root=tmp_path, skip_live=True)
 
-    assert refresh_calls == []
-    assert out["live_proof_summary"] == original
+    assert refresh_calls == [False]
+    assert out["live_proof_summary"] != original
+    assert "refreshed" in out["live_proof_summary"]["sections"]
 
 
 @pytest.mark.parametrize("invalid_sections", [None, [], "not-an-object"])
@@ -348,12 +402,19 @@ def test_closeout_refreshes_malformed_preserved_w9(
         json.dumps({"schema": "canonical_live_section_proofs_p2_w9_v1", "sections": invalid_sections}),
         encoding="utf-8",
     )
-    refreshed = {"sections": {"headline": {"status": "PASS"}}}
+    refreshed = {"status": "PASS", "sections": {"headline": {"status": "PASS"}}}
     refresh_calls: list[bool] = []
 
     def _refresh(**kwargs: Any) -> dict[str, Any]:
         refresh_calls.append(bool(kwargs["run_live"]))
-        return {"w9": refreshed}
+        return {
+            "w9": refreshed,
+            "w10": {
+                "status": "PASS",
+                "package_audit_status": "PASS",
+                "unsupported_or_blocked_sections": [],
+            },
+        }
 
     monkeypatch.setattr(closeout_mod, "write_p2_w9_live_matrix_closeout", _refresh)
 
@@ -376,7 +437,14 @@ def test_closeout_refreshes_w9_when_preservation_is_disabled(
 
     def _refresh(**kwargs: Any) -> dict[str, Any]:
         refresh_calls.append(bool(kwargs["run_live"]))
-        return {"w9": {"sections": {}}}
+        return {
+            "w9": {"status": "PASS", "sections": {}},
+            "w10": {
+                "status": "PASS",
+                "package_audit_status": "PASS",
+                "unsupported_or_blocked_sections": [],
+            },
+        }
 
     monkeypatch.setattr(closeout_mod, "write_p2_w9_live_matrix_closeout", _refresh)
 

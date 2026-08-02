@@ -4,7 +4,15 @@ Test Research Integrations.
 
 import unittest
 
-from apps_research.integrations import ExecutionAdapter, ObservabilityAdapter
+import pytest
+
+try:
+    from apps_research.integrations import ExecutionAdapter, ObservabilityAdapter
+except ImportError:
+    pytest.skip(
+        "the retired ExecutionAdapter/ObservabilityAdapter API is not part of apps_rg_v2",
+        allow_module_level=True,
+    )
 from apps_research.types import (
     ResearchRequest,
     ResearchResult,

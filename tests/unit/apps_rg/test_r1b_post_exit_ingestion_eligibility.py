@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
 
 from apps_rg.cache.r1b_adapter import AppsRgR1BCacheAdapter
 from apps_rg.cache.r1b_constants import (
@@ -15,7 +14,6 @@ from apps_rg.cache.r1b_constants import (
 )
 from apps_rg.cache.r1b_post_exit_eligibility import (
     POST_EXIT_INGESTION_PHASE,
-    assess_post_exit_ingestion_eligibility,
     load_post_exit_metadata,
 )
 from apps_rg.cache.r1b_post_exit_ingest import (
@@ -23,6 +21,7 @@ from apps_rg.cache.r1b_post_exit_ingest import (
     ingest_post_exit_from_run_dir,
 )
 from apps_rg.cache.r1b_store import R1BSemanticCacheStore
+from tests.unit.apps_rg.l5_uwg_fixture import write_verified_l5_sealed_artifact
 
 
 def _raw_request() -> dict:
@@ -48,6 +47,7 @@ def _write_exit_bundle(
     prompt_hash: str = "prompt_w8",
     gate_hash: str = "gate_w8",
     write_x3: bool = True,
+    request_id: str = "hir_run_w8_fixture",
 ) -> None:
     run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "run_manifest.json").write_text(
@@ -90,6 +90,12 @@ def _write_exit_bundle(
         (run_dir / "x2_gate_outputs.json").write_text('{"x2_failed": 0}', encoding="utf-8")
     if include_proof_chunk:
         pass  # proof chunk synthesized by build_chunk_rows_from_run_dir
+    write_verified_l5_sealed_artifact(
+        run_dir,
+        request_id=request_id,
+        run_id="run_w8_fixture",
+        trace_id="trace:run_w8_fixture",
+    )
 
 
 def test_post_exit_ingestion_requires_x3_artifact(tmp_path: Path) -> None:
@@ -160,7 +166,7 @@ def test_adapter_blocks_pre_exit_store(tmp_path: Path) -> None:
 
 def test_adapter_allows_post_exit_with_x3c_artifact_dir(tmp_path: Path) -> None:
     run_dir = tmp_path / "artifact"
-    _write_exit_bundle(run_dir, x3_code="X3C")
+    _write_exit_bundle(run_dir, x3_code="X3C", request_id="hir_w8_live")
     store_root = tmp_path / "store"
     adapter = AppsRgR1BCacheAdapter(runs_dir=str(store_root))
     rid = adapter.store_intent_and_output(

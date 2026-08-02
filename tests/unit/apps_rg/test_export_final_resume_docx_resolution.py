@@ -9,6 +9,7 @@ it silently emitted a hollow DOCX containing only "Candidate" +
   1. run-dir resolution prefers the spine-shaped ``final_resume_assembly`` file;
   2. ``export`` refuses to emit a hollow DOCX from a flat/non-spine blob.
 """
+
 from __future__ import annotations
 
 import json
@@ -17,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from ops_scripts.apps_rg.export_final_resume_docx import (
+from apps_rg.runtime.final_resume_docx import (
     _is_spine_shaped,
     _resolve_final_resume,
     export,

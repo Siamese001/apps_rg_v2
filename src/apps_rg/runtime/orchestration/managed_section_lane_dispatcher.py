@@ -1,6 +1,7 @@
 """Managed wave-based Phase-1 lane dispatcher (external model-safe parallelism)."""
 from __future__ import annotations
 
+import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Callable
 
@@ -11,7 +12,36 @@ from apps_rg.runtime.orchestration.section_lane_executor import (
     run_lane_in_context,
 )
 from apps_rg.runtime.product_output_policy import PHASE1_PRIOR_LANE_FAILED_BLOCKER
-from tools.progress_display import ProgressReporter
+
+
+class ProgressReporter:  # pragma: no cover - exercised via the public dispatcher
+    """App-owned progress fallback; it carries no workflow authority."""
+
+    def __init__(self, total: int, label: str = "", unit: str = "") -> None:
+        self.total = total
+        self.label = label
+        self.unit = unit
+        self.completed = 0
+
+    def update(self, label: str = "") -> None:
+        self.completed += 1
+        logging.getLogger(__name__).info(
+            "%s: %s/%s %s %s",
+            self.label,
+            self.completed,
+            self.total,
+            self.unit,
+            label,
+        )
+
+    def done(self) -> None:
+        logging.getLogger(__name__).info(
+            "%s: complete (%s/%s %s)",
+            self.label,
+            self.completed,
+            self.total,
+            self.unit,
+        )
 
 _WAVE_ABORT_EXEC_STATUS = f"pre_run_blocked:{PHASE1_PRIOR_LANE_FAILED_BLOCKER}"
 

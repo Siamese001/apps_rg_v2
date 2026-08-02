@@ -97,6 +97,41 @@ class TestGateRunnersWarnMode:
         assert res.passed is False
         assert res.threshold == BASE_RESUME_NGRAM_THRESHOLD
 
+    @pytest.mark.parametrize(
+        "base_resume_texts",
+        (
+            [],
+            [""],
+            ["too short"],
+            ["valid reference corpus has enough tokens", object()],
+            {"unexpected": "mapping"},
+        ),
+    )
+    def test_base_resume_hard_mode_fails_closed_on_invalid_corpus(
+        self,
+        base_resume_texts: object,
+    ) -> None:
+        res = check_bullet_base_resume_ngram_overlap(
+            "bul_ibm_001",
+            "a generated bullet with enough words",
+            base_resume_texts,  # type: ignore[arg-type]
+            warn_only=False,
+        )
+        assert res.passed is False
+        assert res.failure_reason is not None
+        assert "base resume reference corpus" in res.failure_reason
+
+    def test_base_resume_warn_mode_observes_empty_corpus_without_blocking(self) -> None:
+        res = check_bullet_base_resume_ngram_overlap(
+            "bul_ibm_001",
+            "a generated bullet with enough words",
+            [],
+            warn_only=True,
+        )
+        assert res.passed is True
+        assert res.failure_reason is not None
+        assert "reference corpus empty" in res.failure_reason
+
     def test_e0_clean_bullet_passes_with_no_reason(self) -> None:
         res = check_bullet_e0_example_ngram_overlap(
             "bul_unify_001",
@@ -144,6 +179,24 @@ class TestRunBulletNgramOverlapGates:
         assert e0_results == []
         assert base_pass is True
         assert e0_pass is True
+
+    def test_hard_runner_fails_closed_when_loader_returns_no_corpus(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(
+            "apps_rg.runtime.validators.bullet_ngram_overlap_x2.load_ibm_base_resume_bullet_texts",
+            lambda: [],
+        )
+        base_pass, base_results, _e0_pass, _e0_results = run_bullet_ngram_overlap_gates(
+            [{"bullet_id": "bul_ibm_001", "bullet_text": "a generated bullet with enough words"}],
+            section_id="ibm_bullets",
+            warn_only=False,
+        )
+        assert base_pass is False
+        assert len(base_results) == 1
+        assert base_results[0].bullet_id == "base_resume_reference_corpus"
+        assert base_results[0].failure_reason is not None
 
     def test_constants(self) -> None:
         assert NGRAM_SIZE == 4

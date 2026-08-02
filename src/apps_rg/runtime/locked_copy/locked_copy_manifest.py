@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.resume_resolution import load_lane_base_resume_json
 
 
@@ -24,11 +25,7 @@ LOCKED_SECTION_IDS: tuple[str, ...] = (
 
 
 def find_repo_root(start: Path | None = None) -> Path:
-    here = (start or Path(__file__)).resolve()
-    for parent in [here.parent, *here.parents]:
-        if (parent / "apps_rg" / "resume" / "base").exists():
-            return parent
-    return Path.cwd()
+    return repository_root(start or Path(__file__))
 
 
 def sha256_hex(text: str) -> str:

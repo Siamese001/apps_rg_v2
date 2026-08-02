@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import apps_rg_package_root
 from apps_rg.runtime.sections.role_episode_bundle_registry import (
     get_role_episode_bundle_by_id,
     get_role_episode_bundles_for_section,
@@ -24,8 +25,9 @@ from apps_rg.runtime.sections.role_episode_metric_registry import (
 )
 
 REPO = Path(__file__).resolve().parents[5]
-INSURTECH_GRAPH = REPO / "apps_rg" / "fact_inventory" / "insurtech_role_episode_bundles.json"
-EY_GRAPH = REPO / "apps_rg" / "fact_inventory" / "ey_role_episode_bundles.json"
+APP_ROOT = apps_rg_package_root(REPO)
+INSURTECH_GRAPH = APP_ROOT / "fact_inventory" / "insurtech_role_episode_bundles.json"
+EY_GRAPH = APP_ROOT / "fact_inventory" / "ey_role_episode_bundles.json"
 
 
 def _minimal_bundle(**overrides) -> dict:

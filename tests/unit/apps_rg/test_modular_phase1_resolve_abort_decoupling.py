@@ -16,18 +16,15 @@ from apps_rg.l2_recipe.modular_resume_generation import (
     run_modular_resume_generation,
 )
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
-from apps_rg.runtime.locked_copy.locked_copy_manifest import find_repo_root
 from apps_rg.runtime.runtime_proof_layout import MODULAR_R4_SECTIONS_ROOT_ENV
+from tests.helpers.standalone_repo_view import materialize_standalone_repo_view
 
 
 def _write_lane_product_bundle(
     repo: Path,
     sections_root: Path,
     lane: str,
-    *,
-    run_id: str | None = None,
 ) -> None:
-    rid = run_id or f"pytest_resolve_{lane}"
     run_dir = (sections_root / lane).resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
     run_rel = run_dir.relative_to(repo).as_posix()
@@ -50,10 +47,12 @@ def _write_lane_product_bundle(
     ptr.write_text(json.dumps({"run_dir": run_rel.replace("\\", "/")}), encoding="utf-8")
 
 
-def test_phase1_resolves_executive_summary_despite_dispatch_exit_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_phase1_resolves_executive_summary_despite_dispatch_exit_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """RC-2: on-disk exec_summary pointer must materialize even if dispatch dict says error."""
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_resolve_{uuid.uuid4().hex[:10]}"
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase1_resolve_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
 
     def _stub_lane_dispatch(**kwargs: object) -> dict[str, object]:
@@ -95,15 +94,17 @@ def test_phase1_resolves_executive_summary_despite_dispatch_exit_error(monkeypat
     assert int(res.extras.get("lanes_executed") or 0) == 1
 
 
-def test_phase1_materialize_runs_all_lanes_when_first_missing_pointer(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_phase1_materialize_runs_all_lanes_when_first_missing_pointer(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """First-lane missing pointer must not skip a later lane's (executive_summary) resolve.
 
     Order-agnostic: asserts the *first* lane in GENERATED_LANES gets PHASE1_NO_RUN_DIR while a
     later lane that wrote its bundle still materializes — the invariant the dependency-ordered
     serial loop must preserve regardless of which lane is first.
     """
-    repo = find_repo_root()
-    art = repo / "artifacts" / "apps_rg" / "runs" / f"phase1_resolve_{uuid.uuid4().hex[:10]}"
+    repo = materialize_standalone_repo_view(tmp_path)
+    art = repo / f"phase1_resolve_{uuid.uuid4().hex[:10]}"
     art.mkdir(parents=True, exist_ok=True)
 
     def _stub_lane_dispatch(**kwargs: object) -> dict[str, object]:

@@ -34,6 +34,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from apps_rg.repository_layout import resolve_repository_path
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
 from apps_rg.runtime.runtime_proof_layout import (
     MODULAR_R4_SECTIONS_ROOT_ENV,
@@ -341,9 +342,7 @@ def derive_patch_targeting(repo: Path, run_dir: Path) -> PatchTargeting:
     jd_text = ""
     jd_flag = str(command_flags.get("--jd") or "").strip()
     if jd_flag:
-        cand = Path(jd_flag)
-        if not cand.is_absolute():
-            cand = repo / jd_flag
+        cand = resolve_repository_path(repo, jd_flag)
         if cand.is_file():
             jd_ref = str(cand.resolve())
             sources["job_description_ref"] = f"{command_source}:command:--jd"
@@ -353,9 +352,7 @@ def derive_patch_targeting(repo: Path, run_dir: Path) -> PatchTargeting:
             sources["job_description_text"] = "lane:validated_request.app_payload"
 
     if manual_brief:
-        mb = Path(manual_brief)
-        if not mb.is_absolute():
-            mb = repo / manual_brief
+        mb = resolve_repository_path(repo, manual_brief)
         if mb.is_file():
             manual_brief = str(mb.resolve())
         else:

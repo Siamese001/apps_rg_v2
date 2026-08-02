@@ -14,8 +14,8 @@ REPO = Path(__file__).resolve().parents[3]
 
 
 def test_persist_graph_selection_rationale_to_run_dir(tmp_path: Path) -> None:
-    jd_path = REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
-    brief_path = REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
+    jd_path = REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt"
+    brief_path = REPO / "src/apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md"
     payload = {
         "target_company": "Brown & Brown",
         "target_title": "SVP IT Strategy & Innovation",
@@ -34,6 +34,7 @@ def test_persist_graph_selection_rationale_to_run_dir(tmp_path: Path) -> None:
     assert rationale["schema"] == RATIONALE_SCHEMA
     assert rationale["jd_subgraph_policy"]["jd_used_as_proof"] is False
     assert rationale["evidence_authority"] == "augmented_skills_graph"
+    assert rationale["graph_ref"] == "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
 
 
 def test_persist_skips_unknown_section(tmp_path: Path) -> None:

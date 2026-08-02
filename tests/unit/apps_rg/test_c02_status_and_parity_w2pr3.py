@@ -10,7 +10,8 @@ Pure product-mode unit tests (no APPS_RG_TEST_HARNESS, no real Chroma).
 
 from __future__ import annotations
 
-from types import SimpleNamespace
+import sys
+from types import ModuleType, SimpleNamespace
 
 import pytest
 
@@ -19,6 +20,27 @@ from apps_rg.runtime.chroma_precomputed_collection import (
     EXPECTED_BGE_DIMENSION,
     assert_collection_embedding_parity,
 )
+
+
+def _install_standalone_chroma_store_shim(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace the monorepo-owned liveness wrapper; this test owns the G6 contract."""
+
+    class _Store:
+        def __init__(self, *, chroma_path) -> None:
+            self.chroma_path = chroma_path
+
+        def ensure_client(self) -> object:
+            return object()
+
+    tools_module = ModuleType("tools")
+    retrieval_module = ModuleType("tools.retrieval")
+    vector_store_module = ModuleType("tools.retrieval.vector_store")
+    vector_store_module.ChromaVectorStore = _Store
+    tools_module.retrieval = retrieval_module
+    retrieval_module.vector_store = vector_store_module
+    monkeypatch.setitem(sys.modules, "tools", tools_module)
+    monkeypatch.setitem(sys.modules, "tools.retrieval", retrieval_module)
+    monkeypatch.setitem(sys.modules, "tools.retrieval.vector_store", vector_store_module)
 
 
 # --------------------------- G9: embedding parity ---------------------------
@@ -75,10 +97,9 @@ def test_parity_handles_numpy_embeddings_without_truthiness_error() -> None:
 # --------------------------- G6: PASS-but-empty ---------------------------
 
 def test_pass_but_empty_dense_lane_raises(monkeypatch, tmp_path) -> None:
-    import chromadb
-
     from apps_rg.runtime.bindings.c0_binding import C0EvidenceGapError
 
+    _install_standalone_chroma_store_shim(monkeypatch)
     monkeypatch.setattr(c02mod, "product_hybrid_retrieval_required", lambda section_id: True)
     monkeypatch.setenv("CHROMA_PERSIST_DIR", str(tmp_path))
     monkeypatch.setattr(

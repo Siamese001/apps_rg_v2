@@ -17,8 +17,7 @@ from apps_rg.runtime.spine.exit_artifacts import (
     exit_spine_kill_switch_enabled,
 )
 from apps_rg.runtime.spine.c0_fec_compose import (
-    FEC_BRIDGE_ARTIFACT,
-    build_spine_c0_fec_artifact,
+    wire_spine_c0_fec_for_section,
 )
 from apps_rg.runtime.spine.front_contracts import (
     activate_fixture_dev_bypass,
@@ -138,20 +137,21 @@ def test_full_l2_then_exit_chain(tmp_path: Path, section_id: str):
     )
     pool = _minimal_pool(section_id)
     payload: dict = {"allowed_fact_ids": list(pool.allowed_fact_ids_ordered), "run_id": "w6_unit"}
-    bridge = build_spine_c0_fec_artifact(
+    wire_spine_c0_fec_for_section(
+        artifact_dir=tmp_path,
         section_id=section_id,
         front_spine=spine,
         pool=pool,
+        runtime_payload=payload,
     )
-    _write_json(tmp_path / FEC_BRIDGE_ARTIFACT, bridge.bridge_doc)
-    payload["section_fec_bridge"] = bridge.bridge_doc
-    payload["fec_bridge_ref"] = FEC_BRIDGE_ARTIFACT
     payload["evidence_contract_consumed"] = True
     _write_json(
         tmp_path / "compiled_prompt_artifact.json",
         {"evidence_contract_consumed": True, "fec_bridge_mode": "section_fec_bridge"},
     )
-    prepare_section_l2_before_provider(tmp_path, section_id, payload, provider_lane="retired_provider_profile")
+    prepare_section_l2_before_provider(
+        tmp_path, section_id, payload, provider_lane="external_claude"
+    )
     _write_json(tmp_path / "provider_request.json", {})
     _write_json(tmp_path / "provider_response.json", {})
     _write_json(tmp_path / "l2_output.json", {"section_id": section_id})

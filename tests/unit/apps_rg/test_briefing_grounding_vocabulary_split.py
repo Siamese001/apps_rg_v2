@@ -35,6 +35,14 @@ def _pm() -> dict[str, str]:
 
 
 def _vr(*, app_payload: dict) -> ValidatedRequest:
+    payload = {
+        "target_company": "Acme Corp",
+        "target_role": "VP Engineering",
+        "target_level": "EXECUTIVE",
+        "job_description_text": "Lead governed AI platform strategy.",
+        "source_resume_text": "Built governed AI infrastructure.",
+        **app_payload,
+    }
     return ValidatedRequest(
         request_id="r1",
         run_id="run1",
@@ -44,7 +52,7 @@ def _vr(*, app_payload: dict) -> ValidatedRequest:
         payload_digest="sha256:test",
         authority_validation_receipt=_auth(),
         l5_certification_ref="test:valid:w6",
-        app_payload=app_payload,
+        app_payload=payload,
     )
 
 
@@ -66,7 +74,7 @@ def test_generate_scratch_product_visible_without_briefing_fails_closed() -> Non
             "profile_manifest": _pm(),
         }
     )
-    with pytest.raises(BriefingMissingError, match="apps_research delegation is disabled"):
+    with pytest.raises(BriefingMissingError, match="requires a run-specific briefing"):
         l1_plan_apps_rg(vr)
 
 

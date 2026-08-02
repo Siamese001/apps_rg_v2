@@ -17,6 +17,7 @@ from typing import Any
 
 import yaml
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.bindings.u0_profile_manifest import repo_root
 from apps_rg.runtime.reasoning.section_reasoning_intensity import (
     profile_to_requested_kw,
@@ -145,13 +146,18 @@ def verify_planning_profile_ref_digest(
     """
 
     root = repo_root().resolve()
-    approved_root = (root / "apps_rg" / "profiles").resolve()
+    approved_root = resolve_apps_rg_path(root, "profiles").resolve()
     raw_ref = str(planning_profile_ref or _CANONICAL_PROFILE_REF).strip()
     candidate = Path(raw_ref)
-    resolved = candidate.resolve() if candidate.is_absolute() else (root / candidate).resolve()
+    if candidate.is_absolute():
+        resolved = candidate.resolve()
+    elif candidate.parts and candidate.parts[0] == "apps_rg":
+        resolved = resolve_apps_rg_path(root, *candidate.parts[1:]).resolve()
+    else:
+        resolved = (root / candidate).resolve()
     try:
-        resolved.relative_to(approved_root)
-        normalized_ref = resolved.relative_to(root).as_posix()
+        profile_relative = resolved.relative_to(approved_root)
+        normalized_ref = (Path("apps_rg/profiles") / profile_relative).as_posix()
     except ValueError as exc:
         raise PlanningProfileIntegrityError(
             f"L1 planning profile ref must remain under apps_rg/profiles: {raw_ref!r}"

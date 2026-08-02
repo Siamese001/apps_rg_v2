@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.judges.bullet_adjudicator import (
     TRIGGER_JUDGE_CONFIDENCE_LOW,
     TRIGGER_METRIC_BULLET_BORDERLINE,
@@ -29,7 +30,7 @@ from apps_rg.runtime.judges.bullet_x2_aggregation import (
     aggregate_bullet_section,
 )
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = repository_root(Path(__file__))
 
 
 def _judge(score: float, threshold: float = 0.8, **kw) -> dict:
@@ -118,7 +119,9 @@ def test_adjudicator_no_escalation_when_x2_hard_fails_and_score_high() -> None:
 
 @pytest.mark.parametrize("lane_file", ["unify_bullets_lane.py", "ibm_bullets_lane.py"])
 def test_unify_and_ibm_bullet_lanes_wire_optional_adjudicator(lane_file: str) -> None:
-    source = (REPO_ROOT / "apps_rg" / "runtime" / "sections" / lane_file).read_text(encoding="utf-8")
+    source = resolve_apps_rg_path(
+        REPO_ROOT, "runtime", "sections", lane_file
+    ).read_text(encoding="utf-8")
 
     assert "evaluate_bullet_adjudicator_trigger" in source
     assert "aggregate_bullet_section" in source
@@ -129,7 +132,9 @@ def test_unify_and_ibm_bullet_lanes_wire_optional_adjudicator(lane_file: str) ->
 
 @pytest.mark.parametrize("lane_file", ["unify_bullets_lane.py", "ibm_bullets_lane.py"])
 def test_unify_and_ibm_x1d_outputs_written_once_after_adjudication(lane_file: str) -> None:
-    source = (REPO_ROOT / "apps_rg" / "runtime" / "sections" / lane_file).read_text(encoding="utf-8")
+    source = resolve_apps_rg_path(
+        REPO_ROOT, "runtime", "sections", lane_file
+    ).read_text(encoding="utf-8")
     write_call = 'write_json(artifact_dir / "x1d_llm_judge_outputs.json"'
 
     assert source.count(write_call) == 1

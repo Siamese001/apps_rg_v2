@@ -6,14 +6,16 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import apps_rg_package_root
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+PACKAGE_ROOT = apps_rg_package_root(REPO_ROOT)
 
 
 def _iter_product_python_files() -> list[Path]:
     roots = [
-        REPO_ROOT / "apps_rg" / "runtime",
-        REPO_ROOT / "apps_rg" / "fact_inventory",
+        PACKAGE_ROOT / "runtime",
+        PACKAGE_ROOT / "fact_inventory",
     ]
     files: list[Path] = []
     for root in roots:
@@ -30,8 +32,8 @@ def test_retired_selected_role_fact_set_import_paths_are_not_used_by_product_cod
         "apps_rg.fact_inventory.selected_role_fact_set",
     )
     tombstones = {
-        REPO_ROOT / "apps_rg" / "runtime" / "sections" / "selected_role_fact_set.py",
-        REPO_ROOT / "apps_rg" / "fact_inventory" / "selected_role_fact_set.py",
+        PACKAGE_ROOT / "runtime" / "sections" / "selected_role_fact_set.py",
+        PACKAGE_ROOT / "fact_inventory" / "selected_role_fact_set.py",
     }
     offenders: list[str] = []
     for path in _iter_product_python_files():
@@ -45,7 +47,7 @@ def test_retired_selected_role_fact_set_import_paths_are_not_used_by_product_cod
 
 
 def test_selected_role_fact_set_cli_flag_is_removed() -> None:
-    text = (REPO_ROOT / "apps_rg" / "__main__.py").read_text(encoding="utf-8")
+    text = (PACKAGE_ROOT / "__main__.py").read_text(encoding="utf-8")
     assert "--selected-role-fact-set" not in text
 
 

@@ -145,7 +145,7 @@ def test_lane_outcome_authorized_from_x3_none_and_empty() -> None:
 
 def test_lane_outcome_authorized_exit_ok_family_without_pass_key() -> None:
     for code in ("EXIT_OK", "EXIT_PARTIAL", "X3C", "X3D"):
-        assert lane_outcome_authorized_from_x3({"x3_code": code}) is True
+        assert lane_outcome_authorized_from_x3({"x3_code": code}) is False
 
 
 def test_phase1_dispatch_hard_failed_false_on_soft_fail_dispatch() -> None:

@@ -8,6 +8,8 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
+
 import apps_rg.fact_inventory.apply_graphdb_capability_sqlite_hardening as applicator_module
 import apps_rg.fact_inventory.augmented_skills_graph_sqlite as graph_sqlite_module
 from apps_rg.fact_inventory.apply_graphdb_capability_sqlite_hardening import (
@@ -201,11 +203,9 @@ def test_fresh_materializer_schema_uses_context_preserving_sibling_primary_key()
 
 
 def test_graph_health_policy_requires_sibling_parent_foreign_key() -> None:
-    policy = json.loads(
-        (Path(__file__).resolve().parents[4] / "apps_rg/config/c03_graph_health_policy.v2.json").read_text(
-            encoding="utf-8"
-        )
-    )
+    repo = Path(__file__).resolve().parents[4]
+    policy_path = resolve_apps_rg_path(repo, "config", "c03_graph_health_policy.v2.json")
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
 
     assert policy["policy_version"] == "c03_graph_health_policy.v4.producer_bound_operational_evidence"
     assert {

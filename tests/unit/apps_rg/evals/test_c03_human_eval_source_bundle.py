@@ -27,7 +27,7 @@ from apps_rg.runtime.c0.resume_graph_allocation import (
 )
 
 REPO = Path(__file__).resolve().parents[4]
-TARGET_MANIFEST = REPO / "apps_rg/evals/c03_human_eval/target_cases.v1.yaml"
+TARGET_MANIFEST = REPO / "src/apps_rg/evals/c03_human_eval/target_cases.v1.yaml"
 SECTION_COUNTS = {
     "competencies": 8,
     "unify_bullets": 6,
@@ -50,6 +50,7 @@ RANKED_SECTIONS = {
     "executive_summary",
     "headline",
 }
+pytestmark = pytest.mark.usefixtures("emulated_posix_private_paths")
 
 
 def _test_freeze_receipt(source: dict[str, Any]) -> dict[str, Any]:

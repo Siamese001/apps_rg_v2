@@ -8,7 +8,7 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
-from apps_rg.repository_layout import resolve_apps_rg_path
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 
 REPO_REL = Path("apps_rg") / "fact_inventory" / "master_skills_arsenal_ledger.json"
 
@@ -703,7 +703,7 @@ def collect_canonical_graph_issues(ledger: dict[str, Any]) -> list[str]:
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return repository_root(Path(__file__))
 
 
 def default_arsenal_ledger_path(repo_root: Path | None = None) -> Path:

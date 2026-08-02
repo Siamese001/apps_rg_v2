@@ -680,7 +680,7 @@ def _jsonable(value: Any) -> Any:
 
 
 def _default_apps_research_runs_root() -> Path:
-    return Path(__file__).resolve().parents[2] / "artifacts" / "apps_research" / "runs"
+    return Path(__file__).resolve().parents[3] / "artifacts" / "apps_research" / "runs"
 
 
 def _validated_u0_receipt(
@@ -965,9 +965,9 @@ def persist_apps_rg_targeting_brief_artifacts(
     }
     marker_bytes = _canonical_json_bytes(marker)
 
-    repo_root = Path(__file__).resolve().parents[2]
+    repo_root = Path(__file__).resolve().parents[3]
     policy_path = repo_root / "config/certification/apps_research_rg_e2e_authority_contract.v1.json"
-    blueprint_path = repo_root / "apps_research/config/domain_contract/runtime_customization_package.company_brief.v1.json"
+    blueprint_path = repo_root / "src/apps_research/config/domain_contract/runtime_customization_package.company_brief.v1.json"
     policy_bytes = policy_path.read_bytes() if policy_path.is_file() else b"apps_research_rg_e2e_authority"
     blueprint_bytes = blueprint_path.read_bytes() if blueprint_path.is_file() else b"apps_research.company_brief.v1"
     identity = {

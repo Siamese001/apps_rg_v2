@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.sections.executive_summary_briefing import extract_briefing_signal_packet
 from apps_rg.runtime.sections import executive_summary_briefing as briefing_mod
 from apps_rg.runtime.ingress.executive_summary_targeting_ingress import (
@@ -13,13 +14,17 @@ from apps_rg.runtime.ingress.executive_summary_targeting_ingress import (
 )
 
 REPO = Path(__file__).resolve().parents[5]
+_BROWN_BRIEFING = resolve_apps_rg_path(
+    REPO,
+    "config",
+    "targeting",
+    "brown_brown_svp_it_strategy_innovation_briefing.md",
+)
 
 
 def test_ingress_bounds_briefing_before_pool_consumption() -> None:
     jd = "SVP engineering platform leadership"
-    brief = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md").read_text(
-        encoding="utf-8"
-    )
+    brief = _BROWN_BRIEFING.read_text(encoding="utf-8")
     ingress = prepare_executive_summary_targeting_ingress(
         jd_text=jd,
         briefing_raw=brief,
@@ -34,9 +39,7 @@ def test_ingress_bounds_briefing_before_pool_consumption() -> None:
 
 def test_brown_briefing_passes_through_when_under_ingress_budget() -> None:
     """Compact Brown SSOT must not be section-trimmed at default ingress."""
-    brief = (REPO / "apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md").read_text(
-        encoding="utf-8"
-    )
+    brief = _BROWN_BRIEFING.read_text(encoding="utf-8")
     assert len(brief) > 3_000
     ingress = prepare_executive_summary_targeting_ingress(
         jd_text="SVP IT Strategy",

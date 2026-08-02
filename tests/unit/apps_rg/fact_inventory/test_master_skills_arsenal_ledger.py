@@ -19,6 +19,7 @@ from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     classify_derived_graph_endpoint,
     collect_canonical_graph_issues,
     derive_registered_graph_endpoint_types,
+    default_arsenal_ledger_path,
     graph_node_requires_source_refs,
     load_master_skills_arsenal_ledger,
     skill_row_eligible_for_external_claim,
@@ -27,7 +28,7 @@ from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
 )
 
 REPO = Path(__file__).resolve().parents[4]
-LEDGER_PATH = REPO / "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+LEDGER_PATH = default_arsenal_ledger_path(REPO)
 
 
 @pytest.fixture

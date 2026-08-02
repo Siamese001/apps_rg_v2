@@ -328,7 +328,11 @@ def build_p1_w5_track_balanced_sections(
     }
 
 
-def write_p1_w5_receipts(*, repo_root: Path | None = None) -> dict[str, Any]:
+def write_p1_w5_receipts(
+    *,
+    repo_root: Path | None = None,
+    out_dir: Path | None = None,
+) -> dict[str, Any]:
     root = repo_root or ROOT
     built = build_p1_w5_track_balanced_sections(repo_root=root)
     exec_proj = built["executive_summary_projection"]
@@ -336,12 +340,15 @@ def write_p1_w5_receipts(*, repo_root: Path | None = None) -> dict[str, Any]:
     closeout = built["p1_w4_closeout"]
     c03 = closeout.get("c03_binding_proof") or {}
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    receipt_mode = "TEST_ONLY_NONCANONICAL_OUTPUT" if out_dir is not None else "CANONICAL"
 
     payload = {
         "schema": "career_track_p1_w5_track_balanced_sections_receipt_v1",
         "generated_at": ts,
         "plan_id": "graph-skills-hardening-f3a8c1",
         "wave": "P1-W5",
+        "receipt_mode": receipt_mode,
+        "certification_eligible": out_dir is None,
         "selected_tracks": exec_proj.get("selected_tracks"),
         "executive_summary_projection_by_track": exec_proj.get("executive_summary_projection_by_track"),
         "sentence_count_by_track": exec_proj.get("sentence_count_by_track"),
@@ -369,13 +376,18 @@ def write_p1_w5_receipts(*, repo_root: Path | None = None) -> dict[str, Any]:
     }
     assert_skills_not_broad_ledger_authority(payload)
 
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    P1_W5_RECEIPT_JSON.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    reports_dir = Path(out_dir) if out_dir is not None else REPORTS_DIR
+    receipt_json = reports_dir / P1_W5_RECEIPT_JSON.name
+    receipt_md = reports_dir / P1_W5_RECEIPT_MD.name
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    receipt_json.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
     md_lines = [
         "# P1-W5 — Track-balanced section projections",
         "",
         f"**Generated:** {ts}",
+        f"**Receipt mode:** {receipt_mode}",
+        f"**Certification eligible:** {out_dir is None}",
         "",
         "## Executive summary (by track)",
         "",
@@ -407,8 +419,8 @@ def write_p1_w5_receipts(*, repo_root: Path | None = None) -> dict[str, Any]:
             "",
         ]
     )
-    P1_W5_RECEIPT_MD.write_text("\n".join(md_lines), encoding="utf-8")
-    return {"receipt_json": str(P1_W5_RECEIPT_JSON), "receipt_md": str(P1_W5_RECEIPT_MD), "payload": payload}
+    receipt_md.write_text("\n".join(md_lines), encoding="utf-8")
+    return {"receipt_json": str(receipt_json), "receipt_md": str(receipt_md), "payload": payload}
 
 
 def main() -> None:

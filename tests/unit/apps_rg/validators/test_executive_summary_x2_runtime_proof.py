@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.validators.executive_summary_x2 import (
     ALLOWED_MODELS,
     PRE_X2_REQUIRED_ARTIFACTS,
@@ -44,24 +45,22 @@ def test_executive_summary_model_allowlist_accepts_only_pinned_claude_primary() 
 
 
 def test_executive_summary_defers_empty_x1d_artifact_until_x2_failure() -> None:
-    source = (
-        Path(__file__).resolve().parents[4]
-        / "apps_rg"
-        / "runtime"
-        / "sections"
-        / "executive_summary_lane.py"
+    source = resolve_apps_rg_path(
+        Path(__file__).resolve().parents[4],
+        "runtime",
+        "sections",
+        "executive_summary_lane.py",
     ).read_text(encoding="utf-8")
 
     assert 'if x2_failed_initial and not (artifact_dir / "x1d_llm_judge_outputs.json").is_file()' in source
 
 
 def test_executive_summary_defers_x2_only_fact_check_on_real_llm_success() -> None:
-    source = (
-        Path(__file__).resolve().parents[4]
-        / "apps_rg"
-        / "runtime"
-        / "sections"
-        / "executive_summary_lane.py"
+    source = resolve_apps_rg_path(
+        Path(__file__).resolve().parents[4],
+        "runtime",
+        "sections",
+        "executive_summary_lane.py",
     ).read_text(encoding="utf-8")
 
     assert 'if x2_failed_initial or runtime_generation_status != "REAL_LLM":' in source

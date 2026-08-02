@@ -22,7 +22,11 @@ AUTHORITY_CONTRACT_ID = "apps_research_rg_e2e_authority"
 AUTHORITY_CONTRACT_REF = (
     "config/certification/apps_research_rg_e2e_authority_contract.v1.json"
 )
-DEFAULT_AUTHORITY_CONTRACT = Path(__file__).resolve().parents[2] / AUTHORITY_CONTRACT_REF
+# ``e2e_stage_ledger.py`` lives under ``<repo>/src/apps_rg/runtime`` in the
+# standalone source layout, while the authority contract remains a repository
+# resource under ``<repo>/config``.  Resolve from the repository root so the
+# default does not drift to the nonexistent ``<repo>/src/config`` directory.
+DEFAULT_AUTHORITY_CONTRACT = Path(__file__).resolve().parents[3] / AUTHORITY_CONTRACT_REF
 DEFAULT_STAGE_GRAPH = (
     Path(__file__).resolve().parents[1]
     / "config"

@@ -791,7 +791,9 @@ def test_integrity_requires_exact_authoritative_metadata_status(
 
 def test_open_graph_sqlite_rejects_writable_mode_for_canonical_path(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.delenv("APPS_RG_AUGMENTED_SKILLS_GRAPH_SQLITE_PATH", raising=False)
     db_path = default_graph_sqlite_path(tmp_path)
     db_path.parent.mkdir(parents=True)
     sqlite3.connect(db_path).close()

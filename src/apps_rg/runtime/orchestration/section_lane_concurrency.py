@@ -8,6 +8,7 @@ from typing import Any
 
 import yaml
 
+from apps_rg.repository_layout import repository_root, resolve_repository_path
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
 
 _MANIFEST_REL = (
@@ -25,15 +26,11 @@ class LaneWave:
 
 
 def _repo_root() -> Path:
-    here = Path(__file__).resolve()
-    for parent in [here.parent, *here.parents]:
-        if (parent / "pyproject.toml").exists():
-            return parent
-    return here.parents[4]
+    return repository_root(Path(__file__))
 
 
 def load_section_dag_manifest() -> dict[str, Any]:
-    path = _repo_root() / _MANIFEST_REL
+    path = resolve_repository_path(_repo_root(), _MANIFEST_REL)
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         raise ValueError(f"invalid manifest: {path}")

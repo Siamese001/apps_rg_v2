@@ -23,7 +23,7 @@ from typing import Any, Mapping, Sequence
 
 import yaml
 
-from ._io import path_has_symlink_component
+from ._io import path_has_symlink_component, resolve_repository_resource
 
 from apps_rg.fact_inventory.master_skills_arsenal_ledger import (
     load_master_skills_arsenal_ledger,
@@ -165,16 +165,12 @@ def _manifest(value: Mapping[str, Any] | Path) -> dict[str, Any]:
 
 def _source_path(repo_root: Path, relative_path: Any, label: str) -> Path:
     relative = Path(_text(relative_path, label))
-    if relative.is_absolute():
-        raise SourceBundleFreezeError(f"{label} must be repository-relative")
-    unresolved = repo_root / relative
-    if path_has_symlink_component(unresolved):
-        raise SourceBundleFreezeError(f"{label} must be a real non-symlink file")
-    path = unresolved.resolve()
     try:
-        path.relative_to(repo_root)
+        path = resolve_repository_resource(repo_root, relative)
     except ValueError as exc:
-        raise SourceBundleFreezeError(f"{label} escapes repo_root") from exc
+        raise SourceBundleFreezeError(f"{label} {exc}") from exc
+    if path_has_symlink_component(path):
+        raise SourceBundleFreezeError(f"{label} must be a real non-symlink file")
     if not path.is_file():
         raise SourceBundleFreezeError(f"{label} does not exist: {relative}")
     return path

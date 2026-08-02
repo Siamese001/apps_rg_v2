@@ -195,7 +195,7 @@ def test_canonical_dispatch_invokes_preflight_before_pipeline(
             with patch.object(cd, "emit_integrated_run_bundle_index", lambda *a, **k: None):
                 with patch.object(cd, "_augment_integrated_manifest_with_apps_rg_docx", lambda *a, **k: None):
                     with patch.object(cd, "_augment_r4_run_manifest_for_apps_rg_l2_fault", lambda *a, **k: None):
-                        cd.run_canonical_apps_rg_from_cli_primitives(
+                        cd.run_canonical_full_resume_from_cli_primitives(
                             target_company="Synthetic Enterprise Corp.",
                             target_role="SVP Engineering",
                             jd="",
@@ -230,7 +230,7 @@ def test_canonical_dispatch_r1b_hit_skips_pipeline(
 
     with patch.object(cd, "build_raw_request_for_r4", return_value=_req()):
         with patch.object(cd, "_default_artifact_dir", return_value=tmp_path / "art"):
-            result = cd.run_canonical_apps_rg_from_cli_primitives(
+            result = cd.run_canonical_full_resume_from_cli_primitives(
                 target_company="Synthetic Enterprise Corp.",
                 target_role="SVP Engineering",
             )

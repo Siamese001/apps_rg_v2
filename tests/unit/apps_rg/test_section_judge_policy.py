@@ -6,6 +6,7 @@ from pathlib import Path
 
 import yaml
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.judges.grade_only_judge_packet import build_grade_only_judge_packet
 from apps_rg.runtime.judges.section_judge_profile import (
     is_forbidden_proof_judge_model,
@@ -19,7 +20,9 @@ from apps_rg.runtime.section_judge_policy import (
 )
 from apps_rg.runtime.section_proof.mock_runtime_proof_policy import compute_lane_proof_bundle
 
-_SSOT = Path(__file__).resolve().parents[3] / "apps_rg" / "config" / "provider_profiles.yaml"
+_SSOT = resolve_apps_rg_path(
+    Path(__file__).resolve().parents[3], "config", "provider_profiles.yaml"
+)
 
 
 def _yaml_judge_model(tier: str, provider_key: str) -> str:

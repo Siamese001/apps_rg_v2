@@ -3,6 +3,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.non_product_proof_stamp import (
     ORCHESTRATOR_PROOF_CLASSIFICATION,
     orchestrator_non_product_stamp,
@@ -21,21 +24,20 @@ def test_orchestrator_stamp_fields() -> None:
 
 
 def test_orchestrate_module_documents_non_product() -> None:
-    src = (
-        Path(__file__).resolve().parents[3]
-        / "tests"
-        / "helpers"
-        / "offline_lane_orchestration.py"
-    ).read_text(encoding="utf-8")
+    repo = repository_root(Path(__file__))
+    helper = repo / "tests" / "helpers" / "offline_lane_orchestration.py"
+    if not helper.is_file():
+        pytest.skip("standalone source baseline excludes the monorepo offline orchestration helper")
+    src = helper.read_text(encoding="utf-8")
     assert "orchestrator_non_product_stamp" in src
     assert "orchestrator_non_product_stamp" in src
     assert "product spine" in src.lower() or "non-product" in src.lower()
 
 
 def test_orchestrate_module_has_no_cli_entry() -> None:
-    src = (Path(__file__).resolve().parents[3] / "apps_rg" / "runtime" / "internal" / "lane_batch.py").read_text(
-        encoding="utf-8"
-    )
+    src = resolve_apps_rg_path(
+        repository_root(Path(__file__)), "runtime", "internal", "lane_batch.py"
+    ).read_text(encoding="utf-8")
     assert "not an operator CLI entrypoint" in src
     assert "def main(" not in src
     assert "python -m apps_rg" in src

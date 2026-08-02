@@ -23,8 +23,11 @@ def test_all_lane_rubrics_meet_w4_markers() -> None:
         assert not snap.forbidden_markers_found
 
 
-def test_rubric_port_diff_passes_against_baseline() -> None:
-    diff = build_rubric_port_diff(repo_root=REPO)
+def test_rubric_port_diff_passes_against_baseline(tmp_path: Path) -> None:
+    diff = build_rubric_port_diff(
+        repo_root=REPO,
+        baseline_path=tmp_path / "graph_skills_x1d_rubric_baseline_w4.json",
+    )
     assert diff["status"] == "PASS"
     assert diff["any_masking_relaxed"] is False
     assert not diff["invariant_failures"]

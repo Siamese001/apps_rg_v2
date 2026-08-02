@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import html
-from importlib import import_module
 import json
 import re
 import zipfile
@@ -26,6 +25,7 @@ from apps_rg.runtime.full_run_section_status import (
     LANE_DISPLAY_TXT_CANDIDATES,
     collect_full_run_section_status,
 )
+from apps_rg.runtime.final_resume_docx import export as export_final_resume_docx
 from apps_rg.runtime.run_output_contract import (
     FINAL_RESUME_ASSEMBLY_JSON_RELPATH,
     FINAL_RESUME_DOCX_RELPATH,
@@ -672,8 +672,7 @@ def emit_final_resume_product_outputs(
             (root / FINAL_RESUME_OUTPUT_TXT).write_text(text, encoding="utf-8")
             docx_path = root / FINAL_RESUME_DOCX_RELPATH
             docx_path.parent.mkdir(parents=True, exist_ok=True)
-            export = getattr(import_module("ops_scripts.apps_rg.export_final_resume_docx"), "export")
-            export(final_resume_path, docx_path)
+            export_final_resume_docx(final_resume_path, docx_path)
 
     contract = build_final_resume_output_contract(root, repo_root=repo_root, required=required)
     _write_output_manifest(root, final_resume_path=final_resume_path, contract=contract)

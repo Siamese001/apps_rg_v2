@@ -7,16 +7,19 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.validators.executive_summary_x2 import (
     check_exec_summary_jd_alignment_proof_flags,
     check_exec_summary_sentence_count_6,
 )
 
 REPO = Path(__file__).resolve().parents[3]
-TEMPLATE = (
-    REPO / "apps_rg" / "prompt_assembly" / "templates" / "executive_summary.generate_scratch_v1.yaml"
+TEMPLATE = resolve_apps_rg_path(
+    REPO, "prompt_assembly", "templates", "executive_summary.generate_scratch_v1.yaml"
 )
-PA_SLOTS = REPO / "apps_rg" / "prompt_assembly" / "templates" / "competency_selector_v2.pa_slots.yaml"
+PA_SLOTS = resolve_apps_rg_path(
+    REPO, "prompt_assembly", "templates", "competency_selector_v2.pa_slots.yaml"
+)
 
 
 _LEGACY_DEFAULT_PATTERNS = (

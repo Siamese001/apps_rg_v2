@@ -13,10 +13,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from apps_rg.repository_layout import apps_rg_package_root
+
 REPO = Path(__file__).resolve().parents[3]
-FI = REPO / "apps_rg" / "fact_inventory"
+APP_ROOT = apps_rg_package_root(REPO)
+FI = APP_ROOT / "fact_inventory"
 LEDGER = FI / "master_skills_arsenal_ledger.json"
-BASE_RESUME = REPO / "apps_rg" / "resume" / "base" / "amit_ayer_base_resume_v1.json"
+BASE_RESUME = APP_ROOT / "resume" / "base" / "amit_ayer_base_resume_v1.json"
 
 REQUIRED_BUNDLE_FIELDS = {
     "role_episode_bundle_id",

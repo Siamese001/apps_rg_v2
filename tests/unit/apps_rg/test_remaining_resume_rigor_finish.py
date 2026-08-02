@@ -12,7 +12,10 @@ from pathlib import Path
 import pytest
 import yaml
 
+from apps_rg.repository_layout import apps_rg_package_root
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
+APP_ROOT = apps_rg_package_root(REPO_ROOT)
 
 
 def _gate_map(results):
@@ -247,7 +250,7 @@ def test_headline_rejects_jd_only_phrase_stuffing():
 
 def test_unify_graph_gap_fill_classifies_all_signals():
     data = json.loads(
-        (REPO_ROOT / "apps_rg" / "fact_inventory" / "unify_graph_gap_fill.json").read_text("utf-8")
+        (APP_ROOT / "fact_inventory" / "unify_graph_gap_fill.json").read_text("utf-8")
     )
     valid = set(data["classification_legend"].keys())
     signals = data["signals"]
@@ -293,7 +296,7 @@ def test_unify_role_episode_bundles_validate_with_bindings():
 
 def test_unify_metric_outcome_nodes_are_graph_ssot():
     data = json.loads(
-        (REPO_ROOT / "apps_rg" / "fact_inventory" / "unify_role_episode_bundles.json").read_text("utf-8")
+        (APP_ROOT / "fact_inventory" / "unify_role_episode_bundles.json").read_text("utf-8")
     )
     nodes = data.get("metric_outcome_nodes") or {}
     approved = data.get("approved_metric_outcome_ids") or {}
@@ -329,10 +332,10 @@ def test_unify_metric_outcome_nodes_are_graph_ssot():
 
 def test_unify_agentic_root_has_svp_engineering_agentic_grain():
     data = json.loads(
-        (REPO_ROOT / "apps_rg" / "fact_inventory" / "unify_role_episode_bundles.json").read_text("utf-8")
+        (APP_ROOT / "fact_inventory" / "unify_role_episode_bundles.json").read_text("utf-8")
     )
     ledger = json.loads(
-        (REPO_ROOT / "apps_rg" / "fact_inventory" / "master_skills_arsenal_ledger.json").read_text("utf-8")
+        (APP_ROOT / "fact_inventory" / "master_skills_arsenal_ledger.json").read_text("utf-8")
     )
     bundle = next(
         b
@@ -657,7 +660,7 @@ def test_unify_narrative_rejects_generic_consulting_language():
 
 def _config_section(section_id: str):
     profile = yaml.safe_load(
-        (REPO_ROOT / "apps_rg" / "config" / "domain_contract" / "section_retrieval_profile.yaml").read_text("utf-8")
+        (APP_ROOT / "config" / "domain_contract" / "section_retrieval_profile.yaml").read_text("utf-8")
     )
     for sec in profile.get("sections", []):
         if sec.get("section_id") == section_id:

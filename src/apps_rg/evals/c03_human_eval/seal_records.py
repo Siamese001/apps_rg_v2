@@ -13,6 +13,31 @@ import stat
 from typing import Any, Mapping, Sequence
 
 
+PLATFORM_SECURITY_UNSUPPORTED = (
+    "PLATFORM_SECURITY_UNSUPPORTED:owner-only permissions cannot be verified "
+    "on this platform"
+)
+
+
+def _path_component_is_alias(path: Path) -> bool:
+    try:
+        metadata = os.lstat(path)
+    except OSError:
+        return False
+    if stat.S_ISLNK(metadata.st_mode):
+        return True
+    reparse_flag = int(getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400))
+    return bool(int(getattr(metadata, "st_file_attributes", 0)) & reparse_flag)
+
+
+def _path_has_alias_component(path: Path) -> bool:
+    absolute = Path(path).absolute()
+    return any(
+        _path_component_is_alias(component)
+        for component in (absolute, *absolute.parents)
+    )
+
+
 def canonical_record_digest(record: Mapping[str, Any]) -> str:
     """Match the packet's canonical SHA-256 record-digest contract."""
 
@@ -30,6 +55,8 @@ def canonical_record_digest(record: Mapping[str, Any]) -> str:
 
 
 def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    if _path_has_alias_component(path):
+        raise ValueError(f"return file must not use a symlink alias or reparse point: {path}")
     rows: list[dict[str, Any]] = []
     for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         if not line.strip():
@@ -61,8 +88,12 @@ def _bind_identity_hashes(record: dict[str, Any]) -> None:
 
 
 def _private_directory(path: Path) -> None:
-    if path.is_symlink():
-        raise ValueError(f"return directory must not be a symlink: {path}")
+    if _path_has_alias_component(path):
+        raise ValueError(
+            f"return directory must not use a symlink alias or reparse point: {path}"
+        )
+    if not callable(getattr(os, "getuid", None)):
+        raise ValueError(f"return directory {PLATFORM_SECURITY_UNSUPPORTED}: {path}")
     if path.exists():
         metadata = path.stat()
         if not stat.S_ISDIR(metadata.st_mode):
@@ -77,8 +108,10 @@ def _private_directory(path: Path) -> None:
 
 def _write_private(path: Path, text: str) -> None:
     _private_directory(path.parent)
-    if path.is_symlink():
-        raise ValueError(f"return file must not be a symlink: {path}")
+    if _path_has_alias_component(path):
+        raise ValueError(
+            f"return file must not use a symlink alias or reparse point: {path}"
+        )
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
     temporary: Path | None = None
     descriptor = -1

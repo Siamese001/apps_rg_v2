@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from apps_rg.runtime.judges.executive_summary_x1d import (
     JudgeOutput,
@@ -14,7 +13,6 @@ from apps_rg.runtime.judges.executive_summary_x1d import (
     _invoke_judge_with_bounded_retries,
     _is_retriable_judge_output,
     _resolved_openai_judge_max_completion_tokens,
-    _x1d_judge_max_attempts,
 )
 
 
@@ -91,6 +89,7 @@ def test_extract_json_from_markdown_fence() -> None:
 def test_openai_empty_length_finish_reason_is_retriable_message(
     mock_urlopen: MagicMock,
     _pytest_net: MagicMock,
+    tmp_path: Path,
 ) -> None:
     empty_completion = {
         "choices": [
@@ -112,7 +111,7 @@ def test_openai_empty_length_finish_reason_is_retriable_message(
         "gpt-5.5",
         "abc123",
         "openai_chatgpt",
-        artifact_base=None,
+        artifact_base=tmp_path,
         attempt=1,
     )
     assert out.provider_status == "BLOCKED_RESPONSE_PARSE_ERROR"
@@ -125,6 +124,7 @@ def test_openai_empty_length_finish_reason_is_retriable_message(
 def test_openai_retry_escalates_max_completion_tokens(
     mock_urlopen: MagicMock,
     _pytest_net: MagicMock,
+    tmp_path: Path,
 ) -> None:
     good = {
         "choices": [
@@ -181,6 +181,7 @@ def test_openai_retry_escalates_max_completion_tokens(
                 "gpt-5.5",
                 "hash1",
                 "openai_chatgpt",
+                artifact_base=tmp_path,
                 attempt=attempt,
             ),
             provider_key="openai_chatgpt",

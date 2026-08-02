@@ -188,13 +188,13 @@ def test_fact_vector_promotion_receipt_has_uwg_and_live_retrieval_proof(
         artifact_dir=tmp_path / "run",
         promotion_run_id="test-promotion-run",
         run_id="section-run",
-        x3_code="X3D",
+        x3_code="X3D_ALLOW_FINISH",
         require_x3_allow=True,
         sparse_dir=tmp_path / "sparse",
     )
 
     assert receipt["status"] == "PASS"
-    assert receipt["source_x3_code"] == "X3D"
+    assert receipt["source_x3_code"] == "X3D_ALLOW_FINISH"
     assert receipt["x3_finish_code_normalized"] == "X3_ALLOW"
     assert receipt["uwg"]["status"] == "ADMITTED"
     assert receipt["uwg"]["target_surface"] == "l4.apps_rg.fact_vectors"

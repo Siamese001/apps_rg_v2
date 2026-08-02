@@ -4,10 +4,21 @@ W2 Tests for apps_research L1 Planning Hints
 Validates that L1 consumes U0 v2 ValidatedRequest and emits 21 advisory hints.
 NO route selection, NO retrieval, NO execution authority.
 """
+# ruff: noqa: E402, F401
 from __future__ import annotations
 
-import pytest
+from pathlib import Path
 from unittest.mock import MagicMock
+
+import agentic_core
+import pytest
+
+REPO = Path(__file__).resolve().parents[2]
+if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+    pytest.skip(
+        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        allow_module_level=True,
+    )
 
 from agentic_core.L1_cognition.apps_research_l1_binding_v2 import (
     l1_plan_apps_research_v2,

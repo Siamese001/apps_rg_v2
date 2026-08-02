@@ -8,11 +8,15 @@ from __future__ import annotations
 import ast
 import pathlib
 
+from apps_rg.repository_layout import resolve_apps_rg_path
+
 import pytest
 
 pytestmark = pytest.mark.unit
 
-_SRC = pathlib.Path(__file__).parents[4] / "apps_rg" / "types" / "gap_closure_architect_agent_types.py"
+_SRC = resolve_apps_rg_path(
+    pathlib.Path(__file__).parents[4], "types", "gap_closure_architect_agent_types.py"
+)
 
 
 def _tree():
