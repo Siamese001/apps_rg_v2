@@ -27,6 +27,14 @@ The principal APIs are:
 - `validate_completed_cluster_qrel_reviews`: requires two distinct rostered human
   reviewers and an independent rostered human adjudicator for every blinded
   query/candidate item. Unknown or incomplete judgments are non-passing.
+- `evaluate_cluster_authority_pipeline`: compares pinned runtime rehydration and
+  allocation traces with the current graph, cluster registry, and completed
+  grounding receipt. It enforces zero authority, lifecycle, section, policy,
+  facet-collapse, and unsupported-claim violations.
+- `evaluate_cluster_runtime_quality`: evaluates at least three cold and three
+  warm observations for bounded-k compliance, rank and rehydration determinism,
+  reported p50/p95 latency against caller-pinned p95 ceilings, and fail-closed
+  missing/invalid manifests.
 - `evaluate_authoritative_grounding`: source bytes + graph paths + system
   claims + completed human truth.
 - `evaluate_authoritative_sections`: two rostered human reviews, one
@@ -74,11 +82,11 @@ python -m apps_rg.evals.authoritative evaluate \
   --output retrieval-receipt.json
 ```
 
-Supported lanes are `retrieval`, `cluster-retrieval`, `grounding`, `sections`,
-`whole-resume`, `repeatability`, and `validity`. The request object uses the
-corresponding Python API keyword names. Paths to authority receipts remain
-filesystem paths; truth and system artifacts are embedded with their
-independently supplied expected digests.
+Supported lanes are `retrieval`, `cluster-retrieval`, `cluster-authority`,
+`cluster-runtime`, `grounding`, `sections`, `whole-resume`, `repeatability`, and
+`validity`. The request object uses the corresponding Python API keyword names.
+Paths to authority receipts remain filesystem paths; truth and system artifacts
+are embedded with their independently supplied expected digests.
 
 ## CI
 

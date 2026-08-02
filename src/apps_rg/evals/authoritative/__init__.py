@@ -8,11 +8,13 @@ from .artifacts import (
     validate_pinned_record,
 )
 from .cluster_retrieval import evaluate_authoritative_cluster_retrieval
+from .cluster_authority import evaluate_cluster_authority_pipeline
 from .cluster_qrel_review import (
     build_cluster_qrel_prelabel_packet,
     validate_cluster_qrel_prelabel_packet,
     validate_completed_cluster_qrel_reviews,
 )
+from .cluster_runtime import evaluate_cluster_runtime_quality
 from .manifest import seal_evaluation_manifest, validate_evaluation_manifest
 from .grounding import evaluate_authoritative_grounding
 from .retrieval import evaluate_authoritative_retrieval
@@ -26,6 +28,8 @@ __all__ = [
     "file_sha256",
     "evaluate_authoritative_grounding",
     "evaluate_authoritative_cluster_retrieval",
+    "evaluate_cluster_authority_pipeline",
+    "evaluate_cluster_runtime_quality",
     "build_cluster_qrel_prelabel_packet",
     "evaluate_authoritative_retrieval",
     "evaluate_authoritative_sections",
