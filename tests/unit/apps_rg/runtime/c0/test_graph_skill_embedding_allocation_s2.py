@@ -218,11 +218,11 @@ def test_stored_runtime_proof_rejects_non_promoted_device() -> None:
         )
 
 
-def test_legacy_embedding_authority_fails_closed_after_w1_graph_hardening() -> None:
+def test_legacy_embedding_authority_fails_closed_after_w5_retirement() -> None:
     repo = Path(__file__).resolve().parents[5]
     with pytest.raises(
         GraphSkillEmbeddingAllocationError,
-        match="graph file digest mismatch",
+        match="lane is retired",
     ):
         load_graph_skill_embedding_authority(repo)
 

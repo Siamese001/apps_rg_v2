@@ -29,6 +29,10 @@ from apps_rg.fact_inventory.c03_graph_node_semantic_hardening import (  # noqa: 
     canonical_sha256,
     file_sha256,
 )
+from apps_rg.fact_inventory.c03_legacy_embedding_retirement_wave5 import (  # noqa: E402
+    RETIREMENT_MARKER_PATH,
+    historical_legacy_inventory_from_marker,
+)
 
 DEFAULT_BASELINE_REF = "d1cac4f592e76d0e6ad9f565fba927cf855eeb29"
 DEFAULT_RECEIPT_PATH = Path(
@@ -75,7 +79,10 @@ def _serialize(value: dict[str, Any]) -> bytes:
 def _legacy_records(repo_root: Path) -> list[dict[str, Any]]:
     root = repo_root / LEGACY_ARTIFACT_DIR
     if not root.is_dir():
-        raise SystemExit(f"Legacy artifact directory is missing: {root}")
+        retirement_path = repo_root / RETIREMENT_MARKER_PATH
+        if not retirement_path.is_file():
+            raise SystemExit(f"Legacy artifact directory is missing: {root}")
+        return historical_legacy_inventory_from_marker(_load_json(retirement_path))
     return [
         {
             "path": path.relative_to(repo_root).as_posix(),
@@ -151,12 +158,10 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("Legacy embedding artifacts changed after the Wave 2 freeze")
     after_graph = reconcile_graph_authority_wave3(before_graph)
     before_edge_ids = {
-        str(edge.get("edge_id") or "")
-        for edge in before_graph.get("graph_edges") or []
+        str(edge.get("edge_id") or "") for edge in before_graph.get("graph_edges") or []
     }
     after_edge_ids = {
-        str(edge.get("edge_id") or "")
-        for edge in after_graph.get("graph_edges") or []
+        str(edge.get("edge_id") or "") for edge in after_graph.get("graph_edges") or []
     }
     historical_refs = _historical_references(
         repo_root, sorted(before_edge_ids - after_edge_ids)

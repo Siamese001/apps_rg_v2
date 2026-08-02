@@ -13,6 +13,12 @@ from typing import Any
 from apps_rg.fact_inventory.c03_graph_authority_reconciliation import (
     reconcile_graph_authority,
 )
+from apps_rg.fact_inventory.c03_legacy_embedding_retirement_wave5 import (
+    RETIREMENT_MARKER,
+    RETIREMENT_MARKER_PATH,
+    LegacyEmbeddingRetirementWave5Error,
+    validate_retirement_marker,
+)
 from apps_rg.fact_inventory.c03_skill_assertion_corpus import (
     build_skill_assertion_corpus,
     canonical_sha256,
@@ -31,6 +37,25 @@ class SkillEmbeddingBuildError(RuntimeError):
     """Raised when offline generation cannot preserve exact authority."""
 
 
+def _assert_legacy_generation_not_retired(repository_root: Path) -> None:
+    marker_path = (repository_root / RETIREMENT_MARKER_PATH).resolve()
+    if not marker_path.is_file():
+        return
+    try:
+        marker = json.loads(marker_path.read_text(encoding="utf-8"))
+        if not isinstance(marker, dict):
+            raise LegacyEmbeddingRetirementWave5Error("marker is not an object")
+        validate_retirement_marker(marker)
+    except (OSError, json.JSONDecodeError, LegacyEmbeddingRetirementWave5Error) as exc:
+        raise SkillEmbeddingBuildError(
+            f"legacy embedding retirement marker is invalid: {marker_path}"
+        ) from exc
+    raise SkillEmbeddingBuildError(
+        "legacy one-vector-per-skill generation is retired by "
+        f"{RETIREMENT_MARKER}; use the graph-evidence cluster pipeline"
+    )
+
+
 def _file_sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -44,7 +69,9 @@ def build_local_model_manifest(model_path: Path | str) -> dict[str, Any]:
     if not root.is_dir():
         raise SkillEmbeddingBuildError(f"local BGE-M3 directory missing: {root}")
     files: list[dict[str, Any]] = []
-    for path in sorted((item for item in root.rglob("*") if item.is_file()), key=lambda p: p.as_posix()):
+    for path in sorted(
+        (item for item in root.rglob("*") if item.is_file()), key=lambda p: p.as_posix()
+    ):
         files.append(
             {
                 "path": path.relative_to(root).as_posix(),
@@ -84,10 +111,14 @@ def encode_bge_m3(
         import torch
         from sentence_transformers import SentenceTransformer
     except ImportError as exc:
-        raise SkillEmbeddingBuildError("BGE-M3 runtime dependencies are unavailable") from exc
+        raise SkillEmbeddingBuildError(
+            "BGE-M3 runtime dependencies are unavailable"
+        ) from exc
     if device.startswith("cuda") and not torch.cuda.is_available():
         raise SkillEmbeddingBuildError("CUDA requested but unavailable")
-    model = SentenceTransformer(str(Path(model_path).resolve()), device=device, local_files_only=True)
+    model = SentenceTransformer(
+        str(Path(model_path).resolve()), device=device, local_files_only=True
+    )
     vectors = model.encode(
         texts,
         batch_size=batch_size,
@@ -134,7 +165,9 @@ def _repository_path(path: Path, *, repository_root: Path) -> str:
     try:
         return path.resolve().relative_to(repository_root.resolve()).as_posix()
     except ValueError as exc:
-        raise SkillEmbeddingBuildError(f"source path escapes repository root: {path}") from exc
+        raise SkillEmbeddingBuildError(
+            f"source path escapes repository root: {path}"
+        ) from exc
 
 
 def build_assertion_embedding_generation(
@@ -147,10 +180,13 @@ def build_assertion_embedding_generation(
     output_dir: Path,
     device: str,
 ) -> dict[str, Any]:
+    _assert_legacy_generation_not_retired(repository_root.resolve())
     graph_bytes = graph_path.read_bytes()
     graph = json.loads(graph_bytes)
     if reconcile_graph_authority(graph) != graph:
-        raise SkillEmbeddingBuildError("canonical graph requires reconciliation before embedding")
+        raise SkillEmbeddingBuildError(
+            "canonical graph requires reconciliation before embedding"
+        )
     candidate_fact_bytes = candidate_fact_path.read_bytes()
     base_resume_bytes = base_resume_path.read_bytes()
     facts = json.loads(candidate_fact_bytes)
@@ -172,7 +208,9 @@ def build_assertion_embedding_generation(
     model_manifest_path = output_dir / (
         f"bge_m3_model_manifest.{model_manifest['artifact_sha256']}.json"
     )
-    model_manifest_file_sha256 = _write_immutable_json(model_manifest_path, model_manifest)
+    model_manifest_file_sha256 = _write_immutable_json(
+        model_manifest_path, model_manifest
+    )
 
     assertion_rows = sorted(corpus["assertions"], key=lambda row: row["assertion_id"])
     runtime, vectors = encode_bge_m3(
@@ -197,7 +235,9 @@ def build_assertion_embedding_generation(
     if projection_path.exists():
         if _file_sha256(projection_path) != projection["sqlite_sha256"]:
             staging_db.unlink(missing_ok=True)
-            raise SkillEmbeddingBuildError(f"immutable projection collision: {projection_path}")
+            raise SkillEmbeddingBuildError(
+                f"immutable projection collision: {projection_path}"
+            )
         staging_db.unlink()
     else:
         os.replace(staging_db, projection_path)
@@ -215,7 +255,9 @@ def build_assertion_embedding_generation(
             "canonical_sha256": canonical_sha256(graph),
         },
         "candidate_fact_ledger": {
-            "path": _repository_path(candidate_fact_path, repository_root=repository_root),
+            "path": _repository_path(
+                candidate_fact_path, repository_root=repository_root
+            ),
             "file_sha256": hashlib.sha256(candidate_fact_bytes).hexdigest(),
             "canonical_sha256": canonical_sha256(facts),
         },

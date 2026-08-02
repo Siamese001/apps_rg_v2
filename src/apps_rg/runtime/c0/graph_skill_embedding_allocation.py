@@ -15,6 +15,12 @@ from apps_rg.fact_inventory.c03_skill_assertion_corpus import (
     canonical_sha256,
     validate_skill_assertion_corpus,
 )
+from apps_rg.fact_inventory.c03_legacy_embedding_retirement_wave5 import (
+    RETIREMENT_MARKER,
+    RETIREMENT_MARKER_PATH,
+    LegacyEmbeddingRetirementWave5Error,
+    validate_retirement_marker,
+)
 from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.graph_skill_embedding_projection import (
     GraphSkillEmbeddingContractError,
@@ -83,6 +89,38 @@ def _load_json_object(path: Path) -> dict[str, Any]:
     return payload
 
 
+def load_legacy_graph_skill_embedding_retirement(
+    repo_root: Path | str,
+) -> dict[str, Any] | None:
+    """Return the valid W5 marker, or ``None`` before the lane is retired."""
+
+    root = Path(repo_root).resolve()
+    path = (root / RETIREMENT_MARKER_PATH).resolve()
+    if not path.is_file():
+        return None
+    marker = _load_json_object(path)
+    try:
+        validate_retirement_marker(marker)
+    except LegacyEmbeddingRetirementWave5Error as exc:
+        raise GraphSkillEmbeddingAllocationError(
+            f"legacy graph-skill embedding retirement marker is invalid: {exc}"
+        ) from exc
+    return marker
+
+
+def assert_legacy_graph_skill_embedding_lane_not_retired(
+    repo_root: Path | str,
+) -> None:
+    """Fail before manifest access when W5 has retired the legacy lane."""
+
+    marker = load_legacy_graph_skill_embedding_retirement(repo_root)
+    if marker is not None:
+        raise GraphSkillEmbeddingAllocationError(
+            "legacy one-vector-per-skill embedding lane is retired by "
+            f"{RETIREMENT_MARKER}; use the graph-evidence cluster pipeline"
+        )
+
+
 def _resolve_within(root: Path, relative: str, *, label: str) -> Path:
     value = str(relative or "").strip()
     if not value:
@@ -91,7 +129,9 @@ def _resolve_within(root: Path, relative: str, *, label: str) -> Path:
     try:
         path.relative_to(root.resolve())
     except ValueError as exc:
-        raise GraphSkillEmbeddingAllocationError(f"{label} path escapes its authority root") from exc
+        raise GraphSkillEmbeddingAllocationError(
+            f"{label} path escapes its authority root"
+        ) from exc
     return path
 
 
@@ -193,9 +233,14 @@ def _validate_runtime_proof(
     promoted_device = str(runtime_contract.get("promoted_device") or "")
     if runtime_proof.get("device") != promoted_device:
         raise GraphSkillEmbeddingAllocationError(f"{label} device proof mismatch")
-    if promoted_device.startswith("cuda") and runtime_proof.get("cuda_available") is not True:
+    if (
+        promoted_device.startswith("cuda")
+        and runtime_proof.get("cuda_available") is not True
+    ):
         raise GraphSkillEmbeddingAllocationError(f"{label} CUDA proof is missing")
-    expected_dimension = int((runtime_contract.get("_model") or {}).get("dimension") or 0)
+    expected_dimension = int(
+        (runtime_contract.get("_model") or {}).get("dimension") or 0
+    )
     if int(runtime_proof.get("dimension") or 0) != expected_dimension:
         raise GraphSkillEmbeddingAllocationError(f"{label} dimension proof mismatch")
     if runtime_proof.get("fallback_used") is not False:
@@ -218,9 +263,13 @@ def _validate_qualification_artifacts(
         label="embedding qualification manifest",
     )
     if manifest.get("status") != "PASS":
-        raise GraphSkillEmbeddingAllocationError("graph embedding qualification is not PASS")
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification is not PASS"
+        )
     if manifest.get("completion_marker") != "GRAPH_EMBEDDINGS_QUALIFIED":
-        raise GraphSkillEmbeddingAllocationError("graph embedding qualification marker is missing")
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification marker is missing"
+        )
     if manifest.get("qualification_scope") != _REGRESSION_QUALIFICATION_SCOPE:
         raise GraphSkillEmbeddingAllocationError(
             "graph embedding qualification scope is not regression-only"
@@ -229,7 +278,10 @@ def _validate_qualification_artifacts(
         raise GraphSkillEmbeddingAllocationError(
             "graph embedding qualification must be non-release-authorizing"
         )
-    if manifest.get("embedding_generation_manifest_sha256") != embedding_manifest_sha256:
+    if (
+        manifest.get("embedding_generation_manifest_sha256")
+        != embedding_manifest_sha256
+    ):
         raise GraphSkillEmbeddingAllocationError(
             "qualification/embedding generation manifest digest mismatch"
         )
@@ -266,7 +318,9 @@ def _validate_qualification_artifacts(
             "graph embedding qualification thresholds payload is malformed"
         )
     if report.get("status") != "PASS" or report.get("failures") not in ([], None):
-        raise GraphSkillEmbeddingAllocationError("graph embedding qualification report failed")
+        raise GraphSkillEmbeddingAllocationError(
+            "graph embedding qualification report failed"
+        )
     if report.get("projection_issues") not in ([], None):
         raise GraphSkillEmbeddingAllocationError(
             "graph embedding qualification reports projection issues"
@@ -283,7 +337,10 @@ def _validate_qualification_artifacts(
         raise GraphSkillEmbeddingAllocationError(
             "qualification report embedding generation digest mismatch"
         )
-    if report.get("network_used") is not False or report.get("fallback_used") is not False:
+    if (
+        report.get("network_used") is not False
+        or report.get("fallback_used") is not False
+    ):
         raise GraphSkillEmbeddingAllocationError(
             "qualification report permits network or embedding fallback"
         )
@@ -335,6 +392,7 @@ def _validate_qualification_artifacts(
 def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any]:
     """Validate the complete immutable graph/assertion/projection authority chain."""
     root = Path(repo_root).resolve()
+    assert_legacy_graph_skill_embedding_lane_not_retired(root)
     runtime_contract = _load_runtime_contract(root)
     artifact_dir = (root / _ACTIVE_ARTIFACT_DIR).resolve()
     manifest_path = artifact_dir / _ACTIVE_MANIFEST
@@ -344,7 +402,10 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
         "manifest_sha256",
         label="graph skill embedding manifest",
     )
-    if manifest.get("network_used") is not False or manifest.get("fallback_used") is not False:
+    if (
+        manifest.get("network_used") is not False
+        or manifest.get("fallback_used") is not False
+    ):
         raise GraphSkillEmbeddingAllocationError(
             "embedding generation manifest permits network or fallback"
         )
@@ -363,8 +424,7 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
             "master_skills_arsenal_ledger.json",
         ).resolve(),
         "candidate_fact_ledger": (
-            root
-            / "artifacts/apps_rg/fact_inventory/"
+            root / "artifacts/apps_rg/fact_inventory/"
             "master_candidate_skills_fact_ledger_20260518T1100Z.json"
         ).resolve(),
         "base_resume": resolve_apps_rg_path(
@@ -377,7 +437,9 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
     for key in ("graph", "candidate_fact_ledger", "base_resume"):
         ref = manifest.get(key)
         if not isinstance(ref, Mapping):
-            raise GraphSkillEmbeddingAllocationError(f"embedding manifest lacks {key} binding")
+            raise GraphSkillEmbeddingAllocationError(
+                f"embedding manifest lacks {key} binding"
+            )
         path = _resolve_within(root, str(ref.get("path") or ""), label=key)
         if path != canonical_source_paths[key]:
             raise GraphSkillEmbeddingAllocationError(
@@ -392,7 +454,9 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
 
     corpus_ref = manifest.get("assertion_corpus")
     if not isinstance(corpus_ref, Mapping):
-        raise GraphSkillEmbeddingAllocationError("embedding manifest lacks assertion corpus binding")
+        raise GraphSkillEmbeddingAllocationError(
+            "embedding manifest lacks assertion corpus binding"
+        )
     corpus_path = _resolve_within(
         artifact_dir,
         str(corpus_ref.get("path") or ""),
@@ -430,7 +494,9 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
 
     model_ref = manifest.get("model")
     if not isinstance(model_ref, Mapping):
-        raise GraphSkillEmbeddingAllocationError("embedding manifest lacks model binding")
+        raise GraphSkillEmbeddingAllocationError(
+            "embedding manifest lacks model binding"
+        )
     model_manifest_path = _resolve_within(
         artifact_dir,
         str(model_ref.get("path") or ""),
@@ -458,7 +524,9 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
 
     projection_ref = manifest.get("projection")
     if not isinstance(projection_ref, Mapping):
-        raise GraphSkillEmbeddingAllocationError("embedding manifest lacks projection binding")
+        raise GraphSkillEmbeddingAllocationError(
+            "embedding manifest lacks projection binding"
+        )
     projection_path = _resolve_within(
         artifact_dir,
         str(projection_ref.get("path") or ""),
@@ -496,7 +564,9 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
     if int(projection_metadata.get("vector_count") or -1) != int(
         corpus_ref.get("assertion_count") or -2
     ):
-        raise GraphSkillEmbeddingAllocationError("projection assertion/vector count mismatch")
+        raise GraphSkillEmbeddingAllocationError(
+            "projection assertion/vector count mismatch"
+        )
 
     graph_sha256 = str((corpus.get("source_digests") or {}).get("graph_sha256") or "")
     if graph_sha256 != str((manifest.get("graph") or {}).get("canonical_sha256") or ""):
@@ -519,7 +589,8 @@ def load_graph_skill_embedding_authority(repo_root: Path | str) -> dict[str, Any
         "graph_sha256": graph_sha256,
         "candidate_fact_ledger_path": str(source_paths["candidate_fact_ledger"]),
         "candidate_fact_ledger_sha256": str(
-            (corpus.get("source_digests") or {}).get("candidate_fact_ledger_sha256") or ""
+            (corpus.get("source_digests") or {}).get("candidate_fact_ledger_sha256")
+            or ""
         ),
         "base_resume_path": str(source_paths["base_resume"]),
         "base_resume_sha256": str(
@@ -634,7 +705,9 @@ def build_whole_resume_graph_embedding_candidates(
         )
     observed_model_manifest = build_local_model_manifest(resolved_model_path)
     if observed_model_manifest != authority["_model_manifest"]:
-        raise GraphSkillEmbeddingAllocationError("local BGE-M3 artifact digest mismatch")
+        raise GraphSkillEmbeddingAllocationError(
+            "local BGE-M3 artifact digest mismatch"
+        )
     resolved_device = str(
         device or os.environ.get(GRAPH_SKILL_EMBEDDING_DEVICE_ENV) or ""
     ).strip()
@@ -706,7 +779,9 @@ def build_whole_resume_graph_embedding_candidates(
                     k=int(authority["assertion_count"]),
                     section_id=authority_section_id,
                 )
-                if any(set(row) != {"assertion_id", "similarity"} for row in raw_candidates):
+                if any(
+                    set(row) != {"assertion_id", "similarity"} for row in raw_candidates
+                ):
                     raise GraphSkillEmbeddingAllocationError(
                         f"{section_id}: embedding index exposed non-candidate fields"
                     )
@@ -727,7 +802,9 @@ def build_whole_resume_graph_embedding_candidates(
                     rows.append(exact)
                 candidates_by_section[section_id] = rows
                 query_receipts[section_id] = {
-                    "query_sha256": hashlib.sha256(query_text.encode("utf-8")).hexdigest(),
+                    "query_sha256": hashlib.sha256(
+                        query_text.encode("utf-8")
+                    ).hexdigest(),
                     "authority_section_id": authority_section_id,
                     "candidate_count": len(raw_candidates),
                     "candidate_ids_sha256": canonical_sha256(raw_candidates),
@@ -739,7 +816,10 @@ def build_whole_resume_graph_embedding_candidates(
             f"embedding candidate rehydration failed: {exc}"
         ) from exc
     projection_after = _file_sha256(projection_path)
-    if projection_before != projection_after or projection_after != authority["projection_sha256"]:
+    if (
+        projection_before != projection_after
+        or projection_after != authority["projection_sha256"]
+    ):
         raise GraphSkillEmbeddingAllocationError(
             "immutable graph skill embedding projection changed during query"
         )
@@ -830,7 +910,9 @@ def build_lane_embedding_allowlists(
             [row.get("skill_id") for row in section_assignments]
         )
         accepted = [
-            row for row in candidates if str(row.get("skill_id") or "") in allocated_skill_ids
+            row
+            for row in candidates
+            if str(row.get("skill_id") or "") in allocated_skill_ids
         ]
         accepted_skill_ids = {str(row.get("skill_id") or "") for row in accepted}
         missing = sorted(set(allocated_skill_ids) - accepted_skill_ids)
@@ -916,7 +998,10 @@ def load_lane_embedding_allowlists(path: Path | str) -> dict[str, Any]:
         "allowlists_digest",
         label="lane graph skill embedding allowlists",
     )
-    if payload.get("schema_version") != "apps_rg.lane_graph_skill_embedding_allowlists.v1":
+    if (
+        payload.get("schema_version")
+        != "apps_rg.lane_graph_skill_embedding_allowlists.v1"
+    ):
         raise GraphSkillEmbeddingAllocationError(
             "lane graph skill embedding allowlist schema mismatch"
         )
@@ -927,10 +1012,9 @@ def load_lane_embedding_allowlists(path: Path | str) -> dict[str, Any]:
             "lane graph skill embedding allowlist inventory is malformed"
         )
     ordered_sections = [str(value) for value in lane_order]
-    if (
-        len(ordered_sections) != len(set(ordered_sections))
-        or set(ordered_sections) != {str(value) for value in lanes}
-    ):
+    if len(ordered_sections) != len(set(ordered_sections)) or set(ordered_sections) != {
+        str(value) for value in lanes
+    }:
         raise GraphSkillEmbeddingAllocationError(
             "lane graph skill embedding allowlist inventory mismatch"
         )
@@ -988,7 +1072,10 @@ def validate_lane_embedding_allowlist_authority(
         "allowlists_digest",
         label="lane graph skill embedding allowlists",
     )
-    if payload.get("schema_version") != "apps_rg.lane_graph_skill_embedding_allowlists.v1":
+    if (
+        payload.get("schema_version")
+        != "apps_rg.lane_graph_skill_embedding_allowlists.v1"
+    ):
         raise GraphSkillEmbeddingAllocationError(
             "lane graph skill embedding allowlist schema mismatch"
         )
@@ -1010,7 +1097,10 @@ def validate_lane_embedding_allowlist_authority(
             f"{section_id}: embedding allowlist authority pins are stale or mismatched"
         )
     allocation_graph_digest = str(allocation_plan.get("graph_digest") or "")
-    if not allocation_graph_digest or allocation_graph_digest != expected_authority["graph_sha256"]:
+    if (
+        not allocation_graph_digest
+        or allocation_graph_digest != expected_authority["graph_sha256"]
+    ):
         raise GraphSkillEmbeddingAllocationError(
             f"{section_id}: embedding allowlist graph authority mismatch"
         )
@@ -1047,16 +1137,18 @@ def validate_lane_embedding_allowlist_authority(
             raise GraphSkillEmbeddingAllocationError(
                 f"{section_id}: embedding candidate similarity is invalid"
             ) from exc
-        if not assertion_id or assertion_id in candidate_ids or not math.isfinite(similarity):
+        if (
+            not assertion_id
+            or assertion_id in candidate_ids
+            or not math.isfinite(similarity)
+        ):
             raise GraphSkillEmbeddingAllocationError(
                 f"{section_id}: embedding candidate identity or similarity is invalid"
             )
         candidate_ids.add(assertion_id)
         candidates.append({"assertion_id": assertion_id, "similarity": similarity})
 
-    authority_section_id = str(
-        lane_payload.get("assertion_authority_section_id") or ""
-    )
+    authority_section_id = str(lane_payload.get("assertion_authority_section_id") or "")
     if not authority_section_id:
         raise GraphSkillEmbeddingAllocationError(
             f"{section_id}: embedding assertion section authority is missing"
@@ -1172,11 +1264,13 @@ __all__ = [
     "GRAPH_SKILL_EMBEDDING_DEVICE_ENV",
     "GRAPH_SKILL_EMBEDDINGS_REQUIRED_ENV",
     "GraphSkillEmbeddingAllocationError",
+    "assert_legacy_graph_skill_embedding_lane_not_retired",
     "build_lane_embedding_allowlists",
     "build_whole_resume_graph_embedding_candidates",
     "candidate_skill_scores_by_section",
     "graph_skill_embeddings_required",
     "load_graph_skill_embedding_authority",
+    "load_legacy_graph_skill_embedding_retirement",
     "load_lane_embedding_allowlists",
     "validate_lane_embedding_allowlist_authority",
     "write_graph_skill_embedding_runtime_bundle",

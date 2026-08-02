@@ -35,6 +35,8 @@ from apps_rg.fact_inventory.c03_skill_embedding_builder import (  # noqa: E402
     encode_bge_m3,
 )
 from apps_rg.runtime.c0.graph_skill_embedding_allocation import (  # noqa: E402
+    GraphSkillEmbeddingAllocationError,
+    assert_legacy_graph_skill_embedding_lane_not_retired,
     load_graph_skill_embedding_authority,
 )
 from apps_rg.runtime.graph_skill_embedding_projection import (  # noqa: E402
@@ -53,12 +55,21 @@ BASE_RESUME_REL = Path("src/apps_rg/resume/base/amit_ayer_base_resume_v1.json")
 GENERATION_MANIFEST_NAME = "graph_skill_embedding_manifest.json"
 QUALIFICATION_MANIFEST_NAME = "graph_embedding_qualification_manifest.json"
 ACTIVATION_MANIFEST_NAME = "graph_skill_embedding_activation_manifest.json"
-RUNTIME_CONTRACT_REL = Path("tools/apps_rg_standalone/c03_embedding_runtime_contract.json")
+RUNTIME_CONTRACT_REL = Path(
+    "tools/apps_rg_standalone/c03_embedding_runtime_contract.json"
+)
 QUALIFICATION_SCOPE = "REGRESSION_ONLY"
 
 
 class StandaloneEmbeddingError(RuntimeError):
     """Raised when a standalone embedding operation cannot preserve authority."""
+
+
+def _assert_legacy_lane_open(repository_root: Path | str) -> None:
+    try:
+        assert_legacy_graph_skill_embedding_lane_not_retired(repository_root)
+    except GraphSkillEmbeddingAllocationError as exc:
+        raise StandaloneEmbeddingError(str(exc)) from exc
 
 
 def _file_sha256(path: Path) -> str:
@@ -83,7 +94,9 @@ def _resolve_within(root: Path, value: str, *, label: str) -> Path:
     try:
         path.relative_to(root.resolve())
     except ValueError as exc:
-        raise StandaloneEmbeddingError(f"{label} path escapes its authority root") from exc
+        raise StandaloneEmbeddingError(
+            f"{label} path escapes its authority root"
+        ) from exc
     return path
 
 
@@ -115,7 +128,11 @@ def _require_self_digest(
     unsigned = dict(payload)
     observed = str(unsigned.pop(field, ""))
     computed = canonical_sha256(unsigned)
-    if not observed or observed != computed or (expected is not None and observed != expected):
+    if (
+        not observed
+        or observed != computed
+        or (expected is not None and observed != expected)
+    ):
         raise StandaloneEmbeddingError(f"{label} digest mismatch")
     return observed
 
@@ -144,7 +161,9 @@ def _write_immutable_json(path: Path, payload: Mapping[str, Any]) -> str:
 def _copy_immutable(source: Path, destination: Path) -> None:
     if destination.exists():
         if _file_sha256(destination) != _file_sha256(source):
-            raise StandaloneEmbeddingError(f"immutable artifact collision: {destination}")
+            raise StandaloneEmbeddingError(
+                f"immutable artifact collision: {destination}"
+            )
         return
     destination.parent.mkdir(parents=True, exist_ok=True)
     staging = destination.with_name(f".{destination.name}.staging-{os.getpid()}")
@@ -206,7 +225,9 @@ def verify_embedding_runtime_contract(repository_root: Path | str) -> dict[str, 
         )
     packages = contract.get("packages")
     if not isinstance(packages, Mapping) or not packages:
-        raise StandaloneEmbeddingError("embedding runtime contract packages are missing")
+        raise StandaloneEmbeddingError(
+            "embedding runtime contract packages are missing"
+        )
     observed_packages: dict[str, str] = {}
     for name, expected in packages.items():
         try:
@@ -226,7 +247,9 @@ def verify_embedding_runtime_contract(repository_root: Path | str) -> dict[str, 
         or contract.get("network_allowed") is not False
         or contract.get("fallback_allowed") is not False
     ):
-        raise StandaloneEmbeddingError("embedding runtime contract weakens offline execution")
+        raise StandaloneEmbeddingError(
+            "embedding runtime contract weakens offline execution"
+        )
     model = contract.get("model")
     if not isinstance(model, Mapping):
         raise StandaloneEmbeddingError("embedding runtime model contract is missing")
@@ -242,7 +265,9 @@ def verify_embedding_runtime_contract(repository_root: Path | str) -> dict[str, 
 
 def _runtime_contract_evidence(runtime_contract: Mapping[str, Any]) -> dict[str, Any]:
     return {
-        key: value for key, value in runtime_contract.items() if not str(key).startswith("_")
+        key: value
+        for key, value in runtime_contract.items()
+        if not str(key).startswith("_")
     }
 
 
@@ -272,14 +297,19 @@ def _validate_runtime_proof(
     if runtime_proof.get("sentence_transformers_version") != packages.get(
         "sentence-transformers"
     ):
-        raise StandaloneEmbeddingError("embedding runtime Sentence Transformers proof mismatch")
+        raise StandaloneEmbeddingError(
+            "embedding runtime Sentence Transformers proof mismatch"
+        )
     promoted_device = str(runtime_contract.get("promoted_device") or "")
     if runtime_proof.get("device") != promoted_device:
         raise StandaloneEmbeddingError(
             f"embedding runtime device mismatch: expected {promoted_device}, "
             f"observed {runtime_proof.get('device')}"
         )
-    if promoted_device.startswith("cuda") and runtime_proof.get("cuda_available") is not True:
+    if (
+        promoted_device.startswith("cuda")
+        and runtime_proof.get("cuda_available") is not True
+    ):
         raise StandaloneEmbeddingError("embedding runtime CUDA proof is missing")
     if runtime_proof.get("fallback_used") is not False:
         raise StandaloneEmbeddingError("embedding runtime used a fallback")
@@ -295,6 +325,7 @@ def build_candidate(
     """Build a standalone-path-bound generation outside the active directory."""
 
     root = Path(repository_root).resolve()
+    _assert_legacy_lane_open(root)
     output = Path(output_dir).resolve()
     active = _active_artifact_dir(root)
     if _is_within(output, active):
@@ -322,7 +353,9 @@ def build_candidate(
     model_ref = generation.get("model")
     runtime_proof = generation.get("runtime_proof")
     if not isinstance(model_ref, Mapping) or not isinstance(runtime_proof, Mapping):
-        raise StandaloneEmbeddingError("embedding generation runtime bindings are incomplete")
+        raise StandaloneEmbeddingError(
+            "embedding generation runtime bindings are incomplete"
+        )
     _validate_model_runtime_contract(runtime_contract, model_ref)
     _validate_runtime_proof(runtime_contract, runtime_proof)
     return generation
@@ -353,7 +386,9 @@ def _load_generation(
             raise StandaloneEmbeddingError(f"embedding manifest lacks {key} binding")
         path = _resolve_within(repository_root, str(ref.get("path") or ""), label=key)
         if path != expected_by_manifest_key[key].resolve():
-            raise StandaloneEmbeddingError(f"{key} does not bind the canonical standalone source")
+            raise StandaloneEmbeddingError(
+                f"{key} does not bind the canonical standalone source"
+            )
         _require_file_digest(path, str(ref.get("file_sha256") or ""), label=key)
         payload = _load_object(path)
         if canonical_sha256(payload) != str(ref.get("canonical_sha256") or ""):
@@ -363,8 +398,12 @@ def _load_generation(
     corpus_ref = generation.get("assertion_corpus")
     model_ref = generation.get("model")
     projection_ref = generation.get("projection")
-    if not all(isinstance(value, Mapping) for value in (corpus_ref, model_ref, projection_ref)):
-        raise StandaloneEmbeddingError("embedding generation artifact bindings are incomplete")
+    if not all(
+        isinstance(value, Mapping) for value in (corpus_ref, model_ref, projection_ref)
+    ):
+        raise StandaloneEmbeddingError(
+            "embedding generation artifact bindings are incomplete"
+        )
 
     corpus_path = _resolve_within(
         generation_dir,
@@ -455,6 +494,7 @@ def qualify_candidate(
     """Run legacy regression qualification for a candidate generation."""
 
     root = Path(repository_root).resolve()
+    _assert_legacy_lane_open(root)
     output = Path(generation_dir).resolve()
     loaded = _load_generation(root, output)
     generation = loaded["generation"]
@@ -581,7 +621,9 @@ def qualify_candidate(
         "embedding_generation_manifest_sha256": loaded["generation_digest"],
     }
     active_manifest["manifest_sha256"] = canonical_sha256(active_manifest)
-    _write_atomic_bytes(output / QUALIFICATION_MANIFEST_NAME, _render_json(active_manifest))
+    _write_atomic_bytes(
+        output / QUALIFICATION_MANIFEST_NAME, _render_json(active_manifest)
+    )
     return report
 
 
@@ -606,12 +648,17 @@ def validate_candidate_bundle(
     if qualification_manifest.get("completion_marker") != "GRAPH_EMBEDDINGS_QUALIFIED":
         raise StandaloneEmbeddingError("embedding qualification marker is missing")
     if qualification_manifest.get("qualification_scope") != QUALIFICATION_SCOPE:
-        raise StandaloneEmbeddingError("embedding qualification scope is not regression-only")
+        raise StandaloneEmbeddingError(
+            "embedding qualification scope is not regression-only"
+        )
     if qualification_manifest.get("release_authorizing") is not False:
-        raise StandaloneEmbeddingError("embedding qualification must be non-release-authorizing")
-    if qualification_manifest.get("embedding_generation_manifest_sha256") != loaded[
-        "generation_digest"
-    ]:
+        raise StandaloneEmbeddingError(
+            "embedding qualification must be non-release-authorizing"
+        )
+    if (
+        qualification_manifest.get("embedding_generation_manifest_sha256")
+        != loaded["generation_digest"]
+    ):
         raise StandaloneEmbeddingError("qualification/generation digest mismatch")
 
     referenced_paths = list(loaded["referenced_paths"])
@@ -624,7 +671,9 @@ def validate_candidate_bundle(
     for key, digest_field in digest_fields.items():
         ref = qualification_manifest.get(key)
         if not isinstance(ref, Mapping):
-            raise StandaloneEmbeddingError(f"qualification manifest lacks {key} binding")
+            raise StandaloneEmbeddingError(
+                f"qualification manifest lacks {key} binding"
+            )
         path = _resolve_within(candidate, str(ref.get("path") or ""), label=key)
         _require_file_digest(path, str(ref.get("file_sha256") or ""), label=key)
         payload = _load_object(path)
@@ -643,27 +692,45 @@ def validate_candidate_bundle(
     thresholds = thresholds_payload.get("thresholds")
     if not isinstance(thresholds, Mapping):
         raise StandaloneEmbeddingError("qualification thresholds payload is malformed")
-    graph_sha256 = str((loaded["corpus"].get("source_digests") or {}).get("graph_sha256") or "")
+    graph_sha256 = str(
+        (loaded["corpus"].get("source_digests") or {}).get("graph_sha256") or ""
+    )
     if report.get("status") != "PASS" or report.get("failures") not in ([], None):
         raise StandaloneEmbeddingError("qualification report failed")
     if report.get("projection_issues") not in ([], None):
         raise StandaloneEmbeddingError("qualification report has projection issues")
-    if report.get("embedding_generation_manifest_sha256") != loaded["generation_digest"]:
-        raise StandaloneEmbeddingError("qualification report generation digest mismatch")
+    if (
+        report.get("embedding_generation_manifest_sha256")
+        != loaded["generation_digest"]
+    ):
+        raise StandaloneEmbeddingError(
+            "qualification report generation digest mismatch"
+        )
     if report.get("corpus_sha256") != loaded["corpus"].get("corpus_sha256"):
         raise StandaloneEmbeddingError("qualification report corpus digest mismatch")
     if report.get("graph_sha256") != graph_sha256:
         raise StandaloneEmbeddingError("qualification report graph digest mismatch")
-    if report.get("network_used") is not False or report.get("fallback_used") is not False:
+    if (
+        report.get("network_used") is not False
+        or report.get("fallback_used") is not False
+    ):
         raise StandaloneEmbeddingError("qualification permits network or fallback")
     if report.get("qualification_scope") != QUALIFICATION_SCOPE:
-        raise StandaloneEmbeddingError("qualification report scope is not regression-only")
+        raise StandaloneEmbeddingError(
+            "qualification report scope is not regression-only"
+        )
     if report.get("release_authorizing") is not False:
-        raise StandaloneEmbeddingError("qualification report must be non-release-authorizing")
+        raise StandaloneEmbeddingError(
+            "qualification report must be non-release-authorizing"
+        )
     if report.get("query_qrel_sha256") != query_qrels.get("query_qrel_sha256"):
-        raise StandaloneEmbeddingError("qualification report/query QREL digest mismatch")
+        raise StandaloneEmbeddingError(
+            "qualification report/query QREL digest mismatch"
+        )
     if report.get("thresholds") != dict(thresholds):
-        raise StandaloneEmbeddingError("qualification report/threshold payload mismatch")
+        raise StandaloneEmbeddingError(
+            "qualification report/threshold payload mismatch"
+        )
     if report.get("thresholds_sha256") != canonical_sha256(dict(thresholds)):
         raise StandaloneEmbeddingError("qualification report threshold digest mismatch")
     runtime_contract = loaded["runtime_contract"]
@@ -676,7 +743,8 @@ def validate_candidate_bundle(
         "qualification_manifest_sha256": qualification_manifest_sha256,
         "qualification_sha256": report["qualification_sha256"],
         "qualification_scope": qualification_manifest.get("qualification_scope"),
-        "release_authorizing": qualification_manifest.get("release_authorizing") is True,
+        "release_authorizing": qualification_manifest.get("release_authorizing")
+        is True,
         "graph_sha256": graph_sha256,
         "corpus_sha256": loaded["corpus"].get("corpus_sha256"),
         "vector_count": loaded["generation"]["projection"]["vector_count"],
@@ -700,6 +768,7 @@ def activate_candidate(
     """Promote a validated candidate while retaining immutable prior generations."""
 
     root = Path(repository_root).resolve()
+    _assert_legacy_lane_open(root)
     candidate = Path(candidate_dir).resolve()
     active = _active_artifact_dir(root)
     if _is_within(candidate, active):
@@ -728,12 +797,16 @@ def activate_candidate(
 
     generation_path = active / GENERATION_MANIFEST_NAME
     qualification_path = active / QUALIFICATION_MANIFEST_NAME
-    previous_generation = generation_path.read_bytes() if generation_path.exists() else None
+    previous_generation = (
+        generation_path.read_bytes() if generation_path.exists() else None
+    )
     previous_qualification = (
         qualification_path.read_bytes() if qualification_path.exists() else None
     )
     activation_path = active / ACTIVATION_MANIFEST_NAME
-    previous_activation = activation_path.read_bytes() if activation_path.exists() else None
+    previous_activation = (
+        activation_path.read_bytes() if activation_path.exists() else None
+    )
     receipt_path: Path | None = None
     receipt_existed = False
     try:
@@ -748,9 +821,10 @@ def activate_candidate(
         authority = load_graph_skill_embedding_authority(root)
         if authority["manifest_sha256"] != validated["generation_manifest_sha256"]:
             raise StandaloneEmbeddingError("activated generation digest mismatch")
-        if authority["qualification"]["qualification_sha256"] != validated[
-            "qualification_sha256"
-        ]:
+        if (
+            authority["qualification"]["qualification_sha256"]
+            != validated["qualification_sha256"]
+        ):
             raise StandaloneEmbeddingError("activated qualification digest mismatch")
 
         previous_digest = ""
@@ -829,6 +903,7 @@ def preflight(
     verify_runtime: bool = False,
 ) -> dict[str, Any]:
     root = Path(repository_root).resolve()
+    _assert_legacy_lane_open(root)
     paths = standalone_source_paths(root)
     missing = [label for label, path in paths.items() if not path.is_file()]
     if missing:
@@ -838,7 +913,9 @@ def preflight(
     graph = _load_object(paths["graph"])
     if reconcile_graph_authority(graph) != graph:
         raise StandaloneEmbeddingError("canonical graph requires reconciliation")
-    selected = Path(artifact_dir).resolve() if artifact_dir else _active_artifact_dir(root)
+    selected = (
+        Path(artifact_dir).resolve() if artifact_dir else _active_artifact_dir(root)
+    )
     if selected == _active_artifact_dir(root):
         authority = load_graph_skill_embedding_authority(root)
         result = {
@@ -874,9 +951,7 @@ def preflight(
         return result
     validated = validate_candidate_bundle(repository_root=root, candidate_dir=selected)
     return {
-        key: value
-        for key, value in validated.items()
-        if key != "referenced_paths"
+        key: value for key, value in validated.items() if key != "referenced_paths"
     } | {"artifact_dir": str(selected)}
 
 
@@ -889,6 +964,7 @@ def smoke_query(
     device: str | None,
     k: int,
 ) -> dict[str, Any]:
+    _assert_legacy_lane_open(repository_root)
     if not query_text.strip():
         raise StandaloneEmbeddingError("smoke query text is empty")
     if k <= 0:

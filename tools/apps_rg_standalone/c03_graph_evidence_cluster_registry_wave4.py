@@ -35,6 +35,10 @@ from apps_rg.fact_inventory.c03_graph_node_semantic_hardening import (  # noqa: 
     canonical_sha256,
     file_sha256,
 )
+from apps_rg.fact_inventory.c03_legacy_embedding_retirement_wave5 import (  # noqa: E402
+    RETIREMENT_MARKER_PATH,
+    historical_legacy_inventory_from_marker,
+)
 
 DEFAULT_BASELINE_REF = "c8b50be2ef8fbc01d923fec6ada321568f725783"
 
@@ -88,7 +92,11 @@ def _source_record(path: Path, payload: bytes) -> dict[str, Any]:
 def _legacy_records(repo_root: Path) -> list[dict[str, Any]]:
     directory = repo_root / LEGACY_ARTIFACT_DIR
     if not directory.is_dir():
-        raise SystemExit(f"Legacy artifact directory is missing: {directory}")
+        retirement_path = repo_root / RETIREMENT_MARKER_PATH
+        if not retirement_path.is_file():
+            raise SystemExit(f"Legacy artifact directory is missing: {directory}")
+        retirement = _load_json(retirement_path)
+        return historical_legacy_inventory_from_marker(retirement)
     records = []
     for path in sorted(directory.iterdir(), key=lambda item: item.name):
         if not path.is_file():
