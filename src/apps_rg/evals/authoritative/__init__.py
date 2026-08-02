@@ -14,6 +14,10 @@ from .cluster_qrel_review import (
     validate_cluster_qrel_prelabel_packet,
     validate_completed_cluster_qrel_reviews,
 )
+from .cluster_release import (
+    freeze_cluster_calibration_thresholds,
+    qualify_cluster_embedding_release,
+)
 from .cluster_runtime import evaluate_cluster_runtime_quality
 from .manifest import seal_evaluation_manifest, validate_evaluation_manifest
 from .grounding import evaluate_authoritative_grounding
@@ -30,6 +34,8 @@ __all__ = [
     "evaluate_authoritative_cluster_retrieval",
     "evaluate_cluster_authority_pipeline",
     "evaluate_cluster_runtime_quality",
+    "freeze_cluster_calibration_thresholds",
+    "qualify_cluster_embedding_release",
     "build_cluster_qrel_prelabel_packet",
     "evaluate_authoritative_retrieval",
     "evaluate_authoritative_sections",

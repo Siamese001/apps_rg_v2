@@ -226,8 +226,12 @@
   },
   "activation_contract": {
     "required_env": "APPS_RG_GRAPH_EVIDENCE_CLUSTER_EMBEDDINGS_REQUIRED",
+    "required_qualification_sha256_env": "APPS_RG_GRAPH_EVIDENCE_CLUSTER_QUALIFICATION_SHA256",
     "active_manifest_path": "artifacts/apps_rg/c03/graph_evidence_cluster_embeddings/graph_evidence_cluster_embedding_activation_manifest.json",
-    "manifest_schema_version": "apps_rg.graph_evidence_cluster_embedding_activation_manifest.v1",
+    "manifest_schema_version": "apps_rg.graph_evidence_cluster_embedding_activation_manifest.v2",
+    "qualification_receipt_schema_version": "apps_rg.cluster_release_qualification_receipt.v1",
+    "qualification_receipt_required": true,
+    "self_declared_release_authority_accepted": false,
     "completion_marker": "GRAPH_EVIDENCE_CLUSTER_EMBEDDINGS_QUALIFIED",
     "release_authorizing_required": true,
     "default_enabled": false,
