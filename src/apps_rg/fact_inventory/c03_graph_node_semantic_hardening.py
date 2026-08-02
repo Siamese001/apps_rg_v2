@@ -793,11 +793,21 @@ def collect_graph_node_semantic_issues(graph_payload: Mapping[str, Any]) -> list
     ]
     _add_issue(issues, "GRAPH_HOP_PATH_AUTHORITY_SENTINEL", fact_missing_rows)
 
+    reconciliation_marker = (
+        graph_metadata.get("authority_reconciliation")
+        if isinstance(graph_metadata, Mapping)
+        else None
+    )
+    expected_edge_count = (
+        reconciliation_marker.get("source_edge_count")
+        if isinstance(reconciliation_marker, Mapping)
+        else len(graph_payload.get("graph_edges") or [])
+    )
     expected_counts = {
         "node_count": len(nodes),
         "hardened_node_count": len(nodes) - held_count,
         "held_internal_only_node_count": held_count,
-        "edge_count": len(graph_payload.get("graph_edges") or []),
+        "edge_count": expected_edge_count,
         "skill_row_count": len(rows),
     }
     marker_mismatches = [
@@ -809,6 +819,10 @@ def collect_graph_node_semantic_issues(graph_payload: Mapping[str, Any]) -> list
         marker_mismatches.append("contract_version")
     if marker.get("wave_id") != NODE_SEMANTIC_HARDENING_WAVE:
         marker_mismatches.append("wave_id")
+    if isinstance(reconciliation_marker, Mapping) and reconciliation_marker.get(
+        "source_w1_marker_sha256"
+    ) != canonical_sha256(marker):
+        marker_mismatches.append("source_w1_marker_sha256")
     edge_digest = canonical_sha256(graph_payload.get("graph_edges") or [])
     edge_marker = (
         graph_metadata.get("edge_semantic_hardening")

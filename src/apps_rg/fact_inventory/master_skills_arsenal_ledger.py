@@ -270,7 +270,9 @@ REGISTERED_GRAPH_EDGE_SIGNATURES: dict[str, frozenset[tuple[str, str]]] = {
     "pillar_section_eligibility": frozenset(
         {("domain_pillar", "resume_section_projection")}
     ),
-    "projection_excludes_blocked_skill": frozenset({("skill_row", "policy")}),
+    "projection_excludes_blocked_skill": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "section_blocks_pending_source_skill": frozenset(
         {("resume_section_projection", "policy_rule")}
     ),
@@ -285,11 +287,17 @@ REGISTERED_GRAPH_EDGE_SIGNATURES: dict[str, frozenset[tuple[str, str]]] = {
         }
     ),
     "skill_can_surface_metric": frozenset({("skill", "metric")}),
-    "skill_external_claim_eligible": frozenset({("skill_row", "policy")}),
+    "skill_external_claim_eligible": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "skill_has_metric_bucket": frozenset({("skill", "metric_bucket")}),
-    "skill_projection_only_internal": frozenset({("skill_row", "policy")}),
+    "skill_projection_only_internal": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "skill_reinforces_skill": frozenset({("skill", "skill")}),
-    "skill_requires_human_confirmation": frozenset({("skill_row", "policy")}),
+    "skill_requires_human_confirmation": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "skill_supported_by_fact": frozenset(
         {
             ("skill", "atomic_proof_fact"),
@@ -755,6 +763,12 @@ def collect_canonical_graph_issues(ledger: dict[str, Any]) -> list[str]:
         )
 
         issues.extend(collect_graph_edge_semantic_issues(ledger))
+    if graph_metadata.get("authority_reconciliation"):
+        from apps_rg.fact_inventory.c03_graph_authority_reconciliation_wave3 import (
+            collect_graph_authority_reconciliation_issues,
+        )
+
+        issues.extend(collect_graph_authority_reconciliation_issues(ledger))
     return issues
 
 

@@ -51,22 +51,18 @@ def test_all_canonical_edges_pass_w2_semantic_hardening() -> None:
     assert collect_graph_edge_semantic_issues(graph) == []
     assert collect_graph_node_semantic_issues(graph) == []
     assert collect_canonical_graph_issues(graph) == []
-    assert profile["edge_count"] == 2114
+    assert profile["edge_count"] == 2315
     assert profile["edge_type_count"] == 32
     assert profile["missing_canonical_assertion_count"] == 0
     assert profile["missing_assertion_basis_count"] == 0
     assert profile["generic_assertion_count"] == 0
     assert profile["semantic_issue_count"] == 0
     assert profile["lifecycle_disposition_counts"] == {
-        "ACTIVE_POLICY_GATED": 1129,
-        "HELD_INTEGRITY_GAP": 85,
-        "HELD_NON_ACTIVE_ENDPOINT": 691,
-        "INTERNAL_TRAVERSAL_ONLY": 209,
+        "ACTIVE_POLICY_GATED": 1291,
+        "HELD_NON_ACTIVE_ENDPOINT": 767,
+        "INTERNAL_TRAVERSAL_ONLY": 257,
     }
-    assert profile["semantic_status_counts"] == {
-        "HARDENED": 2029,
-        "HELD_INTEGRITY_GAP": 85,
-    }
+    assert profile["semantic_status_counts"] == {"HARDENED": 2315}
 
 
 def test_w2_covers_every_registered_edge_type_and_basis_kind() -> None:
@@ -102,29 +98,22 @@ def test_w2_preserves_legacy_edge_payload_nodes_and_skill_rows() -> None:
     assert marker["production_promotion_authorized"] is False
 
 
-def test_w2_holds_cross_field_integrity_conflicts_for_w3() -> None:
+def test_w2_historical_marker_preserves_conflicts_reconciled_by_w3() -> None:
     graph = _load(GRAPH_PATH)
+    marker = graph["graph_metadata"]["edge_semantic_hardening"]
     held = [
         edge
         for edge in graph["graph_edges"]
         if edge["edge_semantic_status"] == "HELD_INTEGRITY_GAP"
     ]
-    reasons = {}
-    for edge in held:
-        reason = edge["integrity_gap_reason"]
-        reasons[reason] = reasons.get(reason, 0) + 1
-
-    assert len(held) == 85
-    assert reasons == {
+    assert held == []
+    assert marker["held_integrity_gap_edge_count"] == 85
+    assert marker["integrity_gap_reason_counts"] == {
         "SOURCE_FIELD_CONFLICT:pillar": 18,
         "SOURCE_FIELD_CONFLICT:domain_id": 9,
         "SECTION_NOT_IN_SKILL_ROW_ALLOWLIST": 32,
         "INTERNAL_ONLY_EDGE_CONFLICTS_WITH_RETRIEVAL_ELIGIBLE_ROW": 26,
     }
-    assert all(edge["lifecycle_disposition"] == "HELD_INTEGRITY_GAP" for edge in held)
-    assert all(
-        "held from release use" in edge["canonical_assertion_text"] for edge in held
-    )
 
 
 def test_non_causal_relationship_edges_are_explicitly_bounded() -> None:

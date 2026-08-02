@@ -414,9 +414,14 @@ def _basis_refs(
     edge_type = str(edge.get("edge_type") or "")
     source_id = str(edge.get("source_node_id") or "")
     target_id = str(edge.get("target_node_id") or "")
+    provenance = (
+        "authority_reconciliation"
+        if edge.get("hardening_wave") == "C03_CLUSTER_EMBEDDING_W3"
+        else "baseline"
+    )
     refs = {
         f"contract:edge_types/{edge_type}",
-        f"baseline:graph_edges/{edge_id}",
+        f"{provenance}:graph_edges/{edge_id}",
         _endpoint_ref(source_id, nodes),
         _endpoint_ref(target_id, nodes),
     }
@@ -705,6 +710,8 @@ def _ref_resolves(
         return True
     if ref == f"baseline:graph_edges/{edge.get('edge_id')}":
         return True
+    if ref == f"authority_reconciliation:graph_edges/{edge.get('edge_id')}":
+        return edge.get("hardening_wave") == "C03_CLUSTER_EMBEDDING_W3"
     if ref.startswith("ledger:graph_nodes/"):
         parts = ref.removeprefix("ledger:graph_nodes/").split("/")
         node = nodes.get(parts[0])
@@ -757,6 +764,12 @@ def collect_graph_edge_semantic_issues(
     )
     if not isinstance(marker, Mapping):
         return ["GRAPH_EDGE_SEMANTIC_HARDENING_MARKER_MISSING"]
+    reconciliation_marker = (
+        metadata.get("authority_reconciliation")
+        if isinstance(metadata, Mapping)
+        else None
+    )
+    has_w3_reconciliation = isinstance(reconciliation_marker, Mapping)
     derived_endpoints = derive_registered_graph_endpoint_types(dict(graph_payload))
     missing_fields: list[str] = []
     generic_assertions: list[str] = []
@@ -781,7 +794,10 @@ def collect_graph_edge_semantic_issues(
                 missing_fields.append(f"{edge_id}.{field}")
         if edge.get("edge_semantic_contract_version") != EDGE_SEMANTIC_CONTRACT_VERSION:
             missing_fields.append(f"{edge_id}.edge_semantic_contract_version")
-        if edge.get("hardening_wave") != EDGE_SEMANTIC_HARDENING_WAVE:
+        allowed_hardening_waves = {EDGE_SEMANTIC_HARDENING_WAVE}
+        if has_w3_reconciliation:
+            allowed_hardening_waves.add("C03_CLUSTER_EMBEDDING_W3")
+        if edge.get("hardening_wave") not in allowed_hardening_waves:
             missing_fields.append(f"{edge_id}.hardening_wave")
         if _is_generic_assertion(edge):
             generic_assertions.append(edge_id)
@@ -839,6 +855,55 @@ def collect_graph_edge_semantic_issues(
         marker_mismatches.append("contract_version")
     if marker.get("wave_id") != EDGE_SEMANTIC_HARDENING_WAVE:
         marker_mismatches.append("wave_id")
+    if has_w3_reconciliation:
+        historical_bindings = {
+            "edge_count": reconciliation_marker.get("source_edge_count"),
+            "hardened_graph_edges_sha256": reconciliation_marker.get(
+                "source_graph_edges_sha256"
+            ),
+            "graph_nodes_sha256_after": reconciliation_marker.get(
+                "source_graph_nodes_sha256"
+            ),
+            "skill_rows_sha256_after": reconciliation_marker.get(
+                "source_skill_rows_sha256"
+            ),
+        }
+        for field, expected in historical_bindings.items():
+            if marker.get(field) != expected:
+                marker_mismatches.append(field)
+        if reconciliation_marker.get("source_w2_marker_sha256") != canonical_sha256(
+            marker
+        ):
+            marker_mismatches.append("source_w2_marker_sha256")
+        if marker.get("semantically_specified_edge_count") != marker.get(
+            "edge_count"
+        ):
+            marker_mismatches.append("semantically_specified_edge_count")
+        if marker.get("hardened_edge_count", 0) + marker.get(
+            "held_integrity_gap_edge_count", 0
+        ) != marker.get("edge_count"):
+            marker_mismatches.append("historical_semantic_counts")
+        if marker.get("integrity_gap_count") != marker.get(
+            "held_integrity_gap_edge_count"
+        ):
+            marker_mismatches.append("historical_integrity_gap_count")
+        for before, after in (
+            ("legacy_edge_payload_sha256_before", "legacy_edge_payload_sha256_after"),
+            ("edge_identity_sha256_before", "edge_identity_sha256_after"),
+            ("edge_topology_sha256_before", "edge_topology_sha256_after"),
+            ("graph_nodes_sha256_before", "graph_nodes_sha256_after"),
+            ("skill_rows_sha256_before", "skill_rows_sha256_after"),
+        ):
+            if marker.get(before) != marker.get(after):
+                marker_mismatches.append(f"{before}!={after}")
+        if marker.get("production_promotion_authorized") is not False:
+            marker_mismatches.append("production_promotion_authorized")
+        _add_issue(
+            issues,
+            "GRAPH_EDGE_SEMANTIC_MARKER_MISMATCH",
+            marker_mismatches,
+        )
+        return issues
     if marker.get("edge_count") != len(edges):
         marker_mismatches.append("edge_count")
     if marker.get("semantically_specified_edge_count") != len(edges):

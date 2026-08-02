@@ -52,7 +52,7 @@ def test_all_canonical_nodes_pass_w1_semantic_hardening() -> None:
     assert collect_graph_node_semantic_issues(graph) == []
     assert collect_canonical_graph_issues(graph) == []
     assert profile["node_count"] == 375
-    assert profile["edge_count"] == 2114
+    assert profile["edge_count"] == 2315
     assert profile["skill_row_count"] == 254
     assert profile["sentinel_description_count"] == 0
     assert profile["generic_description_count"] == 0
