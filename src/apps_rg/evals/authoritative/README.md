@@ -18,6 +18,29 @@ The principal APIs are:
 
 - `evaluate_authoritative_retrieval`: independent universe + system ranking +
   completed QRELs.
+- `evaluate_authoritative_cluster_retrieval`: cluster-only candidate identities,
+  exact graph/registry/corpus/model/projection/query/runtime bindings, a bounded
+  production `top_k`, and completed QRELs. Wave 1 remains non-release-authorizing.
+- `build_cluster_qrel_prelabel_packet`: builds a deterministic blinded reviewer
+  packet plus a separately sealed identity/split manifest. It creates no labels,
+  QRELs, evaluation result, or release authority.
+- `validate_completed_cluster_qrel_reviews`: requires two distinct rostered human
+  reviewers and an independent rostered human adjudicator for every blinded
+  query/candidate item. Unknown or incomplete judgments are non-passing.
+- `evaluate_cluster_authority_pipeline`: compares pinned runtime rehydration and
+  allocation traces with the current graph, cluster registry, and completed
+  grounding receipt. It enforces zero authority, lifecycle, section, policy,
+  facet-collapse, and unsupported-claim violations.
+- `evaluate_cluster_runtime_quality`: evaluates at least three cold and three
+  warm observations for bounded-k compliance, rank and rehydration determinism,
+  reported p50/p95 latency against caller-pinned p95 ceilings, and fail-closed
+  missing/invalid manifests.
+- `freeze_cluster_calibration_thresholds`: freezes the exact threshold policy
+  only when every source-pinned retrieval result is in the calibration split.
+- `qualify_cluster_embedding_release`: consumes the frozen thresholds and a
+  controller-bound, holdout-only chain of completed QREL, retrieval, authority,
+  grounding, repeatability, runtime, and evaluator-validity receipts. It is the
+  only evaluator API capable of emitting cluster release authority.
 - `evaluate_authoritative_grounding`: source bytes + graph paths + system
   claims + completed human truth.
 - `evaluate_authoritative_sections`: two rostered human reviews, one
@@ -65,11 +88,12 @@ python -m apps_rg.evals.authoritative evaluate \
   --output retrieval-receipt.json
 ```
 
-Supported lanes are `retrieval`, `grounding`, `sections`, `whole-resume`,
-`repeatability`, and `validity`. The request object uses the corresponding
-Python API keyword names. Paths to authority receipts remain filesystem paths;
-truth and system artifacts are embedded with their independently supplied
-expected digests.
+Supported lanes are `retrieval`, `cluster-retrieval`, `cluster-authority`,
+`cluster-runtime`, `cluster-threshold-freeze`, `cluster-release`, `grounding`,
+`sections`, `whole-resume`, `repeatability`, and `validity`. The request object
+uses the corresponding Python API keyword names. Paths to authority receipts
+remain filesystem paths; truth and system artifacts are embedded with their
+independently supplied expected digests.
 
 ## CI
 

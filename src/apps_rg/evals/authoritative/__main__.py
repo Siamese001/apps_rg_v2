@@ -8,6 +8,13 @@ from pathlib import Path
 from typing import Sequence
 
 from .controller import execute_controller_plan
+from .cluster_authority import evaluate_cluster_authority_pipeline
+from .cluster_retrieval import evaluate_authoritative_cluster_retrieval
+from .cluster_release import (
+    freeze_cluster_calibration_thresholds,
+    qualify_cluster_embedding_release,
+)
+from .cluster_runtime import evaluate_cluster_runtime_quality
 from .grounding import evaluate_authoritative_grounding
 from .manifest import validate_evaluation_manifest
 from .repeatability import evaluate_controller_bound_repeatability
@@ -29,7 +36,19 @@ def _parser() -> argparse.ArgumentParser:
     evaluate = subparsers.add_parser("evaluate")
     evaluate.add_argument(
         "--lane",
-        choices=("retrieval", "grounding", "sections", "whole-resume", "repeatability", "validity"),
+        choices=(
+            "retrieval",
+            "cluster-retrieval",
+            "cluster-authority",
+            "cluster-runtime",
+            "cluster-threshold-freeze",
+            "cluster-release",
+            "grounding",
+            "sections",
+            "whole-resume",
+            "repeatability",
+            "validity",
+        ),
         required=True,
     )
     evaluate.add_argument("--request", type=Path, required=True)
@@ -43,6 +62,22 @@ def _evaluate_request(lane: str, request: dict[str, object]) -> dict[str, object
     if lane == "retrieval":
         cases = request.pop("cases")
         return evaluate_authoritative_retrieval(cases, **request)  # type: ignore[arg-type]
+    if lane == "cluster-retrieval":
+        cases = request.pop("cases")
+        threshold_policy = request.pop("threshold_policy")
+        return evaluate_authoritative_cluster_retrieval(
+            cases,
+            threshold_policy=threshold_policy,
+            **request,
+        )  # type: ignore[arg-type]
+    if lane == "cluster-authority":
+        return evaluate_cluster_authority_pipeline(**request)  # type: ignore[arg-type]
+    if lane == "cluster-runtime":
+        return evaluate_cluster_runtime_quality(**request)  # type: ignore[arg-type]
+    if lane == "cluster-threshold-freeze":
+        return freeze_cluster_calibration_thresholds(**request)  # type: ignore[arg-type]
+    if lane == "cluster-release":
+        return qualify_cluster_embedding_release(**request)  # type: ignore[arg-type]
     if lane == "grounding":
         return evaluate_authoritative_grounding(**request)
     if lane == "sections":
