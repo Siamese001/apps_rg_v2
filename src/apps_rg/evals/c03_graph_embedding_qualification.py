@@ -12,6 +12,10 @@ from pathlib import Path
 from typing import Any
 
 from apps_rg.fact_inventory.c03_skill_assertion_corpus import canonical_sha256
+from apps_rg.runtime.graph_skill_hybrid_retrieval import (
+    bm25_rank,
+    reciprocal_rank_fusion as _reciprocal_rank_fusion,
+)
 
 QUERY_QREL_SCHEMA_VERSION = "apps_rg.c03_graph_embedding_query_qrels.v1"
 QUALIFICATION_SCHEMA_VERSION = "apps_rg.c03_graph_embedding_qualification.v1"
@@ -196,16 +200,15 @@ def reciprocal_rank_fusion(
     assertion_ids: set[str],
     rank_constant: int,
 ) -> list[str]:
-    if rank_constant <= 0:
-        raise GraphEmbeddingQualificationError("RRF rank constant must be positive")
-    scores = dict.fromkeys(assertion_ids, 0.0)
-    for ranking in rankings:
-        seen: set[str] = set()
-        for rank, assertion_id in enumerate(ranking, start=1):
-            if assertion_id in assertion_ids and assertion_id not in seen:
-                scores[assertion_id] += 1.0 / (rank_constant + rank)
-                seen.add(assertion_id)
-    return sorted(scores, key=lambda assertion_id: (-scores[assertion_id], assertion_id))
+    try:
+        fused = _reciprocal_rank_fusion(
+            rankings,
+            assertion_ids=assertion_ids,
+            rank_constant=rank_constant,
+        )
+    except ValueError as exc:
+        raise GraphEmbeddingQualificationError(str(exc)) from exc
+    return [str(row["assertion_id"]) for row in fused]
 
 
 def _recall_metrics(
@@ -351,6 +354,7 @@ def evaluate_graph_embedding_qualification(
     }
     exact_rankings: dict[str, list[str]] = {}
     fact_rankings: dict[str, list[str]] = {}
+    bm25_rankings: dict[str, list[str]] = {}
     normalized_dense_rankings: dict[str, list[str]] = {}
     stale_ids: set[str] = set()
     orphan_ids: set[str] = set()
@@ -365,6 +369,10 @@ def evaluate_graph_embedding_qualification(
         query_text = str(query.get("query_text") or "")
         exact_rankings[query_id] = _sparse_rank(query_text, exact_documents)
         fact_rankings[query_id] = _sparse_rank(query_text, fact_documents)
+        bm25_rankings[query_id] = [
+            str(row["assertion_id"])
+            for row in bm25_rank(query_text, exact_documents)
+        ]
         dense_rows = list(dense_rankings.get(query_id) or [])
         dense_ids: list[str] = []
         for candidate in dense_rows:
@@ -430,8 +438,7 @@ def evaluate_graph_embedding_qualification(
     hybrid_rankings = {
         str(query.get("query_id") or ""): reciprocal_rank_fusion(
             [
-                exact_rankings.get(str(query.get("query_id") or ""), []),
-                fact_rankings.get(str(query.get("query_id") or ""), []),
+                bm25_rankings.get(str(query.get("query_id") or ""), []),
                 normalized_dense_rankings.get(str(query.get("query_id") or ""), []),
             ],
             assertion_ids=assertion_ids,
@@ -446,6 +453,7 @@ def evaluate_graph_embedding_qualification(
     for name, rankings in (
         ("exact", exact_rankings),
         ("fact_vector", fact_rankings),
+        ("bm25", bm25_rankings),
         ("dense", normalized_dense_rankings),
         ("hybrid", hybrid_rankings),
     ):

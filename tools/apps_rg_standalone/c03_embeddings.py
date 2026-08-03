@@ -44,6 +44,10 @@ from apps_rg.runtime.graph_skill_embedding_projection import (  # noqa: E402
     rehydrate_assertion_candidates,
     validate_embedding_projection,
 )
+from apps_rg.runtime.graph_skill_hybrid_retrieval import (  # noqa: E402
+    bm25_rank,
+    fuse_dense_bm25,
+)
 
 ACTIVE_ARTIFACT_REL = Path("artifacts/apps_rg/c03/graph_skill_embeddings")
 GRAPH_REL = Path("src/apps_rg/fact_inventory/master_skills_arsenal_ledger.json")
@@ -988,29 +992,49 @@ def smoke_query(
         expected_corpus_sha256=authority["corpus_sha256"],
         expected_model_artifact_sha256=authority["model_artifact_sha256"],
     ) as index:
-        candidates = index.query(
+        dense_candidates = index.query(
             vectors[0],
-            k=k,
+            k=len(authority["_corpus_payload"].get("assertions") or []),
             section_id=section_id,
         )
+    bm25_documents = {
+        str(assertion.get("assertion_id") or ""): str(assertion.get("embedding_text") or "")
+        for assertion in authority["_corpus_payload"].get("assertions") or []
+        if isinstance(assertion, Mapping)
+        and section_id in (assertion.get("allowed_sections") or [])
+    }
+    fused_candidates = fuse_dense_bm25(
+        dense_candidates,
+        bm25_rank(query_text, bm25_documents),
+        assertion_ids=set(bm25_documents),
+        rank_constant=int(QUALIFICATION_THRESHOLDS["rrf_rank_constant"]),
+    )[:k]
     hydrated = rehydrate_assertion_candidates(
-        candidates,
+        [
+            {"assertion_id": str(row["assertion_id"]), "similarity": float(row["rrf_score"])}
+            for row in fused_candidates
+        ],
         corpus=authority["_corpus_payload"],
         graph_payload=authority["_graph_payload"],
         section_id=section_id,
     )
     return {
         "status": "PASS",
+        "retrieval_mode": "dense_bm25_rrf",
         "section_id": section_id,
         "query_sha256": hashlib.sha256(query_text.encode("utf-8")).hexdigest(),
         "candidate_count": len(hydrated),
         "candidates": [
             {
                 "assertion_id": row["assertion_id"],
-                "similarity": row["similarity"],
+                "rrf_score": row["similarity"],
+                "dense_similarity": fused_candidates[position]["dense_similarity"],
+                "bm25_score": fused_candidates[position]["bm25_score"],
+                "dense_rank": fused_candidates[position]["dense_rank"],
+                "bm25_rank": fused_candidates[position]["bm25_rank"],
                 "label": row["semantic_card"]["label"],
             }
-            for row in hydrated
+            for position, row in enumerate(hydrated)
         ],
         "runtime_proof": runtime_proof,
         "exact_rehydration_pass": True,

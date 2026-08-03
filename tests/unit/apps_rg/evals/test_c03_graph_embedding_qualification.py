@@ -168,6 +168,7 @@ def test_qualification_requires_exact_authority_and_vector_parity() -> None:
     )
 
     assert report["status"] == "PASS"
+    assert report["retrieval_metrics"]["bm25"]["macro_recall_at_k"] == 1.0
     assert set(report["retrieval_diagnostics"]["dense"]) == {"10", "20", "50"}
     assert report["structural_metrics"] == {
         "authority_eligibility_accuracy": 1.0,

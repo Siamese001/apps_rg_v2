@@ -34,8 +34,10 @@ code-only validation evidence.
 
 ## C0.3 graph embeddings
 
-The canonical C0.3 ledger remains the only claim authority. Dense retrieval is
-a derived, read-only ranking surface: it returns assertion IDs and similarity,
+The canonical C0.3 ledger remains the only claim authority. When an authorized
+C0.3 retrieval invocation is enabled, its ranking surface fuses dense BGE-M3
+and deterministic BM25 rankings with reciprocal-rank fusion (RRF). It returns
+assertion IDs and ranking scores,
 then rehydrates those IDs through the current graph, source facts, section
 authority, and allowlists before they can affect allocation.
 
