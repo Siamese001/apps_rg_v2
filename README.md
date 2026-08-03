@@ -34,44 +34,28 @@ code-only validation evidence.
 
 ## C0.3 graph embeddings
 
-The canonical C0.3 ledger remains the only claim authority. Dense retrieval is
-a derived, read-only ranking surface: it returns assertion IDs and similarity,
+The canonical C0.3 ledger remains the only claim authority. When an authorized
+C0.3 retrieval invocation is enabled, its ranking surface fuses dense BGE-M3
+and deterministic BM25 rankings with reciprocal-rank fusion (RRF). It returns
+assertion IDs and ranking scores,
 then rehydrates those IDs through the current graph, source facts, section
 authority, and allowlists before they can affect allocation.
 
-The standalone operator builds into an isolated candidate directory, performs
-offline regression qualification, and only then replaces the active manifests:
+The former one-vector-per-skill lane was retired in C0.3 cluster-embedding W5.
+Its 13 malformed artifacts were deleted, and a digest-bound retirement marker
+now makes the legacy loader and standalone build, preflight, qualification,
+activation, rebuild, and smoke commands fail closed. Verify that boundary with:
 
 ```powershell
-$env:APPS_RG_EMBEDDING_MODEL_PATH = 'C:\path\to\bge-m3\snapshots\5617a9f61b028005a4858fdac845db406aefb181'
-$env:APPS_RG_GRAPH_SKILL_EMBEDDING_DEVICE = 'cuda:0'
-$candidate = '.runtime\c03-embedding-candidate'
-$qrels = 'artifacts\apps_rg\c03\graph_skill_embeddings\graph_embedding_query_qrels.08f8865fcf693606fb0ee1d1cfff9b7c63ffef2dc2e7eef4ec4e5ee96340ba85.json'
-
-python tools\apps_rg_standalone\c03_embeddings.py rebuild `
-  --candidate-dir $candidate `
-  --query-qrels $qrels `
-  --activate
-
-python tools\apps_rg_standalone\c03_embeddings.py preflight
-python tools\apps_rg_standalone\c03_embeddings.py smoke `
-  --query 'regulated insurance AI transformation and cloud modernization' `
-  --section competencies `
-  --k 10
+python tools\apps_rg_standalone\c03_legacy_embedding_retirement_wave5.py --check
 ```
 
-`tools/apps_rg_standalone/c03_embedding_runtime_contract.json` pins the
-promoted Python 3.12, Torch `2.12.0.dev20260228+cu128`, Sentence Transformers
-`5.2.3`, BGE-M3 revision, and offline/no-fallback rules. `preflight`, `build`,
-`qualify`, and `smoke` fail closed when that runtime contract is not satisfied.
+The W4 registry contains 38 multi-node graph-evidence clusters. W5 generated no
+replacement vectors and did not create an activation manifest. W6 is the first
+wave authorized to generate one vector per active cluster; production promotion
+remains separately gated. `APPS_RG_GRAPH_SKILL_EMBEDDINGS_REQUIRED` is a retired
+legacy flag and must not be repurposed for the cluster lane.
 
-Set `APPS_RG_GRAPH_SKILL_EMBEDDINGS_REQUIRED=true` only for a controlled
-non-production embedding-treatment run. It remains false by default and is not
-a production activation. The bundled seven-query QREL artifact supports
-`REGRESSION_ONLY` qualification; it does not create human labels or authorize
-release. Empirical promotion still requires the
-externally pinned candidate universe, full ranking, two authorized reviewers,
-and adjudication described by `src/apps_rg/evals/MEASUREMENT_VALIDITY_PLAN.md`.
-The exact production boundary, open gates, proposed `off|shadow|production`
-activation design, and canary/rollback requirements are recorded in
-[`C03_EMBEDDING_PRODUCTION_PROMOTION.md`](C03_EMBEDDING_PRODUCTION_PROMOTION.md).
+The historical production-readiness assessment is retained in
+[`C03_EMBEDDING_PRODUCTION_PROMOTION.md`](C03_EMBEDDING_PRODUCTION_PROMOTION.md)
+for audit context, but its per-skill operator commands are retired and blocked.

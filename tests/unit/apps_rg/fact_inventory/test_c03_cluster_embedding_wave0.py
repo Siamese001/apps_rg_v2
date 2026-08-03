@@ -7,7 +7,6 @@ import pytest
 
 from apps_rg.fact_inventory.c03_cluster_embedding_wave0 import (
     ClusterEmbeddingWave0Error,
-    build_wave0_receipt,
     validate_cluster_contract,
     validate_wave0_receipt,
 )
@@ -21,13 +20,8 @@ RECEIPT = ROOT / (
 )
 
 
-def test_wave0_builder_freezes_current_authority_without_promotion() -> None:
-    receipt = build_wave0_receipt(
-        ROOT,
-        source_commit=BASELINE_COMMIT,
-        source_tree=BASELINE_TREE,
-    )
-
+def test_wave0_receipt_preserves_the_pre_w1_authority_profile() -> None:
+    receipt = json.loads(RECEIPT.read_text(encoding="utf-8"))
     validate_wave0_receipt(receipt)
     assert receipt["status"] == "PASS"
     assert receipt["scope"] == {

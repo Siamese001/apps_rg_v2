@@ -1,4 +1,5 @@
 """Master skills arsenal ledger — skills layer beside atomic facts (apps_rg only)."""
+
 from __future__ import annotations
 
 import json
@@ -47,7 +48,13 @@ NON_EXTERNAL_CLAIM_POLICIES = frozenset(
 )
 
 NON_EXTERNAL_SUPPORT_LEVELS = frozenset(
-    {"INTERNAL_ONLY", "REPO_EVIDENCE_PORTFOLIO", "TARGETING_ONLY", "STYLE_ONLY", "BLOCKED"}
+    {
+        "INTERNAL_ONLY",
+        "REPO_EVIDENCE_PORTFOLIO",
+        "TARGETING_ONLY",
+        "STYLE_ONLY",
+        "BLOCKED",
+    }
 )
 
 REQUIRED_SKILL_ROW_FIELDS: tuple[str, ...] = (
@@ -234,7 +241,9 @@ REGISTERED_GRAPH_EDGE_SIGNATURES: dict[str, frozenset[tuple[str, str]]] = {
             ("domain_pillar", "skill_row"),
         }
     ),
-    "career_track_contains_capability_domain": frozenset({("career_track", "capability_domain")}),
+    "career_track_contains_capability_domain": frozenset(
+        {("career_track", "capability_domain")}
+    ),
     "career_track_contains_epoch": frozenset({("career_track", "career_epoch")}),
     "career_track_contains_pillar": frozenset({("career_track", "domain_pillar")}),
     "career_track_precedes_career_track": frozenset({("career_track", "career_track")}),
@@ -248,16 +257,22 @@ REGISTERED_GRAPH_EDGE_SIGNATURES: dict[str, frozenset[tuple[str, str]]] = {
         {("career_epoch", "skill"), ("career_epoch", "skill_row")}
     ),
     "identity_supported_by_epoch": frozenset({("identity_north_star", "career_epoch")}),
-    "identity_supported_by_pillar": frozenset({("identity_north_star", "domain_pillar")}),
+    "identity_supported_by_pillar": frozenset(
+        {("identity_north_star", "domain_pillar")}
+    ),
     "jd_briefing_targeting_only": frozenset({("targeting_input", "policy_rule")}),
     "metric_bucket_contains_metric": frozenset({("metric_bucket", "metric")}),
     "metric_supports_business_outcome": frozenset({("metric", "metric_bucket")}),
-    "pillar_contains_capability_domain": frozenset({("domain_pillar", "capability_domain")}),
+    "pillar_contains_capability_domain": frozenset(
+        {("domain_pillar", "capability_domain")}
+    ),
     "pillar_phase_bridge": frozenset({("domain_pillar", "domain_pillar")}),
     "pillar_section_eligibility": frozenset(
         {("domain_pillar", "resume_section_projection")}
     ),
-    "projection_excludes_blocked_skill": frozenset({("skill_row", "policy")}),
+    "projection_excludes_blocked_skill": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "section_blocks_pending_source_skill": frozenset(
         {("resume_section_projection", "policy_rule")}
     ),
@@ -272,11 +287,17 @@ REGISTERED_GRAPH_EDGE_SIGNATURES: dict[str, frozenset[tuple[str, str]]] = {
         }
     ),
     "skill_can_surface_metric": frozenset({("skill", "metric")}),
-    "skill_external_claim_eligible": frozenset({("skill_row", "policy")}),
+    "skill_external_claim_eligible": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "skill_has_metric_bucket": frozenset({("skill", "metric_bucket")}),
-    "skill_projection_only_internal": frozenset({("skill_row", "policy")}),
+    "skill_projection_only_internal": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "skill_reinforces_skill": frozenset({("skill", "skill")}),
-    "skill_requires_human_confirmation": frozenset({("skill_row", "policy")}),
+    "skill_requires_human_confirmation": frozenset(
+        {("skill", "policy"), ("skill_row", "policy")}
+    ),
     "skill_supported_by_fact": frozenset(
         {
             ("skill", "atomic_proof_fact"),
@@ -289,7 +310,9 @@ REGISTERED_GRAPH_EDGE_SIGNATURES: dict[str, frozenset[tuple[str, str]]] = {
             ("skill_row", "experience_evidence"),
         }
     ),
-    "skill_supported_by_repo_evidence": frozenset({("skill_row", "repository_evidence")}),
+    "skill_supported_by_repo_evidence": frozenset(
+        {("skill_row", "repository_evidence")}
+    ),
     "skill_supported_by_source_concept": frozenset({("skill_row", "source_concept")}),
     "srfs_requires_fact_id_only": frozenset(
         {("external_claim_policy", "policy"), ("policy_rule", "policy")}
@@ -297,7 +320,9 @@ REGISTERED_GRAPH_EDGE_SIGNATURES: dict[str, frozenset[tuple[str, str]]] = {
 }
 
 
-def _register_endpoint_type(registry: dict[str, str], endpoint_id: Any, endpoint_type: str) -> None:
+def _register_endpoint_type(
+    registry: dict[str, str], endpoint_id: Any, endpoint_type: str
+) -> None:
     normalized = str(endpoint_id or "").strip()
     if not normalized:
         return
@@ -353,8 +378,12 @@ def derive_registered_graph_endpoint_types(ledger: Mapping[str, Any]) -> dict[st
             skill_id = str(raw_row.get("skill_id") or "").strip()
             if skill_id:
                 skill_rows_by_id[skill_id] = raw_row
-            _register_endpoint_type(registry, raw_row.get("domain_id"), "capability_domain")
-            _register_endpoint_type(registry, raw_row.get("career_epoch"), "career_epoch")
+            _register_endpoint_type(
+                registry, raw_row.get("domain_id"), "capability_domain"
+            )
+            _register_endpoint_type(
+                registry, raw_row.get("career_epoch"), "career_epoch"
+            )
             for fact_id in raw_row.get("fact_id_links") or []:
                 _register_fact_reference(registry, fact_id)
             for field in ("primary_fact_id", "source_ledger_ref"):
@@ -381,7 +410,9 @@ def derive_registered_graph_endpoint_types(ledger: Mapping[str, Any]) -> dict[st
         for raw_node in raw_nodes:
             if not isinstance(raw_node, dict):
                 continue
-            _register_endpoint_type(registry, raw_node.get("domain_id"), "capability_domain")
+            _register_endpoint_type(
+                registry, raw_node.get("domain_id"), "capability_domain"
+            )
             for fact_id in raw_node.get("fact_id_links") or []:
                 _register_fact_reference(registry, fact_id)
             for field in ("primary_fact_id", "source_fact_id"):
@@ -396,7 +427,10 @@ def derive_registered_graph_endpoint_types(ledger: Mapping[str, Any]) -> dict[st
         for raw_edge in raw_edges:
             if not isinstance(raw_edge, dict):
                 continue
-            if str(raw_edge.get("edge_type") or "").strip() != "skill_supported_by_repo_evidence":
+            if (
+                str(raw_edge.get("edge_type") or "").strip()
+                != "skill_supported_by_repo_evidence"
+            ):
                 continue
             source_id = str(raw_edge.get("source_node_id") or "").strip()
             target_id = str(raw_edge.get("target_node_id") or "").strip()
@@ -405,7 +439,9 @@ def derive_registered_graph_endpoint_types(ledger: Mapping[str, Any]) -> dict[st
             skill_row = skill_rows_by_id.get(source_id)
             repo_files = {
                 str(path or "").strip()
-                for path in (skill_row.get("repo_evidence_files") or [] if skill_row else [])
+                for path in (
+                    skill_row.get("repo_evidence_files") or [] if skill_row else []
+                )
                 if str(path or "").strip()
             }
             if (
@@ -427,7 +463,11 @@ def classify_derived_graph_endpoint(
         return None
     registry = registered_endpoint_types or DERIVED_GRAPH_ENDPOINT_EXACT_TYPES
     endpoint_type = registry.get(normalized)
-    return endpoint_type if endpoint_type and endpoint_type != "__type_conflict__" else None
+    return (
+        endpoint_type
+        if endpoint_type and endpoint_type != "__type_conflict__"
+        else None
+    )
 
 
 def graph_node_requires_source_refs(node: Mapping[str, Any]) -> bool:
@@ -440,7 +480,9 @@ def graph_node_requires_source_refs(node: Mapping[str, Any]) -> bool:
     }:
         return False
     claim_policy = str(node.get("external_claim_policy") or "").strip()
-    return bool(claim_policy and claim_policy not in PROVENANCE_EXEMPT_EXTERNAL_CLAIM_POLICIES)
+    return bool(
+        claim_policy and claim_policy not in PROVENANCE_EXEMPT_EXTERNAL_CLAIM_POLICIES
+    )
 
 
 def _registered_values(value: Any) -> set[str]:
@@ -470,11 +512,17 @@ def collect_canonical_graph_issues(ledger: dict[str, Any]) -> list[str]:
     if not isinstance(raw_edges, list):
         return ["GRAPH_EDGES_NOT_LIST: count=1 offenders=['graph_edges']"]
 
-    metadata = ledger.get("metadata") if isinstance(ledger.get("metadata"), dict) else {}
-    graph_metadata = (
-        ledger.get("graph_metadata") if isinstance(ledger.get("graph_metadata"), dict) else {}
+    metadata = (
+        ledger.get("metadata") if isinstance(ledger.get("metadata"), dict) else {}
     )
-    w4a_hardened = bool(metadata.get("w4a_hardened") or graph_metadata.get("w4a_hardened"))
+    graph_metadata = (
+        ledger.get("graph_metadata")
+        if isinstance(ledger.get("graph_metadata"), dict)
+        else {}
+    )
+    w4a_hardened = bool(
+        metadata.get("w4a_hardened") or graph_metadata.get("w4a_hardened")
+    )
     support_levels = _registered_values(ledger.get("support_levels")) | set(
         GRAPH_ONLY_SUPPORT_LEVELS
     )
@@ -482,9 +530,9 @@ def collect_canonical_graph_issues(ledger: dict[str, Any]) -> list[str]:
         GRAPH_ONLY_VISIBILITY_RULES
     )
     activation_statuses = _registered_values(ledger.get("activation_statuses"))
-    external_claim_policies = _registered_values(ledger.get("external_claim_policies")) | set(
-        GRAPH_ONLY_EXTERNAL_CLAIM_POLICIES
-    )
+    external_claim_policies = _registered_values(
+        ledger.get("external_claim_policies")
+    ) | set(GRAPH_ONLY_EXTERNAL_CLAIM_POLICIES)
     derived_endpoint_types = derive_registered_graph_endpoint_types(ledger)
 
     node_ids: list[str] = []
@@ -625,12 +673,12 @@ def collect_canonical_graph_issues(ledger: dict[str, Any]) -> list[str]:
             endpoint_blank.append(f"{edge_id}.target_node_id")
         if source_id and edge_type and target_id:
             logical_triples.append(f"{source_id}|{edge_type}|{target_id}")
-        source_type = node_types_by_id.get(source_id) or classify_derived_graph_endpoint(
-            source_id, derived_endpoint_types
-        )
-        target_type = node_types_by_id.get(target_id) or classify_derived_graph_endpoint(
-            target_id, derived_endpoint_types
-        )
+        source_type = node_types_by_id.get(
+            source_id
+        ) or classify_derived_graph_endpoint(source_id, derived_endpoint_types)
+        target_type = node_types_by_id.get(
+            target_id
+        ) or classify_derived_graph_endpoint(target_id, derived_endpoint_types)
         if source_id and source_type is None:
             endpoint_unknown.append(f"{edge_id}.source_node_id={source_id}")
         if target_id and target_type is None:
@@ -689,16 +737,38 @@ def collect_canonical_graph_issues(ledger: dict[str, Any]) -> list[str]:
         edge_validation_unknown,
     )
 
-    if "node_count" in graph_metadata and graph_metadata.get("node_count") != len(raw_nodes):
+    if "node_count" in graph_metadata and graph_metadata.get("node_count") != len(
+        raw_nodes
+    ):
         issues.append(
             "GRAPH_METADATA_NODE_COUNT_MISMATCH: "
             f"offenders=['metadata={graph_metadata.get('node_count')}', 'actual={len(raw_nodes)}']"
         )
-    if "edge_count" in graph_metadata and graph_metadata.get("edge_count") != len(raw_edges):
+    if "edge_count" in graph_metadata and graph_metadata.get("edge_count") != len(
+        raw_edges
+    ):
         issues.append(
             "GRAPH_METADATA_EDGE_COUNT_MISMATCH: "
             f"offenders=['metadata={graph_metadata.get('edge_count')}', 'actual={len(raw_edges)}']"
         )
+    if graph_metadata.get("node_semantic_contract_version"):
+        from apps_rg.fact_inventory.c03_graph_node_semantic_hardening import (
+            collect_graph_node_semantic_issues,
+        )
+
+        issues.extend(collect_graph_node_semantic_issues(ledger))
+    if graph_metadata.get("edge_semantic_contract_version"):
+        from apps_rg.fact_inventory.c03_graph_edge_semantic_hardening import (
+            collect_graph_edge_semantic_issues,
+        )
+
+        issues.extend(collect_graph_edge_semantic_issues(ledger))
+    if graph_metadata.get("authority_reconciliation"):
+        from apps_rg.fact_inventory.c03_graph_authority_reconciliation_wave3 import (
+            collect_graph_authority_reconciliation_issues,
+        )
+
+        issues.extend(collect_graph_authority_reconciliation_issues(ledger))
     return issues
 
 
@@ -729,7 +799,9 @@ def load_master_skills_arsenal_ledger(
 
 def arsenal_skill_ids(ledger: dict[str, Any]) -> list[str]:
     rows = ledger.get("skill_rows") or []
-    return [str(r["skill_id"]) for r in rows if isinstance(r, dict) and r.get("skill_id")]
+    return [
+        str(r["skill_id"]) for r in rows if isinstance(r, dict) and r.get("skill_id")
+    ]
 
 
 def validate_skill_row_shape(row: dict[str, Any]) -> None:
@@ -758,7 +830,9 @@ def _phrase_overlap(allowed: list[str], forbidden: list[str]) -> list[str]:
 
 def _is_jd_briefing_fact_id(fact_id: str) -> bool:
     low = fact_id.lower()
-    return any(low.startswith(p) or p in low for p in JD_BRIEFING_FORBIDDEN_FACT_ID_PREFIXES)
+    return any(
+        low.startswith(p) or p in low for p in JD_BRIEFING_FORBIDDEN_FACT_ID_PREFIXES
+    )
 
 
 def skill_row_eligible_for_external_claim(row: dict[str, Any]) -> bool:
@@ -793,7 +867,9 @@ def skill_row_eligible_for_external_claim(row: dict[str, Any]) -> bool:
             return False
         if _is_skill_id(str(fid)):
             return False
-    if _phrase_overlap(list(row.get("allowed_phrases") or []), list(row.get("forbidden_phrases") or [])):
+    if _phrase_overlap(
+        list(row.get("allowed_phrases") or []), list(row.get("forbidden_phrases") or [])
+    ):
         return False
     return True
 
@@ -819,7 +895,9 @@ def validate_skill_row_for_external_output(row: dict[str, Any]) -> list[str]:
         violations.append(f"{support} cannot be used as proof")
     if support == "USER_CONFIRMED_PENDING_SOURCE":
         if row.get("human_confirmation_required", True):
-            violations.append("USER_CONFIRMED_PENDING_SOURCE requires human confirmation")
+            violations.append(
+                "USER_CONFIRMED_PENDING_SOURCE requires human confirmation"
+            )
         elif str(row.get("activation_status")) != "ACTIVE_CONFIRMED":
             violations.append("USER_CONFIRMED_PENDING_SOURCE requires ACTIVE_CONFIRMED")
     if support == "DERIVED_SUPPORTED" and not (row.get("fact_id_links") or []):
@@ -890,18 +968,32 @@ def validate_c03_graph_hardening_shape(ledger: dict[str, Any]) -> None:
     applied, all required nodes and edge types must exist and must remain graph
     authority, not broad ledger fallback.
     """
-    marker = (ledger.get("metadata") or {}).get("c03_actual_graph_full_zero_loss_overwrite")
+    marker = (ledger.get("metadata") or {}).get(
+        "c03_actual_graph_full_zero_loss_overwrite"
+    )
     if not marker:
         return
-    node_ids = {str(n.get("node_id")) for n in ledger.get("graph_nodes") or [] if isinstance(n, dict)}
+    node_ids = {
+        str(n.get("node_id"))
+        for n in ledger.get("graph_nodes") or []
+        if isinstance(n, dict)
+    }
     missing = sorted(C03_REQUIRED_GRAPH_HARDENING_NODES - node_ids)
     if missing:
         raise ValueError(f"C0.3 graph hardening missing nodes: {missing}")
-    edge_types = {str(e.get("edge_type")) for e in ledger.get("graph_edges") or [] if isinstance(e, dict)}
+    edge_types = {
+        str(e.get("edge_type"))
+        for e in ledger.get("graph_edges") or []
+        if isinstance(e, dict)
+    }
     missing_edge_types = sorted(C03_REQUIRED_GRAPH_HARDENING_EDGE_TYPES - edge_types)
     if missing_edge_types:
-        raise ValueError(f"C0.3 graph hardening missing edge types: {missing_edge_types}")
-    for sid in (n for n in C03_REQUIRED_GRAPH_HARDENING_NODES if n.startswith("skill_")):
+        raise ValueError(
+            f"C0.3 graph hardening missing edge types: {missing_edge_types}"
+        )
+    for sid in (
+        n for n in C03_REQUIRED_GRAPH_HARDENING_NODES if n.startswith("skill_")
+    ):
         linked = [
             e
             for e in ledger.get("graph_edges") or []
@@ -910,7 +1002,9 @@ def validate_c03_graph_hardening_shape(ledger: dict[str, Any]) -> None:
             and str(e.get("edge_type")) == "skill_supported_by_fact"
         ]
         if not linked:
-            raise ValueError(f"C0.3 hardening skill has no skill_supported_by_fact edge: {sid}")
+            raise ValueError(
+                f"C0.3 hardening skill has no skill_supported_by_fact edge: {sid}"
+            )
 
 
 def validate_arsenal_ledger_shape(ledger: dict[str, Any]) -> None:

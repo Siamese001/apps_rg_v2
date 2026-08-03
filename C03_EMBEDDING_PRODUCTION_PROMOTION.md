@@ -1,5 +1,12 @@
 # C0.3 embedding production promotion
 
+> **Historical assessment — legacy lane retired.** C0.3 cluster-embedding W5
+> deleted the 13 one-vector-per-skill artifacts described below and installed a
+> fail-closed retirement marker. The legacy preflight, build, qualify, activate,
+> rebuild, and smoke commands in this document must not be run and are blocked
+> by code. W6 may generate one vector per W4 graph-evidence cluster; it does not
+> inherit any production authorization from this historical assessment.
+
 ## Decision
 
 **Verdict: NOT PRODUCTION READY.**
