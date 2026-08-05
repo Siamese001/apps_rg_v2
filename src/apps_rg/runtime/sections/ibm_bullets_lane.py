@@ -72,7 +72,11 @@ from apps_rg.runtime.section_proof.mock_runtime_proof_policy import (
     infer_product_quality_blocked_or_mock,
 )
 from apps_rg.runtime.section_proof.section_input_usage_ledger import build_section_input_usage_ledger_v1
-from apps_rg.runtime.runtime_proof_layout import finalize_runtime_proof_run, prepare_runtime_proof_run_dir
+from apps_rg.runtime.runtime_proof_layout import (
+    finalize_runtime_proof_run,
+    prepare_runtime_proof_run_dir,
+    rel_posix,
+)
 from apps_rg.runtime.shadow.ibm_bullets_l6 import (
     build_l6_shadow_package,
     extend_ibm_bullets_l6_learning_fields,
@@ -1204,7 +1208,7 @@ def run_ibm_bullets_execution(
         or (provider_request_data or {}).get("id")
         or runtime_payload["run_id"]
     )
-    trace_rr = artifact_dir.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    trace_rr = rel_posix(artifact_dir, REPO_ROOT)
     usage_doc = build_section_input_usage_ledger_v1(
         section_id="ibm_bullets",
         run_id=str(runtime_payload["run_id"]),

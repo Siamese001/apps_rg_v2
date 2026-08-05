@@ -17,6 +17,7 @@ from apps_rg.runtime.c0.graph_skill_embedding_allocation import (
 from apps_rg.runtime.c0.resume_graph_allocation import (
     ALLOCATION_PLAN_ENV,
     SECTION_EVIDENCE_CONTRACTS_ENV,
+    SECTION_SOURCE_PLANS_ENV,
     build_section_only_graph_allocation,
     load_resume_graph_allocation_plan,
     slice_section_plan_for_allocation,
@@ -41,6 +42,20 @@ def _load_contracts(path: Path) -> dict[str, dict[str, Any]]:
     }
 
 
+def _load_source_section_plans(path: Path) -> dict[str, dict[str, Any]]:
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"frozen C0.3 source section plans unavailable: {path}") from exc
+    if not isinstance(raw, dict):
+        raise ValueError("frozen C0.3 source section plans must be a JSON object")
+    return {
+        str(section_id): dict(plan)
+        for section_id, plan in raw.items()
+        if isinstance(plan, Mapping)
+    }
+
+
 def _active_whole_resume_inputs(
     section_id: str,
 ) -> tuple[dict[str, Any], dict[str, Any]] | None:
@@ -58,6 +73,63 @@ def _active_whole_resume_inputs(
     if not contract:
         raise ValueError(f"{section_id}: missing frozen final graph evidence contract")
     return plan, contract
+
+
+def load_frozen_whole_resume_source_plan(
+    section_id: str,
+) -> dict[str, Any] | None:
+    """Load the exact C0.3 plan sealed by the active whole-resume allocation.
+
+    Section lanes must consume this immutable source plan. Re-running selection
+    after allocation can legitimately produce a different ranking or tie order,
+    which is not an allowed way to satisfy a frozen whole-run contract.
+    """
+
+    active = _active_whole_resume_inputs(section_id)
+    if active is None:
+        return None
+    allocation_plan, contract = active
+    source_plans_ref = str(os.environ.get(SECTION_SOURCE_PLANS_ENV) or "").strip()
+    if not source_plans_ref:
+        raise ValueError(
+            f"{section_id}: frozen whole-resume source plan binding is unavailable"
+        )
+    source_plan = _load_source_section_plans(Path(source_plans_ref)).get(section_id)
+    if not source_plan:
+        raise ValueError(f"{section_id}: frozen whole-resume source plan is unavailable")
+
+    allocation_digest = str(allocation_plan.get("allocation_plan_digest") or "").strip()
+    if contract.get("pass") is not True:
+        raise ValueError(f"{section_id}: frozen final evidence contract is not passing")
+    if str(contract.get("allocation_plan_digest") or "").strip() != allocation_digest:
+        raise ValueError(f"{section_id}: frozen allocation digest mismatch")
+    expected_plan_id = str(contract.get("source_section_plan_id") or "").strip()
+    expected_digest = str(contract.get("source_section_plan_digest") or "").strip()
+    observed_plan_id = str(source_plan.get("plan_id") or "").strip()
+    observed_digest = str(source_plan.get("plan_digest") or "").strip()
+    if (
+        not expected_digest
+        or expected_digest != observed_digest
+        or (expected_plan_id and expected_plan_id != observed_plan_id)
+    ):
+        raise ValueError(f"{section_id}: frozen source plan contract binding mismatch")
+
+    assigned_roots = {
+        str(row.get("root_id") or "").strip()
+        for row in allocation_plan.get("assignments") or []
+        if isinstance(row, Mapping)
+        and str(row.get("section_id") or "") == section_id
+        and str(row.get("root_id") or "").strip()
+    }
+    source_roots = {
+        str(row.get("role_episode_bundle_id") or row.get("fact_id") or "").strip()
+        for row in source_plan.get("facts") or []
+        if isinstance(row, Mapping)
+        and str(row.get("role_episode_bundle_id") or row.get("fact_id") or "").strip()
+    }
+    if not assigned_roots or not assigned_roots.issubset(source_roots):
+        raise ValueError(f"{section_id}: frozen source plan root coverage mismatch")
+    return source_plan
 
 
 def _active_embedding_binding(
@@ -253,4 +325,7 @@ def bind_proof_pool_to_resume_graph_allocation(pool: Any) -> Any:
     )
 
 
-__all__ = ["bind_proof_pool_to_resume_graph_allocation"]
+__all__ = [
+    "bind_proof_pool_to_resume_graph_allocation",
+    "load_frozen_whole_resume_source_plan",
+]

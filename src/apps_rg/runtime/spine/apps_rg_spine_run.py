@@ -134,14 +134,14 @@ def run_apps_rg_spine(
             run_integrated_single_action_spine,
         )
         from apps_rg.runtime.runtime_proof_layout import (
-            allocate_full_resume_artifact_dir,
+            allocate_section_spine_artifact_dir,
             find_repo_root,
         )
 
         art = (
             Path(artifact_dir).expanduser().resolve()
             if str(artifact_dir or "").strip()
-            else allocate_full_resume_artifact_dir(find_repo_root(), "")
+            else allocate_section_spine_artifact_dir(find_repo_root(), sid)
         )
         raw_request = build_raw_request_for_r4(
             target_company=tc,

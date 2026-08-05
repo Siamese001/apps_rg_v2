@@ -78,6 +78,7 @@ from apps_rg.runtime.section_execution_plan import (
     MAX_SECTION_ATTEMPTS,
     is_hard_no_retry_runtime_status,
 )
+from apps_rg.repository_layout import resolve_repository_path
 
 __all__ = [
     "_assert_artifact_matches_company",
@@ -471,6 +472,18 @@ def _resolve_repo_relative_path(repo_root: Path, path_text: str) -> Path:
     if path.is_absolute():
         return path
     return repo_root / path
+
+
+def _resolve_e2e_baseline_ref(repo_root: Path, baseline_ref_text: str) -> Path:
+    """Resolve the historical logical ``apps_rg/...`` baseline ref in either layout.
+
+    The source checkout keeps the package below ``src/apps_rg`` while baseline
+    contracts retain the monorepo-compatible ``apps_rg/...`` logical reference.
+    Artifact directories are intentionally *not* resolved here: only the
+    package-owned baseline contract uses this translation.
+    """
+
+    return resolve_repository_path(repo_root, baseline_ref_text)
 
 
 def _prepare_fresh_e2e_run(repo_root: Path, artifact_root: str) -> dict[str, Any]:
@@ -1085,7 +1098,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
             artifact_dir=Path(str(args.artifact_dir)),
             e2e_run_id=Path(str(args.artifact_dir)).name,
             repo_root=_repo_root,
-            baseline_ref=_resolve_repo_relative_path(_repo_root, baseline_ref_text),
+            baseline_ref=_resolve_e2e_baseline_ref(_repo_root, baseline_ref_text),
             runtime_check=(
                 None
                 if is_test_harness()

@@ -22,6 +22,7 @@ from agentic_core.config.model_catalog import (
     BGE_M3_MODEL_ID,
 )
 
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.c0.section_authority_profile import (
     c0_authority_manifest,
     c0_section_authority_profile,
@@ -89,7 +90,8 @@ class FactVectorReadinessError(RuntimeError):
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    """Resolve the checkout root in both monorepo and standalone layouts."""
+    return repository_root(Path(__file__))
 
 
 def _read_json(path: Path) -> dict[str, Any]:

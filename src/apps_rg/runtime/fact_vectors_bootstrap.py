@@ -635,12 +635,12 @@ def _build_sparse_sidecar(
 ) -> None:
     """G22: build the FTS5/BM25 sparse sidecar so the mandatory C0.2 sparse lane is available.
 
-    Reads the just-upserted fact_vectors collection and writes data/cache/sparse/fact_vectors.db
-    (read by agentic_core.L4_state.utils.memory.bm25_store.get_sparse_index). Best-effort; the
-    outcome is recorded in the manifest so --strict can gate on it.
+    Reads the just-upserted fact_vectors collection and writes the Apps RG-owned
+    data/cache/sparse/fact_vectors.db sidecar. Best-effort; the outcome is
+    recorded in the manifest so --strict can gate on it.
     """
     try:
-        from tools.generate.ingestion import build_sparse_index as sparse_builder
+        from apps_rg.runtime.c0 import sparse_sidecar as sparse_builder
 
         sparse_dir = _repo_root() / "data" / "cache" / "sparse"
         if chunks:
@@ -668,9 +668,9 @@ def _build_sparse_sidecar(
                 chroma_path=chroma_path,
                 sparse_dir=sparse_dir,
             )
-        from agentic_core.L4_state.utils.memory.bm25_store import sparse_sidecar_exists
-
-        manifest["sparse_sidecar_built"] = bool(sparse_sidecar_exists("fact_vectors"))
+        manifest["sparse_sidecar_built"] = sparse_builder.sparse_sidecar_exists(
+            "fact_vectors", sparse_dir=sparse_dir
+        )
         manifest["sparse_doc_count"] = int(stats.get("doc_count") or 0)
         manifest["sparse_term_count"] = int(stats.get("term_count") or 0)
     except (AttributeError, ImportError, OSError, RuntimeError, sqlite3.Error, TypeError, ValueError) as exc:

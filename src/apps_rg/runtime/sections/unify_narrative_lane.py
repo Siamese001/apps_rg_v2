@@ -65,6 +65,7 @@ from apps_rg.runtime.resume_resolution import load_lane_base_resume_json
 from apps_rg.runtime.runtime_proof_layout import (
     finalize_runtime_proof_run,
     prepare_runtime_proof_run_dir,
+    rel_posix,
     resolve_effective_lane_l2_path,
 )
 from apps_rg.runtime.shadow.l6_shadow_learning import build_l6_shadow_learning_record
@@ -1130,7 +1131,7 @@ def run_unify_narrative_execution(
         or (provider_request_data or {}).get("id")
         or runtime_payload["run_id"]
     )
-    trace_rr = artifact_dir.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    trace_rr = rel_posix(artifact_dir, REPO_ROOT)
     usage_doc = build_section_input_usage_ledger_v1(
         section_id="unify_narrative",
         run_id=str(runtime_payload["run_id"]),

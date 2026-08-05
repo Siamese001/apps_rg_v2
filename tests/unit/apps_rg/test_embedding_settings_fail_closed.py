@@ -54,6 +54,28 @@ def test_bootstrap_defaults_chroma_and_embedding_without_manual_env(
     assert os.environ.get("EMBEDDING_ENABLED") == "true"
 
 
+@pytest.mark.parametrize(
+    ("set_name", "missing_name"),
+    (
+        ("EMBEDDING_ENABLED", "APPS_RG_EMBEDDING_ENABLED"),
+        ("APPS_RG_EMBEDDING_ENABLED", "EMBEDDING_ENABLED"),
+    ),
+)
+def test_bootstrap_syncs_one_sided_embedding_enabled_alias(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    set_name: str,
+    missing_name: str,
+) -> None:
+    monkeypatch.setenv(set_name, "true")
+    monkeypatch.delenv(missing_name, raising=False)
+
+    applied = bootstrap_apps_rg_embedding_env(repo_root=tmp_path)
+
+    assert applied[missing_name] == "true"
+    assert os.environ[missing_name] == "true"
+
+
 def test_embedding_settings_alias_model_catalog() -> None:
     assert APPS_RG_BGE_M3_MODEL_ID == BGE_M3_MODEL_ID
     assert BGE_M3_DIMENSION == BGE_M3_EMBEDDING_DIMENSION

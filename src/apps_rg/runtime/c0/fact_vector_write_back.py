@@ -910,7 +910,7 @@ def _sync_sparse_fact_vectors(
             "sparse_sync_reason": "",
         }
         try:
-            from tools.generate.ingestion import build_sparse_index
+            from apps_rg.runtime.c0 import sparse_sidecar as build_sparse_index
 
             sparse_stats = build_sparse_index.upsert_documents(
                 live_collection,
@@ -934,7 +934,7 @@ def _sync_sparse_fact_vectors(
         except FACT_VECTOR_RUNTIME_EXCEPTIONS as exc:
             update["sparse_sync_reason"] = f"incremental_failed:{type(exc).__name__}:{exc}"
             try:
-                from tools.generate.ingestion import build_sparse_index
+                from apps_rg.runtime.c0 import sparse_sidecar as build_sparse_index
 
                 sparse_stats = _rebuild_from_live_collection(build_sparse_index)
                 update["sparse_synced"] = True

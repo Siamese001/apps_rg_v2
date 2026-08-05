@@ -5,6 +5,7 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
+from apps_rg.repository_layout import repository_root
 from apps_rg.runtime import fact_vector_readiness as fvr
 
 
@@ -37,6 +38,11 @@ def _write_manifest(root: Path, *, stale: bool = False) -> None:
         + "\n",
         encoding="utf-8",
     )
+
+
+def test_default_readiness_root_resolves_the_checkout_not_the_source_directory() -> None:
+    assert fvr._repo_root() == repository_root(Path(fvr.__file__))
+    assert (fvr._repo_root() / "src" / "apps_rg" / "__init__.py").is_file()
 
 
 def _meta(section: str, source_document_id: str) -> dict[str, Any]:

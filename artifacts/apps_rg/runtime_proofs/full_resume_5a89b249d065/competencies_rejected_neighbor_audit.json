@@ -1,0 +1,134 @@
+{
+  "schema_version": "competencies_rejected_neighbor_audit_v1",
+  "audit_status": "present",
+  "min_score_threshold": 0.72,
+  "candidate_variant_count": 6,
+  "candidate_label_count": 6,
+  "selected_count": 3,
+  "rejected_neighbor_count": 3,
+  "selected_labels": [
+    "agentic control plane architecture",
+    "devsecops release resilience",
+    "runtime gate mesh & control semantics"
+  ],
+  "selected_neighbors": [
+    {
+      "category_label": "Agentic Control Plane Architecture",
+      "path_index": 0,
+      "selector_score": 0.93,
+      "best_selector_score_for_label": 0.93,
+      "heuristic_support_score": 0.6667,
+      "effective_score": 0.93,
+      "source_fact_ids": [
+        "reb_unify_agentic_platform_architecture",
+        "skill_unify_agentic_runtime_proof_bundle_lineage"
+      ],
+      "graph_skill_node_ids": [
+        "skill_agentic_control_plane_design",
+        "skill_governed_agentic_systems_architecture",
+        "skill_reusable_agentic_platform_architecture"
+      ],
+      "competency_bundle_id": "ccb_agentic_platforms",
+      "selection_status": "selected"
+    },
+    {
+      "category_label": "Runtime Gate Mesh & Control Semantics",
+      "path_index": 0,
+      "selector_score": 0.9,
+      "best_selector_score_for_label": 0.9,
+      "heuristic_support_score": 0.6667,
+      "effective_score": 0.9,
+      "source_fact_ids": [
+        "reb_unify_runtime_reliability_governance",
+        "skill_audit_grade_observability"
+      ],
+      "graph_skill_node_ids": [
+        "skill_fail_closed_gate_semantics",
+        "skill_policy_bound_runtime_design",
+        "skill_runtime_gate_mesh_design"
+      ],
+      "competency_bundle_id": "ccb_runtime_governance",
+      "selection_status": "selected"
+    },
+    {
+      "category_label": "DevSecOps Release Resilience",
+      "path_index": 0,
+      "selector_score": 0.86,
+      "best_selector_score_for_label": 0.86,
+      "heuristic_support_score": 1.0,
+      "effective_score": 0.86,
+      "source_fact_ids": [
+        "reb_ibm_devsecops_release_resilience",
+        "skill_ibm_automated_release_pipelines"
+      ],
+      "graph_skill_node_ids": [
+        "skill_ibm_automated_release_pipelines",
+        "skill_ibm_devsecops_pipeline_security"
+      ],
+      "competency_bundle_id": "ccb_devsecops_delivery_governance",
+      "selection_status": "selected"
+    }
+  ],
+  "rejected_neighbors": [
+    {
+      "category_label": "Partner Co-Sell Orchestration Motion",
+      "path_index": 0,
+      "selector_score": null,
+      "best_selector_score_for_label": null,
+      "heuristic_support_score": 1.0,
+      "effective_score": 1.0,
+      "source_fact_ids": [
+        "reb_ibm_presales_solution_engineering",
+        "reb_unify_partner_channel_cosell",
+        "skill_partner_partner_led_ai_solutions"
+      ],
+      "graph_skill_node_ids": [
+        "skill_partner_joint_solution_development",
+        "skill_partner_solution_architecture"
+      ],
+      "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+      "selection_status": "rejected",
+      "rejection_reason": "not_selected_by_model"
+    },
+    {
+      "category_label": "Enterprise Deal Orchestration Layer",
+      "path_index": 0,
+      "selector_score": null,
+      "best_selector_score_for_label": null,
+      "heuristic_support_score": 1.0,
+      "effective_score": 1.0,
+      "source_fact_ids": [
+        "reb_ibm_customer_success_value_realization",
+        "reb_ibm_revenue_sales_target_execution",
+        "skill_partner_enterprise_negotiations"
+      ],
+      "graph_skill_node_ids": [
+        "skill_partner_enterprise_negotiations",
+        "skill_partner_sales_revenue_targets"
+      ],
+      "competency_bundle_id": "ccb_commercial_deal_orchestration",
+      "selection_status": "rejected",
+      "rejection_reason": "not_selected_by_model"
+    },
+    {
+      "category_label": "Multi-Agent Reliability Telemetry Mesh",
+      "path_index": 0,
+      "selector_score": null,
+      "best_selector_score_for_label": null,
+      "heuristic_support_score": 1.0,
+      "effective_score": 1.0,
+      "source_fact_ids": [
+        "reb_unify_runtime_reliability_governance",
+        "skill_audit_grade_observability",
+        "skill_unify_agentic_runtime_proof_bundle_lineage"
+      ],
+      "graph_skill_node_ids": [
+        "skill_audit_grade_observability",
+        "skill_fail_closed_gate_semantics"
+      ],
+      "competency_bundle_id": "ccb_llmops_reliability",
+      "selection_status": "rejected",
+      "rejection_reason": "not_selected_by_model"
+    }
+  ]
+}

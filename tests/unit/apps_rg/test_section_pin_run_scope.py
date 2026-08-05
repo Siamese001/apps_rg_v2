@@ -188,6 +188,24 @@ def test_prepare_fresh_e2e_activates_managed_route_and_isolates_child_run_dir(
     assert (run_dir / cli._FRESH_E2E_ARTIFACT_DIR_RECEIPT_FILENAME).is_file()
 
 
+def test_fresh_e2e_baseline_ref_uses_source_package_in_standalone_layout(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    package_root = repo / "src" / "apps_rg"
+    package_root.mkdir(parents=True)
+    (package_root / "__init__.py").write_text("", encoding="utf-8")
+
+    resolved = cli._resolve_e2e_baseline_ref(
+        repo,
+        "apps_rg/config/e2e_baselines/anthropic_partnership.v1.json",
+    )
+
+    assert resolved == (
+        package_root / "config" / "e2e_baselines" / "anthropic_partnership.v1.json"
+    )
+
+
 def test_fresh_e2e_fact_vector_bootstrap_sets_worktree_cache_and_writes_receipt(
     tmp_path: Path,
     monkeypatch,

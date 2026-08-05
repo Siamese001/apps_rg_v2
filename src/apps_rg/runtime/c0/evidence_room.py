@@ -172,6 +172,10 @@ def run_section_c0_evidence_room(
         fact_vector_index_preflight.FACT_VECTOR_INDEX_PREFLIGHT_ARTIFACT
     )
 
+    pp_meta = dict(pool.proof_pool_metadata or {})
+    frozen_graph_plan = pp_meta.get("selected_graph_evidence_plan")
+    if not isinstance(frozen_graph_plan, dict):
+        frozen_graph_plan = pool.selected_fact_plan
     c03 = expand_c03_graph_bindings(
         section_id=section_id,
         atoms=atoms,
@@ -179,6 +183,9 @@ def run_section_c0_evidence_room(
         repo_root=REPO_ROOT,
         run_id=run_id,
         strict_ranked_selection=False,
+        selected_graph_plan=(
+            frozen_graph_plan if isinstance(frozen_graph_plan, dict) else None
+        ),
     )
     bindings = list(c03.get("bindings") or [])
     lane_proof = section_id in ("executive_summary", "headline")
@@ -252,8 +259,6 @@ def run_section_c0_evidence_room(
     # C0.6 is a single, deterministic re-entry into C0.3.  The first C0.4/C0.5
     # packet above is diagnostic only; when refinement is adopted, both are
     # rebuilt from the refined bindings before any write-back or C0.7 handoff.
-    pp_meta = dict(pool.proof_pool_metadata or {})
-    frozen_graph_plan = pp_meta.get("selected_graph_evidence_plan")
     c03, c06 = maybe_c06_weak_refine(
         section_id=section_id,
         role_family_key=rf_key,

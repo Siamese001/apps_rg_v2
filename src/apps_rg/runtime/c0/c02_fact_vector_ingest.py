@@ -213,7 +213,7 @@ def upsert_fact_vector_chunks(
         load_bge_sentence_transformer,
         resolve_apps_rg_embedding_settings,
     )
-    from tools.ingestion.chroma_ingest_pipeline import embed_text
+    from apps_rg.runtime.bge_embedding import embed_text
 
     apply_apps_rg_embedding_env_guards(chroma_persist_dir=chroma_path)
     settings = resolve_apps_rg_embedding_settings(chroma_persist_dir=chroma_path)

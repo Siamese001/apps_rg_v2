@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import json
 import os
+import uuid
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -163,6 +164,61 @@ def _lane_app_payload(run_dir: Path) -> dict[str, Any]:
     return ap if isinstance(ap, dict) else {}
 
 
+def _root_app_payload(run_dir: Path) -> tuple[dict[str, Any], str]:
+    """Load the original whole-run U0 payload when lane artifacts are incomplete.
+
+    A failed managed run can have a valid, source-bound U0 request while having no
+    lane ``validated_request.json`` files (or only lane manifests without a JD
+    flag).  That U0 contract is the canonical fallback for a patch continuation;
+    it is more faithful than asking an operator to reconstruct targeting inputs.
+    """
+    for filename in ("apps_rg_u0_validated_request.json", "validated_request.json"):
+        doc = _load_json(Path(run_dir) / filename) or {}
+        payload = doc.get("payload") if isinstance(doc, dict) else None
+        app_payload = payload.get("app_payload") if isinstance(payload, dict) else None
+        if isinstance(app_payload, dict) and app_payload:
+            return app_payload, f"root:{filename}:app_payload"
+    return {}, ""
+
+
+def _path_from_briefing_value(repo: Path, value: str) -> str:
+    """Return a resolved briefing path only when the persisted value is a file."""
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    candidate = resolve_repository_path(repo, text)
+    return str(candidate.resolve()) if candidate.is_file() else ""
+
+
+def _is_authorized_handoff_reference(
+    *,
+    brief_ref: str,
+    jd_ref: str,
+    target_company: str,
+    target_role: str,
+) -> bool:
+    """Whether a persisted briefing path retains canonical apps_research authority.
+
+    A patch continuation may retain this exact source-bound reference.  It may not
+    replace it with the same briefing text, because inline text loses the adjacent
+    producer envelope and therefore cannot satisfy the U0 provenance gate.
+    """
+    if not str(brief_ref or "").strip():
+        return False
+    from apps_rg.prerequisites.briefing_validator import validate_apps_research_handoff
+
+    validation = validate_apps_research_handoff(
+        brief_ref=str(brief_ref),
+        jd_ref=str(jd_ref or ""),
+        require_observed=True,
+        require_x1_x3_authorization=True,
+        require_canonical_exit=True,
+        expected_target_company=str(target_company or ""),
+        expected_target_role=str(target_role or ""),
+    )
+    return bool(validation.valid)
+
+
 def _pointer_run_dir(repo: Path, pointer_doc: Mapping[str, Any]) -> Path | None:
     rel = str(pointer_doc.get("run_dir") or "").strip()
     if not rel:
@@ -288,6 +344,7 @@ def derive_patch_targeting(repo: Path, run_dir: Path) -> PatchTargeting:
     target_role = str(ingress.get("target_role") or "").strip()
     manual_brief = str(ingress.get("manual_brief") or "").strip()
     generation_mode = str(ingress.get("generation_mode") or "strategic_tailor").strip()
+    root_payload, root_payload_source = _root_app_payload(run_dir)
     if target_company:
         sources["target_company"] = "ingress_raw.json"
     if target_role:
@@ -297,9 +354,6 @@ def derive_patch_targeting(repo: Path, run_dir: Path) -> PatchTargeting:
 
     sections_root = run_dir / "modular_r4" / "sections"
     existing_briefing = _existing_majority_briefing(repo, sections_root)
-    if existing_briefing is not None:
-        manual_brief, source = existing_briefing
-        sources["manual_brief"] = source
 
     command_flags: dict[str, str] = {}
     app_payload: dict[str, Any] = {}
@@ -319,24 +373,45 @@ def derive_patch_targeting(repo: Path, run_dir: Path) -> PatchTargeting:
         if command_flags and app_payload:
             break
 
-    if not target_company:
-        target_company = str(
-            command_flags.get("--target-company") or app_payload.get("target_company") or ""
-        ).strip()
-        if target_company:
-            sources["target_company"] = command_source or payload_source
-    if not target_role:
-        target_role = str(
-            command_flags.get("--target-role") or app_payload.get("target_role") or ""
-        ).strip()
-        if target_role:
-            sources["target_role"] = command_source or payload_source
+    payload_candidates: list[tuple[dict[str, Any], str]] = []
+    if app_payload:
+        payload_candidates.append((app_payload, payload_source))
+    if root_payload:
+        payload_candidates.append((root_payload, root_payload_source))
 
-    target_level = str(
-        command_flags.get("--target-level") or app_payload.get("target_level") or ""
-    ).strip()
+    if not target_company:
+        target_company = str(command_flags.get("--target-company") or "").strip()
+        target_source = command_source
+        if not target_company:
+            for candidate_payload, candidate_source in payload_candidates:
+                target_company = str(candidate_payload.get("target_company") or "").strip()
+                if target_company:
+                    target_source = candidate_source
+                    break
+        if target_company:
+            sources["target_company"] = target_source
+    if not target_role:
+        target_role = str(command_flags.get("--target-role") or "").strip()
+        role_source = command_source
+        if not target_role:
+            for candidate_payload, candidate_source in payload_candidates:
+                target_role = str(candidate_payload.get("target_role") or "").strip()
+                if target_role:
+                    role_source = candidate_source
+                    break
+        if target_role:
+            sources["target_role"] = role_source
+
+    target_level = str(command_flags.get("--target-level") or "").strip()
+    level_source = command_source
+    if not target_level:
+        for candidate_payload, candidate_source in payload_candidates:
+            target_level = str(candidate_payload.get("target_level") or "").strip()
+            if target_level:
+                level_source = candidate_source
+                break
     if target_level:
-        sources["target_level"] = command_source or payload_source
+        sources["target_level"] = level_source
 
     jd_ref = ""
     jd_text = ""
@@ -347,21 +422,72 @@ def derive_patch_targeting(repo: Path, run_dir: Path) -> PatchTargeting:
             jd_ref = str(cand.resolve())
             sources["job_description_ref"] = f"{command_source}:command:--jd"
     if not jd_ref:
-        jd_text = str(app_payload.get("job_description_text") or "").strip()
-        if jd_text:
-            sources["job_description_text"] = "lane:validated_request.app_payload"
+        for candidate_payload, candidate_source in payload_candidates:
+            candidate_ref = str(candidate_payload.get("job_description_ref") or "").strip()
+            if not candidate_ref:
+                continue
+            candidate = resolve_repository_path(repo, candidate_ref)
+            if candidate.is_file():
+                jd_ref = str(candidate.resolve())
+                sources["job_description_ref"] = candidate_source
+                break
+    if not jd_ref:
+        for candidate_payload, candidate_source in payload_candidates:
+            jd_text = str(candidate_payload.get("job_description_text") or "").strip()
+            if jd_text:
+                sources["job_description_text"] = (
+                    "lane:validated_request.app_payload"
+                    if candidate_source.startswith("lane:")
+                    else candidate_source
+                )
+                break
 
-    if manual_brief:
-        mb = resolve_repository_path(repo, manual_brief)
-        if mb.is_file():
-            manual_brief = str(mb.resolve())
-        else:
-            # Path persisted but no longer on disk — fall back to inline briefing text.
-            uc = app_payload.get("user_constraints") or {}
+    # Prefer the canonical producer-backed briefing reference from the original
+    # U0 contract.  A lane's stored text remains a valuable fallback, but text
+    # alone has no adjacent handoff envelope and therefore cannot stand in for
+    # a valid apps_research provenance chain during a patch continuation.
+    persisted_brief = manual_brief
+    persisted_brief_source = str(sources.get("manual_brief") or "")
+    if not persisted_brief:
+        for candidate_payload, candidate_source in payload_candidates:
+            for field_name in ("briefing_artifact_ref", "manual_brief_path"):
+                value = str(candidate_payload.get(field_name) or "").strip()
+                if value:
+                    persisted_brief = value
+                    persisted_brief_source = candidate_source
+                    break
+            if persisted_brief:
+                break
+
+    resolved_persisted_brief = _path_from_briefing_value(repo, persisted_brief)
+    if resolved_persisted_brief and _is_authorized_handoff_reference(
+        brief_ref=resolved_persisted_brief,
+        jd_ref=jd_ref,
+        target_company=target_company,
+        target_role=target_role,
+    ):
+        manual_brief = resolved_persisted_brief
+        sources["manual_brief"] = persisted_brief_source or "ingress_raw.json"
+    elif existing_briefing is not None:
+        manual_brief, source = existing_briefing
+        sources["manual_brief"] = source
+    elif resolved_persisted_brief:
+        manual_brief = resolved_persisted_brief
+    else:
+        # Path persisted but no longer on disk — fall back to an already-used
+        # inline briefing only when no producer-bound reference remains.
+        manual_brief = persisted_brief
+        for candidate_payload, candidate_source in payload_candidates:
+            uc = candidate_payload.get("user_constraints") or {}
             inline = str(uc.get("briefing_text") or "").strip() if isinstance(uc, dict) else ""
             if inline:
                 manual_brief = inline
-                sources["manual_brief"] = "lane:validated_request.user_constraints.briefing_text"
+                sources["manual_brief"] = (
+                    "lane:validated_request.user_constraints.briefing_text"
+                    if candidate_source.startswith("lane:")
+                    else f"{candidate_source}.user_constraints.briefing_text"
+                )
+                break
 
     missing: list[str] = []
     if not target_company:
@@ -594,6 +720,22 @@ def render_patch_plan(plan: PatchPlan) -> str:
 # --------------------------------------------------------------------- dispatch
 
 
+def _patch_lane_attempt_artifact_dir(plan: PatchPlan, lane: str) -> Path:
+    """Return an isolated artifact root for one patch-lane invocation.
+
+    A patch re-dispatch must never write into the flat lane directory left by a
+    prior attempt: its previous receipts may be intentionally small while a
+    later valid graph audit is materially larger. Isolating every retry below
+    ``real/`` preserves both attempts and keeps the write-amplification guard
+    meaningful instead of weakening it.
+    """
+    attempt_id = (
+        f"patch_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_"
+        f"{uuid.uuid4().hex[:12]}"
+    )
+    return plan.run_dir / "modular_r4" / "sections" / lane / "real" / attempt_id
+
+
 def _default_dispatch_lane(
     *,
     plan: PatchPlan,
@@ -615,6 +757,10 @@ def _default_dispatch_lane(
         lane_provider,
         lane,
     )
+    # Explicitly override the flat whole-run lane root with a new, immutable
+    # attempt root. The section finalizer still updates the lane pointer only
+    # when this real run clears its product bar.
+    attempt_artifact_dir = _patch_lane_attempt_artifact_dir(plan, lane)
     result = run_canonical_apps_rg_from_cli_primitives(
         target_company=t.target_company,
         target_role=t.target_role,
@@ -626,7 +772,7 @@ def _default_dispatch_lane(
         resume_path="",
         source_resume_text="",
         generation_mode=t.generation_mode or "strategic_tailor",
-        artifact_dir="",
+        artifact_dir=str(attempt_artifact_dir),
         section=lane,
         lane_provider=effective_provider,
         lane_provider_resolution_source=provider_source,

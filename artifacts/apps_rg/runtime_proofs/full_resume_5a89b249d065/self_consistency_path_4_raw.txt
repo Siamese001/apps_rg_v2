@@ -1,0 +1,89 @@
+{
+  "categories": [
+    {
+      "category_id": "ccb_distributed_systems_engineering",
+      "display_label": "Distributed Cloud Data Systems",
+      "competency_bundle_id": "ccb_distributed_systems_engineering",
+      "graph_skill_node_ids": ["skill_sr_cloud_data_platform_engineering", "skill_sr_microservices_integration_platform", "skill_p2_tech_reference_architecture"],
+      "terms": [
+        {"text": "cloud-native data platform engineering", "source_fact_id": "fact_engineering_platform_002", "source_fact_ids": ["fact_engineering_platform_002"]},
+        {"text": "microservices integration architecture", "source_fact_id": "fact_engineering_platform_002", "source_fact_ids": ["fact_engineering_platform_002"]},
+        {"text": "reference architecture for regulated ecosystems", "source_fact_id": "fact_engineering_platform_002", "source_fact_ids": ["fact_engineering_platform_002"]}
+      ]
+    },
+    {
+      "category_id": "ccb_devsecops_delivery_governance",
+      "display_label": "Automated Release Pipeline Engineering",
+      "competency_bundle_id": "ccb_devsecops_delivery_governance",
+      "graph_skill_node_ids": ["skill_ibm_devsecops_pipeline_security", "skill_ibm_automated_release_pipelines"],
+      "terms": [
+        {"text": "automated release pipeline design", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+        {"text": "devsecops pipeline security controls", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+        {"text": "release resilience across distributed infra", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]}
+      ]
+    },
+    {
+      "category_id": "ccb_agentic_platforms",
+      "display_label": "Agentic Runtime Infrastructure",
+      "competency_bundle_id": "ccb_agentic_platforms",
+      "graph_skill_node_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"],
+      "terms": [
+        {"text": "agentic runtime proof bundle lineage", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+        {"text": "distributed agentic control plane design", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+        {"text": "cloud-scale agentic platform architecture", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]}
+      ]
+    },
+    {
+      "category_id": "ccb_runtime_governance",
+      "display_label": "Infra-Level Observability & Reliability",
+      "competency_bundle_id": "ccb_llmops_reliability",
+      "graph_skill_node_ids": ["skill_audit_grade_observability"],
+      "terms": [
+        {"text": "audit-grade observability at runtime", "source_fact_id": "reb_unify_runtime_reliability_governance", "source_fact_ids": ["reb_unify_runtime_reliability_governance"]},
+        {"text": "distributed system reliability governance", "source_fact_id": "reb_unify_runtime_reliability_governance", "source_fact_ids": ["reb_unify_runtime_reliability_governance"]},
+        {"text": "cloud data pipeline resilience monitoring", "source_fact_id": "reb_unify_runtime_reliability_governance", "source_fact_ids": ["reb_unify_runtime_reliability_governance"]}
+      ]
+    },
+    {
+      "category_id": "ccb_partner_applied_ai_architecture",
+      "display_label": "Partner-Led Cloud Solution Engineering",
+      "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+      "graph_skill_node_ids": ["skill_partner_partner_led_ai_solutions"],
+      "terms": [
+        {"text": "partner-led cloud solution architecture", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+        {"text": "co-sell alliance infrastructure motions", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+        {"text": "joint GTM microservices packaging", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]}
+      ]
+    },
+    {
+      "category_id": "ccb_engineering_leadership",
+      "display_label": "Presales Infra Solution Engineering",
+      "competency_bundle_id": "ccb_engineering_leadership",
+      "graph_skill_node_ids": ["skill_partner_pre_sales"],
+      "terms": [
+        {"text": "presales cloud infrastructure engineering", "source_fact_id": "reb_ibm_presales_solution_engineering", "source_fact_ids": ["reb_ibm_presales_solution_engineering"]},
+        {"text": "technical deal support distributed systems", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+        {"text": "enterprise negotiation for infra platforms", "source_fact_id": "reb_ibm_revenue_sales_target_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]}
+      ]
+    }
+  ],
+  "selected_fact_plan": {
+    "section_id": "competencies",
+    "selection_method": "path_diversity_lens_distributed_cloud",
+    "required_fact_ids": ["fact_engineering_platform_002", "reb_ibm_devsecops_release_resilience", "reb_unify_agentic_platform_architecture", "reb_unify_runtime_reliability_governance", "reb_unify_partner_channel_cosell", "reb_ibm_presales_solution_engineering"]
+  },
+  "claim_ledger": [
+    {"claim": "cloud data platform engineering", "source_fact_ids": ["fact_engineering_platform_002"]},
+    {"claim": "automated release pipelines", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+    {"claim": "agentic runtime lineage architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+    {"claim": "runtime observability governance", "source_fact_ids": ["reb_unify_runtime_reliability_governance"]},
+    {"claim": "partner co-sell channel GTM", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+    {"claim": "presales solution engineering", "source_fact_ids": ["reb_ibm_presales_solution_engineering"]}
+  ],
+  "jd_alignment": ["partner_dependent_ecosystem_context_only"],
+  "excluded_jd_skills": ["carrier_relationship_management", "insurance_domain_specific"],
+  "removed_or_rewritten_terms": [],
+  "gap_notes": ["no_direct_insurance_domain_evidence"],
+  "change_log": ["path4_distributed_cloud_lens_applied"],
+  "self_check": ["all_terms_under_8_words", "source_fact_ids_verbatim", "6_categories_3_terms_each"]
+}

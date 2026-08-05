@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from importlib import import_module
 
+from apps_standalone_import_guard import ensure_external_agentic_core
+
+ensure_external_agentic_core()
+
 __all__ = ["outputs", "reasoning", "services", "types", "integrations"]
 
 

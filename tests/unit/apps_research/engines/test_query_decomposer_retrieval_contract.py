@@ -105,6 +105,23 @@ def test_platform_jd_promotes_platform_relevant_families_without_partner_bias() 
     assert "commercial_motion" not in families
 
 
+def test_technology_family_covers_executive_strategy_and_delivery_evidence() -> None:
+    plans = decompose_coverage_families(
+        "Brown & Brown",
+        "COMPANY_BRIEF_STANDARD",
+        {
+            "job_title": "Senior Vice President, IT Strategy & Innovation",
+            "responsibilities": ["Lead enterprise technology and data strategy"],
+        },
+    )
+
+    technology_plan = next(
+        plan for plan in plans if plan.family == "tech_stack_and_tools"
+    )
+
+    assert technology_plan.query == "Brown & Brown AI technology innovation"
+
+
 def test_ambiguous_partner_word_does_not_force_partnership_retrieval() -> None:
     for jd in (
         {"job_title": "People Partner", "responsibilities": ["Partner with managers on employee relations"]},

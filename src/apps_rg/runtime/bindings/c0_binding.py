@@ -52,8 +52,8 @@ from agentic_core.knowledge.retrieval import (
     fec_sparse_refs_from_lane_outcomes,
     filter_candidates_exact_subphrase,
     merge_dense_sparse_rrf,
-    query_sparse_lexical_lane,
 )
+from apps_rg.runtime.c0.sparse_sidecar import query_apps_rg_sparse_lexical_lane
 from apps_rg.runtime.bindings.c0_evidence_trace_map import (
     AppsRgEvidenceTraceMap,
     SectionEvidenceTrace,
@@ -1291,7 +1291,7 @@ def _run_section_sparse_lane(
         sparse_index_collection_name=coll_ref,
         metadata_filter=meta_filter,
     )
-    return query_sparse_lexical_lane(spec)
+    return query_apps_rg_sparse_lexical_lane(spec)
 
 
 def _metadata_match_for_chunk(meta: dict[str, Any], app_payload: dict[str, Any]) -> float:
@@ -1385,7 +1385,7 @@ def _perform_bounded_section_retrieval(
         assert_dense_retrieval_allowed,
         resolve_apps_rg_embedding_settings,
     )
-    from tools.ingestion.chroma_ingest_pipeline import embed_text
+    from apps_rg.runtime.bge_embedding import embed_text
 
     _sec_emb = resolve_apps_rg_embedding_settings(chroma_persist_dir=chroma_path)
     assert_dense_retrieval_allowed(_sec_emb)
@@ -1717,7 +1717,7 @@ def _query_fact_vectors_for_section(
                 ],
             }
 
-        from tools.ingestion.chroma_ingest_pipeline import embed_text
+        from apps_rg.runtime.bge_embedding import embed_text
 
         model = _get_embedding_model()
         qemb = embed_text(model, query_text)

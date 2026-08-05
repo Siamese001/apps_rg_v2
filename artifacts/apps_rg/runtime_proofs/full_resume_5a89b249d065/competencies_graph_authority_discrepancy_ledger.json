@@ -1,0 +1,888 @@
+{
+  "schema_version": "competencies_graph_authority_discrepancy_ledger_v1",
+  "section_id": "competencies",
+  "allocation_plan_digest": "05d2dde578fc3a4c3196f644463fe8eb86bcbfc109cda6bd8e00d9aaff8d5687",
+  "eligible_candidate_count": 23,
+  "selected_unique_leaf_skill_count": 8,
+  "selected_unique_metric_count": 0,
+  "co_sell_authority_ids": [],
+  "allocation_reconciliation_pass": false,
+  "production_graph_mutated": false,
+  "rows": [
+    {
+      "candidate_id": "reb_ibm_customer_success_value_realization",
+      "candidate_type": "role_episode_root",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_p2_gtm_presales_delivery_handoff",
+        "skill_p2_tech_adoption_derisking",
+        "skill_partner_customer_deal_support",
+        "skill_partner_product_feedback_loops"
+      ],
+      "fact_ids": [
+        "fact_revenue_ops_004"
+      ],
+      "source_references": [
+        "fact_revenue_ops_004"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_customer_success_value_realization"
+      ],
+      "metric_outcome_ids": [
+        "metric_ibm_adoption_risk_to_expansion_readiness",
+        "metric_ibm_value_realization_account_reviews"
+      ],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_ROOT_AUTHORITY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:03"
+      ],
+      "visible_claim_unit_usage": []
+    },
+    {
+      "candidate_id": "fact_revenue_ops_004",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "fact_revenue_ops_004"
+      ],
+      "source_references": [
+        "fact_revenue_ops_004"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_customer_success_value_realization/fact:fact_revenue_ops_004",
+        "reb_ibm_customer_success_value_realization->role_episode_supported_by_fact->fact_revenue_ops_004"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:03"
+      ],
+      "visible_claim_unit_usage": []
+    },
+    {
+      "candidate_id": "skill_partner_customer_deal_support",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_partner_customer_deal_support"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_sales_accounts_001",
+        "Drove $5 Million in Annual Contract Value"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_customer_success_value_realization/skill:skill_partner_customer_deal_support",
+        "reb_ibm_customer_success_value_realization->role_episode_contains_skill->skill_partner_customer_deal_support"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [
+        "partner_motions"
+      ],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:03"
+      ],
+      "visible_claim_unit_usage": []
+    },
+    {
+      "candidate_id": "reb_ibm_devsecops_release_resilience",
+      "candidate_type": "role_episode_root",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_ibm_automated_release_pipelines",
+        "skill_ibm_devsecops_pipeline_security",
+        "skill_p2_tech_devops_pipeline_blueprint"
+      ],
+      "fact_ids": [
+        "fact_engineering_platform_002"
+      ],
+      "source_references": [
+        "fact_engineering_platform_002"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_devsecops_release_resilience"
+      ],
+      "metric_outcome_ids": [
+        "metric_ibm_deployment_blueprint_repeatability",
+        "metric_ibm_release_gate_security_scanning_coverage"
+      ],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_ROOT_AUTHORITY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:01"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:01",
+          "visible_claim_text": "cloud-native AI data reference architectures"
+        }
+      ]
+    },
+    {
+      "candidate_id": "fact_engineering_platform_002",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "fact_engineering_platform_002"
+      ],
+      "source_references": [
+        "fact_engineering_platform_002"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_devsecops_release_resilience/fact:fact_engineering_platform_002",
+        "reb_ibm_devsecops_release_resilience->role_episode_supported_by_fact->fact_engineering_platform_002"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:01"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:01",
+          "visible_claim_text": "cloud-native AI data reference architectures"
+        }
+      ]
+    },
+    {
+      "candidate_id": "skill_ibm_automated_release_pipelines",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_ibm_automated_release_pipelines"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_engineering_platform_004",
+        "Established automated release pipelines with integrated code scanning, reducing production incidents and accelerating time to market for new AI-driven risk models.",
+        "CI/CD pipelines integrating model validation, container orchestration, and code scanning tools."
+      ],
+      "graph_paths": [
+        "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_automated_release_pipelines",
+        "reb_ibm_devsecops_release_resilience->role_episode_contains_skill->skill_ibm_automated_release_pipelines"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:01"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:01",
+          "visible_claim_text": "cloud-native AI data reference architectures"
+        }
+      ]
+    },
+    {
+      "candidate_id": "reb_ibm_presales_solution_engineering",
+      "candidate_type": "role_episode_root",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_p2_gtm_discovery_qualification",
+        "skill_p2_gtm_executive_buyer_alignment",
+        "skill_p2_gtm_solution_mapping",
+        "skill_partner_pre_sales"
+      ],
+      "fact_ids": [
+        "fact_revenue_ops_001",
+        "fact_revenue_ops_004"
+      ],
+      "source_references": [
+        "fact_revenue_ops_001",
+        "fact_revenue_ops_004"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_presales_solution_engineering"
+      ],
+      "metric_outcome_ids": [
+        "metric_ibm_executive_buyer_architecture_alignment",
+        "metric_ibm_presales_discovery_to_solution_handoff"
+      ],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_ROOT_AUTHORITY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:05"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:05",
+          "visible_claim_text": "safe AI partner deployment assurance patterns"
+        }
+      ]
+    },
+    {
+      "candidate_id": "fact_revenue_ops_001",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "fact_revenue_ops_001"
+      ],
+      "source_references": [
+        "fact_revenue_ops_001"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_presales_solution_engineering/fact:fact_revenue_ops_001",
+        "reb_ibm_presales_solution_engineering->role_episode_supported_by_fact->fact_revenue_ops_001"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:05"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:05",
+          "visible_claim_text": "safe AI partner deployment assurance patterns"
+        }
+      ]
+    },
+    {
+      "candidate_id": "skill_partner_pre_sales",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_partner_pre_sales"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_solutions_001",
+        "executive workshops, leading to faster adoption"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_presales_solution_engineering/skill:skill_partner_pre_sales",
+        "reb_ibm_presales_solution_engineering->role_episode_contains_skill->skill_partner_pre_sales"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [
+        "partner_motions"
+      ],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:05"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:05",
+          "visible_claim_text": "safe AI partner deployment assurance patterns"
+        }
+      ]
+    },
+    {
+      "candidate_id": "reb_ibm_revenue_sales_target_execution",
+      "candidate_type": "role_episode_root",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_p2_gtm_enterprise_deal_support",
+        "skill_partner_enterprise_negotiations",
+        "skill_partner_pnl_oversight",
+        "skill_partner_sales_revenue_targets"
+      ],
+      "fact_ids": [
+        "fact_revenue_ops_001",
+        "fact_revenue_ops_002",
+        "fact_revenue_ops_003"
+      ],
+      "source_references": [
+        "fact_revenue_ops_001",
+        "fact_revenue_ops_002",
+        "fact_revenue_ops_003"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_revenue_sales_target_execution"
+      ],
+      "metric_outcome_ids": [
+        "metric_ibm_quota_aligned_solution_cadence",
+        "metric_ibm_revenue_target_solution_validation"
+      ],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_ROOT_AUTHORITY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:06",
+        "competencies:skill:08"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:06",
+          "visible_claim_text": "GraphRAG context grounding for enterprise workflows"
+        }
+      ]
+    },
+    {
+      "candidate_id": "fact_revenue_ops_002",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "fact_revenue_ops_002"
+      ],
+      "source_references": [
+        "fact_revenue_ops_002"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_002",
+        "reb_ibm_revenue_sales_target_execution->role_episode_supported_by_fact->fact_revenue_ops_002"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:06",
+        "competencies:skill:08"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:06",
+          "visible_claim_text": "GraphRAG context grounding for enterprise workflows"
+        }
+      ]
+    },
+    {
+      "candidate_id": "fact_revenue_ops_003",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "fact_revenue_ops_003"
+      ],
+      "source_references": [
+        "fact_revenue_ops_003"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_003",
+        "reb_ibm_revenue_sales_target_execution->role_episode_supported_by_fact->fact_revenue_ops_003"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:06",
+        "competencies:skill:08"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:06",
+          "visible_claim_text": "GraphRAG context grounding for enterprise workflows"
+        }
+      ]
+    },
+    {
+      "candidate_id": "skill_partner_enterprise_negotiations",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_partner_enterprise_negotiations"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_partnerships_gtm_005",
+        "enterprise contract negotiations"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_enterprise_negotiations",
+        "reb_ibm_revenue_sales_target_execution->role_episode_contains_skill->skill_partner_enterprise_negotiations"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [
+        "partner_motions"
+      ],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:06",
+        "competencies:skill:08"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:06",
+          "visible_claim_text": "GraphRAG context grounding for enterprise workflows"
+        }
+      ]
+    },
+    {
+      "candidate_id": "skill_partner_sales_revenue_targets",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_partner_sales_revenue_targets"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_sales_accounts_001",
+        "Achieved 110% of annual revenue targets"
+      ],
+      "graph_paths": [
+        "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_sales_revenue_targets",
+        "reb_ibm_revenue_sales_target_execution->role_episode_contains_skill->skill_partner_sales_revenue_targets"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [
+        "partner_motions"
+      ],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:06",
+        "competencies:skill:08"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:06",
+          "visible_claim_text": "GraphRAG context grounding for enterprise workflows"
+        }
+      ]
+    },
+    {
+      "candidate_id": "reb_unify_agentic_platform_architecture",
+      "candidate_type": "role_episode_root",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_deterministic_route_selection",
+        "skill_governed_agentic_systems_architecture",
+        "skill_graph_aware_relationship_grounding",
+        "skill_replayable_runtime_design",
+        "skill_runtime_gate_mesh_design",
+        "skill_sandboxed_execution_design",
+        "skill_unify_agentic_graphrag_context_pack_grounding",
+        "skill_unify_agentic_human_override_escalation_paths",
+        "skill_unify_agentic_l0_route_policy_dispatch",
+        "skill_unify_agentic_multi_agent_orchestration_contracts",
+        "skill_unify_agentic_replay_key_audit_manifest_design",
+        "skill_unify_agentic_runtime_gate_verdict_contracts",
+        "skill_unify_agentic_runtime_proof_bundle_lineage",
+        "skill_unify_agentic_tool_sandbox_egress_controls"
+      ],
+      "fact_ids": [
+        "fact_engineering_platform_001"
+      ],
+      "source_references": [
+        "fact_engineering_platform_001"
+      ],
+      "graph_paths": [
+        "root:reb_unify_agentic_platform_architecture"
+      ],
+      "metric_outcome_ids": [
+        "metric_unify_agentic_graphrag_context_pack_grounding_surface",
+        "metric_unify_agentic_human_override_escalation_surface",
+        "metric_unify_agentic_l0_route_policy_dispatch_surface",
+        "metric_unify_agentic_multi_agent_orchestration_contract_surface",
+        "metric_unify_agentic_replay_key_audit_manifest_surface",
+        "metric_unify_agentic_runtime_gate_verdict_contract_surface",
+        "metric_unify_agentic_runtime_proof_bundle_lineage_surface",
+        "metric_unify_agentic_tool_sandbox_egress_policy_surface",
+        "metric_unify_policy_gated_agent_execution_surface",
+        "metric_unify_replayable_runtime_traceability"
+      ],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_ROOT_AUTHORITY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:07"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:07",
+          "visible_claim_text": "agentic workflow routing across enterprise systems"
+        }
+      ]
+    },
+    {
+      "candidate_id": "fact_engineering_platform_001",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "fact_engineering_platform_001"
+      ],
+      "source_references": [
+        "fact_engineering_platform_001"
+      ],
+      "graph_paths": [
+        "root:reb_unify_agentic_platform_architecture/fact:fact_engineering_platform_001",
+        "reb_unify_agentic_platform_architecture->role_episode_supported_by_fact->fact_engineering_platform_001"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:07"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:07",
+          "visible_claim_text": "agentic workflow routing across enterprise systems"
+        }
+      ]
+    },
+    {
+      "candidate_id": "skill_unify_agentic_runtime_proof_bundle_lineage",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_unify_agentic_runtime_proof_bundle_lineage"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_engineering_platform_001",
+        "Designed runtime proof bundle lineage tying agent outputs back to graph evidence and proof-pool metadata."
+      ],
+      "graph_paths": [
+        "root:reb_unify_agentic_platform_architecture/skill:skill_unify_agentic_runtime_proof_bundle_lineage",
+        "reb_unify_agentic_platform_architecture->role_episode_contains_skill->skill_unify_agentic_runtime_proof_bundle_lineage"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:07"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:07",
+          "visible_claim_text": "agentic workflow routing across enterprise systems"
+        }
+      ]
+    },
+    {
+      "candidate_id": "reb_unify_partner_channel_cosell",
+      "candidate_type": "role_episode_root",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_partner_cloud_vendor_joint_gtm",
+        "skill_partner_co_selling",
+        "skill_partner_gtm_enablement",
+        "skill_partner_partner_led_ai_solutions",
+        "skill_partner_partner_motions",
+        "skill_partner_partner_revenue_3m"
+      ],
+      "fact_ids": [
+        "exp_unify_001"
+      ],
+      "source_references": [
+        "exp_unify_001"
+      ],
+      "graph_paths": [
+        "root:reb_unify_partner_channel_cosell"
+      ],
+      "metric_outcome_ids": [
+        "metric_unify_partner_cosell_solution_motion_count",
+        "metric_unify_partner_enablement_asset_set"
+      ],
+      "role_axis_labels": [
+        "co_sell",
+        "gtm_enablement",
+        "partner_motions"
+      ],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_ROOT_AUTHORITY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:04"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:04",
+          "visible_claim_text": "partner-ready applied AI reference architectures"
+        }
+      ]
+    },
+    {
+      "candidate_id": "exp_unify_001",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "exp_unify_001"
+      ],
+      "source_references": [
+        "exp_unify_001"
+      ],
+      "graph_paths": [
+        "root:reb_unify_partner_channel_cosell/fact:exp_unify_001",
+        "reb_unify_partner_channel_cosell->role_episode_supported_by_fact->exp_unify_001"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [
+        "co_sell",
+        "partner_motions"
+      ],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:04"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:04",
+          "visible_claim_text": "partner-ready applied AI reference architectures"
+        }
+      ]
+    },
+    {
+      "candidate_id": "skill_partner_partner_led_ai_solutions",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_partner_partner_led_ai_solutions"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_partnerships_gtm_001",
+        "co-developing advanced analytics frameworks with strategic partners"
+      ],
+      "graph_paths": [
+        "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_led_ai_solutions",
+        "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_partner_led_ai_solutions"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [
+        "co_sell",
+        "joint_solution",
+        "partner_motions"
+      ],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:04"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:04",
+          "visible_claim_text": "partner-ready applied AI reference architectures"
+        }
+      ]
+    },
+    {
+      "candidate_id": "reb_unify_runtime_reliability_governance",
+      "candidate_type": "role_episode_root",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_audit_grade_observability",
+        "skill_context_engineering",
+        "skill_runtime_resilience_controls"
+      ],
+      "fact_ids": [
+        "fact_engineering_platform_003"
+      ],
+      "source_references": [
+        "fact_engineering_platform_003"
+      ],
+      "graph_paths": [
+        "root:reb_unify_runtime_reliability_governance"
+      ],
+      "metric_outcome_ids": [
+        "metric_unify_audit_grade_runtime_observability_coverage",
+        "metric_unify_eval_telemetry_rollback_control_set"
+      ],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_ROOT_AUTHORITY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:02"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:02",
+          "visible_claim_text": "audit-grade telemetry for agentic systems"
+        }
+      ]
+    },
+    {
+      "candidate_id": "fact_engineering_platform_003",
+      "candidate_type": "source_fact",
+      "assertion_id": "",
+      "skill_ids": [],
+      "fact_ids": [
+        "fact_engineering_platform_003"
+      ],
+      "source_references": [
+        "fact_engineering_platform_003"
+      ],
+      "graph_paths": [
+        "root:reb_unify_runtime_reliability_governance/fact:fact_engineering_platform_003",
+        "reb_unify_runtime_reliability_governance->role_episode_supported_by_fact->fact_engineering_platform_003"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:02"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:02",
+          "visible_claim_text": "audit-grade telemetry for agentic systems"
+        }
+      ]
+    },
+    {
+      "candidate_id": "skill_audit_grade_observability",
+      "candidate_type": "leaf_skill",
+      "assertion_id": "",
+      "skill_ids": [
+        "skill_audit_grade_observability"
+      ],
+      "fact_ids": [],
+      "source_references": [
+        "fact_engineering_platform_003",
+        "fact_engineering_platform_004",
+        "Audit-grade observability with OTel traces and runtime ADG ingest."
+      ],
+      "graph_paths": [
+        "root:reb_unify_runtime_reliability_governance/skill:skill_audit_grade_observability",
+        "reb_unify_runtime_reliability_governance->role_episode_contains_skill->skill_audit_grade_observability"
+      ],
+      "metric_outcome_ids": [],
+      "role_axis_labels": [],
+      "embedding_rank": null,
+      "exact_eligibility_result": "ELIGIBLE",
+      "allocation_decision": "ALLOCATED_PRIMARY",
+      "selector_decision": "selected",
+      "rejection_reason": [
+        "selected_by_frozen_global_allocation"
+      ],
+      "allocation_claim_unit_ids": [
+        "competencies:skill:02"
+      ],
+      "visible_claim_unit_usage": [
+        {
+          "claim_unit_id": "competencies:skill:02",
+          "visible_claim_text": "audit-grade telemetry for agentic systems"
+        }
+      ]
+    }
+  ],
+  "ledger_digest": "d99d7b293e094b68bd6dce01607b891b539c1b9045435801b54cdb1a22da289a"
+}

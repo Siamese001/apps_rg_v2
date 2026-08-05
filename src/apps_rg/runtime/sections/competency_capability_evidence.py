@@ -308,7 +308,7 @@ VISIBLE_GRAPH_SURFACE_TERM_OVERRIDES: dict[str, tuple[str, ...]] = {
     "ccb_engineering_leadership": (
         "executive-aligned engineering operating cadences for adoption",
         "cross-functional delivery governance at scale",
-        "organization scale-out for platform execution",
+        "organization scale-out for platform operating model",
     ),
 }
 
@@ -1084,7 +1084,84 @@ def _plan_fact_ids_for_bundle(
             _append(mid)
     for linked in rec.get("linked_source_fact_ids") or []:
         _append(linked)
-    return out
+    if out:
+        return out
+
+    # A required capability bundle can be valid graph authority even when its
+    # preferred root was not selected for this target.  Do not leave a visible
+    # category without a source fact in that situation: choose the strongest
+    # *already-selected* root whose graph-authored text overlaps the bundle's
+    # capability and the category wording.  This does not widen the evidence
+    # universe or mint a claim; it only reuses an allowed selected root as the
+    # fallback provenance for the required display category.
+    semantic_text = " ".join(
+        str(value or "")
+        for value in (
+            rec.get("capability_family"),
+            rec.get("display_label_candidate"),
+            rec.get("seniority_signal"),
+            rec.get("technical_density_signal"),
+            rec.get("commercial_or_operating_scope_signal"),
+            rec.get("target_relevance_rationale"),
+            " ".join(str(x or "") for x in (rec.get("vocabulary_anchors") or [])),
+            (cat or {}).get("category_label") if isinstance(cat, dict) else "",
+            (cat or {}).get("resume_display_label") if isinstance(cat, dict) else "",
+            " ".join(
+                term_phrase(term)
+                for term in ((cat or {}).get("terms") or [])
+                if term_phrase(term)
+            )
+            if isinstance(cat, dict)
+            else "",
+        )
+    )
+    semantic_tokens = {
+        token
+        for token in re.findall(r"[a-z0-9]+", semantic_text.casefold())
+        if len(token) >= 4
+        and token
+        not in {"with", "from", "that", "this", "into", "only", "when", "their"}
+    }
+    best: tuple[int, str, list[str]] | None = None
+    for fact in plan.get("facts") or []:
+        if not isinstance(fact, dict):
+            continue
+        root_id = str(
+            fact.get("role_episode_bundle_id") or fact.get("fact_id") or ""
+        ).strip()
+        fact_text = " ".join(
+            str(fact.get(field) or "")
+            for field in ("domain", "bundle_theme", "claim_text", "claim_action", "claim_scope")
+        )
+        fact_tokens = {
+            token
+            for token in re.findall(r"[a-z0-9]+", fact_text.casefold())
+            if len(token) >= 4
+        }
+        overlap = len(semantic_tokens & fact_tokens)
+        if not overlap:
+            continue
+        fact_ids: list[str] = []
+        for raw in (
+            fact.get("linked_source_fact_ids") or [],
+            fact.get("source_fact_ids") or [],
+            [fact.get("fact_id"), root_id],
+        ):
+            values = raw if isinstance(raw, list) else [raw]
+            for value in values:
+                fid = _source_fact_root_id(value)
+                if fid and (not allowed or fid in allowed) and fid not in fact_ids:
+                    fact_ids.append(fid)
+        if not fact_ids:
+            continue
+        candidate = (overlap, root_id, fact_ids)
+        if best is None or candidate[0] > best[0] or (
+            candidate[0] == best[0] and candidate[1] < best[1]
+        ):
+            best = candidate
+    if best is not None:
+        return best[2]
+    return []
 
 
 def _graph_surface_selection_score(idx: int, *, fact_ids: list[str], skill_ids: list[str]) -> float:

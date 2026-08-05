@@ -12,6 +12,7 @@ from types import SimpleNamespace
 import pytest
 
 from apps_rg.repository_layout import resolve_apps_rg_path
+from apps_rg.prerequisites.briefing_validator import validate_apps_research_handoff
 from apps_rg.runtime.dispatch.spine_stage_receipts import (
     FILENAME_DELEGATED_BRIEFING,
     FILENAME_RESEARCH_BRIDGE_REQUEST,
@@ -74,6 +75,9 @@ def _write_authorized_apps_research_handoff(
     *,
     target_company: str = "Anthropic",
     target_role: str = "Manager of Applied AI Architecture, Partnerships",
+    request_id: str = f"req-{_REQUEST_UUID.hex}",
+    run_id: str = str(_RUN_UUID),
+    trace_id: str = str(_TRACE_UUID),
 ) -> tuple[Path, Path]:
     from apps_rg.integrations.apps_research_bridge import MockAppsResearchBridge
 
@@ -88,9 +92,9 @@ def _write_authorized_apps_research_handoff(
         company_name=target_company,
         job_title=target_role,
         capability_ref="apps_research.v2",
-        request_id=f"req-{_REQUEST_UUID.hex}",
-        run_id=str(_RUN_UUID),
-        trace_id=str(_TRACE_UUID),
+        request_id=request_id,
+        run_id=run_id,
+        trace_id=trace_id,
         tenant_id="default",
         job_description_text=jd_text,
     )
@@ -237,6 +241,115 @@ def test_whole_run_static_json_is_replaced_by_delegated_brief(
     assert Path(research_ref["research_briefing_path"]) == producer_brief
     assert Path(research_ref["research_company_brief_path"]).is_file()
     assert Path(research_ref["research_handoff_v2_path"]).is_file()
+
+
+def test_whole_run_redelegates_a_foreign_handoff_before_u0(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """An otherwise-valid old handoff must not skip a new run's research hop."""
+
+    monkeypatch.setenv("APPS_RG_MOCK_RESEARCH", "1")
+    monkeypatch.setenv("APPS_RG_L1_ALLOW_EMPTY_PROFILE_DIGEST", "1")
+
+    from apps_rg.cache.whole_run_entrypoint_preflight import WholeRunCachePreflightOutcome
+    from apps_rg.runtime.orchestration import r3r4_whole_run_orchestration as orch
+
+    class _FakeResult:
+        run_id = "draft-run-foreign-handoff"
+        request_id = "req-foreign-handoff"
+        x3_disposition = "X3A"
+        fault = "L2_EXECUTION_ERROR:test"
+        terminal_r5 = False
+
+    captured: dict[str, object] = {}
+
+    def _fake_spine(**kwargs: object) -> _FakeResult:
+        captured["raw_request"] = kwargs["raw_request"]
+        captured["front_continuation"] = kwargs["front_continuation"]
+        art = Path(kwargs["artifact_dir"])
+        art.mkdir(parents=True, exist_ok=True)
+        (art / "r4_run_manifest.json").write_text(
+            json.dumps(
+                {
+                    "chain_kind": "R4_SINGLE_ACTION",
+                    "route_family": "R4_SINGLE_ACTION",
+                }
+            ),
+            encoding="utf-8",
+        )
+        return _FakeResult()
+
+    monkeypatch.setattr(orch, "run_integrated_single_action_spine", _fake_spine)
+    monkeypatch.setattr(
+        "apps_rg.cache.whole_run_entrypoint_preflight.run_whole_run_cache_preflight",
+        lambda **kwargs: WholeRunCachePreflightOutcome(
+            entrypoint="canonical_dispatch",
+            generation_required=True,
+        ),
+    )
+    monkeypatch.setattr(orch, "emit_integrated_run_bundle_index", lambda *a, **k: None)
+    monkeypatch.setattr(
+        "apps_rg.cache.whole_run_entrypoint_preflight.maybe_ingest_r1b_post_exit",
+        lambda **k: None,
+    )
+    monkeypatch.setattr(
+        "apps_rg.runtime.full_resume_review_bundle.emit_full_resume_review_bundle",
+        lambda run_root: run_root / "review_bundle.zip",
+    )
+    monkeypatch.setattr(
+        "apps_rg.cache.cache_preflight_evidence.write_whole_run_cache_preflight_artifact",
+        lambda *a, **k: None,
+    )
+    monkeypatch.setattr(
+        "apps_rg.cache.cache_preflight_evidence.write_cache_miss_receipt",
+        lambda *a, **k: None,
+    )
+    monkeypatch.setattr(orch, "_default_artifact_dir", lambda explicit: tmp_path / "foreign_handoff_run")
+
+    foreign_brief, jd = _write_authorized_apps_research_handoff(
+        tmp_path,
+        request_id="req-foreign-handoff",
+        run_id="44444444-4444-4444-4444-444444444444",
+        trace_id="55555555-5555-5555-5555-555555555555",
+    )
+    result = orch.run_whole_run_with_route_governance(
+        target_company="Anthropic",
+        target_role="Manager of Applied AI Architecture, Partnerships",
+        jd=str(jd),
+        job_description_text=_JD_TEXT,
+        manual_brief=str(foreign_brief),
+        source_resume_text="Experienced applied AI architecture and partnerships leader.",
+        generation_mode="strategic_tailor",
+        auto_research_internal=True,
+        artifact_dir=str(tmp_path / "foreign_handoff_run"),
+        require_fresh_preflight=False,
+    )
+
+    assert result["route_decision"]["research_delegation_executed"] is True
+    raw_request = captured["raw_request"]
+    assert isinstance(raw_request, dict)
+    fresh_brief = Path(str(raw_request["manual_brief"]))
+    assert fresh_brief != foreign_brief
+    assert fresh_brief.is_file()
+
+    continuation = captured["front_continuation"]
+    assert isinstance(continuation, dict)
+    validated = continuation["validated_request"]
+    validation = validate_apps_research_handoff(
+        brief_ref=str(fresh_brief),
+        jd_ref=str(jd),
+        require_observed=True,
+        require_x1_x3_authorization=True,
+        require_canonical_exit=True,
+        expected_target_company="Anthropic",
+        expected_target_role="Manager of Applied AI Architecture, Partnerships",
+        expected_parent_run_id=validated.run_id,
+        expected_request_id=validated.request_id,
+        expected_trace_root=validated.trace_id,
+        expected_tenant_id=validated.tenant_id,
+    )
+    assert validation.valid, validation.reason
 
 
 def test_whole_run_research_failure_fails_closed_with_manual_brief(

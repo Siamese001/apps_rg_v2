@@ -68,7 +68,7 @@ def run_ibm_narrative_lane_execution(
     companion_text = str(companion_context.get("text") or "")
     ibm_bullets_l2 = resolve_effective_lane_l2_path(REPO_ROOT, "ibm_bullets")
     companion_ref = (
-        str(ibm_bullets_l2.relative_to(REPO_ROOT))
+        rel_posix(ibm_bullets_l2, REPO_ROOT)
         if ibm_bullets_l2 is not None and companion_text
         else companion_context.get("l2_ref")
     )
@@ -486,7 +486,7 @@ def run_ibm_narrative_lane_execution(
         or (provider_request_data or {}).get("id")
         or runtime_payload["run_id"]
     )
-    trace_rr_n = artifact_dir.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    trace_rr_n = rel_posix(artifact_dir, REPO_ROOT)
     usage_doc = build_section_input_usage_ledger_v1(
         section_id="ibm_narrative",
         run_id=str(runtime_payload["run_id"]),

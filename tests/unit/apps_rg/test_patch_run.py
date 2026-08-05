@@ -268,6 +268,68 @@ def test_derive_patch_targeting_preserves_existing_lane_briefing(tmp_path: Path)
     )
 
 
+def test_derive_targeting_uses_root_u0_request_when_lane_metadata_lacks_jd(
+    tmp_path: Path,
+) -> None:
+    repo, run_dir = _seed_integrated_run(tmp_path)
+    sections_root = run_dir / "modular_r4" / "sections"
+    for lane in GENERATED_LANES:
+        lane_rd = latest_lane_run_dir_any(sections_root, lane)
+        if lane_rd is None:
+            continue
+        manifest_path = lane_rd / "run_manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["command"] = ""
+        _write_json(manifest_path, manifest)
+
+    _write_json(
+        run_dir / "apps_rg_u0_validated_request.json",
+        {
+            "payload": {
+                "app_payload": {
+                    "target_company": "AIG",
+                    "target_role": "VP Global Head of Agentic AI Solutions",
+                    "job_description_ref": "apps_rg/config/targeting/aig_jd.txt",
+                    "briefing_artifact_ref": "apps_rg/config/targeting/aig_brief.md",
+                }
+            }
+        },
+    )
+
+    t = derive_patch_targeting(repo, run_dir)
+    assert t.job_description_ref.endswith("aig_jd.txt")
+    assert t.sources["job_description_ref"] == (
+        "root:apps_rg_u0_validated_request.json:app_payload"
+    )
+
+
+def test_derive_targeting_preserves_authorized_handoff_path_over_lane_text(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo, run_dir = _seed_integrated_run(tmp_path)
+    sections_root = run_dir / "modular_r4" / "sections"
+    for lane in ("competencies", "unify_bullets"):
+        lane_rd = latest_lane_run_dir_any(sections_root, lane)
+        assert lane_rd is not None
+        _write_json(lane_rd / "runtime_payload.json", {"briefing": "lane briefing text"})
+        _write_json(
+            lane_rd / "section_input_usage_ledger.json",
+            {"input_refs": {"briefing_hash": "majority_hash"}},
+        )
+
+    seen: dict[str, str] = {}
+
+    def _authorized(**kwargs: str) -> bool:
+        seen.update(kwargs)
+        return True
+
+    monkeypatch.setattr(pr, "_is_authorized_handoff_reference", _authorized)
+    t = derive_patch_targeting(repo, run_dir)
+    assert t.manual_brief.endswith("aig_brief.md")
+    assert t.sources["manual_brief"] == "ingress_raw.json"
+    assert seen["brief_ref"].endswith("aig_brief.md")
+
+
 def test_derive_targeting_jd_text_fallback_when_jd_file_gone(tmp_path: Path) -> None:
     repo, run_dir = _seed_integrated_run(tmp_path)
     resolve_repository_path(repo, "apps_rg/config/targeting/aig_jd.txt").unlink()
@@ -633,9 +695,15 @@ def test_default_dispatch_threads_derived_jd_brief_into_canonical_primitives(
         assert kwargs["job_description_text"] == "", lane
         # --manual-brief path → briefing primitive.
         assert kwargs["manual_brief"] == brief_abs, lane
-        # Full-run phase1 parity: section + provider + no per-lane artifact_dir override.
+        # Each patch retry has an immutable lane-attempt root. This prevents a
+        # materially larger valid evidence receipt from overwriting a prior
+        # failed attempt in the flat lane directory.
         assert kwargs["section"] == lane
-        assert kwargs["artifact_dir"] == ""
+        attempt_dir = Path(str(kwargs["artifact_dir"]))
+        assert attempt_dir.parent.name == "real"
+        assert attempt_dir.parent.parent.name == lane
+        assert attempt_dir.parent.parent.parent == run_dir / "modular_r4" / "sections"
+        assert attempt_dir.name.startswith("patch_")
         assert kwargs["resume_path"] == ""
         assert str(kwargs["lane_provider"]).strip() != ""
         if lane == "ibm_narrative":

@@ -42,6 +42,7 @@ from apps_rg.runtime.section_model_limits import (
 from apps_rg.runtime.runtime_proof_layout import (
     finalize_runtime_proof_run,
     prepare_runtime_proof_run_dir,
+    rel_posix,
 )
 from apps_rg.runtime.section_l2_lane_integration import (
     finalize_section_l2_after_output,
@@ -1889,7 +1890,7 @@ def run_role_episode_lane_execution(
         section_id=sid,
         run_id=run_id,
         request_id=run_id,
-        trace_root=artifact_dir.resolve().relative_to(REPO_ROOT.resolve()).as_posix(),
+        trace_root=rel_posix(artifact_dir, REPO_ROOT),
         repo_root=REPO_ROOT,
         artifact_dir=artifact_dir,
         runtime_payload=runtime_payload,

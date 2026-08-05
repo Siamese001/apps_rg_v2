@@ -93,6 +93,25 @@ def _embedding_env_unset() -> bool:
     return True
 
 
+def _sync_embedding_enabled_aliases(applied: dict[str, str]) -> None:
+    """Populate a missing compatibility alias without rewriting operator intent.
+
+    Some legacy lower-level paths read ``EMBEDDING_ENABLED`` while current
+    apps_rg entrypoints set ``APPS_RG_EMBEDDING_ENABLED``.  A one-sided enable
+    must therefore be visible to both readers.  Explicitly supplied values
+    (including a conflict) are deliberately left untouched; callers retain the
+    existing fail-closed behavior for an explicit disable.
+    """
+    legacy = os.environ.get("EMBEDDING_ENABLED", "").strip()
+    apps_rg = os.environ.get("APPS_RG_EMBEDDING_ENABLED", "").strip()
+    if legacy and not apps_rg:
+        os.environ["APPS_RG_EMBEDDING_ENABLED"] = legacy
+        applied["APPS_RG_EMBEDDING_ENABLED"] = legacy
+    elif apps_rg and not legacy:
+        os.environ["EMBEDDING_ENABLED"] = apps_rg
+        applied["EMBEDDING_ENABLED"] = apps_rg
+
+
 def _hf_hub_bge_snapshot_dir(model_id: str) -> Path | None:
     """Resolve HuggingFace hub cache snapshot (local-files-only; no download)."""
     hf_home = Path(os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface"))
@@ -169,6 +188,8 @@ def bootstrap_apps_rg_embedding_env(
 
     if _embedding_explicitly_disabled():
         return applied
+
+    _sync_embedding_enabled_aliases(applied)
 
     if not os.environ.get("CHROMA_PERSIST_DIR", "").strip():
         chroma = (repo / "data" / "cache" / "chromadb").resolve()

@@ -7,16 +7,26 @@ from pathlib import Path
 import pytest
 
 from apps_rg.runtime.c0.resume_graph_allocation import (
+    ALLOCATION_PLAN_ENV,
     ALL_CLAIM_BEARING_SECTIONS,
     ResumeGraphAllocationError,
+    SECTION_EVIDENCE_CONTRACTS_ENV,
+    SECTION_SOURCE_PLANS_ENV,
     allocate_candidate_sets,
+    build_section_only_graph_allocation,
     build_resume_graph_usage_ledger,
     build_whole_resume_graph_allocation,
+    CANONICAL_BULLET_CLAIM_UNITS,
     normalize_metric_signature,
     slice_section_plan_for_allocation,
     validate_resume_graph_allocation_plan,
+    write_whole_resume_graph_allocation_bundle,
 )
+from apps_rg.runtime.c0.c06_weak_refine import _validate_frozen_selected_plan
 from apps_rg.runtime.c0.constants import C0_SECTIONS_ENABLED
+from apps_rg.runtime.section_graph_skills_proof_pool import (
+    bind_selector_selected_skills_to_section_plan,
+)
 
 
 def _candidate(
@@ -224,6 +234,50 @@ def test_usage_ledger_is_plan_bound_and_section_only_does_not_claim_global_uniqu
     assert validate_resume_graph_allocation_plan(plan) == []
 
 
+def test_section_only_allocation_preserves_graph_authored_visible_surfaces() -> None:
+    """A late résumé projection must never need to reverse-engineer graph IDs."""
+
+    section_plan = {
+        "section_id": "competencies",
+        "plan_id": "competencies:unit",
+        "plan_digest": "p" * 64,
+        "source_authority_contract": {"graph_digest": "g" * 64},
+        "graph_traversal_receipt": {"pass": True, "events_digest": "e" * 64},
+        "facts": [
+            {
+                "role_episode_bundle_id": "reb_controls",
+                "domain": "Regulated AWS Control Implementation",
+                "claim_text": "Implemented AWS controls for regulated insurers.",
+                "linked_source_fact_ids": ["fact_controls"],
+            }
+        ],
+        "selected_skills": [
+            {
+                "skill_id": "skill_aws_iam_kms_cloudtrail_controls",
+                "role_episode_bundle_id": "reb_controls",
+            }
+        ],
+        "graph_candidate_decision_ledger": [
+            {
+                "candidate_id": "skill_aws_iam_kms_cloudtrail_controls",
+                "candidate_type": "leaf_skill",
+                "root_id": "reb_controls",
+                "skill_label": "AWS IAM KMS CloudTrail Controls",
+                "source_refs": ["fact_controls", "Implemented AWS controls for regulated insurers."],
+            }
+        ],
+    }
+
+    result = build_section_only_graph_allocation(
+        section_plan=section_plan,
+        section_id="competencies",
+    )
+    assignment = result["allocation_plan"]["assignments"][0]
+    assert assignment["skill_label"] == "AWS IAM KMS CloudTrail Controls"
+    assert assignment["root_bundle_theme"] == "Regulated AWS Control Implementation"
+    assert "Implemented AWS controls for regulated insurers." in assignment["source_refs"]
+
+
 @pytest.mark.parametrize(
     ("left", "right"),
     [
@@ -276,6 +330,117 @@ def test_real_graph_whole_resume_allocation_covers_all_lanes_and_is_order_invari
     }
     assert set(headline_slice["selected_skill_ids"]) == allocated_headline_skills
     assert headline_slice["allocation_plan_digest"] == plan["allocation_plan_digest"]
+
+
+def test_allocation_slices_keep_exact_selected_authority_paths() -> None:
+    """Every frozen allocation slice must remain a valid C0.6 retry input."""
+
+    repo = Path(__file__).resolve().parents[5]
+    bundle = build_whole_resume_graph_allocation(
+        repo_root=repo,
+        target_role="SVP Agentic Engineering and Platform",
+        jd_text="agentic platform governance revenue growth margin",
+        briefing_text="enterprise platform operating model",
+    )
+    allocation = bundle["allocation_plan"]
+    for section_id in ALL_CLAIM_BEARING_SECTIONS:
+        sliced = slice_section_plan_for_allocation(
+            section_plan=bundle["section_plans"][section_id],
+            allocation_plan=allocation,
+            final_evidence_contract=bundle["section_final_evidence_contracts"][section_id],
+            section_id=section_id,
+        )
+        assert _validate_frozen_selected_plan(sliced, section_id=section_id) == []
+        expected_pairs = {
+            (
+                str(fact.get("role_episode_bundle_id") or fact["fact_id"]),
+                str(skill_id),
+            )
+            for fact in sliced["facts"]
+            for skill_id in fact.get("graph_skill_node_ids") or []
+        }
+        observed_pairs = {
+            (str(row["root_id"]), str(row["candidate_id"]))
+            for row in sliced["graph_candidate_decision_ledger"]
+            if row.get("candidate_type") == "leaf_skill"
+            and row.get("allocation_selected") is True
+        }
+        assert observed_pairs == expected_pairs
+        if section_id in CANONICAL_BULLET_CLAIM_UNITS:
+            assert {
+                str(fact.get("fact_id") or "") for fact in sliced["facts"]
+            } == set(CANONICAL_BULLET_CLAIM_UNITS[section_id])
+            assert all(
+                str(fact.get("role_episode_bundle_id") or "").startswith("reb_")
+                for fact in sliced["facts"]
+            )
+        source_traversal = sliced["allocation_source_traversal_evidence"]
+        assert source_traversal["scope"] == "C03_SOURCE_CANDIDATE_UNIVERSE"
+        assert source_traversal["graph_candidate_receipt"]["candidate_decision_count"] >= len(
+            sliced["graph_candidate_decision_ledger"]
+        )
+
+
+def test_whole_resume_bullet_lanes_use_frozen_root_plans_and_keep_visible_slots(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A final bullet lane must not try to attach graph roots to legacy slots."""
+
+    repo = Path(__file__).resolve().parents[5]
+    target_role = "SVP Agentic Engineering and Platform"
+    jd_text = "agentic platform governance revenue growth margin"
+    briefing_text = "enterprise platform operating model"
+    bundle = build_whole_resume_graph_allocation(
+        repo_root=repo,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
+    refs = write_whole_resume_graph_allocation_bundle(
+        bundle,
+        output_dir=tmp_path / "frozen_whole_resume",
+    )
+    monkeypatch.setenv(ALLOCATION_PLAN_ENV, refs["allocation_plan"])
+    monkeypatch.setenv(
+        SECTION_EVIDENCE_CONTRACTS_ENV,
+        refs["section_final_evidence_contracts"],
+    )
+    monkeypatch.setenv(SECTION_SOURCE_PLANS_ENV, refs["section_plans"])
+
+    for section_id, claim_unit_ids in CANONICAL_BULLET_CLAIM_UNITS.items():
+        legacy_visible_plan = {
+            "section_id": section_id,
+            "facts": [{"fact_id": claim_unit_id} for claim_unit_id in claim_unit_ids],
+        }
+        frozen_source = bind_selector_selected_skills_to_section_plan(
+            legacy_visible_plan,
+            repo_root=repo,
+            section_id=section_id,
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+        )
+        assert frozen_source["plan_digest"] == bundle["section_plans"][section_id][
+            "plan_digest"
+        ]
+        assert all(
+            str(fact.get("role_episode_bundle_id") or "").startswith("reb_")
+            for fact in frozen_source["facts"]
+        )
+
+        sliced = slice_section_plan_for_allocation(
+            section_plan=frozen_source,
+            allocation_plan=bundle["allocation_plan"],
+            final_evidence_contract=bundle["section_final_evidence_contracts"][
+                section_id
+            ],
+            section_id=section_id,
+        )
+        assert {
+            str(fact.get("fact_id") or "") for fact in sliced["facts"]
+        } == set(claim_unit_ids)
+        assert _validate_frozen_selected_plan(sliced, section_id=section_id) == []
 
 
 def test_c0_authority_lane_set_matches_whole_resume_allocator() -> None:

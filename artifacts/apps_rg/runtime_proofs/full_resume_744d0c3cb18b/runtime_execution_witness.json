@@ -1,0 +1,141 @@
+{
+  "artifact_hash": "sha256:d518358f6624f03c9c95a6ce3cefe36bb5d8014c82fbcbcebdc0e76338a882c1",
+  "emitted_at": "2026-08-04T11:33:20Z",
+  "payload": {
+    "attempt_evidence_refs": [],
+    "attempt_evidence_status": "NOT_REPORTED_BY_L2",
+    "c0": {
+      "reason": "BYPASS_PRELOADED_CONTEXT",
+      "status": "BYPASSED_PRELOADED_CONTEXT",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.1",
+          "sub_stage_name": "Query Normalization"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.2",
+          "sub_stage_name": "Embedding Lookup"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.3",
+          "sub_stage_name": "D1 Exact Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.4",
+          "sub_stage_name": "D2 Semantic Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.5",
+          "sub_stage_name": "Retrieval Augmentation"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.6",
+          "sub_stage_name": "Grounding Context Assembly"
+        }
+      ]
+    },
+    "generation_provider_attempt_count": 0,
+    "judge_attempt_count": 0,
+    "l2": {
+      "executed": true,
+      "fault": "L2_EXECUTION_ERROR:FileNotFoundError:[Errno 2] No such file or directory: 'C:\\\\Git\\\\apps_rg_v2\\\\src\\\\artifacts\\\\apps_rg\\\\fact_inventory\\\\master_candidate_skills_fact_ledger_20260518T1100Z.json'",
+      "status": "FAIL",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "app_name": "apps_rg"
+          },
+          "status": "PASS",
+          "sub_stage_id": "E1",
+          "sub_stage_name": "Prep: Plan Decomposition"
+        },
+        {
+          "duration_ms": 0.005,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E2",
+          "sub_stage_name": "Valid: Pre-Execution Contract Check"
+        },
+        {
+          "duration_ms": 392.395,
+          "meta": {
+            "fault": "L2_EXECUTION_ERROR:FileNotFoundError:[Errno 2] No such file or directory: 'C:\\\\Git\\\\apps_rg_v2\\\\src\\\\artifacts\\\\apps_rg\\\\fact_inventory\\\\master_candidate_skills_fact_ledger_20260518T1100Z.json'"
+          },
+          "status": "FAIL",
+          "sub_stage_id": "E3",
+          "sub_stage_name": "Exec: Tool Dispatch"
+        },
+        {
+          "duration_ms": 0.009,
+          "meta": {
+            "retry_attempted": false
+          },
+          "status": "NOT_APPLICABLE",
+          "sub_stage_id": "E4",
+          "sub_stage_name": "Heal: Retry / Recovery"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {},
+          "status": "FAIL",
+          "sub_stage_id": "E5",
+          "sub_stage_name": "Seal: Output Assembly"
+        }
+      ]
+    },
+    "request_id": "req-2c085a2512c64e258555f0397eaf2dd2",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "8c56c9e7-94ad-4ffa-b99f-e79c05ab0bb9",
+    "schema_version": "agentic_core.runtime_execution_witness.v1",
+    "trace_root": "trace-68d1f6e8fd854996ae3d120e1eeffc1f",
+    "x1": {
+      "status": "EXECUTED",
+      "sub_stages": []
+    },
+    "x2": {
+      "disposition": "X3A",
+      "failed_gate_ids": [],
+      "reason_codes": [],
+      "status": "EXECUTED"
+    },
+    "x3": {
+      "disposition": "X3A",
+      "status": "EMITTED"
+    }
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:0264456156150e171b4af914b6fec9fa162704eb1d548d531676636da818bba7"
+}

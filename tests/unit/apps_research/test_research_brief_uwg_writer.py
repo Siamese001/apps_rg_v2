@@ -4,8 +4,16 @@ from __future__ import annotations
 
 
 def test_commit_brief_record_supplies_l5_certification_ref() -> None:
+    from agentic_core.L4_state.uwg.durable_write_gateway import (
+        compute_state_diffs_digest,
+    )
     from apps_research.integrations.governed_research_run import GovernedE2ERunRecord
-    from apps_research.integrations.research_brief_uwg_writer import commit_brief_record
+    from apps_research.integrations.research_brief_uwg_writer import (
+        _BLUEPRINT_REF,
+        _POLICY_REF,
+        _commit_request_signature,
+        commit_brief_record,
+    )
 
     captured = {}
 
@@ -48,4 +56,19 @@ def test_commit_brief_record_supplies_l5_certification_ref() -> None:
     brief = commit_brief_record(run_record, gateway=_Gateway())
 
     assert brief.commit_receipt_ref == "receipt-research-brief-test"
-    assert captured["commit_request"].l5_certification_ref
+    request = captured["commit_request"]
+    assert request.l5_certification_ref
+    assert request.clearance_proof_id == request.cleared_exit_review_packet_ref
+    assert request.registry_digest_set == (
+        f"registry:policy:{_POLICY_REF}",
+        f"registry:blueprint:{_BLUEPRINT_REF}",
+    )
+    assert request.staged_diff_hash == compute_state_diffs_digest(
+        captured["state_diffs"]
+    )
+    assert request.commit_request_signature == _commit_request_signature(
+        commit_request_id=request.commit_request_id,
+        staged_diff_hash=request.staged_diff_hash,
+        clearance_proof_id=request.clearance_proof_id,
+        registry_digest_set=request.registry_digest_set,
+    )

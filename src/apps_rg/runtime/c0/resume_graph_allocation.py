@@ -18,6 +18,8 @@ from typing import Any, Iterable, Mapping, Sequence
 from apps_rg.runtime.c0.c03_resume_graph_contracts import (
     ALLOCATION_PLAN_SCHEMA_VERSION,
     USAGE_LEDGER_SCHEMA_VERSION,
+    TraversalRecorder,
+    build_candidate_receipt,
     stable_digest,
 )
 
@@ -27,6 +29,9 @@ ALLOCATION_SCOPES = frozenset({WHOLE_RESUME_SCOPE, SECTION_ONLY_SCOPE})
 ALLOCATION_PLAN_ENV = "APPS_RG_RESUME_GRAPH_ALLOCATION_PLAN"
 ALLOCATION_USAGE_LEDGER_ENV = "APPS_RG_RESUME_GRAPH_USAGE_LEDGER"
 SECTION_EVIDENCE_CONTRACTS_ENV = "APPS_RG_SECTION_FINAL_GRAPH_EVIDENCE_CONTRACTS"
+# Exact C0.3 source plans frozen before lane execution. A whole-resume lane
+# consumes this snapshot; it never reruns graph selection after allocation.
+SECTION_SOURCE_PLANS_ENV = "APPS_RG_SECTION_GRAPH_SOURCE_PLANS"
 DEFAULT_MAX_CANDIDATES_PER_SLOT = 64
 
 _ALLOCATION_DIGEST_EXCLUDED_KEYS = frozenset(
@@ -369,6 +374,12 @@ def _assignment_view(row: Mapping[str, Any], *, slot: _Slot) -> dict[str, Any]:
         "graph_path_ids",
         "edge_ids",
         "citation_refs",
+        "source_refs",
+        "root_bundle_theme",
+        "root_claim_text",
+        "root_claim_action",
+        "root_claim_scope",
+        "root_claim_outcome",
     )
     out = {key: row.get(key) for key in fields if key in row}
     out["section_id"] = slot.section_id
@@ -597,7 +608,6 @@ def allocate_candidate_sets(
             receipt=receipt,
         )
 
-    slot_by_id = {slot.slot_id: slot for slot in slots}
     chosen: dict[str, dict[str, Any]] = {}
     used_skills: set[str] = set()
     used_metrics: set[str] = set()
@@ -1033,6 +1043,7 @@ def _candidate_sets_from_section_plans(
                             "graph_path_ids": _strings(graph_path_ids),
                             "edge_ids": edge_ids,
                             "citation_refs": citation_refs,
+                            "root_bundle_theme": str(root.get("bundle_theme") or ""),
                             "root_claim_text": str(root.get("claim_text") or ""),
                             "root_claim_action": str(root.get("claim_action") or ""),
                             "root_claim_scope": str(root.get("claim_scope") or ""),
@@ -1230,6 +1241,325 @@ def build_section_final_evidence_contracts(
     return contracts
 
 
+def _allocation_authority_projection(
+    *,
+    section_id: str,
+    section_plan: Mapping[str, Any],
+    assignments: Sequence[Mapping[str, Any]],
+    strict_source_authority: bool,
+) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
+    """Preserve C0.3's complete candidate universe and annotate allocation paths.
+
+    A section plan records the actual graph traversal: selected and rejected
+    roots, skills, facts, and metrics.  A whole-resume allocation is a later
+    reservation decision over that universe.  It must not rewrite the earlier
+    traversal into an all-selected miniature ledger, because doing so erases
+    the finite candidate universe and its rejected alternatives.
+
+    The resulting slice therefore keeps each source terminal decision intact
+    and adds ``allocation_claim_unit_ids`` only to source paths reserved by the
+    frozen allocation.  Consumers that need the final visible allocation use
+    that explicit annotation; consumers that audit C0.3 breadth retain the
+    original C0.3 decisions.
+    """
+
+    source_rows = [
+        dict(raw)
+        for raw in section_plan.get("graph_candidate_decision_ledger") or []
+        if isinstance(raw, Mapping)
+    ]
+    source_index: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    for row in source_rows:
+        candidate_type = str(row.get("candidate_type") or "").strip()
+        candidate_id = str(row.get("candidate_id") or "").strip()
+        root_id = str(row.get("root_id") or "").strip()
+        if candidate_type == "role_episode_root" and not root_id:
+            root_id = candidate_id
+        if candidate_type and root_id and candidate_id:
+            source_index.setdefault((candidate_type, root_id, candidate_id), []).append(row)
+
+    requested: dict[tuple[str, str, str], set[str]] = {}
+    for assignment in assignments:
+        root_id = str(assignment.get("root_id") or "").strip()
+        claim_unit_id = str(assignment.get("claim_unit_id") or "").strip()
+        if not root_id:
+            continue
+        requested.setdefault(("role_episode_root", root_id, root_id), set()).add(claim_unit_id)
+        for candidate_type, key in (
+            ("leaf_skill", "skill_id"),
+            ("source_fact", "fact_id"),
+            ("metric_outcome", "metric_outcome_id"),
+        ):
+            candidate_id = str(assignment.get(key) or "").strip()
+            if candidate_id:
+                requested.setdefault((candidate_type, root_id, candidate_id), set()).add(
+                    claim_unit_id
+                )
+
+    # A canonical source plan must bind every allocated path back to its
+    # pre-targeting authority decision.  The small legacy fixture form below
+    # predates canonical plan sealing and is handled after this check.
+    canonical_source_ledger = strict_source_authority and (
+        bool(section_plan.get("graph_candidate_receipt"))
+        or bool(section_plan.get("plan_digest"))
+    )
+    missing_or_unapproved: list[str] = []
+    for key in sorted(requested):
+        candidates = source_index.get(key, [])
+        if len(candidates) != 1:
+            missing_or_unapproved.append(
+                "missing_or_ambiguous_source_authority_path:" + ":".join(key)
+            )
+            continue
+        source = candidates[0]
+        authority = source.get("authority")
+        if not isinstance(authority, Mapping) or authority.get("authority_pass") is not True:
+            missing_or_unapproved.append("source_authority_not_pass:" + ":".join(key))
+            continue
+        if authority.get("targeting_consulted") is not False:
+            missing_or_unapproved.append("source_authority_targeting_boundary:" + ":".join(key))
+            continue
+    if missing_or_unapproved and canonical_source_ledger:
+        raise ResumeGraphAllocationError(
+            f"{section_id}: allocation cannot project authority paths",
+            receipt={
+                "schema_version": "resume_graph_allocation_failure_v1",
+                "section_id": section_id,
+                "unsatisfied_constraints": ["allocation_authority_path_projection"],
+                "failure_reasons": sorted(missing_or_unapproved),
+            },
+        )
+
+    # Standalone section previews and synthetic unit fixtures created before
+    # canonical C0.3 plan sealing do not carry the full authority ledger. They
+    # are intentionally supported through their already authority-passing
+    # allocation. A whole-resume canonical source plan always takes the strict
+    # path above and fails closed for a missing or ambiguous authority path.
+    if not source_rows and canonical_source_ledger:
+        raise ResumeGraphAllocationError(
+            f"{section_id}: canonical source plan has no candidate ledger",
+            receipt={
+                "schema_version": "resume_graph_allocation_failure_v1",
+                "section_id": section_id,
+                "unsatisfied_constraints": ["canonical_source_candidate_ledger"],
+            },
+        )
+
+    if not canonical_source_ledger:
+        # Legacy fixtures have leaf-skill rows only.  Complete their source
+        # ledger with allocation-bound root/fact paths strictly for test and
+        # standalone compatibility; production canonical plans never enter
+        # this branch.
+        for key, unit_ids in requested.items():
+            if key in source_index:
+                continue
+            candidate_type, root_id, candidate_id = key
+            hop_depth = 0 if candidate_type == "role_episode_root" else 1
+            source_rows.append(
+                {
+                    "schema_version": "graph_candidate_decision_v1",
+                    "section_id": section_id,
+                    "candidate_id": candidate_id,
+                    "candidate_type": candidate_type,
+                    "candidate_path_id": (
+                        f"root:{root_id}"
+                        if candidate_type == "role_episode_root"
+                        else f"root:{root_id}/"
+                        + ("skill" if candidate_type == "leaf_skill" else "fact" if candidate_type == "source_fact" else "metric")
+                        + f":{candidate_id}"
+                    ),
+                    "parent_id": "" if candidate_type == "role_episode_root" else root_id,
+                    "root_id": root_id,
+                    "employer_lane": "",
+                    "hop_depth": hop_depth,
+                    "decision": "selected",
+                    "reason_codes": ["legacy_allocation_projection"],
+                    "authority": {
+                        "authority_pass": True,
+                        "targeting_consulted": False,
+                        "reason_codes": ["legacy_allocation_projection"],
+                    },
+                    "authority_pass": True,
+                    "proof_strength_raw": 0.0,
+                    "target_alignment_score": 0.0,
+                    "ranking_score": 0.0,
+                    "path_signature": "",
+                }
+            )
+
+    projected: list[dict[str, Any]] = []
+    for source in source_rows:
+        row = dict(source)
+        # The source plan is separately sealed.  This newly sliced plan receives
+        # its own canonical stamp below.
+        row.pop("plan_id", None)
+        row.pop("plan_digest", None)
+        row["section_id"] = section_id
+        if not canonical_source_ledger and not isinstance(row.get("authority"), Mapping):
+            row["authority"] = {
+                "authority_pass": row.get("authority_pass") is True,
+                "targeting_consulted": False,
+                "reason_codes": list(row.get("reason_codes") or []),
+            }
+        candidate_type = str(row.get("candidate_type") or "").strip()
+        candidate_id = str(row.get("candidate_id") or "").strip()
+        root_id = str(row.get("root_id") or "").strip()
+        if candidate_type == "role_episode_root" and not root_id:
+            root_id = candidate_id
+            row["root_id"] = root_id
+        key = (candidate_type, root_id, candidate_id)
+        claim_unit_ids = sorted(unit for unit in requested.get(key, set()) if unit)
+        if claim_unit_ids:
+            row["allocation_selected"] = True
+            row["allocation_claim_unit_ids"] = claim_unit_ids
+            row["allocation_source_decision"] = str(source.get("decision") or "")
+        else:
+            row["allocation_selected"] = False
+        projected.append(row)
+
+    projected.sort(
+        key=lambda row: (
+            int(row.get("hop_depth") or 0),
+            str(row.get("candidate_type") or ""),
+            str(row.get("candidate_path_id") or ""),
+        )
+    )
+    candidate_receipt = build_candidate_receipt(
+        section_id=section_id,
+        decisions=projected,
+    )
+    max_hop_depth = max(
+        2,
+        max((int(row.get("hop_depth") or 0) for row in projected), default=0),
+    )
+    recorder = TraversalRecorder(section_id=section_id, max_hop_depth=max_hop_depth)
+    edge_type_by_candidate_type = {
+        "role_episode_root": "allocation_selected_root",
+        "leaf_skill": "role_episode_contains_skill",
+        "source_fact": "role_episode_supported_by_fact",
+        "metric_outcome": "role_episode_has_metric_outcome",
+    }
+    selected_roots: set[str] = set()
+    rejected_roots: set[str] = set()
+    for row in projected:
+        candidate_type = str(row.get("candidate_type") or "")
+        root_id = str(row.get("root_id") or row.get("candidate_id") or "")
+        candidate_id = str(row.get("candidate_id") or "")
+        path_id = str(row.get("candidate_path_id") or "")
+        hop_depth = int(row.get("hop_depth") or (0 if candidate_type == "role_episode_root" else 1))
+        decision = str(row.get("decision") or "").strip().lower()
+        if candidate_type == "role_episode_root":
+            if decision == "selected":
+                selected_roots.add(root_id)
+            elif decision == "rejected":
+                rejected_roots.add(root_id)
+        recorder.record(
+            event_type="edge_traversed",
+            hop_depth=hop_depth,
+            source_node_id="" if candidate_type == "role_episode_root" else root_id,
+            target_node_id=candidate_id,
+            edge_type=edge_type_by_candidate_type.get(candidate_type, "allocation_selected_path"),
+            candidate_path_id=path_id,
+        )
+        authority = dict(row.get("authority") or {})
+        authority_pass = authority.get("authority_pass") is True
+        recorder.record(
+            event_type="authority_evaluated",
+            hop_depth=hop_depth,
+            source_node_id="" if candidate_type == "role_episode_root" else root_id,
+            target_node_id=candidate_id,
+            edge_type=edge_type_by_candidate_type.get(candidate_type, "allocation_selected_path"),
+            candidate_path_id=path_id,
+            authority_pass=authority_pass,
+            reason_codes=authority.get("reason_codes") or [],
+        )
+        recorder.record(
+            event_type="candidate_terminal",
+            hop_depth=hop_depth,
+            source_node_id="" if candidate_type == "role_episode_root" else root_id,
+            target_node_id=candidate_id,
+            edge_type=edge_type_by_candidate_type.get(candidate_type, "allocation_selected_path"),
+            candidate_path_id=path_id,
+            authority_pass=authority_pass,
+            decision=decision,
+            reason_codes=row.get("reason_codes") or [],
+        )
+    traversal_receipt = recorder.build_receipt(
+        decisions=projected,
+        selected_root_ids=sorted(selected_roots),
+        rejected_root_ids=sorted(rejected_roots),
+        target_role_profile=str(section_plan.get("target_role_profile") or ""),
+    )
+    authority_rows = [dict(row.get("authority") or {}) for row in projected]
+    authority_receipt = {
+        "schema_version": "c03_pretarget_authority_receipt_v1",
+        "section_id": section_id,
+        "candidate_count": len(authority_rows),
+        "authority_pass_count": sum(
+            1 for row in authority_rows if row.get("authority_pass") is True
+        ),
+        "authority_block_count": sum(
+            1 for row in authority_rows if row.get("authority_pass") is not True
+        ),
+        "targeting_consulted_count": sum(
+            1 for row in authority_rows if row.get("targeting_consulted") is True
+        ),
+        "authority_before_targeting_pass": all(
+            row.get("targeting_consulted") is False for row in authority_rows
+        ),
+        "authority_decisions_digest": stable_digest(authority_rows),
+    }
+    return projected, candidate_receipt, {
+        "traversal": traversal_receipt,
+        "authority": authority_receipt,
+    }
+
+
+def _allocation_source_traversal_evidence(
+    section_plan: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Carry the source C0.3 breadth receipt beside a narrowed visible slice."""
+
+    fields = (
+        "target_role_profile",
+        "selection_method",
+        "facts",
+        "selected_nodes",
+        "selected_skills",
+        "selected_skill_ids",
+        "selected_metrics_detail",
+        "selected_metrics",
+        "excluded_due_to_root_cap",
+        "excluded_due_to_metric_cap",
+        "graph_evidence_depth_report",
+        "graph_evidence_depth_pre_report",
+        "graph_evidence_depth_comparison_report",
+        "graph_traversal_receipt",
+        "graph_candidate_receipt",
+    )
+    evidence = {
+        key: section_plan.get(key)
+        for key in fields
+        if key in section_plan
+    }
+    evidence.update(
+        {
+            "schema_version": "allocation_source_traversal_evidence_v1",
+            "source_section_plan_id": str(section_plan.get("plan_id") or ""),
+            "source_section_plan_digest": str(section_plan.get("plan_digest") or ""),
+            "source_candidate_ledger_digest": stable_digest(
+                [
+                    dict(row)
+                    for row in section_plan.get("graph_candidate_decision_ledger") or []
+                    if isinstance(row, Mapping)
+                ]
+            ),
+            "scope": "C03_SOURCE_CANDIDATE_UNIVERSE",
+        }
+    )
+    return evidence
+
+
 def slice_section_plan_for_allocation(
     *,
     section_plan: Mapping[str, Any],
@@ -1282,7 +1612,6 @@ def slice_section_plan_for_allocation(
         str(row.get("role_episode_bundle_id") or row.get("fact_id") or ""): dict(row)
         for row in section_plan.get("facts") or []
         if isinstance(row, Mapping)
-        and preserve_root_authority
         and str(row.get("role_episode_bundle_id") or row.get("fact_id") or "")
     }
     source_skills_by_root: dict[str, list[dict[str, Any]]] = {}
@@ -1290,14 +1619,14 @@ def slice_section_plan_for_allocation(
         if not isinstance(raw, Mapping):
             continue
         root_id = str(raw.get("role_episode_bundle_id") or "").strip()
-        if preserve_root_authority and root_id in by_root:
+        if root_id in by_root:
             source_skills_by_root.setdefault(root_id, []).append(dict(raw))
     source_metrics_by_root: dict[str, list[dict[str, Any]]] = {}
     for raw in section_plan.get("selected_metrics_detail") or []:
         if not isinstance(raw, Mapping):
             continue
         root_id = str(raw.get("role_episode_bundle_id") or "").strip()
-        if preserve_root_authority and root_id in by_root:
+        if root_id in by_root:
             source_metrics_by_root.setdefault(root_id, []).append(dict(raw))
 
     facts: list[dict[str, Any]] = []
@@ -1307,15 +1636,23 @@ def slice_section_plan_for_allocation(
     allowed_ids: list[str] = []
     for root_id, rows in sorted(by_root.items()):
         rows.sort(key=lambda row: str(row.get("claim_unit_id") or ""))
+        allocated_skill_ids = {
+            str(row.get("skill_id") or "") for row in rows if str(row.get("skill_id") or "")
+        }
+        allocated_metric_ids = {
+            str(row.get("metric_outcome_id") or "")
+            for row in rows
+            if str(row.get("metric_outcome_id") or "")
+        }
         root_skills = {
             str(row.get("skill_id") or ""): dict(row)
             for row in source_skills_by_root.get(root_id, [])
-            if str(row.get("skill_id") or "")
+            if str(row.get("skill_id") or "") in allocated_skill_ids
         }
         root_metrics = {
             str(row.get("metric_outcome_id") or ""): dict(row)
             for row in source_metrics_by_root.get(root_id, [])
-            if str(row.get("metric_outcome_id") or "")
+            if str(row.get("metric_outcome_id") or "") in allocated_metric_ids
         }
         for assignment in rows:
             skill_id = str(assignment.get("skill_id") or "")
@@ -1447,6 +1784,201 @@ def slice_section_plan_for_allocation(
             }
             for source, edge_type, target in sorted(source_edge_keys)
         )
+
+    # Bullet lanes have stable presentation claim-unit identifiers (for example
+    # ``bul_unify_001``) which must survive the root-bound graph projection.
+    # The prior root-grouped projection emitted one fact per role episode and
+    # silently discarded those slot identities.  That made the final renderer
+    # ask for bullet IDs that the frozen proof pool could not authorize.  Build
+    # one visible fact per immutable allocation assignment instead.  Each row is
+    # still directly bound to its role-episode root, skill, source fact, and
+    # optional metric; no root or evidence path is inferred here.
+    # Section-only / legacy allocations intentionally retain graph-root facts;
+    # they do not carry final visible bullet slots.  A final whole-resume slice
+    # must carry either the complete canonical slot set or none of it: a mixed
+    # allocation would lose the identity of some rendered bullets and fails
+    # closed rather than producing a hybrid proof pool.
+    canonical_bullet_slot_count = 0
+    if section_id in CANONICAL_BULLET_CLAIM_UNITS:
+        expected_bullet_ids = set(CANONICAL_BULLET_CLAIM_UNITS[section_id])
+        canonical_bullet_slot_count = sum(
+            1
+            for assignment in assignments
+            if str(assignment.get("claim_unit_id") or "").startswith(f"{section_id}:")
+            and str(assignment.get("claim_unit_id") or "").split(":", 1)[1]
+            in expected_bullet_ids
+        )
+        if 0 < canonical_bullet_slot_count < len(assignments):
+            raise ResumeGraphAllocationError(
+                f"{section_id}: allocation mixes canonical and noncanonical bullet slots",
+                receipt={
+                    "schema_version": "resume_graph_allocation_failure_v1",
+                    "unsatisfied_constraints": ["canonical_bullet_claim_unit_identity"],
+                    "section_id": section_id,
+                    "canonical_bullet_slot_count": canonical_bullet_slot_count,
+                    "assignment_count": len(assignments),
+                },
+            )
+    if (
+        section_id in CANONICAL_BULLET_CLAIM_UNITS
+        and canonical_bullet_slot_count == len(assignments)
+    ):
+        expected_claim_units = set(CANONICAL_BULLET_CLAIM_UNITS[section_id])
+        display_facts: list[dict[str, Any]] = []
+        display_skills: list[dict[str, Any]] = []
+        display_metrics: list[dict[str, Any]] = []
+        display_allowed_ids: list[str] = []
+        for assignment in sorted(assignments, key=lambda row: str(row.get("claim_unit_id") or "")):
+            claim_unit_id = str(assignment.get("claim_unit_id") or "").strip()
+            prefix = f"{section_id}:"
+            visible_fact_id = (
+                claim_unit_id[len(prefix) :] if claim_unit_id.startswith(prefix) else ""
+            )
+            if visible_fact_id not in expected_claim_units:
+                raise ResumeGraphAllocationError(
+                    f"{section_id}: allocation claim unit has no canonical visible bullet id",
+                    receipt={
+                        "schema_version": "resume_graph_allocation_failure_v1",
+                        "unsatisfied_constraints": ["canonical_bullet_claim_unit_identity"],
+                        "section_id": section_id,
+                        "claim_unit_id": claim_unit_id,
+                    },
+                )
+            root_id = str(assignment.get("root_id") or "").strip()
+            root_fact = dict(source_facts_by_root.get(root_id) or {})
+            if not root_fact:
+                raise ResumeGraphAllocationError(
+                    f"{section_id}: allocated bullet root is absent from the source graph plan",
+                    receipt={
+                        "schema_version": "resume_graph_allocation_failure_v1",
+                        "unsatisfied_constraints": ["allocated_bullet_root_source_coverage"],
+                        "section_id": section_id,
+                        "root_id": root_id,
+                        "claim_unit_id": claim_unit_id,
+                    },
+                )
+            skill_id = str(assignment.get("skill_id") or "").strip()
+            source_fact_id = str(assignment.get("fact_id") or "").strip()
+            metric_id = str(assignment.get("metric_outcome_id") or "").strip()
+            linked_identity_ids = _strings(
+                list(root_fact.get("linked_identity_fact_ids") or [])
+                + [source_fact_id]
+            )
+            linked_source_ids = _strings(
+                list(root_fact.get("linked_source_fact_ids") or [])
+                + [source_fact_id]
+            )
+            evidence_ids = _strings(
+                list(root_fact.get("allowed_graph_evidence_ids") or [])
+                + [visible_fact_id, root_id, source_fact_id, skill_id, metric_id]
+            )
+            display_facts.append(
+                {
+                    **root_fact,
+                    "fact_id": visible_fact_id,
+                    "candidate_fact_id": source_fact_id or root_id,
+                    "claim_text": str(
+                        root_fact.get("claim_text")
+                        or assignment.get("root_claim_text")
+                        or root_id
+                    ),
+                    "role_episode_bundle_id": root_id,
+                    "graph_evidence_type": "role_episode_bundle",
+                    "employer_lane": str(
+                        root_fact.get("employer_lane")
+                        or assignment.get("employer_lane")
+                        or ""
+                    ),
+                    "source_employment": str(
+                        root_fact.get("source_employment")
+                        or root_fact.get("employer_lane")
+                        or assignment.get("employer_lane")
+                        or ""
+                    ),
+                    "graph_skill_node_ids": _strings([skill_id]),
+                    "metric_outcome_ids": _strings([metric_id]),
+                    "selected_metric_ids": _strings([metric_id]),
+                    "allowed_graph_evidence_ids": evidence_ids,
+                    "linked_identity_fact_ids": linked_identity_ids,
+                    "linked_source_fact_ids": linked_source_ids,
+                    # The visible bullet slot is the only source identifier a
+                    # renderer may cite.  The immutable graph source stays in
+                    # linked_source_fact_ids and the allocation assignment.
+                    "source_fact_ids": [visible_fact_id],
+                    "confidence": str(root_fact.get("confidence") or "HIGH"),
+                    "support_level": "allocation_authority_pass",
+                    "verification_status": "allocation_authority_pass",
+                    "metric_values": _strings([assignment.get("metric_text")]),
+                    "has_metric": bool(metric_id),
+                    "metric_raw": str(assignment.get("metric_text") or ""),
+                    "technologies": _strings([skill_id]),
+                    "domain": str(
+                        root_fact.get("domain")
+                        or assignment.get("root_claim_scope")
+                        or ""
+                    ),
+                    "allocation_claim_unit_ids": [claim_unit_id],
+                    "allocation_plan_digest": allocation_digest,
+                }
+            )
+            if skill_id:
+                source_skill = next(
+                    (
+                        row
+                        for row in source_skills_by_root.get(root_id, [])
+                        if str(row.get("skill_id") or "") == skill_id
+                    ),
+                    {},
+                )
+                display_skills.append(
+                    {
+                        **source_skill,
+                        "skill_id": skill_id,
+                        "role_episode_bundle_id": root_id,
+                        "employer_lane": str(assignment.get("employer_lane") or ""),
+                        "claim_unit_id": claim_unit_id,
+                    }
+                )
+            if metric_id:
+                source_metric = next(
+                    (
+                        row
+                        for row in source_metrics_by_root.get(root_id, [])
+                        if str(row.get("metric_outcome_id") or "") == metric_id
+                    ),
+                    {},
+                )
+                display_metrics.append(
+                    {
+                        **source_metric,
+                        "metric_outcome_id": metric_id,
+                        "role_episode_bundle_id": root_id,
+                        "employer_lane": str(assignment.get("employer_lane") or ""),
+                        "metric": str(
+                            source_metric.get("metric")
+                            or assignment.get("metric_text")
+                            or ""
+                        ),
+                        "claim_unit_id": claim_unit_id,
+                    }
+                )
+            display_allowed_ids.extend(evidence_ids)
+        facts = display_facts
+        selected_skills = display_skills
+        selected_metrics_detail = display_metrics
+        allowed_ids = display_allowed_ids
+    projected_decisions, projected_candidate_receipt, projected_receipts = (
+        _allocation_authority_projection(
+            section_id=section_id,
+            section_plan=section_plan,
+            assignments=assignments,
+            strict_source_authority=(
+                str(allocation_plan.get("allocation_scope") or "")
+                != SECTION_ONLY_SCOPE
+            ),
+        )
+    )
+    source_traversal_evidence = _allocation_source_traversal_evidence(section_plan)
     out = dict(section_plan)
     out.pop("plan_id", None)
     out.pop("plan_digest", None)
@@ -1465,6 +1997,14 @@ def slice_section_plan_for_allocation(
                 row.get("metric_outcome_id") for row in selected_metrics_detail
             ),
             "selected_metrics_detail": selected_metrics_detail,
+            "graph_candidate_decision_ledger": projected_decisions,
+            "graph_candidate_receipt": projected_candidate_receipt,
+            "graph_traversal_receipt": projected_receipts["traversal"],
+            "pretarget_authority_receipt": projected_receipts["authority"],
+            # This is intentionally distinct from the narrowed visible
+            # allocation above. X2 traversal checks consume it to prove the
+            # candidate universe C0.3 actually inspected.
+            "allocation_source_traversal_evidence": source_traversal_evidence,
             "selected_employer_lane_ids": _strings(
                 row.get("employer_lane") for row in assignments
             ),
@@ -1638,12 +2178,26 @@ def build_section_only_graph_allocation(
                 "section_id": section_id,
             },
         )
+    # ``selected_skills`` is the compact selection projection.  Carry the
+    # human-readable graph label and source references from the sealed
+    # decision ledger as a backward-compatible fallback for plans generated
+    # before those fields were added to the compact projection.
+    skill_metadata_by_path: dict[tuple[str, str], dict[str, Any]] = {}
+    for row in section_plan.get("graph_candidate_decision_ledger") or []:
+        if not isinstance(row, Mapping) or str(row.get("candidate_type") or "") != "leaf_skill":
+            continue
+        root_id = str(row.get("root_id") or "").strip()
+        skill_id = str(row.get("candidate_id") or "").strip()
+        if root_id and skill_id:
+            skill_metadata_by_path[(root_id, skill_id)] = dict(row)
     slot_specs: list[dict[str, Any]] = []
     candidates: dict[str, list[dict[str, Any]]] = {}
     for index, skill in enumerate(selected_skills, start=1):
         slot_id = f"{section_id}:section_only:{index:02d}"
         root_id = str(skill.get("role_episode_bundle_id") or "")
         fact = facts_by_root.get(root_id) or {}
+        skill_id = str(skill.get("skill_id") or "")
+        ledger_row = skill_metadata_by_path.get((root_id, skill_id), {})
         source_fact_ids = _strings(
             fact.get("linked_source_fact_ids") or fact.get("source_fact_ids") or [root_id]
         )
@@ -1660,7 +2214,17 @@ def build_section_only_graph_allocation(
         candidate = {
             "section_id": section_id,
             "claim_unit_id": slot_id,
-            "skill_id": str(skill.get("skill_id") or ""),
+            "skill_id": skill_id,
+            "skill_label": str(
+                skill.get("skill_label")
+                or ledger_row.get("skill_label")
+                or ledger_row.get("label")
+                or ""
+            ),
+            "source_refs": _strings(
+                list(skill.get("source_refs") or [])
+                + list(ledger_row.get("source_refs") or [])
+            ),
             "fact_id": source_fact_id,
             "root_id": root_id,
             "employer_lane": employer_lane,
@@ -1676,10 +2240,17 @@ def build_section_only_graph_allocation(
                 f"root:{root_id}/fact:{source_fact_id}",
             ],
             "edge_ids": [
-                stable_edge_id(root_id, "role_episode_contains_skill", str(skill.get("skill_id") or "")),
+                stable_edge_id(root_id, "role_episode_contains_skill", skill_id),
                 stable_edge_id(root_id, "role_episode_supported_by_fact", source_fact_id),
             ],
             "citation_refs": source_fact_ids,
+            # The current selector names the graph-authored bundle surface
+            # ``domain``.  Prefer an explicit bundle theme if supplied by a
+            # future projection, while retaining the existing domain surface
+            # for current plans.
+            "root_bundle_theme": str(
+                fact.get("bundle_theme") or fact.get("domain") or ""
+            ),
             "root_claim_text": str(fact.get("claim_text") or root_id),
         }
         candidate["candidate_id"] = "section-only:" + stable_digest(candidate)[:24]
@@ -1793,6 +2364,7 @@ __all__ = [
     "ResumeGraphAllocationError",
     "SECTION_ONLY_SCOPE",
     "SECTION_EVIDENCE_CONTRACTS_ENV",
+    "SECTION_SOURCE_PLANS_ENV",
     "WHOLE_RESUME_SCOPE",
     "ALL_CLAIM_BEARING_SECTIONS",
     "CANONICAL_VISIBLE_SECTIONS",

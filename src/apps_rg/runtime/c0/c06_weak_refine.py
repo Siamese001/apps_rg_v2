@@ -216,11 +216,23 @@ def _validate_frozen_selected_plan(
             if traversal.get("event_count") != len(events):
                 failures.append("selected_graph_plan_traversal_count_invalid")
 
+    # An allocation slice retains the full upstream C0.3 candidate ledger so
+    # its retrieval breadth remains auditable.  Its final visible claim paths
+    # are identified explicitly by allocation_claim_unit_ids; source-local
+    # ``decision=selected`` rows are not necessarily visible allocations.
+    allocation_scoped = any(
+        isinstance(row, Mapping) and "allocation_selected" in row
+        for row in decisions
+    )
     selected_leaf_rows: dict[tuple[str, str], Mapping[str, Any]] = {}
     for row in decisions:
         if (
             str(row.get("candidate_type") or "") == "leaf_skill"
-            and str(row.get("decision") or "") == "selected"
+            and (
+                bool(row.get("allocation_selected"))
+                if allocation_scoped
+                else str(row.get("decision") or "") == "selected"
+            )
         ):
             key = (
                 str(row.get("root_id") or "").strip(),
@@ -241,24 +253,31 @@ def _validate_frozen_selected_plan(
         fact_id = str(
             fact.get("fact_id") or fact.get("candidate_fact_id") or ""
         ).strip()
+        # Bullet sections use a stable visible slot id (``bul_*``) while the
+        # underlying graph authority remains the explicitly carried role root.
+        # Validate the authority path against that root, not against the
+        # presentation-only fact id.
+        authority_root_id = str(
+            fact.get("role_episode_bundle_id") or fact_id
+        ).strip()
         for skill_id in _strings(
             fact.get("graph_skill_node_ids")
             or fact.get("selected_skill_ids")
             or fact.get("source_skill_ids")
         ):
-            pair = (fact_id, skill_id)
+            pair = (authority_root_id, skill_id)
             represented_pairs.add(pair)
             decision = selected_leaf_rows.get(pair)
-            expected_path = f"root:{fact_id}/skill:{skill_id}"
+            expected_path = f"root:{authority_root_id}/skill:{skill_id}"
             if (
                 not decision
-                or str(decision.get("parent_id") or "") != fact_id
+                or str(decision.get("parent_id") or "") != authority_root_id
                 or str(decision.get("candidate_path_id") or "") != expected_path
                 or decision.get("authority_pass") is not True
             ):
                 failures.append(
                     "selected_graph_plan_fact_skill_path_mismatch:"
-                    f"{fact_id}:{skill_id}"
+                    f"{authority_root_id}:{skill_id}"
                 )
     orphan_pairs = sorted(set(selected_leaf_rows) - represented_pairs)
     failures.extend(

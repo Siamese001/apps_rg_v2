@@ -301,6 +301,7 @@ class GovernedResearchRun(GovernedAppRunner):
             bundle=self._last_c0_bundle,
             request=request,
             support_coverage=core.support_coverage,
+            company_brief=_find_company_brief_mapping(fec_ctx),
         )
         confidence_score = max(
             float(core.support_coverage or 0.0),

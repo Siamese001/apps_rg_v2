@@ -492,3 +492,253 @@ def test_role_context_rejects_documents_for_other_unify_entities(
             "url": "https://www.unifyconsulting.com/role",
         },
     ]
+
+
+def test_all_families_reject_false_company_identity_matches(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_single_plan(monkeypatch)
+    monkeypatch.setenv("SEARXNG_BASE_URL", "http://localhost:8080")
+    monkeypatch.setattr(
+        "apps_research.integrations.search_retrieval.retrieve",
+        lambda *_args, **_kwargs: [
+            RetrievedDoc(
+                url="https://www.brown.edu/about",
+                title="About Brown - Brown University",
+                snippet="Brown University is a research university.",
+                score=0.99,
+                engines=("bing",),
+            ),
+            RetrievedDoc(
+                url="https://brownjewelers.com/",
+                title="Brown & Company Jewelers",
+                snippet="Fine jewelry in Atlanta.",
+                score=0.98,
+                engines=("bing",),
+            ),
+            RetrievedDoc(
+                url="https://www.bbrown.com/about/",
+                title="About Brown & Brown",
+                snippet="Brown & Brown is an insurance brokerage.",
+                score=0.95,
+                engines=("bing",),
+            ),
+        ],
+    )
+    monkeypatch.setattr(
+        "apps_research.integrations.reranker_adapter.rerank",
+        lambda _query, docs, *, cutoff: list(docs)[:cutoff],
+    )
+    receipt_path = tmp_path / "apps_research" / "retrieval_receipt.json"
+    (receipt_path.parent / "runs").mkdir(parents=True)
+
+    findings = CompanyBriefEngine()._run_research_v2(
+        topic="Brown & Brown",
+        depth_profile="COMPANY_BRIEF_STANDARD",
+        jd_context={"company_name": "Brown & Brown"},
+        retrieval_receipt_path=receipt_path,
+    )
+
+    row = json.loads(receipt_path.read_text(encoding="utf-8"))["families"][0]
+    assert "Brown & Brown is an insurance brokerage." in findings["company_basics"]
+    assert row["documents_before_rerank"] == 3
+    assert row["documents_identity_admissible"] == 1
+    assert [document["title"] for document in row["accepted_documents"]] == [
+        "About Brown & Brown"
+    ]
+    assert [rejection["title"] for rejection in row["snippets_rejected"]] == [
+        "About Brown - Brown University",
+        "Brown & Company Jewelers",
+    ]
+
+
+def test_competitive_family_recovers_only_explicit_same_run_competitor_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plans = [
+        QueryPlan(
+            family="company_basics",
+            query="Acme Co company overview",
+            min_sources=1,
+        ),
+        QueryPlan(
+            family="competitive_landscape",
+            query="Acme Co competitors",
+            min_sources=1,
+        ),
+    ]
+    monkeypatch.setattr(
+        "apps_research.engines.query_decomposer.decompose_coverage_families",
+        lambda *_args, **_kwargs: plans,
+    )
+    monkeypatch.setenv("SEARXNG_BASE_URL", "http://localhost:8080")
+
+    def retrieve_for_plan(query: str, **_kwargs):
+        if query == "Acme Co company overview":
+            return [
+                RetrievedDoc(
+                    url="https://acme.example/overview",
+                    title="Acme Co Overview",
+                    snippet="Acme Co provides insurance brokerage services.",
+                    score=0.95,
+                    engines=("bing",),
+                ),
+                RetrievedDoc(
+                    url="https://market.example/acme",
+                    title="Acme Co Company Profile and Competitors",
+                    snippet="Acme Co competitors and peer brokerage market position.",
+                    score=0.80,
+                    engines=("bing",),
+                ),
+            ]
+        return [
+            RetrievedDoc(
+                url="https://other.example/competitors",
+                title="Other Company Competitors",
+                snippet="Competitor details for another company.",
+                score=0.99,
+                engines=("bing",),
+            )
+        ]
+
+    monkeypatch.setattr(
+        "apps_research.integrations.search_retrieval.retrieve",
+        retrieve_for_plan,
+    )
+    receipt_path = tmp_path / "apps_research" / "retrieval_receipt.json"
+    (receipt_path.parent / "runs").mkdir(parents=True)
+
+    findings = CompanyBriefEngine()._run_research_v2(
+        topic="Acme Co",
+        depth_profile="COMPANY_BRIEF_STANDARD",
+        jd_context={"company_name": "Acme Co"},
+        retrieval_receipt_path=receipt_path,
+    )
+
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    competitive = next(
+        row for row in receipt["families"] if row["family"] == "competitive_landscape"
+    )
+    assert "Competitors" in findings["competitive_landscape"]
+    assert competitive["retrieval_attempt_status"] == "RECOVERED_FROM_SAME_RUN"
+    assert competitive["recovery"] == {
+        "status": "PASS",
+        "method": "same_run_identity_admissible_semantic_evidence",
+        "donor_families": ["company_basics"],
+        "candidate_count": 1,
+        "accepted_count": 1,
+        "semantic_signal_pattern": (
+            r"\b(?:competitors?|competitive|market\s+(?:positioning|share)|"
+            r"peer\s+(?:companies|group|set))\b"
+        ),
+    }
+    assert [doc["title"] for doc in competitive["accepted_documents"]] == [
+        "Acme Co Company Profile and Competitors"
+    ]
+
+
+def test_c0_role_context_accepts_explicit_direct_jd_evidence() -> None:
+    findings = {
+        "company_basics": "Acme Co overview\nhttps://acme.example/overview",
+        "role_context": "",
+        "leadership_and_org": "Acme Co leadership\nhttps://acme.example/leadership",
+        "recent_news_and_signals": "Acme Co news\nhttps://acme.example/news",
+        "competitive_landscape": "Acme Co competitors\nhttps://acme.example/market",
+    }
+    bundle = CompanyBriefEngine()._build_c0_bundle(
+        topic="Acme Co",
+        depth_profile="COMPANY_BRIEF_STANDARD",
+        profile_cfg={},
+        findings=findings,
+        synthesis={},
+        jd_context={
+            "content": "Acme Co is hiring a Senior Vice President of IT Strategy.",
+            "jd_content_hash": "sha256:test-jd",
+        },
+        retrieval_contract={"required_evidence_families": [], "intent_ids": []},
+    )
+
+    role_entry = next(
+        entry
+        for entry in bundle["briefing_coverage_matrix"]["families"]
+        if entry["family"] == "role_context"
+    )
+    assert role_entry == {
+        "family": "role_context",
+        "covered": True,
+        "source_count": 1,
+        "support_kind": "direct_jd_document",
+    }
+    assert bundle["claim_evidence_map"]["unsupported_direct_evidence_count"] == 0
+    assert bundle["section_gap_report"]["gap_families"] == []
+    assert bundle["source_portfolio_summary"]["direct_jd_source_present"] is True
+    assert bundle["source_portfolio_summary"]["direct_jd_content_hash"] == "sha256:test-jd"
+
+
+def test_adoption_family_recovers_only_explicit_same_run_deployment_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plans = [
+        QueryPlan(
+            family="tech_stack_and_tools",
+            query="Acme Co technology",
+            min_sources=1,
+        ),
+        QueryPlan(
+            family="adoption_motion",
+            query="Acme Co adoption deployment",
+            min_sources=1,
+        ),
+    ]
+    monkeypatch.setattr(
+        "apps_research.engines.query_decomposer.decompose_coverage_families",
+        lambda *_args, **_kwargs: plans,
+    )
+    monkeypatch.setenv("SEARXNG_BASE_URL", "http://localhost:8080")
+
+    def retrieve_for_plan(query: str, **_kwargs):
+        if query == "Acme Co technology":
+            return [
+                RetrievedDoc(
+                    url="https://acme.example/technology",
+                    title="Acme Co Technology Transformation",
+                    snippet="Acme Co will deploy the platform across its engineering teams.",
+                    score=0.95,
+                    engines=("bing",),
+                )
+            ]
+        return [
+            RetrievedDoc(
+                url="https://other.example/adoption",
+                title="Other Company Adoption",
+                snippet="Another company deployment program.",
+                score=0.99,
+                engines=("bing",),
+            )
+        ]
+
+    monkeypatch.setattr(
+        "apps_research.integrations.search_retrieval.retrieve",
+        retrieve_for_plan,
+    )
+    receipt_path = tmp_path / "apps_research" / "retrieval_receipt.json"
+    (receipt_path.parent / "runs").mkdir(parents=True)
+
+    findings = CompanyBriefEngine()._run_research_v2(
+        topic="Acme Co",
+        depth_profile="COMPANY_BRIEF_STANDARD",
+        jd_context={"company_name": "Acme Co"},
+        retrieval_receipt_path=receipt_path,
+    )
+
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    adoption = next(
+        row for row in receipt["families"] if row["family"] == "adoption_motion"
+    )
+    assert "deploy the platform" in findings["adoption_motion"]
+    assert adoption["retrieval_attempt_status"] == "RECOVERED_FROM_SAME_RUN"
+    assert adoption["recovery"]["donor_families"] == ["tech_stack_and_tools"]
+    assert adoption["recovery"]["candidate_count"] == 1

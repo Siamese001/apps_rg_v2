@@ -947,17 +947,24 @@ def _build_traversal_sufficiency_receipt(
     category_count: int,
 ) -> dict[str, Any]:
     plan = _selected_graph_plan(proof_pool_metadata)
-    selected_skills = [row for row in (plan.get("selected_skills") or []) if isinstance(row, dict)]
-    selected_metrics_detail = [row for row in (plan.get("selected_metrics_detail") or []) if isinstance(row, dict)]
-    rejected_skills = [row for row in (plan.get("excluded_due_to_root_cap") or []) if isinstance(row, dict)]
-    rejected_metrics = [row for row in (plan.get("excluded_due_to_metric_cap") or []) if isinstance(row, dict)]
-    facts = [row for row in (plan.get("facts") or []) if isinstance(row, dict)]
+    source_traversal = plan.get("allocation_source_traversal_evidence")
+    if isinstance(source_traversal, dict) and source_traversal.get("scope") == "C03_SOURCE_CANDIDATE_UNIVERSE":
+        traversal_plan = source_traversal
+        traversal_evidence_scope = "C03_SOURCE_CANDIDATE_UNIVERSE"
+    else:
+        traversal_plan = plan
+        traversal_evidence_scope = "FINAL_SECTION_EVIDENCE_PLAN"
+    selected_skills = [row for row in (traversal_plan.get("selected_skills") or []) if isinstance(row, dict)]
+    selected_metrics_detail = [row for row in (traversal_plan.get("selected_metrics_detail") or []) if isinstance(row, dict)]
+    rejected_skills = [row for row in (traversal_plan.get("excluded_due_to_root_cap") or []) if isinstance(row, dict)]
+    rejected_metrics = [row for row in (traversal_plan.get("excluded_due_to_metric_cap") or []) if isinstance(row, dict)]
+    facts = [row for row in (traversal_plan.get("facts") or []) if isinstance(row, dict)]
 
     selected_skill_ids = _unique_strs(
-        [row.get("skill_id") for row in selected_skills] or plan.get("selected_skill_ids") or []
+        [row.get("skill_id") for row in selected_skills] or traversal_plan.get("selected_skill_ids") or []
     )
     selected_metric_ids = _unique_strs(
-        [row.get("metric_outcome_id") for row in selected_metrics_detail] or plan.get("selected_metrics") or []
+        [row.get("metric_outcome_id") for row in selected_metrics_detail] or traversal_plan.get("selected_metrics") or []
     )
     rejected_skill_ids = _unique_strs(row.get("graph_evidence_id") for row in rejected_skills)
     rejected_metric_ids = _unique_strs(row.get("graph_evidence_id") for row in rejected_metrics)
@@ -1021,20 +1028,20 @@ def _build_traversal_sufficiency_receipt(
         | set(rejected_skill_ids)
         | set(rejected_metric_ids)
     )
-    depth_report = plan.get("graph_evidence_depth_report") if isinstance(plan.get("graph_evidence_depth_report"), dict) else {}
+    depth_report = traversal_plan.get("graph_evidence_depth_report") if isinstance(traversal_plan.get("graph_evidence_depth_report"), dict) else {}
     pre_depth_report = (
-        plan.get("graph_evidence_depth_pre_report")
-        if isinstance(plan.get("graph_evidence_depth_pre_report"), dict)
+        traversal_plan.get("graph_evidence_depth_pre_report")
+        if isinstance(traversal_plan.get("graph_evidence_depth_pre_report"), dict)
         else {}
     )
     comparison_report = (
-        plan.get("graph_evidence_depth_comparison_report")
-        if isinstance(plan.get("graph_evidence_depth_comparison_report"), dict)
+        traversal_plan.get("graph_evidence_depth_comparison_report")
+        if isinstance(traversal_plan.get("graph_evidence_depth_comparison_report"), dict)
         else {}
     )
     selector_traversal = (
-        plan.get("graph_traversal_receipt")
-        if isinstance(plan.get("graph_traversal_receipt"), dict)
+        traversal_plan.get("graph_traversal_receipt")
+        if isinstance(traversal_plan.get("graph_traversal_receipt"), dict)
         else {}
     )
     candidate_conservation = (
@@ -1049,8 +1056,10 @@ def _build_traversal_sufficiency_receipt(
         "selector_plan_digest": selector_traversal.get("plan_digest") or plan.get("plan_digest") or "",
         "candidate_conservation": candidate_conservation,
         "candidate_conservation_pass": bool(candidate_conservation.get("pass")),
-        "target_role_profile": plan.get("target_role_profile") or "",
-        "selection_method": plan.get("selection_method") or "",
+        "traversal_evidence_scope": traversal_evidence_scope,
+        "source_section_plan_digest": traversal_plan.get("source_section_plan_digest") or "",
+        "target_role_profile": traversal_plan.get("target_role_profile") or "",
+        "selection_method": traversal_plan.get("selection_method") or "",
         "candidate_nodes_visited_count": max(
             candidate_nodes_visited_count,
             int(candidate_conservation.get("role_episode_roots_total") or 0),
@@ -1099,7 +1108,7 @@ def _build_traversal_sufficiency_receipt(
         "graph_evidence_depth_pre_status": pre_depth_report.get("status") or "",
         "graph_evidence_depth_comparison": comparison_report,
         "role_specific_axis_coverage": _role_axis_coverage(
-            plan,
+            traversal_plan,
             rendered_skill_ids=_rendered_competency_skill_ids(parsed_output),
         ),
     }

@@ -98,6 +98,21 @@ def test_c02_atoms_have_source_metadata() -> None:
 
 
 @pytest.mark.skipif(not LEDGER.is_file(), reason="master ledger missing")
+def test_c02_accepts_standalone_source_root_for_ledger_resolution() -> None:
+    """Section lanes may supply ``<checkout>/src`` in the standalone layout."""
+
+    source_root = REPO / "src"
+    assert default_ledger_path(source_root) == LEDGER
+
+    c02 = fetch_c02_evidence_atoms(
+        section_id="competencies",
+        pool=_pool(),
+        repo_root=source_root,
+    )
+    assert c02["atoms"]
+
+
+@pytest.mark.skipif(not LEDGER.is_file(), reason="master ledger missing")
 def test_c02_carries_graph_refs_metadata_only() -> None:
     atom = fetch_c02_evidence_atoms(section_id="competencies", pool=_pool(), repo_root=REPO)["atoms"][0]
     assert atom["graph_node_refs"] == []

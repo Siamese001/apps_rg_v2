@@ -102,6 +102,7 @@ from apps_rg.runtime.section_proof.mock_runtime_proof_policy import (
 from apps_rg.runtime.runtime_proof_layout import (
     finalize_runtime_proof_run,
     prepare_runtime_proof_run_dir,
+    rel_posix,
     resolve_effective_lane_l2_path,
 )
 from apps_rg.runtime.sections.ibm_canonical_hydration import remap_ibm_narrative_claim_ledger_to_fact_pool

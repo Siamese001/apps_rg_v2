@@ -43,6 +43,23 @@ from apps_research.types.jd_intent_coverage import (
 
 # Plan §P1.4 — V2 retrieval pipeline behind feature flag.
 _RETRIEVAL_V2_FLAG = "APPS_RESEARCH_RETRIEVAL_V2"
+_SAME_RUN_RECOVERY_SIGNAL_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
+    # A document may support more than one research family, but only when its
+    # own title/snippet explicitly names the target family.  This lets a
+    # previously retrieved, identity-admissible source recover a failed
+    # ambiguous query without treating generic company material as competitor
+    # evidence.
+    "competitive_landscape": re.compile(
+        r"\b(?:competitors?|competitive|market\s+(?:positioning|share)|"
+        r"peer\s+(?:companies|group|set))\b",
+        re.IGNORECASE,
+    ),
+    "adoption_motion": re.compile(
+        r"\b(?:adoption|deploy(?:ed|ment|ing)?|implementation|pilot(?:s)?|"
+        r"production|rollout|enablement)\b",
+        re.IGNORECASE,
+    ),
+}
 _COMPANY_BRIEF_PROVIDER_PROFILE: Final[Path] = (
     Path(__file__).resolve().parents[1]
     / "config"
@@ -95,6 +112,57 @@ APPS_RESEARCH_BRIEF_MODEL: Final[str] = _company_brief_primary_openai_model()
 def _v2_enabled() -> bool:
     """True when the V2 retrieval pipeline is opted-in via env flag."""
     return os.environ.get(_RETRIEVAL_V2_FLAG, "").strip() in {"1", "true", "yes", "on"}
+
+
+def _source_repository_root(start: Path | None = None) -> Path:
+    """Resolve the enclosing checkout in standalone and monorepo layouts."""
+    current = Path(start) if start is not None else Path(__file__)
+    current = current.resolve()
+    if current.is_file():
+        current = current.parent
+
+    for candidate in (current, *current.parents):
+        if (candidate / "src" / "apps_research" / "__init__.py").is_file():
+            return candidate
+        if (candidate / "apps_research" / "__init__.py").is_file() and (
+            candidate / ".git"
+        ).exists():
+            return candidate
+    raise FileNotFoundError(f"could not locate repository root from {current}")
+
+
+def _company_identity_matches(*, company_name: str, document: dict[str, Any]) -> bool:
+    """Return whether a retrieved document unambiguously names the company.
+
+    This is deliberately stricter than removing punctuation and comparing a
+    compact string.  For example, that former approach made ``Brown - Brown
+    University`` look like ``Brown & Brown``.  Evidence for one company must
+    never be admitted as company evidence for another.
+    """
+    identity = " ".join(str(company_name or "").casefold().split())
+    tokens = re.findall(r"[a-z0-9]+", identity)
+    if not tokens:
+        return False
+
+    haystack = " ".join(
+        str(document.get(field) or "") for field in ("title", "url", "snippet")
+    ).casefold()
+    if len(tokens) == 1:
+        pattern = rf"(?<![a-z0-9]){re.escape(tokens[0])}(?![a-z0-9])"
+    elif "&" in identity or re.search(r"\band\b", identity):
+        pattern = (
+            r"(?<![a-z0-9])"
+            + r"\s*(?:&|and)\s*".join(re.escape(token) for token in tokens)
+            + r"(?![a-z0-9])"
+        )
+    else:
+        pattern = (
+            r"(?<![a-z0-9])"
+            + r"(?:[\s\-_/,.]+)".join(re.escape(token) for token in tokens)
+            + r"(?![a-z0-9])"
+        )
+    return bool(re.search(pattern, haystack))
+
 
 _log = logging.getLogger(__name__)
 def _emit_company_brief_marker(
@@ -397,6 +465,7 @@ class CompanyBriefEngine(BaseResearchEngine):
         profile_cfg = _DEPTH_PROFILES.get(
             resolved_depth_profile, _DEPTH_PROFILES["COMPANY_BRIEF_STANDARD"]
         )
+        company_name = str((jd_context or {}).get("company_name") or "").strip() or topic
         max_queries = int(profile_cfg["max_queries"])
         if jd_context:
             required_targeting_families = [
@@ -459,7 +528,7 @@ class CompanyBriefEngine(BaseResearchEngine):
                 "exception_message": " ".join(str(exc).split()),
             }
 
-        def _fetch(plan: QueryPlan) -> tuple[str, str, dict[str, Any]]:
+        def _fetch(plan: QueryPlan) -> tuple[str, str, dict[str, Any], list[Any]]:
             search_queries = (plan.query, *plan.supplemental_queries)
             row: dict[str, Any] = {
                 "family": plan.family,
@@ -541,52 +610,47 @@ class CompanyBriefEngine(BaseResearchEngine):
                 row["retrieval_attempt_status"] = (
                     "FAILED" if query_failed else "ZERO_DOCUMENTS"
                 )
-                return plan.family, "", row
+                return plan.family, "", row, []
 
-            if plan.family == "role_context":
-                identity = " ".join(topic.lower().split())
-                compact_identity = re.sub(r"[^a-z0-9]+", "", identity)
-                identity_docs: list[Any] = []
-                for document in docs:
-                    payload = _document_payload(document)
-                    missing_fields = [
-                        field
-                        for field in ("title", "url", "snippet")
-                        if not str(payload.get(field) or "").strip()
-                    ]
-                    if not payload["engines"]:
-                        missing_fields.append("engines")
-                    if missing_fields:
-                        row["snippets_rejected"].append(
-                            {
-                                "url": payload["url"],
-                                "title": payload["title"],
-                                "reason": "REQUIRED_EVIDENCE_FIELDS_MISSING",
-                                "missing_fields": missing_fields,
-                            }
-                        )
-                        continue
-                    haystack = " ".join(
-                        str(payload.get(field) or "")
-                        for field in ("title", "url", "snippet")
-                    ).lower()
-                    compact_haystack = re.sub(r"[^a-z0-9]+", "", haystack)
-                    if identity in haystack or compact_identity in compact_haystack:
-                        identity_docs.append(document)
-                    else:
-                        row["snippets_rejected"].append(
-                            {
-                                "url": payload["url"],
-                                "title": payload["title"],
-                                "reason": "COMPANY_IDENTITY_MISMATCH",
-                            }
-                        )
-                docs = identity_docs
+            identity_docs: list[Any] = []
+            for document in docs:
+                payload = _document_payload(document)
+                missing_fields = [
+                    field
+                    for field in ("title", "url", "snippet")
+                    if not str(payload.get(field) or "").strip()
+                ]
+                if not payload["engines"]:
+                    missing_fields.append("engines")
+                if missing_fields:
+                    row["snippets_rejected"].append(
+                        {
+                            "url": payload["url"],
+                            "title": payload["title"],
+                            "reason": "REQUIRED_EVIDENCE_FIELDS_MISSING",
+                            "missing_fields": missing_fields,
+                        }
+                    )
+                    continue
+                if not _company_identity_matches(
+                    company_name=company_name,
+                    document=payload,
+                ):
+                    row["snippets_rejected"].append(
+                        {
+                            "url": payload["url"],
+                            "title": payload["title"],
+                            "reason": "COMPANY_IDENTITY_MISMATCH",
+                        }
+                    )
+                    continue
+                identity_docs.append(document)
+            docs = identity_docs
 
             row["documents_identity_admissible"] = len(docs)
             if not docs:
                 row["retrieval_attempt_status"] = "NO_ADMISSIBLE_DOCUMENTS"
-                return plan.family, "", row
+                return plan.family, "", row, []
 
             try:
                 top = rerank(plan.query, docs, cutoff=5)
@@ -597,7 +661,7 @@ class CompanyBriefEngine(BaseResearchEngine):
                     status="FAILED",
                     exc=exc,
                 )
-                return plan.family, "", row
+                return plan.family, "", row, docs
 
             row["documents_after_rerank"] = len(top)
             top_refs = {_document_ref(document) for document in top}
@@ -612,7 +676,7 @@ class CompanyBriefEngine(BaseResearchEngine):
                     )
             if not top:
                 row["retrieval_attempt_status"] = "RERANK_EMPTY"
-                return plan.family, "", row
+                return plan.family, "", row, docs
 
             # Plan §P4.5 — wrap each chunk with Anthropic contextual prefix
             # so the downstream synthesizer sees the same template audit
@@ -649,18 +713,114 @@ class CompanyBriefEngine(BaseResearchEngine):
             row["retrieval_attempt_status"] = (
                 "PASS" if blob else "NO_ADMISSIBLE_SNIPPETS"
             )
-            return plan.family, blob, row
+            return plan.family, blob, row, docs
 
         findings: Dict[str, str] = {plan.family: "" for plan in plans}
         family_receipts: list[dict[str, Any]] = []
+        admissible_documents_by_family: dict[str, list[Any]] = {}
         max_workers = max(1, min(5, len(plans)))
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
-            for family, blob, family_receipt in pool.map(_fetch, plans):
+            for family, blob, family_receipt, admissible_documents in pool.map(_fetch, plans):
                 findings[family] = blob
                 family_receipts.append(family_receipt)
+                admissible_documents_by_family[family] = admissible_documents
+
+        # When a query for an ambiguous company returns no identity-admissible
+        # source, a valid document retrieved in this same run can still support
+        # the failed family.  This is deliberately narrow: no new web query,
+        # no identity relaxation, and the candidate's own title/snippet must
+        # explicitly carry the missing family's semantic signal.
+        receipts_by_family = {
+            str(row.get("family") or ""): row for row in family_receipts
+        }
+        for plan in plans:
+            if findings.get(plan.family, "").strip():
+                continue
+            signal_pattern = _SAME_RUN_RECOVERY_SIGNAL_PATTERNS.get(plan.family)
+            if signal_pattern is None:
+                continue
+
+            candidates: list[Any] = []
+            donor_families: list[str] = []
+            seen_candidates: set[tuple[str, str, str, float]] = set()
+            for donor_plan in plans:
+                donor_family = donor_plan.family
+                if donor_family == plan.family:
+                    continue
+                for candidate in admissible_documents_by_family.get(donor_family, []):
+                    payload = _document_payload(candidate)
+                    semantic_text = " ".join(
+                        (payload["title"], payload["snippet"])
+                    )
+                    if not signal_pattern.search(semantic_text):
+                        continue
+                    candidate_ref = _document_ref(candidate)
+                    if candidate_ref in seen_candidates:
+                        continue
+                    seen_candidates.add(candidate_ref)
+                    candidates.append(candidate)
+                    if donor_family not in donor_families:
+                        donor_families.append(donor_family)
+
+            if not candidates:
+                continue
+            try:
+                recovered_docs = rerank(plan.query, candidates, cutoff=5)
+            except (RuntimeError, ValueError) as exc:
+                receipts_by_family[plan.family]["recovery"] = {
+                    "status": "RERANK_FAILED",
+                    "method": "same_run_identity_admissible_semantic_evidence",
+                    "donor_families": donor_families,
+                    "candidate_count": len(candidates),
+                    "exception_type": type(exc).__name__,
+                    "exception_message": " ".join(str(exc).split()),
+                }
+                continue
+            if not recovered_docs:
+                continue
+
+            row = receipts_by_family[plan.family]
+            recovered_chunks: list[str] = []
+            for document in recovered_docs:
+                payload = _document_payload(document)
+                if not payload["snippet"]:
+                    continue
+                row["accepted_documents"].append(payload)
+                chunk = f"- {payload['title']}: {payload['snippet']} ({payload['url']})"
+                if payload["url"]:
+                    chunk = f"{chunk}\n{payload['url']}"
+                recovered_chunks.append(
+                    apply_contextual_prefix(
+                        chunk,
+                        doc_title=payload["title"],
+                        surrounding_text=plan.query,
+                    )
+                )
+            recovered_blob = "\n\n".join(recovered_chunks)
+            if not recovered_blob:
+                continue
+
+            findings[plan.family] = recovered_blob
+            row["documents_after_rerank"] = len(recovered_docs)
+            row["grounded_character_count"] = len(recovered_blob)
+            row["finding_digest"] = "sha256:" + hashlib.sha256(
+                recovered_blob.encode("utf-8")
+            ).hexdigest()
+            row["retrieval_attempt_status"] = "RECOVERED_FROM_SAME_RUN"
+            row["recovery"] = {
+                "status": "PASS",
+                "method": "same_run_identity_admissible_semantic_evidence",
+                "donor_families": donor_families,
+                "candidate_count": len(candidates),
+                "accepted_count": len(row["accepted_documents"]),
+                "semantic_signal_pattern": signal_pattern.pattern,
+            }
 
         grounded_family_count = sum(
-            1 for row in family_receipts if row["retrieval_attempt_status"] == "PASS"
+            1
+            for row in family_receipts
+            if row["retrieval_attempt_status"]
+            in {"PASS", "RECOVERED_FROM_SAME_RUN"}
         )
         receipt = {
             "schema_version": "apps_research.retrieval_receipt.v1",
@@ -789,16 +949,19 @@ class CompanyBriefEngine(BaseResearchEngine):
         )
 
         consumer_template_id = consumer_brief_template_id(jd_context=jd_context)
-        base_prompt = self._build_synthesis_prompt(topic=topic, findings=findings, jd_facets=jd_facets)
-        base_synthesis = self._gemini_synthesize(prompt=base_prompt, topic=topic, jd_facets=jd_facets)
         if apps_rg_targeting_brief_enabled(jd_context=jd_context):
-            targeting = self._synthesize_apps_rg_targeting_brief(
+            # The apps_rg route has its own sealed markdown contract.  A
+            # separate legacy JSON synthesis is neither an input to that
+            # contract nor used by the handoff, and a malformed unused JSON
+            # response must not prevent an otherwise valid targeting brief.
+            return self._synthesize_apps_rg_targeting_brief(
                 topic=topic,
                 findings=findings,
                 jd_context=jd_context or {},
                 jd_anchor=jd_anchor,
             )
-            return {**base_synthesis, **targeting}
+        base_prompt = self._build_synthesis_prompt(topic=topic, findings=findings, jd_facets=jd_facets)
+        base_synthesis = self._gemini_synthesize(prompt=base_prompt, topic=topic, jd_facets=jd_facets)
         if consumer_template_id in {
             "downstream_research_substrate_v1",
             "apps_lic_research_substrate_v1",
@@ -1400,7 +1563,7 @@ class CompanyBriefEngine(BaseResearchEngine):
     ) -> str:
         """Write fail-closed X2 diagnostics without authorizing handoff."""
         try:
-            repo_root = Path(__file__).resolve().parents[2]
+            repo_root = _source_repository_root()
             out_dir = repo_root / "artifacts" / "apps_research" / "x2_judge_failures"
             out_dir.mkdir(parents=True, exist_ok=True)
             digest = hashlib.sha256(
@@ -1650,6 +1813,7 @@ class CompanyBriefEngine(BaseResearchEngine):
     ) -> Dict[str, Any]:
         """Build the 7-object C0 output bundle from research findings + synthesis."""
         from apps_research.integrations.search_retrieval import retrieval_config_snapshot  # noqa: PLC0415
+        from apps_research.prompt_assembly.consumer_briefs import extract_jd_text  # noqa: PLC0415
 
         contract = retrieval_contract or describe_jd_retrieval_contract(jd_context or None)
         required_families = list(dict.fromkeys(
@@ -1660,6 +1824,8 @@ class CompanyBriefEngine(BaseResearchEngine):
             query_families=list(findings.keys())
         )
         jd_present = bool(jd_context)
+        jd_text = extract_jd_text(jd_context=jd_context).strip() if jd_present else ""
+        direct_jd_role_context = bool(jd_text)
 
         # ── BriefingCoverageMatrix ──────────────────────────────────────────
         coverage_entries: List[Dict[str, Any]] = []
@@ -1667,13 +1833,36 @@ class CompanyBriefEngine(BaseResearchEngine):
         for fam in required_families:
             blob = findings.get(fam, "")
             has_content = bool(blob and blob.strip())
-            if has_content:
+            has_direct_jd_support = fam == "role_context" and direct_jd_role_context
+            is_covered = has_content or has_direct_jd_support
+            if is_covered:
                 covered += 1
-            coverage_entries.append({"family": fam, "covered": has_content, "source_count": len(blob.split("\n")) if has_content else 0})
+            coverage_entries.append(
+                {
+                    "family": fam,
+                    "covered": is_covered,
+                    "source_count": (
+                        len(blob.split("\n"))
+                        if has_content
+                        else (1 if has_direct_jd_support else 0)
+                    ),
+                    "support_kind": (
+                        "retrieved_web"
+                        if has_content
+                        else (
+                            "direct_jd_document"
+                            if has_direct_jd_support
+                            else "missing"
+                        )
+                    ),
+                }
+            )
 
         jd_req_families = ["role_context", "tech_stack_and_tools"] if jd_present else []
         jd_covered = sum(
-            1 for f in jd_req_families if (findings.get(f) or "").strip()
+            1
+            for entry in coverage_entries
+            if entry["family"] in jd_req_families and entry["covered"]
         )
         overall_coverage_score = covered / len(required_families) if required_families else 0.0
         jd_coverage_score = jd_covered / len(jd_req_families) if jd_req_families else 0.0
@@ -1709,6 +1898,12 @@ class CompanyBriefEngine(BaseResearchEngine):
             "total_citation_anchors": total_citation_anchors,
             "authoritative_anchor_present": total_sources > 0,
             "source_urls": sorted(set(all_urls))[:50],
+            "direct_jd_source_present": direct_jd_role_context,
+            "direct_jd_content_hash": (
+                str(jd_context.get("jd_content_hash") or "")
+                if direct_jd_role_context
+                else ""
+            ),
         }
 
         # ── ClaimEvidenceMap ────────────────────────────────────────────────
@@ -1737,7 +1932,11 @@ class CompanyBriefEngine(BaseResearchEngine):
         }
 
         # ── SectionGapReport ────────────────────────────────────────────────
-        gap_families = [fam for fam in required_families if not (findings.get(fam) or "").strip()]
+        gap_families = [
+            str(entry["family"])
+            for entry in coverage_entries
+            if not entry["covered"]
+        ]
         section_gap_report = {
             "gap_families": gap_families,
             "gap_count": len(gap_families),
@@ -1752,6 +1951,9 @@ class CompanyBriefEngine(BaseResearchEngine):
             "ordered_sections": required_families,
             "jd_evidence_intents": list(contract.get("intent_ids", [])),
             "jd_required_evidence_families": list(contract.get("required_evidence_families", [])),
+            "direct_jd_evidence_families": (
+                ["role_context"] if direct_jd_role_context else []
+            ),
         }
         if jd_present:
             synthesis_guidance["jd_focal_angle"] = jd_context.get("jd_ref", "")

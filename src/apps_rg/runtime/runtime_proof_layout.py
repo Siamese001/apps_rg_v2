@@ -49,7 +49,23 @@ CONTRACT_HARNESS_PREFIXES: tuple[str, ...] = (
 )
 
 
+def _canonical_runtime_repo_root(repo: Path) -> Path:
+    """Normalize a standalone package ``src`` root to its checkout root.
+
+    Older section lanes retain the monorepo-shaped convention of passing
+    ``<checkout>/src`` to the runtime-proof helpers.  Whole-run artifacts and
+    the modular sections root are intentionally owned by the checkout, not the
+    package directory.  Preserve arbitrary roots used by isolated tests.
+    """
+
+    supplied = Path(repo).resolve()
+    if supplied.name == "src" and (supplied / "apps_rg" / "__init__.py").is_file():
+        return supplied.parent
+    return supplied
+
+
 def modular_sections_root_from_env(repo: Path) -> Path | None:
+    repo = _canonical_runtime_repo_root(repo)
     raw = os.environ.get(MODULAR_R4_SECTIONS_ROOT_ENV, "").strip()
     if not raw:
         return None
@@ -76,6 +92,7 @@ def resolve_modular_latest_l2(repo: Path, lane: str) -> Path | None:
     """Path to ``l2_output.json`` from modular R4 section pointers (Phase 1+), if env is set."""
     from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
 
+    repo = _canonical_runtime_repo_root(repo)
     msr = modular_sections_root_from_env(repo)
     if msr is None:
         return None
@@ -152,21 +169,57 @@ def _whole_run_envelope_active() -> bool:
 
 
 def _modular_root_uses_flat_lane_dirs(msr: Path) -> bool:
-    """``APPS_RG_MODULAR_R4_SECTIONS_ROOT`` points at ``<full_resume_*>/lanes``."""
+    """Return whether ``msr`` belongs to the active whole-resume envelope.
+
+    The canonical CLI envelope uses ``<full_resume_* >/lanes``.  Fresh E2E
+    runs may supply an explicit root instead, whose section root is
+    ``<e2e_run>/modular_r4/sections``.  Both forms own flat per-lane roots and
+    must keep the invoked spine section under the current run rather than
+    allocating a new generic ``full_resume_*`` directory.
+    """
     if not _whole_run_envelope_active():
         return False
     resolved = msr.resolve()
-    return resolved.name == "lanes" and is_integrated_whole_run_dir_name(resolved.parent.name)
+    if resolved.name == "lanes":
+        return is_integrated_whole_run_dir_name(resolved.parent.name)
+    if resolved.name != "sections" or resolved.parent.name != "modular_r4":
+        return False
+    return is_integrated_whole_run_artifact_dir(resolved.parent.parent)
 
 
 def allocate_full_resume_artifact_dir(repo: Path, explicit: str = "") -> Path:
     """Default whole-run artifact root: ``artifacts/apps_rg/runtime_proofs/full_resume_<id>``."""
+    repo = _canonical_runtime_repo_root(repo)
     if str(explicit).strip():
         return Path(explicit).expanduser().resolve()
     rid = uuid.uuid4().hex[:12]
     out = repo / "artifacts" / "apps_rg" / "runtime_proofs" / f"{FULL_RESUME_DIR_PREFIX}{rid}"
     out.mkdir(parents=True, exist_ok=True)
     return out
+
+
+def allocate_section_spine_artifact_dir(
+    repo: Path,
+    lane: str,
+    explicit: str = "",
+) -> Path:
+    """Choose the integrated-spine artifact directory for one section invocation.
+
+    During a whole-resumé Phase 1 run, the core spine passes this directory to
+    the lane as an override.  It must therefore be the run-scoped flat lane
+    directory, not a new unrelated ``full_resume_*`` directory.
+    """
+
+    repo = _canonical_runtime_repo_root(repo)
+    if str(explicit).strip():
+        return Path(explicit).expanduser().resolve()
+    msr = modular_sections_root_from_env(repo)
+    if msr is not None and _modular_root_uses_flat_lane_dirs(msr):
+        require_manifest_for_modular_sections_root(msr, env_name=MODULAR_R4_SECTIONS_ROOT_ENV)
+        out = msr / str(lane).strip()
+        out.mkdir(parents=True, exist_ok=True)
+        return out
+    return allocate_full_resume_artifact_dir(repo)
 
 
 def resolve_phase1_sections_root(artifact_dir: Path, modular_root: Path) -> Path:
@@ -182,11 +235,13 @@ def resolve_phase1_sections_root(artifact_dir: Path, modular_root: Path) -> Path
 
 
 def lane_root(repo: Path, lane: str) -> Path:
+    repo = _canonical_runtime_repo_root(repo)
     return repo / "artifacts" / "apps_rg" / "runtime_proofs" / lane
 
 
 def contract_harness_root(repo: Path) -> Path:
     """Pytest/contract offline scratch — not product lane rollup inputs."""
+    repo = _canonical_runtime_repo_root(repo)
     return repo / "artifacts" / "apps_rg" / "runtime_proofs" / CONTRACT_HARNESS_DIR
 
 
@@ -213,6 +268,7 @@ def run_dir(repo: Path, lane: str, bucket: Bucket, run_id: str) -> Path:
 
 
 def rel_posix(path: Path, repo: Path) -> str:
+    repo = _canonical_runtime_repo_root(repo)
     return path.resolve().relative_to(repo.resolve()).as_posix()
 
 
@@ -224,6 +280,7 @@ def prepare_runtime_proof_run_dir(
     *,
     placement_bucket: Bucket | None = None,
 ) -> Path:
+    repo = _canonical_runtime_repo_root(repo)
     bucket: Bucket = placement_bucket if placement_bucket is not None else proof_bucket_for_provider(provider)
     msr = modular_sections_root_from_env(repo)
     if msr is not None:
@@ -311,6 +368,7 @@ _RUNTIME_PROOF_LINK_FILENAMES: tuple[str, ...] = (
 
 def collect_runtime_proof_artifact_links(repo: Path, artifact_dir: Path) -> dict[str, str]:
     """Map filename → repo-relative POSIX path for artifacts present under ``artifact_dir``."""
+    repo = _canonical_runtime_repo_root(repo)
     ad = artifact_dir.resolve()
     rr = repo.resolve()
     out: dict[str, str] = {}
@@ -356,6 +414,7 @@ def finalize_runtime_proof_run(
     **manifest_extras: Any,
 ) -> None:
     """Write run_manifest.json and latest_{real|mock|plumbing}_run.json under lane root."""
+    repo = _canonical_runtime_repo_root(repo)
     bucket: Bucket = placement_bucket if placement_bucket is not None else proof_bucket_for_provider(provider)
     generated_at_utc = datetime.now(timezone.utc).isoformat()
     cmd = command if command is not None else " ".join(sys.argv)
@@ -450,6 +509,7 @@ def finalize_runtime_proof_run(
 
 
 def load_latest_pointer(repo: Path, lane: str, bucket: Bucket) -> dict[str, Any] | None:
+    repo = _canonical_runtime_repo_root(repo)
     ptr = lane_root(repo, lane) / ("latest_real_run.json" if bucket == "real" else "latest_mock_run.json")
     if not ptr.is_file():
         return None
@@ -461,6 +521,7 @@ def load_latest_pointer(repo: Path, lane: str, bucket: Bucket) -> dict[str, Any]
 
 
 def load_latest_successful_real_pointer(repo: Path, lane: str) -> dict[str, Any] | None:
+    repo = _canonical_runtime_repo_root(repo)
     ptr = lane_root(repo, lane) / LATEST_SUCCESSFUL_REAL_FILENAME
     if not ptr.is_file():
         return None
@@ -472,6 +533,7 @@ def load_latest_successful_real_pointer(repo: Path, lane: str) -> dict[str, Any]
 
 
 def resolve_run_dir_from_latest_successful_pointer(repo: Path, lane: str) -> Path | None:
+    repo = _canonical_runtime_repo_root(repo)
     data = load_latest_successful_real_pointer(repo, lane)
     if not data:
         return None
@@ -486,6 +548,7 @@ def resolve_run_dir_from_latest_successful_pointer(repo: Path, lane: str) -> Pat
 
 def _migration_latest_real_llm_provider_run_dir(repo: Path, lane: str) -> Path | None:
     """When successful pointer is absent or stale, pick newest eligible real-bucket run."""
+    repo = _canonical_runtime_repo_root(repo)
     root = lane_root(repo, lane) / "real"
     if not root.is_dir():
         return None
@@ -533,6 +596,7 @@ def resolve_accepted_real_rollup_run_dir(repo: Path, lane: str) -> tuple[Path | 
 
 
 def resolve_run_dir_from_pointer(repo: Path, lane: str, bucket: Bucket) -> Path | None:
+    repo = _canonical_runtime_repo_root(repo)
     data = load_latest_pointer(repo, lane, bucket)
     if not data:
         return None

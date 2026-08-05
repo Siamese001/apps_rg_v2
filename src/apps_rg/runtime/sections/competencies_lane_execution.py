@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from apps_rg.runtime.c0.c03_resume_graph_contracts import stable_digest
 from apps_rg.runtime.offline_contract_status import OFFLINE_CONTRACT_STUB_RUNTIME_STATUS
 from apps_rg.runtime.section_judge_policy import get_section_judge_policy
 
@@ -634,14 +635,100 @@ def run_competencies_lane_execution(
         ):
             from apps_rg.runtime.c0.competencies_graph_authority import (
                 build_competencies_graph_authority_discrepancy_ledger,
+                insurance_it_strategy_frozen_layout_is_present,
+                materialize_unmatched_competencies_allocation_terms,
+                project_insurance_it_strategy_competencies_from_frozen_allocation,
                 reconcile_competencies_allocation_claim_units,
+                synchronize_competencies_allocation_bindings_to_categories,
             )
 
+            if insurance_it_strategy_frozen_layout_is_present(selected_graph_plan):
+                allocation_output_projection = (
+                    project_insurance_it_strategy_competencies_from_frozen_allocation(
+                        parsed,
+                        selected_plan=selected_graph_plan,
+                        allowed_fact_ids=allowed_fact_ids,
+                    )
+                )
+            else:
+                allocation_output_projection = {
+                    "schema_version": "competencies_frozen_allocation_output_projection_v1",
+                    "section_id": "competencies",
+                    "target_role_profile": str(
+                        selected_graph_plan.get("target_role_profile") or ""
+                    ),
+                    "allocation_plan_digest": str(
+                        selected_graph_plan.get("allocation_plan_digest") or ""
+                    ),
+                    "applicable": False,
+                    "pass": True,
+                    "status": "NOT_APPLICABLE_GENERIC_ALLOCATION",
+                    "reason": (
+                        "selected allocation does not carry the exact "
+                        "insurance_it_strategy frozen 24-unit layout"
+                    ),
+                }
+                allocation_output_projection["receipt_digest"] = stable_digest(
+                    allocation_output_projection
+                )
+            write_json(
+                artifact_dir
+                / "competencies_frozen_allocation_output_projection_receipt.json",
+                allocation_output_projection,
+            )
+            if allocation_output_projection.get("applicable"):
+                if allocation_output_projection.get("pass") is not True:
+                    raise ValueError(
+                        "competencies frozen-allocation output projection failed closed: "
+                        f"{allocation_output_projection.get('status')}"
+                    )
+                # The projection replaced both display surfaces with exact,
+                # source-bound allocation terms. Rebuild before reconciliation
+                # so its claim ledger observes the same final wording.
+                rebuild_claim_ledger_from_competencies(parsed, allowed_fact_ids)
             allocation_reconciliation = reconcile_competencies_allocation_claim_units(
                 parsed,
                 selected_plan=selected_graph_plan,
                 allowed_fact_ids=allowed_fact_ids,
             )
+            allocation_surface_receipt: dict[str, Any] | None = None
+            if allocation_reconciliation["pass"] is not True:
+                allocation_surface_receipt = (
+                    materialize_unmatched_competencies_allocation_terms(
+                        parsed,
+                        selected_plan=selected_graph_plan,
+                        allowed_fact_ids=allowed_fact_ids,
+                        claim_unit_ids=allocation_reconciliation[
+                            "unmatched_claim_unit_ids"
+                        ],
+                    )
+                )
+                write_json(
+                    artifact_dir
+                    / "competencies_allocation_visible_surface_receipt.json",
+                    allocation_surface_receipt,
+                )
+                # The materialized terms are exact frozen graph surfaces. Run the
+                # final X2-aligned lexical cleanup *after* insertion so an added
+                # allocation theme cannot bypass the display-level keyword limit.
+                # That cleanup preserves allocation terms and removes only an
+                # optional competing term where the taxonomy floor allows it.
+                reduce_competency_keyword_stuffing(parsed)
+                # Rebuild the text ledger before reconciling every allocation
+                # unit again.
+                rebuild_claim_ledger_from_competencies(parsed, allowed_fact_ids)
+                allocation_reconciliation = reconcile_competencies_allocation_claim_units(
+                    parsed,
+                    selected_plan=selected_graph_plan,
+                    allowed_fact_ids=allowed_fact_ids,
+                )
+            allocation_v3_sync = synchronize_competencies_allocation_bindings_to_categories(
+                parsed
+            )
+            # Keep the claim ledger's allocation identity after the final
+            # reconciliation.  The builder now preserves explicit claim-unit
+            # IDs rather than silently replacing them with text-only rows.
+            rebuild_claim_ledger_from_competencies(parsed, allowed_fact_ids)
             discrepancy_ledger = build_competencies_graph_authority_discrepancy_ledger(
                 selected_plan=selected_graph_plan,
                 proof_pool_metadata=pp_meta,
@@ -672,6 +759,30 @@ def run_competencies_lane_execution(
                 ),
                 "ledger_digest": discrepancy_ledger["ledger_digest"],
             }
+            parsed["competencies_allocation_v3_sync"] = {
+                "receipt": allocation_v3_sync,
+                "pass": allocation_v3_sync["pass"],
+            }
+            if allocation_output_projection.get("applicable"):
+                parsed["competencies_frozen_allocation_output_projection"] = {
+                    "receipt_ref": _artifact_repo_rel(
+                        artifact_dir
+                        / "competencies_frozen_allocation_output_projection_receipt.json",
+                        REPO_ROOT,
+                    ),
+                    "receipt_digest": allocation_output_projection["receipt_digest"],
+                    "pass": allocation_output_projection["pass"],
+                }
+            if allocation_surface_receipt is not None:
+                parsed["competencies_allocation_visible_surface"] = {
+                    "receipt_ref": _artifact_repo_rel(
+                        artifact_dir
+                        / "competencies_allocation_visible_surface_receipt.json",
+                        REPO_ROOT,
+                    ),
+                    "receipt_digest": allocation_surface_receipt["receipt_digest"],
+                    "pass": allocation_surface_receipt["pass"],
+                }
         _post_finalize = json.dumps(parsed, sort_keys=True, separators=(",", ":"))
         if _post_finalize != _pre_finalize:
             record_deterministic_rewrite(
@@ -731,7 +842,11 @@ def run_competencies_lane_execution(
         or runtime_payload["run_id"]
     )
     jd_alignment_final = merge_jd_alignment((parsed or {}).get("jd_alignment") if isinstance(parsed, dict) else None)
-    trace_rr_c = artifact_dir.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    # Section modules retain a source-root ``REPO_ROOT`` for package assets,
+    # while an integrated run owns its artifacts at the checkout root.  Use the
+    # shared layout helper so standalone ``src`` layouts produce a stable
+    # checkout-relative trace reference.
+    trace_rr_c = rel_posix(artifact_dir, REPO_ROOT)
     usage_doc = build_section_input_usage_ledger_v1(
         section_id="competencies",
         run_id=str(runtime_payload["run_id"]),

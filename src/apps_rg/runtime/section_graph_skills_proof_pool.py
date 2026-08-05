@@ -104,6 +104,28 @@ def bind_selector_selected_skills_to_section_plan(
     if section_id not in _ROLE_EPISODE_SKILL_BINDING_SECTIONS:
         return dict(plan)
 
+    from apps_rg.runtime.c0.resume_graph_proof_pool import (
+        load_frozen_whole_resume_source_plan,
+    )
+
+    # Whole-resume C0.3 selection is frozen before any lane starts. Use the
+    # exact sealed plan rather than re-running retrieval; the latter can change
+    # a deterministic-looking tie order without changing the underlying graph.
+    frozen_whole_resume_plan = load_frozen_whole_resume_source_plan(section_id)
+    if frozen_whole_resume_plan is not None:
+        frozen_skills = [
+            dict(row)
+            for row in frozen_whole_resume_plan.get("selected_skills") or []
+            if isinstance(row, dict) and str(row.get("skill_id") or "").strip()
+        ]
+        if not frozen_skills:
+            raise GraphSkillSelectorBindingError(
+                f"{section_id}: frozen whole-resume source plan has no selected skills",
+                section_id=section_id,
+                unsatisfied_constraint="frozen_source_selected_skill_coverage",
+            )
+        return frozen_whole_resume_plan
+
     from apps_rg.runtime.sections.graph_role_episode_selector import (
         build_selected_graph_evidence_plan_for_section,
     )

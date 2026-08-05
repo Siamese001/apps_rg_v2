@@ -116,6 +116,36 @@ def apps_research_handoff_authorized(manual_brief: str, *, jd_ref: str = "") -> 
     return bool(validation.valid)
 
 
+def _validate_handoff_for_ingress_envelope(
+    *,
+    brief_ref: str,
+    jd_ref: str,
+    envelope: Any,
+    require_observed: bool,
+) -> Any:
+    """Validate a reusable research handoff against this exact ingress run.
+
+    A producer bundle is not portable across independently-created Apps RG
+    runs.  The same bindings are enforced by U0, so the pre-U0 reuse decision
+    must use them too; otherwise the runner can skip research and then send a
+    handoff to U0 that U0 correctly rejects.
+    """
+
+    return validate_apps_research_handoff(
+        brief_ref=brief_ref,
+        jd_ref=jd_ref,
+        require_observed=require_observed,
+        require_x1_x3_authorization=require_observed,
+        require_canonical_exit=require_observed,
+        expected_target_company=str(envelope.app_payload.get("target_company") or ""),
+        expected_target_role=str(envelope.app_payload.get("target_role") or ""),
+        expected_parent_run_id=str(envelope.run_id),
+        expected_request_id=str(envelope.request_id),
+        expected_trace_root=str(envelope.trace_id),
+        expected_tenant_id=str(envelope.tenant_id),
+    )
+
+
 def should_delegate_apps_research(
     *,
     route_family: str,
@@ -983,15 +1013,11 @@ def run_whole_run_with_route_governance(
         or str(jd or "").strip()
         or str(job_description_text or "").strip()
     )
-    initial_handoff_validation = validate_apps_research_handoff(
+    initial_handoff_validation = _validate_handoff_for_ingress_envelope(
         brief_ref=manual_brief,
         jd_ref=handoff_jd_ref,
+        envelope=envelope,
         require_observed=research_delegation_enabled(
-            auto_research_internal=auto_research_internal,
-            research_via=research_via,
-        )
-        and briefing_input_present(manual_brief),
-        require_x1_x3_authorization=research_delegation_enabled(
             auto_research_internal=auto_research_internal,
             research_via=research_via,
         )
@@ -1174,11 +1200,11 @@ def run_whole_run_with_route_governance(
         chroma_path_resolved=None,
         research_via="apps_research" if research_ran else research_via,
     )
-    handoff_validation = validate_apps_research_handoff(
+    handoff_validation = _validate_handoff_for_ingress_envelope(
         brief_ref=manual_brief_eff,
         jd_ref=handoff_jd_ref,
+        envelope=envelope,
         require_observed=research_enabled and briefing_input_present(manual_brief_eff),
-        require_x1_x3_authorization=research_enabled and briefing_input_present(manual_brief_eff),
     )
     handoff_receipt = handoff_validation.to_receipt()
     handoff_identity = handoff_receipt.get("identity")

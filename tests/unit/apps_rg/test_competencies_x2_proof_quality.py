@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from apps_rg.runtime.sections.competencies_lane_runtime import (
     collect_employment_bullets,
     load_base_resume,
     rebuild_claim_ledger_from_competencies,
+    reduce_competency_keyword_stuffing,
 )
 from apps_rg.runtime.validators.competencies_x2 import (
     X2GateResult,
@@ -152,6 +154,76 @@ def test_canonicalize_terms_coerces_plain_strings() -> None:
     plain = next(t for t in terms if t["text"] == "plain string term")
     assert plain["source_fact_id"] == "bul_unify_001"
     assert "bul_unify_001" in plain["source_fact_ids"]
+
+
+def test_keyword_repair_matches_x2_limit_and_preserves_frozen_allocation_term() -> None:
+    """Late graph-theme insertion cannot bypass X2 or lose its required term."""
+    competencies = [
+        {
+            "category_label": "Protected Allocation",
+            "terms": [
+                {
+                    "text": "Revenue target execution and quota-aligned solution leadership",
+                    "allocation_claim_unit_id": "competencies:skill:06",
+                },
+                {"text": "Policy execution oversight across regulated ecosystems"},
+                {"text": "Board-ready operating model governance cadence"},
+            ],
+        },
+        {
+            "category_label": "Optional Supporting Terms",
+            "terms": [
+                {"text": "Organization scale-out for platform execution"},
+                {"text": "Agent execution readiness across customer journeys"},
+                {"text": "Cross-functional capability portfolio design"},
+                {"text": "Enterprise adoption signal measurement"},
+            ],
+        },
+    ]
+    parsed = {
+        "competencies": deepcopy(competencies),
+        "categories": deepcopy(competencies),
+    }
+
+    reduce_competency_keyword_stuffing(parsed)
+
+    for surface in ("competencies", "categories"):
+        terms = [
+            str(term.get("text") or term.get("term") or "")
+            for category in parsed[surface]
+            for term in category["terms"]
+        ]
+        assert "Revenue target execution and quota-aligned solution leadership" in terms
+        assert "Organization scale-out for platform execution" not in terms
+        assert sum("execution" in term.lower().split() for term in terms) == 3
+
+
+def test_rebuild_claim_ledger_preserves_explicit_allocation_identity() -> None:
+    parsed = {
+        "competencies": [
+            {
+                "category_label": "Governance, Risk & Compliance",
+                "source_fact_ids": ["fact_runtime"],
+                "terms": [
+                    {
+                        "text": "governed runtime control architecture",
+                        "source_fact_id": "fact_runtime",
+                        "allocation_claim_unit_id": "competencies:section_only:01",
+                    }
+                ],
+            }
+        ]
+    }
+
+    rebuild_claim_ledger_from_competencies(parsed, {"fact_runtime"})
+
+    assert parsed["claim_ledger"] == [
+        {
+            "claim_text": "governed runtime control architecture",
+            "source_fact_ids": ["fact_runtime"],
+            "claim_unit_id": "competencies:section_only:01",
+        }
+    ]
 
 
 def test_gate_row_consistency_rejects_pass_with_failure_like_observed_em_dash():

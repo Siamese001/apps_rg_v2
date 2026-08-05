@@ -45,6 +45,7 @@ from agentic_core.L4_state.contracts.records import (
 from agentic_core.L4_state.research.research_brief_record import ResearchBriefRecord
 from agentic_core.L4_state.uwg.durable_write_gateway import (
     DurableWriteGateway,
+    compute_state_diffs_digest,
     get_default_gateway,
 )
 
@@ -90,6 +91,30 @@ def _fec_digest(fec_context: dict) -> str:
         return hashlib.sha256(raw.encode()).hexdigest()
     except (TypeError, ValueError):
         return ""
+
+
+def _commit_request_signature(
+    *,
+    commit_request_id: str,
+    staged_diff_hash: str,
+    clearance_proof_id: str,
+    registry_digest_set: tuple[str, ...],
+) -> str:
+    """Bind the Exit clearance, staged mutation, and governing registries.
+
+    This is a deterministic integrity binding used by the current UWG contract;
+    it is not a substitute for the Exit clearance itself.  The caller supplies
+    the same ``clearance_proof_id`` to both relevant CommitRequest fields so
+    UWG can keep the two references auditable as one sealed decision.
+    """
+    return compute_deterministic_digest(
+        {
+            "commit_request_id": commit_request_id,
+            "staged_diff_hash": staged_diff_hash,
+            "clearance_proof_id": clearance_proof_id,
+            "registry_digest_set": list(registry_digest_set),
+        }
+    )
 
 
 def commit_brief_record(
@@ -199,10 +224,21 @@ def commit_brief_record(
             )
         )
 
+        # These bindings are required by the current UWG admission contract.
+        # They are calculated only after the immutable StateDiff exists, then
+        # bound to the same synthetic-Exit reference already used by this
+        # writer's documented post-run provenance model.
+        clearance_proof_id = f"erp://research-brief::{replay_key}"
+        registry_digest_set = (
+            f"registry:policy:{_POLICY_REF}",
+            f"registry:blueprint:{_BLUEPRINT_REF}",
+        )
+        staged_diff_hash = compute_state_diffs_digest([sd])
+
         commit_request = stamp_digest(
             CommitRequest(
                 commit_request_id=commit_request_id,
-                cleared_exit_review_packet_ref=f"erp://research-brief::{replay_key}",
+                cleared_exit_review_packet_ref=clearance_proof_id,
                 request_id=f"req::{commit_request_id}",
                 run_id=run_record.run_id,
                 trace_root=getattr(run_record, "trace_id", "") or run_record.run_id,
@@ -219,6 +255,18 @@ def commit_brief_record(
                 affected_state_surfaces=(_L4_SURFACE,),
                 expected_read_surface_refreshes=(_L4_SURFACE,),
                 l5_certification_ref=_L5_CERTIFICATION_REF,
+                registry_digest_set=registry_digest_set,
+                clearance_proof_id=clearance_proof_id,
+                validator_receipt_id=(
+                    f"validator:apps_research:research_brief:{replay_key}"
+                ),
+                staged_diff_hash=staged_diff_hash,
+                commit_request_signature=_commit_request_signature(
+                    commit_request_id=commit_request_id,
+                    staged_diff_hash=staged_diff_hash,
+                    clearance_proof_id=clearance_proof_id,
+                    registry_digest_set=registry_digest_set,
+                ),
             )
         )
 

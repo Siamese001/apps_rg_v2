@@ -211,8 +211,8 @@ class TestCuratedTargetingFallback:
             return [
                 RetrievedDoc(
                     url=f"https://example.com/{len(calls)}",
-                    title=f"doc-{len(calls)}",
-                    snippet=f"snippet for {query}",
+                    title=f"Anthropic evidence {len(calls)}",
+                    snippet=f"Anthropic evidence for {query}",
                     score=1.0,
                     engines=("bing",),
                 )

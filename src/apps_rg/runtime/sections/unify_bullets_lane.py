@@ -72,7 +72,11 @@ from apps_rg.runtime.reasoning.employment_bullet_pool import (
     sc_path_count_for_lane,
 )
 from apps_rg.runtime.resume_resolution import load_lane_base_resume_json
-from apps_rg.runtime.runtime_proof_layout import finalize_runtime_proof_run, prepare_runtime_proof_run_dir
+from apps_rg.runtime.runtime_proof_layout import (
+    finalize_runtime_proof_run,
+    prepare_runtime_proof_run_dir,
+    rel_posix,
+)
 from apps_rg.runtime.shadow.unify_bullets_l6 import build_l6_shadow_package, extend_unify_bullets_l6_learning_fields
 from apps_rg.runtime.briefing_resolution import resolve_briefing_for_lanes
 from apps_rg.runtime.jd_resolution import resolve_jd_for_lanes
@@ -1331,7 +1335,7 @@ def run_unify_bullets_execution(
         or (provider_request_data or {}).get("id")
         or runtime_payload["run_id"]
     )
-    trace_rr = artifact_dir.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    trace_rr = rel_posix(artifact_dir, REPO_ROOT)
     usage_doc = build_section_input_usage_ledger_v1(
         section_id="unify_bullets",
         run_id=str(runtime_payload["run_id"]),

@@ -108,6 +108,7 @@ from apps_rg.runtime.section_proof.mock_runtime_proof_policy import (
 from apps_rg.runtime.runtime_proof_layout import (
     finalize_runtime_proof_run,
     prepare_runtime_proof_run_dir,
+    rel_posix,
 )
 from apps_rg.runtime.sections.graph_evidence_contract import (
     build_graph_evidence_runtime_payload,
@@ -612,6 +613,26 @@ _KEYWORD_STUFFING_STOPWORDS = frozenset(
         "via",
         "per",
         "by",
+        "at",
+        "from",
+        "into",
+        "across",
+        "over",
+        "under",
+        "between",
+        "within",
+        "without",
+        "using",
+        "based",
+        "enterprise",
+        "platform",
+        "systems",
+        "engineering",
+        "delivery",
+        "quality",
+        "data",
+        "ai",
+        "ml",
     }
 )
 
@@ -625,10 +646,19 @@ def _competency_term_content_words(phrase: str) -> list[str]:
 
 
 def reduce_competency_keyword_stuffing(parsed: dict[str, Any]) -> None:
-    """Drop structured terms until x2_no_keyword_stuffing (<=5 repeats per non-stopword)."""
+    """Drop optional terms until the final X2 keyword limit (<=3) is met.
+
+    ``categories`` is the rich V3 representation and ``competencies`` is the
+    legacy display representation.  When both exist, retain their visible
+    term surfaces in lockstep.  A frozen allocation term is never a removal
+    candidate: an optional competing term must be removed instead, or the
+    function leaves the result for the authoritative allocation gate to block.
+    """
     comps = parsed.get("competencies")
     if not isinstance(comps, list):
         return
+
+    removed_terms: list[tuple[str, str]] = []
 
     def _global_word_freq() -> dict[str, int]:
         freq: dict[str, int] = {}
@@ -651,7 +681,7 @@ def reduce_competency_keyword_stuffing(parsed: dict[str, Any]) -> None:
 
     while True:
         freq = _global_word_freq()
-        if not freq or max(freq.values()) <= 5:
+        if not freq or max(freq.values()) <= 3:
             break
         worst = max(freq, key=lambda w: freq[w])
         removed = False
@@ -665,7 +695,15 @@ def reduce_competency_keyword_stuffing(parsed: dict[str, Any]) -> None:
             for raw_t in terms_raw:
                 phrase = term_phrase(raw_t) if isinstance(raw_t, dict) else str(raw_t or "")
                 words = _competency_term_content_words(phrase)
-                if not removed and worst in words and len(terms_raw) > 2:
+                frozen_allocation = isinstance(raw_t, dict) and bool(
+                    str(raw_t.get("allocation_claim_unit_id") or "").strip()
+                )
+                if (
+                    not removed
+                    and not frozen_allocation
+                    and worst in words
+                    and len(terms_raw) > 3
+                ):
                     changelog.append(
                         {
                             "operation": "drop_keyword_stuffing_term",
@@ -675,6 +713,9 @@ def reduce_competency_keyword_stuffing(parsed: dict[str, Any]) -> None:
                             "overloaded_token": worst,
                         }
                     )
+                    removed_terms.append(
+                        (str(cat.get("category_label") or ""), phrase.casefold())
+                    )
                     removed = True
                     continue
                 kept.append(raw_t)
@@ -683,6 +724,31 @@ def reduce_competency_keyword_stuffing(parsed: dict[str, Any]) -> None:
                 break
         if not removed:
             break
+
+    # Keep the rich V3 category surface aligned with the legacy display
+    # surface while retaining all per-term provenance on surviving rows.
+    categories = parsed.get("categories")
+    if not removed_terms or not isinstance(categories, list) or categories is comps:
+        return
+    remaining_removals: dict[tuple[str, str], int] = {}
+    for key in removed_terms:
+        remaining_removals[key] = remaining_removals.get(key, 0) + 1
+    for category in categories:
+        if not isinstance(category, dict):
+            continue
+        label = str(category.get("category_label") or "")
+        terms_raw = category.get("terms")
+        if not isinstance(terms_raw, list):
+            continue
+        kept: list[Any] = []
+        for raw_t in terms_raw:
+            phrase = term_phrase(raw_t) if isinstance(raw_t, dict) else str(raw_t or "")
+            key = (label, phrase.casefold())
+            if remaining_removals.get(key, 0) > 0:
+                remaining_removals[key] -= 1
+                continue
+            kept.append(raw_t)
+        category["terms"] = kept
 
 
 def dedupe_structured_competency_terms(parsed: dict[str, Any]) -> None:
@@ -1202,12 +1268,27 @@ def rebuild_claim_ledger_from_competencies(parsed: dict[str, Any], allowed_fact_
             ts = term_phrase(raw_t)
             if not ts:
                 continue
+            claim_unit_id = (
+                str(raw_t.get("allocation_claim_unit_id") or "").strip()
+                if isinstance(raw_t, dict)
+                else ""
+            )
+
+            def _ledger_row(source_fact_ids: list[str]) -> dict[str, Any]:
+                row: dict[str, Any] = {
+                    "claim_text": ts,
+                    "source_fact_ids": source_fact_ids,
+                }
+                if claim_unit_id:
+                    row["claim_unit_id"] = claim_unit_id
+                return row
+
             if isinstance(raw_t, dict) and raw_t.get("source_fact_id") is not None:
                 sid = _source_fact_root_id(raw_t["source_fact_id"], allowed_fact_ids)
                 if sid:
-                    ledger.append({"claim_text": ts, "source_fact_ids": [sid]})
+                    ledger.append(_ledger_row([sid]))
                     continue
-            ledger.append({"claim_text": ts, "source_fact_ids": list(ids)})
+            ledger.append(_ledger_row(list(ids)))
     parsed["claim_ledger"] = ledger
 
 

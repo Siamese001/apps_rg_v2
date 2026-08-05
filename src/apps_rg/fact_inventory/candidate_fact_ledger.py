@@ -61,7 +61,14 @@ def _repo_root_from_here() -> Path:
 
 
 def default_ledger_path(repo_root: Path | None = None) -> Path:
-    root = repo_root or _repo_root_from_here()
+    root = Path(repo_root) if repo_root is not None else _repo_root_from_here()
+    # Some legacy section-lane callers use the standalone package directory
+    # (``<checkout>/src``) as their root.  Package-relative inputs work from
+    # there, but the canonical fact ledger is deliberately checkout-relative
+    # under ``artifacts/``.  Normalize only that recognized standalone layout;
+    # preserve arbitrary caller-supplied roots, including isolated test trees.
+    if root.name == "src" and (root / "apps_rg" / "__init__.py").is_file():
+        root = repository_root(root)
     return root / REPO_APPS_REL
 
 

@@ -74,7 +74,11 @@ from apps_rg.runtime.judges.executive_summary_judge_packet import (
 from apps_rg.runtime.judges.executive_summary_x1d import run_llm_judges
 from apps_rg.runtime.exit.executive_summary_x3 import aggregate_x3 as _aggregate_executive_summary_x3
 from apps_rg.runtime.offline_contract_status import OFFLINE_CONTRACT_STUB_RUNTIME_STATUS
-from apps_rg.runtime.runtime_proof_layout import finalize_runtime_proof_run, prepare_runtime_proof_run_dir
+from apps_rg.runtime.runtime_proof_layout import (
+    finalize_runtime_proof_run,
+    prepare_runtime_proof_run_dir,
+    rel_posix,
+)
 from apps_rg.runtime.section_cli_defaults import coalesce_lane_provider_resolution_source
 from apps_rg.runtime.section_proof.section_input_usage_ledger import build_section_input_usage_ledger_v1
 from apps_rg.runtime.shadow.executive_summary_l6 import build_l6_shadow_package
@@ -2568,11 +2572,7 @@ def run_executive_summary_execution(
     write_json(artifact_dir / "claim_ledger.json", claim_ledger)
     write_json(artifact_dir / "text_claim_coverage.json", coverage)
     sfp_for_usage = (parsed or {}).get("selected_fact_plan") or selected_fact_plan
-    ad_res = artifact_dir.resolve()
-    try:
-        trace_rr = ad_res.relative_to(REPO_ROOT.resolve()).as_posix()
-    except ValueError:
-        trace_rr = ad_res.as_posix()
+    trace_rr = rel_posix(artifact_dir, REPO_ROOT)
     req_id = str(
         (provider_request_data or {}).get("request_id")
         or (provider_request_data or {}).get("id")

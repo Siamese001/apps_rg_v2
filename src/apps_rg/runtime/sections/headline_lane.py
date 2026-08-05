@@ -71,6 +71,7 @@ from apps_rg.runtime.runtime_proof_layout import (
     finalize_runtime_proof_run,
     prepare_runtime_proof_run_dir,
     proof_bucket_for_provider,
+    rel_posix,
 )
 from apps_rg.runtime.sections.headline_repair_policy import (
     CONTENT_SIGNAL_REPAIR_MAX_ATTEMPTS,
@@ -2083,7 +2084,7 @@ def run_headline_execution(
         or (provider_request_data or {}).get("id")
         or runtime_payload["run_id"]
     )
-    trace_rr_h = artifact_dir.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    trace_rr_h = rel_posix(artifact_dir, REPO_ROOT)
     usage_doc = build_section_input_usage_ledger_v1(
         section_id="headline",
         run_id=str(runtime_payload["run_id"]),

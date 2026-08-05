@@ -919,6 +919,11 @@ def build_selected_graph_evidence_plan_for_section(
             extra={
                 "employer": str(bundle.get("employer") or ""),
                 "title": str(bundle.get("title") or ""),
+                # Preserve the graph-authored role-episode theme in the frozen
+                # C0.3 candidate record. A later whole-resume allocation can
+                # use this exact, human-readable surface without re-reading a
+                # mutable graph source or inventing a phrase from node IDs.
+                "bundle_theme": str(bundle.get("bundle_theme") or ""),
                 "claim_text": str(bundle.get("claim_text") or ""),
                 "claim_action": str(bundle.get("claim_action") or ""),
                 "claim_scope": str(bundle.get("claim_scope") or ""),
@@ -989,6 +994,17 @@ def build_selected_graph_evidence_plan_for_section(
                 selected_skills.append(
                     {
                         "skill_id": row["candidate_id"],
+                        # Preserve the graph-authored display surface and the
+                        # supporting references through C0.3 selection.  A
+                        # downstream allocation may render the selected skill
+                        # for a résumé, but must never reconstruct it from an
+                        # opaque node ID.
+                        "skill_label": str(
+                            row["row"].get("label") or row["row"].get("name") or ""
+                        ),
+                        "source_refs": list(
+                            row["authority"].get("source_refs") or []
+                        ),
                         "role_episode_bundle_id": bundle_id,
                         "employer_lane": employer_lane,
                         "root_weight": weight,

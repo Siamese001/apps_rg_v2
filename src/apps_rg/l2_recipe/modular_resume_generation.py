@@ -648,6 +648,7 @@ def run_modular_resume_generation(
             ALLOCATION_PLAN_ENV,
             ALLOCATION_USAGE_LEDGER_ENV,
             SECTION_EVIDENCE_CONTRACTS_ENV,
+            SECTION_SOURCE_PLANS_ENV,
             build_whole_resume_graph_allocation,
             write_whole_resume_graph_allocation_bundle,
         )
@@ -734,10 +735,8 @@ def run_modular_resume_generation(
                 )
             )
         # Per-lane composite-judge defaults preserve protected Claude-primary panels while keeping
-        # bullet/narrative lanes compact. Resolving WITHOUT a section_id would force one global
-        # panel onto every lane in whole-run mode, defeating the section policy. Resolve per-lane below.
-        x1d_eff = resolve_cli_x1d_judges(None)
-
+        # bullet/narrative lanes compact. Resolve with the lane id below so no
+        # global panel is forced onto every section in a whole-run.
         def _lane_x1d_judges(lane_id: str) -> str:
             return resolve_cli_x1d_judges(None, section_id=lane_id)
 
@@ -768,6 +767,7 @@ def run_modular_resume_generation(
             ALLOCATION_PLAN_ENV: os.environ.get(ALLOCATION_PLAN_ENV),
             ALLOCATION_USAGE_LEDGER_ENV: os.environ.get(ALLOCATION_USAGE_LEDGER_ENV),
             SECTION_EVIDENCE_CONTRACTS_ENV: os.environ.get(SECTION_EVIDENCE_CONTRACTS_ENV),
+            SECTION_SOURCE_PLANS_ENV: os.environ.get(SECTION_SOURCE_PLANS_ENV),
             GRAPH_SKILL_EMBEDDING_ALLOWLISTS_ENV: os.environ.get(
                 GRAPH_SKILL_EMBEDDING_ALLOWLISTS_ENV
             ),
@@ -778,6 +778,9 @@ def run_modular_resume_generation(
         os.environ[ALLOCATION_USAGE_LEDGER_ENV] = resume_graph_allocation_refs["usage_ledger"]
         os.environ[SECTION_EVIDENCE_CONTRACTS_ENV] = resume_graph_allocation_refs[
             "section_final_evidence_contracts"
+        ]
+        os.environ[SECTION_SOURCE_PLANS_ENV] = resume_graph_allocation_refs[
+            "section_plans"
         ]
         if graph_skill_embedding_required:
             os.environ[GRAPH_SKILL_EMBEDDING_ALLOWLISTS_ENV] = (

@@ -125,6 +125,24 @@ def _stable_graph_authority_refs(
     return normalized
 
 
+def _canonical_section_repo_root(repo_root: Path | None) -> Path:
+    """Normalize the standalone package ``src`` directory to its checkout root.
+
+    Older lane modules pass their package parent (``<checkout>/src``) as
+    ``repo_root`` because that is the monorepo-shaped root.  Repository-owned
+    artifacts, such as the candidate fact ledger, live one level above it in a
+    standalone checkout.  Preserve deliberately supplied non-package roots
+    (common in isolated tests) unchanged.
+    """
+
+    if repo_root is None:
+        return repository_root(Path(__file__))
+    supplied = Path(repo_root).resolve()
+    if supplied.name == "src" and (supplied / "apps_rg" / "__init__.py").is_file():
+        return supplied.parent
+    return supplied
+
+
 def _maybe_apply_hybrid_informed_fact_plan_reorder(
     plan: dict[str, Any],
     *,
@@ -982,7 +1000,7 @@ def resolve_section_proof_pool(
     )
     if section not in SECTION_KEYS:
         raise ValueError(f"unknown section: {section!r}")
-    root = repo_root or repository_root(Path(__file__))
+    root = _canonical_section_repo_root(repo_root)
     role_eff = str(target_role or target_title or "").strip()
     company_eff = str(target_company or "").strip()
     jd_eff = str(jd_text or "").strip()

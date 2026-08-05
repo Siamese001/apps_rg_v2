@@ -7,8 +7,14 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from apps_rg.runtime.c0.competencies_graph_authority import (
+    _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS,
+    _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT,
     build_competencies_graph_authority_discrepancy_ledger,
+    insurance_it_strategy_frozen_layout_is_present,
+    materialize_unmatched_competencies_allocation_terms,
+    project_insurance_it_strategy_competencies_from_frozen_allocation,
     reconcile_competencies_allocation_claim_units,
+    synchronize_competencies_allocation_bindings_to_categories,
 )
 from apps_rg.runtime.c0.resume_graph_allocation import (
     allocate_candidate_sets,
@@ -26,7 +32,14 @@ from apps_rg.runtime.spine.c0_fec_compose import (
     SectionFecBridge,
     _bind_allocation_authority_fields,
 )
-from apps_rg.runtime.validators.competencies_quality_x2 import _role_axis_coverage
+from apps_rg.runtime.validators.competencies_quality_x2 import (
+    _build_traversal_sufficiency_receipt,
+    _role_axis_coverage,
+)
+from apps_rg.runtime.sections.competencies_rigor import (
+    check_competencies_keyword_repetition_limit,
+    check_competencies_visible_terms_svp_agentic_richness,
+)
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -163,11 +176,96 @@ def _parsed_for_plan(plan: dict[str, object]) -> dict[str, object]:
                         "text": str(assignment["skill_id"]).replace("skill_", "").replace("_", " "),
                         "source_fact_id": assignment["fact_id"],
                         "source_fact_ids": [assignment["fact_id"]],
+                        "source_skill_ids": [assignment["skill_id"]],
                     }
                 ],
             }
         )
     return {"competencies": categories, "claim_ledger": []}
+
+
+def _insurance_it_strategy_projection_fixture() -> tuple[dict[str, object], dict[str, object], set[str]]:
+    """A full frozen allocation with source-bound display anchors."""
+
+    assignments: list[dict[str, object]] = []
+    facts_by_root: dict[str, dict[str, object]] = {}
+    stale_fact_id = "fact_stale_preprojection_category"
+    allowed: set[str] = {stale_fact_id}
+    claim_number = 0
+    for spec in _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT:
+        for root_id, skill_id in spec["assignment_keys"]:
+            claim_number += 1
+            fact_id = f"fact_projection_{root_id}"
+            phrase = _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS[(root_id, skill_id)]
+            allowed.add(fact_id)
+            facts_by_root.setdefault(
+                root_id,
+                {
+                    "role_episode_bundle_id": root_id,
+                    "fact_id": fact_id,
+                    "graph_skill_node_ids": [],
+                    "claim_text": phrase,
+                },
+            )
+            facts_by_root[root_id]["graph_skill_node_ids"].append(skill_id)
+            assignments.append(
+                {
+                    "section_id": "competencies",
+                    "claim_unit_id": f"competencies:section_only:{claim_number:02d}",
+                    "root_id": root_id,
+                    "skill_id": skill_id,
+                    "fact_id": fact_id,
+                    "root_bundle_theme": phrase,
+                    "source_refs": [phrase],
+                }
+            )
+
+    categories: list[dict[str, object]] = []
+    for index, spec in enumerate(_INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT, start=1):
+        root_id, _ = spec["assignment_keys"][0]
+        fact_id = str(facts_by_root[root_id]["fact_id"])
+        anchor_text = str(
+            spec.get("generic_anchor_phrase") or f"fixture graph capability anchor {index}"
+        )
+        categories.append(
+            {
+                "category_id": spec["category_id"],
+                "category_label": spec["category_label"],
+                "competency_bundle_id": spec["competency_bundle_id"],
+                "capability_family": f"fixture_family_{index}",
+                # Existing generated categories can have broad, category-level
+                # provenance. The final frozen-allocation projection must not
+                # carry an unrelated (though otherwise allowed) source into a
+                # newly regrouped competency.
+                "source_fact_ids": [fact_id, stale_fact_id],
+                "graph_skill_node_ids": [f"fixture_skill_{index}"],
+                "confidence": 0.80 + (index / 100),
+                "selection_score": 0.80 + (index / 100),
+                "selector_confidence": 0.80 + (index / 100),
+                "terms": [
+                    {
+                        "text": anchor_text,
+                        "term": anchor_text,
+                        "source_fact_id": fact_id,
+                        "source_fact_ids": [fact_id],
+                        "source_skill_ids": [f"fixture_skill_{index}"],
+                        "graph_skill_node_ids": [f"fixture_skill_{index}"],
+                    }
+                ],
+            }
+        )
+    plan: dict[str, object] = {
+        "target_role_profile": "insurance_it_strategy",
+        "allocation_plan_digest": "fixture-allocation-digest",
+        "allocation_assignments": assignments,
+        "facts": list(facts_by_root.values()),
+    }
+    parsed: dict[str, object] = {
+        "categories": copy.deepcopy(categories),
+        "competencies": copy.deepcopy(categories),
+        "claim_ledger": [],
+    }
+    return plan, parsed, allowed
 
 
 def test_stale_nested_seals_do_not_change_canonical_allocation_digest() -> None:
@@ -185,11 +283,29 @@ def test_stale_nested_seals_do_not_change_canonical_allocation_digest() -> None:
     assert baseline != canonical_allocation_digest(without_receipts)
 
 
-def test_exact_rehydration_preserves_sixteen_skills_and_eight_metrics(monkeypatch: object) -> None:
+def test_allocation_slice_separates_visible_paths_from_source_traversal(monkeypatch: object) -> None:
     plan = _slice(monkeypatch)
-    assert len(plan["selected_skill_ids"]) == 16
-    assert len(plan["selected_metrics"]) == 8
-    assert "skill_sr_w12_hyperscaler_alliance_co_sell" in plan["selected_skill_ids"]
+    source = plan["allocation_source_traversal_evidence"]
+    assert len(plan["selected_skill_ids"]) == 8
+    assert len(plan["selected_metrics"]) == 0
+    assert source["scope"] == "C03_SOURCE_CANDIDATE_UNIVERSE"
+    assert len(source["selected_skill_ids"]) == 16
+    assert len(source["selected_metrics"]) == 8
+    assert "skill_sr_w12_hyperscaler_alliance_co_sell" in source["selected_skill_ids"]
+
+
+def test_x2_traversal_uses_source_candidate_universe_for_an_allocation_slice(
+    monkeypatch: object,
+) -> None:
+    plan = _slice(monkeypatch)
+    receipt = _build_traversal_sufficiency_receipt(
+        proof_pool_metadata={"selected_graph_evidence_plan": plan},
+        parsed_output={"competencies": []},
+        category_count=0,
+    )
+    assert receipt["traversal_evidence_scope"] == "C03_SOURCE_CANDIDATE_UNIVERSE"
+    assert receipt["selected_unique_leaf_skill_count"] == 16
+    assert receipt["selected_unique_metric_count"] == 8
 
 
 def test_ineligible_candidate_is_not_added_to_numeric_floors(monkeypatch: object) -> None:
@@ -258,6 +374,595 @@ def test_reconciliation_fails_closed_with_complete_unmatched_ledger(monkeypatch:
     )
     assert receipt["pass"] is False
     assert len(receipt["unmatched_claim_unit_ids"]) == 8
+
+
+def test_materialization_fails_closed_when_two_units_share_one_surface() -> None:
+    """A duplicate phrase cannot falsely consume two allocation units."""
+
+    assignments = [
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:01",
+            "root_id": "reb_shared_delivery",
+            "skill_id": "skill_delivery_one",
+            "fact_id": "fact_shared_delivery",
+            "root_bundle_theme": "Governed enterprise delivery workflow execution",
+            "root_claim_text": "Governed enterprise delivery workflow execution",
+        },
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:02",
+            "root_id": "reb_shared_delivery",
+            "skill_id": "skill_delivery_two",
+            "fact_id": "fact_shared_delivery",
+            "root_bundle_theme": "Governed enterprise delivery workflow execution",
+            "root_claim_text": "Governed enterprise delivery workflow execution",
+        },
+    ]
+    plan = {
+        "allocation_plan_digest": "shared-surface-test",
+        "allocation_assignments": assignments,
+        "facts": [
+            {
+                "role_episode_bundle_id": "reb_shared_delivery",
+                "bundle_theme": "Governed enterprise delivery workflow execution",
+                "claim_text": "Governed enterprise delivery workflow execution",
+            }
+        ],
+    }
+    parsed = {
+        "categories": [{"category_label": "Engineering & Delivery Leadership", "terms": []}],
+        "competencies": [{"category_label": "Engineering & Delivery Leadership", "terms": []}],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={"fact_shared_delivery"},
+        claim_unit_ids=["competencies:skill:01", "competencies:skill:02"],
+    )
+
+    assert receipt["pass"] is False
+    assert receipt["added_claim_unit_ids"] == ["competencies:skill:01"]
+    assert receipt["unresolved_claim_unit_ids"] == ["competencies:skill:02"]
+
+
+def test_materialization_uses_distinct_bound_surfaces_for_revenue_assignments() -> None:
+    assignments = [
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:06",
+            "root_id": "reb_ibm_revenue_sales_target_execution",
+            "skill_id": "skill_partner_sales_revenue_targets",
+            "fact_id": "fact_revenue_ops_003",
+            "root_bundle_theme": "Revenue target execution and quota-aligned solution leadership",
+            "root_claim_text": "Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions",
+            "root_claim_scope": "IBM partner role with quota and revenue-target accountability for enterprise financial-services solution motions.",
+        },
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:08",
+            "root_id": "reb_ibm_revenue_sales_target_execution",
+            "skill_id": "skill_partner_enterprise_negotiations",
+            "fact_id": "fact_revenue_ops_002",
+            "root_bundle_theme": "Revenue target execution and quota-aligned solution leadership",
+            "root_claim_text": "Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions",
+            "root_claim_scope": "IBM partner role with quota and revenue-target accountability for enterprise financial-services solution motions.",
+        },
+    ]
+    plan = {
+        "allocation_plan_digest": "revenue-assignment-test",
+        "allocation_assignments": assignments,
+        "facts": [
+            {
+                "role_episode_bundle_id": "reb_ibm_revenue_sales_target_execution",
+                "bundle_theme": "Revenue target execution and quota-aligned solution leadership",
+                "claim_text": "Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions",
+                "claim_scope": "IBM partner role with quota and revenue-target accountability for enterprise financial-services solution motions.",
+            }
+        ],
+    }
+    parsed = {
+        "categories": [{"category_label": "Commercial & Operating Impact", "terms": []}],
+        "competencies": [{"category_label": "Commercial & Operating Impact", "terms": []}],
+        "claim_ledger": [],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={"fact_revenue_ops_002", "fact_revenue_ops_003"},
+        claim_unit_ids=["competencies:skill:06", "competencies:skill:08"],
+    )
+    reconciliation = reconcile_competencies_allocation_claim_units(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={"fact_revenue_ops_002", "fact_revenue_ops_003"},
+    )
+
+    visible = {
+        term["text"]
+        for category in parsed["competencies"]
+        for term in category["terms"]
+    }
+    assert receipt["pass"] is True
+    assert "Revenue target execution and quota-aligned solution leadership" in visible
+    assert "Enterprise solution negotiation and quota execution" in visible
+    assert reconciliation["pass"] is True
+
+
+def test_devsecops_recovery_surface_is_bound_and_meets_visible_rigor() -> None:
+    assignment = {
+        "section_id": "competencies",
+        "claim_unit_id": "competencies:skill:01",
+        "root_id": "reb_ibm_devsecops_release_resilience",
+        "skill_id": "skill_ibm_automated_release_pipelines",
+        "fact_id": "fact_engineering_platform_002",
+        "root_bundle_theme": "DevSecOps release resilience and governed delivery automation",
+        "root_claim_text": "Embedded release automation and security scanning into regulated modernization delivery paths",
+        "root_claim_scope": "IBM delivery programs requiring release governance, security scanning, and deployment repeatability.",
+    }
+    plan = {
+        "allocation_plan_digest": "devsecops-surface-test",
+        "allocation_assignments": [assignment],
+        "facts": [
+            {
+                "role_episode_bundle_id": "reb_ibm_devsecops_release_resilience",
+                "bundle_theme": assignment["root_bundle_theme"],
+                "claim_text": assignment["root_claim_text"],
+                "claim_scope": assignment["root_claim_scope"],
+            }
+        ],
+    }
+    parsed = {
+        "categories": [
+            {
+                "category_label": "AI Platform Leadership",
+                "visible_graph_surface": True,
+                "terms": [],
+            }
+        ],
+        "competencies": [
+            {
+                "category_label": "AI Platform Leadership",
+                "visible_graph_surface": True,
+                "terms": [],
+            }
+        ],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={"fact_engineering_platform_002"},
+        claim_unit_ids=["competencies:skill:01"],
+    )
+
+    assert receipt["pass"] is True
+    assert parsed["competencies"][0]["terms"][0]["text"] == (
+        "Regulated DevSecOps release governance pipelines"
+    )
+    assert check_competencies_visible_terms_svp_agentic_richness(
+        parsed["competencies"]
+    ) == (True, None)
+
+
+def test_presales_recovery_surface_is_bound_and_meets_visible_rigor() -> None:
+    assignment = {
+        "section_id": "competencies",
+        "claim_unit_id": "competencies:skill:05",
+        "root_id": "reb_ibm_presales_solution_engineering",
+        "skill_id": "skill_partner_pre_sales",
+        "fact_id": "fact_revenue_ops_001",
+        "root_bundle_theme": "Technical pre-sales solution engineering and buyer-specific architecture mapping",
+        "root_claim_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits",
+        "root_claim_scope": "IBM technical pre-sales role surface; partner-level solution engineering across regulated client pursuits.",
+        "root_claim_outcome": "Frame as commercial-technical leadership: buyer discovery, architecture mapping, and delivery-ready solution handoff with no unsupported dollar claims.",
+    }
+    plan = {
+        "allocation_plan_digest": "presales-surface-test",
+        "allocation_assignments": [assignment],
+        "facts": [
+            {
+                "role_episode_bundle_id": "reb_ibm_presales_solution_engineering",
+                "bundle_theme": assignment["root_bundle_theme"],
+                "claim_text": assignment["root_claim_text"],
+                "claim_scope": assignment["root_claim_scope"],
+                "claim_outcome": assignment["root_claim_outcome"],
+            }
+        ],
+    }
+    parsed = {
+        "categories": [
+            {
+                "category_label": "Engineering & Delivery Leadership",
+                "visible_graph_surface": True,
+                "terms": [],
+            }
+        ],
+        "competencies": [
+            {
+                "category_label": "Engineering & Delivery Leadership",
+                "visible_graph_surface": True,
+                "terms": [],
+            }
+        ],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={"fact_revenue_ops_001"},
+        claim_unit_ids=["competencies:skill:05"],
+    )
+
+    assert receipt["pass"] is True
+    assert parsed["competencies"][0]["terms"][0]["text"] == (
+        "Enterprise technical pre-sales architecture mapping"
+    )
+    assert check_competencies_visible_terms_svp_agentic_richness(
+        parsed["competencies"]
+    ) == (True, None)
+
+
+def test_insurance_it_strategy_projection_uses_exact_frozen_allocation_once() -> None:
+    """The final visible résumé groups preserve both bundle and allocation authority."""
+
+    plan, parsed, allowed = _insurance_it_strategy_projection_fixture()
+    receipt = project_insurance_it_strategy_competencies_from_frozen_allocation(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids=allowed,
+    )
+
+    assert receipt["applicable"] is True
+    assert receipt["pass"] is True
+    assert receipt["category_count"] == 8
+    assert receipt["allocation_claim_unit_count"] == 24
+    assert all(len(category["terms"]) == 4 for category in parsed["competencies"])
+    projected_claim_unit_ids = {
+        term["allocation_claim_unit_id"]
+        for category in parsed["competencies"]
+        for term in category["terms"]
+        if term.get("allocation_claim_unit_id")
+    }
+    assert len(projected_claim_unit_ids) == 24
+    assert all(
+        "fact_stale_preprojection_category" not in category["source_fact_ids"]
+        for category in parsed["competencies"]
+    )
+    reconciliation = reconcile_competencies_allocation_claim_units(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids=allowed,
+    )
+    assert reconciliation["pass"] is True
+
+
+def test_insurance_it_strategy_projection_precondition_requires_exact_24_unit_layout(
+    monkeypatch: object,
+) -> None:
+    full_plan, _, _ = _insurance_it_strategy_projection_fixture()
+    assert insurance_it_strategy_frozen_layout_is_present(full_plan) is True
+
+    generic_plan = _slice(monkeypatch)
+    generic_plan["target_role_profile"] = "insurance_it_strategy"
+    assert len(generic_plan["allocation_assignments"]) == 8
+    assert insurance_it_strategy_frozen_layout_is_present(generic_plan) is False
+
+
+def test_insurance_it_strategy_projection_fails_closed_if_allocation_changes() -> None:
+    plan, parsed, allowed = _insurance_it_strategy_projection_fixture()
+    plan["allocation_assignments"].pop()
+    before = copy.deepcopy(parsed)
+
+    receipt = project_insurance_it_strategy_competencies_from_frozen_allocation(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids=allowed,
+    )
+
+    assert receipt["applicable"] is True
+    assert receipt["pass"] is False
+    assert receipt["status"] == "BLOCKED_FROZEN_ALLOCATION_LAYOUT_MISMATCH"
+    assert parsed == before
+
+
+def test_insurance_it_strategy_visible_projection_terms_pass_executive_rigor() -> None:
+    categories = [
+        {
+            "visible_graph_surface": True,
+            "resume_display_label": spec["resume_display_label"],
+            "terms": [
+                {
+                    "text": _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS[(root_id, skill_id)]
+                }
+                for root_id, skill_id in spec["assignment_keys"]
+            ],
+        }
+        for spec in _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT
+    ]
+
+    assert check_competencies_visible_terms_svp_agentic_richness(categories) == (True, None)
+    assert check_competencies_keyword_repetition_limit(categories) == (True, None)
+
+
+def test_reconciliation_does_not_bind_an_unrelated_term_through_shared_fact_only() -> None:
+    """Fact/root provenance supports a term; it does not replace skill identity."""
+    plan = {
+        "allocation_plan_digest": "test-plan",
+        "allocation_assignments": [
+            {
+                "section_id": "competencies",
+                "claim_unit_id": "competencies:section_only:01",
+                "root_id": "reb_security",
+                "skill_id": "skill_pii_encryption_for_insurance_data",
+                "fact_id": "fact_security",
+            }
+        ],
+        "facts": [
+            {
+                "role_episode_bundle_id": "reb_security",
+                "graph_skill_node_ids": ["skill_pii_encryption_for_insurance_data"],
+                "linked_source_fact_ids": ["fact_security"],
+            }
+        ],
+    }
+    parsed = {
+        "competencies": [
+            {
+                "source_fact_ids": ["fact_security"],
+                "graph_skill_node_ids": ["skill_pii_encryption_for_insurance_data"],
+                "terms": [
+                    {
+                        "text": "governed multi-agent orchestration control planes",
+                        "source_fact_ids": ["fact_security"],
+                        "source_skill_ids": [
+                            "skill_pii_encryption_for_insurance_data",
+                            "skill_other_category_support",
+                        ],
+                    }
+                ],
+            }
+        ]
+    }
+
+    receipt = reconcile_competencies_allocation_claim_units(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={"fact_security"},
+    )
+
+    assert receipt["pass"] is False
+    assert receipt["matched_claim_unit_count"] == 0
+    assert receipt["unmatched_claim_unit_ids"] == ["competencies:section_only:01"]
+
+
+def test_unmatched_allocations_materialize_only_graph_authored_terms(monkeypatch: object) -> None:
+    plan = _slice(monkeypatch)
+    assignments = plan["allocation_assignments"]
+    assert isinstance(assignments, list)
+    target_units = [assignments[0]["claim_unit_id"], assignments[1]["claim_unit_id"]]
+    for index, assignment in enumerate(assignments[:2]):
+        assignment["root_bundle_theme"] = (
+            f"Authorized operating cadence for enterprise delivery {index + 1}"
+        )
+    parsed = {
+        "competencies": [
+            {
+                "category_label": "Commercial & Operating Impact",
+                "terms": [{"text": "existing graph-backed term"}],
+            }
+        ],
+        "categories": [
+            {
+                "category_label": "Commercial & Operating Impact",
+                "terms": [{"text": "existing graph-backed term"}],
+            }
+        ],
+        "claim_ledger": [],
+    }
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids=set(plan["allowed_graph_evidence_ids"]),
+        claim_unit_ids=target_units,
+    )
+    assert receipt["pass"] is True
+    assert receipt["unresolved_claim_unit_ids"] == []
+    additions = [
+        term
+        for category in parsed["competencies"]
+        for term in category["terms"]
+        if term.get("allocation_claim_unit_id") in target_units
+    ]
+    assert {term["allocation_claim_unit_id"] for term in additions} == set(target_units)
+    assert all(term["source_fact_id"] in set(plan["allowed_graph_evidence_ids"]) for term in additions)
+    assert all(term["source_skill_ids"] for term in additions)
+    assert all(
+        term["allocation_surface_source_field"] == "root_bundle_theme"
+        for term in additions
+    )
+    final = reconcile_competencies_allocation_claim_units(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids=set(plan["allowed_graph_evidence_ids"]),
+    )
+    assert set(final["unmatched_claim_unit_ids"]) == {
+        row["claim_unit_id"] for row in assignments[2:]
+    }
+
+
+def test_unmatched_allocations_use_bound_resume_surfaces_for_compact_graph_skills() -> None:
+    """Short graph labels are rendered as source-bound, reviewer-readable terms."""
+    roots = {
+        "reb_insurtech_regulated_aws_control_implementation": {
+            "fact_id": "exp_insurtech_001",
+            "domain": "Regulated AWS Control Implementation",
+            "claim_text": "Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.",
+        },
+        "reb_insurtech_aws_migration_execution": {
+            "fact_id": "exp_insurtech_001",
+            "domain": "AWS Migration Execution for Legacy Insurance Platforms",
+            "claim_text": "Led AWS modernization execution for monolithic policy administration and insurance platform workloads.",
+        },
+        "reb_ey_erm_risk_governance": {
+            "fact_id": "exp_ey_001",
+            "domain": "Enterprise Risk Management Operating Model and Risk-Data Aggregation",
+            "claim_text": "Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability.",
+        },
+        "reb_ey_insurance_core_modernization": {
+            "fact_id": "exp_ey_001",
+            "domain": "Insurance Core Modernization: Policy, Claims, Billing, and Data Workflows",
+            "claim_text": "Led insurance core modernization spanning claims automation, integration/data conversion, and BI handoffs; Guidewire was an example platform.",
+        },
+    }
+    sources = {
+        "skill_soc2_zero_trust_security": [
+            "Embedded zero-trust security and compliance (SOC2, GDPR, CCPA)."
+        ],
+        "skill_sr_insurtech_regulated_insurer_controls": [
+            "Designed SOC2-aligned cloud control frameworks enabling regulated insurers to adopt modern analytics and ML."
+        ],
+        "skill_credit_adjudication_default_risk": [
+            "AI-driven credit adjudication project with dynamic risk profiling."
+        ],
+        "skill_risk_model_risk": ["model explainability and data security frameworks"],
+        "skill_insurance_claims_automation": [
+            "Insurance core modernization spanning policy administration, claims automation, integration/data conversion, and BI handoffs."
+        ],
+        "skill_insurance_core_to_bi_reporting_handoff": [
+            "Insurance core modernization spanning policy administration, claims automation, integration/data conversion, and BI handoffs."
+        ],
+        "skill_insurance_guidewire": [
+            "Guidewire is an example platform, not the claim boundary."
+        ],
+    }
+    chosen = [
+        ("reb_insurtech_regulated_aws_control_implementation", "skill_pii_encryption_for_insurance_data"),
+        ("reb_insurtech_regulated_aws_control_implementation", "skill_aws_iam_kms_cloudtrail_controls"),
+        ("reb_insurtech_regulated_aws_control_implementation", "skill_soc2_zero_trust_security"),
+        ("reb_insurtech_regulated_aws_control_implementation", "skill_sr_insurtech_regulated_insurer_controls"),
+        ("reb_insurtech_aws_migration_execution", "skill_application_dependency_mapping"),
+        ("reb_insurtech_aws_migration_execution", "skill_migration_wave_cutover_planning"),
+        ("reb_ey_erm_risk_governance", "skill_credit_adjudication_default_risk"),
+        ("reb_ey_erm_risk_governance", "skill_risk_three_lines_of_defense"),
+        ("reb_ey_erm_risk_governance", "skill_risk_model_risk"),
+        ("reb_ey_insurance_core_modernization", "skill_insurance_claims_automation"),
+        ("reb_ey_insurance_core_modernization", "skill_insurance_core_to_bi_reporting_handoff"),
+        ("reb_ey_insurance_core_modernization", "skill_insurance_guidewire"),
+    ]
+    assignments = []
+    for index, (root_id, skill_id) in enumerate(chosen, start=1):
+        root = roots[root_id]
+        assignments.append(
+            {
+                "section_id": "competencies",
+                "claim_unit_id": f"competencies:section_only:{index:02d}",
+                "root_id": root_id,
+                "skill_id": skill_id,
+                "fact_id": root["fact_id"],
+                "root_bundle_theme": root["domain"],
+                "root_claim_text": root["claim_text"],
+                "source_refs": sources.get(skill_id, []),
+            }
+        )
+    plan = {
+        "allocation_plan_digest": "test-plan",
+        "allocation_assignments": assignments,
+        "facts": [
+            {"role_episode_bundle_id": root_id, **root}
+            for root_id, root in roots.items()
+        ],
+    }
+    parsed = {
+        "categories": [
+            {"category_label": "Governance, Risk & Compliance", "visible_graph_surface": True, "terms": []},
+            {"category_label": "Data & Analytics Modernization", "visible_graph_surface": True, "terms": []},
+        ],
+        "competencies": [
+            {"category_label": "Governance, Risk & Compliance", "visible_graph_surface": True, "terms": []},
+            {"category_label": "Data & Analytics Modernization", "visible_graph_surface": True, "terms": []},
+        ],
+        "claim_ledger": [],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={"exp_insurtech_001", "exp_ey_001"},
+        claim_unit_ids=[row["claim_unit_id"] for row in assignments],
+    )
+
+    expected = {
+        "PII encryption controls for insurance data",
+        "IAM KMS CloudTrail controls for insurers",
+        "SOC2 zero-trust security controls for compliance",
+        "SOC2 control frameworks for regulated insurers",
+        "Application dependency mapping for migration execution",
+        "Migration wave cutover planning for platforms",
+        "AI credit adjudication for enterprise risk",
+        "Enterprise three-lines-of-defense risk operating model",
+        "Model explainability for enterprise risk operating model",
+        "Insurance claims workflow automation integration",
+        "Core reporting workflow integration handoff",
+        "Guidewire platform workflow modernization integration",
+    }
+    visible = {
+        term["text"]
+        for category in parsed["categories"]
+        for term in category["terms"]
+    }
+    assert receipt["pass"] is True
+    assert visible == expected
+    assert all(
+        term["allocation_surface_source_field"] == "graph_authority_surface_composition"
+        for category in parsed["categories"]
+        for term in category["terms"]
+    )
+    richness_ok, richness_reason = check_competencies_visible_terms_svp_agentic_richness(
+        parsed["categories"]
+    )
+    assert richness_ok, richness_reason
+
+
+def test_allocation_sync_copies_provenance_to_canonical_v3_categories() -> None:
+    parsed = {
+        "categories": [
+            {
+                "category_id": "governance_risk_compliance",
+                "category_label": "Governance, Risk & Compliance",
+                "terms": [{"term": "governed runtime control architecture"}],
+                "source_fact_ids": [],
+                "graph_skill_node_ids": [],
+            }
+        ],
+        "competencies": [
+            {
+                "category_id": "governance_risk_compliance",
+                "category_label": "Governance, Risk & Compliance",
+                "terms": [
+                    {
+                        "text": "governed runtime control architecture",
+                        "source_fact_id": "fact_runtime",
+                        "source_fact_ids": ["fact_runtime"],
+                        "source_skill_ids": ["skill_runtime_control"],
+                        "allocation_claim_unit_id": "competencies:section_only:01",
+                    }
+                ],
+            }
+        ],
+    }
+
+    receipt = synchronize_competencies_allocation_bindings_to_categories(parsed)
+
+    category = parsed["categories"][0]
+    term = category["terms"][0]
+    assert receipt["pass"] is True
+    assert term["allocation_claim_unit_id"] == "competencies:section_only:01"
+    assert term["source_fact_ids"] == ["fact_runtime"]
+    assert category["source_fact_ids"] == ["fact_runtime"]
+    assert category["graph_skill_node_ids"] == ["skill_runtime_control"]
 
 
 def test_assertion_skill_fact_and_claim_unit_ids_remain_distinct(monkeypatch: object) -> None:

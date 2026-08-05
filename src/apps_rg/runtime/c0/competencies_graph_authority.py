@@ -1,6 +1,7 @@
 """Deterministic competencies allocation-to-claim authority reconciliation."""
 from __future__ import annotations
 
+import copy
 import re
 from typing import Any, Iterable, Mapping
 
@@ -29,6 +30,261 @@ _ROLE_AXIS_SIGNALS: Mapping[str, tuple[str, ...]] = {
     "joint_solution": ("joint_solution", "joint solution", "partner_led_ai_solutions"),
     "gtm_enablement": ("enablement", "gtm", "technical_close", "go-to-market"),
 }
+
+# The allocation is intentionally more granular than the eight résumé
+# categories.  When a selected graph skill has no matching visible term, these
+# are the compact résumé surfaces for the small set of graph paths whose
+# source labels are themselves too terse to meet the final competency-shape
+# contract.  Each phrase is composed solely from the selected skill path and
+# its root's graph-authored claim/domain/source text; `_composition_is_bound`
+# below proves that before it can be emitted.  This is an output projection,
+# not a new graph fact or an inferred competency.
+_ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
+    (
+        "reb_insurtech_regulated_aws_control_implementation",
+        "skill_pii_encryption_for_insurance_data",
+    ): "PII encryption controls for insurance data",
+    (
+        "reb_insurtech_regulated_aws_control_implementation",
+        "skill_aws_iam_kms_cloudtrail_controls",
+    ): "IAM KMS CloudTrail controls for insurers",
+    (
+        "reb_insurtech_regulated_aws_control_implementation",
+        "skill_soc2_zero_trust_security",
+    ): "SOC2 zero-trust security controls for compliance",
+    (
+        "reb_insurtech_regulated_aws_control_implementation",
+        "skill_sr_insurtech_regulated_insurer_controls",
+    ): "SOC2 control frameworks for regulated insurers",
+    (
+        "reb_insurtech_regulated_aws_control_implementation",
+        "skill_soc2_control_mapping_for_aws",
+    ): "SOC2 AWS control mapping for insurers",
+    (
+        "reb_insurtech_aws_guidewire_core_modernization",
+        "skill_insurance_core_data_model_mapping",
+    ): "Insurance core data mapping for workflows",
+    (
+        "reb_insurtech_aws_migration_execution",
+        "skill_sr_insurtech_legacy_cloud_modernization",
+    ): "AWS-based policy administration architecture execution",
+    (
+        "reb_insurtech_aws_migration_execution",
+        "skill_p2_tech_aws_modernization_patterns",
+    ): "AWS migration patterns for legacy platforms",
+    (
+        "reb_insurtech_aws_migration_execution",
+        "skill_aws_migration_readiness_assessment",
+    ): "Readiness assessments for legacy platforms",
+    (
+        "reb_insurtech_aws_migration_execution",
+        "skill_application_dependency_mapping",
+    ): "Application dependency mapping for migration execution",
+    (
+        "reb_insurtech_aws_migration_execution",
+        "skill_migration_wave_cutover_planning",
+    ): "Migration wave cutover planning for platforms",
+    (
+        "reb_ey_insurance_core_modernization",
+        "skill_insurance_claims_automation",
+    ): "Insurance claims workflow automation integration",
+    (
+        "reb_ey_insurance_core_modernization",
+        "skill_insurance_core_to_bi_reporting_handoff",
+    ): "Core reporting workflow integration handoff",
+    (
+        "reb_ey_insurance_core_modernization",
+        "skill_insurance_guidewire",
+    ): "Guidewire platform workflow modernization integration",
+    (
+        "reb_ey_erm_risk_governance",
+        "skill_credit_adjudication_default_risk",
+    ): "AI credit adjudication for enterprise risk",
+    (
+        "reb_ey_erm_risk_governance",
+        "skill_risk_three_lines_of_defense",
+    ): "Enterprise three-lines-of-defense risk operating model",
+    (
+        "reb_ey_erm_risk_governance",
+        "skill_risk_model_risk",
+    ): "Model explainability for enterprise risk operating model",
+    (
+        "reb_ibm_offering_accelerator_management",
+        "skill_sr_w12_industry_reference_architecture",
+    ): "Industry reference architecture patterns for regulated modernization",
+    (
+        "reb_ibm_offering_accelerator_management",
+        "skill_p2_tech_reusable_accelerators",
+    ): "Reusable agentic platform service accelerators",
+    (
+        "reb_ibm_offering_accelerator_management",
+        "skill_p2_tech_ibm_cloud_portfolio_anchor",
+    ): "Cloud transformation portfolio architecture ownership",
+    (
+        "reb_ibm_devsecops_release_resilience",
+        "skill_ibm_automated_release_pipelines",
+    ): "Regulated DevSecOps release governance pipelines",
+    (
+        "reb_ibm_presales_solution_engineering",
+        "skill_partner_pre_sales",
+    ): "Enterprise technical pre-sales architecture mapping",
+    (
+        "reb_ibm_revenue_sales_target_execution",
+        "skill_partner_enterprise_negotiations",
+    ): "Enterprise solution negotiation and quota execution",
+    (
+        "reb_unify_partner_channel_cosell",
+        "skill_partner_partner_led_ai_solutions",
+    ): "Partner-led AI solution framework for alliance",
+    (
+        "reb_unify_partner_channel_cosell",
+        "skill_partner_cloud_vendor_joint_gtm",
+    ): "Vendor joint AI solution roadmaps for partners",
+    (
+        "reb_unify_agentic_platform_architecture",
+        "skill_unify_agentic_human_override_escalation_paths",
+    ): "Human override escalation paths for governed workflows",
+    (
+        "reb_unify_agentic_platform_architecture",
+        "skill_unify_agentic_runtime_proof_bundle_lineage",
+    ): "Runtime proof bundle lineage for agent platform",
+}
+_SURFACE_COMPOSITION_CONNECTIVES = frozenset({"and", "for", "of", "the", "to", "with"})
+
+# This is a target-specific *output layout*, not a retrieval or evidence
+# policy. Brown & Brown's insurance-IT section has a frozen 24-unit allocation
+# (three source-backed detail terms in each of eight final competency groups).
+# The generic competency-bundle anchor retained in each group carries the
+# required cross-cutting SVP capability signal; the three allocation terms are
+# the exact role-episode evidence that the visible résumé group must consume.
+# A changed allocation fails closed rather than being squeezed into an
+# unrelated heading by lexical proximity.
+_INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT: tuple[Mapping[str, Any], ...] = (
+    {
+        "category_id": "cloud_partner_ecosystems",
+        "category_label": "Cloud & Partner Ecosystems",
+        "resume_display_label": "Partner Applied AI Architecture",
+        "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+        "assignment_keys": (
+            ("reb_ibm_offering_accelerator_management", "skill_sr_w12_industry_reference_architecture"),
+            ("reb_unify_partner_channel_cosell", "skill_partner_partner_led_ai_solutions"),
+            ("reb_unify_partner_channel_cosell", "skill_partner_cloud_vendor_joint_gtm"),
+        ),
+    },
+    {
+        "category_id": "ai_platform_leadership",
+        "category_label": "AI Platform Leadership",
+        "resume_display_label": "Governed Agentic AI Platform Architecture",
+        "competency_bundle_id": "ccb_agentic_platforms",
+        "assignment_keys": (
+            ("reb_ibm_offering_accelerator_management", "skill_p2_tech_reusable_accelerators"),
+            ("reb_unify_agentic_platform_architecture", "skill_unify_agentic_human_override_escalation_paths"),
+            ("reb_unify_agentic_platform_architecture", "skill_unify_agentic_runtime_proof_bundle_lineage"),
+        ),
+    },
+    {
+        "category_id": "governance_risk_compliance",
+        "category_label": "Governance, Risk & Compliance",
+        "resume_display_label": "AI Runtime Governance & Control Gates",
+        "competency_bundle_id": "ccb_runtime_governance",
+        "generic_anchor_phrase": "policy enforcement across agent execution paths",
+        "assignment_keys": (
+            ("reb_insurtech_regulated_aws_control_implementation", "skill_soc2_zero_trust_security"),
+            ("reb_insurtech_regulated_aws_control_implementation", "skill_sr_insurtech_regulated_insurer_controls"),
+            ("reb_insurtech_regulated_aws_control_implementation", "skill_soc2_control_mapping_for_aws"),
+        ),
+    },
+    {
+        "category_id": "tech_strategy_innovation",
+        "category_label": "Technology Strategy & Innovation",
+        "resume_display_label": "AI Risk, Decisioning & Context Engineering",
+        "competency_bundle_id": "ccb_retrieval_context_engineering",
+        "assignment_keys": (
+            ("reb_ey_erm_risk_governance", "skill_credit_adjudication_default_risk"),
+            ("reb_ey_erm_risk_governance", "skill_risk_three_lines_of_defense"),
+            ("reb_ey_erm_risk_governance", "skill_risk_model_risk"),
+        ),
+    },
+    {
+        "category_id": "commercial_operating_impact",
+        "category_label": "Commercial & Operating Impact",
+        "resume_display_label": "Cloud Security, Transformation & Productization",
+        "competency_bundle_id": "ccb_platform_productization",
+        "assignment_keys": (
+            ("reb_insurtech_regulated_aws_control_implementation", "skill_pii_encryption_for_insurance_data"),
+            ("reb_insurtech_regulated_aws_control_implementation", "skill_aws_iam_kms_cloudtrail_controls"),
+            ("reb_ibm_offering_accelerator_management", "skill_p2_tech_ibm_cloud_portfolio_anchor"),
+        ),
+    },
+    {
+        "category_id": "llmops_reliability",
+        "category_label": "LLMOps & Reliability",
+        "resume_display_label": "Modernization Delivery & Reliability",
+        "competency_bundle_id": "ccb_llmops_reliability",
+        "assignment_keys": (
+            ("reb_insurtech_aws_migration_execution", "skill_migration_wave_cutover_planning"),
+            ("reb_insurtech_aws_migration_execution", "skill_application_dependency_mapping"),
+            ("reb_ey_insurance_core_modernization", "skill_insurance_guidewire"),
+        ),
+    },
+    {
+        "category_id": "data_analytics_modernization",
+        "category_label": "Data & Analytics Modernization",
+        "resume_display_label": "Insurance Core Data & Workflow Modernization",
+        "competency_bundle_id": "ccb_distributed_systems_engineering",
+        "assignment_keys": (
+            ("reb_insurtech_aws_guidewire_core_modernization", "skill_insurance_core_data_model_mapping"),
+            ("reb_ey_insurance_core_modernization", "skill_insurance_claims_automation"),
+            ("reb_ey_insurance_core_modernization", "skill_insurance_core_to_bi_reporting_handoff"),
+        ),
+    },
+    {
+        "category_id": "engineering_delivery_leadership",
+        "category_label": "Engineering & Delivery Leadership",
+        "resume_display_label": "AWS Migration Execution & Leadership",
+        "competency_bundle_id": "ccb_engineering_leadership",
+        "assignment_keys": (
+            ("reb_insurtech_aws_migration_execution", "skill_sr_insurtech_legacy_cloud_modernization"),
+            ("reb_insurtech_aws_migration_execution", "skill_p2_tech_aws_modernization_patterns"),
+            ("reb_insurtech_aws_migration_execution", "skill_aws_migration_readiness_assessment"),
+        ),
+    },
+)
+
+
+def insurance_it_strategy_frozen_layout_is_present(
+    selected_plan: Mapping[str, Any],
+) -> bool:
+    """Return whether a plan actually carries the complete frozen 24-unit layout.
+
+    The ordinary whole-resume allocator reserves eight competency units.  The
+    Brown & Brown visible-layout projection is a separate, fixed 24-unit
+    surface and may run only when the selected plan contains that exact
+    assignment universe.  Generic allocation plans continue through the
+    normal allocation/reconciliation path; they must not be mistaken for a
+    damaged copy of the dedicated projection layout.
+    """
+
+    if str(selected_plan.get("target_role_profile") or "").strip() != (
+        "insurance_it_strategy"
+    ):
+        return False
+    assignments = _allocation_assignments(selected_plan)
+    observed_keys = {
+        (
+            str(row.get("root_id") or "").strip(),
+            str(row.get("skill_id") or "").strip(),
+        )
+        for row in assignments
+    }
+    expected_keys = {
+        (str(root_id), str(skill_id))
+        for spec in _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT
+        for root_id, skill_id in spec["assignment_keys"]
+    }
+    return len(assignments) == len(observed_keys) == len(expected_keys) and (
+        observed_keys == expected_keys
+    )
 
 
 def _strings(values: Iterable[Any] | None) -> list[str]:
@@ -102,6 +358,16 @@ def _match_score(
     fact_id = str(assignment.get("fact_id") or "")
     category_skills = set(_strings(category.get("graph_skill_node_ids")))
     category_facts = set(_strings(category.get("source_fact_ids")))
+    term_skills = set()
+    if isinstance(term, Mapping):
+        term_skills = set(
+            _strings(
+                [
+                    *list(term.get("source_skill_ids") or []),
+                    *list(term.get("graph_skill_node_ids") or []),
+                ]
+            )
+        )
     term_sources = set(
         _strings(term.get("source_fact_ids")) if isinstance(term, Mapping) else []
     )
@@ -109,9 +375,16 @@ def _match_score(
         term_sources.add(str(term.get("source_fact_id")))
     reasons: list[str] = []
     score = 0
+    # A term-level list containing several skills is a category-support
+    # inventory, not evidence that this *specific phrase* realizes each
+    # member.  Treat it as direct only when it names exactly one skill; a
+    # broader list still contributes through lexical phrase alignment.
+    if skill_id and term_skills == {skill_id}:
+        score += 2_000
+        reasons.append("EXACT_TERM_SKILL_ID")
     if skill_id and skill_id in category_skills:
         score += 1000
-        reasons.append("EXACT_SKILL_ID")
+        reasons.append("EXACT_CATEGORY_SKILL_ID")
     if root_id and root_id in category_facts | term_sources:
         score += 900
         reasons.append("EXACT_ROOT_ID")
@@ -124,10 +397,644 @@ def _match_score(
         score += 700 + min(len(sibling_overlap), 9)
         reasons.append("EXACT_ROOT_SIBLING_SKILL_ID")
     lexical_overlap = sorted(_tokens(skill_id) & _tokens(_term_text(term)))
-    if lexical_overlap:
+    # A single token (for example, ``insurance``) is not a meaningful skill
+    # identity.  Require two non-noise tokens before it may establish a
+    # visible claim binding.  Shared fact/root provenance remains valuable
+    # supporting evidence, but can never bind an unrelated phrase by itself.
+    if len(lexical_overlap) >= 2:
         score += 100 * len(lexical_overlap)
-        reasons.append("EXACT_SKILL_TERM_TOKEN:" + ",".join(lexical_overlap))
+        reasons.append("SEMANTIC_SKILL_TERM_OVERLAP:" + ",".join(lexical_overlap))
+    if not any(
+        reason == "EXACT_TERM_SKILL_ID"
+        or reason.startswith("SEMANTIC_SKILL_TERM_OVERLAP:")
+        for reason in reasons
+    ):
+        return 0, []
     return score, reasons
+
+
+def _allocation_assignments(selected_plan: Mapping[str, Any]) -> list[dict[str, Any]]:
+    return sorted(
+        (
+            dict(row)
+            for row in selected_plan.get("allocation_assignments") or []
+            if isinstance(row, Mapping) and row.get("section_id") == "competencies"
+        ),
+        key=lambda row: str(row.get("claim_unit_id") or ""),
+    )
+
+
+def _surface_tokens(value: Any) -> set[str]:
+    """Normalize graph-source and résumé surface tokens for bounded matching."""
+
+    return set(re.findall(r"[a-z0-9]+", str(value or "").casefold()))
+
+
+def _composition_is_bound(
+    phrase: str,
+    *,
+    assignment: Mapping[str, Any],
+    root_fact: Mapping[str, Any],
+) -> bool:
+    """Return whether every substantive surface word is already graph-authored.
+
+    The allowed vocabulary is deliberately limited to the selected leaf's
+    label/ID/source snippets and the selected root's graph fields.  A plural
+    may match its singular source token (and vice versa), but no new semantic
+    word can enter a visible allocation recovery term.
+    """
+
+    graph_text = [
+        assignment.get("skill_id"),
+        assignment.get("skill_label"),
+        assignment.get("root_bundle_theme"),
+        assignment.get("root_claim_text"),
+        assignment.get("root_claim_action"),
+        assignment.get("root_claim_scope"),
+        assignment.get("root_claim_outcome"),
+        *(assignment.get("source_refs") or []),
+        root_fact.get("domain"),
+        root_fact.get("bundle_theme"),
+        root_fact.get("claim_text"),
+        root_fact.get("claim_action"),
+        root_fact.get("claim_scope"),
+        root_fact.get("claim_outcome"),
+        *(root_fact.get("source_refs") or []),
+    ]
+    source_tokens = set().union(*(_surface_tokens(value) for value in graph_text))
+    for token in _surface_tokens(phrase):
+        if token in _SURFACE_COMPOSITION_CONNECTIVES or token in source_tokens:
+            continue
+        # Graph source prose commonly spells the certification "SOC 2" while
+        # node labels use the compact résumé surface "SOC2".
+        if token == "soc2" and {"soc", "2"} <= source_tokens:
+            continue
+        if token.endswith("s") and token[:-1] in source_tokens:
+            continue
+        if f"{token}s" in source_tokens:
+            continue
+        return False
+    return True
+
+
+def _allocation_surface_phrase(
+    assignment: Mapping[str, Any],
+    *,
+    selected_plan: Mapping[str, Any],
+) -> tuple[str, str]:
+    """Resolve one human-readable, graph-authored competency surface.
+
+    The frozen allocation identifies the graph skill and supporting fact, but
+    graph IDs are deliberately not résumé text. Prefer the role-episode
+    bundle's author-authored theme, carried into the sealed allocation. Its
+    selected-plan domain and skill label are bounded fallbacks. This is a
+    projection of existing graph content, never an LLM paraphrase or a newly
+    inferred claim.
+    """
+
+    root_id = str(assignment.get("root_id") or "").strip()
+    skill_id = str(assignment.get("skill_id") or "").strip()
+    fact_by_root = {
+        str(row.get("role_episode_bundle_id") or row.get("fact_id") or "").strip(): row
+        for row in selected_plan.get("facts") or []
+        if isinstance(row, Mapping)
+    }
+    root_fact = fact_by_root.get(root_id) or {}
+    composition = _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS.get((root_id, skill_id))
+    if composition and _composition_is_bound(
+        composition,
+        assignment=assignment,
+        root_fact=root_fact,
+    ):
+        return composition, "graph_authority_surface_composition"
+    candidates: list[tuple[str, str]] = [
+        ("root_bundle_theme", str(assignment.get("root_bundle_theme") or "").strip()),
+        ("selected_graph_plan_domain", str(root_fact.get("domain") or "").strip()),
+        ("skill_label", str(assignment.get("skill_label") or "").strip()),
+        ("skill_id_surface", skill_id.removeprefix("skill_").replace("_", " ")),
+    ]
+    for ref in assignment.get("source_refs") or []:
+        candidates.append(("skill_source_ref", str(ref or "").strip()))
+    for row in selected_plan.get("graph_candidate_decision_ledger") or []:
+        if not isinstance(row, Mapping):
+            continue
+        if (
+            str(row.get("candidate_type") or "") == "leaf_skill"
+            and str(row.get("candidate_id") or "") == skill_id
+            and str(row.get("root_id") or "") == root_id
+        ):
+            candidates.extend(
+                [
+                    ("decision_ledger_skill_label", str(row.get("skill_label") or "").strip()),
+                    *[
+                        ("decision_ledger_source_ref", str(ref or "").strip())
+                        for ref in row.get("source_refs") or []
+                    ],
+                ]
+            )
+    for source_field, candidate in candidates:
+        phrase = " ".join(candidate.replace("_", " ").split()).strip()
+        if not phrase or phrase.casefold().startswith(("reb ", "skill ", "fact ")):
+            continue
+        # A visible competency is a compact executive phrase, not an opaque
+        # graph identifier or a full source sentence.  Continue to the next
+        # graph-authored alternative rather than returning the first (possibly
+        # unusable) field.
+        if 5 <= len(phrase.split()) <= 7:
+            return phrase, source_field
+    return "", ""
+
+
+def _allocation_surface_category(
+    categories: list[dict[str, Any]],
+    *,
+    phrase: str,
+    assignment: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Place a graph-authored allocation term in its closest existing category."""
+
+    if not categories:
+        return None
+    phrase_tokens = _tokens(phrase) | _tokens(assignment.get("skill_id"))
+    commercial_tokens = {"customer", "deal", "revenue", "sales", "target", "value"}
+    best: tuple[int, int, int, dict[str, Any]] | None = None
+    for index, category in enumerate(categories):
+        terms = category.get("terms") or []
+        nonempty_terms = sum(1 for term in terms if _term_text(term))
+        if nonempty_terms >= 6:
+            continue
+        category_text = " ".join(
+            [
+                str(category.get("category_label") or ""),
+                str(category.get("resume_display_label") or ""),
+                *[_term_text(term) for term in terms],
+            ]
+        )
+        category_tokens = _tokens(category_text)
+        score = 10 * len(phrase_tokens & category_tokens)
+        category_lower = category_text.casefold()
+        if phrase_tokens & commercial_tokens and any(
+            signal in category_lower for signal in ("commercial", "operating", "impact")
+        ):
+            score += 100
+        if "partner" in phrase_tokens and "partner" in category_lower:
+            score += 50
+        candidate = (score, -nonempty_terms, -index, category)
+        if best is None or candidate[:3] > best[:3]:
+            best = candidate
+    return best[3] if best is not None else None
+
+
+def materialize_unmatched_competencies_allocation_terms(
+    parsed: dict[str, Any],
+    *,
+    selected_plan: Mapping[str, Any],
+    allowed_fact_ids: set[str],
+    claim_unit_ids: Iterable[str],
+) -> dict[str, Any]:
+    """Add only missing frozen-allocation terms to the final résumé surface.
+
+    This is a narrow deterministic bridge between a valid graph allocation and
+    the final competency display.  It runs only after normal model generation
+    and graph-surface enrichment leave a frozen allocation unit unmatched.
+    Each added term retains the assignment's exact skill and source-fact IDs.
+    """
+
+    requested = {str(value or "").strip() for value in claim_unit_ids if str(value or "").strip()}
+    assignments = {
+        str(row.get("claim_unit_id") or ""): row
+        for row in _allocation_assignments(selected_plan)
+        if str(row.get("claim_unit_id") or "") in requested
+    }
+    additions: list[dict[str, Any]] = []
+    unresolved: list[str] = []
+    surfaces = [
+        (name, parsed.get(name))
+        for name in ("categories", "competencies")
+        if isinstance(parsed.get(name), list)
+    ]
+    if not surfaces:
+        unresolved.extend(sorted(requested))
+
+    for claim_unit_id in sorted(requested):
+        assignment = assignments.get(claim_unit_id)
+        if not assignment:
+            unresolved.append(claim_unit_id)
+            continue
+        fact_id = str(assignment.get("fact_id") or "").strip()
+        skill_id = str(assignment.get("skill_id") or "").strip()
+        phrase, source_field = _allocation_surface_phrase(
+            assignment,
+            selected_plan=selected_plan,
+        )
+        # A recovery surface must itself be résumé-quality. If the frozen
+        # graph cannot provide a compact theme, retain the failed-closed
+        # allocation mismatch rather than append a raw node-ID fragment.
+        phrase_word_count = len(phrase.split())
+        if (
+            not fact_id
+            or fact_id not in allowed_fact_ids
+            or not skill_id
+            or not phrase
+            or phrase_word_count < 5
+            or phrase_word_count > 7
+        ):
+            unresolved.append(claim_unit_id)
+            continue
+        unit_added = False
+        for surface_name, raw_categories in surfaces:
+            categories = [row for row in raw_categories if isinstance(row, dict)]
+            category = _allocation_surface_category(
+                categories,
+                phrase=phrase,
+                assignment=assignment,
+            )
+            if category is None:
+                continue
+            terms = list(category.get("terms") or [])
+            same_phrase_terms = [
+                term
+                for term in terms
+                if _term_text(term).casefold() == phrase.casefold()
+            ]
+            if same_phrase_terms:
+                # A shared recovery phrase cannot silently satisfy two frozen
+                # allocation units.  It is complete only when the existing
+                # visible term already carries *this* exact unit identity;
+                # otherwise leave the unit unresolved so the later
+                # reconciliation fails closed.  A distinct, source-bound
+                # composition is required to recover a second assignment.
+                if any(
+                    isinstance(term, Mapping)
+                    and str(term.get("allocation_claim_unit_id") or "")
+                    == claim_unit_id
+                    for term in same_phrase_terms
+                ):
+                    unit_added = True
+                continue
+            terms.append(
+                {
+                    "term": phrase,
+                    "text": phrase,
+                    "source_fact_id": fact_id,
+                    "source_fact_ids": [fact_id],
+                    "source_skill_ids": [skill_id],
+                    "graph_skill_node_ids": [skill_id],
+                    "support_class": "FROZEN_RESUME_GRAPH_ALLOCATION",
+                    "proof_source": "allocation_visible_graph_surface",
+                    "allocation_claim_unit_id": claim_unit_id,
+                    "allocation_surface_source_field": source_field,
+                }
+            )
+            category["terms"] = terms
+            category["source_fact_ids"] = _strings(
+                [*list(category.get("source_fact_ids") or []), fact_id]
+            )
+            category["graph_skill_node_ids"] = _strings(
+                [*list(category.get("graph_skill_node_ids") or []), skill_id]
+            )
+            category["allocation_claim_unit_ids"] = _strings(
+                [*list(category.get("allocation_claim_unit_ids") or []), claim_unit_id]
+            )
+            additions.append(
+                {
+                    "surface": surface_name,
+                    "claim_unit_id": claim_unit_id,
+                    "category_label": str(
+                        category.get("resume_display_label")
+                        or category.get("category_label")
+                        or ""
+                    ),
+                    "visible_term": phrase,
+                    "skill_id": skill_id,
+                    "fact_id": fact_id,
+                    "source": "frozen_graph_role_episode_theme",
+                }
+            )
+            unit_added = True
+        if not unit_added:
+            unresolved.append(claim_unit_id)
+
+    receipt: dict[str, Any] = {
+        "schema_version": "competencies_allocation_visible_surface_v1",
+        "section_id": "competencies",
+        "allocation_plan_digest": str(selected_plan.get("allocation_plan_digest") or ""),
+        "requested_claim_unit_ids": sorted(requested),
+        "added_claim_unit_ids": sorted(
+            {str(row.get("claim_unit_id") or "") for row in additions}
+        ),
+        "unresolved_claim_unit_ids": sorted(set(unresolved)),
+        "additions": additions,
+        "pass": not unresolved,
+    }
+    receipt["receipt_digest"] = stable_digest(receipt)
+    return receipt
+
+
+def project_insurance_it_strategy_competencies_from_frozen_allocation(
+    parsed: dict[str, Any],
+    *,
+    selected_plan: Mapping[str, Any],
+    allowed_fact_ids: set[str],
+) -> dict[str, Any]:
+    """Build the final Brown & Brown competency surface from its frozen allocation.
+
+    The target's existing competency-bundle anchors retain the cross-cutting
+    SVP capability vocabulary required by the section contract.  This function
+    adds the exact three role-episode allocation units assigned to each final
+    group, rather than relying on lexical category proximity.  It is applicable
+    only to the explicitly configured ``insurance_it_strategy`` layout and
+    fails closed if the frozen assignment universe changes.
+    """
+
+    target_profile = str(selected_plan.get("target_role_profile") or "").strip()
+    base: dict[str, Any] = {
+        "schema_version": "competencies_frozen_allocation_output_projection_v1",
+        "section_id": "competencies",
+        "target_role_profile": target_profile,
+        "allocation_plan_digest": str(selected_plan.get("allocation_plan_digest") or ""),
+        "applicable": target_profile == "insurance_it_strategy",
+        "projection_policy": "insurance_it_strategy_frozen_role_episode_layout_v1",
+        "visible_wording_changed": False,
+    }
+    if not base["applicable"]:
+        base.update({"pass": True, "status": "NOT_APPLICABLE"})
+        base["receipt_digest"] = stable_digest(base)
+        return base
+
+    assignments = _allocation_assignments(selected_plan)
+    assignment_by_key = {
+        (
+            str(row.get("root_id") or "").strip(),
+            str(row.get("skill_id") or "").strip(),
+        ): row
+        for row in assignments
+    }
+    expected_keys = {
+        (str(root_id), str(skill_id))
+        for spec in _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT
+        for root_id, skill_id in spec["assignment_keys"]
+    }
+    observed_keys = set(assignment_by_key)
+    missing_keys = sorted(expected_keys - observed_keys)
+    unexpected_keys = sorted(observed_keys - expected_keys)
+    if len(assignments) != len(assignment_by_key) or missing_keys or unexpected_keys:
+        base.update(
+            {
+                "pass": False,
+                "status": "BLOCKED_FROZEN_ALLOCATION_LAYOUT_MISMATCH",
+                "expected_assignment_count": len(expected_keys),
+                "observed_assignment_count": len(assignments),
+                "missing_assignment_keys": [list(value) for value in missing_keys],
+                "unexpected_assignment_keys": [list(value) for value in unexpected_keys],
+            }
+        )
+        base["receipt_digest"] = stable_digest(base)
+        return base
+
+    fact_by_root = {
+        str(row.get("role_episode_bundle_id") or row.get("fact_id") or "").strip(): row
+        for row in selected_plan.get("facts") or []
+        if isinstance(row, Mapping)
+    }
+    source_categories = [
+        row
+        for surface_name in ("categories", "competencies")
+        for row in parsed.get(surface_name) or []
+        if isinstance(row, Mapping)
+    ]
+    anchor_by_bundle: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
+    for category in source_categories:
+        bundle_id = str(category.get("competency_bundle_id") or "").strip()
+        if not bundle_id or bundle_id in anchor_by_bundle:
+            continue
+        for raw_term in category.get("terms") or []:
+            phrase = _term_text(raw_term)
+            if not phrase:
+                continue
+            term = copy.deepcopy(raw_term) if isinstance(raw_term, Mapping) else {"text": phrase}
+            source_fact_ids = _strings(
+                [
+                    term.get("source_fact_id"),
+                    *list(term.get("source_fact_ids") or []),
+                ]
+            )
+            source_skill_ids = _strings(
+                [
+                    *list(term.get("source_skill_ids") or []),
+                    *list(term.get("graph_skill_node_ids") or []),
+                ]
+            )
+            if (
+                source_fact_ids
+                and set(source_fact_ids) <= allowed_fact_ids
+                and source_skill_ids
+            ):
+                term["text"] = phrase
+                term["term"] = phrase
+                anchor_by_bundle[bundle_id] = (dict(category), term)
+                break
+
+    missing_anchors = sorted(
+        str(spec["competency_bundle_id"])
+        for spec in _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT
+        if str(spec["competency_bundle_id"]) not in anchor_by_bundle
+    )
+    if missing_anchors:
+        base.update(
+            {
+                "pass": False,
+                "status": "BLOCKED_COMPETENCY_BUNDLE_ANCHOR_MISSING",
+                "missing_competency_bundle_ids": missing_anchors,
+            }
+        )
+        base["receipt_digest"] = stable_digest(base)
+        return base
+
+    projected_categories: list[dict[str, Any]] = []
+    projected_rows: list[dict[str, Any]] = []
+    failure_rows: list[dict[str, Any]] = []
+    for order, spec in enumerate(_INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT, start=1):
+        bundle_id = str(spec["competency_bundle_id"])
+        source_category, generic_anchor = anchor_by_bundle[bundle_id]
+        preferred_anchor_phrase = str(spec.get("generic_anchor_phrase") or "").strip()
+        if preferred_anchor_phrase:
+            preferred_anchor: dict[str, Any] | None = None
+            for raw_term in source_category.get("terms") or []:
+                if _term_text(raw_term) != preferred_anchor_phrase:
+                    continue
+                candidate = (
+                    copy.deepcopy(raw_term)
+                    if isinstance(raw_term, Mapping)
+                    else {"text": preferred_anchor_phrase}
+                )
+                candidate_fact_ids = _strings(
+                    [
+                        candidate.get("source_fact_id"),
+                        *list(candidate.get("source_fact_ids") or []),
+                    ]
+                )
+                candidate_skill_ids = _strings(
+                    [
+                        *list(candidate.get("source_skill_ids") or []),
+                        *list(candidate.get("graph_skill_node_ids") or []),
+                    ]
+                )
+                if (
+                    candidate_fact_ids
+                    and set(candidate_fact_ids) <= allowed_fact_ids
+                    and candidate_skill_ids
+                ):
+                    candidate["text"] = preferred_anchor_phrase
+                    candidate["term"] = preferred_anchor_phrase
+                    preferred_anchor = candidate
+                    break
+            if preferred_anchor is None:
+                failure_rows.append(
+                    {
+                        "competency_bundle_id": bundle_id,
+                        "preferred_anchor_phrase": preferred_anchor_phrase,
+                        "reason": "preferred_generic_anchor_not_source_bound",
+                    }
+                )
+            else:
+                generic_anchor = preferred_anchor
+        terms: list[dict[str, Any]] = [copy.deepcopy(generic_anchor)]
+        source_fact_ids = [
+            fact_id
+            for fact_id in _strings(
+                [
+                    generic_anchor.get("source_fact_id"),
+                    *list(generic_anchor.get("source_fact_ids") or []),
+                ]
+            )
+            if fact_id in allowed_fact_ids
+        ]
+        graph_skill_ids = _strings(
+            [
+                *list(generic_anchor.get("source_skill_ids") or []),
+                *list(generic_anchor.get("graph_skill_node_ids") or []),
+            ]
+        )
+        claim_unit_ids: list[str] = []
+        for root_id, skill_id in spec["assignment_keys"]:
+            assignment = assignment_by_key[(str(root_id), str(skill_id))]
+            fact_id = str(assignment.get("fact_id") or "").strip()
+            phrase, source_field = _allocation_surface_phrase(
+                assignment,
+                selected_plan=selected_plan,
+            )
+            phrase_word_count = len(phrase.split())
+            root_fact = fact_by_root.get(str(root_id)) or {}
+            if (
+                not fact_id
+                or fact_id not in allowed_fact_ids
+                or not phrase
+                or not _composition_is_bound(
+                    phrase,
+                    assignment=assignment,
+                    root_fact=root_fact,
+                )
+                or phrase_word_count < 5
+                or phrase_word_count > 7
+            ):
+                failure_rows.append(
+                    {
+                        "root_id": str(root_id),
+                        "skill_id": str(skill_id),
+                        "fact_id": fact_id,
+                        "phrase": phrase,
+                        "source_field": source_field,
+                    }
+                )
+                continue
+            claim_unit_id = str(assignment.get("claim_unit_id") or "").strip()
+            terms.append(
+                {
+                    "term": phrase,
+                    "text": phrase,
+                    "source_fact_id": fact_id,
+                    "source_fact_ids": [fact_id],
+                    "source_skill_ids": [str(skill_id)],
+                    "graph_skill_node_ids": [str(skill_id)],
+                    "support_class": "FROZEN_RESUME_GRAPH_ALLOCATION",
+                    "proof_source": "frozen_allocation_targeted_visible_projection",
+                    "allocation_claim_unit_id": claim_unit_id,
+                    "allocation_surface_source_field": source_field,
+                }
+            )
+            source_fact_ids = _strings([*source_fact_ids, fact_id])
+            graph_skill_ids = _strings([*graph_skill_ids, str(skill_id)])
+            claim_unit_ids.append(claim_unit_id)
+        category = {
+            "category_id": str(spec["category_id"]),
+            "category_label": str(spec["category_label"]),
+            "resume_display_label": str(spec["resume_display_label"]),
+            "competency_bundle_id": bundle_id,
+            "capability_family": source_category.get("capability_family"),
+            "terms": terms,
+            "source_fact_ids": source_fact_ids,
+            "graph_skill_node_ids": graph_skill_ids,
+            "allocation_claim_unit_ids": claim_unit_ids,
+            "confidence": source_category.get("confidence"),
+            "selection_score": source_category.get("selection_score"),
+            "selector_confidence": source_category.get("selector_confidence"),
+            "visible_graph_surface": True,
+            "graph_surface_term_source": "frozen_allocation_targeted_visible_projection",
+            "resume_display_order_reason": "insurance_it_strategy_frozen_role_episode_layout",
+        }
+        projected_categories.append(category)
+        projected_rows.append(
+            {
+                "order": order,
+                "category_id": category["category_id"],
+                "resume_display_label": category["resume_display_label"],
+                "competency_bundle_id": bundle_id,
+                "generic_anchor": _term_text(generic_anchor),
+                "allocation_claim_unit_ids": claim_unit_ids,
+                "allocation_terms": [_term_text(term) for term in terms[1:]],
+            }
+        )
+
+    expected_claim_unit_ids = {
+        str(row.get("claim_unit_id") or "") for row in assignments
+    }
+    projected_claim_unit_ids = {
+        str(raw.get("allocation_claim_unit_id") or "")
+        for category in projected_categories
+        for raw in category.get("terms") or []
+        if isinstance(raw, Mapping) and str(raw.get("allocation_claim_unit_id") or "")
+    }
+    if failure_rows or projected_claim_unit_ids != expected_claim_unit_ids:
+        base.update(
+            {
+                "pass": False,
+                "status": "BLOCKED_FROZEN_ALLOCATION_VISIBLE_SURFACE",
+                "projection_failures": failure_rows,
+                "expected_claim_unit_ids": sorted(expected_claim_unit_ids),
+                "projected_claim_unit_ids": sorted(projected_claim_unit_ids),
+            }
+        )
+        base["receipt_digest"] = stable_digest(base)
+        return base
+
+    # Commit only after every mapping, authority binding, and exact-once check
+    # succeeds.  The categories and legacy display surface intentionally start
+    # from independent copies so later V3 synchronization remains one-way.
+    parsed["categories"] = copy.deepcopy(projected_categories)
+    parsed["competencies"] = copy.deepcopy(projected_categories)
+    base.update(
+        {
+            "pass": True,
+            "status": "APPLIED",
+            "category_count": len(projected_categories),
+            "allocation_claim_unit_count": len(projected_claim_unit_ids),
+            "rows": projected_rows,
+            "visible_wording_changed": True,
+        }
+    )
+    base["receipt_digest"] = stable_digest(base)
+    return base
 
 
 def reconcile_competencies_allocation_claim_units(
@@ -138,14 +1045,7 @@ def reconcile_competencies_allocation_claim_units(
 ) -> dict[str, Any]:
     """Bind each competencies allocation unit to one visible term without changing text."""
 
-    assignments = sorted(
-        (
-            dict(row)
-            for row in selected_plan.get("allocation_assignments") or []
-            if isinstance(row, Mapping) and row.get("section_id") == "competencies"
-        ),
-        key=lambda row: str(row.get("claim_unit_id") or ""),
-    )
+    assignments = _allocation_assignments(selected_plan)
     categories = [
         row
         for row in parsed.get("competencies") or []
@@ -267,6 +1167,132 @@ def reconcile_competencies_allocation_claim_units(
     }
     receipt["receipt_digest"] = stable_digest(receipt)
     parsed["claim_ledger"] = claim_ledger
+    return receipt
+
+
+def synchronize_competencies_allocation_bindings_to_categories(
+    parsed: dict[str, Any],
+) -> dict[str, Any]:
+    """Copy final allocation provenance from the display mirror to V3 categories.
+
+    ``categories`` is the canonical rich résumé representation used by X2,
+    while ``competencies`` remains the legacy display mirror used by the
+    allocation reconciler.  The two surfaces have identical visible wording
+    after the graph-surface rewrite, but the legacy reconciliation previously
+    left the V3 surface with stale source facts.  This bridge copies only
+    deterministic graph/allocation provenance for exact text matches; it never
+    changes a visible phrase or manufactures a source binding.
+    """
+
+    categories = [
+        row for row in parsed.get("categories") or [] if isinstance(row, dict)
+    ]
+    competencies = [
+        row for row in parsed.get("competencies") or [] if isinstance(row, dict)
+    ]
+    category_by_key: dict[str, list[dict[str, Any]]] = {}
+    for index, category in enumerate(categories):
+        keys = {
+            str(category.get("category_id") or "").strip().casefold(),
+            str(category.get("category_label") or "").strip().casefold(),
+        }
+        for key in keys:
+            if key:
+                category_by_key.setdefault(key, []).append(category)
+
+    copied_claim_unit_ids: list[str] = []
+    unmatched: list[dict[str, str]] = []
+    for index, legacy_category in enumerate(competencies):
+        keys = (
+            str(legacy_category.get("category_id") or "").strip().casefold(),
+            str(legacy_category.get("category_label") or "").strip().casefold(),
+        )
+        target: dict[str, Any] | None = None
+        for key in keys:
+            if category_by_key.get(key):
+                target = category_by_key[key][0]
+                break
+        if target is None and index < len(categories):
+            target = categories[index]
+        if target is None:
+            continue
+
+        target_terms = [
+            row for row in target.get("terms") or [] if isinstance(row, dict)
+        ]
+        used_target_indexes: set[int] = set()
+        for legacy_term in legacy_category.get("terms") or []:
+            if not isinstance(legacy_term, Mapping):
+                continue
+            claim_unit_id = str(
+                legacy_term.get("allocation_claim_unit_id") or ""
+            ).strip()
+            if not claim_unit_id:
+                continue
+            phrase = _term_text(legacy_term).casefold()
+            target_index = next(
+                (
+                    term_index
+                    for term_index, target_term in enumerate(target_terms)
+                    if term_index not in used_target_indexes
+                    and _term_text(target_term).casefold() == phrase
+                ),
+                None,
+            )
+            if target_index is None:
+                unmatched.append(
+                    {
+                        "claim_unit_id": claim_unit_id,
+                        "phrase": _term_text(legacy_term),
+                    }
+                )
+                continue
+            target_term = target_terms[target_index]
+            used_target_indexes.add(target_index)
+            for field in (
+                "source_fact_id",
+                "source_fact_ids",
+                "source_skill_ids",
+                "graph_skill_node_ids",
+                "support_class",
+                "proof_source",
+                "allocation_claim_unit_id",
+                "allocation_surface_source_field",
+            ):
+                if field in legacy_term:
+                    target_term[field] = legacy_term[field]
+            target["source_fact_ids"] = _strings(
+                [
+                    *list(target.get("source_fact_ids") or []),
+                    *list(legacy_term.get("source_fact_ids") or []),
+                    legacy_term.get("source_fact_id"),
+                ]
+            )
+            target["graph_skill_node_ids"] = _strings(
+                [
+                    *list(target.get("graph_skill_node_ids") or []),
+                    *list(legacy_term.get("source_skill_ids") or []),
+                    *list(legacy_term.get("graph_skill_node_ids") or []),
+                ]
+            )
+            target["allocation_claim_unit_ids"] = _strings(
+                [
+                    *list(target.get("allocation_claim_unit_ids") or []),
+                    claim_unit_id,
+                ]
+            )
+            copied_claim_unit_ids.append(claim_unit_id)
+
+    receipt: dict[str, Any] = {
+        "schema_version": "competencies_allocation_v3_sync_v1",
+        "section_id": "competencies",
+        "copied_claim_unit_ids": sorted(set(copied_claim_unit_ids)),
+        "copied_claim_unit_count": len(set(copied_claim_unit_ids)),
+        "unmatched_legacy_bindings": unmatched,
+        "visible_wording_changed": False,
+        "pass": not unmatched,
+    }
+    receipt["receipt_digest"] = stable_digest(receipt)
     return receipt
 
 
@@ -395,5 +1421,9 @@ def build_competencies_graph_authority_discrepancy_ledger(
 
 __all__ = [
     "build_competencies_graph_authority_discrepancy_ledger",
+    "insurance_it_strategy_frozen_layout_is_present",
+    "materialize_unmatched_competencies_allocation_terms",
+    "project_insurance_it_strategy_competencies_from_frozen_allocation",
     "reconcile_competencies_allocation_claim_units",
+    "synchronize_competencies_allocation_bindings_to_categories",
 ]

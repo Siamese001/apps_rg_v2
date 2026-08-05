@@ -16,6 +16,7 @@ from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.sections import competency_capability_registry as reg
 from apps_rg.runtime.sections.competency_capability_evidence import (
     COMPETENCY_CAPABILITY_EVIDENCE_PACK_MARKER,
+    _plan_fact_ids_for_bundle,
     attach_competency_bundles_to_proof_pool_metadata,
     append_competencies_path_diversity_to_messages,
     build_competency_capability_section_packet,
@@ -611,6 +612,48 @@ def test_visible_graph_surface_uses_partnership_first_bundle_labels_and_terms():
     )
     richness_ok, richness_reason = check_competencies_visible_terms_svp_agentic_richness(competencies)
     assert richness_ok, richness_reason
+
+
+def test_visible_graph_surface_uses_overlapping_selected_root_when_direct_bundle_fact_is_absent():
+    """A required visible bundle retains provenance from an already-selected root.
+
+    The engineering-leadership bundle's direct link is intentionally not in
+    this target's finite plan.  The displayed category must therefore bind to
+    the closest selected graph root, never to a synthetic/default fact id.
+    """
+    packet = build_competency_capability_section_packet("competencies")
+    record = next(
+        row
+        for row in packet["competency_bundles"]
+        if row["competency_bundle_id"] == "ccb_engineering_leadership"
+    )
+    selected_plan = {
+        "facts": [
+            {
+                "fact_id": "fact_engineering_platform_001",
+                "role_episode_bundle_id": "reb_unify_agentic_platform_architecture",
+                "source_fact_ids": ["fact_engineering_platform_001"],
+                "domain": "SVP Engineering agentic AI platform control-plane architecture",
+                "claim_text": "Governed agentic platform architecture and operating model",
+                "graph_skill_node_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"],
+            }
+        ]
+    }
+
+    fact_ids = _plan_fact_ids_for_bundle(
+        record,
+        cat={
+            "category_label": "Engineering & Delivery Leadership",
+            "resume_display_label": "Engineering Leadership & Operating Model",
+            "terms": [
+                {"text": "executive-aligned engineering operating cadences for adoption"}
+            ],
+        },
+        selected_graph_evidence_plan=selected_plan,
+        allowed_fact_ids={"fact_engineering_platform_001"},
+    )
+
+    assert fact_ids == ["fact_engineering_platform_001"]
 
 
 def test_visible_graph_surface_rehydrates_stale_metric_ids_and_claim_ledger():
