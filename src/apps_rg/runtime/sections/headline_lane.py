@@ -1744,6 +1744,7 @@ def run_headline_execution(
         provider_requested=str(args.provider),
         compiled_prompt_artifact=section_compiled.artifact,
         anthropic_workload_kind="ONE_SHOT",
+        idempotent_replay_safe=True,
     )
     provider_request_data = provider_req.to_dict()
     write_json(artifact_dir / "provider_request.json", provider_request_data)

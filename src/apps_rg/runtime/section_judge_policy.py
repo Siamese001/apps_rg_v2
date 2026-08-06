@@ -32,6 +32,7 @@ class JudgeRuntimeProfile:
     max_attempts: int
     retry_backoff_base_seconds: float
     retry_backoff_max_seconds: float
+    gemini_thinking_level: str
 
     def resolved_max_output_tokens(self, *, attempt: int = 1) -> int:
         return min(self.max_output_tokens_hard_cap, self.max_output_tokens * min(max(1, attempt), 2))
@@ -102,6 +103,7 @@ def _parse_judge_runtime_profile(profile_key: str, raw: Mapping[str, Any]) -> Ju
             max_attempts=int(raw["max_attempts"]),
             retry_backoff_base_seconds=float(raw["retry_backoff_base_seconds"]),
             retry_backoff_max_seconds=float(raw["retry_backoff_max_seconds"]),
+            gemini_thinking_level=str(raw["gemini_thinking_level"]),
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise SectionJudgePolicySSOTError(f"Invalid judge runtime profile: {profile_key}") from exc
@@ -123,6 +125,10 @@ def _parse_judge_runtime_profile(profile_key: str, raw: Mapping[str, Any]) -> Ju
     if profile.retry_backoff_max_seconds < profile.retry_backoff_base_seconds:
         raise SectionJudgePolicySSOTError(
             f"judge runtime profile {profile_key} backoff max must be >= backoff base"
+        )
+    if profile.gemini_thinking_level not in {"low", "medium", "high"}:
+        raise SectionJudgePolicySSOTError(
+            f"judge runtime profile {profile_key} has invalid Gemini thinking level"
         )
     return profile
 
@@ -156,6 +162,15 @@ def _load_judge_runtime_profiles() -> dict[JudgeTier, JudgeRuntimeProfile]:
     ):
         raise SectionJudgePolicySSOTError(
             "judge runtime profiles must be monotonic from advisory -> standard -> enhanced"
+        )
+    thinking_order = {"low": 1, "medium": 2, "high": 3}
+    if not (
+        thinking_order[advisory.gemini_thinking_level]
+        <= thinking_order[standard.gemini_thinking_level]
+        <= thinking_order[enhanced.gemini_thinking_level]
+    ):
+        raise SectionJudgePolicySSOTError(
+            "Gemini thinking levels must be monotonic from advisory -> standard -> enhanced"
         )
     return out
 
@@ -367,6 +382,7 @@ def policy_matrix_export() -> dict[str, dict[str, Any]]:
                 "max_attempts": rp.max_attempts,
                 "retry_backoff_base_seconds": rp.retry_backoff_base_seconds,
                 "retry_backoff_max_seconds": rp.retry_backoff_max_seconds,
+                "gemini_thinking_level": rp.gemini_thinking_level,
             },
             "judge_packet_required": p.judge_packet_required,
             "grade_only_required": p.grade_only_required,

@@ -212,6 +212,7 @@ def run_ibm_narrative_lane_execution(
         max_tokens=NARRATIVE_MAX_OUTPUT_TOKENS,
         model=section_model,
         provider_requested=str(args.provider),
+        idempotent_replay_safe=True,
     )
     provider_request_data = provider_req.to_dict()
     write_json(artifact_dir / "provider_request.json", provider_request_data)

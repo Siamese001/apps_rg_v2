@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import apps_rg.runtime.providers.section_provider_call as section_provider_call
 from apps_rg.runtime.providers import anthropic_prompt_cache as subject
 from apps_rg.runtime.providers.provider_contract import ProviderResult
@@ -144,7 +146,12 @@ def test_section_provider_emits_disabled_receipt_without_changing_runtime_status
     assert result.provider_response is not None
     assert result.provider_response["captured"] is True
     assert result.provider_response["provider_cache_receipt"] == result.prompt_cache_receipt
-    assert not any(tmp_path.iterdir())
+    # The W1 spend governor writes its independent reservation ledger; disabled
+    # Anthropic caching itself still creates no cache receipt artifact.
+    files = sorted(path.name for path in tmp_path.iterdir())
+    assert files == ["external_model_token_reservations.jsonl"]
+    reservation = json.loads((tmp_path / files[0]).read_text(encoding="utf-8"))
+    assert reservation["decision"] == "RESERVED"
 
     call = gateway.calls[0]
     compiled = call["compiled_prompt"]

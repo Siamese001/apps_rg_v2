@@ -12,7 +12,10 @@ import hashlib
 import json
 import os
 import re
+import socket
 import shutil
+import urllib.error
+import urllib.request
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -41,6 +44,11 @@ from agentic_core.runtime.gates.gate_types import (
 from apps_research.types.apps_rg_targeting_brief_contract import (
     validate_targeting_brief_text,
 )
+from apps_model_telemetry.external_model_usage import (
+    append_external_model_usage,
+    usage_telemetry,
+)
+from apps_model_telemetry.token_budget_governor import TokenBudgetPolicy, estimate_input_tokens
 
 APPS_RG_HANDOFF_GENERATION_PROVIDER = "external_openai"
 APPS_RG_HANDOFF_JUDGE_NAME = "gemini_pro"
@@ -95,6 +103,53 @@ _HANDOFF_REQUIRED_GATE_IDS = (
     "G24_REPLAY_ELIGIBLE",
     "G26_EXIT_ELIGIBILITY",
 )
+
+
+def _x2_usage_request_digest(request: Any) -> str:
+    """Hash the request body only; never include the API-key-bearing URL."""
+    body = getattr(request, "body", b"")
+    if isinstance(body, bytes):
+        rendered = body
+    else:
+        rendered = str(body or "").encode("utf-8")
+    return hashlib.sha256(rendered).hexdigest()
+
+
+def _x2_prompt_budget_receipt(
+    *,
+    brief_text: str,
+    jd_text: str,
+    research_notes: str,
+    source_register: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+) -> dict[str, int | bool]:
+    raw_cap = str(os.environ.get("APPS_RESEARCH_X2_MAX_INPUT_TOKENS") or "").strip()
+    try:
+        cap = int(raw_cap) if raw_cap else 24_000
+    except ValueError:
+        cap = 24_000
+    cap = max(1_024, min(cap, 48_000))
+    data_only_text = "\n".join(
+        (
+            str(brief_text or ""),
+            str(jd_text or ""),
+            str(research_notes or ""),
+            json.dumps(list(source_register), ensure_ascii=True, sort_keys=True),
+        )
+    )
+    estimated = estimate_input_tokens(
+        data_only_text,
+        policy=TokenBudgetPolicy(
+            chars_per_token_estimate=3,
+            safety_multiplier=1.12,
+            max_input_tokens_per_attempt=cap,
+            max_reserved_tokens_per_run=cap,
+        ),
+    )
+    return {
+        "estimated_input_tokens": estimated,
+        "max_input_tokens": cap,
+        "allowed": estimated <= cap,
+    }
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -349,6 +404,107 @@ def build_apps_rg_targeting_brief_x2_prompt(
 class _AppsRgTargetingBriefGoogleJudge(GoogleJudge):
     """Google judge with an X2 prompt tailored to the briefing contract."""
 
+    def __init__(self, *args: Any, usage_artifact_dir: Path | None = None, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._usage_artifact_dir = usage_artifact_dir
+        self.model_usage_attempts: list[dict[str, Any]] = []
+
+    def _record_model_usage(
+        self,
+        *,
+        request: Any,
+        raw_response: Mapping[str, Any] | None,
+        outcome: str,
+        provider_status: str,
+    ) -> None:
+        response = raw_response if isinstance(raw_response, Mapping) else {}
+        usage = response.get("usageMetadata") if isinstance(response.get("usageMetadata"), Mapping) else None
+        telemetry = usage_telemetry(
+            provider=APPS_RG_HANDOFF_JUDGE_PROVIDER,
+            model=str(response.get("modelVersion") or self._model),
+            usage=usage,
+            response_id=str(response.get("responseId") or ""),
+        )
+        self.model_usage_attempts.append({
+            **telemetry,
+            "outcome": outcome,
+            "provider_status": provider_status,
+        })
+        try:
+            append_external_model_usage(
+                artifact_dir=self._usage_artifact_dir,
+                provider=telemetry["provider"],
+                model=telemetry["model"],
+                request_digest=_x2_usage_request_digest(request),
+                outcome=outcome,
+                provider_status=provider_status,
+                usage=usage,
+                response_id=telemetry["response_id"],
+                stage="L2.X2_research_semantic_gate",
+                logical_attempt=len(self.model_usage_attempts),
+                transport_attempt=1,
+            )
+        except OSError:
+            # Diagnostic storage must not change the X2 evidence decision.
+            pass
+
+    def _call_http(self, request: Any) -> str:  # type: ignore[override]
+        """Preserve Gemini ``usageMetadata`` before extracting the judge text."""
+        native_request = urllib.request.Request(
+            url=request.url,
+            data=request.body,
+            method=request.method,
+            headers=request.headers,
+        )
+        try:
+            with urllib.request.urlopen(native_request, timeout=self._timeout) as response:
+                body = response.read()
+        except socket.timeout as exc:
+            self._record_model_usage(
+                request=request,
+                raw_response=None,
+                outcome="TIMEOUT",
+                provider_status="JUDGE_PROVIDER_ERROR",
+            )
+            raise TimeoutError(f"judge HTTP timeout after {self._timeout}s: {exc}") from exc
+        except urllib.error.HTTPError as exc:
+            self._record_model_usage(
+                request=request,
+                raw_response=None,
+                outcome=f"HTTP_{exc.code}",
+                provider_status="JUDGE_PROVIDER_ERROR",
+            )
+            detail = exc.read().decode("utf-8", errors="ignore")[:500]
+            raise GraderError(f"judge HTTP {exc.code} {exc.reason}: {detail}") from exc
+        except urllib.error.URLError as exc:
+            self._record_model_usage(
+                request=request,
+                raw_response=None,
+                outcome="URL_ERROR",
+                provider_status="JUDGE_PROVIDER_ERROR",
+            )
+            if isinstance(exc.reason, socket.timeout):
+                raise TimeoutError(f"judge HTTP timeout: {exc.reason}") from exc
+            raise GraderError(f"judge HTTP URLError: {exc.reason}") from exc
+
+        try:
+            parsed = json.loads(body.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError) as exc:
+            self._record_model_usage(
+                request=request,
+                raw_response=None,
+                outcome="RESPONSE_UNPARSEABLE",
+                provider_status="JUDGE_PROVIDER_ERROR",
+            )
+            raise GraderError(f"judge response was not JSON: {exc}") from exc
+        self._record_model_usage(
+            request=request,
+            raw_response=parsed if isinstance(parsed, Mapping) else None,
+            outcome="SUCCESS",
+            provider_status="RESPONSE_RECEIVED",
+        )
+        return self._extract_text(parsed)
+
     def judge(self, dimension: Dimension, context: Mapping[str, Any]):  # type: ignore[override]
         system, user = build_apps_rg_targeting_brief_x2_prompt(
             brief_text=str(context.get("brief_text") or ""),
@@ -368,6 +524,7 @@ def run_apps_rg_handoff_x2_judge(
     research_notes: str,
     source_register: list[dict[str, Any]] | tuple[dict[str, Any], ...] = (),
     judge: Any | None = None,
+    usage_artifact_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Run the model-backed X2 semantic judge and return a sealed receipt."""
     deterministic_adversarial_reason = _targeting_brief_adversarial_directive_reason(
@@ -390,6 +547,31 @@ def run_apps_rg_handoff_x2_judge(
         "threshold": APPS_RG_HANDOFF_X2_THRESHOLD,
         "model_backed": True,
     }
+    budget_receipt = _x2_prompt_budget_receipt(
+        brief_text=brief_text,
+        jd_text=jd_text,
+        research_notes=research_notes,
+        source_register=source_register,
+    )
+    if not budget_receipt["allowed"]:
+        return {
+            **base,
+            "status": "FAIL",
+            "score": 0.0,
+            "verdict": "FAIL",
+            "provider_status": "BLOCKED_TOKEN_BUDGET",
+            "model_backed": False,
+            "attempt_count": 0,
+            "retry_count": 0,
+            "retryable_provider_error": False,
+            "reason": (
+                "X2 input exceeds the preflight cap: "
+                f"estimated_input_tokens={budget_receipt['estimated_input_tokens']}; "
+                f"max_input_tokens={budget_receipt['max_input_tokens']}"
+            ),
+            "token_budget_preflight": budget_receipt,
+            "model_usage_attempts": [],
+        }
     if deterministic_adversarial_reason:
         return {
             **base,
@@ -414,6 +596,7 @@ def run_apps_rg_handoff_x2_judge(
         model=APPS_RG_HANDOFF_JUDGE_MODEL,
         timeout=30.0,
         max_tokens=APPS_RG_HANDOFF_JUDGE_MAX_TOKENS,
+        usage_artifact_dir=usage_artifact_dir,
     )
     response = None
     attempt = 0
@@ -437,6 +620,9 @@ def run_apps_rg_handoff_x2_judge(
                 "retry_count": max(0, attempt - 1),
                 "retryable_provider_error": retryable_error,
                 "reason": f"{type(exc).__name__}: {exc}",
+                "model_usage_attempts": list(
+                    getattr(resolved_judge, "model_usage_attempts", ())
+                ),
             }
 
     score = float(getattr(response, "score", 0.0) or 0.0)
@@ -452,6 +638,9 @@ def run_apps_rg_handoff_x2_judge(
         "retry_count": max(0, attempt - 1),
         "retryable_provider_error": retryable_error,
         "reason": str(getattr(response, "reasoning", "") or ""),
+        "model_usage_attempts": list(
+            getattr(resolved_judge, "model_usage_attempts", ())
+        ),
     }
 
 

@@ -34,11 +34,104 @@ from apps_rg.runtime.providers.anthropic_prompt_cache import (
 )
 from apps_rg.runtime.section_judge_policy import get_section_judge_policy
 from apps_rg.runtime.section_model_limits import runtime_limit_float, runtime_limit_int
+from apps_rg.runtime.model_token_governor import reserve_apps_rg_model_tokens
+from apps_model_telemetry.external_model_usage import append_external_model_usage
 
 JUDGE_RUBRIC_VERSION = "executive_summary_x1d_v1"
+JUDGE_INPUT_PROMPT_VERSION = "executive_summary_x1d_system_contract_once_v2"
 DEFAULT_THRESHOLD = 0.80
 VALID_SCORE_SCALES = frozenset({"0_to_1", "0_to_5"})
 JUDGE_REQUIRED_FIELDS = ("score_scale", "score", "threshold", "pass")
+ENV_APPS_RG_GEMINI_GRADE_ONLY_THINKING = "APPS_RG_GEMINI_GRADE_ONLY_THINKING"
+
+
+def _record_x1d_external_usage(
+    *,
+    artifact_base: Path | None,
+    provider: str,
+    model: str,
+    input_hash: str,
+    section_id: str | None,
+    logical_attempt: int,
+    transport_attempt: int,
+    outcome: str,
+    provider_status: str,
+    usage: Mapping[str, Any] | None = None,
+    response_id: str | None = None,
+    retry_reason: str | None = None,
+    raw_response_ref: str | None = None,
+) -> None:
+    """Write diagnostic token telemetry without affecting a judge verdict."""
+    try:
+        append_external_model_usage(
+            artifact_dir=artifact_base,
+            provider=provider,
+            model=model,
+            request_digest=input_hash,
+            outcome=outcome,
+            provider_status=provider_status,
+            usage=usage,
+            section_id=section_id or "executive_summary",
+            stage="L2.X1D_judge",
+            logical_attempt=logical_attempt,
+            transport_attempt=transport_attempt,
+            retry_reason=retry_reason,
+            response_id=response_id,
+            raw_response_ref=raw_response_ref,
+        )
+    except OSError:
+        # A diagnostic artifact failure must not change a model-backed verdict.
+        return
+
+
+def _x1d_token_budget_blocked_output(
+    *,
+    artifact_base: Path | None,
+    provider: str,
+    provider_key: str,
+    model: str,
+    input_hash: str,
+    prompt: str,
+    max_output_tokens: int,
+    section_id: str | None,
+    attempt: int,
+) -> JudgeOutput | None:
+    try:
+        reservation = reserve_apps_rg_model_tokens(
+            artifact_dir=artifact_base,
+            provider=provider,
+            model=model,
+            request_digest=input_hash,
+            prompt_text=prompt,
+            max_output_tokens=max_output_tokens,
+            stage="L2.X1D_judge",
+            section_id=section_id or "executive_summary",
+            run_id="",
+        )
+    except ValueError as exc:
+        return _make_blocked_output(
+            provider_key,
+            input_hash,
+            "BLOCKED_TOKEN_BUDGET",
+            "BLOCKED_TOKEN_BUDGET",
+            f"External-model token budget ledger invalid: {exc}",
+            model_name=model,
+        )
+    if reservation.allowed:
+        return None
+    return _make_blocked_output(
+        provider_key,
+        input_hash,
+        "BLOCKED_TOKEN_BUDGET",
+        "BLOCKED_TOKEN_BUDGET",
+        (
+            "External-model token budget preflight blocked: "
+            f"{reservation.reason}; estimated_input_tokens={reservation.estimated_input_tokens}; "
+            f"prior_reserved_total_tokens={reservation.prior_reserved_total_tokens}; "
+            f"max_reserved_tokens_per_run={reservation.max_reserved_tokens_per_run}"
+        ),
+        model_name=model,
+    )
 
 
 def _is_openai_gpt5_chat_model(model: str) -> bool:
@@ -210,15 +303,22 @@ Score contract (mandatory - every judge response MUST comply):
 - Do not infer scale from magnitude; declare score_scale explicitly and keep score/threshold within that scale.
 """.strip()
 
-def _build_rubric() -> str:
+def _build_rubric(*, include_score_schema: bool = True) -> str:
+    """Build the authoritative rubric, optionally omitting a system-owned copy."""
     from apps_rg.runtime.judges.executive_summary_x1d_dimension_verdicts import (
         build_executive_summary_x1d_rubric_text,
     )
 
-    return build_executive_summary_x1d_rubric_text(include_score_schema=JUDGE_SCORE_SCHEMA)
+    return build_executive_summary_x1d_rubric_text(
+        include_score_schema=JUDGE_SCORE_SCHEMA if include_score_schema else ""
+    )
 
 
+# Preserve the complete canonical rubric for contract audits and input
+# provenance. Provider system instructions own the output/score contract.
 RUBRIC = _build_rubric()
+# The user message carries only its non-duplicated, evidence-evaluation part.
+JUDGE_USER_PROMPT_RUBRIC = _build_rubric(include_score_schema=False)
 
 
 @dataclass
@@ -582,27 +682,67 @@ def _normalize_judge_result(raw: dict[str, Any]) -> dict[str, Any]:
 
 
 def _build_judge_user_prompt(resume_display_text: str, claim_ledger: list[dict[str, Any]]) -> str:
-    """Build provider judge user prompt with compact JSON-only output contract."""
+    """Build the evidence-bearing user prompt for the canonical X1D system contract.
+
+    ``JUDGE_COMPACT_OUTPUT`` remains in every provider's canonical system
+    instruction.  Repeating it here consumed input context without adding a
+    second control, so the user message carries only the rubric and evidence.
+    """
     return (
-        f"{RUBRIC}\n\n{JUDGE_COMPACT_OUTPUT}\n\n"
-        f"RESUME_DISPLAY_TEXT:\n{resume_display_text}\n\n"
+        f"{JUDGE_USER_PROMPT_RUBRIC}\n\nRESUME_DISPLAY_TEXT:\n{resume_display_text}\n\n"
         f"CLAIM_LEDGER:\n{json.dumps(claim_ledger, separators=(',', ':'))}"
     )
 
 
-def _gemini_generation_config(*, attempt: int = 1, section_id: str | None = None) -> dict[str, Any]:
+def gemini_grade_only_thinking_enabled(environ: Mapping[str, str] | None = None) -> bool:
+    """Enable the W3 thinking-effort pilot only by explicit operator choice."""
+    env = os.environ if environ is None else environ
+    return str(env.get(ENV_APPS_RG_GEMINI_GRADE_ONLY_THINKING) or "").strip() == "1"
+
+
+def _gemini_thinking_config(*, model: str | None, section_id: str | None) -> dict[str, str] | None:
+    """Return a model-supported W3 thinking setting for compact grade-only JSON.
+
+    Gemini 3 Pro cannot turn thinking off.  The pilot therefore requests the
+    source-controlled ``thinkingLevel`` appropriate to the judge tier rather
+    than attempting an unsupported budget/disable setting.  It is intentionally
+    absent unless the operator opts in for this run.
+    """
+    if not gemini_grade_only_thinking_enabled():
+        return None
+    if not str(model or "").startswith(GEMINI_3_FAMILY_PREFIX):
+        return None
+    if section_id:
+        level = _section_judge_runtime_profile(section_id).gemini_thinking_level
+    else:
+        from apps_rg.runtime.section_judge_policy import JudgeTier, get_judge_runtime_profile
+
+        level = get_judge_runtime_profile(JudgeTier.STANDARD_REASONING).gemini_thinking_level
+    return {"thinkingLevel": level}
+
+
+def _gemini_generation_config(
+    *,
+    attempt: int = 1,
+    section_id: str | None = None,
+    model: str | None = None,
+) -> dict[str, Any]:
     """Gemini generationConfig for compact schema-valid judge JSON."""
     max_tokens = (
         _resolved_section_x1d_judge_max_output_tokens(section_id, attempt=attempt)
         if section_id
         else _resolved_x1d_judge_max_output_tokens(attempt=attempt)
     )
-    return {
+    config: dict[str, Any] = {
         "temperature": 0.1,
         "maxOutputTokens": max_tokens,
         "responseMimeType": "application/json",
         "responseSchema": GEMINI_JUDGE_RESPONSE_SCHEMA,
     }
+    thinking_config = _gemini_thinking_config(model=model, section_id=section_id)
+    if thinking_config is not None:
+        config["thinkingConfig"] = thinking_config
+    return config
 
 
 def _extract_anthropic_message_text(data: dict[str, Any]) -> str:
@@ -1055,6 +1195,20 @@ def _call_openai(
         payload["max_tokens"] = max_tokens
         payload["temperature"] = 0.1
         payload["response_format"] = {"type": "json_object"}
+
+    budget_block = _x1d_token_budget_blocked_output(
+        artifact_base=artifact_base,
+        provider="openai",
+        provider_key=provider_key,
+        model=model,
+        input_hash=input_hash,
+        prompt=prompt,
+        max_output_tokens=max_tokens,
+        section_id=section_id,
+        attempt=attempt,
+    )
+    if budget_block is not None:
+        return budget_block
     
     # Write request artifact
     req_path = _artifact_path(provider_key, "provider_request", artifact_base=artifact_base)
@@ -1104,6 +1258,18 @@ def _call_openai(
         # Write error response artifact
         err_path = _artifact_path(provider_key, "provider_response_raw", artifact_base=artifact_base)
         _write_artifact(err_path, {"error": True, "status_code": e.code, "body": error_body, "input_hash": input_hash})
+        _record_x1d_external_usage(
+            artifact_base=artifact_base,
+            provider="openai",
+            model=model,
+            input_hash=input_hash,
+            section_id=section_id,
+            logical_attempt=attempt,
+            transport_attempt=1,
+            outcome=f"HTTP_{e.code}",
+            provider_status="BLOCKED_PROVIDER_UNAVAILABLE",
+            raw_response_ref=str(err_path),
+        )
         return _make_blocked_output(
             provider_key, input_hash, "BLOCKED_PROVIDER_UNAVAILABLE",
             "BLOCKED_PROVIDER_UNAVAILABLE", f"OpenAI API error {e.code}: {error_body}",
@@ -1116,6 +1282,21 @@ def _call_openai(
     
     try:
         data = json.loads(raw_response)
+        usage_doc = data if isinstance(data, Mapping) else {}
+        _record_x1d_external_usage(
+            artifact_base=artifact_base,
+            provider="openai",
+            model=str(usage_doc.get("model") or model),
+            input_hash=input_hash,
+            section_id=section_id,
+            logical_attempt=attempt,
+            transport_attempt=1,
+            outcome="SUCCESS",
+            provider_status="RESPONSE_RECEIVED",
+            usage=usage_doc.get("usage") if isinstance(usage_doc.get("usage"), Mapping) else None,
+            response_id=str(usage_doc.get("id") or ""),
+            raw_response_ref=str(raw_path),
+        )
         choice = data["choices"][0]
         message = choice.get("message") or {}
         content = str(message.get("content") or "")
@@ -1282,6 +1463,20 @@ def _call_anthropic(
 
     apply_anthropic_temperature_capability(payload)
 
+    budget_block = _x1d_token_budget_blocked_output(
+        artifact_base=artifact_base,
+        provider="anthropic",
+        provider_key=provider_key,
+        model=model,
+        input_hash=input_hash,
+        prompt=prompt,
+        max_output_tokens=max_tokens,
+        section_id=section_id,
+        attempt=attempt,
+    )
+    if budget_block is not None:
+        return budget_block
+
     # Write request artifact
     req_path = _artifact_path(provider_key, "provider_request", artifact_base=artifact_base)
     req_doc = {
@@ -1343,6 +1538,18 @@ def _call_anthropic(
                 "body": error_body,
                 "input_hash": input_hash
             })
+            _record_x1d_external_usage(
+                artifact_base=artifact_base,
+                provider="anthropic",
+                model=model,
+                input_hash=input_hash,
+                section_id=section_id,
+                logical_attempt=attempt,
+                transport_attempt=1,
+                outcome=f"HTTP_{e.code}",
+                provider_status="BLOCKED_MODEL_NOT_FOUND",
+                raw_response_ref=str(err_path),
+            )
             
             return _make_blocked_output(
                 provider_key, input_hash, "BLOCKED_MODEL_NOT_FOUND",
@@ -1354,6 +1561,18 @@ def _call_anthropic(
         # Other HTTP errors
         err_path = _artifact_path(provider_key, "provider_response_raw", artifact_base=artifact_base)
         _write_artifact(err_path, {"error": True, "status_code": e.code, "body": error_body, "input_hash": input_hash})
+        _record_x1d_external_usage(
+            artifact_base=artifact_base,
+            provider="anthropic",
+            model=model,
+            input_hash=input_hash,
+            section_id=section_id,
+            logical_attempt=attempt,
+            transport_attempt=1,
+            outcome=f"HTTP_{e.code}",
+            provider_status="BLOCKED_PROVIDER_UNAVAILABLE",
+            raw_response_ref=str(err_path),
+        )
         return _make_blocked_output(
             provider_key, input_hash, "BLOCKED_PROVIDER_UNAVAILABLE",
             "BLOCKED_PROVIDER_UNAVAILABLE", f"Anthropic API error {e.code}: {error_body}",
@@ -1367,6 +1586,21 @@ def _call_anthropic(
     
     try:
         data = json.loads(raw_response)
+        usage_doc = data if isinstance(data, Mapping) else {}
+        _record_x1d_external_usage(
+            artifact_base=artifact_base,
+            provider="anthropic",
+            model=str(usage_doc.get("model") or model),
+            input_hash=input_hash,
+            section_id=section_id,
+            logical_attempt=attempt,
+            transport_attempt=1,
+            outcome="SUCCESS",
+            provider_status="RESPONSE_RECEIVED",
+            usage=usage_doc.get("usage") if isinstance(usage_doc.get("usage"), Mapping) else None,
+            response_id=str(usage_doc.get("id") or ""),
+            raw_response_ref=str(raw_path),
+        )
         text = _extract_anthropic_message_text(data)
         stop_reason = str(data.get("stop_reason") or "")
         if cache_seed is not None:
@@ -1578,17 +1812,37 @@ def _call_gemini(
     section_id: str | None = None,
 ) -> JudgeOutput:
     """Call Gemini API with full artifact preservation."""
+    logical_attempt = attempt
     judge_max_attempts = _section_x1d_judge_max_attempts(section_id) if section_id else _x1d_judge_max_attempts()
     max_tokens = (
         _resolved_section_x1d_judge_max_output_tokens(section_id, attempt=attempt)
         if section_id
         else _resolved_x1d_judge_max_output_tokens(attempt=attempt)
     )
+    generation_config = _gemini_generation_config(
+        attempt=attempt,
+        section_id=section_id,
+        model=model,
+    )
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "systemInstruction": {"parts": [{"text": build_x1d_judge_system_prompt(compact=True)}]},
-        "generationConfig": _gemini_generation_config(attempt=attempt, section_id=section_id),
+        "generationConfig": generation_config,
     }
+
+    budget_block = _x1d_token_budget_blocked_output(
+        artifact_base=artifact_base,
+        provider="gemini",
+        provider_key=provider_key,
+        model=model,
+        input_hash=input_hash,
+        prompt=prompt,
+        max_output_tokens=max_tokens,
+        section_id=section_id,
+        attempt=attempt,
+    )
+    if budget_block is not None:
+        return budget_block
 
     endpoint_version = "v1beta" if _uses_gemini_preview_endpoint(model) else "v1"
     url = f"https://generativelanguage.googleapis.com/{endpoint_version}/models/{model}:generateContent?key={api_key}"
@@ -1612,6 +1866,8 @@ def _call_gemini(
         "input_hash": input_hash,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "judge_attempt": attempt,
+        "gemini_thinking_config": dict(generation_config.get("thinkingConfig") or {}),
+        "gemini_thinking_optimization_enabled": bool(generation_config.get("thinkingConfig")),
         **_x1d_provider_request_receipt_fields(
             judge_receipt,
             provider_name="gemini",
@@ -1638,17 +1894,29 @@ def _call_gemini(
             service_label="Gemini",
         )
 
-    for attempt in range(retries + 1):
+    for transport_attempt in range(retries + 1):
         try:
             with urllib.request.urlopen(req, timeout=60) as response:
                 raw_response = response.read().decode()
             break
         except urllib.error.HTTPError as e:
             body = e.read().decode(errors="replace")
-            if attempt < retries and e.code == 429:
+            if transport_attempt < retries and e.code == 429:
+                _record_x1d_external_usage(
+                    artifact_base=artifact_base,
+                    provider="gemini",
+                    model=model,
+                    input_hash=input_hash,
+                    section_id=section_id,
+                    logical_attempt=logical_attempt,
+                    transport_attempt=transport_attempt + 1,
+                    outcome="HTTP_429",
+                    provider_status="RETRYING",
+                    retry_reason="provider_rate_limit",
+                )
                 wait_s = _parse_gemini_retry_delay_seconds(body)
                 if wait_s is None:
-                    wait_s = min(30.0, 2.0**attempt)
+                    wait_s = min(30.0, 2.0**transport_attempt)
                 sleep_for = min(45.0, max(1.5, float(wait_s)))
                 time.sleep(sleep_for)
                 continue
@@ -1662,9 +1930,21 @@ def _call_gemini(
                     "status_code": e.code,
                     "body": body,
                     "input_hash": input_hash,
-                    "attempt": attempt,
+                    "attempt": transport_attempt,
                     "retries_configured": retries,
                 },
+            )
+            _record_x1d_external_usage(
+                artifact_base=artifact_base,
+                provider="gemini",
+                model=model,
+                input_hash=input_hash,
+                section_id=section_id,
+                logical_attempt=logical_attempt,
+                transport_attempt=transport_attempt + 1,
+                outcome=f"HTTP_{e.code}",
+                provider_status=prov_status,
+                raw_response_ref=str(err_path),
             )
             return _make_blocked_output(
                 provider_key,
@@ -1689,11 +1969,39 @@ def _call_gemini(
             "detail": str(e),
             "raw_response_ref": str(raw_path),
         })
+        _record_x1d_external_usage(
+            artifact_base=artifact_base,
+            provider="gemini",
+            model=model,
+            input_hash=input_hash,
+            section_id=section_id,
+            logical_attempt=logical_attempt,
+            transport_attempt=transport_attempt + 1,
+            outcome="RESPONSE_UNPARSEABLE",
+            provider_status="BLOCKED_RESPONSE_PARSE_ERROR",
+            raw_response_ref=str(raw_path),
+        )
         return _make_blocked_output(
             provider_key, input_hash, "BLOCKED_RESPONSE_PARSE_ERROR",
             "BLOCKED_RESPONSE_PARSE_ERROR", f"Gemini response envelope parse error: {e}",
             raw_response_ref=str(raw_path), model_name=model,
         )
+
+    usage_doc = data if isinstance(data, Mapping) else {}
+    _record_x1d_external_usage(
+        artifact_base=artifact_base,
+        provider="gemini",
+        model=str(usage_doc.get("modelVersion") or model),
+        input_hash=input_hash,
+        section_id=section_id,
+        logical_attempt=logical_attempt,
+        transport_attempt=transport_attempt + 1,
+        outcome="SUCCESS",
+        provider_status="RESPONSE_RECEIVED",
+        usage=usage_doc.get("usageMetadata") if isinstance(usage_doc.get("usageMetadata"), Mapping) else None,
+        response_id=str(usage_doc.get("responseId") or ""),
+        raw_response_ref=str(raw_path),
+    )
 
     text, finish_reason = _extract_gemini_text(data)
     return _finish_judge_text_parse(
@@ -1799,6 +2107,7 @@ def run_llm_judges(
             "resume_display_text": resume_display_text,
             "claim_ledger": claim_ledger,
             "rubric": RUBRIC,
+            "prompt_contract_version": JUDGE_INPUT_PROMPT_VERSION,
         }
         input_hash = hashlib.sha256(json.dumps(input_payload, sort_keys=True).encode()).hexdigest()[:16]
         prompt = _build_judge_user_prompt(resume_display_text, claim_ledger)
