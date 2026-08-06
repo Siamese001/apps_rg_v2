@@ -15,7 +15,9 @@ from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.prerequisites.briefing_validator import validate_apps_research_handoff
 from apps_rg.runtime.dispatch.spine_stage_receipts import (
     FILENAME_DELEGATED_BRIEFING,
+    FILENAME_L1_PLANNING_CAPSULE,
     FILENAME_PLAN_EXECUTION_RECEIPT,
+    FILENAME_PLAN_REPLAN_DECISION,
     FILENAME_RESEARCH_BRIDGE_REQUEST,
     FILENAME_RESEARCH_BRIDGE_RESPONSE,
     FILENAME_SPINE_MANIFEST,
@@ -249,6 +251,15 @@ def test_whole_run_static_json_is_replaced_by_delegated_brief(
     )
     assert plan_execution_receipt["emission"]["wave"] == "W1"
     assert plan_execution_receipt["summary"]["all_planned_units_reconciled"] is True
+    plan_replan_decision = json.loads(
+        (tmp_path / "static_json_run" / FILENAME_PLAN_REPLAN_DECISION).read_text(
+            encoding="utf-8"
+        )
+    )
+    assert (tmp_path / "static_json_run" / FILENAME_L1_PLANNING_CAPSULE).is_file()
+    assert plan_replan_decision["replan_status"] == "NO_ACTIONABLE_REPLAN"
+    assert plan_replan_decision["replan_revision"] is None
+    assert plan_replan_decision["parent_plan"]["capsule_ref"] == FILENAME_L1_PLANNING_CAPSULE
 
 
 def test_whole_run_redelegates_a_foreign_handoff_before_u0(
