@@ -11,6 +11,7 @@ STAGE_RECEIPT_SCHEMA_VERSION = "apps_rg.stage_receipt.v1"
 FILENAME_INGRESS_RAW = "ingress_raw.json"
 FILENAME_U0_RECEIPT = "u0_receipt.json"
 FILENAME_L1_PLAN = "l1_plan_contract.json"
+FILENAME_PLAN_EXECUTION_RECEIPT = "plan_execution_receipt.json"
 FILENAME_ROUTE_CONTRACT = "route_contract.json"
 FILENAME_ROUTE_PRE_RESEARCH = "route_contract_pre_research.json"
 FILENAME_RESEARCH_BRIDGE_REQUEST = "research_bridge_request.json"
@@ -41,6 +42,7 @@ __all__ = [
     "FILENAME_DRAFT_LEG_MANIFEST",
     "FILENAME_INGRESS_RAW",
     "FILENAME_L1_PLAN",
+    "FILENAME_PLAN_EXECUTION_RECEIPT",
     "FILENAME_MOCK_ELIMINATION_PROOF",
     "FILENAME_RESEARCH_BRIDGE_REQUEST",
     "FILENAME_RESEARCH_BRIDGE_RESPONSE",

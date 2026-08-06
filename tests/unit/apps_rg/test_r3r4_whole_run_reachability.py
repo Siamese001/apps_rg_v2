@@ -15,6 +15,7 @@ from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.prerequisites.briefing_validator import validate_apps_research_handoff
 from apps_rg.runtime.dispatch.spine_stage_receipts import (
     FILENAME_DELEGATED_BRIEFING,
+    FILENAME_PLAN_EXECUTION_RECEIPT,
     FILENAME_RESEARCH_BRIDGE_REQUEST,
     FILENAME_RESEARCH_BRIDGE_RESPONSE,
     FILENAME_SPINE_MANIFEST,
@@ -241,6 +242,13 @@ def test_whole_run_static_json_is_replaced_by_delegated_brief(
     assert Path(research_ref["research_briefing_path"]) == producer_brief
     assert Path(research_ref["research_company_brief_path"]).is_file()
     assert Path(research_ref["research_handoff_v2_path"]).is_file()
+    plan_execution_receipt = json.loads(
+        (tmp_path / "static_json_run" / FILENAME_PLAN_EXECUTION_RECEIPT).read_text(
+            encoding="utf-8"
+        )
+    )
+    assert plan_execution_receipt["emission"]["wave"] == "W1"
+    assert plan_execution_receipt["summary"]["all_planned_units_reconciled"] is True
 
 
 def test_whole_run_redelegates_a_foreign_handoff_before_u0(
