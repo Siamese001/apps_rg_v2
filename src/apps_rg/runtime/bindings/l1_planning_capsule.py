@@ -34,6 +34,30 @@ _ROUTE_AUTHORITY_KEYS = frozenset(
 )
 _CANONICAL_PROFILE_REF = "apps_rg/profiles/rg_planning_profile.yaml"
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
+_JD_OBLIGATION_PLAN_SCHEMA = "apps_rg.jd_obligation_plan.v1"
+_JD_OBLIGATION_ESCALATION = "HITL_OR_UPSTREAM_EVIDENCE_REVIEW_REQUIRED"
+_JD_OBLIGATION_SOURCE_KINDS = frozenset(
+    {"RESPONSIBILITY", "REQUIREMENT", "PREFERRED_QUALIFICATION", "JD_STATEMENT"}
+)
+_JD_OBLIGATION_CRITICALITIES = frozenset({"CRITICAL", "HIGH", "STANDARD"})
+_JD_OBLIGATION_COVERAGE_STATUSES = frozenset({"MAPPED", "ESCALATED", "UNMAPPED"})
+_JD_SECTION_MARKERS: tuple[tuple[str, str], ...] = (
+    ("responsibilit", "RESPONSIBILITY"),
+    ("you may be a good fit", "REQUIREMENT"),
+    ("qualifications", "REQUIREMENT"),
+    ("requirements", "REQUIREMENT"),
+    ("strong candidates", "PREFERRED_QUALIFICATION"),
+)
+_JD_CRITICAL_TERMS_RE = re.compile(
+    r"\b(?:must|required|minimum|\d+\+?\s+years?|track record|deep "
+    r"understanding|exceptional|lead(?:ing)?|manage|hire|own)\b",
+    re.IGNORECASE,
+)
+_JD_EXPLICIT_REQUIREMENT_RE = re.compile(
+    r"\b(?:must|required|minimum|\d+\+?\s+years?|bachelor(?:'s)? degree|"
+    r"master(?:'s)? degree|ph\.d\.)\b",
+    re.IGNORECASE,
+)
 _REQUIRED_VALIDATION_ASSERTIONS = frozenset(
     {
         "no_route_selection",
@@ -302,6 +326,7 @@ def build_apps_rg_l1_planning_capsule(
     generation_mode = _generation_mode(app_payload)
     mode_profile = _mode_profile(profile, generation_mode)
     work_units = _work_units_for_mode(profile, app_payload, generation_mode)
+    jd_obligation_plan = _jd_obligation_plan(app_payload, work_units)
     ambiguity_register = stable_ambiguity_register(
         app_payload=app_payload,
         ambiguity_rules=profile.get("ambiguity_rules") or (),
@@ -339,7 +364,8 @@ def build_apps_rg_l1_planning_capsule(
         "completion_criteria": completion_criteria,
         "work_units": work_units,
         "dependency_sketch": _dependency_sketch(work_units),
-        "evidence_plan": _evidence_plan(work_units),
+        "jd_obligation_plan": jd_obligation_plan,
+        "evidence_plan": _evidence_plan(work_units, jd_obligation_plan),
         "prompt_plan": _prompt_plan(work_units),
         "cognition_plan": _cognition_plan(work_units),
         "route_feature_hints": route_feature_hints,
@@ -432,6 +458,24 @@ def verify_apps_rg_l1_planning_capsule(
         raise PlanningCapsuleIntegrityError(
             f"planning_status={planning_status!r} conflicts with ambiguity register"
         )
+
+    work_units = capsule.get("work_units")
+    if not isinstance(work_units, Sequence) or isinstance(work_units, (str, bytes)):
+        raise PlanningCapsuleIntegrityError("work_units are required")
+    unit_ids = {
+        str(unit.get("unit_id") or "").strip()
+        for unit in work_units
+        if isinstance(unit, Mapping) and str(unit.get("unit_id") or "").strip()
+    }
+    if not unit_ids:
+        raise PlanningCapsuleIntegrityError("work_units must contain unit_id values")
+    jd_obligation_plan = capsule.get("jd_obligation_plan")
+    _verify_jd_obligation_plan(jd_obligation_plan, unit_ids=unit_ids)
+    _verify_evidence_plan_jd_coverage(
+        capsule.get("evidence_plan"),
+        unit_ids=unit_ids,
+        jd_obligation_plan=jd_obligation_plan,
+    )
 
     validation = capsule.get("validation")
     if not isinstance(validation, Mapping):
@@ -652,7 +696,262 @@ def _dependency_sketch(work_units: Sequence[Mapping[str, Any]]) -> list[dict[str
     return rows
 
 
-def _evidence_plan(work_units: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+def _jd_obligation_plan(
+    app_payload: Mapping[str, Any],
+    work_units: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Derive a deterministic, target-only JD obligation plan for L1.
+
+    The JD names what the output should address; it never proves that the
+    candidate has satisfied an obligation.  Evidence collection and claim
+    decisions remain downstream C0/L2 responsibilities.
+    """
+
+    jd_text = _inline_jd_text(app_payload)
+    jd_hash = _declared_jd_hash(app_payload, jd_text)
+    unit_ids = tuple(
+        str(unit.get("unit_id") or "").strip()
+        for unit in work_units
+        if str(unit.get("unit_id") or "").strip()
+    )
+    obligations: list[dict[str, Any]] = []
+    for source_kind, text in _extract_jd_obligation_texts(jd_text):
+        mapped_unit_ids = _jd_obligation_unit_ids(text, unit_ids)
+        criticality = _jd_obligation_criticality(text, source_kind)
+        escalation_reason = ""
+        if mapped_unit_ids:
+            coverage_status = "MAPPED"
+        elif criticality == "CRITICAL":
+            coverage_status = "ESCALATED"
+            escalation_reason = _JD_OBLIGATION_ESCALATION
+        else:
+            coverage_status = "UNMAPPED"
+        obligation_id = _jd_obligation_id(
+            jd_hash=jd_hash,
+            source_kind=source_kind,
+            text=text,
+        )
+        obligations.append(
+            {
+                "obligation_id": obligation_id,
+                "source_kind": source_kind,
+                "obligation_text": text,
+                "criticality": criticality,
+                "mapped_unit_ids": list(mapped_unit_ids),
+                "coverage_status": coverage_status,
+                "escalation_reason": escalation_reason,
+            }
+        )
+
+    critical_obligations = [
+        obligation
+        for obligation in obligations
+        if obligation["criticality"] == "CRITICAL"
+    ]
+    critical_mapped_count = sum(
+        1
+        for obligation in critical_obligations
+        if obligation["coverage_status"] == "MAPPED"
+    )
+    critical_escalated_count = sum(
+        1
+        for obligation in critical_obligations
+        if obligation["coverage_status"] == "ESCALATED"
+    )
+    source_binding = {
+        "source_class": "U0_VALIDATED_JD_PAYLOAD",
+        "jd_hash": jd_hash,
+        "inline_text_present": bool(jd_text),
+        "inline_text_digest": _sha256_json_prefixed({"jd_text": jd_text})
+        if jd_text
+        else "",
+    }
+    plan: dict[str, Any] = {
+        "schema_version": _JD_OBLIGATION_PLAN_SCHEMA,
+        "authority_class": "L1_TARGETING_ADVISORY_ONLY",
+        "source_binding": source_binding,
+        "extraction_status": "EXTRACTED" if jd_text else "NO_INLINE_JD_TEXT",
+        "obligations": obligations,
+        "coverage": {
+            "obligation_count": len(obligations),
+            "critical_count": len(critical_obligations),
+            "critical_mapped_count": critical_mapped_count,
+            "critical_escalated_count": critical_escalated_count,
+            "all_critical_obligations_resolved": (
+                critical_mapped_count + critical_escalated_count
+                == len(critical_obligations)
+            ),
+        },
+        "validation": {
+            "jd_is_targeting_input_not_candidate_evidence": True,
+            "no_evidence_retrieval": True,
+            "no_claim_generation": True,
+            "no_execution_path_selection": True,
+        },
+    }
+    plan["obligation_plan_digest"] = _stable_jd_obligation_plan_digest(plan)
+    return plan
+
+
+def _inline_jd_text(app_payload: Mapping[str, Any]) -> str:
+    jd_payload = (
+        app_payload.get("jd_payload")
+        if isinstance(app_payload.get("jd_payload"), Mapping)
+        else {}
+    )
+    for value in (
+        app_payload.get("job_description_text"),
+        app_payload.get("jd_text"),
+        jd_payload.get("jd_text"),
+        jd_payload.get("text"),
+        jd_payload.get("content"),
+    ):
+        text = str(value or "").strip()
+        if text:
+            return text
+    return ""
+
+
+def _declared_jd_hash(app_payload: Mapping[str, Any], jd_text: str) -> str:
+    jd_payload = (
+        app_payload.get("jd_payload")
+        if isinstance(app_payload.get("jd_payload"), Mapping)
+        else {}
+    )
+    query_spec = (
+        app_payload.get("query_spec")
+        if isinstance(app_payload.get("query_spec"), Mapping)
+        else {}
+    )
+    for value in (
+        app_payload.get("jd_hash"),
+        jd_payload.get("hash"),
+        jd_payload.get("jd_hash"),
+        query_spec.get("jd_hash"),
+    ):
+        digest = str(value or "").strip().lower().removeprefix("sha256:")
+        if _SHA256_HEX_RE.fullmatch(digest):
+            return digest
+    return hashlib.sha256(f"text:{jd_text}".encode("utf-8")).hexdigest() if jd_text else ""
+
+
+def _extract_jd_obligation_texts(jd_text: str) -> list[tuple[str, str]]:
+    """Extract explicit bullet and requirement statements without inference."""
+
+    if not jd_text:
+        return []
+    rows: list[tuple[str, str]] = []
+    section_kind = "JD_STATEMENT"
+    for raw_line in jd_text.splitlines():
+        line = " ".join(raw_line.strip().split())
+        if not line:
+            continue
+        header_kind = _jd_section_kind(line)
+        if header_kind:
+            section_kind = header_kind
+            continue
+        bullet_text = re.sub(r"^(?:[-*•]+|\d+[.)])\s*", "", line).strip()
+        if bullet_text != line:
+            rows.append((section_kind, bullet_text))
+        elif _JD_EXPLICIT_REQUIREMENT_RE.search(line):
+            rows.append(("REQUIREMENT", line))
+
+    if not rows and jd_text.strip():
+        normalized = " ".join(jd_text.split())
+        rows.append(("JD_STATEMENT", normalized))
+    deduped: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for source_kind, text in rows:
+        key = (source_kind, text)
+        if key not in seen:
+            seen.add(key)
+            deduped.append(key)
+    return deduped
+
+
+def _jd_section_kind(line: str) -> str:
+    normalized = line.lower().rstrip(":")
+    for marker, source_kind in _JD_SECTION_MARKERS:
+        if marker in normalized:
+            return source_kind
+    return ""
+
+
+def _jd_obligation_criticality(text: str, source_kind: str) -> str:
+    if source_kind == "PREFERRED_QUALIFICATION":
+        return "STANDARD"
+    if source_kind == "REQUIREMENT" or _JD_CRITICAL_TERMS_RE.search(text):
+        return "CRITICAL"
+    if source_kind == "RESPONSIBILITY":
+        return "HIGH"
+    return "STANDARD"
+
+
+def _jd_obligation_id(*, jd_hash: str, source_kind: str, text: str) -> str:
+    digest = _sha256_json_prefixed(
+        {"jd_hash": jd_hash, "source_kind": source_kind, "obligation_text": text}
+    )
+    return f"jdob-{digest.removeprefix('sha256:')[:16]}"
+
+
+def _jd_obligation_unit_ids(text: str, available_unit_ids: Sequence[str]) -> tuple[str, ...]:
+    """Map only explicit JD terms to L1 work units; unknowns remain unresolved."""
+
+    normalized = text.lower()
+    candidates: list[str] = []
+
+    def add(*unit_ids: str) -> None:
+        for unit_id in unit_ids:
+            if unit_id in available_unit_ids and unit_id not in candidates:
+                candidates.append(unit_id)
+
+    if re.search(r"\b(?:lead|manage|mentor|hire|coach|executive|c-suite|team)\b", normalized):
+        add("executive_summary", "headline", "experience_block")
+    if re.search(
+        r"\b(?:partner|partnership|gsi|cloud|gtm|pre-sales|presales|customer|revenue|deal)\b",
+        normalized,
+    ):
+        add("headline", "executive_summary", "experience_block")
+    if re.search(
+        r"\b(?:technical|architect|ai|genai|llm|api|engineering|solution|deployment|"
+        r"prompt|evaluation|integration)\b",
+        normalized,
+    ):
+        add("experience_block", "competencies", "skills_block")
+    if re.search(r"\b(?:communication|teaching|thought leadership)\b", normalized):
+        add("headline", "executive_summary", "experience_block")
+    if re.search(r"\b(?:bachelor|master|ph\.d|degree|coursework|education)\b", normalized):
+        add("education_block")
+    if re.search(r"\b(?:certification|certified)\b", normalized):
+        add("certifications_block")
+    if re.search(r"\b(?:years?|track record|experience)\b", normalized):
+        add("experience_block")
+    return tuple(candidates)
+
+
+def _stable_jd_obligation_plan_digest(plan: Mapping[str, Any]) -> str:
+    body = dict(plan)
+    body.pop("obligation_plan_digest", None)
+    return _sha256_json_prefixed(body)
+
+
+def _evidence_plan(
+    work_units: Sequence[Mapping[str, Any]],
+    jd_obligation_plan: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    obligation_ids_by_unit: dict[str, list[str]] = {}
+    obligations = jd_obligation_plan.get("obligations")
+    if isinstance(obligations, Sequence) and not isinstance(obligations, (str, bytes)):
+        for obligation in obligations:
+            if not isinstance(obligation, Mapping):
+                continue
+            obligation_id = str(obligation.get("obligation_id") or "").strip()
+            for unit_id in obligation.get("mapped_unit_ids") or ():
+                normalized_unit_id = str(unit_id or "").strip()
+                if obligation_id and normalized_unit_id:
+                    obligation_ids_by_unit.setdefault(normalized_unit_id, []).append(
+                        obligation_id
+                    )
     return [
         {
             "unit_id": str(unit.get("unit_id") or ""),
@@ -666,9 +965,136 @@ def _evidence_plan(work_units: Sequence[Mapping[str, Any]]) -> list[dict[str, An
             ],
             "contradiction_scan_expected": True,
             "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": obligation_ids_by_unit.get(
+                str(unit.get("unit_id") or ""), []
+            ),
+            "jd_obligation_targeting_only": True,
         }
         for unit in work_units
     ]
+
+
+def _verify_jd_obligation_plan(
+    jd_obligation_plan: Any,
+    *,
+    unit_ids: set[str],
+) -> None:
+    if not isinstance(jd_obligation_plan, Mapping):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan is required")
+    if jd_obligation_plan.get("schema_version") != _JD_OBLIGATION_PLAN_SCHEMA:
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan schema_version is invalid")
+    if jd_obligation_plan.get("authority_class") != "L1_TARGETING_ADVISORY_ONLY":
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan authority_class is invalid")
+    declared_digest = str(jd_obligation_plan.get("obligation_plan_digest") or "")
+    if declared_digest != _stable_jd_obligation_plan_digest(jd_obligation_plan):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan digest mismatch")
+    source_binding = jd_obligation_plan.get("source_binding")
+    if not isinstance(source_binding, Mapping):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan source_binding is required")
+    if source_binding.get("source_class") != "U0_VALIDATED_JD_PAYLOAD":
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan source binding is invalid")
+    jd_hash = str(source_binding.get("jd_hash") or "")
+    if jd_hash and not _SHA256_HEX_RE.fullmatch(jd_hash):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan jd_hash is invalid")
+    obligations = jd_obligation_plan.get("obligations")
+    if not isinstance(obligations, Sequence) or isinstance(obligations, (str, bytes)):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan obligations are required")
+    observed_ids: set[str] = set()
+    critical_mapped = 0
+    critical_escalated = 0
+    for obligation in obligations:
+        if not isinstance(obligation, Mapping):
+            raise PlanningCapsuleIntegrityError("jd obligation must be a mapping")
+        obligation_id = str(obligation.get("obligation_id") or "").strip()
+        source_kind = str(obligation.get("source_kind") or "").strip()
+        text = str(obligation.get("obligation_text") or "").strip()
+        criticality = str(obligation.get("criticality") or "").strip()
+        coverage_status = str(obligation.get("coverage_status") or "").strip()
+        mapped_unit_ids = obligation.get("mapped_unit_ids")
+        if not obligation_id or obligation_id in observed_ids:
+            raise PlanningCapsuleIntegrityError("jd obligation ids must be present and unique")
+        observed_ids.add(obligation_id)
+        if not text or source_kind not in _JD_OBLIGATION_SOURCE_KINDS:
+            raise PlanningCapsuleIntegrityError("jd obligation source content is invalid")
+        if criticality not in _JD_OBLIGATION_CRITICALITIES:
+            raise PlanningCapsuleIntegrityError("jd obligation criticality is invalid")
+        if coverage_status not in _JD_OBLIGATION_COVERAGE_STATUSES:
+            raise PlanningCapsuleIntegrityError("jd obligation coverage_status is invalid")
+        if not isinstance(mapped_unit_ids, Sequence) or isinstance(mapped_unit_ids, (str, bytes)):
+            raise PlanningCapsuleIntegrityError("jd obligation mapped_unit_ids is invalid")
+        mapped = tuple(str(unit_id or "").strip() for unit_id in mapped_unit_ids)
+        if len(set(mapped)) != len(mapped) or not set(mapped).issubset(unit_ids):
+            raise PlanningCapsuleIntegrityError("jd obligation maps an unknown or duplicate unit")
+        escalation_reason = str(obligation.get("escalation_reason") or "").strip()
+        if coverage_status == "MAPPED" and (not mapped or escalation_reason):
+            raise PlanningCapsuleIntegrityError("mapped jd obligation must have only unit mappings")
+        if coverage_status == "ESCALATED" and (
+            mapped or escalation_reason != _JD_OBLIGATION_ESCALATION
+        ):
+            raise PlanningCapsuleIntegrityError("escalated jd obligation is invalid")
+        if coverage_status == "UNMAPPED" and (mapped or escalation_reason):
+            raise PlanningCapsuleIntegrityError("unmapped jd obligation is invalid")
+        if criticality == "CRITICAL":
+            if coverage_status not in {"MAPPED", "ESCALATED"}:
+                raise PlanningCapsuleIntegrityError(
+                    "critical jd obligation must be mapped or escalated"
+                )
+            critical_mapped += coverage_status == "MAPPED"
+            critical_escalated += coverage_status == "ESCALATED"
+
+    coverage = jd_obligation_plan.get("coverage")
+    if not isinstance(coverage, Mapping):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan coverage is required")
+    critical_count = critical_mapped + critical_escalated
+    expected_coverage = {
+        "obligation_count": len(obligations),
+        "critical_count": critical_count,
+        "critical_mapped_count": critical_mapped,
+        "critical_escalated_count": critical_escalated,
+        "all_critical_obligations_resolved": True,
+    }
+    if any(coverage.get(key) != value for key, value in expected_coverage.items()):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan coverage is inconsistent")
+    validation = jd_obligation_plan.get("validation")
+    if not isinstance(validation, Mapping) or any(
+        validation.get(key) is not True
+        for key in (
+            "jd_is_targeting_input_not_candidate_evidence",
+            "no_evidence_retrieval",
+            "no_claim_generation",
+            "no_execution_path_selection",
+        )
+    ):
+        raise PlanningCapsuleIntegrityError("jd_obligation_plan validation is incomplete")
+
+
+def _verify_evidence_plan_jd_coverage(
+    evidence_plan: Any,
+    *,
+    unit_ids: set[str],
+    jd_obligation_plan: Mapping[str, Any],
+) -> None:
+    if not isinstance(evidence_plan, Sequence) or isinstance(evidence_plan, (str, bytes)):
+        raise PlanningCapsuleIntegrityError("evidence_plan is required")
+    expected: dict[str, set[str]] = {unit_id: set() for unit_id in unit_ids}
+    for obligation in jd_obligation_plan["obligations"]:
+        for unit_id in obligation["mapped_unit_ids"]:
+            expected[str(unit_id)].add(str(obligation["obligation_id"]))
+    observed: dict[str, set[str]] = {}
+    for row in evidence_plan:
+        if not isinstance(row, Mapping):
+            raise PlanningCapsuleIntegrityError("evidence_plan row is invalid")
+        unit_id = str(row.get("unit_id") or "").strip()
+        obligation_ids = row.get("jd_obligation_ids")
+        if unit_id not in unit_ids or unit_id in observed:
+            raise PlanningCapsuleIntegrityError("evidence_plan unit coverage is invalid")
+        if not isinstance(obligation_ids, Sequence) or isinstance(obligation_ids, (str, bytes)):
+            raise PlanningCapsuleIntegrityError("evidence_plan jd_obligation_ids is invalid")
+        observed[unit_id] = {str(obligation_id) for obligation_id in obligation_ids}
+        if row.get("jd_obligation_targeting_only") is not True:
+            raise PlanningCapsuleIntegrityError("evidence_plan JD targeting assertion is invalid")
+    if observed != expected:
+        raise PlanningCapsuleIntegrityError("evidence_plan JD obligation coverage is inconsistent")
 
 
 def _prompt_plan(work_units: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
