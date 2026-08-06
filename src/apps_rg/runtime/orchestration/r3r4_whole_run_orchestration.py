@@ -13,8 +13,13 @@ from typing import Any
 from apps_rg.prerequisites.briefing_validator import validate_apps_research_handoff
 from apps_rg.runtime.bindings.briefing_mode_classifier import classify_briefing_mode
 from apps_rg.runtime.bindings.l0_binding import l0_route_apps_rg
+from apps_rg.runtime.bindings.l0_route_evidence import L1PlanNotReadyError
 from apps_rg.runtime.bindings.l1_binding import l1_plan_apps_rg
 from apps_rg.runtime.bindings.u0_binding import u0_validate_apps_rg
+from apps_rg.runtime.contracts.plan_execution_reconciliation import (
+    emit_plan_execution_reconciliation,
+)
+from apps_rg.runtime.contracts.failure_aware_replan import emit_failure_aware_replan
 from apps_rg.runtime.dispatch import spine_stage_receipts as sr
 from apps_rg.runtime.executive_summary_certification import (
     EXECUTIVE_SUMMARY_JUDGE_REVIEW_X3,
@@ -1183,12 +1188,60 @@ def run_whole_run_with_route_governance(
         },
     )
     l1_plan = l1_plan_apps_rg(validated_request)
+    l1_task_spec = getattr(l1_plan, "task_spec", None) or {}
+    l1_capsule = (
+        l1_task_spec.get("apps_rg_planning_capsule")
+        if isinstance(l1_task_spec, dict)
+        else None
+    )
+    if not isinstance(l1_capsule, dict):
+        raise ProductE2EAuthorityError("L1 planning capsule is required for W1 reconciliation")
+    l1_capsule_path = art / sr.FILENAME_L1_PLANNING_CAPSULE
+    sr.write_stage_receipt(l1_capsule_path, l1_capsule)
+
+    def emit_plan_execution_artifacts(
+        *,
+        execution_witness: dict[str, Any] | None = None,
+        l2_result: Any = None,
+        terminal_reason: str = "",
+    ) -> dict[str, str]:
+        """Emit the W1 observation and its W2 advisory decision for this run path."""
+
+        execution_receipt = emit_plan_execution_reconciliation(
+            request_id=validated_request.request_id,
+            run_id=validated_request.run_id,
+            plan_capsule=l1_capsule,
+            artifact_dir=art,
+            execution_witness=execution_witness,
+            l2_result=l2_result,
+            terminal_reason=terminal_reason,
+        )
+        replan_decision = emit_failure_aware_replan(
+            parent_plan_capsule_path=l1_capsule_path,
+            plan_execution_receipt_path=execution_receipt,
+            artifact_dir=art,
+        )
+        return {
+            "plan_execution_receipt": str(execution_receipt),
+            "plan_replan_decision": str(replan_decision),
+        }
+
     stage_ledger.record(
         stage_id="L1",
         status="PASS",
-        output_refs={"l1_plan": sr.FILENAME_L1_PLAN},
+        output_refs={
+            "l1_plan": sr.FILENAME_L1_PLAN,
+            "l1_planning_capsule": sr.FILENAME_L1_PLANNING_CAPSULE,
+        },
     )
-    route = l0_route_apps_rg(l1_plan)
+    try:
+        route = l0_route_apps_rg(l1_plan)
+    except L1PlanNotReadyError:
+        # L0's fail-closed readiness boundary has no RouteContract to attach
+        # to a normal terminal payload.  Preserve its existing exception
+        # semantics, but never omit the planned-unit reconciliation it caused.
+        emit_plan_execution_artifacts(terminal_reason="L1_PLAN_BLOCKED")
+        raise
     stage_ledger.record(
         stage_id="L0",
         status="PASS",
@@ -1240,6 +1293,7 @@ def run_whole_run_with_route_governance(
             route_decision=route_decision,
         )
         failed["completion_status"] = "BLOCKED"
+        failed.update(emit_plan_execution_artifacts(terminal_reason=reason))
         _emit_terminal_mandatory_closeout(
             artifact_dir=art,
             repo_root=repo,
@@ -1321,7 +1375,10 @@ def run_whole_run_with_route_governance(
         "research_note": research_note,
         "route_decision": route_decision,
         "downstream_refs": {
+            "l1_planning_capsule": sr.FILENAME_L1_PLANNING_CAPSULE,
             "route_contract": sr.FILENAME_ROUTE_CONTRACT,
+            "plan_execution_receipt": sr.FILENAME_PLAN_EXECUTION_RECEIPT,
+            "plan_replan_decision": sr.FILENAME_PLAN_REPLAN_DECISION,
             "research_bridge_request": sr.FILENAME_RESEARCH_BRIDGE_REQUEST,
             "research_bridge_response": sr.FILENAME_RESEARCH_BRIDGE_RESPONSE,
             "delegated_briefing": delegated_briefing_ref,
@@ -1367,6 +1424,11 @@ def run_whole_run_with_route_governance(
                     "observability_repair_required": False,
                 }
             )
+            failed.update(
+                emit_plan_execution_artifacts(
+                    terminal_reason="PRODUCT_RUN_IDENTITY_UNAVAILABLE"
+                )
+            )
             _emit_terminal_mandatory_closeout(
                 artifact_dir=art,
                 repo_root=repo,
@@ -1399,6 +1461,11 @@ def run_whole_run_with_route_governance(
                     "observability_repair_required": False,
                     "e2e_authority_error": f"{type(exc).__name__}:{exc}",
                 }
+            )
+            failed.update(
+                emit_plan_execution_artifacts(
+                    terminal_reason="PRODUCT_E2E_AUTHORITY_ACTIVATION_FAILED"
+                )
             )
             _emit_terminal_mandatory_closeout(
                 artifact_dir=art,
@@ -1468,6 +1535,11 @@ def run_whole_run_with_route_governance(
                 "cache_candidate_completion_errors": list(cache_completion.errors),
             }
         )
+        failed.update(
+            emit_plan_execution_artifacts(
+                terminal_reason="E2E_FRESH_RUN_REQUIRES_CACHE_MISS"
+            )
+        )
         _emit_terminal_mandatory_closeout(
             artifact_dir=art,
             repo_root=repo,
@@ -1502,6 +1574,13 @@ def run_whole_run_with_route_governance(
         },
     )
     execution_witness = dict(getattr(result, "execution_witness", {}) or {})
+    plan_execution_artifacts = emit_plan_execution_artifacts(
+        execution_witness=execution_witness,
+        l2_result=getattr(result, "l2_result", None),
+        terminal_reason=str(getattr(result, "fault", "") or ""),
+    )
+    plan_execution_receipt = plan_execution_artifacts["plan_execution_receipt"]
+    plan_replan_decision = plan_execution_artifacts["plan_replan_decision"]
     stage_ledger.record(
         stage_id="C0",
         status="PASS",
@@ -1894,6 +1973,8 @@ def run_whole_run_with_route_governance(
         "draft_leg_route_family": DRAFT_LEG_ROUTE_FAMILY,
         "spine_run_manifest": str(art / sr.FILENAME_SPINE_MANIFEST),
         "route_decision": route_decision,
+        "plan_execution_receipt": plan_execution_receipt,
+        "plan_replan_decision": plan_replan_decision,
         "research_delegation_executed": research_ran,
         "l7_how_trace_emitted": bool(result.fault == "" and (art / "agentic_core_how_trace.json").is_file()),
         "terminal_r5": result.terminal_r5,

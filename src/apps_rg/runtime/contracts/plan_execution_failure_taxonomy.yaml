@@ -1,0 +1,41 @@
+# W0 failure taxonomy for L1 plan-to-execution reconciliation.
+#
+# This is decision-support data only.  W0 records the suggested W2 replan
+# class; it does not retry, route, retrieve, generate, or authorize an exit.
+schema_version: apps_rg.plan_execution_failure_taxonomy.v1
+app_id: apps_rg
+task_class: resume_generation
+
+failure_codes:
+  - code: L1_PLAN_BLOCKED
+    failure_class: INGRESS_OR_AMBIGUITY
+    allowed_dispositions: [BLOCKED]
+    w2_replan_hint: CLARIFY_OR_REPAIR_INPUT
+  - code: UPSTREAM_EVIDENCE_MISSING
+    failure_class: UPSTREAM_EVIDENCE
+    allowed_dispositions: [BLOCKED, SKIPPED]
+    w2_replan_hint: REPLAN_EVIDENCE
+  - code: REQUIRED_PROOF_ABSENT
+    failure_class: UPSTREAM_EVIDENCE
+    allowed_dispositions: [BLOCKED, SKIPPED]
+    w2_replan_hint: REPLAN_EVIDENCE
+  - code: FEC_NOT_FINALIZED
+    failure_class: UPSTREAM_EVIDENCE
+    allowed_dispositions: [BLOCKED, SKIPPED]
+    w2_replan_hint: REPLAN_EVIDENCE
+  - code: REQUIRED_DEPENDENCY_EMPTY
+    failure_class: UPSTREAM_EVIDENCE
+    allowed_dispositions: [BLOCKED, SKIPPED]
+    w2_replan_hint: REPLAN_EVIDENCE
+  - code: RETRIEVAL_FAILED
+    failure_class: RETRIEVAL
+    allowed_dispositions: [FAILED]
+    w2_replan_hint: REPLAN_RETRIEVAL
+  - code: GENERATION_FAILED
+    failure_class: GENERATION
+    allowed_dispositions: [FAILED]
+    w2_replan_hint: REPAIR_OR_RETRY_GENERATION
+  - code: POLICY_BLOCKED
+    failure_class: POLICY
+    allowed_dispositions: [BLOCKED, SKIPPED]
+    w2_replan_hint: TERMINAL_BLOCK

@@ -48,7 +48,12 @@ was uncommitted at import time.
   Wave 1 import boundary.
 - `.runtime/**`, Python bytecode, and test caches were not imported.
 - The source-refreeze branch was not merged into Agentic Workflow `main`.
-- This target does not yet contain standalone packaging or a parity claim.
+- This target does not contain standalone packaging or a parity claim. Product
+  entry now records `standalone_runtime_dependency_receipt.json` and fails
+  closed unless the excluded `agentic_core` resolves as an external regular
+  package with U0 → L1 → L0 → C0 → PA → L2 → Exit contract sentinels. This is
+  an explicit external-runtime posture, not an independent-installability or
+  behavior-parity assertion.
 
 ## Local main authority
 

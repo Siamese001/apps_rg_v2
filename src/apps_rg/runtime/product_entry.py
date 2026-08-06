@@ -38,6 +38,29 @@ def _non_fresh_artifact_dir_result(artifact_dir: Path) -> dict[str, Any]:
     }
 
 
+def _runtime_dependency_blocked_result(
+    *, artifact_dir: Path, dependency_receipt_path: Path, dependency_receipt: dict[str, Any]
+) -> dict[str, Any]:
+    """Fail closed before preflight when the excluded core runtime is unavailable."""
+
+    dependency_status = str(dependency_receipt.get("status") or "UNKNOWN")
+    return {
+        "exit_status": "error",
+        "execution_status": "failed",
+        "outcome_authorized": False,
+        "product_authorized": False,
+        "pipeline_complete": False,
+        "observability_repair_required": False,
+        "completion_status": "BLOCKED",
+        "fault": "STANDALONE_RUNTIME_DEPENDENCY_UNAVAILABLE",
+        "completion_fault": "STANDALONE_RUNTIME_DEPENDENCY_UNAVAILABLE",
+        "artifact_dir": str(artifact_dir),
+        "standalone_runtime_dependency_receipt": str(dependency_receipt_path),
+        "standalone_runtime_dependency_status": dependency_status,
+        "authority_contract_id": "apps_research_rg_e2e_authority",
+    }
+
+
 def run_product_whole_run_from_primitives(
     *,
     target_company: str,
@@ -59,6 +82,24 @@ def run_product_whole_run_from_primitives(
     if art.exists() and any(art.iterdir()):
         return _non_fresh_artifact_dir_result(art)
     art.mkdir(parents=True, exist_ok=True)
+
+    from apps_rg.runtime.standalone_dependency_posture import (
+        EXTERNAL_RUNTIME_BOUND,
+        verify_external_agentic_core_runtime,
+        write_standalone_runtime_dependency_receipt,
+    )
+
+    dependency_receipt = verify_external_agentic_core_runtime(repo_root=repo)
+    dependency_receipt_path = write_standalone_runtime_dependency_receipt(
+        artifact_dir=art,
+        receipt=dependency_receipt,
+    )
+    if dependency_receipt.get("status") != EXTERNAL_RUNTIME_BOUND:
+        return _runtime_dependency_blocked_result(
+            artifact_dir=art,
+            dependency_receipt_path=dependency_receipt_path,
+            dependency_receipt=dependency_receipt,
+        )
 
     from apps_rg.runtime.e2e_preflight import (
         E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME,

@@ -1,9 +1,18 @@
-"""Lightweight RG resume orchestrator for scripts + deterministic anti-overfit hooks."""
+"""Receipt-backed legacy adapter for the governed Apps RG whole-run spine.
+
+``ResumeOrchestratorEngine`` remains as a compatibility entrypoint for older
+scripts, but it is no longer an execution façade.  It performs the local
+anti-overfit guard then delegates to the canonical product entrypoint, which
+owns preflight, U0, L1, L0, C0, L2, and Exit.  No synthetic hop values,
+quality scores, or success states are emitted here.
+"""
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
+from collections.abc import Callable, Mapping
 from typing import Any
 
 
@@ -49,11 +58,18 @@ def _fake_history_blob(blob_l: str) -> bool:
 
 
 class ResumeOrchestratorEngine:
-    """Deterministic façade used by RG scripts until the modular pipeline binds fully."""
+    """Legacy adapter that delegates execution to the governed product spine."""
 
-    def __init__(self, ctx: Any, *, logger: logging.Logger | None = None):
+    def __init__(
+        self,
+        ctx: Any,
+        *,
+        logger: logging.Logger | None = None,
+        product_runner: Callable[..., Mapping[str, Any]] | None = None,
+    ):
         self.ctx = ctx
         self.logger = logger or logging.getLogger(__name__)
+        self._product_runner = product_runner
 
     def _resume_to_overfit_artifact(self) -> dict[str, Any]:
         m = getattr(self.ctx, "master_resume", {}) or {}
@@ -101,31 +117,166 @@ class ResumeOrchestratorEngine:
             "escalate": escalate,
         }
 
-    async def execute(self, jd: str) -> dict[str, Any]:
-        """Populate buffer keys expected by tooling and return a terse run envelope."""
-        overfit = self._run_anti_overfit_check(self._resume_to_overfit_artifact(), jd)
+    def _context_value(self, *names: str) -> str:
+        """Read explicitly supplied legacy context without inferring new inputs."""
 
-        master = getattr(self.ctx, "master_resume", {}) or {}
-        ranked = dict(master) if isinstance(master, dict) else {}
-        self.ctx.buffer.write("ranked_content", ranked)
+        master_resume = getattr(self.ctx, "master_resume", {}) or {}
+        for name in names:
+            value = getattr(self.ctx, name, None)
+            if value is None and isinstance(master_resume, Mapping):
+                value = master_resume.get(name)
+            normalized = str(value or "").strip()
+            if normalized:
+                return normalized
+        return ""
 
-        # rg_live_fire deep buffer inspection (minimal happy-path scaffolding).
-        self.ctx.buffer.write(
-            "hop1_extraction",
-            {"experience_sections": [{"bullets": [{"quantified_metrics": ["stub"]}]}]},
+    def _source_resume_text(self) -> str:
+        supplied = self._context_value("source_resume_text", "resume_text")
+        if supplied:
+            return supplied
+        master_resume = getattr(self.ctx, "master_resume", {}) or {}
+        if not isinstance(master_resume, Mapping) or not master_resume:
+            return ""
+        # The legacy context itself is the user-supplied resume source.  A
+        # deterministic representation preserves it for U0 without fabricating
+        # a résumé summary or score.
+        import json
+
+        return json.dumps(master_resume, ensure_ascii=False, sort_keys=True)
+
+    def _governed_inputs(self, jd: str) -> tuple[dict[str, str], list[str]]:
+        jd_text = str(jd or "").strip() or self._context_value(
+            "job_description_text", "jd_text"
         )
-        self.ctx.buffer.write("hop2_enrichment", {})
-        self.ctx.buffer.write("k9_competencies", [{}] * 6)
-        self.ctx.buffer.write("ats_report", {"valid": True})
-
-        status = "COMPLETE"
-        if overfit["escalate"]:
-            status = "ESCALATED_OVERFIT"
-
-        return {
-            "status": status,
-            "final_quality_score": float(0.85 if not overfit["escalate"] else 0.4),
-            "ats_valid": bool(not overfit["escalate"]),
-            "checkpoints": ["hop_stub"],
-            "overfit": overfit,
+        inputs = {
+            "target_company": self._context_value("target_company", "company_name"),
+            "target_role": self._context_value("target_role", "job_title", "role"),
+            "target_level": self._context_value("target_level"),
+            "jd": jd_text,
+            "job_description_ref": self._context_value("job_description_ref", "jd_ref"),
+            "job_description_text": jd_text,
+            "manual_brief": self._context_value("manual_brief", "manual_brief_path"),
+            "resume_path": self._context_value("resume_path", "source_resume_ref"),
+            "source_resume_text": self._source_resume_text(),
+            "generation_mode": self._context_value("generation_mode")
+            or "strategic_tailor",
+            "artifact_dir": self._context_value("artifact_dir"),
         }
+        missing = [
+            field
+            for field in ("target_company", "target_role")
+            if not inputs[field]
+        ]
+        if not inputs["jd"] and not inputs["job_description_ref"]:
+            missing.append("job_description_text_or_ref")
+        return inputs, missing
+
+    @staticmethod
+    def _actual_receipt_refs(result: Mapping[str, Any]) -> list[str]:
+        refs: list[str] = []
+        for key in (
+            "artifact_dir",
+            "spine_run_manifest",
+            "terminal_manifest_ref",
+            "pipeline_completion_receipt_ref",
+            "mandatory_run_output_json",
+        ):
+            value = str(result.get(key) or "").strip()
+            if value and value not in refs:
+                refs.append(value)
+        return refs
+
+    def _write_governed_receipt(self, receipt: Mapping[str, Any]) -> None:
+        buffer = getattr(self.ctx, "buffer", None)
+        write = getattr(buffer, "write", None)
+        if callable(write):
+            write("governed_run_receipt", dict(receipt))
+
+    def _run_product_spine(self, inputs: Mapping[str, str]) -> Mapping[str, Any]:
+        if self._product_runner is not None:
+            result = self._product_runner(**dict(inputs))
+        else:
+            from apps_rg.runtime.product_entry import run_product_whole_run_from_primitives
+
+            result = run_product_whole_run_from_primitives(**dict(inputs))
+        if not isinstance(result, Mapping):
+            raise TypeError("governed Apps RG product runner returned a non-mapping result")
+        return result
+
+    async def execute(self, jd: str) -> dict[str, Any]:
+        """Run the canonical product spine or return a fail-closed adapter receipt."""
+
+        inputs, missing_inputs = self._governed_inputs(jd)
+        overfit = self._run_anti_overfit_check(
+            self._resume_to_overfit_artifact(), inputs["jd"]
+        )
+
+        if missing_inputs:
+            receipt = {
+                "status": "BLOCKED_INPUT",
+                "execution_status": "not_started",
+                "outcome_authorized": False,
+                "product_authorized": False,
+                "pipeline_complete": False,
+                "missing_inputs": missing_inputs,
+                "overfit": overfit,
+                "checkpoints": ["legacy_adapter_input_gate"],
+                "receipt_refs": [],
+            }
+            self._write_governed_receipt(receipt)
+            return receipt
+
+        if overfit["escalate"]:
+            receipt = {
+                "status": "ESCALATED_OVERFIT",
+                "execution_status": "blocked",
+                "outcome_authorized": False,
+                "product_authorized": False,
+                "pipeline_complete": False,
+                "overfit": overfit,
+                "checkpoints": ["anti_overfit_gate"],
+                "receipt_refs": [],
+            }
+            self._write_governed_receipt(receipt)
+            return receipt
+
+        try:
+            result = await asyncio.to_thread(self._run_product_spine, inputs)
+        except Exception as exc:  # guardian: legacy adapter must return a sealed failure receipt
+            self.logger.exception("governed Apps RG product spine failed")
+            receipt = {
+                "status": "EXECUTION_ERROR",
+                "execution_status": "failed",
+                "outcome_authorized": False,
+                "product_authorized": False,
+                "pipeline_complete": False,
+                "overfit": overfit,
+                "checkpoints": ["governed_product_spine"],
+                "receipt_refs": [],
+                "error_type": type(exc).__name__,
+                "error_message": " ".join(str(exc).split()),
+            }
+            self._write_governed_receipt(receipt)
+            return receipt
+
+        product_authorized = result.get("product_authorized") is True
+        outcome_authorized = result.get("outcome_authorized") is True
+        pipeline_complete = result.get("pipeline_complete") is True
+        receipt = {
+            "status": (
+                "COMPLETE"
+                if product_authorized and outcome_authorized and pipeline_complete
+                else "BLOCKED"
+            ),
+            "execution_status": str(result.get("execution_status") or "unknown"),
+            "exit_status": str(result.get("exit_status") or "unknown"),
+            "outcome_authorized": outcome_authorized,
+            "product_authorized": product_authorized,
+            "pipeline_complete": pipeline_complete,
+            "overfit": overfit,
+            "checkpoints": ["governed_product_spine"],
+            "receipt_refs": self._actual_receipt_refs(result),
+            "governed_result": dict(result),
+        }
+        self._write_governed_receipt(receipt)
+        return receipt

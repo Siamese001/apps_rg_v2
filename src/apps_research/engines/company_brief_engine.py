@@ -36,6 +36,9 @@ from apps_research.engines.query_decomposer import (  # noqa: F401
     describe_jd_retrieval_contract,
 )
 from apps_research.integrations.llm_client import create_openai_sync_client
+from apps_research.reasoning.adaptive_research_loop import (
+    build_adaptive_research_revision,
+)
 from apps_research.types.jd_intent_coverage import (
     infer_evidence_intents,
     required_families_for_intents,
@@ -816,11 +819,73 @@ class CompanyBriefEngine(BaseResearchEngine):
                 "semantic_signal_pattern": signal_pattern.pattern,
             }
 
+        adaptive_revision = build_adaptive_research_revision(
+            topic=topic,
+            plans=plans,
+            family_observations=family_receipts,
+        )
+        adaptive_execution: list[dict[str, Any]] = []
+        for action in adaptive_revision["follow_up_queries"]:
+            family = str(action["family"])
+            parent_row = receipts_by_family[family]
+            parent_plan = next(plan for plan in plans if plan.family == family)
+            follow_up_plan = QueryPlan(
+                family=family,
+                query=str(action["query"]),
+                min_sources=parent_plan.min_sources,
+                jd_boosted=True,
+            )
+            _family, follow_up_blob, follow_up_row, _documents = _fetch(follow_up_plan)
+            execution_row = {
+                "family": family,
+                "query": str(action["query"]),
+                "strategy": str(action["strategy"]),
+                "trigger": dict(action["trigger"]),
+                "retrieval_attempt_status": str(
+                    follow_up_row["retrieval_attempt_status"]
+                ),
+                "accepted_document_count": len(
+                    follow_up_row["accepted_documents"]
+                ),
+                "finding_digest": str(follow_up_row["finding_digest"]),
+            }
+            adaptive_execution.append(execution_row)
+            parent_row["adaptive_follow_up"] = execution_row
+            if not follow_up_blob:
+                continue
+
+            initial_blob = findings.get(family, "")
+            findings[family] = "\n\n".join(
+                blob for blob in (initial_blob, follow_up_blob) if blob
+            )
+            parent_row["accepted_documents"].extend(
+                follow_up_row["accepted_documents"]
+            )
+            parent_row["documents_before_rerank"] += follow_up_row[
+                "documents_before_rerank"
+            ]
+            parent_row["documents_identity_admissible"] += follow_up_row[
+                "documents_identity_admissible"
+            ]
+            parent_row["documents_after_rerank"] += follow_up_row[
+                "documents_after_rerank"
+            ]
+            parent_row["grounded_character_count"] = len(findings[family])
+            parent_row["finding_digest"] = "sha256:" + hashlib.sha256(
+                findings[family].encode("utf-8")
+            ).hexdigest()
+            if not initial_blob:
+                parent_row["retrieval_attempt_status"] = "RECOVERED_BY_ADAPTIVE_FOLLOW_UP"
+
         grounded_family_count = sum(
             1
             for row in family_receipts
             if row["retrieval_attempt_status"]
-            in {"PASS", "RECOVERED_FROM_SAME_RUN"}
+            in {
+                "PASS",
+                "RECOVERED_FROM_SAME_RUN",
+                "RECOVERED_BY_ADAPTIVE_FOLLOW_UP",
+            }
         )
         receipt = {
             "schema_version": "apps_research.retrieval_receipt.v1",
@@ -830,6 +895,8 @@ class CompanyBriefEngine(BaseResearchEngine):
             "configuration": config_snapshot,
             "configuration_digest": config_digest,
             "families": family_receipts,
+            "adaptive_research_revision": adaptive_revision,
+            "adaptive_research_execution": adaptive_execution,
             "summary": {
                 "status": "PASS" if grounded_family_count else "BLOCKED",
                 "planned_family_count": len(plans),

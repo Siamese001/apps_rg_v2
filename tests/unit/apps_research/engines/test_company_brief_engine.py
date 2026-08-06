@@ -11,6 +11,7 @@ assembly. This module covers that surface with real inputs. No mocks.
 from __future__ import annotations
 
 import hashlib
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -25,7 +26,7 @@ _REPO_ROOT = str(Path(__file__).resolve().parents[4])
 if sys.path[0] != _REPO_ROOT:
     sys.path.insert(0, _REPO_ROOT)
 
-from apps_research.engines.company_brief_engine import (
+from apps_research.engines.company_brief_engine import (  # noqa: E402
     CompanyBriefEngine,
     CompanyBriefUnavailableError,
     _v2_enabled,
@@ -50,6 +51,65 @@ class TestFacetQueries:
     def test_templates_use_company_placeholder(self, engine):
         for _facet, template in engine._FACET_QUERIES:
             assert "{company}" in template
+
+
+class TestW4AdaptiveResearchLoop:
+    def test_v2_retrieval_runs_bounded_jd_promoted_follow_up_for_coverage_gap(
+        self, monkeypatch, engine, tmp_path
+    ):
+        from apps_research.integrations.search_retrieval import RetrievedDoc
+
+        calls: list[str] = []
+
+        def _retrieve(query: str, *, top_k: int = 10):
+            calls.append(query)
+            if query == "Anthropic partners alliances cloud partnerships co-sell GSI ISV ecosystem":
+                return []
+            return [
+                RetrievedDoc(
+                    url=f"https://www.anthropic.com/{len(calls)}",
+                    title="Anthropic official evidence",
+                    snippet=f"Anthropic evidence for {query}",
+                    score=1.0,
+                    engines=("bing",),
+                )
+            ]
+
+        monkeypatch.setattr(
+            "apps_research.integrations.search_retrieval.retrieve", _retrieve
+        )
+        monkeypatch.setattr(
+            "apps_research.integrations.reranker_adapter.rerank",
+            lambda _query, docs, *, cutoff=5: list(docs)[:cutoff],
+        )
+        receipt_path = tmp_path / "run" / "retrieval_receipt.json"
+        (receipt_path.parent / "runs").mkdir(parents=True)
+
+        findings = engine._run_research_v2(
+            topic="Anthropic",
+            depth="standard",
+            jd_context={
+                "company_name": "Anthropic",
+                "job_title": "Partnerships Architect",
+                "content": "Lead GSI and cloud partnerships with partner enablement.",
+            },
+            retrieval_receipt_path=receipt_path,
+        )
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+
+        assert "Anthropic official partnerships alliances cloud ecosystem primary sources" in calls
+        assert findings["partner_ecosystem"].strip()
+        assert receipt["adaptive_research_revision"]["revision_status"] == "FOLLOW_UP_PROPOSED"
+        follow_up = next(
+            row
+            for row in receipt["adaptive_research_execution"]
+            if row["family"] == "partner_ecosystem"
+        )
+        assert follow_up["retrieval_attempt_status"] == "PASS"
+        family = next(
+            row for row in receipt["families"] if row["family"] == "partner_ecosystem"
+        )
+        assert family["retrieval_attempt_status"] == "RECOVERED_BY_ADAPTIVE_FOLLOW_UP"
 
 
 class TestV2Flag:
