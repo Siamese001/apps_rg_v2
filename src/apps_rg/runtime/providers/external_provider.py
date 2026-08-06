@@ -28,6 +28,7 @@ from apps_rg.runtime.providers.provider_attempt_spans import (
     summarize_provider_attempt_spans,
 )
 from apps_rg.runtime.providers.provider_contract import ProviderResult
+from apps_model_telemetry.external_model_usage import append_external_model_usage
 ExternalTransport = Callable[[dict[str, Any]], dict[str, Any]]
 
 DEFAULT_ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
@@ -619,6 +620,33 @@ class ExternalProvider:
 
         prompt = _prompt_text(compiled_prompt)
         messages = _prompt_messages(compiled_prompt)
+        request_digest = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+
+        def _record_usage(
+            *,
+            outcome: str,
+            provider_status: str,
+            raw_usage: Mapping[str, Any] | None = None,
+            response_id: str | None = None,
+            model_name: str | None = None,
+        ) -> None:
+            """Do not let observability storage alter the generation outcome."""
+            try:
+                append_external_model_usage(
+                    provider=self.provider_profile.value,
+                    model=str(model_name or self.model),
+                    request_digest=request_digest,
+                    outcome=outcome,
+                    provider_status=provider_status,
+                    usage=raw_usage,
+                    response_id=response_id,
+                    logical_attempt=1,
+                    transport_attempt=1,
+                )
+            except OSError:
+                # A full or unavailable artifact volume must not turn a completed
+                # model call into a different resume-generation outcome.
+                return
         # W1: resolve the effective wall-clock budget through the shared policy.
         provider_timeout_seconds = resolve_external_section_timeout_s(timeout_seconds)
         # W2: a caller-owned progress sink the streamed transport mutates in place, so a timeout
@@ -675,6 +703,7 @@ class ExternalProvider:
         except HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:1000]
             error = f"External provider HTTP {exc.code}: {detail or exc.reason}"
+            _record_usage(outcome=f"HTTP_{exc.code}", provider_status="BLOCKED")
             return ProviderResult(
                 provider_requested=self.provider_profile.value,
                 provider_attempted=True,
@@ -703,6 +732,7 @@ class ExternalProvider:
                     f", chunk_count={prog.get('chunk_count')}]"
                 )
             error = f"External provider call failed: {type(exc).__name__}: {exc}{progress_note}"
+            _record_usage(outcome=type(exc).__name__.upper(), provider_status="BLOCKED")
             return ProviderResult(
                 provider_requested=self.provider_profile.value,
                 provider_attempted=True,
@@ -724,6 +754,13 @@ class ExternalProvider:
         if not text.strip():
             raw_response = response.get("raw_response") if isinstance(response.get("raw_response"), Mapping) else {}
             usage = raw_response.get("usage") if isinstance(raw_response, Mapping) else {}
+            _record_usage(
+                outcome="EMPTY_RESPONSE",
+                provider_status="BLOCKED",
+                raw_usage=usage if isinstance(usage, Mapping) else None,
+                response_id=str(raw_response.get("id") or raw_response.get("response_id") or ""),
+                model_name=resolved_model,
+            )
             output_details = usage.get("output_tokens_details") if isinstance(usage, Mapping) else None
             stop_reason = raw_response.get("stop_reason") if isinstance(raw_response, Mapping) else None
             detail_parts = []
@@ -748,7 +785,7 @@ class ExternalProvider:
                     {
                         "provider_profile": self.provider_profile.value,
                         "model": resolved_model,
-                        "request_digest": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+                        "request_digest": request_digest,
                         "effective_timeout_seconds": provider_timeout_seconds,
                         "transport_timing": response.get("transport_timing"),
                         "transport_response": response,
@@ -761,6 +798,15 @@ class ExternalProvider:
                     model=resolved_model,
                 ),
             )
+        raw_response = response.get("raw_response") if isinstance(response.get("raw_response"), Mapping) else {}
+        raw_usage = raw_response.get("usage") if isinstance(raw_response, Mapping) else {}
+        _record_usage(
+            outcome="SUCCESS",
+            provider_status="REAL_LLM",
+            raw_usage=raw_usage if isinstance(raw_usage, Mapping) else None,
+            response_id=str(raw_response.get("id") or raw_response.get("response_id") or ""),
+            model_name=resolved_model,
+        )
         return ProviderResult(
             provider_requested=self.provider_profile.value,
             provider_attempted=True,
@@ -773,7 +819,7 @@ class ExternalProvider:
                 {
                     "provider_profile": self.provider_profile.value,
                     "model": resolved_model,
-                    "request_digest": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+                    "request_digest": request_digest,
                     "effective_timeout_seconds": provider_timeout_seconds,
                     "transport_timing": response.get("transport_timing"),
                     "transport_response": response,

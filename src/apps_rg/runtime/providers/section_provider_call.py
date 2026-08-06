@@ -7,6 +7,7 @@ same requests route through ``ProviderGateway`` for external profiles.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -31,6 +32,19 @@ from apps_rg.runtime.providers.provider_contract import ProviderResult
 from apps_rg.runtime.section_model_limits import (
     external_openai_generation_model,
     resolve_section_generation_model,
+)
+from apps_rg.runtime.model_token_governor import reserve_apps_rg_model_tokens
+from apps_model_telemetry.external_model_usage import (
+    append_external_model_usage,
+    external_model_usage_scope,
+)
+from apps_model_telemetry.exact_response_reuse import (
+    ExactResponseReuseError,
+    build_exact_request_identity,
+    build_reuse_receipt,
+    exact_response_reuse_enabled,
+    lookup_exact_response,
+    store_exact_response,
 )
 
 
@@ -210,6 +224,84 @@ def _with_cache_receipt(
     return result
 
 
+def _exact_response_reuse_requested(provider_payload: Mapping[str, Any]) -> bool:
+    """Whether this caller declares one response interchangeable with a retry.
+
+    Self-consistency and other sampling paths must never set this flag: their
+    multiple requests are intentionally independent even when much of the
+    surrounding context is shared.
+    """
+    workload = str(provider_payload.get("anthropic_workload_kind") or "").strip().upper()
+    # These calls are intentional independent samples.  A repeat is signal for
+    # the selector, not an accidental replay, even if another field happens to
+    # be byte-for-byte identical.
+    if workload == "SELF_CONSISTENCY" or "sc_path_index" in provider_payload:
+        return False
+    raw = provider_payload.get("exact_response_reuse")
+    return raw is True or str(raw or "").strip().upper() == "IDEMPOTENT"
+
+
+def _blocked_exact_response_reuse_result(
+    *,
+    profile: ProviderProfile,
+    model: str | None,
+    request_digest: str,
+    detail: str,
+) -> ProviderResult:
+    return ProviderResult(
+        provider_requested=profile.value,
+        provider_attempted=False,
+        provider_available=False,
+        exact_provider_error=f"Exact-response reuse cache invalid: {detail}",
+        runtime_generation_status="BLOCKED",
+        model=str(model or ""),
+        raw_model_output="",
+        provider_response={"request_digest": request_digest},
+    )
+
+
+def _restore_exact_response_result(
+    cached_result: Mapping[str, Any],
+    *,
+    identity: Any,
+    source_event_digest: str,
+) -> ProviderResult:
+    """Restore a cached result without obscuring that no transport ran now."""
+    try:
+        result = ProviderResult(**dict(cached_result))
+    except TypeError as exc:
+        raise ExactResponseReuseError("cached provider result does not match the provider contract") from exc
+    response = dict(result.provider_response or {})
+    response["exact_response_reuse"] = build_reuse_receipt(
+        identity=identity,
+        source_event_digest=source_event_digest,
+        transport_executed_this_invocation=False,
+    )
+    result.provider_response = response
+    return result
+
+
+def _write_fresh_exact_response_reuse_receipt(
+    result: ProviderResult,
+    *,
+    identity: Any,
+    source_event_digest: str | None,
+    store_error: str | None = None,
+) -> ProviderResult:
+    response = dict(result.provider_response or {})
+    receipt = build_reuse_receipt(
+        identity=identity,
+        source_event_digest=source_event_digest or "",
+        transport_executed_this_invocation=True,
+    )
+    receipt["cache_store_status"] = "STORED" if source_event_digest else "NOT_STORED"
+    if store_error:
+        receipt["cache_store_error"] = store_error
+    response["exact_response_reuse"] = receipt
+    result.provider_response = response
+    return result
+
+
 def call_section_model_provider(
     provider_profile: str | ProviderProfile | None,
     provider_payload: dict[str, Any],
@@ -250,40 +342,161 @@ def call_section_model_provider(
         anthropic_cache_receipt_seed=anthropic_cache_seed,
         anthropic_cache_strategy=anthropic_cache_strategy,
     )
-    result = build_section_provider_gateway(
-        claude_model=claude_model,
-        openai_model=openai_model,
-    ).generate(
-        profile,
-        compiled,
-        token_budget=budget,
-        temperature=temperature,
-        timeout_seconds=timeout_seconds,
-    )
-    result = maybe_retry_claude_availability_same_provider(
-        result,
-        compiled,
-        token_budget=budget,
-        temperature=temperature,
-        timeout_seconds=timeout_seconds,
-        section_id=sid or None,
-    )
-    result = maybe_fallback_to_openai_for_claude_availability(
-        result,
-        compiled,
-        token_budget=budget,
-        temperature=temperature,
-        timeout_seconds=timeout_seconds,
-        section_id=sid or None,
-    )
-    return _with_cache_receipt(
-        result,
-        profile=profile,
-        model=requested_model,
-        section_id=sid or None,
-        seed=anthropic_cache_seed,
+    prompt_text = "\n".join(block.content for block in compiled.prompt_blocks)
+    request_digest = compiled.compilation_hash or hashlib.sha256(prompt_text.encode("utf-8")).hexdigest()
+    exact_identity = None
+    reuse_requested = _exact_response_reuse_requested(provider_payload)
+    if reuse_requested and exact_response_reuse_enabled():
+        try:
+            exact_identity = build_exact_request_identity(
+                run_id=compiled.run_id,
+                stage="L2.section_generation",
+                section_id=sid or None,
+                provider=profile.value,
+                model=str(requested_model or ""),
+                request_digest=request_digest,
+                prompt_text=prompt_text,
+                native_payload=anthropic_payload,
+                temperature=temperature,
+                max_output_tokens=budget,
+                timeout_seconds=timeout_seconds,
+            )
+            cached = lookup_exact_response(
+                artifact_dir=artifact_dir,
+                identity=exact_identity,
+            )
+            if cached is not None:
+                cached_result, source_event_digest = cached
+                result = _restore_exact_response_result(
+                    cached_result,
+                    identity=exact_identity,
+                    source_event_digest=source_event_digest,
+                )
+                append_external_model_usage(
+                    artifact_dir=artifact_dir,
+                    provider=profile.value,
+                    model=str(requested_model or ""),
+                    request_digest=request_digest,
+                    outcome="REUSED_EXACT_RESPONSE",
+                    provider_status="IN_RUN_EXACT_RESPONSE_REUSE",
+                    run_id=compiled.run_id,
+                    stage="L2.section_generation",
+                    section_id=sid or None,
+                    raw_response_ref=f"exact-response-cache:{source_event_digest}",
+                )
+                return result
+        except (ExactResponseReuseError, OSError) as exc:
+            return _blocked_exact_response_reuse_result(
+                profile=profile,
+                model=requested_model,
+                request_digest=request_digest,
+                detail=str(exc),
+            )
+    try:
+        reservation = reserve_apps_rg_model_tokens(
+            artifact_dir=artifact_dir,
+            provider=profile.value,
+            model=str(requested_model or ""),
+            request_digest=request_digest,
+            prompt_text=prompt_text,
+            max_output_tokens=budget,
+            stage="L2.section_generation",
+            section_id=sid,
+            run_id=compiled.run_id,
+        )
+    except ValueError as exc:
+        return ProviderResult(
+            provider_requested=profile.value,
+            provider_attempted=False,
+            provider_available=False,
+            exact_provider_error=f"External-model token budget ledger invalid: {exc}",
+            runtime_generation_status="BLOCKED",
+            model=str(requested_model or ""),
+            raw_model_output="",
+            provider_response={"request_digest": request_digest},
+        )
+    if not reservation.allowed:
+        return ProviderResult(
+            provider_requested=profile.value,
+            provider_attempted=False,
+            provider_available=False,
+            exact_provider_error=(
+                "External-model token budget preflight blocked: "
+                f"{reservation.reason}; estimated_input_tokens={reservation.estimated_input_tokens}; "
+                f"prior_reserved_total_tokens={reservation.prior_reserved_total_tokens}; "
+                f"max_reserved_tokens_per_run={reservation.max_reserved_tokens_per_run}"
+            ),
+            runtime_generation_status="BLOCKED",
+            model=str(requested_model or ""),
+            raw_model_output="",
+            provider_response={
+                "token_budget_reservation": dict(reservation.event or {}),
+                "request_digest": request_digest,
+            },
+        )
+    with external_model_usage_scope(
         artifact_dir=artifact_dir,
-    )
+        run_id=compiled.run_id,
+        stage="L2.section_generation",
+        section_id=sid or None,
+    ):
+        result = build_section_provider_gateway(
+            claude_model=claude_model,
+            openai_model=openai_model,
+        ).generate(
+            profile,
+            compiled,
+            token_budget=budget,
+            temperature=temperature,
+            timeout_seconds=timeout_seconds,
+        )
+        result = maybe_retry_claude_availability_same_provider(
+            result,
+            compiled,
+            token_budget=budget,
+            temperature=temperature,
+            timeout_seconds=timeout_seconds,
+            section_id=sid or None,
+        )
+        result = maybe_fallback_to_openai_for_claude_availability(
+            result,
+            compiled,
+            token_budget=budget,
+            temperature=temperature,
+            timeout_seconds=timeout_seconds,
+            section_id=sid or None,
+        )
+        result = _with_cache_receipt(
+            result,
+            profile=profile,
+            model=requested_model,
+            section_id=sid or None,
+            seed=anthropic_cache_seed,
+            artifact_dir=artifact_dir,
+        )
+        if exact_identity is not None:
+            try:
+                source_event_digest = store_exact_response(
+                    artifact_dir=artifact_dir,
+                    identity=exact_identity,
+                    result=result.to_dict(),
+                )
+            except (ExactResponseReuseError, OSError) as exc:
+                # The live output is already valid.  Do not discard it after a
+                # paid call because an optional reuse artifact could not persist;
+                # make the absence explicit in its receipt instead.
+                return _write_fresh_exact_response_reuse_receipt(
+                    result,
+                    identity=exact_identity,
+                    source_event_digest=None,
+                    store_error=str(exc),
+                )
+            return _write_fresh_exact_response_reuse_receipt(
+                result,
+                identity=exact_identity,
+                source_event_digest=source_event_digest,
+            )
+        return result
 
 
 __all__ = [

@@ -7,7 +7,9 @@ import json
 import os
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Mapping
+
+from apps_model_telemetry.external_model_usage import append_external_model_usage
 
 from apps_rg.runtime.judges.executive_summary_x1d import (
     PROVIDERS,
@@ -50,6 +52,7 @@ from apps_rg.runtime.section_model_limits import (
     resolve_selector_provider_model,
     selector_role_for_section,
 )
+from apps_rg.runtime.model_token_governor import reserve_apps_rg_model_tokens
 
 SlotKind = Literal["bullets", "competencies"]
 
@@ -77,6 +80,39 @@ POOL_SELECTOR_SYSTEM_PROMPT = (
 DEFAULT_POOL_SELECTOR_TIMEOUT_SECONDS = 90.0
 DEFAULT_COMPETENCIES_POOL_SELECTOR_TIMEOUT_SECONDS = 240.0
 SELECTOR_TIMING_RECEIPT_FILENAME = "bullet_pool_claude_selector_timing.json"
+
+
+def _record_pool_selector_usage(
+    *,
+    artifact_dir: Path | None,
+    provider: str,
+    model: str,
+    input_hash: str,
+    outcome: str,
+    provider_status: str,
+    usage: Mapping[str, Any] | None = None,
+    response_id: str | None = None,
+    raw_response_ref: str | None = None,
+) -> None:
+    """Record one selector attempt without changing selection fail-closed logic."""
+    try:
+        append_external_model_usage(
+            artifact_dir=artifact_dir,
+            provider=provider,
+            model=model,
+            request_digest=input_hash,
+            outcome=outcome,
+            provider_status=provider_status,
+            usage=usage,
+            section_id="competencies",
+            stage="L2.bullet_pool_selector",
+            logical_attempt=1,
+            transport_attempt=1,
+            response_id=response_id,
+            raw_response_ref=raw_response_ref,
+        )
+    except OSError:
+        return
 
 
 def pool_selector_timeout_s(*, default_seconds: float | None = None) -> float:
@@ -886,6 +922,46 @@ def _call_anthropic_pool_selector(
     }
     apply_anthropic_temperature_capability(payload)
     apply_anthropic_adaptive_thinking_config(payload, os.environ)
+    try:
+        reservation = reserve_apps_rg_model_tokens(
+            artifact_dir=artifact_dir,
+            provider="anthropic",
+            model=model,
+            request_digest=input_hash,
+            prompt_text=prompt,
+            max_output_tokens=max_tokens,
+            stage="L2.bullet_pool_selector",
+            section_id="competencies",
+        )
+    except ValueError as exc:
+        return (
+            _make_blocked_output(
+                "anthropic_claude",
+                input_hash,
+                "BLOCKED_TOKEN_BUDGET",
+                "BLOCKED_TOKEN_BUDGET",
+                f"External-model token budget ledger invalid: {exc}",
+                model_name=model,
+            ),
+            None,
+        )
+    if not reservation.allowed:
+        return (
+            _make_blocked_output(
+                "anthropic_claude",
+                input_hash,
+                "BLOCKED_TOKEN_BUDGET",
+                "BLOCKED_TOKEN_BUDGET",
+                (
+                    "External-model token budget preflight blocked: "
+                    f"{reservation.reason}; estimated_input_tokens={reservation.estimated_input_tokens}; "
+                    f"prior_reserved_total_tokens={reservation.prior_reserved_total_tokens}; "
+                    f"max_reserved_tokens_per_run={reservation.max_reserved_tokens_per_run}"
+                ),
+                model_name=model,
+            ),
+            None,
+        )
     started_wall = datetime.now(timezone.utc).isoformat()
     req_path = _artifact_path("anthropic_claude", "provider_request", artifact_base=artifact_dir)
     _write_artifact(
@@ -943,6 +1019,14 @@ def _call_anthropic_pool_selector(
             raw_response = response.read().decode()
     except urllib.error.HTTPError as exc:
         body = exc.read().decode()
+        _record_pool_selector_usage(
+            artifact_dir=artifact_dir,
+            provider="anthropic",
+            model=model,
+            input_hash=input_hash,
+            outcome=f"HTTP_{exc.code}",
+            provider_status="BLOCKED_PROVIDER_UNAVAILABLE",
+        )
         _write_selector_timing_receipt(
             artifact_dir,
             {
@@ -967,6 +1051,14 @@ def _call_anthropic_pool_selector(
         elapsed = round(time.monotonic() - t0, 4)
         is_timeout = isinstance(exc, TimeoutError) or "timed out" in str(exc).lower()
         outcome = "selector_timeout" if is_timeout else "provider_transport_error"
+        _record_pool_selector_usage(
+            artifact_dir=artifact_dir,
+            provider="anthropic",
+            model=model,
+            input_hash=input_hash,
+            outcome=outcome.upper(),
+            provider_status="BLOCKED_SELECTOR_TIMEOUT" if is_timeout else "BLOCKED_PROVIDER_UNAVAILABLE",
+        )
         _write_selector_timing_receipt(
             artifact_dir,
             {
@@ -1004,6 +1096,18 @@ def _call_anthropic_pool_selector(
     _write_artifact(raw_path, {"raw_response": raw_response, "input_hash": input_hash})
     try:
         data = json.loads(raw_response)
+        usage_doc = data if isinstance(data, Mapping) else {}
+        _record_pool_selector_usage(
+            artifact_dir=artifact_dir,
+            provider="anthropic",
+            model=str(usage_doc.get("model") or model),
+            input_hash=input_hash,
+            outcome="SUCCESS",
+            provider_status="RESPONSE_RECEIVED",
+            usage=usage_doc.get("usage") if isinstance(usage_doc.get("usage"), Mapping) else None,
+            response_id=str(usage_doc.get("id") or ""),
+            raw_response_ref=str(raw_path),
+        )
         text = _extract_anthropic_message_text(data)
         if cache_seed is not None:
             usage = data.get("usage") if isinstance(data, dict) else None
@@ -1133,6 +1237,47 @@ def _call_openai_pool_selector(
         payload["temperature"] = 0.1
         payload["response_format"] = {"type": "json_object"}
 
+    try:
+        reservation = reserve_apps_rg_model_tokens(
+            artifact_dir=artifact_dir,
+            provider="openai",
+            model=model,
+            request_digest=input_hash,
+            prompt_text=prompt,
+            max_output_tokens=max_tokens,
+            stage="L2.bullet_pool_selector",
+            section_id="competencies",
+        )
+    except ValueError as exc:
+        return (
+            _make_blocked_output(
+                "openai_chatgpt",
+                input_hash,
+                "BLOCKED_TOKEN_BUDGET",
+                "BLOCKED_TOKEN_BUDGET",
+                f"External-model token budget ledger invalid: {exc}",
+                model_name=model,
+            ),
+            None,
+        )
+    if not reservation.allowed:
+        return (
+            _make_blocked_output(
+                "openai_chatgpt",
+                input_hash,
+                "BLOCKED_TOKEN_BUDGET",
+                "BLOCKED_TOKEN_BUDGET",
+                (
+                    "External-model token budget preflight blocked: "
+                    f"{reservation.reason}; estimated_input_tokens={reservation.estimated_input_tokens}; "
+                    f"prior_reserved_total_tokens={reservation.prior_reserved_total_tokens}; "
+                    f"max_reserved_tokens_per_run={reservation.max_reserved_tokens_per_run}"
+                ),
+                model_name=model,
+            ),
+            None,
+        )
+
     started_wall = datetime.now(timezone.utc).isoformat()
     req_path = _artifact_path("openai_chatgpt", "provider_request", artifact_base=artifact_dir)
     _write_artifact(
@@ -1185,6 +1330,14 @@ def _call_openai_pool_selector(
             raw_response = response.read().decode()
     except urllib.error.HTTPError as exc:
         body = exc.read().decode()
+        _record_pool_selector_usage(
+            artifact_dir=artifact_dir,
+            provider="openai",
+            model=model,
+            input_hash=input_hash,
+            outcome=f"HTTP_{exc.code}",
+            provider_status="BLOCKED_PROVIDER_UNAVAILABLE",
+        )
         _write_selector_timing_receipt(
             artifact_dir,
             {
@@ -1208,6 +1361,14 @@ def _call_openai_pool_selector(
         elapsed = round(time.monotonic() - t0, 4)
         is_timeout = isinstance(exc, TimeoutError) or "timed out" in str(exc).lower()
         outcome = "selector_timeout" if is_timeout else "provider_transport_error"
+        _record_pool_selector_usage(
+            artifact_dir=artifact_dir,
+            provider="openai",
+            model=model,
+            input_hash=input_hash,
+            outcome=outcome.upper(),
+            provider_status="BLOCKED_SELECTOR_TIMEOUT" if is_timeout else "BLOCKED_PROVIDER_UNAVAILABLE",
+        )
         _write_selector_timing_receipt(
             artifact_dir,
             {
@@ -1245,6 +1406,18 @@ def _call_openai_pool_selector(
     _write_artifact(raw_path, {"raw_response": raw_response, "input_hash": input_hash})
     try:
         data = json.loads(raw_response)
+        usage_doc = data if isinstance(data, Mapping) else {}
+        _record_pool_selector_usage(
+            artifact_dir=artifact_dir,
+            provider="openai",
+            model=str(usage_doc.get("model") or model),
+            input_hash=input_hash,
+            outcome="SUCCESS",
+            provider_status="RESPONSE_RECEIVED",
+            usage=usage_doc.get("usage") if isinstance(usage_doc.get("usage"), Mapping) else None,
+            response_id=str(usage_doc.get("id") or ""),
+            raw_response_ref=str(raw_path),
+        )
         choice = data["choices"][0]
         message = choice.get("message") or {}
         text = str(message.get("content") or "").strip()

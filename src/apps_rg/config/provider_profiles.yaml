@@ -140,6 +140,14 @@ selector_models:
 
 runtime_limits:
   section_context_window: 131072
+  # W1 external-model spend guard.  This is a conservative reservation of
+  # estimated input plus requested maximum output, not a truncation policy.
+  # It prevents a malformed loop from consuming unbounded paid capacity.
+  model_token_governor:
+    chars_per_token_estimate: 3
+    safety_multiplier: 1.12
+    max_input_tokens_per_attempt: 48000
+    max_reserved_tokens_per_run: 250000
   executive_summary:
     scratch_max_output_tokens: 4096
     regen_max_output_tokens: 4096
@@ -167,6 +175,9 @@ runtime_limits:
         max_attempts: 1
         retry_backoff_base_seconds: 0.25
         retry_backoff_max_seconds: 0.25
+        # W3 pilot setting for Gemini 3 grade-only JSON judges.  It is only
+        # sent when APPS_RG_GEMINI_GRADE_ONLY_THINKING=1 is explicitly set.
+        gemini_thinking_level: low
       standard_reasoning:
         judge_weight: 2
         max_output_tokens: 4096
@@ -174,6 +185,7 @@ runtime_limits:
         max_attempts: 2
         retry_backoff_base_seconds: 0.5
         retry_backoff_max_seconds: 1.0
+        gemini_thinking_level: low
       bullet_rewrite_quality:
         judge_weight: 2
         max_output_tokens: 4096
@@ -181,6 +193,7 @@ runtime_limits:
         max_attempts: 2
         retry_backoff_base_seconds: 0.5
         retry_backoff_max_seconds: 1.0
+        gemini_thinking_level: low
       enhanced_reasoning:
         judge_weight: 3
         max_output_tokens: 8192
@@ -188,3 +201,4 @@ runtime_limits:
         max_attempts: 3
         retry_backoff_base_seconds: 0.5
         retry_backoff_max_seconds: 4.0
+        gemini_thinking_level: medium

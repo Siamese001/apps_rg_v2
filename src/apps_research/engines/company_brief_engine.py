@@ -36,6 +36,8 @@ from apps_research.engines.query_decomposer import (  # noqa: F401
     describe_jd_retrieval_contract,
 )
 from apps_research.integrations.llm_client import create_openai_sync_client
+from apps_model_telemetry.external_model_usage import append_external_model_usage
+from apps_model_telemetry.token_budget_governor import TokenBudgetPolicy, estimate_input_tokens
 from apps_research.reasoning.adaptive_research_loop import (
     build_adaptive_research_revision,
 )
@@ -201,6 +203,74 @@ def _emit_company_brief_marker(
         append_marker(payload, session_hint="apps_research.company_brief")
     except (OSError, PermissionError):
         pass
+
+
+def _openai_usage_mapping(response: Any) -> Dict[str, Any] | None:
+    usage = getattr(response, "usage", None)
+    if isinstance(usage, dict):
+        return dict(usage)
+    dump = getattr(usage, "model_dump", None)
+    if callable(dump):
+        rendered = dump()
+        return dict(rendered) if isinstance(rendered, dict) else None
+    return None
+
+
+def _record_company_brief_model_usage(
+    *,
+    model: str,
+    prompt: str,
+    outcome: str,
+    usage: Dict[str, Any] | None = None,
+    response_id: str = "",
+) -> None:
+    """Emit an opt-in ledger event without retaining briefing text."""
+    try:
+        append_external_model_usage(
+            provider="openai",
+            model=model,
+            request_digest=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+            outcome=outcome,
+            provider_status="RESPONSE_RECEIVED" if outcome == "SUCCESS" else "ERROR",
+            usage=usage,
+            response_id=response_id,
+            stage="L2.apps_research_company_brief",
+            logical_attempt=1,
+            transport_attempt=1,
+        )
+    except OSError:
+        # Token telemetry is diagnostic and cannot replace the engine's
+        # explicit availability/grounding failure semantics.
+        pass
+
+
+def _company_brief_prompt_token_cap() -> int:
+    """Hard guard for a single research synthesis request, not a text rewrite."""
+    raw = os.environ.get("APPS_RESEARCH_MAX_INPUT_TOKENS", "").strip()
+    if raw:
+        try:
+            return max(1_024, min(int(raw), 48_000))
+        except ValueError:
+            pass
+    return 24_000
+
+
+def _enforce_company_brief_prompt_budget(prompt: str) -> None:
+    cap = _company_brief_prompt_token_cap()
+    estimated = estimate_input_tokens(
+        prompt,
+        policy=TokenBudgetPolicy(
+            chars_per_token_estimate=3,
+            safety_multiplier=1.12,
+            max_input_tokens_per_attempt=cap,
+            max_reserved_tokens_per_run=cap,
+        ),
+    )
+    if estimated > cap:
+        raise CompanyBriefUnavailableError(
+            "apps_research company-brief input exceeds the preflight cap: "
+            f"estimated_input_tokens={estimated}; max_input_tokens={cap}"
+        )
 
 
 class CompanyBriefUnavailableError(RuntimeError):
@@ -1081,6 +1151,7 @@ class CompanyBriefEngine(BaseResearchEngine):
         synthesis dict on success and fails closed on transport, empty-response,
         or parse failure.
         """
+        _enforce_company_brief_prompt_budget(prompt)
         try:
             client = create_openai_sync_client()
         except Exception as exc:  # guardian: allow-broad-exception -- OpenAI client setup can fail for missing credentials or SDK issues
@@ -1108,6 +1179,11 @@ class CompanyBriefEngine(BaseResearchEngine):
             )
         except Exception as exc:  # guardian: allow-broad-exception -- OpenAI SDK raises heterogeneous transport/API errors; fail closed
             self.logger.info("[CompanyBriefEngine] openai model=%s failed: %s", model_name, exc)
+            _record_company_brief_model_usage(
+                model=model_name,
+                prompt=prompt,
+                outcome=type(exc).__name__.upper(),
+            )
             _emit_company_brief_marker(
                 accepted=False,
                 model_used=model_name,
@@ -1118,6 +1194,13 @@ class CompanyBriefEngine(BaseResearchEngine):
                 f"{topic}: OpenAI synthesis failed for model={model_name}: {type(exc).__name__}: {exc}"
             ) from exc
 
+        _record_company_brief_model_usage(
+            model=str(getattr(resp, "model", "") or model_name),
+            prompt=prompt,
+            outcome="SUCCESS",
+            usage=_openai_usage_mapping(resp),
+            response_id=str(getattr(resp, "id", "") or ""),
+        )
         text = ""
         if getattr(resp, "choices", None):
             try:
@@ -1670,6 +1753,7 @@ class CompanyBriefEngine(BaseResearchEngine):
         return text
 
     def _gemini_synthesize_plain(self, *, prompt: str) -> str:
+        _enforce_company_brief_prompt_budget(prompt)
         try:
             client = create_openai_sync_client()
         except Exception as exc:  # guardian: allow-broad-exception -- OpenAI client setup can fail for missing credentials or SDK issues
@@ -1700,9 +1784,21 @@ class CompanyBriefEngine(BaseResearchEngine):
                 model_name,
                 exc,
             )
+            _record_company_brief_model_usage(
+                model=model_name,
+                prompt=prompt,
+                outcome=type(exc).__name__.upper(),
+            )
             raise CompanyBriefUnavailableError(
                 f"targeting brief OpenAI synthesis failed for model={model_name}: {type(exc).__name__}: {exc}"
             ) from exc
+        _record_company_brief_model_usage(
+            model=str(getattr(resp, "model", "") or model_name),
+            prompt=prompt,
+            outcome="SUCCESS",
+            usage=_openai_usage_mapping(resp),
+            response_id=str(getattr(resp, "id", "") or ""),
+        )
         if not getattr(resp, "choices", None):
             raise CompanyBriefUnavailableError(
                 f"targeting brief OpenAI synthesis returned no choices for model={model_name}"

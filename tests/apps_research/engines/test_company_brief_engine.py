@@ -17,6 +17,7 @@ from apps_research.engines.company_brief_engine import (
     CompanyBriefEngine,
     CompanyBriefUnavailableError,
     _company_brief_primary_openai_model,
+    _enforce_company_brief_prompt_budget,
     _v2_enabled,
 )
 
@@ -44,6 +45,12 @@ def test_v2_flag_off_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_v2_flag_on_when_set(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("APPS_RESEARCH_RETRIEVAL_V2", "1")
     assert _v2_enabled() is True
+
+
+def test_company_brief_prompt_budget_blocks_oversize_input(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APPS_RESEARCH_MAX_INPUT_TOKENS", "1024")
+    with pytest.raises(CompanyBriefUnavailableError, match="input exceeds the preflight cap"):
+        _enforce_company_brief_prompt_budget("x" * 4_000)
 
 
 def test_v2_path_offline_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:

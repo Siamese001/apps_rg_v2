@@ -982,6 +982,7 @@ def run_unify_narrative_execution(
         temperature_bounds=NARRATIVE_TEMP_RANGE,
         model=section_model,
         provider_requested=str(args.provider),
+        idempotent_replay_safe=True,
     )
     provider_payload = tag_reasoning_lane(provider_payload, LANE_KEY)
     provider_request_data = provider_req.to_dict()

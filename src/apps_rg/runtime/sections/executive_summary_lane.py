@@ -2233,6 +2233,7 @@ def run_executive_summary_execution(
             provider_requested=str(args.provider),
             compiled_prompt_artifact=section_compiled.artifact,
             anthropic_workload_kind="ONE_SHOT",
+            idempotent_replay_safe=True,
         )
         provider_payload = tag_reasoning_lane(provider_payload, LANE_KEY)
         provider_request_data = provider_req.to_dict()
