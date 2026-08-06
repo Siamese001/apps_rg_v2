@@ -4,8 +4,12 @@ Local `main` integration target for the simplified `apps_rg` extraction.
 
 This initial commit is a provenance-preserving source transplant from the
 Agentic Workflow source-refreeze and standalone worktrees. It is intentionally
-not yet an independently installable package: packaging, import reconciliation,
-and behavior-parity certification are later refactoring waves.
+not independently installable: product entry requires an external
+`agentic_core` source runtime. Before any product preflight, it writes
+`standalone_runtime_dependency_receipt.json`, proving the resolved external
+package and the U0 → L1 → L0 → C0 → PA → L2 → Exit contract sentinels. An
+uninstalled editable/source-tree dependency is valid; the receipt does not
+claim vendoring, independent installability, or behavior parity.
 
 The complete six-wave offline evaluation surface is now implemented under
 `src/apps_rg/evals`. It provides the G1-G6 measurement contract, modular

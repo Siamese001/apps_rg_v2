@@ -7,6 +7,24 @@ from types import SimpleNamespace
 import pytest
 
 
+def _allow_external_runtime_dependency(
+    monkeypatch: pytest.MonkeyPatch,
+    run_dir: Path,
+) -> None:
+    from apps_rg.runtime import standalone_dependency_posture
+
+    monkeypatch.setattr(
+        standalone_dependency_posture,
+        "verify_external_agentic_core_runtime",
+        lambda **kwargs: {"status": "EXTERNAL_RUNTIME_BOUND"},
+    )
+    monkeypatch.setattr(
+        standalone_dependency_posture,
+        "write_standalone_runtime_dependency_receipt",
+        lambda **kwargs: run_dir / "standalone_runtime_dependency_receipt.json",
+    )
+
+
 def test_product_entry_mints_preflight_before_whole_run(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -23,6 +41,7 @@ def test_product_entry_mints_preflight_before_whole_run(
         "allocate_full_resume_artifact_dir",
         lambda repo, explicit: run_dir,
     )
+    _allow_external_runtime_dependency(monkeypatch, run_dir)
 
     def _preflight(**kwargs: object) -> SimpleNamespace:
         calls.append("preflight")
@@ -74,6 +93,7 @@ def test_product_entry_restores_prior_envelope_after_orchestrator_error(
         "allocate_full_resume_artifact_dir",
         lambda repo, explicit: run_dir,
     )
+    _allow_external_runtime_dependency(monkeypatch, run_dir)
     monkeypatch.setattr(
         "apps_rg.runtime.e2e_preflight.run_fresh_e2e_preflight",
         lambda **kwargs: SimpleNamespace(
@@ -116,6 +136,7 @@ def test_product_entry_stops_when_preflight_blocks(
         "allocate_full_resume_artifact_dir",
         lambda repo, explicit: run_dir,
     )
+    _allow_external_runtime_dependency(monkeypatch, run_dir)
     monkeypatch.setattr(
         "apps_rg.runtime.e2e_preflight.run_fresh_e2e_preflight",
         lambda **kwargs: SimpleNamespace(
@@ -134,6 +155,45 @@ def test_product_entry_stops_when_preflight_blocks(
     assert result["fault"] == "PREFLIGHT_BLOCKED"
     assert result["product_authorized"] is False
     assert result["pipeline_complete"] is False
+
+
+def test_product_entry_blocks_before_preflight_without_external_core_runtime(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime import product_entry
+    from apps_rg.runtime import standalone_dependency_posture
+
+    run_dir = tmp_path / "full_resume_dependency_blocked"
+    monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
+    monkeypatch.setattr(
+        product_entry,
+        "allocate_full_resume_artifact_dir",
+        lambda repo, explicit: run_dir,
+    )
+    monkeypatch.setattr(
+        standalone_dependency_posture,
+        "verify_external_agentic_core_runtime",
+        lambda **kwargs: {"status": "BLOCKED_AGENTIC_CORE_UNAVAILABLE"},
+    )
+    monkeypatch.setattr(
+        standalone_dependency_posture,
+        "write_standalone_runtime_dependency_receipt",
+        lambda **kwargs: run_dir / "standalone_runtime_dependency_receipt.json",
+    )
+    monkeypatch.setattr(
+        "apps_rg.runtime.e2e_preflight.run_fresh_e2e_preflight",
+        lambda **kwargs: pytest.fail("preflight must not run without external core"),
+    )
+
+    result = product_entry.run_product_whole_run_from_primitives(
+        target_company="Anthropic",
+        target_role="Manager",
+    )
+
+    assert result["fault"] == "STANDALONE_RUNTIME_DEPENDENCY_UNAVAILABLE"
+    assert result["standalone_runtime_dependency_status"] == "BLOCKED_AGENTIC_CORE_UNAVAILABLE"
+    assert result["product_authorized"] is False
 
 
 def test_product_entry_rejects_non_fresh_explicit_artifact_dir(
