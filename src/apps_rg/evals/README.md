@@ -82,6 +82,23 @@ replace authoritative human-qualified receipts. Missing evidence emits
 `NOT_MEASURED`; duplicate, stale/tampered, incompatible, or under-authorized
 receipts emit `BLOCKED`.
 
+## W2 benchmark and holdout design
+
+`python -m apps_rg.evals.benchmark_design` validates the tracked W2 case
+manifest without loading any holdout case identity. Calibration cases must use
+distinct source bundles, target requests, and expected outputs; cover every
+runtime-generated lane and each declared role, target-profile, evidence-density,
+hard-negative, binding, and protected-risk slice; and carry a valid Apps
+Research-to-U0 validation receipt. The protected holdout is represented only by
+an external authority reference, sealed-index digest, and count, so development
+code cannot access its case IDs.
+
+The manifest pre-registers a paired normal-approximation power calculation. A
+missing holdout seal or sample size reports `NOT_MEASURED`; duplicate cases,
+holdout-identity exposure, invalid Apps Research admission, and an underpowered
+plan report `BLOCKED`. This benchmark-design receipt is technical-only and does
+not create human qualification, release, or production authority.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
