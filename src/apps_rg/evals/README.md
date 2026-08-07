@@ -48,6 +48,25 @@ The report schemas require all six gates and all seven score groups to be
 present. An unavailable lane is represented explicitly as `UNKNOWN` or
 `NOT_MEASURED`; it is not omitted.
 
+## W0 success metrics and U0 admission
+
+[`contracts/success_metric_contract.v1.yaml`](contracts/success_metric_contract.v1.yaml)
+adds the outcome layer that the G1-G6 diagnostic gates do not supply on their
+own. It defines two non-blended outcomes: blinded finished-resume utility over
+a frozen baseline (P1), and the rate of eligible end-to-end attempts that
+produce a grounded, decision-ready result (P2). Neither is measured by W0;
+both remain explicitly `NOT_MEASURED` until their governed human-review and
+full-denominator lanes exist.
+
+W0 records Apps Research as a mandatory pre-U0 admission prerequisite. The
+non-mutating `success_metrics.py` evaluator consumes the already-produced
+`apps_rg.apps_research_handoff_validation_receipt.v2`: missing validation is
+`UNKNOWN`, an observed invalid handoff is `FAIL`, and only an observed valid
+handoff is `PASS`. That PASS merely makes a run eligible for the P2
+denominator; it cannot make P1, P2, a guardrail, release, or production pass.
+Its `success_metric_receipt.v1.schema.json` receipt is always technical-only,
+non-promoting, and keeps G1-G6 diagnostic-only.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
