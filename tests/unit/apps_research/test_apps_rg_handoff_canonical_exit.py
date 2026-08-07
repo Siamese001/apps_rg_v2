@@ -8,9 +8,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
+from jsonschema import Draft202012Validator
 
 from apps_research.integrations.apps_rg_handoff import (
     persist_apps_rg_targeting_brief_artifacts,
+    validate_apps_rg_handoff_sidecar,
+)
+from apps_research.config.model_pins import (
+    apps_rg_handoff_judge_pin,
+    company_brief_generation_pin,
 )
 from apps_rg.prerequisites.briefing_validator import (
     validate_apps_research_handoff,
@@ -68,19 +74,27 @@ class _Record:
 
 def _sidecar(brief: str, *, x2_status: str = "PASS") -> dict:
     score = 0.91 if x2_status == "PASS" else 0.0
+    generation_pin = company_brief_generation_pin()
+    judge_pin = apps_rg_handoff_judge_pin()
     return {
         "brief_text_sha256": hashlib.sha256(brief.strip().encode("utf-8")).hexdigest(),
-        "generation_provider": "external_openai",
-        "generation_model": "gpt-5.4-mini-2026-03-17",
+        "generation_provider": generation_pin.provider,
+        "generation_model_requested": generation_pin.model,
+        "generation_model": generation_pin.model,
+        "generation_reasoning_effort": generation_pin.reasoning_effort,
+        "generation_model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
         "provider_call_attempted": True,
         "handoff_eligible": True,
         "reason": "ok",
         "x2_judge_receipt": {
             "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
             "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
-            "judge_name": "gemini_pro",
-            "judge_provider": "gemini_pro",
-            "judge_model": "gemini-3.1-pro-preview",
+            "judge_name": judge_pin.provider_key,
+            "judge_provider": judge_pin.provider_key,
+            "judge_model_requested": judge_pin.model,
+            "judge_model": judge_pin.model,
+            "thinking_level": judge_pin.reasoning_effort,
+            "model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
             "threshold": 0.75,
             "model_backed": True,
             "status": x2_status,
@@ -119,6 +133,21 @@ def _record(run_id: str, *, x2_status: str = "PASS") -> _Record:
     )
 
 
+def test_handoff_rejects_generation_reasoning_effort_drift() -> None:
+    sidecar = _sidecar(_VALID_BRIEF)
+    sidecar["generation_reasoning_effort"] = "low"
+
+    eligible, reason = validate_apps_rg_handoff_sidecar(
+        sidecar,
+        expected_brief_sha=hashlib.sha256(
+            _VALID_BRIEF.strip().encode("utf-8")
+        ).hexdigest(),
+    )
+
+    assert eligible is False
+    assert reason == "generation_reasoning_effort_mismatch"
+
+
 def test_publisher_writes_brief_only_after_canonical_x3d(tmp_path: Path) -> None:
     jd = "Lead partner solution architecture for Claude."
     bundle = persist_apps_rg_targeting_brief_artifacts(
@@ -142,9 +171,27 @@ def test_publisher_writes_brief_only_after_canonical_x3d(tmp_path: Path) -> None
     assert bundle.bundle_manifest_digest.startswith("sha256:")
 
     handoff = bundle.envelope
+    schema = json.loads(
+        (
+            Path(__file__).resolve().parents[3]
+            / "config/certification/schemas/apps_research_apps_rg_handoff.v2.schema.json"
+        ).read_text(encoding="utf-8")
+    )
+    Draft202012Validator.check_schema(schema)
+    Draft202012Validator(schema).validate(handoff)
     assert handoff["schema_version"] == "apps_research.apps_rg_handoff.v2"
     assert handoff["exit_authorization"]["x3_code"] == "X3D_ALLOW_FINISH"
     assert handoff["identity"]["brief_sha256"] == bundle.brief_sha256
+    assert handoff["model_observations"]["generation"]["observed_model"] == (
+        company_brief_generation_pin().model
+    )
+    assert handoff["model_observations"]["generation"]["reasoning_effort"] == (
+        company_brief_generation_pin().reasoning_effort
+    )
+    assert handoff["model_observations"]["judge"]["observed_model"] == (
+        apps_rg_handoff_judge_pin().model
+    )
+    assert handoff["model_observations"]["judge"]["reasoning_effort"] == "high"
     assert set(handoff["mandatory_gate_receipts"]) == {
         "G5",
         "G6",

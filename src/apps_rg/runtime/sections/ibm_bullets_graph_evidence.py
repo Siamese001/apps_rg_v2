@@ -58,9 +58,9 @@ IBM_BULLET_SLOT_SKILL_MAP: dict[str, list[dict[str, str]]] = {
     ],
 }
 
-# Mechanism vocabulary per slot extracted from base resume IBM fact structured fields.
-# Source: amit_ayer_base_resume_v1.json → facts.employment[exp_ibm_001].bullets[*].technologies
-# Constraint: claim_text prose is EXCLUDED. Only the `technologies` list is used here.
+# Mechanism vocabulary per sealed IBM slot. The source-fact terms and the
+# listed role-episode graph skills are both permitted; this keeps the
+# deterministic specificity check aligned with the actual C0 allocation.
 IBM_BULLET_MECHANISM_VOCAB: dict[str, list[str]] = {
     "bul_ibm_001": ["AI platforms", "analytics", "cloud-native"],
     "bul_ibm_002": [
@@ -73,9 +73,9 @@ IBM_BULLET_MECHANISM_VOCAB: dict[str, list[str]] = {
         "risk scenario analysis",
         "scenario analysis",
     ],
-    "bul_ibm_003": ["SaaS platforms", "regulatory workflows", "shared services"],
+    "bul_ibm_003": ["SaaS platforms", "regulatory workflows", "shared services", "P&L oversight"],
     "bul_ibm_004": ["data lineage", "observability", "real-time ingestion"],
-    "bul_ibm_005": ["hyperscaler alliances", "co-sell"],
+    "bul_ibm_005": ["hyperscaler alliances", "co-sell", "technical discovery", "solution mapping"],
 }
 
 # Legacy locked metrics retired — HOLD/DO_NOT_PROMOTE base-resume tokens must not drive C0.

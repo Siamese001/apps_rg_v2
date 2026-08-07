@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import json
 
 import pytest
 
@@ -13,10 +14,16 @@ from apps_research.engines.company_brief_engine import (
     CompanyBriefUnavailableError,
 )
 from apps_research.integrations.apps_rg_handoff import (
+    APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL,
+    _AppsRgTargetingBriefGoogleJudge,
     _targeting_brief_adversarial_directive_reason,
     build_apps_rg_targeting_brief_x2_prompt,
     run_apps_rg_handoff_x2_judge,
     x2_judge_receipt_passes,
+)
+from apps_research.config.model_pins import (
+    apps_rg_handoff_judge_pin,
+    company_brief_generation_pin,
 )
 from apps_research.prompt_assembly.apps_rg_targeting_brief import (
     load_targeting_brief_prompt_template,
@@ -29,12 +36,18 @@ _TARGETING_JD_CONTEXT = {
     "jd_context": {"role": "SVP IT Strategy"},
 }
 
+_GENERATION_PIN = company_brief_generation_pin()
+_JUDGE_PIN = apps_rg_handoff_judge_pin()
+
 _PASS_X2_RECEIPT = {
     "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
     "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
-    "judge_name": "gemini_pro",
-    "judge_provider": "gemini_pro",
-    "judge_model": "gemini-3.1-pro-preview",
+    "judge_name": _JUDGE_PIN.provider_key,
+    "judge_provider": _JUDGE_PIN.provider_key,
+    "judge_model_requested": _JUDGE_PIN.model,
+    "judge_model": _JUDGE_PIN.model,
+    "thinking_level": _JUDGE_PIN.reasoning_effort,
+    "model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
     "threshold": 0.75,
     "model_backed": True,
     "status": "PASS",
@@ -102,6 +115,7 @@ def test_synthesis_fails_closed_on_gate_fail() -> None:
 
 def test_synthesis_seals_valid_markdown(monkeypatch) -> None:
     engine = CompanyBriefEngine()
+    engine._last_targeting_generation_model_observed = _GENERATION_PIN.model
     monkeypatch.setattr(engine, "_call_llm_plain_markdown", lambda prompt: _VALID_MD)
     monkeypatch.setattr(
         engine,
@@ -120,7 +134,8 @@ def test_synthesis_seals_valid_markdown(monkeypatch) -> None:
     assert len(re.findall(r"(?m)^- ", md)) <= 17
     sidecar = synthesized["apps_rg_targeting_brief_sidecar"]
     assert sidecar["generation_provider"] == "external_openai"
-    assert sidecar["generation_model"] == "gpt-5.4-mini-2026-03-17"
+    assert sidecar["generation_model"] == _GENERATION_PIN.model
+    assert sidecar["generation_model_observation_status"] == "OBSERVED_PROVIDER_RESPONSE"
     assert sidecar["x2_judge_receipt"]["model_backed"] is True
 
 
@@ -202,6 +217,7 @@ def test_synthesis_rejects_invalid_markdown(monkeypatch) -> None:
 class _FlakySerializationJudge:
     def __init__(self) -> None:
         self.calls = 0
+        self.observed_model = _JUDGE_PIN.model
 
     def judge(self, _dimension, _context):
         self.calls += 1
@@ -210,9 +226,22 @@ class _FlakySerializationJudge:
         return JudgeResponse(score=0.91, abstain=False, reasoning="clean retry")
 
 
+class _FlakyServiceUnavailableJudge:
+    def __init__(self) -> None:
+        self.calls = 0
+        self.observed_model = _JUDGE_PIN.model
+
+    def judge(self, _dimension, _context):
+        self.calls += 1
+        if self.calls == 1:
+            raise GraderError("judge HTTP 503 Service Unavailable")
+        return JudgeResponse(score=0.91, abstain=False, reasoning="service recovered")
+
+
 class _SemanticFailJudge:
     def __init__(self) -> None:
         self.calls = 0
+        self.observed_model = _JUDGE_PIN.model
 
     def judge(self, _dimension, _context):
         self.calls += 1
@@ -235,6 +264,26 @@ def test_apps_rg_x2_judge_retries_serialization_error_once() -> None:
     assert receipt["attempt_count"] == 2
     assert receipt["retry_count"] == 1
     assert receipt["retryable_provider_error"] is True
+    assert x2_judge_receipt_passes(receipt)
+
+
+def test_apps_rg_x2_judge_retries_transient_service_unavailable_once() -> None:
+    judge = _FlakyServiceUnavailableJudge()
+
+    receipt = run_apps_rg_handoff_x2_judge(
+        brief_text=_VALID_MD,
+        jd_text="Lead partner architecture.",
+        research_notes="Acme has verified partner motion.",
+        source_register=[{"family": "overview", "has_content": True}],
+        judge=judge,
+    )
+
+    assert judge.calls == 2
+    assert receipt["status"] == "PASS"
+    assert receipt["attempt_count"] == 2
+    assert receipt["retry_count"] == 1
+    assert receipt["retryable_provider_error"] is True
+    assert receipt["thinking_level"] == "high"
     assert x2_judge_receipt_passes(receipt)
 
 
@@ -276,6 +325,24 @@ def test_apps_rg_x2_prompt_treats_required_evidence_boundary_as_content() -> Non
     assert "<<<TARGETING_BRIEF_START>>>" in user
     assert "Do Not Use As Proof" in user
     assert _targeting_brief_adversarial_directive_reason(user) == ""
+
+
+def test_apps_rg_x2_google_request_uses_high_thinking_without_temperature() -> None:
+    judge = _AppsRgTargetingBriefGoogleJudge(
+        model=_JUDGE_PIN.model,
+        api_key="test-key",
+        max_tokens=512,
+    )
+
+    request = judge._build_request("system", "user")
+    payload = json.loads(request.body.decode("utf-8"))
+    generation_config = payload["generationConfig"]
+
+    assert generation_config["thinkingConfig"] == {
+        "thinkingLevel": APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL
+    }
+    assert APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL == "high"
+    assert "temperature" not in generation_config
 
 
 class _NeverCalledJudge:

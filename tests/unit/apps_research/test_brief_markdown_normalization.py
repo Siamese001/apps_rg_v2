@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
-
 from apps_research.engines.company_brief_engine import (
     CompanyBriefEngine,
-    CompanyBriefUnavailableError,
+)
+from apps_research.config.model_pins import (
+    apps_rg_handoff_judge_pin,
+    company_brief_generation_pin,
 )
 from apps_research.types.apps_rg_targeting_brief_contract import (
     normalize_markdown_brief_text,
@@ -21,12 +22,18 @@ _TARGETING_JD_CONTEXT = {
     "jd_context": {"role": "SVP IT Strategy"},
 }
 
+_GENERATION_PIN = company_brief_generation_pin()
+_JUDGE_PIN = apps_rg_handoff_judge_pin()
+
 _PASS_X2_RECEIPT = {
     "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
     "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
-    "judge_name": "gemini_pro",
-    "judge_provider": "gemini_pro",
-    "judge_model": "gemini-3.1-pro-preview",
+    "judge_name": _JUDGE_PIN.provider_key,
+    "judge_provider": _JUDGE_PIN.provider_key,
+    "judge_model_requested": _JUDGE_PIN.model,
+    "judge_model": _JUDGE_PIN.model,
+    "thinking_level": _JUDGE_PIN.reasoning_effort,
+    "model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
     "threshold": 0.75,
     "model_backed": True,
     "status": "PASS",
@@ -81,6 +88,7 @@ def test_targeting_normalizer_preserves_jd_dense_bullet_for_rejection() -> None:
 
 def test_targeting_synthesis_repairs_jd_dense_bullet(monkeypatch) -> None:
     engine = CompanyBriefEngine()
+    engine._last_targeting_generation_model_observed = _GENERATION_PIN.model
     bad_markdown = (
         "Acme Co (ACME) - SVP IT Strategy targeting brief\n"
         "| SVP IT Strategy | band | Reports to CIO (2026) |\n\n"

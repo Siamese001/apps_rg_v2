@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from tests.helpers import apps_rg_model_pins as pins
 
 import apps_rg.runtime.providers.section_provider_call as section_provider_call
 from apps_rg.runtime.providers import anthropic_prompt_cache as subject
@@ -67,13 +68,13 @@ def test_prompt_cache_flags_default_off_and_enable_only_on_one() -> None:
 def test_disabled_cache_receipt_has_provider_neutral_schema() -> None:
     receipt = subject.build_disabled_cache_receipt(
         provider="external_claude",
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         section_id="competencies",
     )
 
     assert receipt == {
         "provider": "external_claude",
-        "model": "claude-sonnet-5",
+        "model": pins.CLAUDE_GENERATOR_MODEL,
         "section_id": "competencies",
         "cache_enabled": False,
         "cache_strategy": "disabled",
@@ -97,11 +98,11 @@ def test_cache_flag_off_preserves_section_payload_shape() -> None:
         messages=[{"role": "user", "content": "Write JSON."}],
         prompt_hash="prompt-hash",
         input_payload_hash="input-hash",
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
     )
 
     assert payload == {
-        "model": "claude-sonnet-5",
+        "model": pins.CLAUDE_GENERATOR_MODEL,
         "messages": [{"role": "user", "content": "Write JSON."}],
         "temperature": 0.45,
         "max_tokens": 700,

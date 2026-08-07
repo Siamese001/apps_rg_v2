@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 
 from apps_rg.runtime.section_l7_binding_manifest import (
@@ -81,7 +83,7 @@ def test_manifest_surfaces_provider_attempt_spans(tmp_path: Path) -> None:
             "attempt_kind": "requested",
             "attempt_index": 0,
             "provider": "external_claude",
-            "model": "claude-sonnet-5",
+            "model": pins.CLAUDE_GENERATOR_MODEL,
             "provider_attempted": True,
             "provider_available": False,
             "runtime_generation_status": "BLOCKED",

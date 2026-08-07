@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, FrozenSet, Mapping
+from typing import Any, Mapping
 
 from apps_rg.runtime.section_model_limits import runtime_limit_mapping
 
@@ -59,11 +59,8 @@ class SectionJudgePolicy:
     judge_required_for_proof: bool
     judge_tier: JudgeTier
     required_judge_providers: tuple[str, ...]
-    proof_eligible_model_classes: FrozenSet[str]
-    advisory_model_classes: FrozenSet[str]
     judge_packet_required: bool
     grade_only_required: bool
-    replacement_generation_allowed: bool
     fallback_policy: FallbackPolicy = FallbackPolicy.FAIL_CLOSED
 
     @property
@@ -200,11 +197,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.ENHANCED_REASONING,
         required_judge_providers=_enhanced_providers(),
-        proof_eligible_model_classes=frozenset({"enhanced_frontier", "enhanced_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "headline": SectionJudgePolicy(
         section_name="headline",
@@ -212,11 +206,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.STANDARD_REASONING,
         required_judge_providers=_DUAL_JUDGE_PANEL,
-        proof_eligible_model_classes=frozenset({"standard_frontier", "standard_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "unify_bullets": SectionJudgePolicy(
         section_name="unify_bullets",
@@ -224,11 +215,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.BULLET_REWRITE_QUALITY,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "bullet_rewrite_quality"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "ibm_bullets": SectionJudgePolicy(
         section_name="ibm_bullets",
@@ -236,11 +224,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.BULLET_REWRITE_QUALITY,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "bullet_rewrite_quality"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "insurtech_bullets": SectionJudgePolicy(
         section_name="insurtech_bullets",
@@ -248,11 +233,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.BULLET_REWRITE_QUALITY,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "bullet_rewrite_quality"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "ey_bullets": SectionJudgePolicy(
         section_name="ey_bullets",
@@ -260,11 +242,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.BULLET_REWRITE_QUALITY,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "bullet_rewrite_quality"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "unify_narrative": SectionJudgePolicy(
         section_name="unify_narrative",
@@ -272,11 +251,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.STANDARD_REASONING,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "standard_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "ibm_narrative": SectionJudgePolicy(
         section_name="ibm_narrative",
@@ -284,11 +260,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.STANDARD_REASONING,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "standard_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "insurtech_narrative": SectionJudgePolicy(
         section_name="insurtech_narrative",
@@ -296,11 +269,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.STANDARD_REASONING,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "standard_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "ey_narrative": SectionJudgePolicy(
         section_name="ey_narrative",
@@ -308,11 +278,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.STANDARD_REASONING,
         required_judge_providers=_standard_providers(),
-        proof_eligible_model_classes=frozenset({"standard_frontier", "standard_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "competencies": SectionJudgePolicy(
         section_name="competencies",
@@ -320,11 +287,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.STANDARD_REASONING,
         required_judge_providers=_COMPETENCIES_JUDGE_PANEL,
-        proof_eligible_model_classes=frozenset({"standard_frontier", "standard_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
     "final_aggregate_resume": SectionJudgePolicy(
         section_name="final_aggregate_resume",
@@ -332,11 +296,8 @@ _SECTION_POLICIES: dict[str, SectionJudgePolicy] = {
         judge_required_for_proof=True,
         judge_tier=JudgeTier.ENHANCED_REASONING,
         required_judge_providers=_enhanced_providers(),
-        proof_eligible_model_classes=frozenset({"enhanced_frontier", "enhanced_reasoning"}),
-        advisory_model_classes=frozenset({"flash", "mini", "haiku", "advisory", "mock", "stub"}),
         judge_packet_required=True,
         grade_only_required=True,
-        replacement_generation_allowed=False,
     ),
 }
 
@@ -386,7 +347,6 @@ def policy_matrix_export() -> dict[str, dict[str, Any]]:
             },
             "judge_packet_required": p.judge_packet_required,
             "grade_only_required": p.grade_only_required,
-            "replacement_generation_allowed": p.replacement_generation_allowed,
             "fallback_policy": p.fallback_policy.value,
         }
     return out

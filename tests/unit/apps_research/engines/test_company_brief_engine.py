@@ -26,6 +26,8 @@ _REPO_ROOT = str(Path(__file__).resolve().parents[4])
 if sys.path[0] != _REPO_ROOT:
     sys.path.insert(0, _REPO_ROOT)
 
+from tests.helpers import apps_rg_model_pins as pins  # noqa: E402
+
 from apps_research.engines.company_brief_engine import (  # noqa: E402
     CompanyBriefEngine,
     CompanyBriefUnavailableError,
@@ -216,7 +218,9 @@ class TestResolveJdContext:
 
 
 class TestCuratedTargetingFallback:
-    def test_targeting_handoff_blocks_weak_c0_gate(self, monkeypatch, engine):
+    def test_targeting_handoff_blocks_weak_c0_gate_without_jd_coverage(
+        self, monkeypatch, engine
+    ):
         monkeypatch.setenv("APPS_RESEARCH_RETRIEVAL_V2", "1")
         monkeypatch.setattr(
             engine,
@@ -260,6 +264,73 @@ class TestCuratedTargetingFallback:
             "c0_support_gate=WEAK_WITH_CAVEATS"
         )
         assert "company_brief_text" not in brief
+
+    def test_targeting_handoff_accepts_caveated_jd_complete_c0_bundle(
+        self, monkeypatch, engine
+    ):
+        monkeypatch.setenv("APPS_RESEARCH_RETRIEVAL_V2", "1")
+        monkeypatch.setattr(
+            engine,
+            "_run_research_v2",
+            lambda **_kwargs: {"tech_stack_and_tools": "grounded public evidence"},
+        )
+        monkeypatch.setattr(engine, "_load_jd_facets", lambda _anchor: [])
+        monkeypatch.setattr(
+            engine,
+            "_synthesize",
+            lambda **_kwargs: {
+                "targeting_brief_disposition": "SEALED",
+                "apps_rg_targeting_brief_markdown": "grounded targeting brief",
+                "apps_rg_targeting_brief_sidecar": {"handoff_eligible": True},
+            },
+        )
+        monkeypatch.setattr(
+            engine,
+            "_build_c0_bundle",
+            lambda **_kwargs: {
+                "briefing_coverage_matrix": {
+                    "families": [
+                        {"family": "role_context", "covered": True},
+                        {"family": "tech_stack_and_tools", "covered": True},
+                        {"family": "adoption_motion", "covered": True},
+                    ]
+                },
+                "jd_retrieval_contract": {
+                    "required_evidence_families": [
+                        "tech_stack_and_tools",
+                        "adoption_motion",
+                    ]
+                },
+                "source_portfolio_summary": {
+                    "authoritative_anchor_present": True,
+                    "total_final_sources": 3,
+                },
+                "contradiction_matrix": {"unresolved_critical": 0},
+                "freshness_report": {"gate_fail_triggered": False},
+                "synthesis_guidance": {},
+            },
+        )
+        monkeypatch.setattr(
+            engine,
+            "_evaluate_c0_pa_gate",
+            lambda **_kwargs: ("WEAK_WITH_CAVEATS", "optional-family gap", ""),
+        )
+        monkeypatch.setattr(engine, "_assemble_brief", lambda **_kwargs: {})
+
+        brief = engine.execute(
+            {
+                "topic": "Unify Consulting",
+                "jd_context": {
+                    "company_name": "Unify Consulting",
+                    "job_title": "SVP Technical Pre-Sales",
+                },
+            }
+        )
+
+        assert brief["targeting_brief_disposition"] == "SEALED"
+        assert brief["company_brief_text"] == "grounded targeting brief"
+        assert brief["targeting_brief_c0_disposition"] == "CAVEATED_JD_COMPLETE"
+        assert brief["targeting_brief_c0_caveat"] == "optional-family gap"
 
     def test_v2_research_returns_coverage_family_keys(self, monkeypatch, engine):
         from apps_research.integrations.search_retrieval import RetrievedDoc
@@ -398,7 +469,7 @@ class TestCuratedTargetingFallback:
         semantics = SimpleNamespace(
             score=0.9,
             judge_name="gemini_pro",
-            judge_model="gemini-3.1-pro-preview",
+            judge_model=pins.GEMINI_PROOF_JUDGE_MODEL,
             handoff_eligible=False,
             reason="missing_sections",
             role_archetype="partnerships",
@@ -419,13 +490,14 @@ class TestCuratedTargetingFallback:
             findings={"partner_ecosystem": "co-sell notes"},
             gate_verdict="PASS",
             gate_reason="",
-            model_name="gpt-5.4-mini-2026-03-17",
+            model_name=pins.RESEARCH_GENERATOR_MODEL,
             semantic_override=semantics,
             x2_judge_receipt={
                 "status": "PASS",
                 "model_backed": True,
-                "judge_model": "gemini-3.1-pro-preview",
+                "judge_model": pins.GEMINI_PROOF_JUDGE_MODEL,
                 "judge_provider": "gemini_pro",
+                "thinking_level": pins.RESEARCH_JUDGE_REASONING_EFFORT,
                 "score": 1.0,
                 "threshold": 0.75,
             },

@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from apps_rg.runtime.full_run_section_status import (
     FINAL_AGGREGATION_LANE,
     FULL_RUN_SECTION_STATUS_MD,
@@ -83,9 +85,9 @@ def _write_final_aggregation(root: Path) -> None:
                 "judges": [
                     {
                         "judge_id": "gemini",
-                        "provider_name": "Google Gemini 3.1 Pro Preview",
+                        "provider_name": "Google Gemini 3.6 Flash",
                         "provider_key": "gemini_pro",
-                        "model_name": "gemini-3.1-pro-preview",
+                        "model_name": pins.GEMINI_PROOF_JUDGE_MODEL,
                         "score": 5.0,
                         "threshold": 4.0,
                         "pass": True,
@@ -95,7 +97,7 @@ def _write_final_aggregation(root: Path) -> None:
                         "judge_id": "openai",
                         "provider_name": "OpenAI ChatGPT",
                         "provider_key": "openai_chatgpt",
-                        "model_name": "gpt-5.5",
+                        "model_name": pins.COMPETENCIES_SELECTOR_MODEL,
                         "score": 4.4,
                         "threshold": 4.0,
                         "pass": True,
@@ -205,8 +207,8 @@ def test_collect_rows_support_flat_lane_pointer_to_sibling_runtime_proof(tmp_pat
             {
                 "judges": [
                     {
-                        "provider_name": "Google Gemini 3.1 Pro Preview",
-                        "model_name": "gemini-3.1-pro-preview",
+                        "provider_name": "Google Gemini 3.6 Flash",
+                        "model_name": pins.GEMINI_PROOF_JUDGE_MODEL,
                         "score": 5.0,
                         "threshold": 4.0,
                         "pass": True,
@@ -232,7 +234,7 @@ def test_collect_rows_support_flat_lane_pointer_to_sibling_runtime_proof(tmp_pat
     assert row.x3_code == "X3_ALLOW"
     assert row.x2_pass == "PASS"
     assert row.runtime_generation_status == "REAL_LLM"
-    assert "Google Gemini 3.1 Pro Preview" in row.judge_summary
+    assert "Google Gemini 3.6 Flash" in row.judge_summary
 
 
 def test_collect_rows_support_flat_single_section_run_root(tmp_path: Path):
@@ -398,14 +400,14 @@ def test_collect_rows_append_final_aggregation_lane_with_judges(tmp_path: Path):
     assert final.mean_normalized_score == "0.94"
     assert final.model_backed_pass_count == "2"
     assert final.model_backed_total == "2"
-    assert "Google Gemini 3.1 Pro Preview" in final.judge_summary
+    assert "Google Gemini 3.6 Flash" in final.judge_summary
     assert "OpenAI ChatGPT" in final.judge_summary
     assert final.display_txt_rel == "modular_r4/final_resume_assembly/final_resume.json"
 
     md = render_full_run_section_status_markdown(rows, run_root=run_root, repo_root=tmp_path)
     assert FINAL_AGGREGATION_LANE in md
-    assert "Google Gemini 3.1 Pro Preview" in md
-    assert "gpt-5.5" in md
+    assert "Google Gemini 3.6 Flash" in md
+    assert pins.COMPETENCIES_SELECTOR_MODEL in md
 
 
 def test_persist_writes_md_and_json(tmp_path: Path):

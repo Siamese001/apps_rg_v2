@@ -166,6 +166,25 @@ def test_explicit_stub_unknown_lane_returns_stub(monkeypatch: pytest.MonkeyPatch
     assert prof.provider_kind == ProviderKind.STUB
 
 
+@pytest.mark.parametrize("provider", ["anthropic", "openai", "gemini"])
+def test_live_provider_without_explicit_model_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    provider: str,
+) -> None:
+    _live_env(monkeypatch)
+
+    class _Cpa:
+        target_provider = provider
+        target_model = ""
+
+    with pytest.raises(AppsRgEnvelopeProviderResolutionError, match="MODEL_NOT_OBSERVED"):
+        _provider_profile_for_cpa(
+            _Cpa(),
+            provider_mode=ProviderMode.LIVE_ALLOWED,
+            run_mode=ProviderRunMode.LIVE_REQUIRED,
+        )
+
+
 def test_live_http_error_no_stub_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
     _live_env(monkeypatch)
     prep = MagicMock()

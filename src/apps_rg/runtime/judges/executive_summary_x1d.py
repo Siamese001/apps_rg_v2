@@ -17,22 +17,13 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-from agentic_core.config.model_catalog import (
-    GEMINI_2_FAMILY_PREFIX,
-    GEMINI_3_FAMILY_PREFIX,
-    OPENAI_GPT5_FAMILY_PREFIX,
-)
 from apps_rg.runtime.env_bootstrap import bootstrap_process_env_if_needed
 from apps_rg.runtime.judges.executive_summary_x1d_dimension_verdicts import (
     dimension_verdicts_json_schema_fragment,
     ensure_dimension_verdicts,
 )
-from apps_rg.runtime.providers.anthropic_prompt_cache import (
-    anthropic_prompt_cache_enabled,
-    anthropic_prompt_cache_telemetry_enabled,
-    build_cache_receipt_from_usage,
-)
 from apps_rg.runtime.section_judge_policy import get_section_judge_policy
+from apps_rg.runtime.model_capabilities import try_model_capabilities
 from apps_rg.runtime.section_model_limits import runtime_limit_float, runtime_limit_int
 from apps_rg.runtime.model_token_governor import reserve_apps_rg_model_tokens
 from apps_model_telemetry.external_model_usage import append_external_model_usage
@@ -42,7 +33,6 @@ JUDGE_INPUT_PROMPT_VERSION = "executive_summary_x1d_system_contract_once_v2"
 DEFAULT_THRESHOLD = 0.80
 VALID_SCORE_SCALES = frozenset({"0_to_1", "0_to_5"})
 JUDGE_REQUIRED_FIELDS = ("score_scale", "score", "threshold", "pass")
-ENV_APPS_RG_GEMINI_GRADE_ONLY_THINKING = "APPS_RG_GEMINI_GRADE_ONLY_THINKING"
 
 
 def _record_x1d_external_usage(
@@ -80,7 +70,6 @@ def _record_x1d_external_usage(
             raw_response_ref=raw_response_ref,
         )
     except OSError:
-        # A diagnostic artifact failure must not change a model-backed verdict.
         return
 
 
@@ -134,13 +123,24 @@ def _x1d_token_budget_blocked_output(
     )
 
 
-def _is_openai_gpt5_chat_model(model: str) -> bool:
-    return str(model or "").startswith(OPENAI_GPT5_FAMILY_PREFIX)
+def _openai_chat_uses_max_completion_tokens(model: str) -> bool:
+    capabilities = try_model_capabilities(model)
+    return bool(
+        capabilities
+        and capabilities.provider == "openai"
+        and capabilities.supports_endpoint("chat_completions")
+        and capabilities.max_output_tokens_parameter_for("chat_completions")
+        == "max_completion_tokens"
+    )
 
 
-def _uses_gemini_preview_endpoint(model: str) -> bool:
-    mid = str(model or "")
-    return "preview" in mid or mid.startswith(GEMINI_2_FAMILY_PREFIX) or mid.startswith(GEMINI_3_FAMILY_PREFIX)
+def _uses_gemini_v1beta_endpoint(model: str) -> bool:
+    capabilities = try_model_capabilities(model)
+    return bool(
+        capabilities
+        and capabilities.provider == "google_gemini"
+        and capabilities.supports_endpoint("gemini_generate_content_v1beta")
+    )
 
 
 def _resolved_x1d_judge_max_output_tokens(*, attempt: int = 1) -> int:
@@ -153,7 +153,6 @@ def _resolved_x1d_judge_max_output_tokens(*, attempt: int = 1) -> int:
 GOOGLE_AI_JUDGE_MAX_OUTPUT_TOKENS = _resolved_x1d_judge_max_output_tokens(attempt=1)
 # Back-compat alias for tests and external imports (same unified resolution).
 GEMINI_JUDGE_MAX_OUTPUT_TOKENS = GOOGLE_AI_JUDGE_MAX_OUTPUT_TOKENS
-ANTHROPIC_JUDGE_MAX_OUTPUT_TOKENS = _resolved_x1d_judge_max_output_tokens(attempt=1)
 
 
 def _resolved_openai_judge_max_completion_tokens(*, attempt: int = 1) -> int:
@@ -317,7 +316,6 @@ def _build_rubric(*, include_score_schema: bool = True) -> str:
 # Preserve the complete canonical rubric for contract audits and input
 # provenance. Provider system instructions own the output/score contract.
 RUBRIC = _build_rubric()
-# The user message carries only its non-duplicated, evidence-evaluation part.
 JUDGE_USER_PROMPT_RUBRIC = _build_rubric(include_score_schema=False)
 
 
@@ -380,13 +378,15 @@ class JudgeOutput:
         data["mocked"] = data.get("evaluator_mode") == "MOCKED"
         if data.get("fallback_model"):
             data["fallback_used"] = True
+        if self.provider_key == "gemini_pro" and self.reasoning_effort:
+            data["thinking_level"] = self.reasoning_effort
         return data
 
 
 # Provider configuration
 PROVIDERS = {
     "gemini_pro": {
-        "provider_name": "Google Gemini 3.1 Pro Preview",
+        "provider_name": "Google Gemini 3.6 Flash",
         "env": "GOOGLE_API_KEY",
         # GEMINI_API_KEY is a deprecated legacy alias (same credential as Google AI Gemini).
         "env_fallbacks": ("GEMINI_API_KEY",),
@@ -395,16 +395,11 @@ PROVIDERS = {
         "provider_name": "OpenAI ChatGPT",
         "env": "OPENAI_API_KEY",
     },
-    "anthropic_claude": {
-        "provider_name": "Anthropic Claude",
-        "env": "ANTHROPIC_API_KEY",
-    },
 }
 
 _ARTIFACT_PROVIDER_FILENAME_ALIASES = {
     "gemini_pro": "gemini",
     "openai_chatgpt": "openai",
-    "anthropic_claude": "claude",
 }
 
 
@@ -486,11 +481,7 @@ def _artifact_path(
     else:
         base = Path("artifacts/apps_rg/runtime_proofs/executive_summary")
     _ensure_dir(base)
-    leaf_provider = (
-        provider_key
-        if suffix == "anthropic_judge_cache_receipt"
-        else _ARTIFACT_PROVIDER_FILENAME_ALIASES.get(provider_key, provider_key)
-    )
+    leaf_provider = _ARTIFACT_PROVIDER_FILENAME_ALIASES.get(provider_key, provider_key)
     return base / f"x1d_{leaf_provider}_{suffix}_{ts}.json"
 
 
@@ -500,72 +491,6 @@ def _write_artifact(path: Path, data: Any) -> str:
     with open(_filesystem_path(path), "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False, default=str)
     return str(path)
-
-
-def _x1d_hash16(value: str) -> str:
-    return hashlib.sha256(str(value or "").encode("utf-8")).hexdigest()[:16]
-
-
-def _anthropic_judge_cache_seed(
-    *,
-    model: str,
-    system_prompt: str,
-    user_prompt: str,
-    input_hash: str,
-    packet_hash: str | None,
-    canonical_contract_hash: str | None,
-    section_id: str | None,
-) -> dict[str, Any]:
-    stable_hash = _x1d_hash16(system_prompt)
-    candidate_hash = _x1d_hash16(user_prompt)
-    contract_hash = str(canonical_contract_hash or stable_hash)
-    return {
-        "provider": "anthropic_claude",
-        "model": str(model or ""),
-        "section_id": str(section_id or "executive_summary"),
-        "cache_enabled": True,
-        "cache_strategy": "x1d_judge_system_v1",
-        "stable_prefix_hash": stable_hash,
-        "c0_prefix_hash": "",
-        "volatile_tail_hash": candidate_hash,
-        "x1d_cache_group_hash": _x1d_hash16(f"x1d:{contract_hash}:{stable_hash}"),
-        "judge_contract_hash": contract_hash,
-        "candidate_hash": candidate_hash,
-        "packet_hash": str(packet_hash or input_hash or ""),
-        "cache_marker_count": 1,
-        "input_tokens": None,
-        "output_tokens": None,
-        "cache_creation_input_tokens": None,
-        "cache_read_input_tokens": None,
-        "cache_hit_ratio": None,
-        "estimated_uncached_input_tokens": None,
-        "estimated_cached_input_tokens": None,
-        "cache_savings_estimate_source": "pending_anthropic_usage",
-    }
-
-
-def _anthropic_judge_system_for_payload(system_prompt: str) -> str | list[dict[str, Any]]:
-    if not anthropic_prompt_cache_enabled():
-        return system_prompt
-    return [
-        {
-            "type": "text",
-            "text": system_prompt,
-            "cache_control": {"type": "ephemeral"},
-        }
-    ]
-
-
-def _write_anthropic_judge_cache_receipt(
-    *,
-    provider_key: str,
-    artifact_base: Path | None,
-    receipt: dict[str, Any],
-) -> None:
-    if not (anthropic_prompt_cache_enabled() or anthropic_prompt_cache_telemetry_enabled()):
-        return
-    receipt_path = _artifact_path(provider_key, "anthropic_judge_cache_receipt", artifact_base=artifact_base)
-    _write_artifact(receipt_path, receipt)
 
 
 def _validate_judge_score_contract(
@@ -622,23 +547,6 @@ def _resolve_gemini_model(
     )
 
 
-def _resolve_anthropic_model(
-    meta: dict[str, Any],
-    *,
-    section_id: str = "executive_summary",
-) -> tuple[str, str]:
-    """Resolve Anthropic judge model via section_judge_profile tier matrix."""
-    from apps_rg.runtime.judges.section_judge_profile import resolve_section_proof_judge_model
-
-    resolution = resolve_section_proof_judge_model(section_id, "anthropic_claude")
-    if resolution.model_actual and not resolution.blocked:
-        return resolution.model_actual, resolution.model_source
-    raise RuntimeError(
-        resolution.block_reason
-        or f"proof judge model unavailable for section={section_id} provider=anthropic_claude"
-    )
-
-
 def _normalize_judge_result(raw: dict[str, Any]) -> dict[str, Any]:
     """Coerce provider-native judge JSON into the executive_summary_x1d schema."""
     result = dict(raw)
@@ -682,78 +590,34 @@ def _normalize_judge_result(raw: dict[str, Any]) -> dict[str, Any]:
 
 
 def _build_judge_user_prompt(resume_display_text: str, claim_ledger: list[dict[str, Any]]) -> str:
-    """Build the evidence-bearing user prompt for the canonical X1D system contract.
-
-    ``JUDGE_COMPACT_OUTPUT`` remains in every provider's canonical system
-    instruction.  Repeating it here consumed input context without adding a
-    second control, so the user message carries only the rubric and evidence.
-    """
+    """Build the evidence-bearing user prompt for the canonical X1D system contract."""
     return (
         f"{JUDGE_USER_PROMPT_RUBRIC}\n\nRESUME_DISPLAY_TEXT:\n{resume_display_text}\n\n"
         f"CLAIM_LEDGER:\n{json.dumps(claim_ledger, separators=(',', ':'))}"
     )
 
 
-def gemini_grade_only_thinking_enabled(environ: Mapping[str, str] | None = None) -> bool:
-    """Enable the W3 thinking-effort pilot only by explicit operator choice."""
-    env = os.environ if environ is None else environ
-    return str(env.get(ENV_APPS_RG_GEMINI_GRADE_ONLY_THINKING) or "").strip() == "1"
-
-
-def _gemini_thinking_config(*, model: str | None, section_id: str | None) -> dict[str, str] | None:
-    """Return a model-supported W3 thinking setting for compact grade-only JSON.
-
-    Gemini 3 Pro cannot turn thinking off.  The pilot therefore requests the
-    source-controlled ``thinkingLevel`` appropriate to the judge tier rather
-    than attempting an unsupported budget/disable setting.  It is intentionally
-    absent unless the operator opts in for this run.
-    """
-    if not gemini_grade_only_thinking_enabled():
-        return None
-    if not str(model or "").startswith(GEMINI_3_FAMILY_PREFIX):
-        return None
-    if section_id:
-        level = _section_judge_runtime_profile(section_id).gemini_thinking_level
-    else:
-        from apps_rg.runtime.section_judge_policy import JudgeTier, get_judge_runtime_profile
-
-        level = get_judge_runtime_profile(JudgeTier.STANDARD_REASONING).gemini_thinking_level
-    return {"thinkingLevel": level}
-
-
 def _gemini_generation_config(
     *,
+    thinking_level: str,
     attempt: int = 1,
     section_id: str | None = None,
-    model: str | None = None,
 ) -> dict[str, Any]:
     """Gemini generationConfig for compact schema-valid judge JSON."""
+    resolved_thinking_level = str(thinking_level or "").strip().lower()
+    if not resolved_thinking_level:
+        raise ValueError("Gemini proof judge thinking_level must be explicit")
     max_tokens = (
         _resolved_section_x1d_judge_max_output_tokens(section_id, attempt=attempt)
         if section_id
         else _resolved_x1d_judge_max_output_tokens(attempt=attempt)
     )
-    config: dict[str, Any] = {
-        "temperature": 0.1,
+    return {
+        "thinkingConfig": {"thinkingLevel": resolved_thinking_level},
         "maxOutputTokens": max_tokens,
         "responseMimeType": "application/json",
         "responseSchema": GEMINI_JUDGE_RESPONSE_SCHEMA,
     }
-    thinking_config = _gemini_thinking_config(model=model, section_id=section_id)
-    if thinking_config is not None:
-        config["thinkingConfig"] = thinking_config
-    return config
-
-
-def _extract_anthropic_message_text(data: dict[str, Any]) -> str:
-    """Extract assistant text from Anthropic messages API content blocks."""
-    chunks: list[str] = []
-    for block in data.get("content") or []:
-        if not isinstance(block, dict):
-            continue
-        if block.get("type") == "text" and block.get("text"):
-            chunks.append(str(block["text"]))
-    return "".join(chunks)
 
 
 def _gemini_judge_max_retries() -> int:
@@ -1123,11 +987,31 @@ def _make_model_backed_output(
     )
 
 
-def _openai_reasoning_effort_supported(model: str) -> bool:
-    """True only for OpenAI model families that accept reasoning.effort in chat completions."""
-    mid = str(model or "").strip().lower()
-    # Catalog OpenAI chat judge models reject the reasoning parameter (400 unknown_parameter).
-    return mid.startswith("o3") or mid.startswith("o4")
+def _openai_judge_uses_responses_api(model: str) -> bool:
+    """Route exact catalog-approved proof judges through the Responses transport."""
+    capabilities = try_model_capabilities(model)
+    return bool(
+        capabilities
+        and capabilities.provider == "openai"
+        and capabilities.proof_eligible
+        and capabilities.supports_endpoint("responses")
+    )
+
+
+def _openai_responses_text(data: dict[str, Any]) -> str:
+    text = str(data.get("output_text") or "").strip()
+    if text:
+        return text
+    parts: list[str] = []
+    for item in data.get("output") or []:
+        if not isinstance(item, dict):
+            continue
+        for block in item.get("content") or []:
+            if isinstance(block, dict) and block.get("type") in {"output_text", "text"}:
+                value = str(block.get("text") or "").strip()
+                if value:
+                    parts.append(value)
+    return "\n".join(parts)
 
 
 def _x1d_provider_request_receipt_fields(
@@ -1138,6 +1022,8 @@ def _x1d_provider_request_receipt_fields(
     input_hash: str,
     max_tokens: int,
     response_format: str,
+    temperature: float | None = 0.1,
+    thinking_level: str | None = None,
 ) -> dict[str, Any]:
     receipt = judge_receipt or {}
     return {
@@ -1149,7 +1035,8 @@ def _x1d_provider_request_receipt_fields(
             json.dumps(GEMINI_JUDGE_RESPONSE_SCHEMA, sort_keys=True).encode()
         ).hexdigest()[:16],
         "max_tokens": max_tokens,
-        "temperature": 0.1,
+        "temperature": temperature,
+        "thinking_level": thinking_level,
         "response_format": response_format,
     }
 
@@ -1171,30 +1058,35 @@ def _call_openai(
 ) -> JudgeOutput:
     """Call OpenAI API with full artifact preservation."""
     system_content = build_x1d_judge_system_prompt(compact=True)
-    # Build request payload
-    payload: dict[str, Any] = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_content},
-            {"role": "user", "content": prompt},
-        ],
-    }
-    # GPT-5 family: max_completion_tokens only; temperature/reasoning rejected on current chat SKUs.
     max_tokens = (
         _resolved_section_x1d_judge_max_output_tokens(section_id, attempt=attempt)
         if section_id
         else _resolved_x1d_judge_max_output_tokens(attempt=attempt)
     )
     judge_max_attempts = _section_x1d_judge_max_attempts(section_id) if section_id else _x1d_judge_max_attempts()
-    if _is_openai_gpt5_chat_model(model):
-        payload["max_completion_tokens"] = max_tokens
-        effort = (reasoning_effort or "").strip()
-        if effort and _openai_reasoning_effort_supported(model):
-            payload["reasoning"] = {"effort": effort}
-    else:
-        payload["max_tokens"] = max_tokens
-        payload["temperature"] = 0.1
-        payload["response_format"] = {"type": "json_object"}
+    uses_responses_api = _openai_judge_uses_responses_api(model)
+    if not uses_responses_api:
+        raise ValueError(f"Unsupported OpenAI proof judge model for Responses transport: {model!r}")
+    effort = (reasoning_effort or "").strip().lower()
+    if not effort:
+        raise ValueError("OpenAI proof judge reasoning_effort must be explicit")
+    payload: dict[str, Any] = {
+        "model": model,
+        "input": [
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": prompt},
+        ],
+        "max_output_tokens": max_tokens,
+        "reasoning": {"effort": effort},
+        "text": {
+            "format": {
+                "type": "json_schema",
+                "name": "apps_rg_x1d_judge",
+                "strict": True,
+                "schema": GEMINI_JUDGE_RESPONSE_SCHEMA,
+            }
+        },
+    }
 
     budget_block = _x1d_token_budget_blocked_output(
         artifact_base=artifact_base,
@@ -1228,7 +1120,8 @@ def _call_openai(
             model_env_source=model_env_source,
             input_hash=input_hash,
             max_tokens=max_tokens,
-            response_format="json_object" if not _is_openai_gpt5_chat_model(model) else "gpt5_completion",
+            response_format="responses_json_schema",
+            temperature=None,
         ),
     }
     if judge_receipt:
@@ -1236,7 +1129,7 @@ def _call_openai(
     _write_artifact(req_path, req_doc)
     
     req = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
+        "https://api.openai.com/v1/responses",
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
         method="POST",
@@ -1297,11 +1190,9 @@ def _call_openai(
             response_id=str(usage_doc.get("id") or ""),
             raw_response_ref=str(raw_path),
         )
-        choice = data["choices"][0]
-        message = choice.get("message") or {}
-        content = str(message.get("content") or "")
-        finish_reason = str(choice.get("finish_reason") or "")
-    except (json.JSONDecodeError, KeyError, IndexError, TypeError) as e:
+        content = _openai_responses_text(data)
+        finish_reason = str(data.get("status") or "")
+    except (json.JSONDecodeError, TypeError) as e:
         parse_err_path = _artifact_path(provider_key, "provider_parse_result", artifact_base=artifact_base)
         _write_artifact(
             parse_err_path,
@@ -1317,13 +1208,13 @@ def _call_openai(
             model_name=model,
         )
 
-    if not content.strip() and finish_reason.lower() == "length":
+    if not content.strip() and finish_reason.lower() == "incomplete":
         parse_err_path = _artifact_path(provider_key, "provider_parse_result", artifact_base=artifact_base)
         usage = data.get("usage") or {}
         _write_artifact(
             parse_err_path,
             {
-                "error": "empty_content_length",
+                "error": "empty_content_incomplete",
                 "finish_reason": finish_reason,
                 "usage": usage,
                 "raw_response_ref": str(raw_path),
@@ -1336,7 +1227,7 @@ def _call_openai(
             "BLOCKED_RESPONSE_PARSE_ERROR",
             "BLOCKED_RESPONSE_PARSE_ERROR",
             (
-                "OpenAI judge returned empty content (finish_reason=length); "
+                f"OpenAI judge returned empty content (finish_reason={finish_reason}); "
                 "completion token budget likely consumed by reasoning — retriable"
             ),
             raw_response_ref=str(raw_path),
@@ -1349,7 +1240,7 @@ def _call_openai(
         model_name=model,
         raw_path=raw_path,
         text=content,
-        finish_reason=finish_reason if provider_key == "gemini_pro" else None,
+        finish_reason=finish_reason,
         artifact_base=artifact_base,
         judge_receipt=judge_receipt,
         model_requested=model_requested,
@@ -1409,292 +1300,6 @@ def _validate_judge_parse_result(
     return None
 
 
-def _call_anthropic(
-    api_key: str,
-    prompt: str,
-    model: str,
-    input_hash: str,
-    provider_key: str,
-    *,
-    model_source: str = "unknown",
-    artifact_base: Path | None = None,
-    model_requested: str | None = None,
-    judge_receipt: dict[str, Any] | None = None,
-    attempt: int = 1,
-    packet_hash: str | None = None,
-    canonical_contract_hash: str | None = None,
-    section_id: str | None = None,
-) -> JudgeOutput:
-    """Call Anthropic API with full artifact preservation."""
-    original_model = model
-    fallback_model = None
-    section_max_attempts = (
-        _section_x1d_judge_max_attempts(section_id)
-        if section_id
-        else max(1, min(2, _x1d_judge_max_attempts()))
-    )
-    max_tokens = (
-        _resolved_section_x1d_judge_max_output_tokens(section_id, attempt=attempt)
-        if section_id
-        else _resolved_x1d_judge_max_output_tokens(attempt=attempt)
-    )
-    system_prompt = build_x1d_judge_system_prompt(compact=True)
-    cache_seed = (
-        _anthropic_judge_cache_seed(
-            model=model,
-            system_prompt=system_prompt,
-            user_prompt=prompt,
-            input_hash=input_hash,
-            packet_hash=packet_hash,
-            canonical_contract_hash=canonical_contract_hash,
-            section_id=section_id,
-        )
-        if anthropic_prompt_cache_enabled()
-        else None
-    )
-    payload = {
-        "model": model,
-        "max_tokens": max_tokens,
-        "system": _anthropic_judge_system_for_payload(system_prompt),
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.1,
-    }
-    from apps_rg.runtime.providers.external_provider import apply_anthropic_temperature_capability
-
-    apply_anthropic_temperature_capability(payload)
-
-    budget_block = _x1d_token_budget_blocked_output(
-        artifact_base=artifact_base,
-        provider="anthropic",
-        provider_key=provider_key,
-        model=model,
-        input_hash=input_hash,
-        prompt=prompt,
-        max_output_tokens=max_tokens,
-        section_id=section_id,
-        attempt=attempt,
-    )
-    if budget_block is not None:
-        return budget_block
-
-    # Write request artifact
-    req_path = _artifact_path(provider_key, "provider_request", artifact_base=artifact_base)
-    req_doc = {
-        "payload": payload,
-        "input_hash": input_hash,
-        "packet_hash": packet_hash,
-        "canonical_contract_hash": canonical_contract_hash,
-        "provider_name": "anthropic",
-        "model_env_source": model_source,
-        "max_tokens": max_tokens,
-        "temperature": payload.get("temperature"),
-        "response_format": "system_json_instruction",
-        "judge_attempt": attempt,
-        "judge_max_attempts": section_max_attempts,
-        "original_model": original_model,
-        "resolved_model": model,
-        "resolved_model_source": model_source,
-        "model_requested": model_requested or model,
-        "model_actual": model,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "anthropic_judge_cache_receipt_seed": cache_seed,
-    }
-    if judge_receipt:
-        req_doc["judge_receipt"] = judge_receipt
-    _write_artifact(req_path, req_doc)
-
-    req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=json.dumps(payload).encode(),
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        },
-        method="POST",
-    )
-
-    if not _judge_live_https_allowed_under_pytest():
-        return _pytest_network_disabled_blocked_output(
-            provider_key=provider_key,
-            input_hash=input_hash,
-            model=model,
-            service_label="Anthropic",
-        )
-
-    try:
-        with urllib.request.urlopen(req, timeout=60) as response:
-            raw_response = response.read().decode()
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode()
-
-        # Check for 404 model not found
-        if e.code == 404 or "not_found_error" in error_body:
-            err_path = _artifact_path(provider_key, "provider_response_raw", artifact_base=artifact_base)
-            _write_artifact(err_path, {
-                "error": True,
-                "status_code": e.code,
-                "requested_model": model,
-                "body": error_body,
-                "input_hash": input_hash
-            })
-            _record_x1d_external_usage(
-                artifact_base=artifact_base,
-                provider="anthropic",
-                model=model,
-                input_hash=input_hash,
-                section_id=section_id,
-                logical_attempt=attempt,
-                transport_attempt=1,
-                outcome=f"HTTP_{e.code}",
-                provider_status="BLOCKED_MODEL_NOT_FOUND",
-                raw_response_ref=str(err_path),
-            )
-            
-            return _make_blocked_output(
-                provider_key, input_hash, "BLOCKED_MODEL_NOT_FOUND",
-                "BLOCKED_MODEL_NOT_FOUND", f"Model not found: {model}",
-                raw_response_ref=str(err_path), model_name=model,
-                original_model=original_model, fallback_model=fallback_model
-            )
-        
-        # Other HTTP errors
-        err_path = _artifact_path(provider_key, "provider_response_raw", artifact_base=artifact_base)
-        _write_artifact(err_path, {"error": True, "status_code": e.code, "body": error_body, "input_hash": input_hash})
-        _record_x1d_external_usage(
-            artifact_base=artifact_base,
-            provider="anthropic",
-            model=model,
-            input_hash=input_hash,
-            section_id=section_id,
-            logical_attempt=attempt,
-            transport_attempt=1,
-            outcome=f"HTTP_{e.code}",
-            provider_status="BLOCKED_PROVIDER_UNAVAILABLE",
-            raw_response_ref=str(err_path),
-        )
-        return _make_blocked_output(
-            provider_key, input_hash, "BLOCKED_PROVIDER_UNAVAILABLE",
-            "BLOCKED_PROVIDER_UNAVAILABLE", f"Anthropic API error {e.code}: {error_body}",
-            raw_response_ref=str(err_path), model_name=model,
-            original_model=original_model, fallback_model=fallback_model
-        )
-    
-    # Write raw response artifact
-    raw_path = _artifact_path(provider_key, "provider_response_raw", artifact_base=artifact_base)
-    _write_artifact(raw_path, {"raw_response": raw_response, "input_hash": input_hash})
-    
-    try:
-        data = json.loads(raw_response)
-        usage_doc = data if isinstance(data, Mapping) else {}
-        _record_x1d_external_usage(
-            artifact_base=artifact_base,
-            provider="anthropic",
-            model=str(usage_doc.get("model") or model),
-            input_hash=input_hash,
-            section_id=section_id,
-            logical_attempt=attempt,
-            transport_attempt=1,
-            outcome="SUCCESS",
-            provider_status="RESPONSE_RECEIVED",
-            usage=usage_doc.get("usage") if isinstance(usage_doc.get("usage"), Mapping) else None,
-            response_id=str(usage_doc.get("id") or ""),
-            raw_response_ref=str(raw_path),
-        )
-        text = _extract_anthropic_message_text(data)
-        stop_reason = str(data.get("stop_reason") or "")
-        if cache_seed is not None:
-            usage = data.get("usage") if isinstance(data, dict) else None
-            _write_anthropic_judge_cache_receipt(
-                provider_key=provider_key,
-                artifact_base=artifact_base,
-                receipt=build_cache_receipt_from_usage(
-                    seed=cache_seed,
-                    provider="anthropic_claude",
-                    model=model,
-                    section_id=section_id or "executive_summary",
-                    usage=usage if isinstance(usage, dict) else None,
-                ),
-            )
-    except (json.JSONDecodeError, KeyError, TypeError) as exc:
-        parse_err_path = _artifact_path(provider_key, "provider_parse_result", artifact_base=artifact_base)
-        _write_artifact(parse_err_path, {
-            "error": "response_structure",
-            "detail": str(exc),
-            "raw_response_ref": str(raw_path),
-        })
-        if attempt < section_max_attempts and attempt < 2 and canonical_contract_hash and packet_hash:
-            retry_path = _artifact_path(provider_key, "anthropic_judge_retry_receipt", artifact_base=artifact_base)
-            _write_artifact(
-                retry_path,
-                {
-                    "reason": "parse_error_retry",
-                    "canonical_contract_hash": canonical_contract_hash,
-                    "packet_hash": packet_hash,
-                    "attempt": attempt,
-                    "next_attempt": attempt + 1,
-                    "retry_authority": "JudgePanelRunner",
-                },
-            )
-        return _make_blocked_output(
-            provider_key,
-            input_hash,
-            "BLOCKED_RESPONSE_PARSE_ERROR",
-            "BLOCKED_RESPONSE_PARSE_ERROR",
-            f"Anthropic response parse error: {exc}",
-            raw_response_ref=str(raw_path),
-            model_name=model,
-            original_model=original_model,
-            fallback_model=fallback_model,
-        )
-
-    if stop_reason == "max_tokens":
-        if attempt < section_max_attempts and attempt < 2 and canonical_contract_hash and packet_hash:
-            retry_path = _artifact_path(provider_key, "anthropic_judge_retry_receipt", artifact_base=artifact_base)
-            _write_artifact(
-                retry_path,
-                {
-                    "reason": "max_tokens_truncation",
-                    "stop_reason": stop_reason,
-                    "canonical_contract_hash": canonical_contract_hash,
-                    "packet_hash": packet_hash,
-                    "attempt": attempt,
-                    "next_attempt": attempt + 1,
-                    "retry_authority": "JudgePanelRunner",
-                    "next_max_tokens": (
-                        _resolved_section_x1d_judge_max_output_tokens(section_id, attempt=2)
-                        if section_id
-                        else _resolved_x1d_judge_max_output_tokens(attempt=2)
-                    ),
-                },
-            )
-        return _make_blocked_output(
-            provider_key,
-            input_hash,
-            "BLOCKED_RESPONSE_PARSE_ERROR",
-            "BLOCKED_RESPONSE_PARSE_ERROR",
-            f"Anthropic truncated (finish_reason={stop_reason}); not a content-quality judge verdict",
-            raw_response_ref=str(raw_path),
-            model_name=model,
-            original_model=original_model,
-            fallback_model=fallback_model,
-        )
-
-    out = _finish_judge_text_parse(
-        provider_key=provider_key,
-        input_hash=input_hash,
-        model_name=model,
-        raw_path=raw_path,
-        text=text,
-        original_model=original_model,
-        fallback_model=fallback_model,
-        artifact_base=artifact_base,
-        judge_receipt=judge_receipt,
-        model_requested=model_requested,
-    )
-    return _attach_judge_receipt_fields(out, judge_receipt, model_requested=model_requested or model)
-
-
 def _finish_judge_text_parse(
     *,
     provider_key: str,
@@ -1710,11 +1315,11 @@ def _finish_judge_text_parse(
     model_requested: str | None = None,
 ) -> JudgeOutput:
     """Parse extracted judge text into JudgeOutput or blocked status."""
-    if (
-        provider_key == "gemini_pro"
-        and finish_reason
-        and str(finish_reason).upper() not in ("STOP",)
-    ):
+    allowed_finish_reasons = {
+        "gemini_pro": {"STOP"},
+        "openai_chatgpt": {"COMPLETED"},
+    }
+    if finish_reason and str(finish_reason).upper() not in allowed_finish_reasons.get(provider_key, set()):
         parse_err_path = _artifact_path(provider_key, "provider_parse_result", artifact_base=artifact_base)
         _write_artifact(parse_err_path, {
             "error": "finish_reason",
@@ -1727,7 +1332,7 @@ def _finish_judge_text_parse(
             input_hash,
             "BLOCKED_RESPONSE_PARSE_ERROR",
             "BLOCKED_RESPONSE_PARSE_ERROR",
-            f"Gemini finishReason={finish_reason} (incomplete judge JSON)",
+            f"{provider_key} finish/status={finish_reason} (incomplete judge JSON)",
             raw_response_ref=str(raw_path),
             model_name=model_name,
             original_model=original_model,
@@ -1808,6 +1413,7 @@ def _call_gemini(
     artifact_base: Path | None = None,
     model_requested: str | None = None,
     judge_receipt: dict[str, Any] | None = None,
+    thinking_level: str | None = None,
     attempt: int = 1,
     section_id: str | None = None,
 ) -> JudgeOutput:
@@ -1819,10 +1425,13 @@ def _call_gemini(
         if section_id
         else _resolved_x1d_judge_max_output_tokens(attempt=attempt)
     )
+    resolved_thinking_level = str(thinking_level or "").strip().lower()
+    if not resolved_thinking_level:
+        raise ValueError("Gemini proof judge thinking_level must be explicit")
     generation_config = _gemini_generation_config(
+        thinking_level=resolved_thinking_level,
         attempt=attempt,
         section_id=section_id,
-        model=model,
     )
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -1844,7 +1453,7 @@ def _call_gemini(
     if budget_block is not None:
         return budget_block
 
-    endpoint_version = "v1beta" if _uses_gemini_preview_endpoint(model) else "v1"
+    endpoint_version = "v1beta" if _uses_gemini_v1beta_endpoint(model) else "v1"
     url = f"https://generativelanguage.googleapis.com/{endpoint_version}/models/{model}:generateContent?key={api_key}"
 
     retries = _gemini_judge_max_retries()
@@ -1859,6 +1468,7 @@ def _call_gemini(
         "resolved_model_source": model_source,
         "model_requested": model_requested or model,
         "model_actual": model,
+        "thinking_level": resolved_thinking_level,
         "provider_key": provider_key,
         "request_timeout_seconds": 60,
         "gemini_max_retries_configured": retries,
@@ -1875,6 +1485,8 @@ def _call_gemini(
             input_hash=input_hash,
             max_tokens=max_tokens,
             response_format="responseSchema",
+            temperature=None,
+            thinking_level=resolved_thinking_level,
         ),
     }
     if judge_receipt:
@@ -2004,7 +1616,7 @@ def _call_gemini(
     )
 
     text, finish_reason = _extract_gemini_text(data)
-    return _finish_judge_text_parse(
+    out = _finish_judge_text_parse(
         provider_key=provider_key,
         input_hash=input_hash,
         model_name=model,
@@ -2015,6 +1627,8 @@ def _call_gemini(
         judge_receipt=judge_receipt,
         model_requested=model_requested,
     )
+    out.reasoning_effort = resolved_thinking_level
+    return out
 
 
 def _mocked_output(provider_key: str, input_hash: str) -> JudgeOutput:
@@ -2244,26 +1858,6 @@ def run_llm_judges(
                     provider_key=key,
                     section_id=sid,
                 )
-            elif key == "anthropic_claude":
-                output = _invoke_judge_with_bounded_retries(
-                    lambda attempt, _api=api_key, _prompt=prompt, _model=model: _call_anthropic(
-                        _api,
-                        _prompt,
-                        _model,
-                        input_hash,
-                        key,
-                        model_source=model_source,
-                        artifact_base=artifact_base,
-                        model_requested=model_requested,
-                        judge_receipt=receipt,
-                        attempt=attempt,
-                        packet_hash=input_hash,
-                        canonical_contract_hash=contract_hash,
-                        section_id=sid,
-                    ),
-                    provider_key=key,
-                    section_id=sid,
-                )
             else:
                 output = _invoke_judge_with_bounded_retries(
                     lambda attempt, _api=api_key, _prompt=prompt, _model=model: _call_gemini(
@@ -2276,6 +1870,7 @@ def run_llm_judges(
                         artifact_base=artifact_base,
                         model_requested=model_requested,
                         judge_receipt=receipt,
+                        thinking_level=reasoning_effort,
                         attempt=attempt,
                         section_id=sid,
                     ),

@@ -3,48 +3,42 @@ app_id: apps_rg
 version: "1.0.0"
 status: active
 
+# apps_rg routing authority. Shared model catalogs may describe provider capabilities,
+# but they must not select an apps_rg generator, proof judge, or selector. Environment
+# variables may supply credentials/endpoints only; model identities resolve from this file.
+model_pin_ownership:
+  routing_ssot: apps_rg/config/provider_profiles.yaml
+  shared_catalog_role: capability_metadata_only
+  environment_model_override_allowed: false
+  receipt_identity_source: observed_provider_response
+  role_paths:
+    generation: profiles.*.model_by_section
+    proof_judge: judge_models
+    selector: selector_models
+
 wave10a_policy:
   default_provider: external_claude
   external_default_status: claude_default_for_apps_rg_e2e
 
 profiles:
-  local_qwen_generator:
-    profile_id: apps_rg::provider::local_qwen_generator::v1
-    provider_profile: local_qwen_generator
-    provider_class: local_vllm
-    provider_vendor: local_vllm
-    model_id: Qwen/Qwen2.5-32B-Instruct-AWQ
-    endpoint_env_var: VLLM_BASE_URL
-    capabilities:
-      - text_generation
-      - structured_json_generation
-      - judge_grade_only
-    max_tokens: 4096
-    timeout_seconds: 60
-    default: false
-
-  local_generator_stub:
-    profile_id: apps_rg::provider::local_generator_stub::v1
-    provider_profile: local_generator_stub
-    provider_class: stub
-    capabilities:
-      - text_generation
-      - structured_json_generation
-    endpoint_env_var: null
-    api_key_env_var: null
-    default: false
-
   external_openai_generator:
     profile_id: apps_rg::provider::external_openai_generator::v1
     provider_profile: external_openai
     provider_class: external_api
+    pin_owner: apps_rg.section_generation.openai
+    pin_review_after: "2026-11-07"
     # Explicit OpenAI generation pins. No provider-level default model is allowed for
     # proof-bearing apps_rg lanes.
     model_by_section:
-      unify_narrative: gpt-5.4-mini-2026-03-17
-      ibm_narrative: gpt-5.4-mini-2026-03-17
-      insurtech_narrative: gpt-5.4-mini-2026-03-17
-      ey_narrative: gpt-5.4-mini-2026-03-17
+      unify_narrative: gpt-5.6-luna
+      ibm_narrative: gpt-5.6-luna
+      insurtech_narrative: gpt-5.6-luna
+      ey_narrative: gpt-5.6-luna
+    effort_by_section:
+      unify_narrative: medium
+      ibm_narrative: medium
+      insurtech_narrative: low
+      ey_narrative: low
     endpoint_env_var: APPS_RG_EXTERNAL_OPENAI_BASE_URL
     api_key_env_var: OPENAI_API_KEY
     capabilities:
@@ -57,6 +51,8 @@ profiles:
     profile_id: apps_rg::provider::external_claude_generator::v1
     provider_profile: external_claude
     provider_class: external_api
+    pin_owner: apps_rg.section_generation.claude
+    pin_review_after: "2026-11-07"
     # Explicit Claude generation pins. No provider-level default model is allowed for
     # proof-bearing apps_rg lanes.
     model_by_section:
@@ -67,6 +63,14 @@ profiles:
       ey_bullets: claude-sonnet-5
       headline: claude-sonnet-5
       executive_summary: claude-sonnet-5
+    effort_by_section:
+      competencies: high
+      unify_bullets: medium
+      ibm_bullets: medium
+      insurtech_bullets: low
+      ey_bullets: low
+      headline: medium
+      executive_summary: high
     endpoint_env_var: APPS_RG_EXTERNAL_CLAUDE_BASE_URL
     api_key_env_var: ANTHROPIC_API_KEY
     capabilities:
@@ -120,23 +124,35 @@ profiles:
 # the SSOT is unreadable or incomplete.
 judge_models:
   enhanced:
-    gemini_pro: gemini-3.1-pro-preview
-    openai_chatgpt: gpt-5.5
-    anthropic_claude: claude-sonnet-5
+    gemini_pro: gemini-3.6-flash
+    openai_chatgpt: gpt-5.6-sol
   standard:
-    gemini_pro: gemini-3.1-pro-preview
-    openai_chatgpt: gpt-5.5
-    anthropic_claude: claude-sonnet-5
+    gemini_pro: gemini-3.6-flash
+    openai_chatgpt: gpt-5.6-sol
+
+judge_model_governance:
+  owner: apps_rg.section_proof_judges
+  review_after: "2026-11-07"
+  proof_eligible: true
 
 # Selector models are live provider calls that choose among self-consistency pools.
 # They are advisory/non-proof receipts and must never satisfy X1D proof gates.
 selector_models:
   competencies_graph_pool_selector:
-    provider_key: openai_chatgpt
-    model: gpt-5.5
+    provider_key: anthropic_claude
+    model: claude-sonnet-5
+    reasoning_effort: high
+    role: advisory_selector
+    owner: apps_rg.competencies_graph_pool
+    review_after: "2026-11-07"
+    proof_eligible: false
   employment_bullet_pool_selector:
     provider_key: anthropic_claude
     model: claude-sonnet-5
+    role: advisory_selector
+    owner: apps_rg.employment_bullet_pool
+    review_after: "2026-11-07"
+    proof_eligible: false
 
 runtime_limits:
   section_context_window: 131072
@@ -166,7 +182,8 @@ runtime_limits:
     x1d_max_attempts: 3
     retry_backoff_base_seconds: 0.5
     retry_backoff_max_seconds: 4.0
-    openai_enhanced_reasoning_effort: high
+    gemini_proof_thinking_level: high
+    openai_proof_reasoning_effort: high
     runtime_profiles:
       optional_advisory_taxonomy_only:
         judge_weight: 1

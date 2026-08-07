@@ -19,12 +19,15 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from apps_research.config.model_pins import apps_rg_handoff_judge_pin
 from apps_research.types.jd_intent_coverage import (
     infer_evidence_intents_from_text,
     intent_ids,
     required_families_for_intents,
     signal_terms_for_intents,
 )
+
+_HANDOFF_JUDGE_PIN = apps_rg_handoff_judge_pin()
 
 @dataclass(frozen=True)
 class BriefingProfile:
@@ -185,8 +188,8 @@ class BriefingSemanticsAssessment:
     signal_terms_missing: tuple[str, ...] = ()
     evidence_intents: tuple[str, ...] = ()
     handoff_eligible: bool = False
-    judge_name: str = "gemini_pro"
-    judge_model: str = "gemini-3.1-pro-preview"
+    judge_name: str = _HANDOFF_JUDGE_PIN.provider_key
+    judge_model: str = _HANDOFF_JUDGE_PIN.model
     reason: str = ""
 
     def as_dict(self) -> dict[str, Any]:

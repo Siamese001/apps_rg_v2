@@ -7,6 +7,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import apps_rg.runtime.providers.external_provider as external_provider_module
 import apps_rg.runtime.providers.section_provider_call as section_provider_call_module
 from apps_rg.runtime.section_model_limits import (
@@ -47,10 +49,10 @@ def test_provider_profiles_config_uses_external_claude_default() -> None:
     profiles = data["profiles"]
     assert "default_model" not in profiles["external_openai_generator"]
     assert profiles["external_openai_generator"]["model_by_section"] == {
-        "unify_narrative": "gpt-5.4-mini-2026-03-17",
-        "ibm_narrative": "gpt-5.4-mini-2026-03-17",
-        "insurtech_narrative": "gpt-5.4-mini-2026-03-17",
-        "ey_narrative": "gpt-5.4-mini-2026-03-17",
+        "unify_narrative": "gpt-5.6-luna",
+        "ibm_narrative": "gpt-5.6-luna",
+        "insurtech_narrative": "gpt-5.6-luna",
+        "ey_narrative": "gpt-5.6-luna",
     }
     assert profiles["external_openai_generator"]["default"] is False
     assert profiles["external_claude_generator"]["default"] is True
@@ -73,9 +75,9 @@ def test_external_claude_competencies_pin_is_sonnet() -> None:
     assert "haiku" not in DEFAULT_EXTERNAL_CLAUDE_MODEL
 
 
-def test_external_openai_narrative_pin_is_gpt_5_4_mini() -> None:
+def test_external_openai_narrative_pin_is_gpt_56_luna() -> None:
     assert external_openai_generation_model(section_id="unify_narrative") == DEFAULT_EXTERNAL_OPENAI_MODEL
-    assert DEFAULT_EXTERNAL_OPENAI_MODEL == "gpt-5.4-mini-2026-03-17"
+    assert DEFAULT_EXTERNAL_OPENAI_MODEL == "gpt-5.6-luna"
 
 
 def test_competencies_primary_and_backup_models() -> None:
@@ -232,14 +234,9 @@ def test_openai_responses_transport_omits_temperature_for_catalog_model(monkeypa
         return _Response()
 
     monkeypatch.setattr(external_provider_module.urllib.request, "urlopen", _urlopen)
-    monkeypatch.setattr(
-        external_provider_module,
-        "OPENAI_OMIT_TEMPERATURE_MODELS",
-        frozenset({"gpt-catalog"}),
-    )
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_OPENAI,
-        model="gpt-catalog",
+        model=pins.OPENAI_GENERATOR_MODEL,
         environ={"OPENAI_API_KEY": "test"},
     )
 
@@ -248,7 +245,7 @@ def test_openai_responses_transport_omits_temperature_for_catalog_model(monkeypa
     )
 
     assert response["text"] == "{\"ok\":true}"
-    assert captured["body"]["model"] == "gpt-catalog"
+    assert captured["body"]["model"] == pins.OPENAI_GENERATOR_MODEL
     assert "temperature" not in captured["body"]
 
 

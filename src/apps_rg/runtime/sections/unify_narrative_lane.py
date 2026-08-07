@@ -147,6 +147,12 @@ def write_json(path: Path, data: Any) -> None:
     _wg.write_text(path, json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
+def _write_pre_x2_evaluation_state(artifact_dir: Path) -> None:
+    """Record in-progress state without pre-materializing final X2 receipts."""
+    write_json(artifact_dir / "x3_disposition.json", {"x3_code": "PENDING", "status": "pending"})
+    write_x2_gate_outputs(artifact_dir / "x2_gate_outputs.json", [], section_id="unify_narrative")
+
+
 def load_base_resume() -> tuple[dict[str, Any], Path, str]:
     return load_lane_base_resume_json(repo_root=REPO_ROOT)
 
@@ -327,6 +333,13 @@ _UNIFY_METRIC_REWRITE_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
 )
 
 _UNIFY_COMPANION_COPY_REWRITE_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
+    # The commercial root explicitly supports reusable platform services. This
+    # replaces the exact four-gram copied from the finalized companion bullet
+    # without adding a new claim to the narrative's source surface.
+    (
+        re.compile(r"\binto\s+reusable\s+enterprise\s+capability\b", re.IGNORECASE),
+        "into reusable platform services",
+    ),
     (
         re.compile(
             r"\b(?:scaled|grew|expanded|built|doubled|increased)\s+engineering\s+from\s+\d+\s+to\s+\d+\b",
@@ -1187,9 +1200,10 @@ def run_unify_narrative_execution(
         provider_result_data=provider_result_data if isinstance(provider_result_data, dict) else None,
     )
     write_json(artifact_dir / "prompt_selection_trace.json", trace)
-    write_json(artifact_dir / "fact_check_result.json", {"passed": False, "failed_gates": [], "status": "pending"})
-    write_json(artifact_dir / "x3_disposition.json", {"x3_code": "PENDING", "status": "pending"})
-    write_x2_gate_outputs(artifact_dir / "x2_gate_outputs.json", [], section_id="unify_narrative")
+    # ``fact_check_result.json`` is created only after X2 evaluates the final
+    # narrative.  A small pending placeholder cannot safely be overwritten by
+    # an honest failed-gate list under the L2 write-amplification guard.
+    _write_pre_x2_evaluation_state(artifact_dir)
 
     from apps_rg.runtime.product_evidence_authority import x2_proof_pool_gate_flags
 

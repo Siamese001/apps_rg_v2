@@ -14,7 +14,6 @@ from apps_rg.runtime.judges.executive_summary_x1d import (
     JUDGE_COMPACT_OUTPUT,
     PROVIDERS,
     JudgeOutput,
-    _call_anthropic,
     _call_gemini,
     _call_openai,
     _invoke_judge_with_bounded_retries,
@@ -229,18 +228,6 @@ def run_full_resume_coherence_judges(
                         attempt=attempt_no,
                         section_id="full_resume_coherence",
                     )
-                if key == "anthropic_claude":
-                    return _call_anthropic(
-                        api_key,
-                        prompt,
-                        model,
-                        input_hash,
-                        key,
-                        model_source=model_source,
-                        artifact_base=artifact_base,
-                        attempt=attempt_no,
-                        section_id="full_resume_coherence",
-                    )
                 return _call_gemini(
                     api_key,
                     prompt,
@@ -249,6 +236,8 @@ def run_full_resume_coherence_judges(
                     key,
                     model_source=model_source,
                     artifact_base=artifact_base,
+                    model_requested=model_requested,
+                    thinking_level=reasoning_effort,
                     attempt=attempt_no,
                     section_id="full_resume_coherence",
                 )

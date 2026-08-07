@@ -9,11 +9,14 @@ import json
 import types
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 import apps_research
 
 from apps_research.engines.company_brief_engine import (
     APPS_RESEARCH_BRIEF_MODEL,
+    APPS_RESEARCH_BRIEF_REASONING_EFFORT,
     CompanyBriefEngine,
     CompanyBriefUnavailableError,
     _company_brief_primary_openai_model,
@@ -26,7 +29,8 @@ _PASS_X2_RECEIPT = {
     "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
     "judge_name": "gemini_pro",
     "judge_provider": "gemini_pro",
-    "judge_model": "gemini-3.1-pro-preview",
+    "judge_model": pins.GEMINI_PROOF_JUDGE_MODEL,
+    "thinking_level": pins.RESEARCH_JUDGE_REASONING_EFFORT,
     "threshold": 0.75,
     "model_backed": True,
     "status": "PASS",
@@ -143,6 +147,7 @@ def test_openai_synthesis_uses_pinned_model_and_output_tokens(monkeypatch: pytes
     responses = iter(
         [
             types.SimpleNamespace(
+                model=pins.RESEARCH_GENERATOR_MODEL,
                 choices=[
                     types.SimpleNamespace(
                         message=types.SimpleNamespace(
@@ -158,6 +163,7 @@ def test_openai_synthesis_uses_pinned_model_and_output_tokens(monkeypatch: pytes
                 ]
             ),
             types.SimpleNamespace(
+                model=pins.RESEARCH_GENERATOR_MODEL,
                 choices=[
                     types.SimpleNamespace(
                         message=types.SimpleNamespace(content="TestCo targeting brief")
@@ -168,11 +174,11 @@ def test_openai_synthesis_uses_pinned_model_and_output_tokens(monkeypatch: pytes
     )
 
     class _FakeChatCompletions:
-        def create(self, *, model, messages, temperature, max_completion_tokens):
+        def create(self, *, model, messages, reasoning_effort, max_completion_tokens):
             captured.append(
                 {
                     "model": model,
-                    "temperature": temperature,
+                    "reasoning_effort": reasoning_effort,
                     "max_completion_tokens": max_completion_tokens,
                     "messages": tuple(messages),
                 }
@@ -204,7 +210,11 @@ def test_openai_synthesis_uses_pinned_model_and_output_tokens(monkeypatch: pytes
         APPS_RESEARCH_BRIEF_MODEL,
     ]
     assert all(row["max_completion_tokens"] == 777 for row in captured)
-    assert APPS_RESEARCH_BRIEF_MODEL == "gpt-5.4-mini-2026-03-17"
+    assert all(
+        row["reasoning_effort"] == APPS_RESEARCH_BRIEF_REASONING_EFFORT == "medium"
+        for row in captured
+    )
+    assert APPS_RESEARCH_BRIEF_MODEL == pins.RESEARCH_GENERATOR_MODEL
 
 
 def test_company_brief_model_is_resolved_from_provider_profile() -> None:

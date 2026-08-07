@@ -19,7 +19,6 @@ DEFAULT_SUITE_SUMMARY_FILENAME = "anthropic_cache_suite_summary.json"
 _STANDALONE_RECEIPT_GLOBS: tuple[str, ...] = (
     "**/provider_cache_receipt*.json",
     "**/bullet_pool_selector_cache_receipt*.json",
-    "**/x1d_*anthropic_judge_cache_receipt*.json",
     "**/anthropic_cache_live_probe_receipt*.json",
 )
 

@@ -20,6 +20,10 @@ from pathlib import Path
 from typing import Any, Dict, Final, List, Optional
 
 from apps_research.engines.base_research_engine import BaseResearchEngine
+from apps_research.config.model_pins import (
+    AppsResearchModelPinError,
+    company_brief_generation_pin,
+)
 
 # W2 (apps-research-spine-deferred-followup-9c3e1a P2.2) — import catalog
 # and helpers from query_decomposer (L1 cognition layer). Re-export them
@@ -65,53 +69,24 @@ _SAME_RUN_RECOVERY_SIGNAL_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
         re.IGNORECASE,
     ),
 }
-_COMPANY_BRIEF_PROVIDER_PROFILE: Final[Path] = (
-    Path(__file__).resolve().parents[1]
-    / "config"
-    / "domain_contract"
-    / "provider_profile.company_brief.v1.yaml"
-)
-
-
-class CompanyBriefProviderProfileError(RuntimeError):
-    """Raised when apps_research company-brief provider profile is invalid."""
+CompanyBriefProviderProfileError = AppsResearchModelPinError
 
 
 def _company_brief_primary_openai_model() -> str:
     """Resolve the runtime synthesis model from the provider-profile SSOT."""
-    try:
-        import yaml  # noqa: PLC0415
-
-        data = yaml.safe_load(_COMPANY_BRIEF_PROVIDER_PROFILE.read_text(encoding="utf-8"))
-    except ImportError as exc:
-        raise CompanyBriefProviderProfileError(
-            f"Cannot load apps_research provider profile SSOT: {_COMPANY_BRIEF_PROVIDER_PROFILE}"
-        ) from exc
-    except (AttributeError, OSError, TypeError, UnicodeError, ValueError, yaml.YAMLError) as exc:
-        raise CompanyBriefProviderProfileError(
-            f"Cannot load apps_research provider profile SSOT: {_COMPANY_BRIEF_PROVIDER_PROFILE}"
-        ) from exc
-    lanes = (data or {}).get("approved_model_lanes") if isinstance(data, dict) else None
-    primary = lanes.get("primary") if isinstance(lanes, dict) else None
-    if not isinstance(primary, dict):
-        raise CompanyBriefProviderProfileError(
-            f"Missing approved_model_lanes.primary in {_COMPANY_BRIEF_PROVIDER_PROFILE}"
-        )
-    provider = str(primary.get("provider") or "").strip()
-    model = str(primary.get("model") or "").strip()
-    if provider != "external_openai":
+    pin = company_brief_generation_pin()
+    if pin.provider != "external_openai":
         raise CompanyBriefProviderProfileError(
             "CompanyBriefEngine currently supports only approved_model_lanes.primary.provider="
-            f"external_openai; got {provider!r} in {_COMPANY_BRIEF_PROVIDER_PROFILE}"
+            f"external_openai; got {pin.provider!r}"
         )
-    if not model:
-        raise CompanyBriefProviderProfileError(
-            f"Missing approved_model_lanes.primary.model in {_COMPANY_BRIEF_PROVIDER_PROFILE}"
-        )
-    return model
+    return pin.model
 
 
 APPS_RESEARCH_BRIEF_MODEL: Final[str] = _company_brief_primary_openai_model()
+APPS_RESEARCH_BRIEF_REASONING_EFFORT: Final[str] = (
+    company_brief_generation_pin().reasoning_effort
+)
 
 
 def _v2_enabled() -> bool:
@@ -431,19 +406,30 @@ class CompanyBriefEngine(BaseResearchEngine):
         brief["_sub_stages"] = _sub_stages
         if jd_context:
             brief["_jd_context"] = dict(jd_context)
-        # apps_rg targeting brief: fail closed on a failing C0 support gate.
-        # A brief produced before the gate result is only promoted to
-        # company_brief_text when the gate did not fail; otherwise we surface
-        # a sealed BLOCKED disposition and emit NO company_brief_text.
+        # apps_rg targeting brief: fail closed when the C0 gate fails, or when
+        # a caveated C0 result is missing evidence required by the target JD.
+        #
+        # COMPANY_BRIEF_STANDARD also measures generic company families such
+        # as competitive landscape.  Their absence remains visible in the C0
+        # receipt, but cannot invalidate an otherwise sealed targeting brief
+        # when its direct JD role context and every JD-required family are
+        # grounded.  Conversely, a WEAK result never passes merely because a
+        # downstream semantic judge liked the prose.
         targeting_disposition = str(synthesized.get("targeting_brief_disposition") or "").strip()
         if targeting_disposition:
             targeting_md = str(synthesized.get("apps_rg_targeting_brief_markdown") or "").strip()
             targeting_sidecar = synthesized.get("apps_rg_targeting_brief_sidecar") or {}
-            gate_blocks = str(gate_verdict).upper() != "PASS"
+            gate_blocks = not self._targeting_c0_gate_allows_handoff(
+                c0_bundle=c0_bundle,
+                gate_verdict=gate_verdict,
+            )
             if targeting_md and not gate_blocks and targeting_disposition == "SEALED":
                 brief["apps_rg_targeting_brief_text"] = targeting_md
                 brief["company_brief_text"] = targeting_md
                 brief["targeting_brief_disposition"] = "SEALED"
+                if str(gate_verdict).upper() == "WEAK_WITH_CAVEATS":
+                    brief["targeting_brief_c0_disposition"] = "CAVEATED_JD_COMPLETE"
+                    brief["targeting_brief_c0_caveat"] = gate_caveat
             else:
                 brief["targeting_brief_disposition"] = (
                     "BLOCKED" if gate_blocks else targeting_disposition
@@ -1174,7 +1160,7 @@ class CompanyBriefEngine(BaseResearchEngine):
                     },
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.2,
+                reasoning_effort=APPS_RESEARCH_BRIEF_REASONING_EFFORT,
                 max_completion_tokens=_resolved_gemini_max_output_tokens(),
             )
         except Exception as exc:  # guardian: allow-broad-exception -- OpenAI SDK raises heterogeneous transport/API errors; fail closed
@@ -1202,6 +1188,12 @@ class CompanyBriefEngine(BaseResearchEngine):
             response_id=str(getattr(resp, "id", "") or ""),
         )
         text = ""
+        observed_model = str(getattr(resp, "model", "") or "").strip()
+        if not observed_model:
+            raise CompanyBriefUnavailableError(
+                f"{topic}: OpenAI synthesis response did not report its model identity"
+            )
+        self._last_company_brief_generation_model_observed = observed_model
         if getattr(resp, "choices", None):
             try:
                 text = str(resp.choices[0].message.content or "").strip()
@@ -1221,7 +1213,7 @@ class CompanyBriefEngine(BaseResearchEngine):
         parsed = self._parse_synthesis(text, topic=topic, jd_facets=jd_facets)
         _emit_company_brief_marker(
             accepted=True,
-            model_used=model_name,
+            model_used=observed_model,
             fallback_reason="none",
             latency_ms=(time.time() - started) * 1000.0,
         )
@@ -1262,8 +1254,6 @@ class CompanyBriefEngine(BaseResearchEngine):
         company_name = str(jd_context.get("company_name") or "").strip() or topic
         jd_text = extract_jd_text(jd_context=jd_context, jd_anchor=jd_anchor)
         research_notes = format_research_findings(findings)
-        model_name = APPS_RESEARCH_BRIEF_MODEL
-
         has_research = bool(research_notes.strip())
         gate_failed = str(gate_verdict).upper() in {"FAIL", "EMPTY", "CONFLICTED"}
         if not has_research or gate_failed:
@@ -1388,6 +1378,13 @@ class CompanyBriefEngine(BaseResearchEngine):
                 f"{x2_judge_receipt.get('status', 'MISSING_RECEIPT')}; "
                 f"reason={x2_judge_receipt.get('reason', 'missing_model_backed_pass')}"
                 f"{diagnostic_suffix}"
+            )
+        model_name = str(
+            getattr(self, "_last_targeting_generation_model_observed", "") or ""
+        ).strip()
+        if not model_name:
+            raise CompanyBriefUnavailableError(
+                f"{company_name}: targeting brief generation model was not observed"
             )
         return {
             "synthesis_template": "apps_rg_targeting_brief_synthesis_v1",
@@ -1654,7 +1651,10 @@ class CompanyBriefEngine(BaseResearchEngine):
             "schema_version": "apps_research.apps_rg_targeting_brief_sidecar/v1",
             "company_name": company_name,
             "generation_provider": APPS_RG_HANDOFF_GENERATION_PROVIDER,
+            "generation_model_requested": APPS_RESEARCH_BRIEF_MODEL,
             "generation_model": model_name,
+            "generation_reasoning_effort": APPS_RESEARCH_BRIEF_REASONING_EFFORT,
+            "generation_model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
             "provider_call_attempted": True,
             "generation_token_budget": _resolved_gemini_max_output_tokens(),
             "judge_name": judge_name,
@@ -1775,7 +1775,7 @@ class CompanyBriefEngine(BaseResearchEngine):
                     },
                     {"role": "user", "content": prompt},
                 ],
-                temperature=0.2,
+                reasoning_effort=APPS_RESEARCH_BRIEF_REASONING_EFFORT,
                 max_completion_tokens=_resolved_gemini_max_output_tokens(),
             )
         except Exception as exc:  # guardian: allow-broad-exception -- OpenAI SDK raises heterogeneous transport/API errors; fail closed
@@ -1799,6 +1799,12 @@ class CompanyBriefEngine(BaseResearchEngine):
             usage=_openai_usage_mapping(resp),
             response_id=str(getattr(resp, "id", "") or ""),
         )
+        observed_model = str(getattr(resp, "model", "") or "").strip()
+        if not observed_model:
+            raise CompanyBriefUnavailableError(
+                "targeting brief OpenAI synthesis response did not report its model identity"
+            )
+        self._last_targeting_generation_model_observed = observed_model
         if not getattr(resp, "choices", None):
             raise CompanyBriefUnavailableError(
                 f"targeting brief OpenAI synthesis returned no choices for model={model_name}"
@@ -2206,6 +2212,73 @@ class CompanyBriefEngine(BaseResearchEngine):
         return ("FAIL", "", f"Coverage {coverage_score:.0%} below weak floor {gate_weak_floor:.0%}.")
 
     @staticmethod
+    def _targeting_c0_gate_allows_handoff(
+        *,
+        c0_bundle: Dict[str, Any],
+        gate_verdict: str,
+    ) -> bool:
+        """Return whether a C0 result is safe to hand to the Apps RG target lane.
+
+        ``PASS`` is sufficient.  ``WEAK_WITH_CAVEATS`` is sufficient only for
+        the narrower targeting case: the direct JD role context and every
+        evidence family selected by the JD-intent retrieval contract have
+        explicit C0 coverage.  This does not change the generic C0 verdict or
+        hide its caveat; it prevents optional company-brief gaps from masking
+        a fully grounded, sealed targeting brief.
+        """
+        verdict = str(gate_verdict or "").upper()
+        if verdict == "PASS":
+            return True
+        if verdict != "WEAK_WITH_CAVEATS":
+            return False
+
+        coverage_matrix = c0_bundle.get("briefing_coverage_matrix")
+        contract = c0_bundle.get("jd_retrieval_contract")
+        source_summary = c0_bundle.get("source_portfolio_summary")
+        contradictions = c0_bundle.get("contradiction_matrix")
+        freshness = c0_bundle.get("freshness_report")
+        if not all(
+            isinstance(value, dict)
+            for value in (
+                coverage_matrix,
+                contract,
+                source_summary,
+                contradictions,
+                freshness,
+            )
+        ):
+            return False
+
+        required_families = {
+            str(family).strip()
+            for family in contract.get("required_evidence_families", [])
+            if str(family).strip()
+        }
+        # A caveated path without a concrete JD-derived contract is not
+        # admissible.  The direct JD role context is also mandatory even when
+        # it is not one of the inferred evidence-intent families.
+        if not required_families:
+            return False
+        covered_families = {
+            str(entry.get("family") or "").strip()
+            for entry in coverage_matrix.get("families", [])
+            if isinstance(entry, dict) and bool(entry.get("covered"))
+        }
+        if "role_context" not in covered_families:
+            return False
+        if not required_families.issubset(covered_families):
+            return False
+        if not bool(source_summary.get("authoritative_anchor_present")):
+            return False
+        if int(source_summary.get("total_final_sources") or 0) < 1:
+            return False
+        if int(contradictions.get("unresolved_critical") or 0) > 0:
+            return False
+        if bool(freshness.get("gate_fail_triggered")):
+            return False
+        return True
+
+    @staticmethod
     def _assemble_brief(*, topic: str, synthesis: Dict[str, Any]) -> Dict[str, Any]:
         now = datetime.now(timezone.utc).isoformat()
         return {
@@ -2241,4 +2314,8 @@ class CompanyBriefEngine(BaseResearchEngine):
         }
 
 
-__all__ = ["APPS_RESEARCH_BRIEF_MODEL", "CompanyBriefEngine"]
+__all__ = [
+    "APPS_RESEARCH_BRIEF_MODEL",
+    "APPS_RESEARCH_BRIEF_REASONING_EFFORT",
+    "CompanyBriefEngine",
+]

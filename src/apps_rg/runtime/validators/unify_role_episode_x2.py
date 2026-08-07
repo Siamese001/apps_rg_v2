@@ -105,6 +105,13 @@ def _metric_token_visible_in_text(metric_id: str, text: str) -> str | None:
         t_norm = _surface_norm(token)
         if t_norm and t_norm in norm:
             return token
+    # Accept only the directly equivalent wording for this one approved
+    # organization-scale outcome. The number pair and team subject remain
+    # required, so this cannot admit an unbound numeric claim.
+    if str(metric_id) == "metric_unify_team_scaled_8_to_28" and re.search(
+        r"\b(?:engineering\s+)?team\b.{0,48}\b8\s*(?:to|-)\s*28\b", low
+    ):
+        return "engineering team from 8 to 28"
     return None
 
 

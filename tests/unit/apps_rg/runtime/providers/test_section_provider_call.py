@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from tests.helpers import apps_rg_model_pins as pins
 
 import apps_rg.runtime.providers.section_provider_call as subject
 from apps_rg.runtime.providers.provider_contract import ProviderResult
@@ -70,7 +71,7 @@ class _PinnedModelGateway(_CapturingGateway):
             provider_available=True,
             exact_provider_error=None,
             runtime_generation_status="REAL_LLM",
-            model="gpt-5.4-mini-2026-03-17",
+            model=pins.OPENAI_GENERATOR_MODEL,
             raw_model_output='{"result":"source-response"}',
             provider_response={"captured": True},
         )
@@ -78,8 +79,8 @@ class _PinnedModelGateway(_CapturingGateway):
 
 def test_build_section_provider_gateway_registers_external_profiles() -> None:
     gateway = subject.build_section_provider_gateway(
-        claude_model="claude-sonnet-5",
-        openai_model="gpt-5.4-mini-2026-03-17",
+        claude_model=pins.CLAUDE_GENERATOR_MODEL,
+        openai_model=pins.OPENAI_GENERATOR_MODEL,
     )
 
     assert set(gateway.registered_profiles()) == {
@@ -127,6 +128,7 @@ def test_call_section_model_provider_threads_messages_and_overrides(monkeypatch)
     assert compiled.compilation_hash == "prompt-hash"
     assert compiled.request_id == "request-1"
     assert compiled.run_id == "explicit-run"
+    assert compiled.reasoning_effort == "high"
     assert [(b.role, b.content) for b in compiled.prompt_blocks] == [
         ("system", "System guard."),
         ("user", "Write one bullet."),
@@ -161,6 +163,7 @@ def test_call_section_model_provider_falls_back_to_prompt_and_max_output_tokens(
     assert call["temperature"] == 0.45
     assert call["timeout_seconds"] is None
     assert compiled.run_id == "payload-run"
+    assert compiled.reasoning_effort == "medium"
     assert [(b.role, b.content) for b in compiled.prompt_blocks] == [
         ("user", "Fallback prompt body."),
     ]
@@ -211,8 +214,9 @@ def test_call_section_model_provider_pins_openai_unify_narrative_model(monkeypat
     )
 
     assert captured["claude_model"] is None
-    assert captured["openai_model"] == "gpt-5.4-mini-2026-03-17"
+    assert captured["openai_model"] == pins.OPENAI_GENERATOR_MODEL
     assert gateway.calls[0]["profile"] == ProviderProfile.EXTERNAL_OPENAI
+    assert gateway.calls[0]["compiled_prompt"].reasoning_effort == "medium"
 
 
 def test_call_section_model_provider_fails_closed_before_gateway_when_budget_blocks(monkeypatch, tmp_path) -> None:

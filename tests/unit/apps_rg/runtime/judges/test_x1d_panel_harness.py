@@ -170,6 +170,7 @@ def test_panel_registry_requires_keys_and_transport_parity_reports_mismatches() 
         "provider_key_mismatch",
         "max_output_tokens_below_declared",
         "json_output_lock_mismatch",
+        "temperature_mismatch",
         "system_missing_score_schema",
         "truncation_stop_reason",
     }

@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from apps_rg.runtime.providers.availability_fallback import (
-    maybe_fallback_to_openai_for_claude_availability,
     maybe_retry_claude_availability_same_provider,
 )
 from apps_rg.runtime.providers.anthropic_prompt_cache import (
@@ -31,6 +30,7 @@ from apps_rg.runtime.providers.provider_gateway import ProviderGateway, Provider
 from apps_rg.runtime.providers.provider_contract import ProviderResult
 from apps_rg.runtime.section_model_limits import (
     external_openai_generation_model,
+    resolve_section_generation_effort,
     resolve_section_generation_model,
 )
 from apps_rg.runtime.model_token_governor import reserve_apps_rg_model_tokens
@@ -63,6 +63,7 @@ class _CompiledMessagesPrompt:
     anthropic_payload: dict[str, Any] | None = None
     anthropic_cache_receipt_seed: dict[str, Any] | None = None
     anthropic_cache_strategy: str | None = None
+    reasoning_effort: str | None = None
 
 
 def build_section_provider_gateway(
@@ -98,6 +99,7 @@ def _compiled_prompt_from_payload(
     anthropic_payload: dict[str, Any] | None = None,
     anthropic_cache_receipt_seed: dict[str, Any] | None = None,
     anthropic_cache_strategy: str | None = None,
+    reasoning_effort: str | None = None,
 ) -> _CompiledMessagesPrompt:
     messages = provider_payload.get("messages") or []
     blocks: list[_PromptBlock] = []
@@ -119,6 +121,7 @@ def _compiled_prompt_from_payload(
         anthropic_payload=anthropic_payload,
         anthropic_cache_receipt_seed=anthropic_cache_receipt_seed,
         anthropic_cache_strategy=anthropic_cache_strategy,
+        reasoning_effort=reasoning_effort,
     )
 
 
@@ -328,6 +331,7 @@ def call_section_model_provider(
     elif profile == ProviderProfile.EXTERNAL_OPENAI:
         openai_model = external_openai_generation_model(section_id=sid or None)
     requested_model = claude_model or openai_model
+    reasoning_effort = resolve_section_generation_effort(sid or None)
     anthropic_payload, anthropic_cache_seed, anthropic_cache_strategy = _resolve_anthropic_cache_payload(
         provider_payload,
         profile=profile,
@@ -341,6 +345,7 @@ def call_section_model_provider(
         anthropic_payload=anthropic_payload,
         anthropic_cache_receipt_seed=anthropic_cache_seed,
         anthropic_cache_strategy=anthropic_cache_strategy,
+        reasoning_effort=reasoning_effort,
     )
     prompt_text = "\n".join(block.content for block in compiled.prompt_blocks)
     request_digest = compiled.compilation_hash or hashlib.sha256(prompt_text.encode("utf-8")).hexdigest()
@@ -451,14 +456,6 @@ def call_section_model_provider(
             timeout_seconds=timeout_seconds,
         )
         result = maybe_retry_claude_availability_same_provider(
-            result,
-            compiled,
-            token_budget=budget,
-            temperature=temperature,
-            timeout_seconds=timeout_seconds,
-            section_id=sid or None,
-        )
-        result = maybe_fallback_to_openai_for_claude_availability(
             result,
             compiled,
             token_budget=budget,

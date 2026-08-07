@@ -231,13 +231,6 @@ def resolve_delta_class(
     if _executive_signal_and_voice_composite_eligible(soft, failed_dims):
         return DELTA_CLASS_EXECUTIVE_SIGNAL_AND_VOICE
 
-    if _soft_failed_provider_keys(soft) == {"anthropic_claude"} and any(
-        _synthesis_s6_thin_signal(j) for j in soft
-    ):
-        if _regen_citations_exceed_s6_only(soft):
-            return DELTA_CLASS_EXECUTIVE_SIGNAL_AND_VOICE
-        return DELTA_CLASS_S6_FORWARD_SYNTHESIS
-
     if not failed_dims:
         if any(
             _holistic_below_operator_floor(j, floor) and _synthesis_s6_thin_signal(j) for j in soft
@@ -753,19 +746,10 @@ def format_judge_regen_operator_stderr_line(
 ) -> str:
     """One-line operator summary for stderr (plan W4.3)."""
     floor_s = f"{operator_floor:.1f}" if operator_floor is not None else "?"
-    claude_bits: list[str] = []
-    for row in g3_verdicts or []:
-        if str(row.get("provider_key") or "") != "anthropic_claude":
-            continue
-        sb = row.get("score_before")
-        sa = row.get("score_after")
-        if sb is not None and sa is not None:
-            claude_bits.append(f"Claude {sb}→{sa}")
-        break
-    regression = f" ({', '.join(claude_bits)})" if claude_bits else ""
+    _ = g3_verdicts
     if reject_gate:
         return (
-            f"Judge regen cycle {cycle} rejected: {reject_gate}{regression} "
+            f"Judge regen cycle {cycle} rejected: {reject_gate} "
             f"(floor {floor_s}). Published {final_publish_baseline} "
             f"(min {published_min_score if published_min_score is not None else '?'})."
         )

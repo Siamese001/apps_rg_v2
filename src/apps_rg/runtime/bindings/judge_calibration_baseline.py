@@ -16,7 +16,7 @@ APPS_RG_EXEC_POSITIONING_CALIBRATION_IDENTITY = {
     "judge_version": "v1",
     "rubric_hash": ("e3cec96dfac21b61056f4f5d1d150fa769e3242a5e4b93c4c907afe8b731fdb1"),
     "rubric_version": "1.0.0",
-    "provider_profile_ref": "local_qwen_generator",
+    "provider_profile_ref": "openai_chatgpt",
     "dataset_id": "apps_rg_executive_positioning",
     "dataset_version": "v1",
 }

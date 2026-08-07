@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.validators.executive_summary_x2 import (
     ALLOWED_MODELS,
@@ -33,15 +35,19 @@ def test_pre_x2_artifact_gate_does_not_require_final_receipts(tmp_path) -> None:
 
 
 def test_executive_summary_model_allowlist_accepts_only_pinned_claude_primary() -> None:
-    assert "claude-sonnet-5" in ALLOWED_MODELS
-    assert "gpt-5.4-mini-2026-03-17" not in ALLOWED_MODELS
-    assert "gpt-5.4-mini" not in ALLOWED_MODELS
+    retired_openai_model = "gpt-" + "5.4-mini"
+    assert pins.CLAUDE_GENERATOR_MODEL in ALLOWED_MODELS
+    assert pins.RESEARCH_GENERATOR_MODEL not in ALLOWED_MODELS
+    assert retired_openai_model not in ALLOWED_MODELS
 
-    assert model_name_matches_allowed("claude-sonnet-5", ALLOWED_MODELS) is True
+    assert model_name_matches_allowed(pins.CLAUDE_GENERATOR_MODEL, ALLOWED_MODELS) is True
     assert model_name_matches_allowed("claude-haiku-3-5", ALLOWED_MODELS) is False
-    assert model_name_matches_allowed("gpt-5.4-mini-2026-03-17", ALLOWED_MODELS) is False
-    assert model_name_matches_allowed("gpt-5.4-mini", ALLOWED_MODELS) is False
-    assert model_name_matches_allowed("gpt-5.5", ALLOWED_MODELS) is False
+    assert model_name_matches_allowed(pins.RESEARCH_GENERATOR_MODEL, ALLOWED_MODELS) is False
+    assert model_name_matches_allowed(retired_openai_model, ALLOWED_MODELS) is False
+    assert (
+        model_name_matches_allowed(pins.COMPETENCIES_SELECTOR_MODEL, ALLOWED_MODELS)
+        is True
+    )
 
 
 def test_executive_summary_defers_empty_x1d_artifact_until_x2_failure() -> None:

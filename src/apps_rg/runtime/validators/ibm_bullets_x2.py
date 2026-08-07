@@ -5,7 +5,7 @@ import json
 import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from apps_rg.runtime.validators.executive_summary_x2 import (
     EM_DASH,
@@ -705,6 +705,18 @@ def run_ibm_bullets_x2_gates(
         else None,
     )
 
+    expected_bundle_by_slot = dict(IBM_BULLET_SLOT_BUNDLE_MAP)
+    selected_plan = (runtime_payload or {}).get("selected_fact_plan")
+    if isinstance(selected_plan, Mapping):
+        for row in selected_plan.get("allocation_assignments") or []:
+            if not isinstance(row, Mapping) or str(row.get("section_id") or "") != "ibm_bullets":
+                continue
+            claim_unit_id = str(row.get("claim_unit_id") or "")
+            bullet_id = claim_unit_id.rsplit(":", 1)[-1]
+            root_id = str(row.get("root_id") or "").strip()
+            if bullet_id in IBM_BULLET_IDS and root_id:
+                expected_bundle_by_slot[bullet_id] = root_id
+
     bullets_missing_bundle_id: list[str] = []
     bullets_metric_unsupported: list[str] = []
     allowed_outcomes = set(PROMOTABLE_METRIC_OUTCOME_IDS)
@@ -716,7 +728,7 @@ def run_ibm_bullets_x2_gates(
         if not bid_cl.startswith("bul_ibm_"):
             continue
         reb = str(cl_entry.get("role_episode_bundle_id") or "").strip()
-        expected = IBM_BULLET_SLOT_BUNDLE_MAP.get(bid_cl, "")
+        expected = expected_bundle_by_slot.get(bid_cl, "")
         if not reb:
             bullets_missing_bundle_id.append(bid_cl)
         elif expected and reb != expected:

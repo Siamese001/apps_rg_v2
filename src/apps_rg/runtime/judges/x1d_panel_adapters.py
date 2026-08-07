@@ -33,7 +33,8 @@ def _transport_receipt(
         provider_key=ctx.provider_key,
         contract_hash=contract.contract_hash(),
         max_output_tokens=max_tokens,
-        temperature=0.1,
+        temperature=None if ctx.provider_key == "gemini_pro" else 0.1,
+        thinking_level=(ctx.reasoning_effort if ctx.provider_key == "gemini_pro" else None),
         json_output_lock=json_lock,
         finish_or_stop_reason=finish_reason,
         parse_status=parse_status,
@@ -93,7 +94,10 @@ class AppsRgX1dPanelAdapter:
                 self._ctx.section_id, attempt=attempt
             ),
             json_output_lock=json_lock,
-            temperature=0.1,
+            temperature=None if self.provider_key == "gemini_pro" else 0.1,
+            thinking_level=(
+                self._ctx.reasoning_effort if self.provider_key == "gemini_pro" else None
+            ),
         )
 
     def invoke(
@@ -104,7 +108,6 @@ class AppsRgX1dPanelAdapter:
     ) -> tuple[PanelJudgeOutcome, TransportReceipt]:
         ctx = self._ctx
         prompt = contract.user_prompt
-        gate_summary = dict(ctx.deterministic_gate_summary or contract.deterministic_gate_summary)
 
         from apps_rg.runtime.judges import executive_summary_x1d as x1d_mod
 
@@ -124,8 +127,8 @@ class AppsRgX1dPanelAdapter:
                     model_env_source=ctx.model_source,
                     section_id=ctx.section_id,
                 )
-            if ctx.provider_key == "anthropic_claude":
-                return x1d_mod._call_anthropic(
+            if ctx.provider_key == "gemini_pro":
+                return x1d_mod._call_gemini(
                     ctx.api_key,
                     prompt,
                     ctx.model,
@@ -133,27 +136,13 @@ class AppsRgX1dPanelAdapter:
                     ctx.provider_key,
                     model_source=ctx.model_source,
                     artifact_base=ctx.artifact_base,
-                    allow_model_fallback=ctx.allow_model_fallback,
                     model_requested=ctx.model_requested,
                     judge_receipt=ctx.judge_receipt,
+                    thinking_level=ctx.reasoning_effort,
                     attempt=attempt_no,
-                    packet_hash=ctx.input_hash,
-                    canonical_contract_hash=ctx.canonical_contract_hash or contract.contract_hash(),
                     section_id=ctx.section_id,
                 )
-            return x1d_mod._call_gemini(
-                ctx.api_key,
-                prompt,
-                ctx.model,
-                ctx.input_hash,
-                ctx.provider_key,
-                model_source=ctx.model_source,
-                artifact_base=ctx.artifact_base,
-                model_requested=ctx.model_requested,
-                judge_receipt=ctx.judge_receipt,
-                attempt=attempt_no,
-                section_id=ctx.section_id,
-            )
+            raise AdapterInvokeError(f"Unsupported proof judge provider: {ctx.provider_key}")
 
         try:
             ctx.last_judge_output = _dispatch(attempt)

@@ -1,8 +1,7 @@
-"""X1D judge transport parity contract — shared across apps_rg proof judge providers.
+"""X1D judge transport parity contract for Gemini and OpenAI proof providers.
 
-Audits that Gemini, OpenAI, and Claude receive the same grading objectives, user packet,
-score normalization, and comparable token/JSON/system constraints. Transport-only API deltas
-(responseSchema vs json_object) are allowed when documented.
+Audits that both proof providers receive the same grading objectives, user packet,
+score normalization, and comparable token/JSON/system constraints.
 
 Transport wiring audits (system/json/truncation/token parity) delegate to the
 apps_rg X1D panel harness via :mod:`apps_rg.runtime.judges.x1d_panel_preflight`.
@@ -11,7 +10,6 @@ Legacy ``inspect.getsource`` checks are deprecated for provider transport profil
 
 from __future__ import annotations
 
-import ast
 import inspect
 import json
 from dataclasses import dataclass
@@ -19,26 +17,23 @@ from pathlib import Path
 from typing import Any
 
 from apps_rg.runtime.judges.executive_summary_x1d import (
-    ANTHROPIC_JUDGE_MAX_OUTPUT_TOKENS,
     GEMINI_JUDGE_RESPONSE_SCHEMA,
-    GOOGLE_AI_JUDGE_MAX_OUTPUT_TOKENS,
-    JUDGE_COMPACT_OUTPUT,
-    JUDGE_COMPACT_SYSTEM,
     JUDGE_REQUIRED_FIELDS,
-    JUDGE_SCORE_SCHEMA,
     PROVIDERS,
-    _call_anthropic,
     _call_gemini,
     _call_openai,
     _make_model_backed_output,
-    _resolved_openai_judge_max_completion_tokens,
     run_llm_judges,
 )
 from apps_rg.runtime.section_judge_policy import (
     REQUIRED_JUDGE_PROVIDER_KEYS,
     get_section_judge_policy,
 )
-from apps_rg.runtime.section_model_limits import SectionModelSSOTError, runtime_limit_int
+from apps_rg.runtime.section_model_limits import (
+    SectionModelSSOTError,
+    runtime_limit_int,
+    runtime_limit_str,
+)
 
 PROOF_JUDGE_PROVIDER_KEYS: tuple[str, ...] = REQUIRED_JUDGE_PROVIDER_KEYS
 
@@ -86,12 +81,13 @@ class ProviderTransportProfile:
     system_includes_compact_output: bool
     system_includes_compact_system: bool
     has_json_output_lock: bool
-    temperature_is_low: bool
+    temperature: float | None
+    thinking_level: str | None
     checks_truncation_stop_reason: bool
 
 
 def resolved_provider_max_output_tokens(provider_key: str, *, attempt: int = 1) -> int:
-    """Resolved max output token budget — unified across Gemini, OpenAI, and Anthropic."""
+    """Resolved max output token budget for the Gemini/OpenAI proof panel."""
     from apps_rg.runtime.judges.executive_summary_x1d import _resolved_x1d_judge_max_output_tokens
 
     if provider_key in PROOF_JUDGE_PROVIDER_KEYS:
@@ -118,7 +114,8 @@ def build_provider_transport_profile(provider_key: str) -> ProviderTransportProf
             system_includes_compact_system=shared or "JUDGE_COMPACT_SYSTEM" in mod_src,
             has_json_output_lock="_gemini_generation_config" in src
             or "responseSchema" in mod_src,
-            temperature_is_low="_gemini_generation_config" in src,
+            temperature=None,
+            thinking_level=runtime_limit_str("judge.gemini_proof_thinking_level"),
             checks_truncation_stop_reason="finishReason" in mod_src,
         )
     if provider_key == "openai_chatgpt":
@@ -130,29 +127,10 @@ def build_provider_transport_profile(provider_key: str) -> ProviderTransportProf
             system_includes_score_schema=shared or "JUDGE_SCORE_SCHEMA" in src,
             system_includes_compact_output=shared or "JUDGE_COMPACT_OUTPUT" in src,
             system_includes_compact_system=shared or "JUDGE_COMPACT_SYSTEM" in src,
-            has_json_output_lock="json_object" in src,
-            temperature_is_low=(
-                '"temperature": 0.1' in src
-                or "_is_openai_gpt5_chat_model" in src  # GPT-5 family: temperature omitted (not elevated)
-            ),
+            has_json_output_lock="json_schema" in src,
+            temperature=None,
+            thinking_level=None,
             checks_truncation_stop_reason="finish_reason" in src,
-        )
-    if provider_key == "anthropic_claude":
-        src = inspect.getsource(_call_anthropic)
-        mod_src = Path(__file__).with_name("executive_summary_x1d.py").read_text(encoding="utf-8")
-        shared = _call_uses_shared_judge_system(_call_anthropic)
-        return ProviderTransportProfile(
-            provider_key=provider_key,
-            max_output_tokens=resolved_provider_max_output_tokens(provider_key, attempt=1),
-            system_includes_score_schema=shared or "JUDGE_SCORE_SCHEMA" in src,
-            system_includes_compact_output=shared or "JUDGE_COMPACT_OUTPUT" in src,
-            system_includes_compact_system=shared or "JUDGE_COMPACT_SYSTEM" in src,
-            has_json_output_lock=shared
-            or "json_object" in src
-            or "structured" in src.lower()
-            or "build_x1d_judge_system_prompt" in mod_src,
-            temperature_is_low='"temperature": 0.1' in src,
-            checks_truncation_stop_reason="stop_reason" in mod_src,
         )
     raise KeyError(provider_key)
 
@@ -186,7 +164,7 @@ def audit_unified_token_budget_env() -> list[TransportViolation]:
             TransportViolation(
                 code="token_budget_spread_exceeds_2x",
                 detail=f"provider max_output_tokens map: {budgets}",
-                path=str(x1d_path),
+                path="apps_rg/runtime/judges/executive_summary_x1d.py",
             )
         )
     return violations
@@ -320,7 +298,7 @@ def audit_run_llm_judges_single_prompt_assignment() -> list[TransportViolation]:
                 path="apps_rg/runtime/judges/executive_summary_x1d.py",
             )
         ]
-    for callee in ("_call_openai", "_call_anthropic", "_call_gemini"):
+    for callee in ("_call_openai", "_call_gemini"):
         if callee not in src:
             continue
         if "_prompt=prompt" not in src.replace(" ", ""):
@@ -439,8 +417,7 @@ def audit_policy_sections_proof_judge_roster() -> list[TransportViolation]:
 def audit_providers_registry_complete() -> list[TransportViolation]:
     """PROVIDERS registry must define every required proof panel key.
 
-    Extra provider implementations may remain available for explicit overrides; the
-    proof roster is governed by ``PROOF_JUDGE_PROVIDER_KEYS``.
+    The registry is proof-only; selector providers have a separate registry.
     """
     reg = frozenset(PROVIDERS.keys())
     expected = frozenset(PROOF_JUDGE_PROVIDER_KEYS)

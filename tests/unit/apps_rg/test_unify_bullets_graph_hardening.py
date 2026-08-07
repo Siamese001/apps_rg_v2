@@ -22,6 +22,7 @@ from apps_rg.runtime.section_graph_skills_proof_pool import (
 )
 from apps_rg.runtime.sections.unify_bullets_graph_evidence import (
     FORBIDDEN_C0_PROMPT_SUBSTRINGS,
+    FROZEN_WHOLE_RESUME_SELECTION_METHOD,
     LEGACY_SIX_PACK_LEDGER_ORDER,
     TRACK_RANKED_SELECTION_METHOD,
     append_unify_path_framing_to_messages,
@@ -45,6 +46,8 @@ from apps_rg.runtime.sections.role_episode_metric_registry import metric_outcome
 from apps_rg.runtime.sections.unify_graph_role_episode_registry import BUNDLES_PATH as UNIFY_BUNDLES_PATH
 from apps_rg.runtime.sections.unify_role_episode_evidence import (
     attach_role_episode_bundles_to_proof_pool_metadata,
+    format_unify_role_episode_evidence_pack,
+    resolve_unify_bullet_slot_bundle_map_with_fallback,
 )
 from apps_rg.runtime.validators.unify_role_episode_x2 import (
     run_unify_bullets_role_episode_x2_gates,
@@ -178,8 +181,108 @@ def test_legacy_six_pack_detector() -> None:
 
 def test_selection_method_guard_rejects_company_hint() -> None:
     assert is_allowed_unify_selection_method(TRACK_RANKED_SELECTION_METHOD)
+    assert is_allowed_unify_selection_method(FROZEN_WHOLE_RESUME_SELECTION_METHOD)
     assert not is_allowed_unify_selection_method("augmented_skills_graph_unify_bullets_company_hint")
     assert not is_allowed_unify_selection_method("hydrate_unify_bullets_from_canonical_resume")
+
+
+def test_unify_slot_map_replaces_internal_only_bundle_before_prompt_or_allocation() -> None:
+    """A JD-fit profile cannot route an external résumé slot to internal-only ADG evidence."""
+    slot_map = resolve_unify_bullet_slot_bundle_map_with_fallback(
+        "PARTNER_APPLIED_AI_ARCHITECTURE",
+        repo_root=REPO,
+    )
+    assert slot_map["bul_unify_001"] == "reb_unify_agentic_platform_architecture"
+    assert "reb_unify_dependency_graph_accelerator" not in set(slot_map.values())
+
+
+def test_unify_graph_receipt_uses_the_resolved_external_slot_contract() -> None:
+    """Internal-only dependency evidence cannot remain a required external résumé axis."""
+    meta = _partner_role_episode_meta()
+    receipt = meta["unify_graph_traversal_sufficiency_receipt"]
+    axes = receipt["role_specific_axis_coverage"]
+
+    assert axes["missing_axes"] == []
+    assert "dependency_graph_accelerator" not in axes["required_axes"]
+    assert len(axes["required_axes"]) == len(UNIFY_BULLET_IDS)
+
+
+def test_unify_prompt_binds_each_slot_to_one_allocated_metric_outcome() -> None:
+    """The provider sees the exact allocation outcome, not the whole bundle's metric menu."""
+    meta = _partner_role_episode_meta()
+    slot_map = meta["unify_bullet_slot_bundle_map_resolved"]
+    bundles = {row["role_episode_bundle_id"]: row for row in meta["role_episode_bundles"]}
+    facts = [
+        {
+            "fact_id": slot_id,
+            "metric_outcome_ids": [bundles[slot_map[slot_id]]["linked_metric_outcome_ids"][0]],
+        }
+        for slot_id in UNIFY_BULLET_IDS
+    ]
+    pack = format_unify_role_episode_evidence_pack(
+        {
+            "selected_fact_plan": {"facts": facts},
+            "proof_pool_metadata": meta,
+        },
+        section_id="unify_bullets",
+    )
+
+    assert "use exactly the selected_metric_outcome_id" in pack
+    assert "do not emit any other metric/outcome" in pack
+    assert pack.count("selected_metric_outcome_id:") == len(UNIFY_BULLET_IDS)
+
+
+def test_x2_accepts_slot_bound_source_facts_and_ignores_global_allocation_metadata() -> None:
+    """The section validator accepts only its exact bound sources, not global plan noise."""
+    bullets, parsed, meta = _partner_metric_surface_payload()
+    slot_map = meta["unify_bullet_slot_bundle_map_resolved"]
+    bundles = {row["role_episode_bundle_id"]: row for row in meta["role_episode_bundles"]}
+    facts = [
+        {
+            "fact_id": bullet_id,
+            "candidate_fact_id": bundles[slot_map[bullet_id]]["linked_source_fact_ids"][0],
+        }
+        for bullet_id in UNIFY_BULLET_IDS
+    ]
+    parsed["selected_fact_plan"] = {
+        "section_id": "unify_bullets",
+        "selection_method": FROZEN_WHOLE_RESUME_SELECTION_METHOD,
+        "facts": facts,
+        # A whole-resume plan has cross-lane reservations.  They are provenance,
+        # not evidence authored by the Unify model output.
+        "allocation_assignments": [
+            {
+                "section_id": "ibm_bullets",
+                "claim_unit_id": "ibm_bullets:bul_ibm_001",
+                "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "fact_id": "bul_ibm_001",
+            }
+        ],
+        "employer_root_weights": {"reb_ibm_aws_alliance_partner_cosell_gtm": 0.5},
+    }
+    allowed = {
+        str(value)
+        for fact in facts
+        for value in (fact["fact_id"], fact["candidate_fact_id"])
+    }
+    gates = run_unify_bullets_x2_gates(
+        bullets=bullets,
+        parsed_output=parsed,
+        claim_ledger=parsed["claim_ledger"],
+        allowed_fact_ids=allowed,
+        jd_text=JD,
+        runtime_generation_status="REAL_LLM",
+        provider_requested="test",
+        provider_attempted="test",
+        model_name="test",
+        raw_output="{}",
+        x1d_judges=[],
+        proof_pool_metadata=meta,
+    )
+    gate_by_id = {gate.gate_id: gate for gate in gates}
+    assert gate_by_id["x2_unify_only_fact_scope"].pass_ is True
+    assert gate_by_id["x2_no_ibm_fact_leakage"].pass_ is True
+    assert gate_by_id["x2_no_insurtech_fact_leakage"].pass_ is True
 
 
 def test_company_hint_plan_raises_for_unify_bullets() -> None:
@@ -308,6 +411,20 @@ def test_unify_normalization_repairs_metric_surface_visibility_from_registry() -
     assert by_id["x2_unify_metric_outcomes_distributed_by_slot"].passed is True
 
 
+def test_unify_team_scale_metric_accepts_equivalent_visible_graph_wording() -> None:
+    """Avoid appending a duplicate metric when the completed bullet already states it."""
+    from apps_rg.runtime.sections.unify_bullets_lane import _metric_token_visible_in_text
+    from apps_rg.runtime.validators.unify_role_episode_x2 import (
+        _metric_token_visible_in_text as x2_metric_token_visible_in_text,
+    )
+
+    text = "Led platform commercialization, scaling the engineering team from 8 to 28."
+    metric_id = "metric_unify_team_scaled_8_to_28"
+
+    assert _metric_token_visible_in_text(metric_id, text) == "engineering team from 8 to 28"
+    assert x2_metric_token_visible_in_text(metric_id, text) == "engineering team from 8 to 28"
+
+
 def test_unify_normalization_repairs_present_tense_ownership_for_seniority_floor() -> None:
     _bullets, parsed, meta = _partner_metric_surface_payload()
     parsed["bullets"][0]["bullet_text"] = (
@@ -328,6 +445,34 @@ def test_unify_normalization_repairs_present_tense_ownership_for_seniority_floor
     assert text.startswith("Owned governed agentic systems architecture")
     assert normalized["claim_ledger"][0]["claim_text"] == text
     assert check_bullet_seniority_floor("bul_unify_001", text).passed is True
+
+
+@pytest.mark.parametrize(
+    ("present", "past"),
+    [
+        ("Drive enterprise platform adoption.", "Directed enterprise platform adoption."),
+        ("Establish governed runtime controls.", "Established governed runtime controls."),
+        ("Standardize the AI systems lifecycle.", "Standardized the AI systems lifecycle."),
+        ("Architect distributed cloud infrastructure.", "Architected distributed cloud infrastructure."),
+    ],
+)
+def test_unify_normalization_repairs_present_tense_executive_verbs(present: str, past: str) -> None:
+    _bullets, parsed, meta = _partner_metric_surface_payload()
+    parsed["bullets"][0]["bullet_text"] = present
+    parsed["claim_ledger"][0]["claim_text"] = present
+
+    normalized = normalize_unify_parsed_without_ledger_synthesis(
+        parsed,
+        {
+            "allowed_fact_ids": list(UNIFY_BULLET_IDS),
+            "selected_fact_plan": {"facts": []},
+            "proof_pool_metadata": meta,
+        },
+    )
+
+    assert normalized is not None
+    assert normalized["bullets"][0]["bullet_text"].startswith(past.rstrip("."))
+    assert check_bullet_seniority_floor("bul_unify_001", past).passed is True
 
 
 def test_agentic_runtime_terms_count_for_bullet_technical_specificity() -> None:

@@ -9,6 +9,7 @@ from apps_rg.runtime.validators.unify_bullets_x2 import UNIFY_BULLET_IDS
 GRAPH_BULLET_EVIDENCE_PACK_MARKER = "GRAPH_BULLET_EVIDENCE_PACK"
 
 TRACK_RANKED_SELECTION_METHOD = "augmented_skills_graph_unify_bullets_track_ranked"
+FROZEN_WHOLE_RESUME_SELECTION_METHOD = "selected_graph_evidence_plan_unify_bullets"
 
 # Ledger facts that must appear in the six-pack when present (X2 metric anchors on 004/006 slots).
 _UNIFY_METRIC_LEDGER_IDS: tuple[str, ...] = (
@@ -112,6 +113,8 @@ def is_allowed_unify_selection_method(method: str) -> bool:
     if any(marker in m for marker in FORBIDDEN_SELECTION_METHOD_MARKERS):
         return False
     if m == TRACK_RANKED_SELECTION_METHOD:
+        return True
+    if m == FROZEN_WHOLE_RESUME_SELECTION_METHOD:
         return True
     return m.startswith("augmented_skills_graph_unify_bullets")
 

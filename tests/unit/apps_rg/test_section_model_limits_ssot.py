@@ -25,6 +25,27 @@ def test_generation_profiles_have_no_default_model() -> None:
     profiles = _yaml_data()["profiles"]
     assert "default_model" not in profiles["external_claude_generator"]
     assert "default_model" not in profiles["external_openai_generator"]
+    assert all(profile.get("provider_class") != "local_vllm" for profile in profiles.values())
+
+
+def test_explicit_section_effort_map() -> None:
+    expected = {
+        "competencies": "high",
+        "unify_bullets": "medium",
+        "ibm_bullets": "medium",
+        "headline": "medium",
+        "executive_summary": "high",
+        "insurtech_bullets": "low",
+        "ey_bullets": "low",
+        "unify_narrative": "medium",
+        "ibm_narrative": "medium",
+        "insurtech_narrative": "low",
+        "ey_narrative": "low",
+    }
+    assert {
+        section_id: sml.resolve_section_generation_effort(section_id)
+        for section_id in expected
+    } == expected
 
 
 def test_explicit_claude_section_pins() -> None:
@@ -49,7 +70,7 @@ def test_explicit_openai_section_pins() -> None:
         assert (
             sml.external_openai_generation_model(section_id=section_id)
             == _yaml_openai_section_model(section_id)
-            == "gpt-5.4-mini-2026-03-17"
+            == "gpt-5.6-luna"
         )
 
 
@@ -60,6 +81,10 @@ def test_missing_section_id_fails_closed() -> None:
         sml.external_claude_generation_model({})
     with pytest.raises(sml.SectionModelSSOTError):
         sml.external_openai_generation_model(section_id="headline")
+    with pytest.raises(sml.SectionModelSSOTError):
+        sml.resolve_section_generation_effort(None)
+    with pytest.raises(sml.SectionModelSSOTError):
+        sml.resolve_section_generation_effort("unknown_section")
 
 
 def test_env_override_is_ignored_for_explicit_section() -> None:
@@ -78,15 +103,20 @@ def test_openai_model_source_reports_only_configured_section() -> None:
 
 def test_selector_models_are_explicit_and_advisory() -> None:
     assert sml.resolve_selector_provider_model("competencies_graph_pool_selector") == (
-        "openai_chatgpt",
-        "gpt-5.5",
+        "anthropic_claude",
+        "claude-sonnet-5",
         "apps_rg/config/provider_profiles.yaml:selector_models.competencies_graph_pool_selector.model",
+    )
+    assert (
+        sml.resolve_selector_reasoning_effort("competencies_graph_pool_selector")
+        == "high"
     )
     assert sml.resolve_selector_provider_model("employment_bullet_pool_selector") == (
         "anthropic_claude",
         "claude-sonnet-5",
         "apps_rg/config/provider_profiles.yaml:selector_models.employment_bullet_pool_selector.model",
     )
+    assert sml.resolve_selector_reasoning_effort("employment_bullet_pool_selector") == ""
 
 
 def test_missing_yaml_fails_closed(monkeypatch, tmp_path) -> None:

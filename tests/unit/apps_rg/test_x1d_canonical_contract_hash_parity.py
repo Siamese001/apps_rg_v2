@@ -5,7 +5,6 @@ from __future__ import annotations
 import inspect
 
 from apps_rg.runtime.judges.executive_summary_x1d import (
-    _call_anthropic,
     _call_gemini,
     _call_openai,
     build_x1d_judge_system_prompt,
@@ -29,6 +28,6 @@ def test_canonical_contract_hash_in_rendered_prompt() -> None:
 def test_all_providers_use_shared_system_prompt_builder() -> None:
     canonical_system = build_x1d_judge_system_prompt(compact=True)
     assert "score_scale" in canonical_system
-    for fn in (_call_openai, _call_anthropic, _call_gemini):
+    for fn in (_call_openai, _call_gemini):
         src = inspect.getsource(fn)
         assert "build_x1d_judge_system_prompt" in src or "JUDGE_SCORE_SCHEMA" in src

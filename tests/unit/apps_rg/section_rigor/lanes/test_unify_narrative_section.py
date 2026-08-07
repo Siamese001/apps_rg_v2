@@ -194,6 +194,32 @@ def test_unify_narrative_normalization_trims_exact_companion_overlap_phrase() ->
     assert by_id["x2_no_companion_ngram_copy"].pass_ is True
 
 
+def test_unify_narrative_normalization_trims_live_reusable_capability_fourgram() -> None:
+    narrative = (
+        "Owned Unify Consulting's shift from bespoke agentic engagements to a governed, IP-led commercial engine, "
+        "unifying architecture, reliability, and partner-enabled adoption into reusable enterprise capability for regulated clients."
+    )
+    companion = (
+        "- bul_unify_006: Commercialized the agentic AI platform into reusable enterprise capability, "
+        "scaling the engineering team from 8 to 28."
+    )
+    parsed = {
+        "narrative_sentence": narrative,
+        "claim_ledger": [{"claim_text": narrative, "source_fact_ids": ["bul_unify_006"]}],
+        "selected_fact_plan": {"facts": [{"fact_id": "bul_unify_006"}]},
+    }
+    runtime_payload = {
+        "selected_fact_plan": parsed["selected_fact_plan"],
+        "allowed_fact_ids": ["bul_unify_006"],
+    }
+
+    normalized = normalize_unify_narrative_parsed(parsed, runtime_payload, companion_text=companion)
+
+    assert normalized is not None
+    assert "into reusable enterprise capability" not in normalized["narrative_sentence"].lower()
+    assert "into reusable platform services" in normalized["narrative_sentence"].lower()
+
+
 def test_unify_narrative_normalization_collapses_live_comma_stack_before_x2() -> None:
     narrative = (
         "Owned Unify Consulting's governed agentic AI platform mandate, turning architecture, "

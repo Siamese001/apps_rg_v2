@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 
 import apps_rg.runtime.providers.section_provider_call as spc
@@ -53,7 +55,7 @@ def test_competencies_resolves_to_pinned_model_via_tag(monkeypatch):
         {"_reasoning_section_lane": "competencies", "messages": [{"role": "user", "content": "x"}]},
     )
     assert captured["claude_model"] == resolve_section_generation_model("competencies")
-    assert captured["claude_model"] == "claude-sonnet-5"
+    assert captured["claude_model"] == pins.CLAUDE_GENERATOR_MODEL
 
 
 def test_explicit_section_id_resolves_pin(monkeypatch):
@@ -64,7 +66,7 @@ def test_explicit_section_id_resolves_pin(monkeypatch):
         {"messages": [{"role": "user", "content": "x"}]},
         section_id="ibm_bullets",
     )
-    assert captured["claude_model"] == "claude-sonnet-5"
+    assert captured["claude_model"] == pins.CLAUDE_GENERATOR_MODEL
 
 
 def test_untagged_lane_fails_closed(monkeypatch):
@@ -84,14 +86,14 @@ def test_operator_pin_does_not_override_per_section(monkeypatch):
         "external_claude",
         {"_reasoning_section_lane": "competencies", "messages": [{"role": "user", "content": "x"}]},
     )
-    assert captured["claude_model"] == "claude-sonnet-5"
+    assert captured["claude_model"] == pins.CLAUDE_GENERATOR_MODEL
 
 
 def test_gateway_pins_model_on_claude_provider():
-    gw = spc.build_section_provider_gateway(claude_model="claude-sonnet-5")
+    gw = spc.build_section_provider_gateway(claude_model=pins.CLAUDE_GENERATOR_MODEL)
     prov = gw._providers[ProviderProfile.EXTERNAL_CLAUDE]
     assert isinstance(prov, ExternalProvider)
-    assert prov.model == "claude-sonnet-5"
+    assert prov.model == pins.CLAUDE_GENERATOR_MODEL
 
 
 def test_gateway_empty_model_fails_closed():

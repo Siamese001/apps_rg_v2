@@ -28,7 +28,8 @@ def profile_to_transport_receipt(
         provider_key=provider_key,
         contract_hash=contract_hash,
         max_output_tokens=profile.max_output_tokens,
-        temperature=0.1 if profile.temperature_is_low else None,
+        temperature=profile.temperature,
+        thinking_level=profile.thinking_level,
         json_output_lock=json_lock,
         finish_or_stop_reason="stop" if profile.checks_truncation_stop_reason else None,
         parse_status="ok" if profile.system_includes_score_schema else "missing_schema_anchor",
@@ -42,7 +43,8 @@ def profile_to_declared_policy(profile: ProviderTransportProfile, provider_key: 
     return DeclaredTransportPolicy(
         max_output_tokens=profile.max_output_tokens,
         json_output_lock=json_lock,
-        temperature=0.1 if profile.temperature_is_low else None,
+        temperature=profile.temperature,
+        thinking_level=profile.thinking_level,
         system_includes_score_schema=profile.system_includes_score_schema,
     )
 

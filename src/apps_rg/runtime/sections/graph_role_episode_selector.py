@@ -746,6 +746,22 @@ def build_selected_graph_evidence_plan_for_section(
     target_role_profile = _infer_target_role_profile(
         target_role=target_role, jd_text=jd_text, briefing_text=briefing_text
     )
+    unify_slot_bundle_map: dict[str, str] = {}
+    required_unify_root_ids: set[str] = set()
+    if section_id == "unify_bullets":
+        from apps_rg.runtime.sections.unify_role_episode_evidence import (
+            resolve_unify_bullet_slot_bundle_map_with_fallback,
+        )
+
+        unify_slot_bundle_map = resolve_unify_bullet_slot_bundle_map_with_fallback(
+            target_role_profile,
+            repo_root=repo_root,
+        )
+        required_unify_root_ids = {
+            str(root_id).strip()
+            for root_id in unify_slot_bundle_map.values()
+            if str(root_id).strip()
+        }
     target_blob = f"{target_role}\n{jd_text}\n{briefing_text}"
     briefing_signal_packet = {
         **extract_briefing_signal_packet(briefing_text),
@@ -817,7 +833,47 @@ def build_selected_graph_evidence_plan_for_section(
         or _SHARED_SECTION_LIMITS.get(section_id)
         or 8
     )
-    if section_id in _SHARED_SECTION_LIMITS:
+    if required_unify_root_ids:
+        eligible_by_id = {
+            str(row["bundle"].get("role_episode_bundle_id") or ""): row
+            for row in eligible_roots
+        }
+        missing_required_roots = sorted(required_unify_root_ids - set(eligible_by_id))
+        if missing_required_roots:
+            raise ValueError(
+                f"{section_id}: required slot bundles are not authority-eligible: "
+                + ", ".join(missing_required_roots)
+            )
+        if len(required_unify_root_ids) > max_items:
+            raise ValueError(
+                f"{section_id}: {len(required_unify_root_ids)} required slot bundles exceed "
+                f"the root budget {max_items}"
+            )
+        required_order = [
+            str(root_id).strip()
+            for _slot_id, root_id in unify_slot_bundle_map.items()
+            if str(root_id).strip()
+        ]
+        selected_roots = [eligible_by_id[root_id] for root_id in required_order]
+        selected_roots.extend(
+            row
+            for row in sorted(
+                eligible_roots,
+                key=lambda row: (
+                    -float(row["ranking_score"]),
+                    row["employer_lane"],
+                    str(row["bundle"].get("role_episode_bundle_id") or ""),
+                ),
+            )
+            if str(row["bundle"].get("role_episode_bundle_id") or "")
+            not in required_unify_root_ids
+        )
+        selected_roots = selected_roots[:max_items]
+        budgets = {
+            "required_unify_slot_bundles": len(required_unify_root_ids),
+            "ranked_remainder": max_items - len(required_unify_root_ids),
+        }
+    elif section_id in _SHARED_SECTION_LIMITS:
         budgets = _allocate_employer_root_budgets(
             candidates_by_employer=by_employer,
             employer_weights=employer_weights,
@@ -900,7 +956,11 @@ def build_selected_graph_evidence_plan_for_section(
         elif root.get("structural_rejection_reason"):
             root_reason = [str(root["structural_rejection_reason"])]
         elif root_selected:
-            root_reason = ["selected_by_authority_then_rank"]
+            root_reason = [
+                "selected_by_required_unify_slot_bundle_map"
+                if bundle_id in required_unify_root_ids
+                else "selected_by_authority_then_rank"
+            ]
         else:
             root_reason = ["root_budget_not_selected"]
         root_decision = build_candidate_decision(
@@ -1317,6 +1377,7 @@ def build_selected_graph_evidence_plan_for_section(
         "pretarget_authority_receipt": pretarget_authority_receipt,
         "target_role_profile": target_role_profile,
         "role_family_key": target_role_profile,
+        "unify_bullet_slot_bundle_map_resolved": unify_slot_bundle_map,
         "graph_weight_profile": {
             "profile": target_role_profile,
             "employer_weights": employer_weights,

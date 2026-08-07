@@ -173,6 +173,148 @@ class TestX2RoleEpisodeGates:
         gate = next(g for g in gates if g.gate_id == "x2_ibm_bullet_role_episode_bundle_id_required")
         assert gate.pass_ is True
 
+    def test_x2_bundle_id_gate_uses_frozen_allocation_when_present(self) -> None:
+        from apps_rg.runtime.sections.ibm_bullets_lane import (
+            _bind_ibm_change_log_to_frozen_allocation,
+        )
+        from apps_rg.runtime.validators.ibm_bullets_x2 import run_ibm_bullets_x2_gates
+
+        po = self._minimal_bullets_output()
+        allocations = []
+        for index, row in enumerate(po["change_log"], start=1):
+            bullet_id = row["bullet_id"]
+            root_id = f"reb_ibm_frozen_{index:03d}"
+            allocations.append(
+                {
+                    "section_id": "ibm_bullets",
+                    "claim_unit_id": f"ibm_bullets:{bullet_id}",
+                    "root_id": root_id,
+                    "skill_id": row["graph_skill_node_ids"][0],
+                }
+            )
+        _bind_ibm_change_log_to_frozen_allocation(
+            po,
+            selected_fact_plan={"allocation_assignments": allocations},
+        )
+        assert [row["role_episode_bundle_id"] for row in po["change_log"]] == [
+            f"reb_ibm_frozen_{index:03d}" for index in range(1, 6)
+        ]
+        gates = run_ibm_bullets_x2_gates(
+            bullets=po["bullets"],
+            parsed_output=po,
+            claim_ledger=po["claim_ledger"],
+            allowed_fact_ids={f"bul_ibm_{i:03d}" for i in range(1, 6)},
+            jd_text="",
+            runtime_generation_status="REAL_LLM",
+            proof_pool_metadata=self._graph_proof_meta("ibm_bullets"),
+            runtime_payload={
+                "selected_fact_plan": {"allocation_assignments": allocations}
+            },
+        )
+
+        gate = next(g for g in gates if g.gate_id == "x2_ibm_bullet_role_episode_bundle_id_required")
+        assert gate.pass_ is True
+
+    def test_frozen_allocation_rehydrates_display_and_ledger_by_slot(self) -> None:
+        from apps_rg.runtime.sections.ibm_bullets_lane import (
+            _materialize_ibm_bullets_from_frozen_allocation,
+        )
+
+        parsed = self._minimal_bullets_output()
+        for row in parsed["bullets"]:
+            row["bullet_text"] = "Model prose from the wrong slot."
+        allocations = [
+            {
+                "section_id": "ibm_bullets",
+                "claim_unit_id": f"ibm_bullets:bul_ibm_{index:03d}",
+                "root_claim_text": f"Frozen graph claim for slot {index}.",
+            }
+            for index in range(1, 6)
+        ]
+
+        changed = _materialize_ibm_bullets_from_frozen_allocation(
+            parsed,
+            selected_fact_plan={"allocation_assignments": allocations},
+        )
+
+        assert changed is True
+        assert [row["bullet_text"] for row in parsed["bullets"]] == [
+            f"Frozen graph claim for slot {index}." for index in range(1, 6)
+        ]
+        assert [row["source_fact_ids"] for row in parsed["claim_ledger"]] == [
+            [f"bul_ibm_{index:03d}"] for index in range(1, 6)
+        ]
+
+    def test_frozen_allocation_rehydrates_distinct_source_bound_mechanisms_and_metric(self) -> None:
+        from apps_rg.runtime.sections.ibm_bullets_graph_evidence import (
+            IBM_BULLET_MECHANISM_VOCAB,
+        )
+        from apps_rg.runtime.sections.ibm_bullets_lane import (
+            _materialize_ibm_bullets_from_frozen_allocation,
+        )
+        from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+            run_bullet_quality_floor_gates,
+        )
+
+        parsed = self._minimal_bullets_output()
+        allocations = [
+            {
+                "section_id": "ibm_bullets",
+                "claim_unit_id": "ibm_bullets:bul_ibm_001",
+                "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "skill_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+                "root_claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+                "metric_text": "20% joint revenue growth",
+            },
+            {
+                "section_id": "ibm_bullets",
+                "claim_unit_id": "ibm_bullets:bul_ibm_002",
+                "root_id": "reb_ibm_data_modeling_bi_decision_support",
+                "skill_id": "skill_sr_cloud_data_platform_engineering",
+                "root_claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions",
+            },
+            {
+                "section_id": "ibm_bullets",
+                "claim_unit_id": "ibm_bullets:bul_ibm_003",
+                "root_id": "reb_ibm_revenue_sales_target_execution",
+                "skill_id": "skill_partner_pnl_oversight",
+                "root_claim_text": "Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions",
+            },
+            {
+                "section_id": "ibm_bullets",
+                "claim_unit_id": "ibm_bullets:bul_ibm_004",
+                "root_id": "reb_ibm_data_modeling_bi_decision_support",
+                "skill_id": "skill_p2_tech_reference_architecture",
+                "root_claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions",
+            },
+            {
+                "section_id": "ibm_bullets",
+                "claim_unit_id": "ibm_bullets:bul_ibm_005",
+                "root_id": "reb_ibm_presales_solution_engineering",
+                "skill_id": "skill_p2_gtm_executive_buyer_alignment",
+                "root_claim_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits",
+            },
+        ]
+
+        changed = _materialize_ibm_bullets_from_frozen_allocation(
+            parsed,
+            selected_fact_plan={"allocation_assignments": allocations},
+        )
+
+        assert changed is True
+        by_id = {row["bullet_id"]: row for row in parsed["bullets"]}
+        assert "20% joint revenue growth" in by_id["bul_ibm_001"]["bullet_text"]
+        assert by_id["bul_ibm_001"]["has_metric"] is True
+        assert "P&L oversight" in by_id["bul_ibm_003"]["bullet_text"]
+        assert "reference architectures" in by_id["bul_ibm_004"]["bullet_text"]
+        assert by_id["bul_ibm_004"]["has_metric"] is False
+        _, _, technical_pass, technical_results, _, _ = run_bullet_quality_floor_gates(
+            parsed["bullets"],
+            section_id="ibm_bullets",
+            mechanism_vocab_by_slot=IBM_BULLET_MECHANISM_VOCAB,
+        )
+        assert technical_pass, [row.failure_reason for row in technical_results]
+
     def test_x2_hold_metric_fails_on_forbidden_output(self) -> None:
         from apps_rg.runtime.validators.ibm_bullets_x2 import run_ibm_bullets_x2_gates
         po = self._minimal_bullets_output()

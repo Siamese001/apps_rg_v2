@@ -131,6 +131,24 @@ def _plan_fact_id(fact: Mapping[str, Any]) -> str:
     return str(fact.get("fact_id") or fact.get("candidate_fact_id") or "").strip()
 
 
+def _plan_fact_evidence_id(fact: Mapping[str, Any]) -> str:
+    """Return the immutable fact identity that a C0.2 atom can bind.
+
+    Whole-resume allocation may replace a graph fact's visible ``fact_id`` with
+    a render-only slot such as ``bul_unify_001``.  That slot is useful to the
+    renderer, but it is not a graph node and must not become the C0.3 lookup
+    identity.  The allocation contract carries the original fact explicitly
+    as ``candidate_fact_id``; ordinary section plans continue to use their
+    existing fact id.
+    """
+    return str(fact.get("candidate_fact_id") or _plan_fact_id(fact) or "").strip()
+
+
+def _plan_fact_authority_root_id(fact: Mapping[str, Any]) -> str:
+    """Return the graph role-episode root that authorizes the direct path."""
+    return str(fact.get("role_episode_bundle_id") or _plan_fact_id(fact) or "").strip()
+
+
 def _authority_decision_index(plan: Mapping[str, Any]) -> dict[tuple[str, str], dict[str, Any]]:
     out: dict[tuple[str, str], dict[str, Any]] = {}
     for raw in plan.get("graph_candidate_decision_ledger") or []:
@@ -178,21 +196,34 @@ def _selected_plan_graph_selection(
     selected_by_fact: dict[str, list[dict[str, Any]]] = {}
     rejected_by_fact: dict[str, list[dict[str, Any]]] = {}
     decisions: list[dict[str, Any]] = []
+    decision_by_path: dict[str, dict[str, Any]] = {}
+    evidence_fact_ids_by_root: dict[str, set[str]] = {}
     recorder = TraversalRecorder(section_id=section_id, max_hop_depth=1)
 
     for fact in sorted(facts, key=_plan_fact_id):
-        fact_id = _plan_fact_id(fact)
+        display_fact_id = _plan_fact_id(fact)
+        evidence_fact_id = _plan_fact_evidence_id(fact)
+        authority_root_id = _plan_fact_authority_root_id(fact)
+        if not evidence_fact_id or not authority_root_id:
+            # The initial filter above requires a render/display identity.  A
+            # graph direct path also requires both an immutable evidence fact
+            # and a graph authority root, so an incomplete allocation cannot
+            # silently become claim support.
+            continue
+        evidence_fact_ids_by_root.setdefault(authority_root_id, set()).add(evidence_fact_id)
         linked_sources = list(
             fact.get("linked_source_fact_ids")
             or fact.get("linked_identity_fact_ids")
             or fact.get("source_fact_ids")
-            or [fact_id]
+            or [evidence_fact_id]
         )
+        if evidence_fact_id not in linked_sources:
+            linked_sources.append(evidence_fact_id)
         selected_rows: list[dict[str, Any]] = []
         rejected_rows: list[dict[str, Any]] = []
         for skill_id in sorted(_skill_ids_from_plan_fact(fact)):
             row = skill_by_id.get(skill_id) or {}
-            upstream = upstream_index.get((fact_id, skill_id)) or {}
+            upstream = upstream_index.get((authority_root_id, skill_id)) or {}
             upstream_authority = upstream.get("authority")
             if isinstance(upstream_authority, Mapping):
                 authority = dict(upstream_authority)
@@ -221,12 +252,17 @@ def _selected_plan_graph_selection(
                     extra_reason_codes=[] if row else ["missing_skill_authority_row"],
                 )
 
-            path_id = str(upstream.get("candidate_path_id") or f"plan:{fact_id}/skill:{skill_id}")
+            path_id = str(
+                upstream.get("candidate_path_id")
+                or f"root:{authority_root_id}/skill:{skill_id}"
+            )
             proof_strength = float(upstream.get("proof_strength_raw") or 1.0)
             target_alignment = float(upstream.get("target_alignment_score") or 0.0)
             ranking_score = float(upstream.get("ranking_score") or proof_strength + target_alignment)
             candidate = {
-                "fact_id": fact_id,
+                "fact_id": evidence_fact_id,
+                "display_fact_id": display_fact_id,
+                "authority_root_id": authority_root_id,
                 "skill_id": skill_id,
                 "skill_label": str(row.get("label") or row.get("skill_name") or skill_id),
                 "claim_eligibility": bool(authority.get("authority_pass")),
@@ -245,7 +281,7 @@ def _selected_plan_graph_selection(
                 "section_allowed": bool(authority.get("section_allowed")),
                 "path_signature": str(
                     upstream.get("path_signature")
-                    or f"{fact_id}->selected_graph_plan_contains_skill->{skill_id}"
+                    or f"{authority_root_id}->selected_graph_plan_contains_skill->{skill_id}"
                 ),
                 "proof_strength_raw": proof_strength,
                 "target_alignment_score": target_alignment,
@@ -276,78 +312,102 @@ def _selected_plan_graph_selection(
                 reason_codes=reason_codes,
                 authority=authority,
                 hop_depth=1,
-                parent_id=fact_id,
-                root_id=fact_id,
+                parent_id=authority_root_id,
+                root_id=authority_root_id,
                 proof_strength_raw=proof_strength,
                 target_alignment_score=target_alignment,
                 ranking_score=ranking_score,
                 path_signature=str(candidate["path_signature"]),
-                extra={"selection_source": "selected_graph_evidence_plan"},
+                extra={
+                    "selection_source": "selected_graph_evidence_plan",
+                    "evidence_fact_ids": [evidence_fact_id],
+                    "display_fact_ids": [display_fact_id],
+                },
             )
-            decisions.append(decision)
-            recorder.record(
-                event_type="edge_traversed",
-                hop_depth=1,
-                source_node_id=fact_id,
-                target_node_id=skill_id,
-                edge_type="selected_graph_plan_contains_skill",
-                candidate_path_id=path_id,
-            )
-            recorder.record(
-                event_type="authority_evaluated",
-                hop_depth=1,
-                source_node_id=fact_id,
-                target_node_id=skill_id,
-                edge_type="selected_graph_plan_contains_skill",
-                candidate_path_id=path_id,
-                authority_pass=bool(authority.get("authority_pass")),
-                reason_codes=authority.get("reason_codes") or [],
-            )
-            recorder.record(
-                event_type="candidate_terminal",
-                hop_depth=1,
-                source_node_id=fact_id,
-                target_node_id=skill_id,
-                edge_type="selected_graph_plan_contains_skill",
-                candidate_path_id=path_id,
-                authority_pass=bool(authority.get("authority_pass")),
-                decision="selected" if selected else "rejected",
-                reason_codes=reason_codes,
-            )
+            existing = decision_by_path.get(path_id)
+            if existing is None:
+                decisions.append(decision)
+                decision_by_path[path_id] = decision
+                recorder.record(
+                    event_type="edge_traversed",
+                    hop_depth=1,
+                    source_node_id=authority_root_id,
+                    target_node_id=skill_id,
+                    edge_type="selected_graph_plan_contains_skill",
+                    candidate_path_id=path_id,
+                )
+                recorder.record(
+                    event_type="authority_evaluated",
+                    hop_depth=1,
+                    source_node_id=authority_root_id,
+                    target_node_id=skill_id,
+                    edge_type="selected_graph_plan_contains_skill",
+                    candidate_path_id=path_id,
+                    authority_pass=bool(authority.get("authority_pass")),
+                    reason_codes=authority.get("reason_codes") or [],
+                )
+                recorder.record(
+                    event_type="candidate_terminal",
+                    hop_depth=1,
+                    source_node_id=authority_root_id,
+                    target_node_id=skill_id,
+                    edge_type="selected_graph_plan_contains_skill",
+                    candidate_path_id=path_id,
+                    authority_pass=bool(authority.get("authority_pass")),
+                    decision="selected" if selected else "rejected",
+                    reason_codes=reason_codes,
+                )
+            else:
+                # Multiple visible slots may intentionally use the same graph
+                # path.  Keep one terminal C0.3 candidate while preserving
+                # every bound fact/slot in the audit record.
+                for field, value in (
+                    ("evidence_fact_ids", evidence_fact_id),
+                    ("display_fact_ids", display_fact_id),
+                ):
+                    values = {str(item) for item in existing.get(field) or [] if str(item)}
+                    values.add(value)
+                    existing[field] = sorted(values)
 
-        selected_by_fact[fact_id] = selected_rows
-        rejected_by_fact[fact_id] = rejected_rows
+        selected_by_fact.setdefault(evidence_fact_id, []).extend(selected_rows)
+        rejected_by_fact.setdefault(evidence_fact_id, []).extend(rejected_rows)
 
     # Preserve rejected alternatives from a canonical upstream traversal when
     # they belong to selected facts and are not already represented above.
     represented = {(str(row.get("root_id") or ""), str(row.get("candidate_id") or "")) for row in decisions}
-    covered = set(selected_by_fact)
+    covered_roots = set(evidence_fact_ids_by_root)
     for raw in selected_graph_plan.get("graph_candidate_decision_ledger") or []:
         if not isinstance(raw, Mapping) or str(raw.get("candidate_type") or "") != "leaf_skill":
             continue
         root_id = str(raw.get("root_id") or raw.get("parent_id") or "").strip()
         skill_id = str(raw.get("candidate_id") or "").strip()
-        if root_id not in covered or not skill_id or (root_id, skill_id) in represented:
+        if root_id not in covered_roots or not skill_id or (root_id, skill_id) in represented:
             continue
         authority = dict(raw.get("authority") or {})
-        candidate = {
-            "fact_id": root_id,
-            "skill_id": skill_id,
-            "skill_label": skill_id,
-            "metric_bucket": str(raw.get("metric_bucket") or "general_business_outcome"),
-            "skill_family": str(raw.get("skill_family") or "unclassified"),
-            "path_signature": str(raw.get("path_signature") or ""),
-            "proof_strength_raw": float(raw.get("proof_strength_raw") or 0.0),
-            "target_alignment_score": float(raw.get("target_alignment_score") or 0.0),
-            "score": float(raw.get("ranking_score") or 0.0),
-            "authority": authority,
-            "authority_pass": bool(authority.get("authority_pass")),
-            "rejection_reason": ",".join(str(value) for value in raw.get("reason_codes") or []),
-            "failed_gate": "upstream_section_plan",
-            "selection_source": "selected_graph_evidence_plan",
-        }
-        rejected_by_fact.setdefault(root_id, []).append(candidate)
+        for evidence_fact_id in sorted(evidence_fact_ids_by_root[root_id]):
+            rejected_by_fact.setdefault(evidence_fact_id, []).append(
+                {
+                    "fact_id": evidence_fact_id,
+                    "authority_root_id": root_id,
+                    "skill_id": skill_id,
+                    "skill_label": skill_id,
+                    "metric_bucket": str(raw.get("metric_bucket") or "general_business_outcome"),
+                    "skill_family": str(raw.get("skill_family") or "unclassified"),
+                    "path_signature": str(raw.get("path_signature") or ""),
+                    "proof_strength_raw": float(raw.get("proof_strength_raw") or 0.0),
+                    "target_alignment_score": float(raw.get("target_alignment_score") or 0.0),
+                    "score": float(raw.get("ranking_score") or 0.0),
+                    "authority": authority,
+                    "authority_pass": bool(authority.get("authority_pass")),
+                    "rejection_reason": ",".join(
+                        str(value) for value in raw.get("reason_codes") or []
+                    ),
+                    "failed_gate": "upstream_section_plan",
+                    "selection_source": "selected_graph_evidence_plan",
+                }
+            )
         decision = dict(raw)
+        decision["evidence_fact_ids"] = sorted(evidence_fact_ids_by_root[root_id])
         decisions.append(decision)
         path_id = str(decision.get("candidate_path_id") or f"plan:{root_id}/skill:{skill_id}")
         recorder.record(
@@ -562,7 +622,6 @@ def _combine_component_receipts(
         )
         traversal = component.get("graph_traversal_receipt") or {}
         events.extend(dict(row) for row in traversal.get("events") or [] if isinstance(row, Mapping))
-        authority = component.get("pretarget_authority_receipt") or {}
         component_rows.append(
             {
                 "schema_version": component.get("schema_version"),
@@ -791,10 +850,13 @@ def expand_c03_graph_bindings(
         query_id = _atom_query_fact_id(atom)
         query_to_surfaces.setdefault(query_id, []).append(surface)
 
-    # A frozen selected plan is the primary direct authority.  Do not eagerly
-    # materialize or query SQLite when that plan (or a canonical role bundle)
-    # already covers every atom.  Unknown IDs are also rejected before the
-    # projection adapter so a nonexistent fact cannot force a fail-open query.
+    # A frozen selected plan is the primary direct claim authority.  It can
+    # satisfy every atom without a per-fact SQLite candidate search, but the
+    # role-family targeting proof is still required for every C0.3 result.
+    # Resolve that one immutable projection up front; unknown role families
+    # therefore fail closed even when a plan happens to cover all atoms.
+    # Unknown IDs are rejected before the per-fact projection adapter so a
+    # nonexistent fact cannot force a fail-open candidate query.
     from apps_rg.fact_inventory.augmented_skills_graph import load_augmented_skills_graph
 
     canonical_graph = load_augmented_skills_graph(repo_root=repo_root)
@@ -818,14 +880,8 @@ def expand_c03_graph_bindings(
         if query_id in canonical_fact_ids
     }
     pillar_hints = resolve_c0_pillar_hints(role_family_key, repo_root=repo_root)
-    projection: dict[str, Any] = {
-        "role_family_key": role_family_key,
-        "pillar_hint_ids": list(pillar_hints),
-        "sqlite_projection_row_found": False,
-        "projection_source": "frozen_graph_plan_or_canonical_frontier",
-        "release_eligible_targeting_proof": False,
-        "targeting_degraded_explicit": False,
-    }
+    projection = resolve_role_family_projection(role_family_key, repo_root=repo_root)
+    pillar_hints = tuple(projection.get("pillar_hint_ids") or ()) or pillar_hints
     ctx: dict[str, Any] = {"sqlite_db_path": "", "context": {}}
     inner: dict[str, Any] = {}
     sqlite_selection: dict[str, Any] = {
@@ -852,8 +908,6 @@ def expand_c03_graph_bindings(
         "run_id_scope": run_id,
     }
     if query_to_surfaces:
-        projection = resolve_role_family_projection(role_family_key, repo_root=repo_root)
-        pillar_hints = tuple(projection.get("pillar_hint_ids") or ()) or pillar_hints
         # Keep the generated SQLite adapter behind the execution boundary.
         from apps_rg.runtime.c03_graph_sqlite_context import (
             assemble_c03_graph_sqlite_context,
@@ -979,9 +1033,6 @@ def expand_c03_graph_bindings(
                 str(row.get("metric_bucket") or "general_business_outcome") for row in selected_flat
             ).items()
         )
-    )
-    skill_family_counts = dict(
-        sorted(Counter(str(row.get("skill_family") or "unclassified") for row in selected_flat).items())
     )
     return {
         # Keep the historical top-level schema for existing app contracts. The

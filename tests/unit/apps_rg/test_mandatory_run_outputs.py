@@ -5,6 +5,8 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 
 from apps_rg.runtime.full_resume_review_bundle import write_review_index
@@ -949,7 +951,7 @@ def test_failed_lane_table_hydrates_provider_proof_from_current_run(tmp_path: Pa
         {
             "provider_requested": "external_claude",
             "provider_attempted": True,
-            "model": "claude-sonnet-5",
+            "model": pins.CLAUDE_GENERATOR_MODEL,
         },
     )
     _write_json(
@@ -1005,7 +1007,7 @@ def test_failed_lane_table_hydrates_provider_proof_from_current_run(tmp_path: Pa
     row = next(row for row in doc["section_lane_table"] if row["section"] == "unify_bullets")
     assert row["provider_call_attempted"] is True
     assert row["primary_provider"] == "external_claude"
-    assert row["primary_model_observed"] == "claude-sonnet-5"
+    assert row["primary_model_observed"] == pins.CLAUDE_GENERATOR_MODEL
     assert row["generation_status"] == "REAL_LLM"
     recommendations = doc["inline_required_output"]["bcg"]["p0_p1_px_recommendations"]["rows"]
     assert not any(
@@ -1163,7 +1165,9 @@ def test_mandatory_outputs_rca_classifies_selector_timeout(tmp_path: Path) -> No
     assert "Provider selector budget" in domains
 
 
-def test_mandatory_row0_reports_apps_research_provider_when_handoff_missing(tmp_path: Path) -> None:
+def test_mandatory_row0_does_not_invent_apps_research_model_when_handoff_missing(
+    tmp_path: Path,
+) -> None:
     run = tmp_path / "delegated_research_missing_handoff"
     run.mkdir()
     brief = tmp_path / "delegated_briefing.txt"
@@ -1186,8 +1190,8 @@ def test_mandatory_row0_reports_apps_research_provider_when_handoff_missing(tmp_
 
     briefing = emitted["payload"]["section_lane_table"][0]
     assert briefing["research_source_class"] == "FRESH_APPS_RESEARCH"
-    assert briefing["primary_provider"] == "external_openai"
-    assert briefing["primary_model_observed"] == "gpt-5.4-mini-2026-03-17"
+    assert briefing["primary_provider"] == "NOT_OBSERVED"
+    assert briefing["primary_model_observed"] == "MODEL_NOT_OBSERVED"
     assert briefing["x2"] == "NOT_OBSERVED; blocker=missing_apps_research_handoff_v2"
     assert briefing["x3"] == "NOT_OBSERVED; blocker=missing_apps_research_handoff_v2"
 
@@ -1236,6 +1240,57 @@ def test_apps_research_gate_context_projects_frozen_v2_receipt_status(
     assert context["reason"] == expected_reason
 
 
+def test_apps_research_gate_context_consumes_observed_models_from_handoff(
+    tmp_path: Path,
+) -> None:
+    run = tmp_path / "observed_models"
+    run.mkdir()
+    _write_json(
+        run / "apps_research_handoff_validation_receipt.json",
+        {
+            "schema_version": "apps_rg.apps_research_handoff_validation_receipt.v2",
+            "status": "PASS",
+            "failure_reasons": [],
+        },
+    )
+    _write_json(
+        run / "apps_research_apps_rg_handoff_v2.json",
+        {
+            "identity": {"child_run_id": "research-observed"},
+            "mandatory_gate_receipts": {
+                gate: {"status": "PASS"}
+                for gate in ("G5", "G6", "G7", "G21", "G24", "G26")
+            },
+            "exit_authorization": {"x3_code": "X3D_ALLOW_FINISH"},
+            "model_observations": {
+                "generation": {
+                    "provider": "external_openai",
+                    "observed_model": "producer-reported-generation-model",
+                    "status": "OBSERVED_PROVIDER_RESPONSE",
+                },
+                "judge": {
+                    "provider": "gemini_pro",
+                    "observed_model": "producer-reported-judge-model",
+                    "status": "OBSERVED_PROVIDER_RESPONSE",
+                },
+            },
+        },
+    )
+
+    context = _apps_research_gate_context(
+        run,
+        repo_root=tmp_path,
+        ingress={},
+        spine={},
+        brief_ref="",
+        auto_research_internal=False,
+    )
+
+    assert context["generation_provider"] == "external_openai"
+    assert context["generation_model"] == "producer-reported-generation-model"
+    assert context["x2_judge_model"] == "producer-reported-judge-model"
+
+
 def test_mandatory_row0_rejects_legacy_apps_research_handoff(tmp_path: Path) -> None:
     run = tmp_path / "authorized_research_handoff"
     run.mkdir()
@@ -1264,7 +1319,7 @@ def test_mandatory_row0_rejects_legacy_apps_research_handoff(tmp_path: Path) -> 
             "is_stale": False,
             "handoff_eligible": True,
             "generation_provider": "external_openai",
-            "generation_model": "gpt-5.4-mini-2026-03-17",
+            "generation_model": pins.RESEARCH_GENERATOR_MODEL,
             "provider_call_attempted": True,
             "brief_sha256": brief_sha,
             "jd_sha256": jd_sha,
@@ -1281,7 +1336,8 @@ def test_mandatory_row0_rejects_legacy_apps_research_handoff(tmp_path: Path) -> 
                     "threshold": 0.75,
                     "judge_name": "gemini_pro",
                     "judge_provider": "gemini_pro",
-                    "judge_model": "gemini-3.1-pro-preview",
+                    "judge_model": pins.GEMINI_PROOF_JUDGE_MODEL,
+                    "thinking_level": pins.RESEARCH_JUDGE_REASONING_EFFORT,
                     "model_backed": True,
                     "provider_status": "MODEL_BACKED_PASS",
                 },
@@ -1313,9 +1369,9 @@ def test_mandatory_row0_rejects_legacy_apps_research_handoff(tmp_path: Path) -> 
     assert briefing["section"] == "research_briefing_input"
     assert briefing["provider_call_attempted"] is True
     assert briefing["research_source_class"] == "FRESH_APPS_RESEARCH"
-    assert briefing["primary_provider"] == "external_openai"
-    assert briefing["primary_model_observed"] == "gpt-5.4-mini-2026-03-17"
-    assert briefing["x2"] == "BLOCKED"
+    assert briefing["primary_provider"] == "NOT_OBSERVED"
+    assert briefing["primary_model_observed"] == "MODEL_NOT_OBSERVED"
+    assert briefing["x2"] == "BLOCKED; judge=MODEL_NOT_OBSERVED"
     assert briefing["x3"] == "NOT_OBSERVED; blocker=legacy_only_handoff_rejected"
     assert all(
         gate["pass"]
@@ -1458,9 +1514,9 @@ def test_bcg_surfaces_final_aggregation_x2_failure_as_p0(tmp_path: Path) -> None
             "judges": [
                 {
                     "judge_id": "x1d_gemini_pro_full_resume_coherence",
-                    "provider_name": "Google Gemini 3.1 Pro Preview",
+                    "provider_name": "Google Gemini 3.6 Flash",
                     "provider_key": "gemini_pro",
-                    "model_name": "gemini-3.1-pro-preview",
+                    "model_name": pins.GEMINI_PROOF_JUDGE_MODEL,
                     "provider_status": "BLOCKED_PROVIDER_ERROR",
                     "pass": False,
                     "threshold": 0.8,
@@ -1593,9 +1649,9 @@ def test_bcg_classifies_final_aggregation_upstream_certification_failure(tmp_pat
         {
             "judges": [
                 {
-                    "provider_name": "Google Gemini 3.1 Pro Preview",
+                    "provider_name": "Google Gemini 3.6 Flash",
                     "provider_key": "gemini_pro",
-                    "model_name": "gemini-3.1-pro-preview",
+                    "model_name": pins.GEMINI_PROOF_JUDGE_MODEL,
                     "provider_status": "MODEL_BACKED_PASS",
                     "score": 5,
                     "threshold": 4,
@@ -1604,7 +1660,7 @@ def test_bcg_classifies_final_aggregation_upstream_certification_failure(tmp_pat
                 {
                     "provider_name": "OpenAI ChatGPT",
                     "provider_key": "openai_chatgpt",
-                    "model_name": "gpt-5.5",
+                    "model_name": pins.COMPETENCIES_SELECTOR_MODEL,
                     "provider_status": "MODEL_BACKED_PASS",
                     "score": 4.4,
                     "threshold": 4,
@@ -1987,9 +2043,9 @@ def test_exec_summary_deterministic_gate_rca_names_synthesis_contract() -> None:
 def test_x1d_decisive_judge_failure_rca_surfaces_without_failed_x2_gates() -> None:
     judges = [
         {
-            "provider": "Google Gemini 3.1 Pro Preview",
+            "provider": "Google Gemini 3.6 Flash",
             "provider_key": "gemini_pro",
-            "model": "gemini-3.1-pro-preview",
+            "model": pins.GEMINI_PROOF_JUDGE_MODEL,
             "score": 0.0,
             "threshold": 4.0,
             "pass": False,

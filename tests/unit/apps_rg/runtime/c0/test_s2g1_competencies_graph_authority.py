@@ -9,6 +9,7 @@ from types import SimpleNamespace
 from apps_rg.runtime.c0.competencies_graph_authority import (
     _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS,
     _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT,
+    _allocation_surface_category,
     build_competencies_graph_authority_discrepancy_ledger,
     insurance_it_strategy_frozen_layout_is_present,
     materialize_unmatched_competencies_allocation_terms,
@@ -791,6 +792,43 @@ def test_unmatched_allocations_materialize_only_graph_authored_terms(monkeypatch
     assert set(final["unmatched_claim_unit_ids"]) == {
         row["claim_unit_id"] for row in assignments[2:]
     }
+
+
+def test_joint_alliance_surface_is_placed_in_commercialization_category() -> None:
+    categories = [
+        {"category_label": "Partner Applied AI Architecture", "terms": []},
+        {
+            "category_label": "Commercial & Operating Impact",
+            "resume_display_label": "Platform Productization & Commercialization",
+            "terms": [],
+        },
+    ]
+    assignment = {
+        "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_id": "skill_partner_joint_solution_development",
+    }
+
+    category = _allocation_surface_category(
+        categories,
+        phrase="AWS alliance modernization co-sell and joint development",
+        assignment=assignment,
+    )
+
+    assert category is categories[1]
+    rich, reason = check_competencies_visible_terms_svp_agentic_richness(
+        [
+            {
+                "visible_graph_surface": True,
+                "resume_display_label": "Platform Productization & Commercialization",
+                "terms": [
+                    {
+                        "text": "AWS alliance modernization co-sell and joint development"
+                    }
+                ],
+            }
+        ]
+    )
+    assert rich is True, reason
 
 
 def test_unmatched_allocations_use_bound_resume_surfaces_for_compact_graph_skills() -> None:

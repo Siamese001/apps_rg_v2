@@ -43,7 +43,11 @@ UNIFY_BULLET_SLOT_IDS: tuple[str, ...] = (
 
 UNIFY_BULLET_SLOT_BUNDLE_MAP: dict[str, str] = {
     "bul_unify_001": "reb_unify_agentic_platform_architecture",
-    "bul_unify_002": "reb_unify_dependency_graph_accelerator",
+    # The legacy dependency-graph accelerator is intentionally internal-only
+    # and is therefore ineligible for a customer-facing résumé claim.  Keep
+    # the visible six-slot shape, but bind slot 002 to an ACTIVE_CONFIRMED
+    # graph bundle with external claim authority.
+    "bul_unify_002": "reb_unify_enterprise_adoption_revenue",
     "bul_unify_003": "reb_unify_runtime_reliability_governance",
     "bul_unify_004": "reb_unify_production_adoption_lifecycle",
     "bul_unify_005": "reb_unify_distributed_ecosystem_engineering",
@@ -75,6 +79,56 @@ def resolve_unify_bullet_slot_bundle_map(
         graph=graph,
         protected_slots=UNIFY_METRIC_PROTECTED_BULLET_SLOT_IDS,
     )
+
+
+def resolve_unify_bullet_slot_bundle_map_with_fallback(
+    role_family_key: str = "",
+    *,
+    repo_root: Path | None = None,
+) -> dict[str, str]:
+    """Return the single runtime slot contract used by planning and prompt assembly.
+
+    Some target profiles deliberately have no JD-fit override.  In that case
+    the graph-authored canonical Unify slot map remains the contract; the
+    fallback is not a heuristic and must be identical for every consumer.
+    """
+    resolved: dict[str, str]
+    if role_family_key:
+        try:
+            resolved = resolve_unify_bullet_slot_bundle_map(
+                role_family_key,
+                repo_root=repo_root,
+            )
+        except ValueError:
+            resolved = dict(UNIFY_BULLET_SLOT_BUNDLE_MAP)
+    else:
+        resolved = dict(UNIFY_BULLET_SLOT_BUNDLE_MAP)
+
+    # A JD-fit profile may prioritize a bundle that is valid as internal
+    # engineering context but explicitly prohibited from an external résumé
+    # claim.  Retain every valid profile override, replacing only those
+    # forbidden slots with their graph-authored externally eligible default.
+    for slot_id, default_bundle_id in UNIFY_BULLET_SLOT_BUNDLE_MAP.items():
+        bundle_id = str(resolved.get(slot_id) or "").strip()
+        bundle = get_bundle_by_id(bundle_id) if bundle_id else None
+        external_policy = str((bundle or {}).get("external_claim_policy") or "")
+        activation_status = str((bundle or {}).get("activation_status") or "")
+        if (
+            not bundle
+            or external_policy == "internal_only_not_external_claim"
+            or activation_status == "ACTIVE_INTERNAL_ONLY"
+        ):
+            resolved[slot_id] = default_bundle_id
+
+    expected_slots = set(UNIFY_BULLET_SLOT_BUNDLE_MAP)
+    resolved_values = [str(resolved.get(slot_id) or "").strip() for slot_id in expected_slots]
+    if (
+        set(resolved) != expected_slots
+        or any(not bundle_id for bundle_id in resolved_values)
+        or len(set(resolved_values)) != len(resolved_values)
+    ):
+        return dict(UNIFY_BULLET_SLOT_BUNDLE_MAP)
+    return {slot_id: str(resolved[slot_id]) for slot_id in UNIFY_BULLET_SLOT_IDS}
 
 UNIFY_FORBIDDEN_C0_PROMPT_SUBSTRINGS: tuple[str, ...] = (
     "CANONICAL UNIFY FACTS",
@@ -159,27 +213,6 @@ def _mechanism_vocab_from_bundle(bundle: dict[str, Any]) -> list[str]:
     return tokens[:8]
 
 
-def _role_family_required_axes(target_role_profile: str) -> tuple[str, ...]:
-    profile = str(target_role_profile or "").strip().upper()
-    if profile == "PARTNER_APPLIED_AI_ARCHITECTURE":
-        return (
-            "agentic_platform_architecture",
-            "partner_channel_cosell",
-            "enterprise_adoption_revenue",
-            "production_adoption_lifecycle",
-            "distributed_ecosystem_engineering",
-            "platform_commercialization_leadership",
-        )
-    return (
-        "agentic_platform_architecture",
-        "dependency_graph_accelerator",
-        "runtime_reliability_governance",
-        "production_adoption_lifecycle",
-        "distributed_ecosystem_engineering",
-        "platform_commercialization_leadership",
-    )
-
-
 def build_unify_graph_traversal_sufficiency_receipt(
     *,
     section_id: str,
@@ -218,11 +251,19 @@ def build_unify_graph_traversal_sufficiency_receipt(
     rejected_skill_ids = _collect(rejected_ids, "graph_skill_node_ids")
     selected_metric_ids = _collect(selected_ids, "linked_metric_outcome_ids")
     rejected_metric_ids = _collect(rejected_ids, "linked_metric_outcome_ids")
-    selected_axes = [
-        str((bundle_by_id.get(bid) or {}).get("root_capability_node_id") or bid.replace("reb_unify_", ""))
-        for bid in selected_ids
+    def _axis_for_bundle(bundle_id: str) -> str:
+        bundle = bundle_by_id.get(bundle_id) or {}
+        return str(bundle.get("root_capability_node_id") or bundle_id.replace("reb_unify_", ""))
+
+    selected_axes = [_axis_for_bundle(bid) for bid in selected_ids]
+    # The visible Unify slots are deliberately bound to the runtime-resolved,
+    # externally eligible bundle map.  Validate graph depth against that
+    # immutable slot contract instead of a stale role-family list which can
+    # name an internal-only root prohibited from résumé prose.
+    required_axes = [
+        _axis_for_bundle(str(slot_bundle_map.get(slot_id) or ""))
+        for slot_id in UNIFY_BULLET_SLOT_IDS
     ]
-    required_axes = list(_role_family_required_axes(target_role_profile))
     missing_axes = [axis for axis in required_axes if axis not in selected_axes]
 
     return {
@@ -354,16 +395,10 @@ def attach_role_episode_bundles_to_proof_pool_metadata(
             or out.get("target_role_profile")
             or ""
         ).strip()
-        if target_role_profile:
-            try:
-                slot_bundle_map = resolve_unify_bullet_slot_bundle_map(
-                    target_role_profile,
-                    repo_root=repo_root,
-                )
-            except ValueError:
-                slot_bundle_map = dict(UNIFY_BULLET_SLOT_BUNDLE_MAP)
-        else:
-            slot_bundle_map = dict(UNIFY_BULLET_SLOT_BUNDLE_MAP)
+        slot_bundle_map = resolve_unify_bullet_slot_bundle_map_with_fallback(
+            target_role_profile,
+            repo_root=repo_root,
+        )
         out["unify_bullet_slot_bundle_map_resolved"] = slot_bundle_map
         out["unify_graph_traversal_sufficiency_receipt"] = build_unify_graph_traversal_sufficiency_receipt(
             section_id=section_id,
@@ -429,10 +464,11 @@ def format_unify_role_episode_evidence_pack(
         "- Each bullet/narrative claim MUST cite role_episode_bundle_id in change_log.",
         "- skill_id alone is not proof; linked_source_fact_ids and approved metric_outcome_ids bind claims.",
         (
-            "- metric_outcome_usage_contract: every bul_unify_* bullet MUST choose >=1 "
-            "approved metric_outcome_id from its slot bundle, surface one of that node's metric/"
-            "surface_tokens in bullet_text, set metric_raw to the chosen metric_outcome_id(s), "
-            "and record it in change_log.metric_outcome_ids[]."
+            "- metric_outcome_usage_contract: every bul_unify_* bullet MUST use its one "
+            "slot-assigned metric_outcome_id, surface one of that node's metric/surface_tokens "
+            "in bullet_text, set metric_raw to that ID, and record the same single ID in "
+            "change_log.metric_outcome_ids[]. Do not emit another metric or outcome from the "
+            "same bundle."
         ),
         "- Internal-only signals (dependency graph accelerator, identity controls) are supporting context — not external metrics.",
     ]
@@ -442,12 +478,6 @@ def format_unify_role_episode_evidence_pack(
         )
         for fid in sorted(str(x) for x in allowed_fact_ids_raw):
             header_lines.append(f"- {fid}")
-    header_lines.append(
-        "\nAPPROVED_METRIC_OUTCOME_IDS (metric claims allowed only when bound to these IDs):"
-    )
-    for mid in APPROVED_METRIC_OUTCOME_IDS:
-        header_lines.append(f"- {_metric_option_label(mid)}")
-
     header = "\n".join(header_lines)
 
     if section_id == "unify_narrative":
@@ -499,6 +529,14 @@ def format_unify_role_episode_evidence_pack(
             ),
         )
     slot_blocks: list[str] = []
+    selected_metric_by_slot: dict[str, str] = {}
+    for fact in plan.get("facts") or []:
+        if not isinstance(fact, dict):
+            continue
+        slot_id = str(fact.get("fact_id") or "").strip()
+        metric_ids = [str(mid).strip() for mid in (fact.get("metric_outcome_ids") or []) if str(mid).strip()]
+        if slot_id in UNIFY_BULLET_SLOT_IDS and len(metric_ids) == 1:
+            selected_metric_by_slot[slot_id] = metric_ids[0]
     for slot_id in UNIFY_BULLET_SLOT_IDS:
         bundle_id = slot_bundle_map.get(slot_id, "")
         bundle = get_bundle_by_id(bundle_id) if bundle_id else None
@@ -506,17 +544,25 @@ def format_unify_role_episode_evidence_pack(
             slot_blocks.append(f"{slot_id} | ERROR: missing bundle {bundle_id}")
             continue
         vocab = _mechanism_vocab_from_bundle(bundle)
-        allowed_metrics = _bundle_allowed_metric_outcome_ids(bundle)
+        selected_metric = selected_metric_by_slot.get(slot_id)
+        bundle_metrics = _bundle_allowed_metric_outcome_ids(bundle)
+        if selected_metric and selected_metric not in bundle_metrics:
+            raise ValueError(
+                f"{section_id}: {slot_id} selected metric {selected_metric} is not bound to {bundle_id}"
+            )
+        allowed_metrics = [selected_metric] if selected_metric else bundle_metrics
         lines = [
             f"{slot_id} | compose_one_bullet_from:",
             f"  role_episode_bundle_id: {bundle_id}",
             f"  employer: {bundle.get('employer')} | time_window: {UNIFY_TIME_WINDOW}",
             f"  allowed_source_fact_ids: {list(bundle.get('linked_source_fact_ids') or []) + [slot_id]}",
+            f"  selected_metric_outcome_id: {_metric_option_label(allowed_metrics[0]) if len(allowed_metrics) == 1 else ''}",
             f"  allowed_metric_outcome_ids: {[_metric_option_label(mid) for mid in allowed_metrics]}",
             (
-                "  metric_outcome_usage_contract: choose >=1 approved metric_outcome_id for this "
-                "bullet; surface its metric/surface_tokens in bullet_text; record it in "
-                "change_log.metric_outcome_ids; set metric_raw to the chosen metric_outcome_id(s)."
+                "  metric_outcome_usage_contract: use exactly the selected_metric_outcome_id for this "
+                "bullet; surface its metric/surface_tokens in bullet_text; record that one ID in "
+                "change_log.metric_outcome_ids; set metric_raw to that one ID; do not emit any "
+                "other metric/outcome from this bundle."
             ),
             "  metric_outcome_options:",
             *[f"    - {_metric_option_label(mid)}" for mid in allowed_metrics],
@@ -583,6 +629,7 @@ __all__ = [
     "UNIFY_BULLET_SLOT_IDS",
     "UNIFY_METRIC_PROTECTED_BULLET_SLOT_IDS",
     "UNIFY_ROLE_EPISODE_EVIDENCE_MARKER",
+    "resolve_unify_bullet_slot_bundle_map_with_fallback",
     "assert_unify_role_episode_evidence_pack_has_no_forbidden_leaks",
     "assert_unify_section_may_consume_graph_context",
     "attach_role_episode_bundles_to_proof_pool_metadata",

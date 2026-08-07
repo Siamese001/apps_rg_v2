@@ -195,6 +195,52 @@ def test_load_companion_unify_from_latest_successful_pointer(tmp_path: Path, mon
     assert len(ctx.get("bullet_ids") or []) == len(UNIFY_BULLET_IDS)
 
 
+def test_load_companion_unify_from_direct_current_envelope_artifact(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A current envelope may expose its lane before pointer publication."""
+    from apps_rg.runtime.runtime_proof_layout import MODULAR_R4_SECTIONS_ROOT_ENV
+    import apps_rg.runtime.sections.unify_narrative_lane as unify_narrative_lane
+    from apps_rg.runtime.sections_root_manifest import emit_sections_root_manifest
+
+    monkeypatch.delenv("APPS_RG_TEST_HARNESS", raising=False)
+    parsed, _allowed = unify_bullets_parsed_from_mock()
+    repo_root = tmp_path / "r"
+    repo_root.mkdir()
+    monkeypatch.setattr(unify_narrative_lane, "REPO_ROOT", repo_root)
+    msr = repo_root / "sections"
+    msr.mkdir(parents=True, exist_ok=True)
+    emit_sections_root_manifest(
+        repo_root=repo_root,
+        sections_root_abs=msr,
+        source_env_literal=MODULAR_R4_SECTIONS_ROOT_ENV,
+        correlation_id="test-direct-companion-chain",
+        integrated_run_ref="test-integrated-run",
+        run_links_ref=None,
+    )
+    monkeypatch.setenv(MODULAR_R4_SECTIONS_ROOT_ENV, str(msr))
+    art = msr / "unify_bullets"
+    art.mkdir(parents=True, exist_ok=True)
+    (art / "l2_output.json").write_text(
+        json.dumps(
+            {
+                "section_id": "unify_bullets",
+                "product_quality_status": "PASS",
+                "runtime_generation_status": "REAL_LLM",
+                "bullets": parsed["bullets"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (art / "x3_disposition.json").write_text(
+        json.dumps({"x3_code": "X3_ALLOW", "x2_failed_gates": []}),
+        encoding="utf-8",
+    )
+    ctx = unify_narrative_lane.load_companion_unify_bullets_context()
+    assert ctx["status"] == ACCEPTED_FINALIZED_COMPANION_STATUS
+    assert ctx["l2_ref"].replace("\\", "/").endswith("sections/unify_bullets/l2_output.json")
+
+
 def test_legacy_latest_successful_pointer_alone_is_not_companion_authority(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

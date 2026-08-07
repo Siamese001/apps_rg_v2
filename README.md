@@ -10,6 +10,10 @@ not independently installable: product entry requires an external
 package and the U0 → L1 → L0 → C0 → PA → L2 → Exit contract sentinels. An
 uninstalled editable/source-tree dependency is valid; the receipt does not
 claim vendoring, independent installability, or behavior parity.
+Repository-local import precedence is enforced by small root-package shims.
+Bare `python` commands started from this repository root resolve `apps_rg`,
+`apps_research`, and `apps_eval` from `src/` before the editable Agentic
+Workflow installation.
 
 The complete six-wave offline evaluation surface is now implemented under
 `src/apps_rg/evals`. It provides the G1-G6 measurement contract, modular
@@ -17,7 +21,7 @@ resume-graph metrics, section and whole-resume quality evaluation, stored-run
 repeatability, critical-grader mutation testing, and seven-receipt CI
 ratcheting. Run its owned suite with:
 
-`PYTHONPATH=C:\Git\apps_rg_v2\src python -m pytest -q src/apps_rg/evals`
+`python -m pytest -q src/apps_rg/evals`
 
 The owned fixture suite does not create human labels, qualify a real corpus, or
 authorize release. A source-bound control plane now exists under
@@ -35,6 +39,10 @@ convergence sync and its single lint-only source difference.
 source-bound measurement remediation and remaining real-evidence gates;
 `src/apps_rg/evals/MEASUREMENT_VALIDITY_IMPLEMENTATION_RECEIPT.json` seals its
 code-only validation evidence.
+
+Current human-evidence gates, the single-versus-dual proof-judge roster, and
+the separate BGE-M3 QREL qualification boundary are documented in
+[`docs/QUALIFICATION_OPEN_ITEMS.md`](docs/QUALIFICATION_OPEN_ITEMS.md).
 
 ## C0.3 graph embeddings
 

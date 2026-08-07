@@ -441,6 +441,25 @@ def test_whole_resume_bullet_lanes_use_frozen_root_plans_and_keep_visible_slots(
             str(fact.get("fact_id") or "") for fact in sliced["facts"]
         } == set(claim_unit_ids)
         assert _validate_frozen_selected_plan(sliced, section_id=section_id) == []
+        if section_id == "unify_bullets":
+            slot_map = frozen_source["unify_bullet_slot_bundle_map_resolved"]
+            assignments = {
+                str(row["claim_unit_id"]): row
+                for row in sliced["allocation_assignments"]
+            }
+            assert {
+                str(fact["fact_id"]): str(fact["role_episode_bundle_id"])
+                for fact in sliced["facts"]
+            } == slot_map
+            assert all(
+                str(assignments[f"unify_bullets:{slot_id}"]["root_id"])
+                == str(expected_root)
+                for slot_id, expected_root in slot_map.items()
+            )
+            assert all(
+                assignments[f"unify_bullets:{slot_id}"].get("metric_outcome_id")
+                for slot_id in slot_map
+            )
 
 
 def test_c0_authority_lane_set_matches_whole_resume_allocator() -> None:

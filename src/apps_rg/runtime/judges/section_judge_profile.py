@@ -2,20 +2,16 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from typing import Mapping
 
-from agentic_core.L0_routing.config.model_catalog import (
-    GEMINI_20_FLASH_MODEL_ID,
-    OPENAI_GPT3_MODEL_ID,
-    OPENAI_GPT4O_MINI_MODEL_ID,
-    OPENAI_GPT4O_MODEL_ID,
-    OPENAI_NON_CHAT_COMPLETIONS_MODELS,
-)
-
 from pathlib import Path
 
+from apps_rg.runtime.model_capabilities import (
+    ModelCapabilityError,
+    assert_model_request_capabilities,
+    try_model_capabilities,
+)
 from apps_rg.runtime.section_judge_policy import JudgeTier, get_section_judge_policy, normalize_section_id
 from apps_rg.runtime.section_model_limits import runtime_limit_str
 
@@ -48,25 +44,16 @@ def _yaml_judge_models() -> dict:
 def _tier_yaml_label(tier: JudgeTier) -> str:
     return "enhanced" if tier == JudgeTier.ENHANCED_REASONING else "standard"
 
-_FORBIDDEN_PROOF_MODEL_RE = re.compile(
-    r"(?:^|[/_-])(flash|mini|haiku)(?:[/_-]|$)|"
-    rf"{re.escape(GEMINI_20_FLASH_MODEL_ID)}|"
-    r"gemini-[1]\.|"
-    rf"{re.escape(OPENAI_GPT4O_MINI_MODEL_ID)}|"
-    rf"{re.escape(OPENAI_GPT3_MODEL_ID)}(?:\.|$|-|/)|"
-    rf"(?:^|/){re.escape(OPENAI_GPT4O_MODEL_ID)}$",
-    re.IGNORECASE,
-)
-
-# OpenAI ids that reject v1/chat/completions (completions-only product SKUs).
-_OPENAI_NON_CHAT_COMPLETIONS_MODELS = OPENAI_NON_CHAT_COMPLETIONS_MODELS
-
-
 def openai_chat_completions_eligible(model_id: str) -> bool:
-    """False when the model id is known to fail chat/completions (judge transport)."""
-    return str(model_id or "").strip().lower() not in _OPENAI_NON_CHAT_COMPLETIONS_MODELS
+    """Return exact catalog eligibility for the OpenAI Chat Completions endpoint."""
+    capabilities = try_model_capabilities(model_id)
+    return bool(
+        capabilities
+        and capabilities.provider == "openai"
+        and capabilities.supports_endpoint("chat_completions")
+    )
 
-_SUPPORTED_PROVIDER_KEYS = frozenset({"gemini_pro", "openai_chatgpt", "anthropic_claude"})
+_SUPPORTED_PROVIDER_KEYS = frozenset({"gemini_pro", "openai_chatgpt"})
 _ENHANCED_PROFILE = {provider_key: {} for provider_key in _SUPPORTED_PROVIDER_KEYS}
 _STANDARD_PROFILE = {provider_key: {} for provider_key in _SUPPORTED_PROVIDER_KEYS}
 
@@ -89,10 +76,8 @@ class SectionJudgeModelResolution:
 
 
 def is_forbidden_proof_judge_model(model_id: str) -> bool:
-    mid = (model_id or "").strip()
-    if not mid:
-        return True
-    return bool(_FORBIDDEN_PROOF_MODEL_RE.search(mid))
+    capabilities = try_model_capabilities(model_id)
+    return capabilities is None or not capabilities.proof_eligible
 
 
 def _model_tier_label(tier: JudgeTier, model_id: str) -> str:
@@ -154,49 +139,55 @@ def resolve_section_proof_judge_model(
         raise SectionJudgeProfileSSOTError(
             f"Missing judge_models.{_tier_yaml_label(tier)}.{provider_key} in {_PROVIDER_PROFILES_PATH}"
         )
-    candidates: list[tuple[str, str]] = [(str(yaml_model), "yaml_judge_models")]
+    model_id = str(yaml_model)
+    source = "yaml_judge_models"
 
     reasoning_effort: str | None = None
-    if provider_key == "openai_chatgpt" and tier == JudgeTier.ENHANCED_REASONING:
-        reasoning_effort = runtime_limit_str("judge.openai_enhanced_reasoning_effort")
+    if provider_key == "gemini_pro":
+        reasoning_effort = runtime_limit_str("judge.gemini_proof_thinking_level")
+    elif provider_key == "openai_chatgpt":
+        reasoning_effort = runtime_limit_str("judge.openai_proof_reasoning_effort")
 
-    for model_id, source in candidates:
-        forbidden = is_forbidden_proof_judge_model(model_id)
-        if provider_key == "openai_chatgpt" and not openai_chat_completions_eligible(model_id):
-            continue
-        mt = _model_tier_label(tier, model_id)
-        if forbidden:
-            continue
-        proof_eligible = policy.judge_required_for_proof and not forbidden
+    provider, endpoint = {
+        "gemini_pro": ("google_gemini", "gemini_generate_content_v1beta"),
+        "openai_chatgpt": ("openai", "responses"),
+    }[provider_key]
+    try:
+        assert_model_request_capabilities(
+            model_id,
+            provider=provider,
+            endpoint=endpoint,
+            reasoning_effort=reasoning_effort,
+            structured_output_required=True,
+            proof_required=policy.judge_required_for_proof,
+        )
+    except ModelCapabilityError as exc:
         return SectionJudgeModelResolution(
             provider_key=provider_key,
             section_id=sid,
             judge_tier=tier.value,
             model_requested=model_id,
-            model_actual=model_id,
+            model_actual="",
             model_source=source,
-            model_tier=mt,
+            model_tier="blocked",
             reasoning_effort=reasoning_effort,
-            blocked=False,
-            advisory_only=not policy.judge_required_for_proof,
-            proof_eligible_judge=proof_eligible,
+            blocked=True,
+            block_reason=str(exc),
+            proof_eligible_judge=False,
         )
 
     return SectionJudgeModelResolution(
         provider_key=provider_key,
         section_id=sid,
         judge_tier=tier.value,
-        model_requested="",
-        model_actual="",
-        model_source="none_allowed",
-        model_tier="blocked",
-        blocked=True,
-        block_reason=(
-            f"No proof-eligible judge model configured for section={sid} provider={provider_key} "
-            f"tier={tier.value}. Set provider_profiles.yaml judge_models; "
-            "flash/mini/haiku are advisory-only."
-        ),
-        proof_eligible_judge=False,
+        model_requested=model_id,
+        model_actual=model_id,
+        model_source=source,
+        model_tier=_model_tier_label(tier, model_id),
+        reasoning_effort=reasoning_effort,
+        blocked=False,
+        advisory_only=not policy.judge_required_for_proof,
+        proof_eligible_judge=policy.judge_required_for_proof,
     )
 
 

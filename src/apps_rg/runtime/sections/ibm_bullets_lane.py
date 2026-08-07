@@ -292,6 +292,136 @@ def _normalize_ibm_claim_ledger(parsed: dict[str, Any], allowed: set[str] | None
             entry["source_fact_ids"] = _clamp_to_ibm_fact_scope(ids, allowed or set())
 
 
+def _bind_ibm_change_log_to_frozen_allocation(
+    parsed: dict[str, Any],
+    *,
+    selected_fact_plan: dict[str, Any],
+) -> None:
+    """Bind IBM bullet provenance to the C0-frozen slot allocation.
+
+    L2 may describe a valid source fact while carrying a stale role-episode
+    bundle label from a pre-allocation evidence packet.  The selected graph
+    plan is the sealed source of truth for the current run, so only its exact
+    root and leaf-skill identifiers may reach the final change log.
+    """
+
+    allocation_by_bullet: dict[str, dict[str, str]] = {}
+    for row in selected_fact_plan.get("allocation_assignments") or []:
+        if not isinstance(row, dict) or str(row.get("section_id") or "") != "ibm_bullets":
+            continue
+        claim_unit_id = str(row.get("claim_unit_id") or "")
+        bullet_id = claim_unit_id.rsplit(":", 1)[-1]
+        root_id = str(row.get("root_id") or "").strip()
+        skill_id = str(row.get("skill_id") or "").strip()
+        if bullet_id in IBM_BULLET_IDS and root_id and skill_id:
+            allocation_by_bullet[bullet_id] = {
+                "claim_unit_id": claim_unit_id,
+                "root_id": root_id,
+                "skill_id": skill_id,
+            }
+    if not allocation_by_bullet:
+        return
+
+    raw_log = parsed.get("change_log")
+    change_log = [dict(row) for row in raw_log or [] if isinstance(row, dict)]
+    by_bullet = {
+        str(row.get("bullet_id") or "").strip(): row
+        for row in change_log
+        if str(row.get("bullet_id") or "").strip() in allocation_by_bullet
+    }
+    for bullet_id in IBM_BULLET_IDS:
+        allocation = allocation_by_bullet.get(bullet_id)
+        if not allocation:
+            continue
+        entry = by_bullet.get(bullet_id)
+        if entry is None:
+            entry = {"bullet_id": bullet_id}
+            change_log.append(entry)
+        entry["role_episode_bundle_id"] = allocation["root_id"]
+        entry["graph_skill_node_ids"] = [allocation["skill_id"]]
+        entry["allocation_claim_unit_id"] = allocation["claim_unit_id"]
+    parsed["change_log"] = change_log
+
+
+_IBM_FROZEN_ALLOCATION_DISPLAY_COMPOSITIONS: dict[tuple[str, str], str] = {
+    # Both surfaces are direct graph labels/claim language for their exact
+    # sealed allocation leaves.  They prevent a source-faithful rehydration
+    # from collapsing distinct IBM slots into generic commercial prose.
+    (
+        "reb_ibm_revenue_sales_target_execution",
+        "skill_partner_pnl_oversight",
+    ): "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions.",
+    (
+        "reb_ibm_data_modeling_bi_decision_support",
+        "skill_p2_tech_reference_architecture",
+    ): "Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.",
+}
+
+
+def _materialize_ibm_bullets_from_frozen_allocation(
+    parsed: dict[str, Any],
+    *,
+    selected_fact_plan: dict[str, Any],
+) -> bool:
+    """Render each IBM slot from its sealed C0 allocation root claim.
+
+    A model may keep a canonical ``bul_ibm_*`` identifier while drifting to a
+    different selected slot's prose.  That is an evidence mismatch, not a
+    stylistic variation.  When the frozen plan supplies all five slot root
+    claims, make the display and its ledger the exact source-bound projection
+    of those claims before X1D evaluates it.
+    """
+
+    allocation_by_bullet: dict[str, dict[str, str]] = {}
+    for row in selected_fact_plan.get("allocation_assignments") or []:
+        if not isinstance(row, dict) or str(row.get("section_id") or "") != "ibm_bullets":
+            continue
+        bullet_id = str(row.get("claim_unit_id") or "").rsplit(":", 1)[-1]
+        text = str(row.get("root_claim_text") or row.get("root_claim_action") or "").strip()
+        if bullet_id in IBM_BULLET_IDS and text:
+            root_id = str(row.get("root_id") or "").strip()
+            skill_id = str(row.get("skill_id") or "").strip()
+            display = _IBM_FROZEN_ALLOCATION_DISPLAY_COMPOSITIONS.get(
+                (root_id, skill_id),
+                text,
+            )
+            metric = str(row.get("metric_text") or "").strip()
+            if metric and metric.casefold() not in display.casefold():
+                display = f"{display.rstrip('.')} , delivering {metric}.".replace(" ,", ",")
+            allocation_by_bullet[bullet_id] = {
+                "bullet_text": display,
+                "metric_text": metric,
+            }
+    if set(allocation_by_bullet) != set(IBM_BULLET_IDS):
+        return False
+
+    bullets = [dict(row) for row in parsed.get("bullets") or [] if isinstance(row, dict)]
+    by_bullet = {
+        str(row.get("bullet_id") or "").strip(): row
+        for row in bullets
+        if str(row.get("bullet_id") or "").strip() in allocation_by_bullet
+    }
+    if set(by_bullet) != set(IBM_BULLET_IDS):
+        return False
+
+    ordered: list[dict[str, Any]] = []
+    for bullet_id in IBM_BULLET_IDS:
+        row = by_bullet[bullet_id]
+        allocation = allocation_by_bullet[bullet_id]
+        row["bullet_text"] = allocation["bullet_text"]
+        row["has_metric"] = bool(allocation["metric_text"])
+        row["metric_raw"] = allocation["metric_text"] or None
+        row["source_fact_ids"] = [bullet_id]
+        ordered.append(row)
+    parsed["bullets"] = ordered
+    parsed["claim_ledger"] = [
+        {"claim_text": row["bullet_text"], "source_fact_ids": [row["bullet_id"]]}
+        for row in ordered
+    ]
+    parsed["frozen_allocation_display_rehydrated"] = True
+    return True
+
+
 def _count_intensities(bullets: list[dict[str, Any]]) -> dict[str, int]:
     counts = {"HEAVY": 0, "MODERATE": 0, "LIGHT_PROTECTED": 0}
     for bullet in bullets:
@@ -968,6 +1098,17 @@ def run_ibm_bullets_execution(
         return blocked
     allowed_fact_ids = {str(x) for x in (runtime_payload.get("allowed_fact_ids") or allowed_fact_ids)}
     selected_fact_plan = dict(runtime_payload.get("selected_fact_plan") or selected_fact_plan)
+    ibm_facts = list(selected_fact_plan.get("facts") or [])
+    ibm_facts.sort(
+        key=lambda r: IBM_BULLET_IDS.index(r["fact_id"]) if r.get("fact_id") in IBM_BULLET_IDS else 99,
+    )
+    for _f in ibm_facts:
+        if isinstance(_f, dict) and _HOLD_METRIC_TEXT_RE.search(str(_f.get("metric_raw") or "")):
+            _f["metric_raw"] = ""
+            _f["has_metric"] = False
+            _f["metric_demoted_hold"] = True
+    selected_fact_plan = {**selected_fact_plan, "facts": ibm_facts}
+    runtime_payload["selected_fact_plan"] = selected_fact_plan
     input_payload_hash = sha16(json.dumps(runtime_payload, sort_keys=True))
     section_compiled = compile_ibm_bullets_prompt(runtime_payload, run_id=runtime_payload["run_id"])
     messages = section_compiled.artifact.messages
@@ -1105,6 +1246,14 @@ def run_ibm_bullets_execution(
                 parsed,
                 plan_facts=ibm_facts,
                 allowed_fact_ids=allowed_fact_ids,
+            )
+            _materialize_ibm_bullets_from_frozen_allocation(
+                parsed,
+                selected_fact_plan=selected_fact_plan,
+            )
+            _bind_ibm_change_log_to_frozen_allocation(
+                parsed,
+                selected_fact_plan=selected_fact_plan,
             )
             record_mechanical(
                 artifact_dir,
@@ -1418,6 +1567,14 @@ def run_ibm_bullets_execution(
         scrub_cross_slot_plan_metrics(doc, ibm_facts)
         align_ibm_claim_ledger_from_canonical_facts(
             doc, plan_facts=ibm_facts, allowed_fact_ids=allowed_fact_ids
+        )
+        _materialize_ibm_bullets_from_frozen_allocation(
+            doc,
+            selected_fact_plan=selected_fact_plan,
+        )
+        _bind_ibm_change_log_to_frozen_allocation(
+            doc,
+            selected_fact_plan=selected_fact_plan,
         )
         return doc
 

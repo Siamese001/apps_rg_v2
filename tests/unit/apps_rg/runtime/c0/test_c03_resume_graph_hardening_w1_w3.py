@@ -221,6 +221,121 @@ def test_selected_graph_plan_directly_binds_c02_atom() -> None:
     assert c03["graph_traversal_receipt"]["pass"] is True
     sqlite_receipt = c03["sqlite_selection_receipt"]
     assert sqlite_receipt["run_id_scope"] == "receipt-scope-w1-w3"
+    projection = c03["role_family_projection"]
+    assert projection["projection_source"] == "sqlite_role_family_projection"
+    assert projection["sqlite_projection_row_found"] is True
+    assert projection["release_eligible_targeting_proof"] is True
+
+
+def test_whole_resume_display_slots_bind_actual_fact_through_role_episode_root() -> None:
+    """A rendered bullet slot is not a C0.3 graph root or fact identity.
+
+    Whole-resume allocation can use the same source fact in more than one
+    visible bullet.  C0.3 must use ``candidate_fact_id`` to satisfy the C0.2
+    atom and ``role_episode_bundle_id`` to replay the graph authority path;
+    otherwise it unnecessarily falls through to SQLite and can duplicate the
+    candidate universe.
+    """
+    source_fact_id = "fact_engineering_platform_004"
+    root_id = "reb_unify_production_adoption_lifecycle"
+    skill_ids = (
+        "skill_managed_workflow_orchestration",
+        "skill_replayable_runtime_design",
+    )
+
+    def frozen_leaf(skill_id: str) -> dict[str, Any]:
+        authority = evaluate_pretarget_authority(
+            candidate_id=skill_id,
+            candidate_type="leaf_skill",
+            section_id="unify_bullets",
+            section_allowed=True,
+            activation_status="ACTIVE_CONFIRMED",
+            support_level="DIRECT_FROM_RESUME_ARCHIVE",
+            external_claim_policy="derived_supported_with_fact",
+            external_eligible=True,
+            claim_eligible=True,
+            source_refs=[source_fact_id],
+            path_present=True,
+        )
+        return build_candidate_decision(
+            section_id="unify_bullets",
+            candidate_id=skill_id,
+            candidate_type="leaf_skill",
+            candidate_path_id=f"root:{root_id}/skill:{skill_id}",
+            decision="selected",
+            reason_codes=["selected_after_full_sibling_ranking"],
+            authority=authority,
+            hop_depth=1,
+            parent_id=root_id,
+            root_id=root_id,
+            proof_strength_raw=1.0,
+            ranking_score=1.0,
+        )
+
+    plan = {
+        "section_id": "unify_bullets",
+        "facts": [
+            {
+                "fact_id": "bul_unify_002",
+                "candidate_fact_id": source_fact_id,
+                "role_episode_bundle_id": root_id,
+                "linked_source_fact_ids": [source_fact_id],
+                "graph_skill_node_ids": [skill_ids[0]],
+            },
+            {
+                "fact_id": "bul_unify_005",
+                "candidate_fact_id": source_fact_id,
+                "role_episode_bundle_id": root_id,
+                "linked_source_fact_ids": [source_fact_id],
+                "graph_skill_node_ids": [skill_ids[1]],
+            },
+        ],
+        "graph_candidate_decision_ledger": [frozen_leaf(skill_id) for skill_id in skill_ids],
+    }
+    atoms = [
+        {
+            "fact_id": source_fact_id,
+            "proof_status": "proof_eligible",
+            "source_span_ref": f"ledger:{source_fact_id}",
+            "skill_tags": [],
+            "metric_refs": [],
+            "career_phase_refs": [],
+        },
+        {
+            "fact_id": source_fact_id,
+            "proof_status": "proof_eligible",
+            "source_span_ref": f"ledger:{source_fact_id}",
+            "skill_tags": [],
+            "metric_refs": [],
+            "career_phase_refs": [],
+        },
+    ]
+
+    c03 = expand_c03_graph_bindings(
+        section_id="unify_bullets",
+        atoms=atoms,
+        repo_root=REPO,
+        selected_graph_plan=plan,
+        run_id="whole-resume-display-slot-regression",
+    )
+
+    assert c03["missing_required_fact_ids"] == []
+    assert c03["selected_graph_plan_receipt"]["covered_fact_ids"] == [source_fact_id]
+    assert c03["sqlite_selection_receipt"]["candidate_count"] == 0
+    assert c03["role_family_projection"]["projection_source"] == "sqlite_role_family_projection"
+    assert c03["graph_candidate_receipt"]["candidate_conservation_pass"] is True
+    assert c03["graph_traversal_receipt"]["pass"] is True
+    assert all(
+        row["root_id"] == root_id
+        and row["parent_id"] == root_id
+        and row["candidate_path_id"].startswith(f"root:{root_id}/skill:")
+        for row in c03["graph_candidate_decision_ledger"]
+    )
+    assert all("bul_unify_" not in row["candidate_path_id"] for row in c03["graph_candidate_decision_ledger"])
+    assert all(
+        set(binding["graph_node_refs"]) == set(skill_ids)
+        for binding in c03["bindings"]
+    )
 
 
 def test_sqlite_selection_receipt_binds_run_and_projection_digests() -> None:

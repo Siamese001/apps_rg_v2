@@ -10,6 +10,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -122,7 +124,7 @@ def test_summarize_section_run(tmp_path):
     d.mkdir()
     _write(
         d / "provider_response.json",
-        {"provider_requested": "external_claude", "model": "claude-sonnet-5", "runtime_generation_status": "REAL_LLM"},
+        {"provider_requested": "external_claude", "model": pins.CLAUDE_GENERATOR_MODEL, "runtime_generation_status": "REAL_LLM"},
     )
     _write(
         d / "exit_disposition_receipt.json",
@@ -148,7 +150,7 @@ def test_summarize_section_run(tmp_path):
     rec = summary["lanes"][0]
     assert rec["lane"] == "unify_bullets"
     assert rec["provider"] == "external_claude"
-    assert rec["model"] == "claude-sonnet-5"
+    assert rec["model"] == pins.CLAUDE_GENERATOR_MODEL
     assert rec["runtime_generation_status"] == "REAL_LLM"
     assert rec["x2_failed"] == 3
     assert rec["x3"] == "X3_BLOCK"

@@ -8,22 +8,6 @@ Plan: apps-rg-l2-v4-envelope-adoption-e9f2b1 (W2–W7).
 """
 from __future__ import annotations
 
-from agentic_core.config.model_catalog import (
-    ANTHROPIC_SONNET_4_20250514_MODEL_ID,
-    GEMINI_20_FLASH_MODEL_ID,
-    OPENAI_GPT4O_MINI_MODEL_ID,
-)
-
-from apps_rg.runtime.w3_execution_path_labels import (
-    BUCKET_GOVERNED_PA_L2_EXIT,
-    PLAN_SLUG,
-    validate_bucket,
-)
-
-W3_EXECUTION_PATH_BUCKET = BUCKET_GOVERNED_PA_L2_EXIT
-W3_EXECUTION_PATH_PLAN_SLUG = PLAN_SLUG
-validate_bucket(W3_EXECUTION_PATH_BUCKET, context=__name__)
-
 import hashlib
 import json
 import os
@@ -57,6 +41,15 @@ from apps_rg.runtime.providers.provider_run_mode import (
     assert_provider_authentic_for_full_resume,
     classify_provider_run_mode,
 )
+from apps_rg.runtime.w3_execution_path_labels import (
+    BUCKET_GOVERNED_PA_L2_EXIT,
+    PLAN_SLUG,
+    validate_bucket,
+)
+
+W3_EXECUTION_PATH_BUCKET = BUCKET_GOVERNED_PA_L2_EXIT
+W3_EXECUTION_PATH_PLAN_SLUG = PLAN_SLUG
+validate_bucket(W3_EXECUTION_PATH_BUCKET, context=__name__)
 
 __all__ = [
     "run_apps_rg_l2_envelope",
@@ -548,6 +541,22 @@ def _provider_profile_for_cpa(
         )
 
     if provider_mode == ProviderMode.LIVE_ALLOWED:
+        live_provider_aliases = {
+            "local_local_model_server",
+            "anthropic",
+            "claude",
+            "openai",
+            "gpt",
+            "azure_openai",
+            "google_gemini",
+            "gemini",
+            "google",
+        }
+        if tp in live_provider_aliases and not mid:
+            raise AppsRgEnvelopeProviderResolutionError(
+                "MODEL_NOT_OBSERVED: live L2 provider resolution requires an explicit "
+                f"target_model for target_provider={tp!r}"
+            )
         if tp == "local_local_model_server":
             return ProviderProfile(
                 profile_id="apps_rg_envelope_local_model_server",
@@ -562,7 +571,7 @@ def _provider_profile_for_cpa(
             return ProviderProfile(
                 profile_id="apps_rg_envelope_anthropic",
                 provider_kind=ProviderKind.EXTERNAL_API,
-                model_id=mid or ANTHROPIC_SONNET_4_20250514_MODEL_ID,
+                model_id=mid,
                 api_key_env_var="ANTHROPIC_API_KEY",
                 vendor="anthropic",
                 capabilities=("text_generation", "structured_json_generation"),
@@ -573,7 +582,7 @@ def _provider_profile_for_cpa(
             return ProviderProfile(
                 profile_id="apps_rg_envelope_openai",
                 provider_kind=ProviderKind.EXTERNAL_API,
-                model_id=mid or OPENAI_GPT4O_MINI_MODEL_ID,
+                model_id=mid,
                 api_key_env_var="OPENAI_API_KEY",
                 vendor="openai",
                 capabilities=("text_generation", "structured_json_generation"),
@@ -584,7 +593,7 @@ def _provider_profile_for_cpa(
             return ProviderProfile(
                 profile_id="apps_rg_envelope_gemini",
                 provider_kind=ProviderKind.EXTERNAL_API,
-                model_id=mid or GEMINI_20_FLASH_MODEL_ID,
+                model_id=mid,
                 api_key_env_var="GOOGLE_API_KEY",
                 vendor="google_gemini",
                 capabilities=("text_generation", "structured_json_generation"),
