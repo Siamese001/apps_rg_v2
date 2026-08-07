@@ -144,6 +144,24 @@ Every tracked card remains `NOT_MEASURED` until that evidence exists. Synthetic
 human labels block the registry, and even a technically complete card registry
 does not independently authorize human qualification, release, or production.
 
+## W6 source-bound operational and document evidence
+
+`python -m apps_rg.evals.e2e_operational_evaluation` reads a ledger of actual
+Apps Research-to-U0-to-Exit attempts. Every attempt has a pinned Apps Research
+handoff receipt, runtime/provider identity, ordered stage lineage, retry/token/
+cost/latency fields, and either a complete all-lane result or an explicit failed
+stage and failure code. Failed attempts remain in P2's completion denominator;
+they cannot be omitted to improve an SLO.
+
+For completed attempts the ledger requires all runtime lanes and digest-bound
+PDF/DOCX render records. Source text must match both parsed renderings, section
+order must be verified, and overflow must be zero. PII leaks, authority bypass,
+or a failed counterfactual check fail the technical receipt. The tracked
+manifest deliberately contains no attempts or SLO values and is therefore
+`NOT_MEASURED` until a real source-bound execution is captured. A passing W6
+technical receipt still does not create human qualification, release, or
+production authority.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
