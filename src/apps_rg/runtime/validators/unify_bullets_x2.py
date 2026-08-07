@@ -616,6 +616,19 @@ def run_unify_bullets_x2_gates(
 
     source_ids = set(_all_source_fact_ids(parsed_output, claim_ledger))
     proof_source = proof_source_from_metadata(proof_pool_metadata)
+    bound_source_fact_ids = {
+        str(fact.get("candidate_fact_id") or "").strip()
+        for fact in plan_facts
+        if isinstance(fact, dict)
+        and str(fact.get("fact_id") or "").startswith("bul_unify_")
+        and str(fact.get("candidate_fact_id") or "").strip()
+    }
+    bound_visible_fact_ids = {
+        str(fact.get("fact_id") or "").split("_metric_")[0]
+        for fact in plan_facts
+        if isinstance(fact, dict)
+        and str(fact.get("fact_id") or "").startswith("bul_unify_")
+    }
     if proof_source in ("srfs", "broad_skills_ledger"):
         scope_ok, illegal_prefix_ids, forbidden_hits, not_in_allowlist = scope_ids_membership_only(
             source_ids,
@@ -624,7 +637,16 @@ def run_unify_bullets_x2_gates(
         )
         scope_threshold = "active_proof_pool_membership"
     else:
-        illegal_prefix_ids = sorted({str(s) for s in source_ids if not str(s).startswith("bul_unify_")})
+        illegal_prefix_ids = sorted(
+            {
+                str(s)
+                for s in source_ids
+                if not (
+                    str(s).split("_metric_")[0] in bound_visible_fact_ids
+                    or str(s) in bound_source_fact_ids
+                )
+            }
+        )
         forbidden_hits = sorted(
             {str(s) for s in source_ids if any(str(s).startswith(prefix) for prefix in FORBIDDEN_FACT_PREFIXES)}
         )
@@ -632,16 +654,15 @@ def run_unify_bullets_x2_gates(
             {
                 str(s)
                 for s in source_ids
-                if str(s).startswith("bul_unify_")
-                and str(s) not in allowed_fact_ids
+                if str(s) not in allowed_fact_ids
                 and str(s).split("_metric_")[0] not in allowed_fact_ids
             }
         )
         scope_ok = bool(source_ids) and not illegal_prefix_ids and not forbidden_hits and not not_in_allowlist
-        scope_threshold = "bul_unify_*"
+        scope_threshold = "slot-bound bul_unify_* or its exact graph source fact"
     scope_parts: list[str] = []
     if illegal_prefix_ids:
-        scope_parts.append(f"tokens_not_bul_unify_prefix={illegal_prefix_ids}")
+        scope_parts.append(f"tokens_not_slot_bound_unify_evidence={illegal_prefix_ids}")
     if forbidden_hits:
         scope_parts.append(f"forbidden_cross_lane_tokens={forbidden_hits}")
     if not_in_allowlist:
@@ -658,12 +679,28 @@ def run_unify_bullets_x2_gates(
         None if scope_ok else scope_failure,
     )
 
-    # Leakage scan covers PROOF-CARRYING fields only (W5, plan
-    # apps-rg-aig-remaining-lanes-closeout-d4e1f7): ``self_check`` is the model's free-form
-    # compliance attestation — a key literally named "no_bul_ibm_references": true tripped the
-    # naive whole-doc substring scan (false positive). Bullets/claim_ledger/change_log/
-    # selected_fact_plan/gap_notes all remain scanned at full strength.
-    _scan_doc = {k: v for k, v in (parsed_output or {}).items() if k != "self_check"}
+    # Scan only the section's proof-carrying surface.  Whole-resume allocation
+    # metadata deliberately contains reservations for IBM, InsurTech, and EY;
+    # it is upstream provenance, not Unify-authored evidence.  Keep the
+    # section-local selected facts in scope so a cross-lane fact in the actual
+    # Unify plan still fails closed.
+    _section_plan_for_leakage = {
+        "section_id": plan_raw.get("section_id"),
+        "selection_method": plan_raw.get("selection_method"),
+        "facts": plan_facts,
+        "required_fact_ids": plan_raw.get("required_fact_ids"),
+        "allowed_graph_evidence_ids": plan_raw.get("allowed_graph_evidence_ids"),
+        "selected_skill_ids": plan_raw.get("selected_skill_ids"),
+        "selected_metrics": plan_raw.get("selected_metrics"),
+    }
+    _scan_doc = {
+        "bullets": po_raw.get("bullets"),
+        "claim_ledger": claim_ledger,
+        "change_log": po_raw.get("change_log"),
+        "gap_notes": po_raw.get("gap_notes"),
+        "jd_alignment": po_raw.get("jd_alignment"),
+        "selected_fact_plan": _section_plan_for_leakage,
+    }
     serialized = json.dumps(_scan_doc, sort_keys=True).lower()
     add("x2_no_ibm_fact_leakage", "bul_ibm_" not in serialized, "bul_ibm_", "absent", "IBM fact leakage detected.")
     add(

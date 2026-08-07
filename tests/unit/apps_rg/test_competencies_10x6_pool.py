@@ -6,13 +6,15 @@ The selector receipt is Anthropic-backed; the formal competencies judge is Gemin
 from __future__ import annotations
 
 import json
-from unittest.mock import patch
+
+from tests.helpers import apps_rg_model_pins as pins
 
 import pytest
 
 from apps_rg.runtime.judges.bullet_pool_claude_selector import (
     PoolSelectionResult,
     PoolSelectorUnavailableError,
+    _call_anthropic_pool_selector,
     run_claude_bullet_pool_selection,
 )
 from apps_rg.runtime.providers.provider_contract import ProviderResult
@@ -81,15 +83,15 @@ class _FakeSelectorJudge:
     def __init__(
         self,
         *,
-        provider_key: str = "openai_chatgpt",
-        model_name: str = "gpt-5.5",
+        provider_key: str = "anthropic_claude",
+        model_name: str = pins.COMPETENCIES_SELECTOR_MODEL,
         passed: bool = True,
         status: str = "MODEL_BACKED_PASS",
         exact_provider_error: str | None = None,
         rationale: str = "yaml_judge_models",
     ) -> None:
         self.judge_id = f"x1d_{provider_key}_bullet_pool_selector"
-        self.provider_name = "OpenAI ChatGPT"
+        self.provider_name = "Anthropic Claude"
         self.provider_key = provider_key
         self.evaluator_mode = "MODEL_BACKED"
         self.provider_status = status
@@ -230,7 +232,7 @@ def test_competencies_rejected_neighbor_audit_records_unselected_candidates() ->
     }
 
 
-def test_openai_competencies_selection_emits_high_signal_categories(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_claude_competencies_selection_emits_high_signal_categories(monkeypatch: pytest.MonkeyPatch) -> None:
     paths = [_path_with_categories(0)]
     selections = [
         {
@@ -243,13 +245,13 @@ def test_openai_competencies_selection_emits_high_signal_categories(monkeypatch:
         for i in range(COMPETENCIES_FINAL_CATEGORY_COUNT)
     ]
 
-    monkeypatch.setenv("OPENAI_API_KEY", "fake-openai-key")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake-anthropic-key")
     monkeypatch.setattr(
         "apps_rg.runtime.judges.bullet_pool_claude_selector.bootstrap_apps_rg_env",
         lambda: None,
     )
     monkeypatch.setattr(
-        "apps_rg.runtime.judges.bullet_pool_claude_selector._call_openai_pool_selector",
+        "apps_rg.runtime.judges.bullet_pool_claude_selector._call_anthropic_pool_selector",
         lambda **_: (_FakeSelectorJudge(), {"selections": selections, "pool_summary": {}}),
     )
     pool: PoolSelectionResult = run_claude_bullet_pool_selection(
@@ -263,10 +265,10 @@ def test_openai_competencies_selection_emits_high_signal_categories(monkeypatch:
         },
         mode="blocked_if_unavailable",
     )
-    assert pool.selection_mode == "openai_competencies_adaptive_6_8_pass"
+    assert pool.selection_mode == "competencies_advisory_selector_adaptive_6_8_pass"
     assert pool.judge_output is not None
-    assert pool.judge_output.provider_key == "openai_chatgpt"
-    assert pool.judge_output.model_name == "gpt-5.5"
+    assert pool.judge_output.provider_key == "anthropic_claude"
+    assert pool.judge_output.model_name == pins.COMPETENCIES_SELECTOR_MODEL
     comps = pool.merged_parsed.get("competencies") or []
     assert len(comps) == COMPETENCIES_FINAL_CATEGORY_COUNT
     audit = pool.rejected_neighbor_audit
@@ -274,11 +276,42 @@ def test_openai_competencies_selection_emits_high_signal_categories(monkeypatch:
     assert audit["schema_version"] == "competencies_rejected_neighbor_audit_v1"
 
 
-def test_openai_competencies_selector_fails_closed_without_credentials(
+def test_claude_competencies_selector_request_carries_sonnet_high(
+    tmp_path,
+) -> None:
+    judge_output, selection = _call_anthropic_pool_selector(
+        api_key="test-key-never-sent",
+        prompt="Select the strongest competencies.",
+        model=pins.COMPETENCIES_SELECTOR_MODEL,
+        reasoning_effort=pins.COMPETENCIES_SELECTOR_REASONING_EFFORT,
+        input_hash="selector-input-hash",
+        model_source="test-provider-profile",
+        artifact_dir=tmp_path,
+        timeout_s=1.0,
+    )
+
+    assert selection is None
+    assert judge_output.provider_blocked is True
+    request_paths = list(
+        tmp_path.glob("x1d_anthropic_claude_provider_request_*.json")
+    )
+    assert len(request_paths) == 1
+    payload = json.loads(request_paths[0].read_text(encoding="utf-8"))["payload"]
+    assert payload["model"] == pins.COMPETENCIES_SELECTOR_MODEL
+    assert payload["output_config"]["effort"] == (
+        pins.COMPETENCIES_SELECTOR_REASONING_EFFORT
+    ) == "high"
+    assert payload["thinking"] == {"type": "adaptive", "display": "omitted"}
+    assert payload["max_tokens"] > 0
+    assert "temperature" not in payload
+    assert "max_completion_tokens" not in payload
+
+
+def test_claude_competencies_selector_fails_closed_without_credentials(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     paths = [_path_with_categories(0)]
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     monkeypatch.setattr(
         "apps_rg.runtime.judges.bullet_pool_claude_selector.bootstrap_apps_rg_env",
         lambda: None,
@@ -286,7 +319,7 @@ def test_openai_competencies_selector_fails_closed_without_credentials(
 
     with pytest.raises(
         PoolSelectorUnavailableError,
-        match="competencies selector unavailable: missing OpenAI credentials",
+        match="competencies selector unavailable: missing Claude credentials",
     ):
         run_claude_bullet_pool_selection(
             section_id="competencies",
@@ -335,9 +368,9 @@ def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.Monkey
     paths = [_path_with_categories(i, n_categories=COMPETENCIES_FINAL_CATEGORY_COUNT) for i in range(4)]
 
     class _Judge:
-        provider_key = "openai_chatgpt"
-        provider_name = "OpenAI ChatGPT"
-        model_name = "gpt-5.5"
+        provider_key = "anthropic_claude"
+        provider_name = "Anthropic Claude"
+        model_name = pins.COMPETENCIES_SELECTOR_MODEL
         provider_status = "MODEL_BACKED_PASS"
         exact_provider_error = None
         pass_ = True
@@ -345,7 +378,7 @@ def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.Monkey
 
         def to_dict(self) -> dict[str, object]:
             return {
-                "judge_id": "x1d_openai_chatgpt_bullet_pool_selector",
+                "judge_id": "x1d_anthropic_claude_bullet_pool_selector",
                 "provider_name": self.provider_name,
                 "provider_key": self.provider_key,
                 "provider_status": self.provider_status,
@@ -375,13 +408,13 @@ def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.Monkey
         "apps_rg.runtime.reasoning.bullet_lane_generation.run_provider_self_consistency_paths",
         _fake_paths,
     )
-    monkeypatch.setenv("OPENAI_API_KEY", "fake-openai-key")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake-anthropic-key")
     monkeypatch.setattr(
         "apps_rg.runtime.judges.bullet_pool_claude_selector.bootstrap_apps_rg_env",
         lambda: None,
     )
     monkeypatch.setattr(
-        "apps_rg.runtime.judges.bullet_pool_claude_selector._call_openai_pool_selector",
+        "apps_rg.runtime.judges.bullet_pool_claude_selector._call_anthropic_pool_selector",
         lambda **_: (
             _Judge(),
             {
@@ -473,7 +506,7 @@ def test_competencies_pool_x1d_row_from_generation_meta(tmp_path) -> None:
     gen_meta = {
         "generation_mode": "model_competencies_graph_pool_adaptive_6_8_regen",
         "selection_gate": {"ok": True, "categories_in_merged": COMPETENCIES_FINAL_CATEGORY_COUNT},
-        "selection_mode": "openai_competencies_adaptive_6_8_pass",
+        "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass",
     }
     rows = competencies_pool_x1d_judge_rows(
         artifact_dir=tmp_path,
@@ -481,11 +514,13 @@ def test_competencies_pool_x1d_row_from_generation_meta(tmp_path) -> None:
         gen_meta=gen_meta,
     )
     assert len(rows) == 1
-    assert rows[0]["judge_id"] == "x1d_openai_chatgpt_competencies_pool"
-    assert rows[0]["provider_key"] == "openai_chatgpt"
-    assert rows[0]["provider_name"] == "OpenAI ChatGPT"
-    assert rows[0]["model_name"] == "gpt-5.5"
-    assert rows[0]["selection_mode"] == "openai_competencies_adaptive_6_8_pass"
+    assert rows[0]["judge_id"] == "x1d_anthropic_claude_competencies_pool"
+    assert rows[0]["provider_key"] == "anthropic_claude"
+    assert rows[0]["provider_name"] == "Anthropic Claude"
+    assert rows[0]["model_name"] == pins.COMPETENCIES_SELECTOR_MODEL
+    assert rows[0]["selection_mode"] == (
+        "competencies_advisory_selector_adaptive_6_8_pass"
+    )
     assert rows[0]["judge_role"] == "competencies_graph_pool_selector"
     assert rows[0]["advisory_only"] is True
     assert rows[0]["proof_eligible_judge"] is False

@@ -504,6 +504,68 @@ def test_ey_duplicate_selected_source_fact_reselects_unique_proof_fact_before_di
     assert len({b["source_fact_ids"][0] for b in bullets}) == 3
 
 
+def test_role_episode_materializer_preserves_canonical_slot_source_identity() -> None:
+    cfg = role_episode_lane._ROLE_LANES["insurtech_bullets"]
+    facts = [
+        {
+            "fact_id": f"bul_insurtech_{index:03d}",
+            "claim_text": "Led AWS modernization execution for insurance platforms."
+            if index in (2, 3)
+            else "Implemented SOC 2-aligned AWS controls for regulated insurers.",
+        }
+        for index in range(1, 4)
+    ]
+    selected_order = ["bul_insurtech_002", "bul_insurtech_001", "bul_insurtech_003"]
+    parsed = {
+        "bullets": [
+            {"bullet_text": f"Candidate {source_id}", "source_fact_ids": [source_id]}
+            for source_id in selected_order
+        ]
+    }
+
+    bullets, receipt = role_episode_lane._materialize_bullet_generation(
+        cfg=cfg,
+        parsed=parsed,
+        parse_error="",
+        provider_runtime_generation_status="REAL_LLM",
+        facts=facts,
+        allowed=selected_order,
+        graph_packet_digest="digest://slot-bound-proof",
+    )
+
+    assert [row["bullet_id"] for row in bullets] == [
+        "bul_insurtech_001",
+        "bul_insurtech_002",
+        "bul_insurtech_003",
+    ]
+    assert [row["source_fact_ids"][0] for row in bullets] == [
+        "bul_insurtech_001",
+        "bul_insurtech_002",
+        "bul_insurtech_003",
+    ]
+    assert receipt["final_materialized_selection_contract"]["slot_bound_ordering_applied"] is True
+
+
+def test_insurtech_legacy_modernization_leaf_has_a_distinct_bound_surface() -> None:
+    fact = {
+        "fact_id": "bul_insurtech_003",
+        "claim_text": "Led AWS modernization execution for monolithic policy administration and insurance platform workloads.",
+        "domain": "AWS Migration Execution for Legacy Insurance Platforms",
+        "role_episode_bundle_id": "reb_insurtech_aws_migration_execution",
+        "graph_skill_node_ids": ["skill_sr_insurtech_legacy_cloud_modernization"],
+        "allowed_graph_evidence_ids": [
+            "reb_insurtech_aws_migration_execution",
+            "skill_sr_insurtech_legacy_cloud_modernization",
+            "bul_insurtech_003",
+        ],
+    }
+
+    rendered = role_episode_lane._proof_fact_text(fact)
+
+    assert rendered == "Led legacy cloud modernization for AWS insurance platforms."
+    assert role_episode_lane._proof_fact_composition_is_bound(rendered, fact) is True
+
+
 def test_role_episode_display_text_gate_rejects_valid_id_with_unbacked_phrase() -> None:
     fact = {
         "fact_id": "reb_insurtech_founder_led_market_creation",
@@ -610,3 +672,20 @@ def test_ey_narrative_display_text_gate_rejects_valid_id_with_unbacked_phrase() 
     gate = _gate_by_id(gates)["x2_ey_narrative_display_text_proof_authorized"]
     assert gate["pass"] is False
     assert gate["observed_value"]["status"] == "FAIL"
+
+
+def test_role_episode_payload_hash_excludes_private_l2_authority_objects() -> None:
+    """L2's frozen in-process room must not make durable provenance hashing fail."""
+
+    class _FrozenRoom:
+        pass
+
+    public_payload = {"section_id": "insurtech_bullets", "run_id": "run_1"}
+    prepared_payload = {
+        **public_payload,
+        "_canonical_l2_frozen_room": _FrozenRoom(),
+    }
+
+    assert role_episode_lane._json_hash(prepared_payload) == role_episode_lane._json_hash(
+        public_payload
+    )

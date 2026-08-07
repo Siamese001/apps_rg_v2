@@ -58,7 +58,7 @@ def _check_generation_provider_key() -> DoctorCheck:
     """Default apps_rg E2E generation needs Anthropic and OpenAI keys."""
     required_keys = {
         "ANTHROPIC_API_KEY": "Claude-backed bullets, headline, and executive_summary lanes",
-        "OPENAI_API_KEY": "OpenAI-backed competencies and narrative lanes",
+        "OPENAI_API_KEY": "OpenAI-backed narrative lanes and proof judges",
     }
     missing = [var for var in required_keys if not os.environ.get(var, "").strip()]
     if not missing:

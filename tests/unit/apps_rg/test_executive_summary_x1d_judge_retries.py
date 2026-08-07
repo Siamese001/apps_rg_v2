@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from apps_rg.runtime.judges.executive_summary_x1d import (
     JudgeOutput,
     _call_openai,
@@ -23,6 +25,53 @@ def test_openai_completion_token_budget_escalates_on_retry() -> None:
     )
 
 
+@patch("apps_rg.runtime.judges.executive_summary_x1d._judge_live_https_allowed_under_pytest", return_value=True)
+@patch("apps_rg.runtime.judges.executive_summary_x1d.urllib.request.urlopen")
+def test_sol_judge_uses_responses_api_with_high_effort(
+    mock_urlopen: MagicMock,
+    _pytest_net: MagicMock,
+    tmp_path: Path,
+) -> None:
+    result = {
+        "score_scale": "0_to_5",
+        "score": 4.5,
+        "threshold": 4.0,
+        "pass": True,
+        "decisive_failure": False,
+        "findings": ["ok"],
+        "cited_sentence_indexes": [1],
+        "remediation_suggestions": [],
+    }
+    response = MagicMock()
+    response.read.return_value = json.dumps(
+        {"model": pins.OPENAI_PROOF_JUDGE_MODEL, "status": "completed", "output_text": json.dumps(result)}
+    ).encode()
+    response.__enter__.return_value = response
+    mock_urlopen.return_value = response
+
+    out = _call_openai(
+        "sk-test",
+        "grade this section",
+        pins.OPENAI_PROOF_JUDGE_MODEL,
+        "sol-input-hash",
+        "openai_chatgpt",
+        artifact_base=tmp_path,
+        reasoning_effort="high",
+        section_id="executive_summary",
+    )
+
+    request = mock_urlopen.call_args.args[0]
+    body = json.loads(request.data)
+    assert request.full_url == "https://api.openai.com/v1/responses"
+    assert body["model"] == pins.OPENAI_PROOF_JUDGE_MODEL
+    assert body["reasoning"] == {"effort": "high"}
+    assert body["max_output_tokens"] >= 4096
+    assert body["text"]["format"]["type"] == "json_schema"
+    assert body["text"]["format"]["strict"] is True
+    assert "messages" not in body
+    assert out.evaluator_mode == "MODEL_BACKED"
+
+
 def test_is_retriable_parse_error() -> None:
     out = JudgeOutput(
         judge_id="x1d_openai_chatgpt_headline",
@@ -30,7 +79,7 @@ def test_is_retriable_parse_error() -> None:
         provider_key="openai_chatgpt",
         evaluator_mode="BLOCKED_RESPONSE_PARSE_ERROR",
         provider_status="BLOCKED_RESPONSE_PARSE_ERROR",
-        model_name="gpt-5.5",
+        model_name=pins.COMPETENCIES_SELECTOR_MODEL,
         provider_available=False,
         provider_blocked=True,
         exact_provider_error="Failed to extract JSON from openai_chatgpt response",
@@ -50,7 +99,7 @@ def test_bounded_retries_stop_after_success() -> None:
                 provider_key="openai_chatgpt",
                 evaluator_mode="BLOCKED_RESPONSE_PARSE_ERROR",
                 provider_status="BLOCKED_RESPONSE_PARSE_ERROR",
-                model_name="gpt-5.5",
+                model_name=pins.COMPETENCIES_SELECTOR_MODEL,
                 provider_available=False,
                 provider_blocked=True,
                 exact_provider_error="Failed to extract JSON from openai_chatgpt response",
@@ -61,7 +110,7 @@ def test_bounded_retries_stop_after_success() -> None:
             provider_key="openai_chatgpt",
             evaluator_mode="MODEL_BACKED",
             provider_status="MODEL_BACKED_PASS",
-            model_name="gpt-5.5",
+            model_name=pins.COMPETENCIES_SELECTOR_MODEL,
             provider_available=True,
             provider_blocked=False,
             exact_provider_error=None,
@@ -92,13 +141,9 @@ def test_openai_empty_length_finish_reason_is_retriable_message(
     tmp_path: Path,
 ) -> None:
     empty_completion = {
-        "choices": [
-            {
-                "message": {"role": "assistant", "content": ""},
-                "finish_reason": "length",
-            }
-        ],
-        "usage": {"completion_tokens": 900, "completion_tokens_details": {"reasoning_tokens": 900}},
+        "status": "incomplete",
+        "output_text": "",
+        "usage": {"output_tokens": 900, "output_tokens_details": {"reasoning_tokens": 900}},
     }
     mock_resp = MagicMock()
     mock_resp.read.return_value = json.dumps(empty_completion).encode()
@@ -108,15 +153,16 @@ def test_openai_empty_length_finish_reason_is_retriable_message(
     out = _call_openai(
         "sk-test",
         "grade this headline",
-        "gpt-5.5",
+        pins.OPENAI_PROOF_JUDGE_MODEL,
         "abc123",
         "openai_chatgpt",
         artifact_base=tmp_path,
+        reasoning_effort="high",
         attempt=1,
     )
     assert out.provider_status == "BLOCKED_RESPONSE_PARSE_ERROR"
     assert _is_retriable_judge_output(out)
-    assert "finish_reason=length" in (out.exact_provider_error or "").lower()
+    assert "finish_reason=incomplete" in (out.exact_provider_error or "").lower()
 
 
 @patch("apps_rg.runtime.judges.executive_summary_x1d._judge_live_https_allowed_under_pytest", return_value=True)
@@ -127,40 +173,27 @@ def test_openai_retry_escalates_max_completion_tokens(
     tmp_path: Path,
 ) -> None:
     good = {
-        "choices": [
+        "status": "completed",
+        "output_text": json.dumps(
             {
-                "message": {
-                    "role": "assistant",
-                    "content": json.dumps(
-                        {
-                            "score_scale": "0_to_5",
-                            "score": 4.5,
-                            "threshold": 4.0,
-                            "pass": True,
-                            "decisive_failure": False,
-                            "findings": ["ok"],
-                            "cited_sentence_indexes": [1],
-                            "remediation_suggestions": [],
-                        }
-                    ),
-                },
-                "finish_reason": "stop",
+                "score_scale": "0_to_5",
+                "score": 4.5,
+                "threshold": 4.0,
+                "pass": True,
+                "decisive_failure": False,
+                "findings": ["ok"],
+                "cited_sentence_indexes": [1],
+                "remediation_suggestions": [],
             }
-        ]
+        ),
     }
-    empty = {
-        "choices": [
-            {"message": {"role": "assistant", "content": ""}, "finish_reason": "length"}
-        ]
-    }
+    empty = {"status": "incomplete", "output_text": ""}
     payloads: list[int] = []
 
     def side_effect(req: object, timeout: float = 60) -> MagicMock:
         body = json.loads(getattr(req, "data", b"{}"))
-        if body.get("max_completion_tokens"):
-            payloads.append(int(body["max_completion_tokens"]))
-        elif body.get("max_tokens"):
-            payloads.append(int(body["max_tokens"]))
+        if body.get("max_output_tokens"):
+            payloads.append(int(body["max_output_tokens"]))
         mock_resp = MagicMock()
         mock_resp.read.return_value = json.dumps(
             empty if len(payloads) == 1 else good
@@ -178,10 +211,11 @@ def test_openai_retry_escalates_max_completion_tokens(
             lambda attempt: _call_openai(
                 "sk-test",
                 "grade",
-                "gpt-5.5",
+                pins.OPENAI_PROOF_JUDGE_MODEL,
                 "hash1",
                 "openai_chatgpt",
                 artifact_base=tmp_path,
+                reasoning_effort="high",
                 attempt=attempt,
             ),
             provider_key="openai_chatgpt",

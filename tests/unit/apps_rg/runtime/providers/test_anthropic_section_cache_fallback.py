@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from agentic_core.knowledge.retrieval.anthropic_cache_control import min_cacheable_chars
 from apps_rg.runtime.providers.anthropic_section_cache_payload import (
     build_anthropic_section_cache_payload,
@@ -18,7 +20,7 @@ def _legacy_role_episode_messages(model: str) -> list[dict[str, str]]:
 
 
 def test_legacy_insurtech_and_ey_self_consistency_cache_repeated_user_prefix() -> None:
-    model = "claude-sonnet-5"
+    model = pins.CLAUDE_GENERATOR_MODEL
     messages = _legacy_role_episode_messages(model)
 
     insurtech = build_anthropic_section_cache_payload(
@@ -49,7 +51,7 @@ def test_legacy_insurtech_and_ey_self_consistency_cache_repeated_user_prefix() -
 
 
 def test_legacy_one_shot_and_repair_never_cache_the_user_message() -> None:
-    model = "claude-sonnet-5"
+    model = pins.CLAUDE_GENERATOR_MODEL
     messages = _legacy_role_episode_messages(model)
 
     for workload in ("ONE_SHOT", "REPAIR", "SELECTOR"):

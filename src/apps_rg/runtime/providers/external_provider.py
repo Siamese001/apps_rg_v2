@@ -19,9 +19,8 @@ from datetime import datetime, timezone
 from typing import Any, Mapping
 from urllib.error import HTTPError
 
-from agentic_core.L0_routing.config.model_catalog import OPENAI_OMIT_TEMPERATURE_MODELS
-
 from apps_rg.runtime.env_bootstrap import bootstrap_process_env_if_needed
+from apps_rg.runtime.model_capabilities import try_model_capabilities
 from apps_rg.runtime.providers.provider_gateway import ProviderGatewayError, ProviderProfile
 from apps_rg.runtime.providers.provider_attempt_spans import (
     build_provider_attempt_span,
@@ -32,6 +31,13 @@ ExternalTransport = Callable[[dict[str, Any]], dict[str, Any]]
 
 DEFAULT_ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 DEFAULT_OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
+def _openai_model_omits_temperature(model: Any) -> bool:
+    capabilities = try_model_capabilities(str(model or ""))
+    return bool(
+        capabilities
+        and capabilities.provider == "openai"
+        and capabilities.temperature_parameter == "omit"
+    )
 DEFAULT_EXTERNAL_PROVIDER_TIMEOUT_SECONDS = 90.0
 ANTHROPIC_SYSTEM_ONLY_USER_PROMPT = "Return the requested JSON object now."
 # Shared upper safety bound for ANY external section provider wall-clock budget.
@@ -40,36 +46,24 @@ ANTHROPIC_SYSTEM_ONLY_USER_PROMPT = "Return the requested JSON object now."
 DEFAULT_EXTERNAL_PROVIDER_TIMEOUT_MAX_SECONDS = 300.0
 
 
-ANTHROPIC_OMIT_TEMPERATURE_MODEL_PREFIXES: frozenset[str] = frozenset(
-    {
-        "claude-sonnet-5",
-    }
-)
-ANTHROPIC_ADAPTIVE_THINKING_MODEL_PREFIXES: frozenset[str] = frozenset(
-    {
-        "claude-sonnet-5",
-    }
-)
-
-
-def _anthropic_model_matches_prefix(model: Any, prefixes: frozenset[str]) -> bool:
-    model_id = str(model or "").strip().lower()
-    if not model_id:
-        return False
-    return any(
-        model_id == prefix or model_id.startswith(f"{prefix}-")
-        for prefix in prefixes
-    )
-
-
 def anthropic_model_omits_temperature(model: Any) -> bool:
     """Return True for Anthropic models whose Messages API rejects temperature."""
-    return _anthropic_model_matches_prefix(model, ANTHROPIC_OMIT_TEMPERATURE_MODEL_PREFIXES)
+    capabilities = try_model_capabilities(str(model or ""))
+    return bool(
+        capabilities
+        and capabilities.provider == "anthropic"
+        and capabilities.temperature_parameter == "omit"
+    )
 
 
 def anthropic_model_uses_adaptive_thinking(model: Any) -> bool:
     """Return True for Anthropic models that need adaptive thinking effort control."""
-    return _anthropic_model_matches_prefix(model, ANTHROPIC_ADAPTIVE_THINKING_MODEL_PREFIXES)
+    capabilities = try_model_capabilities(str(model or ""))
+    return bool(
+        capabilities
+        and capabilities.provider == "anthropic"
+        and capabilities.thinking_mode == "adaptive"
+    )
 
 
 def apply_anthropic_temperature_capability(body: dict[str, Any]) -> dict[str, Any]:
@@ -82,19 +76,25 @@ def apply_anthropic_temperature_capability(body: dict[str, Any]) -> dict[str, An
 def apply_anthropic_adaptive_thinking_config(
     body: dict[str, Any],
     environ: Mapping[str, str] | None = None,
+    *,
+    effort: Any = None,
 ) -> dict[str, Any]:
     """Constrain Sonnet 5 adaptive thinking so compact JSON calls leave budget for text."""
     if not anthropic_model_uses_adaptive_thinking(body.get("model")):
         return body
     env = os.environ if environ is None else environ
-    effort = str(env.get("APPS_RG_ANTHROPIC_EFFORT") or "low").strip().lower()
-    if effort not in {"low", "medium", "high", "xhigh"}:
-        effort = "low"
+    resolved_effort = str(effort or env.get("APPS_RG_ANTHROPIC_EFFORT") or "low").strip().lower()
+    if resolved_effort not in {"low", "medium", "high", "xhigh"}:
+        resolved_effort = "low"
     body.setdefault("thinking", {"type": "adaptive", "display": "omitted"})
     output_config = body.get("output_config")
     if not isinstance(output_config, dict):
         output_config = {}
-    output_config.setdefault("effort", effort)
+    if effort is None:
+        output_config.setdefault("effort", resolved_effort)
+    else:
+        # The per-section provider-profile SSOT wins over payload-local or process-wide defaults.
+        output_config["effort"] = resolved_effort
     body["output_config"] = output_config
     return body
 
@@ -305,7 +305,11 @@ class ExternalProvider:
                 "stream": True,
             }
         apply_anthropic_temperature_capability(body)
-        apply_anthropic_adaptive_thinking_config(body, self.environ)
+        apply_anthropic_adaptive_thinking_config(
+            body,
+            self.environ,
+            effort=request.get("reasoning_effort"),
+        )
         url = str(request.get("base_url") or self.base_url or DEFAULT_ANTHROPIC_MESSAGES_URL)
         headers = {
             "Content-Type": "application/json",
@@ -477,7 +481,10 @@ class ExternalProvider:
             "input": prompt,
             "max_output_tokens": int(request.get("max_tokens") or 900),
         }
-        if str(body["model"]).strip() not in OPENAI_OMIT_TEMPERATURE_MODELS:
+        reasoning_effort = str(request.get("reasoning_effort") or "").strip().lower()
+        if reasoning_effort:
+            body["reasoning"] = {"effort": reasoning_effort}
+        if not _openai_model_omits_temperature(body["model"]):
             body["temperature"] = float(request.get("temperature") or 0.0)
         url = str(request.get("base_url") or self.base_url or DEFAULT_OPENAI_RESPONSES_URL)
         http_req = urllib.request.Request(
@@ -572,6 +579,12 @@ class ExternalProvider:
         timeout_seconds: int | float | None = None,
     ) -> ProviderResult:
         attempt_started_at_utc = datetime.now(timezone.utc).isoformat()
+        reasoning_effort = str(getattr(compiled_prompt, "reasoning_effort", None) or "").strip().lower()
+        capabilities = try_model_capabilities(self.model)
+        if reasoning_effort and capabilities and not capabilities.supports_reasoning_effort(
+            reasoning_effort
+        ):
+            raise ProviderGatewayError(f"Invalid section generation reasoning effort: {reasoning_effort!r}")
 
         def _provider_response_with_attempt(
             payload: dict[str, Any] | None,
@@ -583,6 +596,8 @@ class ExternalProvider:
             model: str | None = None,
         ) -> dict[str, Any]:
             response = dict(payload or {})
+            if reasoning_effort:
+                response.setdefault("reasoning_effort", reasoning_effort)
             response.setdefault("attempt_started_at_utc", attempt_started_at_utc)
             response["attempt_completed_at_utc"] = datetime.now(timezone.utc).isoformat()
             transport_response = response.get("transport_response")
@@ -635,6 +650,8 @@ class ExternalProvider:
             "timeout_seconds": provider_timeout_seconds,
             "progress_sink": progress_sink,
         }
+        if reasoning_effort:
+            request["reasoning_effort"] = reasoning_effort
         if self.provider_profile == ProviderProfile.EXTERNAL_CLAUDE:
             native_anthropic_payload = getattr(compiled_prompt, "anthropic_payload", None)
             if isinstance(native_anthropic_payload, Mapping):
@@ -789,8 +806,6 @@ class ExternalProvider:
 
 
 __all__ = [
-    "ANTHROPIC_ADAPTIVE_THINKING_MODEL_PREFIXES",
-    "ANTHROPIC_OMIT_TEMPERATURE_MODEL_PREFIXES",
     "ExternalProvider",
     "ExternalTransport",
     "anthropic_model_omits_temperature",

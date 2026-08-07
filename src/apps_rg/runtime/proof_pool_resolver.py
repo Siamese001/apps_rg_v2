@@ -61,6 +61,110 @@ def _merge_dual_source_metadata(
 PROOF_SOURCE_AUGMENTED_SKILLS_GRAPH = "augmented_skills_graph"
 
 
+def _track_weighted_seed_ids_for_selected_role_episodes(
+    facts: list[dict[str, Any]],
+) -> list[str]:
+    """Return the graph fact identities underlying selected role-episode roots.
+
+    Role-episode bundle ids are the résumé claim authority, while the
+    track-weighted graph records its verified hops against the linked source
+    fact.  Seeding the latter preserves the finite selected evidence set and
+    avoids a false "no hops" result caused solely by those two valid ID
+    namespaces being different.
+    """
+
+    out: list[str] = []
+    seen: set[str] = set()
+    for fact in facts:
+        primary = str(fact.get("fact_id") or "").strip()
+        linked = [
+            str(value or "").strip()
+            for key in ("linked_source_fact_ids", "linked_identity_fact_ids")
+            for value in (fact.get(key) or [])
+            if str(value or "").strip()
+        ]
+        candidates = linked if primary.startswith("reb_") and linked else [primary]
+        for candidate in candidates:
+            if candidate and candidate not in seen:
+                seen.add(candidate)
+                out.append(candidate)
+    return out
+
+
+def _attach_selected_role_episode_hop_aliases(
+    track_expansion: dict[str, Any],
+    facts: list[dict[str, Any]],
+) -> tuple[dict[str, Any], list[dict[str, str]]]:
+    """Alias verified source-fact hops back to their selected role episodes.
+
+    The appended edge is not an inferred claim: it materializes the exact
+    ``linked_source_fact_ids`` relationship already carried by the selected
+    graph role-episode fact.  This keeps C0.3 paths readable at the same
+    logical retrieval unit that PA/L2 receive, while every path still begins
+    with a verified track → pillar → skill → source-fact route.
+    """
+
+    selected = [dict(row) for row in (track_expansion.get("selected_facts") or []) if isinstance(row, dict)]
+    by_fact: dict[str, list[dict[str, Any]]] = {}
+    for row in selected:
+        fact_id = str(row.get("fact_id") or "").strip()
+        hop = row.get("graph_hop_path")
+        if fact_id and isinstance(hop, list) and hop:
+            by_fact.setdefault(fact_id, []).append(row)
+
+    aliases: list[dict[str, Any]] = []
+    receipts: list[dict[str, str]] = []
+    existing_ids = {str(row.get("fact_id") or "").strip() for row in selected}
+    for fact in facts:
+        role_episode_id = str(fact.get("fact_id") or "").strip()
+        if not role_episode_id.startswith("reb_") or role_episode_id in existing_ids:
+            continue
+        linked_ids = [
+            str(value or "").strip()
+            for key in ("linked_source_fact_ids", "linked_identity_fact_ids")
+            for value in (fact.get(key) or [])
+            if str(value or "").strip()
+        ]
+        source_id = next((value for value in linked_ids if by_fact.get(value)), "")
+        if not source_id:
+            continue
+        source_row = dict(by_fact[source_id][0])
+        source_hop = [dict(step) for step in source_row.get("graph_hop_path") or [] if isinstance(step, dict)]
+        if not source_hop:
+            continue
+        aliases.append(
+            {
+                **source_row,
+                "fact_id": role_episode_id,
+                "source_fact_id": source_id,
+                "graph_hop_path": [
+                    *source_hop,
+                    {
+                        "edge_type": "role_episode_bundle_linked_source_fact",
+                        "from": source_id,
+                        "to": role_episode_id,
+                        "note": "selected role-episode linked_source_fact_ids binding",
+                    },
+                ],
+                "role_episode_projection": True,
+            }
+        )
+        existing_ids.add(role_episode_id)
+        receipts.append(
+            {
+                "role_episode_bundle_id": role_episode_id,
+                "linked_source_fact_id": source_id,
+            }
+        )
+
+    if not aliases:
+        return dict(track_expansion), receipts
+    out = dict(track_expansion)
+    out["selected_facts"] = [*selected, *aliases]
+    out["role_episode_hop_aliases"] = receipts
+    return out, receipts
+
+
 @dataclass(frozen=True, slots=True)
 class SectionProofPool:
     section: str
@@ -398,18 +502,23 @@ def _resolve_executive_summary_graph_only_proof_pool(
     role_episode_seed_namespace = bool(root_fact_ids) and all(
         fid.startswith("reb_") for fid in root_fact_ids
     )
-    # Exact role-episode seeds are authority-bearing.  If they cannot be
-    # expanded, propagating the contract error is the only safe behavior;
-    # retrying with an empty seed pool silently widens the evidence universe.
+    track_seed_fact_ids = _track_weighted_seed_ids_for_selected_role_episodes(facts)
+    # Exact role-episode seeds are authority-bearing. Their linked source
+    # facts are the same finite authority expressed in the track graph's fact
+    # namespace; no unseeded expansion or widened evidence pool is allowed.
     track_expansion = build_track_weighted_expansion(
         graph=graph,
         role_family_key=role_family_key,
         jd_text=jd_text,
         briefing_text=briefing_text,
-        seed_fact_ids=root_fact_ids,
+        seed_fact_ids=track_seed_fact_ids,
         enforce_hybrid_contract=False,
         bind_c03=True,
         repo_root=root,
+    )
+    track_expansion, role_episode_hop_aliases = _attach_selected_role_episode_hop_aliases(
+        track_expansion,
+        facts,
     )
     track_weighted_seed_fallback_used = False
     track_weighted_seed_fallback_reason = ""
@@ -462,6 +571,8 @@ def _resolve_executive_summary_graph_only_proof_pool(
     meta["track_weighted_seed_fallback_used"] = track_weighted_seed_fallback_used
     meta["track_weighted_seed_fallback_reason"] = track_weighted_seed_fallback_reason
     meta["track_weighted_seed_namespace"] = "role_episode_bundle" if role_episode_seed_namespace else "fact"
+    meta["track_weighted_seed_fact_ids"] = track_seed_fact_ids
+    meta["role_episode_hop_aliases"] = role_episode_hop_aliases
     meta["track_weighted_hop_paths_attached_to_c03"] = not track_weighted_seed_fallback_used
     meta["broad_skills_ledger_default"] = False
     meta["broad_skills_ledger_fallback"] = False

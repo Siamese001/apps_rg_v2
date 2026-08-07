@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from agentic_core.knowledge.retrieval.anthropic_cache_control import min_cacheable_chars
 from apps_rg.runtime.providers.provider_gateway import ProviderProfile
 from apps_rg.runtime.providers.section_provider_call import _resolve_anthropic_cache_payload
@@ -7,7 +9,7 @@ from apps_rg.runtime.providers.section_provider_call import _resolve_anthropic_c
 
 def test_section_provider_renders_legacy_insurtech_and_ey_self_consistency_payloads(monkeypatch) -> None:
     monkeypatch.setenv("APPS_RG_ANTHROPIC_PROMPT_CACHE", "1")
-    model = "claude-sonnet-5"
+    model = pins.CLAUDE_GENERATOR_MODEL
     long_prompt = "role episode graph evidence " * ((min_cacheable_chars(model) // 28) + 100)
 
     for section_id in ("insurtech_bullets", "ey_bullets"):

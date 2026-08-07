@@ -12,12 +12,10 @@ from apps_rg.runtime.judges.executive_summary_x1d import (
     JUDGE_COMPACT_OUTPUT,
     PROVIDERS,
     JudgeOutput,
-    _call_anthropic,
     _call_gemini,
     _call_openai,
     _invoke_judge_with_bounded_retries,
     _make_blocked_output,
-    _resolve_anthropic_model,
     _resolve_gemini_model,
     resolve_x1d_provider_credentials,
 )
@@ -266,8 +264,6 @@ def run_competencies_judges(
 
         if key == "gemini_pro":
             model, model_source = _resolve_gemini_model(meta, section_id="competencies")
-        elif key == "anthropic_claude":
-            model, model_source = _resolve_anthropic_model(meta, section_id="competencies")
         else:
             model = resolution.model_actual
             model_source = resolution.model_source
@@ -290,19 +286,6 @@ def run_competencies_judges(
                         attempt=attempt_no,
                         section_id="competencies",
                     )
-                if key == "anthropic_claude":
-                    return _call_anthropic(
-                        api_key,
-                        prompt,
-                        model,
-                        input_hash,
-                        key,
-                        model_source=model_source,
-                        artifact_base=artifact_base,
-                        model_requested=model_requested,
-                        attempt=attempt_no,
-                        section_id="competencies",
-                    )
                 return _call_gemini(
                     api_key,
                     prompt,
@@ -312,6 +295,7 @@ def run_competencies_judges(
                     model_source=model_source,
                     artifact_base=artifact_base,
                     model_requested=model_requested,
+                    thinking_level=reasoning_effort,
                     attempt=attempt_no,
                     section_id="competencies",
                 )

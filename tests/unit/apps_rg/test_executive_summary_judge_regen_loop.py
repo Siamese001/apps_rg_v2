@@ -26,7 +26,7 @@ def test_finding_contradicts_soft_fail_filters_pass_noise() -> None:
 
 def test_collect_delta_lines_prioritizes_edit_budget() -> None:
     judge = {
-        "provider_key": "anthropic_claude",
+        "provider_key": "openai_chatgpt",
         "evaluator_mode": "MODEL_BACKED",
         "provider_status": "MODEL_BACKED_FAIL",
         "pass": False,
@@ -51,7 +51,7 @@ def test_collect_delta_lines_prioritizes_edit_budget() -> None:
     )
     joined = "\n".join(lines)
     assert "EDIT_BUDGET" in joined
-    assert "S6_forward_synthesis" in joined or "revise S6" in joined
+    assert "connective_S2_S5" in joined
 
 
 def test_resume_display_text_from_regen_messages() -> None:
@@ -69,7 +69,7 @@ def test_resume_display_text_from_regen_messages() -> None:
 def test_advance_regen_thread_for_next_cycle() -> None:
     messages = [{"role": "system", "content": "sys"}]
     raw = json.dumps({"resume_display_text": "A. B. C. D. E. F.", "claim_ledger": []})
-    judges = [{"provider_key": "anthropic_claude", "score": 4.2, "pass": True}]
+    judges = [{"provider_key": "openai_chatgpt", "score": 4.2, "pass": True}]
     out_msgs, out_judges = advance_regen_thread_for_next_cycle(
         messages,
         raw_output=raw,

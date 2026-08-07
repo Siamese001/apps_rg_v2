@@ -13,7 +13,7 @@ import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Mapping
 
 from apps_rg.runtime.c0.section_proof_loader import (
     apply_proof_pool_to_usage_ledger,
@@ -33,11 +33,11 @@ from apps_rg.runtime.providers import (
     ProviderGatewayError,
     ProviderProfile,
 )
-from apps_rg.runtime.providers.availability_fallback import maybe_fallback_to_openai_for_claude_availability
 from apps_rg.runtime.providers.provider_contract import ProviderResult
 from apps_rg.runtime.section_model_limits import (
     external_claude_generation_model,
     external_openai_generation_model,
+    resolve_section_generation_effort,
 )
 from apps_rg.runtime.runtime_proof_layout import (
     finalize_runtime_proof_run,
@@ -51,7 +51,11 @@ from apps_rg.runtime.section_l2_lane_integration import (
 from apps_rg.runtime.section_proof.section_input_usage_ledger import (
     build_section_input_usage_ledger_v1,
 )
-from apps_rg.runtime.sections.lane_artifact_io import sha16, write_json
+from apps_rg.runtime.sections.lane_artifact_io import (
+    runtime_payload_for_json,
+    sha16,
+    write_json,
+)
 from apps_rg.runtime.spine.c0_fec_compose import (
     merge_compiled_prompt_artifact_fec_fields,
 )
@@ -90,7 +94,7 @@ ROLE_EPISODE_MAX_OUTPUT_TOKENS_BY_SECTION: dict[str, int] = {
     "ey_bullets": 2200,
 }
 ROLE_EPISODE_GRAPH_BULLET_RENDERER_VERSION = "deterministic_graph_bullet_render.v1"
-ROLE_EPISODE_PROOF_TEXT_RENDERER_VERSION = "proof_authorized_fact_claim_render.v1"
+ROLE_EPISODE_PROOF_TEXT_RENDERER_VERSION = "proof_authorized_fact_claim_render.v2"
 ROLE_EPISODE_FINAL_BULLET_COUNT = 3
 ROLE_EPISODE_FINAL_MATERIALIZED_SELECTION_CONTRACT = (
     "role_episode_final_materialized_selection_contract.json"
@@ -203,7 +207,13 @@ def build_role_episode_lane_args(
 
 
 def _json_hash(value: Any) -> str:
-    return sha16(json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":")))
+    # L2 preparation attaches frozen, in-process authority objects under private keys.
+    # They remain available to the lane, but do not belong in durable payloads. Hash
+    # the same public projection that the lane persists.
+    serializable = runtime_payload_for_json(value) if isinstance(value, dict) else value
+    return sha16(
+        json.dumps(serializable, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    )
 
 
 def _compact_text(text: str, *, max_chars: int = 240) -> str:
@@ -571,7 +581,56 @@ def _fact_id_from_row(fact: dict[str, Any]) -> str:
     return str(fact.get("fact_id") or fact.get("candidate_fact_id") or "").strip()
 
 
+_PROOF_FACT_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
+    # The frozen allocation has two distinct leaf skills under the same
+    # migration bundle. This concise, source-vocabulary-only projection keeps
+    # the legacy-modernization leaf distinguishable from the generic AWS
+    # modernization bullet while retaining its exact fact and graph path.
+    (
+        "bul_insurtech_003",
+        "skill_sr_insurtech_legacy_cloud_modernization",
+    ): "Led legacy cloud modernization for AWS insurance platforms",
+}
+_PROOF_FACT_COMPOSITION_CONNECTIVES = frozenset({"and", "for", "of", "the", "to"})
+
+
+def _proof_fact_surface_tokens(fact: Mapping[str, Any]) -> set[str]:
+    values: list[Any] = [
+        fact.get("claim_text"),
+        fact.get("text"),
+        fact.get("domain"),
+        fact.get("role_episode_bundle_id"),
+        fact.get("graph_skill_node_ids"),
+        fact.get("allowed_graph_evidence_ids"),
+    ]
+    return set(
+        re.findall(
+            r"[a-z0-9]+",
+            " ".join(str(value or "") for value in values).casefold(),
+        )
+    )
+
+
+def _proof_fact_composition_is_bound(phrase: str, fact: Mapping[str, Any]) -> bool:
+    source_tokens = _proof_fact_surface_tokens(fact)
+    for token in re.findall(r"[a-z0-9]+", str(phrase or "").casefold()):
+        if token in _PROOF_FACT_COMPOSITION_CONNECTIVES or token in source_tokens:
+            continue
+        if token.endswith("s") and token[:-1] in source_tokens:
+            continue
+        if f"{token}s" in source_tokens:
+            continue
+        return False
+    return True
+
+
 def _proof_fact_text(fact: dict[str, Any]) -> str:
+    fact_id = _fact_id_from_row(fact)
+    skill_ids = [str(value or "").strip() for value in fact.get("graph_skill_node_ids") or []]
+    if len(skill_ids) == 1:
+        composition = _PROOF_FACT_SURFACE_COMPOSITIONS.get((fact_id, skill_ids[0]))
+        if composition and _proof_fact_composition_is_bound(composition, fact):
+            return _sentence(composition)
     return _sentence(str(fact.get("claim_text") or fact.get("text") or ""))
 
 
@@ -699,8 +758,27 @@ def _proof_authorized_bullets_from_selection_with_contract(
         expected_count=ROLE_EPISODE_FINAL_BULLET_COUNT,
         allow_deterministic_reselect=cfg.allow_deterministic_graph_render,
     )
+    # When a selected source is itself a canonical role-bullet slot id, retain
+    # that identity through the final deterministic render.  This makes the
+    # visible bullet, claim ledger, and whole-resume allocation refer to the
+    # same slot even when two source facts render to identical prose.
+    expected_slot_ids = {
+        f"{cfg.bullet_prefix}_{index:03d}"
+        for index in range(1, ROLE_EPISODE_FINAL_BULLET_COUNT + 1)
+    }
+    slot_bound_ordering_applied = (
+        len(selected_ids) == ROLE_EPISODE_FINAL_BULLET_COUNT
+        and len(set(selected_ids)) == ROLE_EPISODE_FINAL_BULLET_COUNT
+        and set(selected_ids) == expected_slot_ids
+    )
+    render_ids = (
+        sorted(selected_ids)
+        if slot_bound_ordering_applied
+        else list(selected_ids)
+    )
+
     out: list[dict[str, Any]] = []
-    for fid in selected_ids:
+    for fid in render_ids:
         fact = proof_by_id.get(fid)
         if not fact:
             continue
@@ -710,7 +788,7 @@ def _proof_authorized_bullets_from_selection_with_contract(
         idx = len(out)
         out.append(
             {
-                "bullet_id": f"{cfg.bullet_prefix}_{idx + 1:03d}",
+                "bullet_id": fid if slot_bound_ordering_applied else f"{cfg.bullet_prefix}_{idx + 1:03d}",
                 "bullet_text": text,
                 "source_fact_ids": [fid],
             }
@@ -722,6 +800,7 @@ def _proof_authorized_bullets_from_selection_with_contract(
         {
             "rendered_bullet_count": len(out),
             "rendered_source_fact_ids": rendered_source_fact_ids,
+            "slot_bound_ordering_applied": slot_bound_ordering_applied,
             "final_materialized_acceptance_ok": (
                 len(out) == ROLE_EPISODE_FINAL_BULLET_COUNT
                 and len(set(rendered_source_fact_ids)) == ROLE_EPISODE_FINAL_BULLET_COUNT
@@ -1644,9 +1723,29 @@ def run_role_episode_lane_execution(
     if blocked is not None:
         return blocked
 
+    # C0/FEC may replace the loader's local candidate plan with the frozen
+    # whole-resume allocation.  Refresh every local projection input before
+    # prompt execution and deterministic rendering; otherwise the final text
+    # can be rendered from a stale per-lane plan while its provenance names the
+    # new allocation digest.
+    selected_fact_plan = dict(runtime_payload.get("selected_fact_plan") or selected_fact_plan)
+    allowed_fact_ids = list(runtime_payload.get("allowed_fact_ids") or allowed_fact_ids)
+    facts = _facts_from_plan(selected_fact_plan)
+    if not allowed_fact_ids or not facts:
+        runtime_payload["runtime_generation_status"] = "REQUIRED_PROOF_ABSENT"
+        return _write_blocked_artifacts(
+            cfg=cfg,
+            args=args,
+            artifact_dir=artifact_dir,
+            runtime_payload=runtime_payload,
+            reason=f"required upstream proof absent for {sid}: empty frozen allocation slice",
+            status="REQUIRED_PROOF_ABSENT",
+        )
+
     prompt_text = _compiled_prompt(cfg, runtime_payload)
     prompt_hash = hashlib.sha256(prompt_text.encode("utf-8")).hexdigest()
     compiled_obj = _prompt_object(prompt_text, run_id=run_id, prompt_hash=prompt_hash)
+    compiled_obj.reasoning_effort = resolve_section_generation_effort(sid)
     write_json(artifact_dir / "runtime_payload.json", runtime_payload)
     (artifact_dir / "compiled_prompt.txt").write_text(prompt_text + "\n", encoding="utf-8")
     write_json(
@@ -1734,12 +1833,6 @@ def run_role_episode_lane_execution(
         try:
             provider_result = _provider_gateway(sid, str(args.provider)).generate(
                 str(args.provider),
-                compiled_obj,
-                token_budget=max_output_tokens,
-                temperature=float(args.temperature),
-            )
-            provider_result = maybe_fallback_to_openai_for_claude_availability(
-                provider_result,
                 compiled_obj,
                 token_budget=max_output_tokens,
                 temperature=float(args.temperature),

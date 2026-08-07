@@ -5,6 +5,8 @@ section-model identity/budget constants and the SSOT-backed resolver.
 """
 from __future__ import annotations
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import apps_rg.runtime.section_model_limits as sml
 from apps_rg.runtime.section_model_limits import (
     DEFAULT_EXTERNAL_CLAUDE_MODEL,
@@ -19,7 +21,7 @@ class TestConstants:
     def test_competencies_model_identity(self) -> None:
         # Compatibility label is an explicit competencies lane pin, not a fallback default.
         assert DEFAULT_EXTERNAL_CLAUDE_MODEL == resolve_section_generation_model("competencies")
-        assert DEFAULT_EXTERNAL_CLAUDE_MODEL == "claude-sonnet-5"
+        assert DEFAULT_EXTERNAL_CLAUDE_MODEL == pins.CLAUDE_GENERATOR_MODEL
         assert "haiku" not in DEFAULT_EXTERNAL_CLAUDE_MODEL
 
     def test_max_model_len_is_positive_int(self) -> None:
@@ -36,8 +38,10 @@ class TestConstants:
             "external_claude_generation_model",
             "external_openai_generation_model",
             "external_openai_generation_model_source",
+            "resolve_section_generation_effort",
             "resolve_section_generation_model",
             "resolve_selector_provider_model",
+            "resolve_selector_reasoning_effort",
             "runtime_limit_float",
             "runtime_limit_mapping",
             "runtime_limit_int",

@@ -113,6 +113,10 @@ _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
         "skill_sr_w12_industry_reference_architecture",
     ): "Industry reference architecture patterns for regulated modernization",
     (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_partner_joint_solution_development",
+    ): "AWS alliance modernization co-sell and joint development",
+    (
         "reb_ibm_offering_accelerator_management",
         "skill_p2_tech_reusable_accelerators",
     ): "Reusable agentic platform service accelerators",
@@ -148,6 +152,19 @@ _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
         "reb_unify_agentic_platform_architecture",
         "skill_unify_agentic_runtime_proof_bundle_lineage",
     ): "Runtime proof bundle lineage for agent platform",
+}
+
+# A joint alliance/co-sell capability is commercial evidence, even when its
+# graph root is also eligible for the applied-AI architecture category. Keep
+# the visible term in the existing commercialization category so the category
+# label and its terms tell one coherent résumé story. This affects only the
+# selected graph path below; it does not create a new claim or alter graph
+# selection.
+_ALLOCATION_SURFACE_CATEGORY_OVERRIDES: Mapping[tuple[str, str], str] = {
+    (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_partner_joint_solution_development",
+    ): "Platform Productization & Commercialization",
 }
 _SURFACE_COMPOSITION_CONNECTIVES = frozenset({"and", "for", "of", "the", "to", "with"})
 
@@ -555,6 +572,19 @@ def _allocation_surface_category(
 
     if not categories:
         return None
+    override_label = _ALLOCATION_SURFACE_CATEGORY_OVERRIDES.get(
+        (
+            str(assignment.get("root_id") or "").strip(),
+            str(assignment.get("skill_id") or "").strip(),
+        )
+    )
+    if override_label:
+        for category in categories:
+            if override_label in {
+                str(category.get("category_label") or "").strip(),
+                str(category.get("resume_display_label") or "").strip(),
+            }:
+                return category
     phrase_tokens = _tokens(phrase) | _tokens(assignment.get("skill_id"))
     commercial_tokens = {"customer", "deal", "revenue", "sales", "target", "value"}
     best: tuple[int, int, int, dict[str, Any]] | None = None

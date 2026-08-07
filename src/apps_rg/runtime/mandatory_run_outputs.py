@@ -129,8 +129,6 @@ BCG_EVIDENCE_MAP_ROW_KEYS = ("label", "path")
 BCG_NESTED_TABLE_KEYS = ("columns", "rows")
 SECTION_LANE_TABLE_KEYS = ("title", "columns", "rows")
 RESUME_DOCX_INLINE_KEYS = ("title", "source", "text")
-APPS_RESEARCH_PRIMARY_GENERATION_PROVIDER = "external_openai"
-APPS_RESEARCH_PRIMARY_GENERATION_MODEL = "gpt-5.4-mini-2026-03-17"
 APPS_RG_OUTPUT_MANIFEST = "apps_rg_output_manifest.json"
 
 _PRODUCT_OUTPUT_ARTIFACTS = (
@@ -911,6 +909,21 @@ def _apps_research_gate_context(
         if isinstance(envelope.get("exit_authorization"), dict)
         else {}
     )
+    model_observations = (
+        envelope.get("model_observations")
+        if isinstance(envelope.get("model_observations"), dict)
+        else {}
+    )
+    generation_observation = (
+        model_observations.get("generation")
+        if isinstance(model_observations.get("generation"), dict)
+        else {}
+    )
+    judge_observation = (
+        model_observations.get("judge")
+        if isinstance(model_observations.get("judge"), dict)
+        else {}
+    )
     route_decision = spine.get("route_decision") if isinstance(spine.get("route_decision"), dict) else {}
     if "status" in receipt:
         # The frozen v2 consumer receipt deliberately has no legacy
@@ -958,9 +971,21 @@ def _apps_research_gate_context(
         x3_status = "NOT_OBSERVED"
         x3_disposition = "NOT_OBSERVED"
     x2_score = "NOT_OBSERVED"
-    x2_judge_model = "NOT_OBSERVED"
-    generation_provider = "NOT_OBSERVED"
-    generation_model = "NOT_OBSERVED"
+    x2_judge_model = (
+        str(judge_observation.get("observed_model") or "MODEL_NOT_OBSERVED")
+        if judge_observation.get("status") == "OBSERVED_PROVIDER_RESPONSE"
+        else "MODEL_NOT_OBSERVED"
+    )
+    generation_provider = (
+        str(generation_observation.get("provider") or "NOT_OBSERVED")
+        if generation_observation.get("status") == "OBSERVED_PROVIDER_RESPONSE"
+        else "NOT_OBSERVED"
+    )
+    generation_model = (
+        str(generation_observation.get("observed_model") or "MODEL_NOT_OBSERVED")
+        if generation_observation.get("status") == "OBSERVED_PROVIDER_RESPONSE"
+        else "MODEL_NOT_OBSERVED"
+    )
     handoff_eligible = valid
     summary = (
         f"handoff_observed={observed}; handoff_valid={valid}; reason={reason}; "
@@ -1150,14 +1175,16 @@ def _research_briefing_row(run_root: Path, *, repo_root: Path, cache: dict[str, 
         "primary_provider": (
             generation_provider
             if delegation_observed is True and generation_provider and generation_provider != "NOT_OBSERVED"
-            else APPS_RESEARCH_PRIMARY_GENERATION_PROVIDER
+            else "NOT_OBSERVED"
             if delegation_observed is True
             else "STATIC_MANUAL_BRIEF" if briefing_present else "NOT_OBSERVED"
         ),
         "primary_model_observed": (
             generation_model
-            if delegation_observed is True and generation_model and generation_model != "NOT_OBSERVED"
-            else APPS_RESEARCH_PRIMARY_GENERATION_MODEL
+            if delegation_observed is True
+            and generation_model
+            and generation_model not in {"NOT_OBSERVED", "MODEL_NOT_OBSERVED"}
+            else "MODEL_NOT_OBSERVED"
             if delegation_observed is True
             else "NOT_OBSERVED"
         ),

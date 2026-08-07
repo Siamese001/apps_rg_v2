@@ -472,17 +472,26 @@ class MockAppsResearchBridge(AppsResearchBridge):
             if isinstance(upstream, dict):
                 return upstream
         import hashlib
+        from apps_research.config.model_pins import (
+            apps_rg_handoff_judge_pin,
+            company_brief_generation_pin,
+        )
 
         normalized = str(brief_text or "").strip()
+        generation_pin = company_brief_generation_pin()
+        judge_pin = apps_rg_handoff_judge_pin()
         return {
             "schema_version": "apps_research.apps_rg_targeting_brief_sidecar/v1",
             "company_name": "Mock Co",
-            "generation_provider": "external_openai",
-            "generation_model": "gpt-5.4-mini-2026-03-17",
+            "generation_provider": generation_pin.provider,
+            "generation_model_requested": generation_pin.model,
+            "generation_model": generation_pin.model,
+            "generation_reasoning_effort": generation_pin.reasoning_effort,
+            "generation_model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
             "provider_call_attempted": True,
             "generation_token_budget": 2048,
-            "judge_name": "gemini_pro",
-            "judge_model": "gemini-3.1-pro-preview",
+            "judge_name": judge_pin.provider_key,
+            "judge_model": judge_pin.model,
             "briefing_semantic_score": 0.91,
             "semantic_gate_mode": "model_backed_llm_judge",
             "handoff_eligible": bool(normalized),
@@ -490,9 +499,12 @@ class MockAppsResearchBridge(AppsResearchBridge):
             "x2_judge_receipt": {
                 "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
                 "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
-                "judge_name": "gemini_pro",
-                "judge_provider": "gemini_pro",
-                "judge_model": "gemini-3.1-pro-preview",
+                "judge_name": judge_pin.provider_key,
+                "judge_provider": judge_pin.provider_key,
+                "judge_model_requested": judge_pin.model,
+                "judge_model": judge_pin.model,
+                "thinking_level": judge_pin.reasoning_effort,
+                "model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
                 "threshold": 0.75,
                 "model_backed": True,
                 "status": "PASS",

@@ -177,6 +177,15 @@ def _l2_from_modular_successful_pointer(repo: Path, upstream_section_id: str) ->
     msr = modular_sections_root_from_env(repo)
     if msr is None:
         return None
+    # A whole-resume envelope stores the live lane artifacts directly beneath
+    # its current sections root. The downstream narrative executes after the
+    # upstream lane has emitted those artifacts, but before the run-level
+    # pointer publication is necessarily observable. Read that direct,
+    # same-envelope artifact first; the caller still validates its L2/X3
+    # finalization state, so this is not a stale/global fallback.
+    direct_l2 = msr / upstream_section_id / "l2_output.json"
+    if direct_l2.is_file():
+        return direct_l2
     ptr = msr / upstream_section_id / LATEST_SUCCESSFUL_REAL_FILENAME
     data = _read_json_dict(ptr)
     if not data:
@@ -208,8 +217,9 @@ def resolve_companion_bullets_l2_path(
 ) -> Path | None:
     """Resolve upstream bullet L2 for narrative companion context.
 
-    Product and test paths: modular ``latest_successful_real_run.json`` only
-    from the current run tree. Global runtime_proofs scans are forbidden.
+    Product and test paths: the direct artifact in the current whole-resume
+    envelope, or modular ``latest_successful_real_run.json`` from that same
+    run tree. Global runtime_proofs scans are forbidden.
     """
     modular_l2 = _l2_from_modular_successful_pointer(repo, upstream_section_id)
     if modular_l2 is not None:

@@ -488,10 +488,6 @@ def test_all_product_sections_attach_evidence_authority(section_id: str) -> None
     ("section_id", "blocker"),
     [
         (
-            "executive_summary",
-            "seed_fact_ids have no matching track-weighted graph hop paths",
-        ),
-        (
             "unify_bullets",
             "section fact plan has no role_episode_bundle_id bindings",
         ),

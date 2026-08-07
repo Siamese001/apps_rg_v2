@@ -10,12 +10,10 @@ from pathlib import Path
 from typing import Any, Literal
 
 from apps_rg.runtime.judges.executive_summary_x1d import (
-    PROVIDERS,
     JudgeOutput,
     _artifact_path,
-    _extract_anthropic_message_text,
     _extract_json_from_text,
-    _is_openai_gpt5_chat_model,
+    _openai_chat_uses_max_completion_tokens,
     _write_artifact,
 )
 from apps_rg.runtime.env_bootstrap import bootstrap_apps_rg_env
@@ -48,8 +46,23 @@ from apps_rg.runtime.sections.executive_summary_context_limits import (
 )
 from apps_rg.runtime.section_model_limits import (
     resolve_selector_provider_model,
+    resolve_selector_reasoning_effort,
     selector_role_for_section,
 )
+
+_SELECTOR_PROVIDERS: dict[str, dict[str, str]] = {
+    "openai_chatgpt": {"env": "OPENAI_API_KEY"},
+    "anthropic_claude": {"env": "ANTHROPIC_API_KEY"},
+}
+
+
+def _extract_anthropic_message_text(data: dict[str, Any]) -> str:
+    """Extract selector text from an Anthropic Messages response."""
+    parts: list[str] = []
+    for block in data.get("content") or []:
+        if isinstance(block, dict) and block.get("type") == "text":
+            parts.append(str(block.get("text") or ""))
+    return "".join(parts)
 
 SlotKind = Literal["bullets", "competencies"]
 
@@ -846,6 +859,7 @@ def _call_anthropic_pool_selector(
     api_key: str,
     prompt: str,
     model: str,
+    reasoning_effort: str,
     input_hash: str,
     model_source: str,
     artifact_dir: Path | None,
@@ -885,7 +899,11 @@ def _call_anthropic_pool_selector(
         "temperature": 0.1,
     }
     apply_anthropic_temperature_capability(payload)
-    apply_anthropic_adaptive_thinking_config(payload, os.environ)
+    apply_anthropic_adaptive_thinking_config(
+        payload,
+        os.environ,
+        effort=reasoning_effort,
+    )
     started_wall = datetime.now(timezone.utc).isoformat()
     req_path = _artifact_path("anthropic_claude", "provider_request", artifact_base=artifact_dir)
     _write_artifact(
@@ -906,6 +924,7 @@ def _call_anthropic_pool_selector(
             "started_at": started_wall,
             "effective_timeout_seconds": timeout_s,
             "model": model,
+            "reasoning_effort": reasoning_effort,
             "input_hash": input_hash,
         },
     )
@@ -1098,6 +1117,7 @@ def _call_openai_pool_selector(
     api_key: str,
     prompt: str,
     model: str,
+    reasoning_effort: str,
     input_hash: str,
     model_source: str,
     artifact_dir: Path | None,
@@ -1126,8 +1146,10 @@ def _call_openai_pool_selector(
             {"role": "user", "content": prompt},
         ],
     }
-    if _is_openai_gpt5_chat_model(model):
+    if _openai_chat_uses_max_completion_tokens(model):
         payload["max_completion_tokens"] = max_tokens
+        payload["reasoning_effort"] = reasoning_effort
+        payload["response_format"] = {"type": "json_object"}
     else:
         payload["max_tokens"] = max_tokens
         payload["temperature"] = 0.1
@@ -1152,6 +1174,7 @@ def _call_openai_pool_selector(
             "started_at": started_wall,
             "effective_timeout_seconds": timeout_s,
             "model": model,
+            "reasoning_effort": reasoning_effort,
             "input_hash": input_hash,
         },
     )
@@ -1678,6 +1701,7 @@ def run_claude_bullet_pool_selection(
 
     selector_role = selector_role_for_section(section_id, slot_kind=slot_kind)
     provider_key, model, model_source = resolve_selector_provider_model(selector_role)
+    reasoning_effort = resolve_selector_reasoning_effort(selector_role)
     prompt = _selection_prompt(
         section_id=section_id,
         slot_kind=slot_kind,
@@ -1705,12 +1729,18 @@ def run_claude_bullet_pool_selection(
             targeting_context=targeting_context,
         )
 
-    meta = PROVIDERS.get(provider_key) or {}
+    meta = _SELECTOR_PROVIDERS.get(provider_key) or {}
     bootstrap_apps_rg_env()
     api_key = os.environ.get(str(meta.get("env") or ""), "").strip()
     if not api_key:
         if competencies_selector:
-            provider_label = "OpenAI" if provider_key == "openai_chatgpt" else provider_key
+            provider_label = (
+                "OpenAI"
+                if provider_key == "openai_chatgpt"
+                else "Claude"
+                if provider_key == "anthropic_claude"
+                else provider_key
+            )
             raise PoolSelectorUnavailableError(
                 f"competencies selector unavailable: missing {provider_label} credentials"
             )
@@ -1726,6 +1756,7 @@ def run_claude_bullet_pool_selection(
             api_key=api_key,
             prompt=prompt,
             model=model,
+            reasoning_effort=reasoning_effort,
             input_hash=input_hash,
             model_source=model_source,
             artifact_dir=artifact_dir,
@@ -1736,6 +1767,7 @@ def run_claude_bullet_pool_selection(
             api_key=api_key,
             prompt=prompt,
             model=model,
+            reasoning_effort=reasoning_effort,
             input_hash=input_hash,
             model_source=model_source,
             artifact_dir=artifact_dir,
@@ -1797,11 +1829,7 @@ def run_claude_bullet_pool_selection(
             min_score_threshold=floor,
             targeting_context=tc,
         )
-        selection_mode = (
-            "claude_competencies_adaptive_6_8_pass"
-            if provider_key == "anthropic_claude"
-            else "openai_competencies_adaptive_6_8_pass"
-        )
+        selection_mode = "competencies_advisory_selector_adaptive_6_8_pass"
     else:
         merged, source_map = merge_competency_selections(valid_paths, selections, base_parsed=base)
         selection_mode = "claude_per_slot_selection"

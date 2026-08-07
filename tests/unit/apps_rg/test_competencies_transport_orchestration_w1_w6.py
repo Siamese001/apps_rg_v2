@@ -17,6 +17,8 @@ from __future__ import annotations
 import json
 import types
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 
 from apps_rg.runtime.providers import external_provider as ep
@@ -133,7 +135,7 @@ def test_w2_stream_transport_records_timing_and_progress(monkeypatch):
 
     prov = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         environ={"ANTHROPIC_API_KEY": "k"},
     )
     sink: dict = {}
@@ -158,7 +160,7 @@ def test_w2_generate_success_returns_real_llm_and_surfaces_timing():
 
     prov = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         environ={"ANTHROPIC_API_KEY": "k"},
         transport=fake_transport,
     )
@@ -178,7 +180,7 @@ def test_w2_generate_timeout_surfaces_last_progress():
 
     prov = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         environ={"ANTHROPIC_API_KEY": "k"},
         transport=stalling_transport,
     )
@@ -275,9 +277,9 @@ def test_w3_competencies_selector_uses_extended_timeout_default(monkeypatch):
     captured: dict[str, object] = {}
 
     class FakeJudge:
-        provider_key = "openai_chatgpt"
-        provider_name = "OpenAI ChatGPT"
-        model_name = "gpt-test"
+        provider_key = "anthropic_claude"
+        provider_name = "Anthropic Claude"
+        model_name = "claude-test"
         provider_status = "MODEL_BACKED_PASS"
         exact_provider_error = None
         pass_ = True
@@ -297,19 +299,20 @@ def test_w3_competencies_selector_uses_extended_timeout_default(monkeypatch):
 
     monkeypatch.delenv("APPS_RG_POOL_SELECTOR_TIMEOUT_SECONDS", raising=False)
     monkeypatch.delenv("APPS_RG_EXTERNAL_PROVIDER_TIMEOUT_MAX_SECONDS", raising=False)
-    monkeypatch.setenv("OPENAI_API_KEY", "fake-openai-key")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake-anthropic-key")
     monkeypatch.setattr(sel, "bootstrap_apps_rg_env", lambda: None)
     monkeypatch.setattr(
         sel,
         "resolve_selector_provider_model",
-        lambda _role: ("openai_chatgpt", "gpt-test", "test-model-source"),
+        lambda _role: ("anthropic_claude", "claude-test", "test-model-source"),
     )
 
-    def fake_openai_selector(**kwargs):
+    def fake_anthropic_selector(**kwargs):
         captured["timeout_s"] = kwargs["timeout_s"]
+        captured["reasoning_effort"] = kwargs["reasoning_effort"]
         return FakeJudge(), {"selections": selections, "pool_summary": {}}
 
-    monkeypatch.setattr(sel, "_call_openai_pool_selector", fake_openai_selector)
+    monkeypatch.setattr(sel, "_call_anthropic_pool_selector", fake_anthropic_selector)
 
     sel.run_claude_bullet_pool_selection(
         section_id="competencies",
@@ -324,6 +327,7 @@ def test_w3_competencies_selector_uses_extended_timeout_default(monkeypatch):
     )
 
     assert captured["timeout_s"] == sel.DEFAULT_COMPETENCIES_POOL_SELECTOR_TIMEOUT_SECONDS
+    assert captured["reasoning_effort"] == "high"
 
 
 def test_w3_no_hardcoded_60s_selector_timeout():

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from apps_rg.runtime.providers.anthropic_prompt_cache import build_cache_receipt_from_usage
 
 
@@ -14,7 +16,7 @@ def test_cost_receipt_uses_anthropic_5m_1h_and_read_multipliers() -> None:
             "input_usd_per_million": 2.0,
         },
         provider="external_claude",
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         section_id="competencies",
         usage={
             "input_tokens": 100,
@@ -44,7 +46,7 @@ def test_aggregate_creation_without_breakdown_uses_conservative_active_ttl() -> 
     receipt = build_cache_receipt_from_usage(
         seed={"cache_enabled": True, "active_cache_ttls": ["1h", "5m"]},
         provider="external_claude",
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         usage={"input_tokens": 0, "cache_creation_input_tokens": 100, "cache_read_input_tokens": 0},
     )
 

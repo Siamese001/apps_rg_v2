@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from apps_rg.runtime.judges import competencies_x1d
 
 
@@ -32,7 +34,7 @@ def test_competencies_rubric_mentions_ta_screen_and_ai_authenticity() -> None:
     assert "deep agentic ai practitioner" in rubric
 
 
-def test_run_competencies_judges_uses_pinned_gemini_preview_model(monkeypatch) -> None:
+def test_run_competencies_judges_uses_pinned_gemini_high_model(monkeypatch) -> None:
     captured: dict[str, str] = {}
 
     def fake_credentials(provider_key: str, environ):
@@ -40,9 +42,10 @@ def test_run_competencies_judges_uses_pinned_gemini_preview_model(monkeypatch) -
         return "fake-google-key", ["GOOGLE_API_KEY"]
 
     def fake_call_gemini(api_key: str, prompt: str, model: str, input_hash: str, provider_key: str, **kwargs):
-        del api_key, prompt, input_hash, kwargs
+        del api_key, prompt, input_hash
         captured["provider_key"] = provider_key
         captured["model"] = model
+        captured["thinking_level"] = kwargs["thinking_level"]
         out = competencies_x1d._mocked(provider_key, "input-hash")
         out.evaluator_mode = "MODEL_BACKED"
         out.provider_status = "MODEL_BACKED_PASS"
@@ -62,7 +65,8 @@ def test_run_competencies_judges_uses_pinned_gemini_preview_model(monkeypatch) -
     )
 
     assert captured["provider_key"] == "gemini_pro"
-    assert captured["model"] == "gemini-3.1-pro-preview"
+    assert captured["model"] == pins.GEMINI_PROOF_JUDGE_MODEL
+    assert captured["thinking_level"] == "high"
     assert len(outputs) == 1
     out = outputs[0]
     assert out.provider_key == "gemini_pro"

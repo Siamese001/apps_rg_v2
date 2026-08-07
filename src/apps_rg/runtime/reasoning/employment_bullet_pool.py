@@ -455,11 +455,7 @@ def competencies_pool_x1d_judge_rows(
     row["rubric_version"] = JUDGE_RUBRIC_VERSION
     row["selection_mode"] = str(
         (gen_meta or {}).get("selection_mode")
-        or (
-            "claude_competencies_adaptive_6_8_pass"
-            if selector_provider_key == "anthropic_claude"
-            else "openai_competencies_adaptive_6_8_pass"
-        )
+        or "competencies_advisory_selector_adaptive_6_8_pass"
     )
     row["min_category_count"] = n_min
     row["max_category_count"] = n_max

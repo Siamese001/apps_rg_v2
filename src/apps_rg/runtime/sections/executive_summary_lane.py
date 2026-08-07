@@ -113,6 +113,58 @@ from apps_rg.runtime.judges.executive_summary_x1d_dimension_verdicts import (
 PROMPT_ID = "executive_summary.generate_scratch_v1"
 
 
+def _reconcile_final_plan_c03_allowlist(
+    proof_pool_metadata: dict[str, Any],
+    *,
+    allowed_fact_ids: set[str],
+    proof_pool_digest: str,
+    jd_text: str,
+) -> dict[str, Any]:
+    """Reconcile the early graph-targeting view with the sealed final plan.
+
+    C0 may inspect a wider, non-claimable graph neighborhood before the
+    whole-resume allocator seals this section's finite fact set.  Once that
+    allocation exists, the lane must carry forward only its claimable C0.3
+    evidence while retaining the wider neighborhood exclusively as recorded
+    targeting context.  The returned filter receipt is later checked by X2;
+    it is not an allowlist expansion or a fallback.
+    """
+
+    c03 = proof_pool_metadata.get("c03_graphrag_bound")
+    if not isinstance(c03, dict):
+        return proof_pool_metadata
+
+    from apps_rg.runtime.c0.c03_allowlist_coherence import (
+        build_exec_summary_allowlist_receipt,
+        filter_c03_evidence_to_allowed_pool,
+    )
+
+    track_expansion = proof_pool_metadata.get("track_weighted_graph_expansion")
+    c03_claimable, filter_receipt = filter_c03_evidence_to_allowed_pool(
+        c03,
+        allowed_fact_ids,
+        track_expansion=track_expansion if isinstance(track_expansion, dict) else None,
+    )
+    out = dict(proof_pool_metadata)
+    out["c03_graphrag_bound"] = c03_claimable
+    out["exec_summary_allowlist_receipt"] = build_exec_summary_allowlist_receipt(
+        allowed_fact_ids=allowed_fact_ids,
+        allowlist_filter_receipt=filter_receipt,
+        track_expansion=track_expansion if isinstance(track_expansion, dict) else None,
+        proof_pool_digest=proof_pool_digest,
+        jd_text=jd_text,
+    )
+    out["c03_filtered_out_fact_ids"] = list(
+        filter_receipt.get("c03_filtered_out_fact_ids") or []
+    )
+    out["c03_context_fact_ids"] = list(filter_receipt.get("c03_context_fact_ids") or [])
+    out["c03_expansion_surplus_fact_ids"] = list(
+        filter_receipt.get("c03_expansion_surplus_fact_ids") or []
+    )
+    out["allowlist_mismatch"] = False
+    return out
+
+
 def _write_x1d_judge_artifacts(artifact_dir: Path, x1d: list[Any]) -> None:
     """Persist judge panel outputs and per-dimension debug matrix."""
     write_json(artifact_dir / "x1d_llm_judge_outputs.json", {"judges": x1d})
@@ -1795,7 +1847,12 @@ def run_executive_summary_execution(
     selected_fact_plan = pool.selected_fact_plan
     allowed_fact_ids = pool.allowed_fact_ids
     allowed_fact_ids_ordered = list(pool.allowed_fact_ids_ordered)
-    proof_pool_metadata = pool.proof_pool_metadata
+    proof_pool_metadata = _reconcile_final_plan_c03_allowlist(
+        pool.proof_pool_metadata,
+        allowed_fact_ids=allowed_fact_ids,
+        proof_pool_digest=str(pool.proof_pool_digest or ""),
+        jd_text=targeting_ingress.jd_text,
+    )
 
     provider_resolution_source = coalesce_lane_provider_resolution_source(
         explicit=getattr(args, "provider_resolution_source", None),
@@ -1929,9 +1986,10 @@ def run_executive_summary_execution(
         c03_bound=proof_pool_metadata.get("c03_graphrag_bound")
         if isinstance(proof_pool_metadata, dict)
         else None,
-        track_expansion=proof_pool_metadata.get("track_weighted_graph_expansion")
-        if isinstance(proof_pool_metadata, dict)
-        else None,
+        # The full track expansion is retained as non-proof targeting context.
+        # Its complete surplus set is recorded in the reconciliation receipt
+        # above and checked again by X2; C0.3 is the claimable projection.
+        track_expansion=None,
         runtime_payload=runtime_payload,
     )
     if allowlist_block_reason:
@@ -2616,7 +2674,12 @@ def run_executive_summary_execution(
         jd_alignment=l2_output.get("jd_alignment"),
     )
     usage_doc = apply_proof_pool_to_usage_ledger(usage_doc, pool)
-    runtime_payload["proof_pool_metadata"] = pool.proof_pool_metadata
+    # Keep the exact final-plan reconciliation through X2.  ``pool`` retains
+    # the broader whole-run metadata so that usage reporting can preserve its
+    # lineage, but the executive section may only validate against its final
+    # section allowlist.  Replacing this with ``pool.proof_pool_metadata``
+    # silently reintroduced C0.3 candidates removed before L2.
+    runtime_payload["proof_pool_metadata"] = proof_pool_metadata
     _targeting_parity, usage_doc = publish_targeting_parity_and_usage_ledger(
         artifact_dir=artifact_dir,
         runtime_payload=runtime_payload,

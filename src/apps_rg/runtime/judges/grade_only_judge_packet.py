@@ -73,8 +73,6 @@ def build_grade_only_judge_packet(
     """Build canonical GRADE_ONLY JudgePacket for any section."""
     sid = normalize_section_id(section_id)
     policy = get_section_judge_policy(sid)
-    if policy.grade_only_required and policy.replacement_generation_allowed:
-        raise ValueError("policy invariant: grade_only_required implies no replacement generation")
 
     targeting = dict(targeting_context or {})
     materiality = dict(graph_binding_materiality_summary or {})

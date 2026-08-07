@@ -95,7 +95,7 @@ def test_make_model_backed_output_attaches_dimension_verdicts() -> None:
         "quality_flags": ["bullet_stack_prose"],
     }
     out = _make_model_backed_output(
-        "anthropic_claude",
+        "openai_chatgpt",
         "h",
         "m",
         dict(body),

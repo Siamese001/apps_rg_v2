@@ -92,15 +92,26 @@ def _claim_rows(artifact_dir: Path, l2: Mapping[str, Any]) -> list[dict[str, Any
                         row["claim_unit_id"] = claim_unit_id
 
     bullets = [row for row in l2.get("bullets") or [] if isinstance(row, Mapping)]
-    by_text = {
-        _text_key(str(row.get("bullet_text") or "")): str(row.get("bullet_id") or "")
-        for row in bullets
-        if str(row.get("bullet_text") or "").strip()
-    }
+    # A graph bullet source id is stronger evidence of slot ownership than
+    # surface-text matching.  In particular, two selected graph facts may
+    # intentionally render to the same display sentence.  A text-key dict
+    # would collapse those rows to the last matching bullet and silently bind
+    # the first claim to the wrong frozen allocation unit.
+    text_to_ids: dict[str, set[str]] = {}
+    for bullet in bullets:
+        text_key = _text_key(str(bullet.get("bullet_text") or ""))
+        bullet_id = str(bullet.get("bullet_id") or "").strip()
+        if text_key and bullet_id:
+            text_to_ids.setdefault(text_key, set()).add(bullet_id)
     for row in rows:
-        bullet_id = by_text.get(_text_key(_claim_text(row)), "")
-        if bullet_id:
-            row.setdefault("bullet_id", bullet_id)
+        source_ids = _strings(row.get("source_fact_ids"))
+        # Canonical role-bullet ids already identify the allocated source slot;
+        # do not replace them with a lossy text-derived presentation id.
+        if any(source_id.startswith("bul_") for source_id in source_ids):
+            continue
+        candidate_ids = text_to_ids.get(_text_key(_claim_text(row)), set())
+        if len(candidate_ids) == 1:
+            row.setdefault("bullet_id", next(iter(candidate_ids)))
     return rows
 
 
@@ -606,6 +617,17 @@ def bind_final_claims_to_resume_graph_allocation(
     allocated_claim_units = {
         str(row.get("claim_unit_id") or "") for row in assignments if row.get("claim_unit_id")
     }
+    # Narrative allocations are deliberately non-exclusive alternative
+    # source paths. They remain available for a generated narrative to bind,
+    # but an unused alternative is not a required visible claim. Every normal
+    # section allocation stays mandatory and continues to fail closed if it is
+    # not consumed.
+    required_allocated_claim_units = {
+        str(row.get("claim_unit_id") or "")
+        for row in assignments
+        if row.get("claim_unit_id")
+        and row.get("counts_toward_global_uniqueness") is not False
+    }
     explicit_consumption_counts = Counter(
         str(claim.get("claim_unit_id") or "")
         for claim in claims
@@ -639,7 +661,7 @@ def bind_final_claims_to_resume_graph_allocation(
             failures.append("competencies_allocation_claim_reconciliation_failed")
     else:
         invalid_consumption_counts = {}
-    orphan_claim_units = sorted(allocated_claim_units - used_claim_units)
+    orphan_claim_units = sorted(required_allocated_claim_units - used_claim_units)
     if orphan_claim_units:
         failures.append("orphan_allocation_claim_units:" + ",".join(orphan_claim_units))
     metric_exactness_pass = not any(
@@ -664,6 +686,7 @@ def bind_final_claims_to_resume_graph_allocation(
         "binding_coverage": round(binding_coverage, 6),
         "metric_exactness_pass": metric_exactness_pass,
         "allocated_claim_unit_count": len(allocated_claim_units),
+        "required_allocated_claim_unit_count": len(required_allocated_claim_units),
         "bound_allocation_claim_unit_count": len(used_claim_units),
         "allocation_claim_unit_consumption_counts": {
             claim_unit_id: int(explicit_consumption_counts.get(claim_unit_id, 0))

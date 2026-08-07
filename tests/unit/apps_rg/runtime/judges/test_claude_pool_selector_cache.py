@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import urllib.request
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import apps_rg.runtime.judges.bullet_pool_claude_selector as subject
 import apps_rg.runtime.judges.executive_summary_x1d as x1d
 
@@ -54,7 +56,8 @@ def test_anthropic_pool_selector_caches_system_but_not_candidate_pool(
     judge_output, parsed = subject._call_anthropic_pool_selector(
         api_key="test-key",
         prompt="SELECTION_SCHEMA stable\n\nCANDIDATE POOL\npath_index=0 bullet text",
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
+        reasoning_effort="high",
         input_hash="input-hash",
         model_source="unit",
         artifact_dir=tmp_path,
@@ -64,6 +67,7 @@ def test_anthropic_pool_selector_caches_system_but_not_candidate_pool(
     assert body["system"][0]["cache_control"] == {"type": "ephemeral"}
     assert "cache_control" not in str(body["messages"])
     assert "CANDIDATE POOL" in body["messages"][0]["content"]
+    assert body["output_config"]["effort"] == "high"
     assert parsed == {"selections": [], "pool_summary": {"ok": True}}
     assert judge_output.provider_status == "MODEL_BACKED_PASS"
 

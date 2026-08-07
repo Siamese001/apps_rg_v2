@@ -78,6 +78,7 @@ class DeclaredTransportPolicy:
     max_output_tokens: int
     json_output_lock: str
     temperature: float | None = None
+    thinking_level: str | None = None
     system_includes_score_schema: bool = True
 
 
@@ -93,6 +94,7 @@ class TransportReceipt:
     finish_or_stop_reason: str | None
     parse_status: str
     attempt: int = 1
+    thinking_level: str | None = None
 
 
 @dataclass(frozen=True)
@@ -331,6 +333,28 @@ def audit_transport_parity(
             TransportParityViolation(
                 code="json_output_lock_mismatch",
                 detail=f"observed={observed.json_output_lock!r} declared={declared.json_output_lock!r}",
+                provider_key=provider_key,
+            )
+        )
+    if observed.temperature != declared.temperature:
+        violations.append(
+            TransportParityViolation(
+                code="temperature_mismatch",
+                detail=(
+                    f"observed={observed.temperature!r} "
+                    f"declared={declared.temperature!r}"
+                ),
+                provider_key=provider_key,
+            )
+        )
+    if declared.thinking_level and observed.thinking_level != declared.thinking_level:
+        violations.append(
+            TransportParityViolation(
+                code="thinking_level_mismatch",
+                detail=(
+                    f"observed={observed.thinking_level!r} "
+                    f"declared={declared.thinking_level!r}"
+                ),
                 provider_key=provider_key,
             )
         )

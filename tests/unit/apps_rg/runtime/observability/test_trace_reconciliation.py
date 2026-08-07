@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from apps_rg.runtime.observability.trace_reconciliation import (
     L6_TRACE_OBSERVABILITY_SUMMARY_ARTIFACT,
     TRACE_RECONCILED,
@@ -25,7 +27,7 @@ def _provider_span() -> dict:
         "attempt_kind": "requested",
         "attempt_index": 0,
         "provider": "external_claude",
-        "model": "claude-sonnet-5",
+        "model": pins.CLAUDE_GENERATOR_MODEL,
         "provider_attempted": True,
         "provider_available": True,
         "runtime_generation_status": "REAL_LLM",
@@ -93,7 +95,7 @@ def test_reconciliation_passes_when_otel_provider_mirror_matches(tmp_path: Path)
                         "span_kind": "provider_attempt",
                         "attempt_index": 0,
                         "provider": "external_claude",
-                        "model": "claude-sonnet-5",
+                        "model": pins.CLAUDE_GENERATOR_MODEL,
                         "duration_seconds": 2.0,
                     },
                 },

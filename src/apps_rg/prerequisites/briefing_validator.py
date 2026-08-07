@@ -247,6 +247,7 @@ _V2_TOP_LEVEL_KEYS = frozenset(
         "producer",
         "raw_input",
         "normalized_input",
+        "model_observations",
         "mandatory_gate_receipts",
         "exit_authorization",
         "artifact_manifest",
@@ -280,6 +281,20 @@ _SHORT_TO_LONG_GATES = {
     "G24": "G24_REPLAY_ELIGIBLE",
     "G26": "G26_EXIT_ELIGIBILITY",
 }
+_MODEL_OBSERVATION_KEYS = frozenset(
+    {
+        "role",
+        "provider",
+        "requested_model",
+        "reasoning_effort",
+        "observed_model",
+        "status",
+        "receipt_source",
+    }
+)
+_REASONING_EFFORTS = frozenset(
+    {"none", "low", "medium", "high", "xhigh", "max"}
+)
 
 
 def _exact_keys(value: Any, expected: set[str] | frozenset[str]) -> bool:
@@ -348,6 +363,26 @@ def _validate_v2_handoff(
         failures.append("unsupported_v2_handoff_schema")
     if manifest.get("authority_contract_id") != "apps_research_rg_e2e_authority":
         failures.append("authority_contract_id_mismatch")
+
+    model_observations = _as_mapping(manifest.get("model_observations"))
+    if set(model_observations) != {"generation", "judge"}:
+        failures.append("model_observations_roles_mismatch")
+    for model_role in ("generation", "judge"):
+        observation = _as_mapping(model_observations.get(model_role))
+        if set(observation) != _MODEL_OBSERVATION_KEYS:
+            failures.append(f"model_observation_{model_role}_keys_mismatch")
+            continue
+        if observation.get("status") != "OBSERVED_PROVIDER_RESPONSE":
+            failures.append(f"model_observation_{model_role}_status_not_observed")
+        if not str(observation.get("provider") or "").strip():
+            failures.append(f"model_observation_{model_role}_provider_missing")
+        if not str(observation.get("requested_model") or "").strip():
+            failures.append(f"model_observation_{model_role}_requested_model_missing")
+        observed_model = str(observation.get("observed_model") or "").strip()
+        if not observed_model or observed_model == "MODEL_NOT_OBSERVED":
+            failures.append(f"model_observation_{model_role}_model_not_observed")
+        if observation.get("reasoning_effort") not in _REASONING_EFFORTS:
+            failures.append(f"model_observation_{model_role}_reasoning_effort_invalid")
 
     identity_raw = manifest.get("identity")
     identity = _as_mapping(identity_raw)
@@ -841,6 +876,7 @@ def _validate_v2_handoff(
         "exit_receipt_sha256": _sha256_bytes(
             artifact_bytes_by_name.get("exit_disposition_receipt.json", b"")
         ),
+        "model_observations": model_observations,
     }
     expected_attestation = _sha256_bytes(_canonical_json_bytes(attestation_seed))
     if producer.get("producer_app_id") != "apps_research":

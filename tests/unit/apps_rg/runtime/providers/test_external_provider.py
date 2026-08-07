@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from types import SimpleNamespace
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 
 from apps_rg.runtime.providers import external_provider as subject
@@ -19,6 +21,12 @@ def _compiled_prompt() -> SimpleNamespace:
         system_preamble="Fallback system",
         user_instruction="Fallback user",
     )
+
+
+def _anthropic_message_start() -> bytes:
+    return (
+        f'data: {{"type":"message_start","message":{{"model":"{pins.CLAUDE_GENERATOR_MODEL}"}}}}\n'
+    ).encode()
 
 
 def test_prompt_text_prefers_prompt_blocks() -> None:
@@ -51,7 +59,7 @@ def test_external_provider_blocks_without_credentials_and_does_not_call_transpor
 
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_OPENAI,
-        model="gpt-5.4-mini-2026-03-17",
+        model=pins.RESEARCH_GENERATOR_MODEL,
         transport=_transport,
         environ={},
     )
@@ -129,10 +137,33 @@ def test_external_provider_threads_request_to_injected_transport() -> None:
     }
 
 
+def test_external_provider_threads_section_effort_to_request_and_receipt() -> None:
+    captured: dict[str, object] = {}
+
+    def _transport(request):
+        captured.update(request)
+        return {"text": "Generated section.", "model": pins.RESEARCH_GENERATOR_MODEL}
+
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_OPENAI,
+        model=pins.RESEARCH_GENERATOR_MODEL,
+        transport=_transport,
+        environ={"OPENAI_API_KEY": "test-key"},
+    )
+    compiled = _compiled_prompt()
+    compiled.reasoning_effort = "medium"
+
+    result = provider.generate(compiled, token_budget=88)
+
+    assert captured["reasoning_effort"] == "medium"
+    assert result.provider_response is not None
+    assert result.provider_response["reasoning_effort"] == "medium"
+
+
 def test_external_provider_transport_errors_fail_closed() -> None:
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_OPENAI,
-        model="gpt-5.4-mini-2026-03-17",
+        model=pins.RESEARCH_GENERATOR_MODEL,
         transport=lambda _request: (_ for _ in ()).throw(OSError("down")),
         environ={"OPENAI_API_KEY": "test-key"},
     )
@@ -156,7 +187,7 @@ def test_external_provider_transport_errors_fail_closed() -> None:
 def test_external_provider_json_errors_fail_closed() -> None:
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_OPENAI,
-        model="gpt-5.4-mini-2026-03-17",
+        model=pins.RESEARCH_GENERATOR_MODEL,
         transport=lambda _request: (_ for _ in ()).throw(
             json.JSONDecodeError("bad", "{}", 0)
         ),
@@ -184,7 +215,7 @@ def test_anthropic_messages_transport_omits_temperature_for_sonnet5(monkeypatch)
         def __iter__(self):
             return iter(
                 [
-                    b'data: {"type":"message_start","message":{"model":"claude-sonnet-5"}}\n',
+                    _anthropic_message_start(),
                     b'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"{}"}}\n',
                     b'data: {"type":"message_stop"}\n',
                 ]
@@ -198,7 +229,7 @@ def test_anthropic_messages_transport_omits_temperature_for_sonnet5(monkeypatch)
     monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         environ={"ANTHROPIC_API_KEY": "test-key"},
     )
 
@@ -207,10 +238,99 @@ def test_anthropic_messages_transport_omits_temperature_for_sonnet5(monkeypatch)
     )
 
     assert response["text"] == "{}"
-    assert captured["body"]["model"] == "claude-sonnet-5"
+    assert captured["body"]["model"] == pins.CLAUDE_GENERATOR_MODEL
     assert "temperature" not in captured["body"]
     assert captured["body"]["thinking"] == {"type": "adaptive", "display": "omitted"}
     assert captured["body"]["output_config"] == {"effort": "low"}
+
+
+def test_anthropic_messages_transport_uses_explicit_section_effort(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class _StreamResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def __iter__(self):
+            return iter(
+                [
+                    _anthropic_message_start(),
+                    b'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"{}"}}\n',
+                    b'data: {"type":"message_stop"}\n',
+                ]
+            )
+
+    def _urlopen(req, timeout):
+        captured["body"] = json.loads(req.data.decode("utf-8"))
+        return _StreamResponse()
+
+    monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
+        model=pins.CLAUDE_GENERATOR_MODEL,
+        environ={"ANTHROPIC_API_KEY": "test-key", "APPS_RG_ANTHROPIC_EFFORT": "low"},
+    )
+
+    provider._anthropic_messages_transport(
+        {
+            "prompt": "Return JSON",
+            "max_tokens": 20,
+            "temperature": 0.4,
+            "reasoning_effort": "high",
+        }
+    )
+
+    assert captured["body"]["output_config"] == {"effort": "high"}
+
+
+def test_explicit_section_effort_overrides_native_payload_effort() -> None:
+    body = {
+        "model": pins.CLAUDE_GENERATOR_MODEL,
+        "output_config": {"effort": "low"},
+    }
+
+    subject.apply_anthropic_adaptive_thinking_config(
+        body,
+        {"APPS_RG_ANTHROPIC_EFFORT": "low"},
+        effort="high",
+    )
+
+    assert body["output_config"] == {"effort": "high"}
+
+
+def test_openai_responses_transport_uses_explicit_section_effort(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class _Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return json.dumps({"model": pins.OPENAI_GENERATOR_MODEL, "output_text": "{}"}).encode()
+
+    def _urlopen(req, timeout):
+        captured["body"] = json.loads(req.data.decode("utf-8"))
+        return _Response()
+
+    monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_OPENAI,
+        model=pins.OPENAI_GENERATOR_MODEL,
+        environ={"OPENAI_API_KEY": "test-key"},
+    )
+
+    provider._openai_responses_transport(
+        {"prompt": "Return JSON", "max_tokens": 20, "reasoning_effort": "medium"}
+    )
+
+    assert captured["body"]["reasoning"] == {"effort": "medium"}
+    assert "temperature" not in captured["body"]
 
 
 def test_anthropic_messages_transport_keeps_temperature_for_sonnet4(monkeypatch) -> None:
@@ -256,7 +376,7 @@ def test_external_provider_empty_text_fails_closed_with_stop_details() -> None:
     def _transport(_request):
         return {
             "text": "",
-            "model": "claude-sonnet-5",
+            "model": pins.CLAUDE_GENERATOR_MODEL,
             "transport_timing": {"raw_output_chars": 0},
             "raw_response": {
                 "stop_reason": "max_tokens",
@@ -268,7 +388,7 @@ def test_external_provider_empty_text_fails_closed_with_stop_details() -> None:
 
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         transport=_transport,
         environ={"ANTHROPIC_API_KEY": "test-key"},
     )
@@ -295,7 +415,7 @@ def test_anthropic_messages_transport_preserves_system_and_user_messages(monkeyp
         def __iter__(self):
             return iter(
                 [
-                    b'data: {"type":"message_start","message":{"model":"claude-sonnet-5"}}\n',
+                    _anthropic_message_start(),
                     b'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"{}"}}\n',
                     b'data: {"type":"message_stop"}\n',
                 ]
@@ -308,7 +428,7 @@ def test_anthropic_messages_transport_preserves_system_and_user_messages(monkeyp
     monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         environ={"ANTHROPIC_API_KEY": "test-key"},
     )
 
@@ -343,7 +463,7 @@ def test_anthropic_messages_transport_does_not_duplicate_system_only_prompt(monk
         def __iter__(self):
             return iter(
                 [
-                    b'data: {"type":"message_start","message":{"model":"claude-sonnet-5"}}\n',
+                    _anthropic_message_start(),
                     b'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"{}"}}\n',
                     b'data: {"type":"message_stop"}\n',
                 ]
@@ -356,7 +476,7 @@ def test_anthropic_messages_transport_does_not_duplicate_system_only_prompt(monk
     monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         environ={"ANTHROPIC_API_KEY": "test-key"},
     )
 
@@ -390,7 +510,7 @@ def test_anthropic_stream_attempts_scale_to_wall_clock(monkeypatch) -> None:
     monkeypatch.delenv("APPS_RG_STREAM_ATTEMPTS", raising=False)
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
-        model="claude-sonnet-5",
+        model=pins.CLAUDE_GENERATOR_MODEL,
         environ={"ANTHROPIC_API_KEY": "test-key"},
     )
 

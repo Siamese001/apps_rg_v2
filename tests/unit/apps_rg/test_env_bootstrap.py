@@ -11,7 +11,6 @@ from apps_rg.runtime.env_bootstrap import (
 )
 import apps_rg.runtime.env_bootstrap as env_bootstrap
 import apps_rg.runtime.judges.executive_summary_x1d as x1d
-import apps_rg.integrations.hops._llm_client as hops_llm_client
 
 
 def test_bootstrap_apps_rg_env_loads_explicit_repo_dotenv(tmp_path: Path, monkeypatch) -> None:
@@ -87,21 +86,22 @@ def test_apps_rg_cli_bootstraps_env_before_production_runtime_guard() -> None:
 
 
 def test_x1d_credential_resolver_bootstraps_process_env(monkeypatch) -> None:
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     calls = {"count": 0}
 
     def _bootstrap(environ) -> None:
         calls["count"] += 1
         assert environ is os.environ
-        monkeypatch.setenv("ANTHROPIC_API_KEY", "dotenv-anthropic")
+        monkeypatch.setenv("GOOGLE_API_KEY", "dotenv-google")
 
     monkeypatch.setattr(x1d, "bootstrap_process_env_if_needed", _bootstrap)
 
-    key, consulted = x1d.resolve_x1d_provider_credentials("anthropic_claude", os.environ)
+    key, consulted = x1d.resolve_x1d_provider_credentials("gemini_pro", os.environ)
 
     assert calls["count"] == 1
-    assert key == "dotenv-anthropic"
-    assert consulted == ["ANTHROPIC_API_KEY"]
+    assert key == "dotenv-google"
+    assert consulted == ["GOOGLE_API_KEY"]
 
 
 def test_x1d_credential_resolver_does_not_bootstrap_injected_env(monkeypatch) -> None:
@@ -111,20 +111,3 @@ def test_x1d_credential_resolver_does_not_bootstrap_injected_env(monkeypatch) ->
 
     assert key == ""
     assert consulted == ["OPENAI_API_KEY"]
-
-
-def test_hops_llm_client_bootstraps_before_provider_probe(monkeypatch) -> None:
-    for key in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY"):
-        monkeypatch.delenv(key, raising=False)
-
-    def _bootstrap() -> None:
-        monkeypatch.setenv("OPENAI_API_KEY", "dotenv-openai")
-
-    monkeypatch.setattr(hops_llm_client, "bootstrap_apps_rg_env", _bootstrap)
-    monkeypatch.setattr(
-        hops_llm_client,
-        "_make_openai_generator",
-        lambda **_kwargs: "openai-generator",
-    )
-
-    assert hops_llm_client.make_generator() == "openai-generator"

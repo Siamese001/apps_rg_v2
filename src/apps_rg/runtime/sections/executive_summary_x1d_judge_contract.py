@@ -1,9 +1,4 @@
-"""Executive-summary X1D judge packet coherence + provider transport parity audits.
-
-Catches the Brown & Brown class bug: X2 all PASS, Gemini/OpenAI PASS, Claude FAIL on the
-same packet because GRAPH rubric soft-penalties conflict with deterministic_gate_summary and
-provider adapters diverge (Anthropic missing shared score schema / JSON lock).
-"""
+"""Executive-summary X1D judge packet coherence + provider transport parity audits."""
 
 from __future__ import annotations
 
@@ -17,15 +12,9 @@ from apps_rg.runtime.judges import executive_summary_judge_packet as judge_packe
 from apps_rg.runtime.judges.executive_summary_judge_packet import (
     GRAPH_ONLY_GRADE_ONLY_RUBRIC,
     build_executive_summary_judge_packet,
-    judge_contract_hash,
-    reconcile_grade_only_judge_result,
-    reconcile_judge_result_against_deterministic_gate_closures,
     render_judge_prompt_from_packet,
 )
 from apps_rg.runtime.judges.executive_summary_x1d import (
-    ANTHROPIC_JUDGE_MAX_OUTPUT_TOKENS,
-    GOOGLE_AI_JUDGE_MAX_OUTPUT_TOKENS,
-    _call_anthropic,
     _call_gemini,
     _call_openai,
     _make_model_backed_output,
@@ -56,36 +45,6 @@ GATE_PASSED_FORBIDDEN_RUBRIC_PHRASES: dict[str, tuple[str, ...]] = {
         "mechanism inventory",
     ),
 }
-
-# Live Claude 001344 finding class — reconcile must address when all gates pass (W3 target).
-CLAUDE_001344_SOFT_FAIL_FINDINGS: tuple[str, ...] = (
-    "Sentences 2-5 read as a metric/credential stack rather than an integrated executive narrative",
-    "No meaningful alignment with the JD's emphasis on enterprise architecture",
-    "credential inventory despite passing the deterministic gate",
-)
-
-# Positive reconcile control: only findings that violate passed X2 gate closures.
-CLAUDE_001344_GATE_CLOSURE_ONLY_FINDINGS: tuple[str, ...] = (
-    "Sentences 2-5 read as a metric/credential stack rather than an integrated executive narrative",
-    "credential inventory despite passing the deterministic gate",
-)
-
-CLAUDE_001344_RESIDUAL_QUALITY_FINDINGS: tuple[str, ...] = (
-    "Executive positioning is unclear and narrative coherence is weak for an SVP reader.",
-    "Poor commercial fit — the paragraph does not read as a cohesive executive story.",
-)
-
-CLAUDE_001344_JUDGE_RESULT: dict[str, Any] = {
-    "score_scale": "0_to_5",
-    "score": 2.8,
-    "threshold": 4.0,
-    "pass": False,
-    "decisive_failure": False,
-    "findings": list(CLAUDE_001344_SOFT_FAIL_FINDINGS),
-    "cited_sentence_indexes": [2, 3, 4, 5],
-    "remediation_suggestions": ["Weave JD emphasis", "Reduce metric stacking"],
-}
-
 
 @dataclass(frozen=True)
 class JudgePacketCoherenceViolation:
@@ -225,26 +184,14 @@ def audit_judge_packet_coherence(packet: dict[str, Any]) -> list[JudgePacketCohe
 def audit_provider_transport_parity() -> list[JudgePacketCoherenceViolation]:
     """Provider _call_* wiring must share score-schema system anchors (transport-only deltas OK)."""
     out: list[JudgePacketCoherenceViolation] = []
-    anthropic_src = inspect.getsource(_call_anthropic)
     openai_src = inspect.getsource(_call_openai)
     gemini_src = inspect.getsource(_call_gemini)
 
-    if "build_x1d_judge_system_prompt" not in anthropic_src and "JUDGE_SCORE_SCHEMA" not in anthropic_src:
-        out.append(
-            JudgePacketCoherenceViolation(
-                code="anthropic_missing_judge_score_schema",
-                detail=(
-                    "_call_anthropic does not use build_x1d_judge_system_prompt or JUDGE_SCORE_SCHEMA; "
-                    "OpenAI does — judges receive asymmetric instruction anchors."
-                ),
-                path="apps_rg/runtime/judges/executive_summary_x1d.py",
-            )
-        )
-    if "json_object" not in openai_src and "response_format" not in openai_src:
+    if "json_schema" not in openai_src:
         out.append(
             JudgePacketCoherenceViolation(
                 code="openai_missing_json_mode",
-                detail="_call_openai missing response_format json_object",
+                detail="_call_openai missing Responses JSON schema lock",
                 path="apps_rg/runtime/judges/executive_summary_x1d.py",
             )
         )
@@ -256,61 +203,7 @@ def audit_provider_transport_parity() -> list[JudgePacketCoherenceViolation]:
                 path="apps_rg/runtime/judges/executive_summary_x1d.py",
             )
         )
-    if ANTHROPIC_JUDGE_MAX_OUTPUT_TOKENS < min(2048, GOOGLE_AI_JUDGE_MAX_OUTPUT_TOKENS // 2):
-        out.append(
-            JudgePacketCoherenceViolation(
-                code="anthropic_token_budget_asymmetric",
-                detail=(
-                    f"ANTHROPIC_JUDGE_MAX_OUTPUT_TOKENS={ANTHROPIC_JUDGE_MAX_OUTPUT_TOKENS} "
-                    f"vs GOOGLE_AI_JUDGE_MAX_OUTPUT_TOKENS={GOOGLE_AI_JUDGE_MAX_OUTPUT_TOKENS}"
-                ),
-                path="apps_rg/runtime/judges/executive_summary_x1d.py",
-            )
-        )
-    if "stop_reason" not in anthropic_src and "max_tokens" in anthropic_src:
-        out.append(
-            JudgePacketCoherenceViolation(
-                code="anthropic_missing_stop_reason_truncation_check",
-                detail="_call_anthropic does not check stop_reason for max_tokens truncation",
-                path="apps_rg/runtime/judges/executive_summary_x1d.py",
-            )
-        )
     return out
-
-
-def audit_reconcile_claude_class_soft_fail() -> list[JudgePacketCoherenceViolation]:
-    """reconcile_grade_only_judge_result must not leave Claude-class soft fails when all X2 pass."""
-    gate_summary = {
-        gid: {"pass": True, "detail": "ok"}
-        for gid in (
-            "x2_exec_summary_sentence_count_6",
-            "x2_exec_summary_evidence_utilization",
-            "x2_exec_summary_no_credential_dump",
-            "x2_exec_summary_no_mechanism_inventory",
-            "x2_exec_summary_paragraph_max_words",
-            "x2_exec_summary_meta_filler_zero",
-        )
-    }
-    positive_body = dict(CLAUDE_001344_JUDGE_RESULT)
-    positive_body["findings"] = list(CLAUDE_001344_GATE_CLOSURE_ONLY_FINDINGS)
-    reconciled = reconcile_judge_result_against_deterministic_gate_closures(
-        positive_body,
-        gate_summary,
-    )
-    score = float(reconciled.get("score", 0.0))
-    threshold = float(reconciled.get("threshold", 4.0))
-    if score >= threshold and not reconciled.get("decisive_failure"):
-        return []
-    return [
-        JudgePacketCoherenceViolation(
-            code="reconcile_leaves_claude_class_soft_fail",
-            detail=(
-                f"All gates pass + Claude 001344-class findings; after reconcile "
-                f"score={score} threshold={threshold} decisive_failure={reconciled.get('decisive_failure')!r}"
-            ),
-            path=judge_packet_mod.__file__ or "",
-        )
-    ]
 
 
 def audit_identical_judge_json_same_pass_all_providers() -> list[JudgePacketCoherenceViolation]:
@@ -327,7 +220,7 @@ def audit_identical_judge_json_same_pass_all_providers() -> list[JudgePacketCohe
     }
     gate_summary = {"x2_exec_summary_sentence_count_6": {"pass": True, "detail": "ok"}}
     statuses: dict[str, str] = {}
-    for key in ("gemini_pro", "openai_chatgpt", "anthropic_claude"):
+    for key in ("gemini_pro", "openai_chatgpt"):
         out = _make_model_backed_output(
             key,
             "hash-parity",
@@ -422,7 +315,6 @@ def audit_executive_summary_x1d_judge_coherence(
     raw: list[JudgePacketCoherenceViolation] = []
     raw.extend(audit_judge_packet_coherence(pkt))
     raw.extend(audit_provider_transport_parity())
-    raw.extend(audit_reconcile_claude_class_soft_fail())
     raw.extend(audit_identical_judge_json_same_pass_all_providers())
     transport_violations = audit_x1d_judge_transport_parity(pkt, prompt=rendered)
     merged = list(raw) + [
@@ -447,8 +339,6 @@ def assert_executive_summary_x1d_judge_coherence(packet: dict[str, Any] | None =
 
 
 __all__ = [
-    "CLAUDE_001344_JUDGE_RESULT",
-    "CLAUDE_001344_SOFT_FAIL_FINDINGS",
     "JudgePacketCoherenceViolation",
     "audit_active_graph_rubric_x2_supremacy",
     "audit_evidence_utilization_prompt_coherence",
@@ -456,7 +346,6 @@ __all__ = [
     "audit_identical_judge_json_same_pass_all_providers",
     "audit_judge_packet_coherence",
     "audit_provider_transport_parity",
-    "audit_reconcile_claude_class_soft_fail",
     "audit_rubric_soft_penalties_when_gates_pass",
     "assert_executive_summary_x1d_judge_coherence",
     "build_brown_brown_six_sentence_packet",

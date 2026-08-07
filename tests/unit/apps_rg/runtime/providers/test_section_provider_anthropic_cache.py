@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 from types import SimpleNamespace
 
+from tests.helpers import apps_rg_model_pins as pins
+
 import pytest
 
 import apps_rg.runtime.providers.section_provider_call as section_provider_call
@@ -49,7 +51,7 @@ class _CapturingGateway:
             provider_available=True,
             exact_provider_error=None,
             runtime_generation_status="REAL_LLM",
-            model="claude-sonnet-5",
+            model=pins.CLAUDE_GENERATOR_MODEL,
             raw_model_output='{"ok":true}',
             provider_response={
                 "transport_response": {
@@ -189,7 +191,7 @@ def test_native_anthropic_payload_rejects_gateway_owned_key_conflicts() -> None:
     with pytest.raises(ProviderGatewayError, match="gateway-owned"):
         _anthropic_body_from_native_request(
             {
-                "model": "claude-sonnet-5",
+                "model": pins.CLAUDE_GENERATOR_MODEL,
                 "max_tokens": 99,
                 "temperature": 0.2,
                 "anthropic_payload": {
@@ -198,14 +200,14 @@ def test_native_anthropic_payload_rejects_gateway_owned_key_conflicts() -> None:
                     "messages": [{"role": "user", "content": "hello"}],
                 },
             },
-            "claude-sonnet-5",
+            pins.CLAUDE_GENERATOR_MODEL,
         )
 
 
 def test_native_anthropic_payload_keeps_cache_control_and_gateway_model() -> None:
     body = _anthropic_body_from_native_request(
         {
-            "model": "claude-sonnet-5",
+            "model": pins.CLAUDE_GENERATOR_MODEL,
             "max_tokens": 99,
             "temperature": 0.2,
             "anthropic_payload": {
@@ -219,10 +221,10 @@ def test_native_anthropic_payload_keeps_cache_control_and_gateway_model() -> Non
                 "messages": [{"role": "user", "content": "candidate pool"}],
             },
         },
-        "claude-sonnet-5",
+        pins.CLAUDE_GENERATOR_MODEL,
     )
 
-    assert body["model"] == "claude-sonnet-5"
+    assert body["model"] == pins.CLAUDE_GENERATOR_MODEL
     assert body["max_tokens"] == 99
     assert body["temperature"] == 0.2
     assert body["stream"] is True

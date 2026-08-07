@@ -21,7 +21,7 @@ from apps_rg.runtime.validators.unify_role_episode_x2 import (
 )
 
 
-def _scope_verdict(claim_ledger: list[dict]) -> bool:
+def _scope_verdict(claim_ledger: list[dict], *, allowed_fact_ids: set[str] | None = None) -> bool:
     """Run the unify_narrative X2 gates and return the unify_only_fact_scope pass/fail."""
     gates = run_unify_narrative_x2_gates(
         narrative_sentence="Stewarded an end-to-end agentic AI mandate at Unify Consulting.",
@@ -31,6 +31,7 @@ def _scope_verdict(claim_ledger: list[dict]) -> bool:
         runtime_generation_status="REAL_LLM",
         companion_bullet_texts="",
         companion_bullets_status="ACCEPTED_FINALIZED",
+        allowed_fact_ids=allowed_fact_ids,
     )
     by_id = {g.gate_id: g.pass_ for g in gates}
     return bool(by_id.get("x2_unify_narrative_unify_only_fact_scope"))
@@ -55,6 +56,13 @@ def test_scope_rejects_foreign_lane_ids() -> None:
     # A foreign lane's bullet/metric ids must still fail Unify scope (leakage guard).
     cl = [{"claim_text": "x", "source_fact_ids": ["bul_ibm_005", "metric_ibm_20pct_joint_revenue_growth"]}]
     assert _scope_verdict(cl) is False, "foreign-lane ids must fail unify_only_fact_scope"
+
+
+def test_scope_accepts_shared_fact_only_when_it_is_in_the_active_allowlist() -> None:
+    cl = [{"claim_text": "x", "source_fact_ids": ["fact_engineering_platform_006"]}]
+
+    assert _scope_verdict(cl, allowed_fact_ids={"fact_engineering_platform_006"}) is True
+    assert _scope_verdict(cl, allowed_fact_ids=set()) is False
 
 _BINDING_GATES = {
     "x2_unify_narrative_role_episode_bundle_id_required",

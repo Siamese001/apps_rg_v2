@@ -27,7 +27,6 @@ X1D_JUDGE_PREFLIGHT_AUTHORITY_SCOPE = "apps_rg_x1d_judge_preflight_not_core_x1_g
 _PROVIDER_TYPES: dict[str, str] = {
     "gemini_pro": "external_cloud_llm_judge",
     "openai_chatgpt": "external_cloud_llm_judge",
-    "anthropic_claude": "external_cloud_llm_judge",
 }
 
 
@@ -165,7 +164,7 @@ def preflight_x1d_judge_policy(
     elif not repo_dotenv_path_existed:
         remediation_parts.append(
             "No repo-root .env file found — export GOOGLE_API_KEY (Gemini/Google AI Studio; GEMINI_API_KEY is deprecated), "
-            "OPENAI_API_KEY, ANTHROPIC_API_KEY for judges, "
+            "OPENAI_API_KEY for judges, "
             "or add them to .env at the repository root (dispatch modules call load_dotenv() at import)."
         )
 

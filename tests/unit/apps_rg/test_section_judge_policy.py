@@ -185,7 +185,7 @@ def test_forbidden_models_fail_proof_resolution() -> None:
     assert r.model_source == "yaml_judge_models"
 
 
-def test_anthropic_judge_tier_yaml_ssot_ignores_env() -> None:
+def test_anthropic_is_not_a_proof_judge_even_when_env_is_present() -> None:
     env = {
         "APPS_RG_ANTHROPIC_JUDGE_MODEL_ENHANCED": "ignored-anthropic-judge-env",
         "APPS_RG_ANTHROPIC_JUDGE_MODEL_STANDARD": "claude-sonnet-5",
@@ -193,47 +193,53 @@ def test_anthropic_judge_tier_yaml_ssot_ignores_env() -> None:
     }
     enhanced = resolve_section_proof_judge_model("executive_summary", "anthropic_claude", env)
     assert enhanced.model_actual == ""
-    assert enhanced.model_source == "not_section_proof_provider"
+    assert enhanced.model_source == "unknown_provider"
     assert enhanced.blocked is True
     standard = resolve_section_proof_judge_model("headline", "anthropic_claude", env)
     assert standard.model_actual == ""
-    assert standard.model_source == "not_section_proof_provider"
+    assert standard.model_source == "unknown_provider"
     assert standard.blocked is True
 
 
 def test_openai_judge_tier_yaml_ssot_ignores_env() -> None:
-    assert openai_chat_completions_eligible("gpt-5.5") is True
-    assert openai_chat_completions_eligible("gpt-5.5-pro") is False
+    assert openai_chat_completions_eligible("gpt-5.6-luna") is True
+    assert openai_chat_completions_eligible("gpt-5.6-terra") is True
+    assert openai_chat_completions_eligible("gpt-5.6-sol") is True
+    retired_selector = "gpt-" + "5.5"
+    assert openai_chat_completions_eligible(retired_selector) is False
     env = {
-        "APPS_RG_OPENAI_JUDGE_MODEL_ENHANCED": "gpt-5.5-pro",
-        "APPS_RG_OPENAI_JUDGE_MODEL_STANDARD": "gpt-5.5",
+        "APPS_RG_OPENAI_JUDGE_MODEL_ENHANCED": retired_selector + "-pro",
+        "APPS_RG_OPENAI_JUDGE_MODEL_STANDARD": retired_selector,
         "OPENAI_MODEL": "gpt-5.1",
     }
     enhanced = resolve_section_proof_judge_model("executive_summary", "openai_chatgpt", env)
     assert enhanced.model_actual == _yaml_judge_model("enhanced", "openai_chatgpt")
     assert enhanced.model_source == "yaml_judge_models"
-    assert enhanced.reasoning_effort == _yaml_runtime_limit("judge.openai_enhanced_reasoning_effort")
+    assert enhanced.reasoning_effort == _yaml_runtime_limit("judge.openai_proof_reasoning_effort")
     standard = resolve_section_proof_judge_model("headline", "openai_chatgpt", env)
     assert standard.model_actual == _yaml_judge_model("standard", "openai_chatgpt")
     assert standard.model_source == "yaml_judge_models"
-    assert standard.reasoning_effort is None
+    assert standard.reasoning_effort == _yaml_runtime_limit("judge.openai_proof_reasoning_effort")
 
 
 def test_google_judge_tier_yaml_ssot_ignores_env() -> None:
     env = {
-        "APPS_RG_GOOGLE_JUDGE_MODEL_ENHANCED": "gemini-3.1-pro-preview",
+        "APPS_RG_GOOGLE_JUDGE_MODEL_ENHANCED": "retired-gemini-model",
         "APPS_RG_GOOGLE_JUDGE_MODEL_STANDARD": "gemini-2.5-pro",
         "GOOGLE_AI_PRO_MODEL": "gemini-2.5-flash",
     }
     enhanced = resolve_section_proof_judge_model("executive_summary", "gemini_pro", env)
     assert enhanced.model_actual == _yaml_judge_model("enhanced", "gemini_pro")
     assert enhanced.model_source == "yaml_judge_models"
+    assert enhanced.reasoning_effort == _yaml_runtime_limit("judge.gemini_proof_thinking_level")
     standard = resolve_section_proof_judge_model("headline", "gemini_pro", env)
     assert standard.model_actual == _yaml_judge_model("standard", "gemini_pro")
     assert standard.model_source == "yaml_judge_models"
+    assert standard.reasoning_effort == _yaml_runtime_limit("judge.gemini_proof_thinking_level")
     bullet = resolve_section_proof_judge_model("ibm_bullets", "gemini_pro", env)
     assert bullet.model_actual == _yaml_judge_model("standard", "gemini_pro")
     assert bullet.model_source == "yaml_judge_models"
+    assert bullet.reasoning_effort == _yaml_runtime_limit("judge.gemini_proof_thinking_level")
 
 
 def test_grade_only_judge_packet_shape() -> None:
@@ -285,10 +291,12 @@ def test_competencies_policy_requires_llm_judge_for_proof() -> None:
     assert p.required_judge_providers == ("gemini_pro", "openai_chatgpt")
     assert "anthropic_claude" not in p.required_judge_providers
     gemini = resolve_section_proof_judge_model("competencies", "gemini_pro", {})
-    assert gemini.model_actual == "gemini-3.1-pro-preview"
+    assert gemini.model_actual == "gemini-3.6-flash"
+    assert gemini.reasoning_effort == "high"
     assert gemini.proof_eligible_judge is True
     openai = resolve_section_proof_judge_model("competencies", "openai_chatgpt", {})
-    assert openai.model_actual == "gpt-5.5"
+    assert openai.model_actual == "gpt-5.6-sol"
+    assert openai.reasoning_effort == "high"
     assert openai.proof_eligible_judge is True
     rubric = ""
     from apps_rg.runtime.judges import competencies_x1d

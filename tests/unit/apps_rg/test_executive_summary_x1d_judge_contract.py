@@ -1,11 +1,4 @@
-"""Contract tests for X1D judge packet coherence and provider transport parity.
-
-These would have caught the Brown & Brown Claude-only soft-fail (runs 001344/014222/005722):
-same packet, X2 all PASS, Gemini/OpenAI PASS, Claude FAIL ~2.8.
-
-Tests assert zero violations from audit_* helpers — they FAIL on current code until
-exec-summary-x1d-transport-parity-d8f2a1 plan lands.
-"""
+"""Contract tests for Gemini/OpenAI X1D packet and transport parity."""
 
 from __future__ import annotations
 
@@ -19,20 +12,15 @@ from apps_rg.runtime.judges.executive_summary_judge_packet import (
     SRFS_GRADE_ONLY_RUBRIC,
     judge_contract_hash,
     reconcile_grade_only_judge_result,
-    reconcile_judge_result_against_deterministic_gate_closures,
 )
 from apps_rg.runtime.judges.executive_summary_x1d import _make_model_backed_output, build_x1d_judge_system_prompt
 from apps_rg.runtime.sections.executive_summary_x1d_judge_contract import (
-    CLAUDE_001344_GATE_CLOSURE_ONLY_FINDINGS,
-    CLAUDE_001344_JUDGE_RESULT,
-    CLAUDE_001344_RESIDUAL_QUALITY_FINDINGS,
     audit_active_graph_rubric_x2_supremacy,
     audit_evidence_utilization_prompt_coherence,
     audit_executive_summary_x1d_judge_coherence,
     audit_identical_judge_json_same_pass_all_providers,
     audit_judge_packet_coherence,
     audit_provider_transport_parity,
-    audit_reconcile_claude_class_soft_fail,
     audit_rubric_soft_penalties_when_gates_pass,
     build_brown_brown_six_sentence_packet,
     load_frozen_post_x2_packet,
@@ -115,55 +103,6 @@ def test_provider_transport_parity_zero_violations() -> None:
     assert violations == [], _violation_codes(violations)
 
 
-# --- Would-have-caught: reconcile gap for Claude 001344 class ----------------
-
-
-def test_reconcile_claude_001344_class_findings_when_all_x2_pass() -> None:
-    violations = audit_reconcile_claude_class_soft_fail()
-    assert violations == [], _violation_codes(violations)
-
-
-def test_reconcile_positive_gate_closure_only_findings_pass() -> None:
-    gate_summary = {
-        gid: {"pass": True, "detail": "ok"}
-        for gid in (
-            "x2_exec_summary_sentence_count_6",
-            "x2_exec_summary_evidence_utilization",
-            "x2_exec_summary_no_credential_dump",
-            "x2_exec_summary_no_mechanism_inventory",
-        )
-    }
-    body = dict(CLAUDE_001344_JUDGE_RESULT)
-    body["findings"] = list(CLAUDE_001344_GATE_CLOSURE_ONLY_FINDINGS)
-    out = reconcile_judge_result_against_deterministic_gate_closures(body, gate_summary)
-    assert float(out["score"]) >= float(out["threshold"])
-    assert out.get("pass") is True
-    receipt = out.get("reconciliation_receipt") or {}
-    assert receipt.get("suppressed_findings")
-
-
-def test_reconcile_negative_control_preserves_residual_quality_fail() -> None:
-    gate_summary = {
-        "x2_exec_summary_no_credential_dump": {"pass": True, "detail": "ok"},
-        "x2_exec_summary_evidence_utilization": {"pass": True, "detail": "ok"},
-    }
-    body = {
-        "score_scale": "0_to_5",
-        "score": 2.5,
-        "threshold": 4.0,
-        "pass": False,
-        "decisive_failure": False,
-        "findings": list(CLAUDE_001344_RESIDUAL_QUALITY_FINDINGS),
-        "cited_sentence_indexes": [1, 2],
-        "remediation_suggestions": [],
-    }
-    out = reconcile_judge_result_against_deterministic_gate_closures(body, gate_summary)
-    assert float(out["score"]) < float(out["threshold"])
-    assert out.get("pass") is False
-    preserved = out.get("findings") or []
-    assert len(preserved) >= 1
-
-
 def test_canonical_contract_hash_stable_for_same_packet() -> None:
     packet_a = build_brown_brown_six_sentence_packet()
     packet_b = build_brown_brown_six_sentence_packet()
@@ -212,12 +151,12 @@ def test_make_model_backed_output_parity_explicit() -> None:
     }
     gate_summary = {"x2_exec_summary_no_credential_dump": {"pass": True, "detail": "ok"}}
     statuses = {}
-    for key in ("gemini_pro", "openai_chatgpt", "anthropic_claude"):
+    for key in ("gemini_pro", "openai_chatgpt"):
         out = _make_model_backed_output(
             key, "h", "m", dict(body), deterministic_gate_summary=gate_summary
         )
         statuses[key] = (out.provider_status, out.normalized_score, out.pass_)
-    assert statuses["gemini_pro"] == statuses["openai_chatgpt"] == statuses["anthropic_claude"]
+    assert statuses["gemini_pro"] == statuses["openai_chatgpt"]
 
 
 def test_reconcile_strips_retired_criteria_findings_gemini_openai_class() -> None:

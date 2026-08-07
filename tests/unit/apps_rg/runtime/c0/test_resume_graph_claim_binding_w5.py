@@ -13,6 +13,8 @@ from apps_rg.runtime.c0.resume_graph_allocation import (
 )
 from apps_rg.runtime.c0.resume_graph_claim_binding import (
     GRAPH_CLAIM_BINDING_GATE_ID,
+    _claim_rows,
+    _explicit_claim_unit,
     bind_final_claims_to_resume_graph_allocation,
 )
 
@@ -133,6 +135,35 @@ def _artifact_fixture(
     return assignments
 
 
+def test_graph_slot_source_precedes_duplicate_display_text_when_deriving_claim_unit(
+    tmp_path: Path,
+) -> None:
+    same_text = "Led AWS modernization execution for insurance platforms."
+    _write_json(
+        tmp_path / "claim_ledger.json",
+        [
+            {"claim_text": same_text, "source_fact_ids": ["bul_insurtech_001"]},
+            {"claim_text": same_text, "source_fact_ids": ["bul_insurtech_002"]},
+        ],
+    )
+    l2 = {
+        "bullets": [
+            {"bullet_id": "bul_insurtech_001", "bullet_text": same_text},
+            {"bullet_id": "bul_insurtech_002", "bullet_text": same_text},
+        ]
+    }
+
+    rows = _claim_rows(tmp_path, l2)
+
+    assert [row.get("bullet_id") for row in rows] == [None, None]
+    assert [
+        _explicit_claim_unit(row, section_id="insurtech_bullets") for row in rows
+    ] == [
+        "insurtech_bullets:bul_insurtech_001",
+        "insurtech_bullets:bul_insurtech_002",
+    ]
+
+
 @pytest.mark.parametrize("section_id", ALL_CLAIM_BEARING_SECTIONS)
 def test_all_eleven_lanes_bind_visible_claims_to_exact_paths(
     tmp_path: Path,
@@ -248,6 +279,39 @@ def test_unrendered_allocation_is_an_orphan_and_blocks(tmp_path: Path) -> None:
 
     assert contract["pass"] is False
     assert contract["orphan_allocation_claim_unit_ids"] == ["headline:skill:02"]
+
+
+def test_unrendered_narrative_alternative_is_not_an_orphan(tmp_path: Path) -> None:
+    assignments = _artifact_fixture(tmp_path, section_id="ibm_narrative")
+    assignments.append(
+        {
+            **assignments[0],
+            "claim_unit_id": "ibm_narrative:derived:02",
+            "skill_id": "skill_alternative",
+            "fact_id": "fact_alternative",
+            "root_id": "root_alternative",
+            "citation_refs": ["fact_alternative"],
+            "graph_path_ids": ["root:root_alternative", "root:root_alternative/skill:skill_alternative"],
+            "edge_ids": ["edge_alternative"],
+            "counts_toward_global_uniqueness": False,
+        }
+    )
+    plan = json.loads((tmp_path / "selected_fact_plan.json").read_text(encoding="utf-8"))
+    plan["allocation_assignments"] = assignments
+    _write_json(tmp_path / "selected_fact_plan.json", plan)
+    l2 = json.loads((tmp_path / "l2_output.json").read_text(encoding="utf-8"))
+    l2["selected_fact_plan"] = plan
+    _write_json(tmp_path / "l2_output.json", l2)
+
+    contract = bind_final_claims_to_resume_graph_allocation(
+        tmp_path,
+        section_id="ibm_narrative",
+    )
+
+    assert contract["pass"] is True
+    assert contract["allocated_claim_unit_count"] == 2
+    assert contract["required_allocated_claim_unit_count"] == 0
+    assert contract["orphan_allocation_claim_unit_ids"] == []
 
 
 def test_upstream_compiled_prompt_digest_drift_is_not_repaired(tmp_path: Path) -> None:

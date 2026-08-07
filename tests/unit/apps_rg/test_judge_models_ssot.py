@@ -27,7 +27,8 @@ def test_judge_models_block_present_and_complete():
     jm = _judge_models()
     assert set(jm) >= {"enhanced", "standard"}
     for tier in ("enhanced", "standard"):
-        assert set(jm[tier]) >= {"gemini_pro", "openai_chatgpt", "anthropic_claude"}
+        assert set(jm[tier]) == {"gemini_pro", "openai_chatgpt"}
+        assert jm[tier]["openai_chatgpt"] == "gpt-5.6-sol"
 
 
 def test_code_profiles_do_not_carry_model_fallbacks():
@@ -58,23 +59,12 @@ def test_resolver_sources_enhanced_gemini_from_yaml_when_env_absent():
     assert not res.blocked
 
 
-def test_resolver_blocks_standard_anthropic_as_proof_when_env_absent():
+def test_resolver_rejects_anthropic_as_unknown_proof_provider():
     from apps_rg.runtime.judges.section_judge_profile import resolve_section_proof_judge_model
 
     res = resolve_section_proof_judge_model("unify_narrative", "anthropic_claude", environ={})
     assert res.model_actual == ""
-    assert res.model_source == "not_section_proof_provider"
-    assert res.blocked
-    assert res.advisory_only is True
-
-
-def test_w4_enhanced_anthropic_judge_metadata_is_sonnet5_but_not_proof():
-    from apps_rg.runtime.judges.section_judge_profile import resolve_section_proof_judge_model
-
-    assert _judge_models()["enhanced"]["anthropic_claude"] == "claude-sonnet-5"
-    res = resolve_section_proof_judge_model("executive_summary", "anthropic_claude", environ={})
-    assert res.model_actual == ""
-    assert res.model_source == "not_section_proof_provider"
+    assert res.model_source == "unknown_provider"
     assert res.blocked
     assert res.proof_eligible_judge is False
 

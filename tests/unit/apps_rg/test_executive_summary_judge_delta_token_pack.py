@@ -61,7 +61,7 @@ def _three_judge_soft_fail_panel() -> list[dict]:
         },
         {
             "provider_key": "gemini_pro",
-            "provider_name": "Google Gemini 3.1 Pro Preview",
+            "provider_name": "Google Gemini 3.6 Flash",
             "evaluator_mode": "MODEL_BACKED",
             "provider_status": "MODEL_BACKED_PASS",
             "pass": True,

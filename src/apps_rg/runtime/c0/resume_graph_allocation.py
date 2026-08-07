@@ -129,7 +129,9 @@ class _Slot:
     slot_id: str
     section_id: str
     metric_required: bool
+    metric_outcome_required: bool
     employer_lane: str
+    required_root_id: str
     counts_toward_global_uniqueness: bool
 
 
@@ -186,7 +188,9 @@ def _slot_from_row(row: Mapping[str, Any]) -> _Slot:
         slot_id=slot_id,
         section_id=section_id,
         metric_required=bool(row.get("metric_required")),
+        metric_outcome_required=bool(row.get("metric_outcome_required")),
         employer_lane=str(row.get("employer_lane") or "").strip(),
+        required_root_id=str(row.get("required_root_id") or "").strip(),
         counts_toward_global_uniqueness=bool(
             row.get("counts_toward_global_uniqueness", True)
         ),
@@ -295,6 +299,7 @@ def _normalize_candidate(
     row["fact_id"] = str(row.get("fact_id") or "").strip()
     row["metric_outcome_id"] = str(row.get("metric_outcome_id") or "").strip()
     row["metric_text"] = str(row.get("metric_text") or "").strip()
+    row["root_id"] = str(row.get("root_id") or "").strip()
     row["normalized_metric_signature"] = str(
         row.get("normalized_metric_signature")
         or normalize_metric_signature(row["metric_text"])
@@ -333,6 +338,13 @@ def _normalize_candidate(
         reasons.append("missing_citation_refs")
     if slot.employer_lane and row["employer_lane"] != slot.employer_lane:
         reasons.append("employer_locality_mismatch")
+    if slot.required_root_id and row["root_id"] != slot.required_root_id:
+        reasons.append("slot_role_episode_bundle_mismatch")
+    if slot.metric_outcome_required:
+        if not row["metric_outcome_id"]:
+            reasons.append("metric_outcome_required_missing_metric_outcome_id")
+        if not row["metric_text"]:
+            reasons.append("metric_outcome_required_missing_metric_text")
     if slot.metric_required:
         if not row["metric_outcome_id"]:
             reasons.append("metric_required_missing_metric_outcome_id")
@@ -385,6 +397,9 @@ def _assignment_view(row: Mapping[str, Any], *, slot: _Slot) -> dict[str, Any]:
     out["section_id"] = slot.section_id
     out["claim_unit_id"] = slot.slot_id
     out["metric_required"] = slot.metric_required
+    out["metric_outcome_required"] = slot.metric_outcome_required
+    if slot.required_root_id:
+        out["required_root_id"] = slot.required_root_id
     out["counts_toward_global_uniqueness"] = slot.counts_toward_global_uniqueness
     return out
 
@@ -906,6 +921,29 @@ def _default_slot_specs(
                 "metric_required": False,
             }
         )
+    unify_slot_roots = section_plans.get("unify_bullets", {}).get(
+        "unify_bullet_slot_bundle_map_resolved"
+    )
+    if not isinstance(unify_slot_roots, Mapping) or set(unify_slot_roots) != set(
+        CANONICAL_BULLET_CLAIM_UNITS["unify_bullets"]
+    ):
+        raise ResumeGraphAllocationError(
+            "unify_bullets: frozen source plan lacks the complete slot-to-role-episode contract",
+            receipt={
+                "schema_version": "resume_graph_allocation_failure_v1",
+                "unsatisfied_constraints": ["unify_slot_role_episode_contract"],
+                "observed_slot_ids": sorted(unify_slot_roots) if isinstance(unify_slot_roots, Mapping) else [],
+            },
+        )
+    if any(not str(root_id).strip() for root_id in unify_slot_roots.values()):
+        raise ResumeGraphAllocationError(
+            "unify_bullets: slot-to-role-episode contract contains an empty root",
+            receipt={
+                "schema_version": "resume_graph_allocation_failure_v1",
+                "unsatisfied_constraints": ["unify_slot_role_episode_contract"],
+            },
+        )
+
     for section_id, claim_units in CANONICAL_BULLET_CLAIM_UNITS.items():
         metric_available = any(
             extract_exact_metric_value_unit(str(row.get("metric") or ""))[0]
@@ -918,8 +956,24 @@ def _default_slot_specs(
                 {
                     "slot_id": f"{section_id}:{claim_unit}",
                     "section_id": section_id,
-                    "metric_required": metric_available and index == 0,
+                    # Unify's resume bullets have a graph-authored role-episode
+                    # contract.  Each slot receives one approved metric outcome;
+                    # it is not valid to move the first numeric outcome into the
+                    # first presentation slot merely because that slot is first.
+                    "metric_required": (
+                        metric_available and index == 0 and section_id != "unify_bullets"
+                    ),
+                    "metric_outcome_required": section_id == "unify_bullets",
                     "employer_lane": EMPLOYER_LANE_BY_SECTION[section_id],
+                    **(
+                        {
+                            "required_root_id": str(
+                                unify_slot_roots.get(claim_unit) or ""
+                            ).strip()
+                        }
+                        if section_id == "unify_bullets"
+                        else {}
+                    ),
                 }
             )
     for index in range(1, 4):
@@ -965,13 +1019,18 @@ def _candidate_sets_from_section_plans(
             employer_lane = str(root.get("employer_lane") or "")
             if slot.employer_lane and employer_lane != slot.employer_lane:
                 continue
+            if slot.required_root_id and root_id != slot.required_root_id:
+                continue
             metric_options: list[dict[str, Any] | None] = [None]
-            if slot.metric_required:
+            if slot.metric_required or slot.metric_outcome_required:
                 metric_options = []
                 for metric in metrics:
                     value, unit = extract_exact_metric_value_unit(str(metric.get("metric") or ""))
-                    if value and unit:
-                        metric_options.append({**metric, "metric_value": value, "metric_unit": unit})
+                    if slot.metric_required and not (value and unit):
+                        continue
+                    metric_options.append(
+                        {**metric, "metric_value": value, "metric_unit": unit}
+                    )
                 if not metric_options:
                     continue
             for skill in skills:

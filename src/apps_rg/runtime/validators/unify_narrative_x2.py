@@ -337,7 +337,8 @@ def run_unify_narrative_x2_gates(
         # facts (incl. their ``reb_ibm_*`` / ``metric_ibm_*`` ids, which match no allowed prefix).
         scope_ok = (
             all(
-                str(s).startswith(
+                str(s) in allow_runtime_set
+                or str(s).startswith(
                     (
                         "bul_unify_",
                         "unify_narrative_base_",
@@ -351,7 +352,7 @@ def run_unify_narrative_x2_gates(
             )
         ) and not any(p in serialized for p in ("bul_ibm_", "bul_insurtech_", "bul_ey_"))
         scope_threshold = (
-            "bul_unify_*|unify_narrative_base_*|exp_unify_*|reb_unify_*|metric_unify_*|skill_*"
+            "active_allowlist|bul_unify_*|unify_narrative_base_*|exp_unify_*|reb_unify_*|metric_unify_*|skill_*"
         )
         scope_fail = "Non-Unify fact scope."
     add(

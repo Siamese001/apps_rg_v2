@@ -6,11 +6,6 @@ from typing import Any
 
 import pytest
 
-
-@pytest.fixture(autouse=True)
-def _enable_regen_caps_for_policy_tests(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_REGEN_CAPS", "1")
-
 from apps_rg.runtime.sections.executive_summary_candidate_pool import (
     SCORES_FRESHNESS_CARRIED_FORWARD,
     SCORES_FRESHNESS_FULL_PANEL,
@@ -19,6 +14,7 @@ from apps_rg.runtime.sections.executive_summary_judge_remediation import (
     collect_judge_remediation_delta_lines,
 )
 from apps_rg.runtime.sections.executive_summary_regen_delta_policy import (
+    DELTA_CLASS_CONNECTIVE_S2_S5,
     DELTA_CLASS_DIMENSION_EXECUTIVE_SIGNAL,
     DELTA_CLASS_EXECUTIVE_SIGNAL_AND_VOICE,
     DELTA_CLASS_EXPLORATORY_FULL_PARAGRAPH,
@@ -40,6 +36,11 @@ from apps_rg.runtime.sections.executive_summary_regen_delta_policy import (
 from apps_rg.runtime.sections.executive_summary_repair_policy import (
     exploratory_full_paragraph_regen_enabled,
 )
+
+
+@pytest.fixture(autouse=True)
+def _enable_regen_caps_for_policy_tests(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_REGEN_CAPS", "1")
 
 
 def _soft_fail(dim: str, *, major: bool = True) -> dict[str, Any]:
@@ -146,7 +147,7 @@ def _brown_svp_soft_fail_panel() -> list[dict]:
         },
         {
             "provider_key": "gemini_pro",
-            "provider_name": "Google Gemini 3.1 Pro Preview",
+            "provider_name": "Google Gemini 3.6 Flash",
             "evaluator_mode": "MODEL_BACKED",
             "provider_status": "MODEL_BACKED_FAIL",
             "pass": False,
@@ -425,9 +426,9 @@ def test_exploratory_delta_class_env_default_off(monkeypatch: Any) -> None:
     assert resolve_delta_class([_soft_fail("executive_signal")]) != DELTA_CLASS_EXPLORATORY_FULL_PARAGRAPH
 
 
-def _claude_holistic_soft_fail_s6_thin() -> dict[str, Any]:
+def _openai_holistic_soft_fail_s6_thin() -> dict[str, Any]:
     return {
-        "provider_key": "anthropic_claude",
+        "provider_key": "openai_chatgpt",
         "evaluator_mode": "MODEL_BACKED",
         "provider_status": "MODEL_BACKED_FAIL",
         "pass": False,
@@ -462,13 +463,13 @@ def _claude_holistic_soft_fail_s6_thin() -> dict[str, Any]:
 
 
 def test_resolve_delta_class_holistic_floor_s6_thin_without_major_dim() -> None:
-    judges = [_claude_holistic_soft_fail_s6_thin()]
+    judges = [_openai_holistic_soft_fail_s6_thin()]
     assert (
         resolve_delta_class(judges, operator_judge_pass_floor=4.2)
         == DELTA_CLASS_S6_FORWARD_SYNTHESIS
     )
 
 
-def test_resolve_delta_class_claude_only_binding_s6() -> None:
-    judges = [_claude_holistic_soft_fail_s6_thin()]
-    assert resolve_delta_class(judges) == DELTA_CLASS_S6_FORWARD_SYNTHESIS
+def test_resolve_delta_class_without_floor_defaults_connective() -> None:
+    judges = [_openai_holistic_soft_fail_s6_thin()]
+    assert resolve_delta_class(judges) == DELTA_CLASS_CONNECTIVE_S2_S5

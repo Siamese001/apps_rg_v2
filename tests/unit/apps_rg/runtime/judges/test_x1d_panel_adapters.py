@@ -49,6 +49,7 @@ def _ctx(provider_key: str = "openai_chatgpt", *, section_id: str = "executive_s
         model_source="env",
         model_requested="model",
         section_id=section_id,
+        reasoning_effort="high",
     )
 
 
@@ -59,7 +60,8 @@ def test_panel_adapter_declared_policy_uses_provider_json_lock() -> None:
     assert openai_policy.max_output_tokens >= gemini_policy.max_output_tokens
     assert openai_policy.json_output_lock == "json_object"
     assert gemini_policy.json_output_lock == "responseSchema"
-    assert gemini_policy.temperature == 0.1
+    assert gemini_policy.temperature is None
+    assert gemini_policy.thinking_level == "high"
 
 
 def test_panel_adapter_declared_policy_scales_by_section_profile() -> None:

@@ -54,7 +54,7 @@ def _profile() -> SpearmanCalibrationProfile:
         judge_version="v1",
         rubric_hash=RUBRIC_HASH,
         rubric_version="1.0.0",
-        provider_profile_ref="local_qwen_generator",
+        provider_profile_ref="openai_chatgpt",
         minimum_samples=4,
         minimum_spearman_rho=0.8,
         maximum_p_value=0.05,
@@ -109,7 +109,7 @@ def _spans() -> tuple[dict, ...]:
             "parent_span_id": "",
             "status": "ok",
             "attributes": {
-                "provider_lane": "local_qwen_generator",
+                "provider_lane": "openai_chatgpt",
                 "prompt_hash": "prompt-hash-1",
                 "artifact_digest": "artifact-digest-1",
                 "eval_readiness_hint": "READY",

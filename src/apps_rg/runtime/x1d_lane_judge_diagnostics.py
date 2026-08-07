@@ -16,7 +16,6 @@ from apps_rg.runtime.section_judge_policy import REQUIRED_JUDGE_PROVIDER_KEYS
 _COL_TO_PROVIDER: dict[str, str] = {
     "gemini": "gemini_pro",
     "openai": "openai_chatgpt",
-    "anthropic": "anthropic_claude",
 }
 _PROVIDER_TO_COL: dict[str, str] = {provider: col for col, provider in _COL_TO_PROVIDER.items()}
 
@@ -179,13 +178,12 @@ def _error_code_and_class_from_blob(blob: dict[str, Any] | None) -> tuple[str, s
     return "", ""
 
 
-def _rollup_gemini_and_anthropic_notes(
+def _rollup_proof_provider_notes(
     *,
     lanes_out: Mapping[str, Any],
     lane_blobs_map: Mapping[str, list[dict[str, Any]]],
 ) -> dict[str, Any]:
     gem_seen: dict[str, int] = {}
-    anth_seen: dict[str, int] = {}
     fixes: list[str] = []
 
     for lane_key, lj in lane_blobs_map.items():
@@ -201,18 +199,6 @@ def _rollup_gemini_and_anthropic_notes(
             elif ecc:
                 gem_seen.setdefault(ecc, 0)
                 gem_seen[ecc] += 1
-        ac = by_pk.get("anthropic_claude")
-        if isinstance(ac, dict):
-            st = _status_upper(ac.get("provider_status"))
-            if "MODEL_BACKED_FAIL" in st:
-                findings = "; ".join(str(x) for x in list(ac.get("findings") or [])[:5])
-                key = findings[:240] if findings.strip() else "MODEL_BACKED_FAIL_NO_FINDINGS_DETAIL"
-                anth_seen[key] = anth_seen.get(key, 0) + 1
-            ecc, ech = _error_code_and_class_from_blob(ac)
-            if ecc or ech:
-                k = ecc or ech
-                anth_seen[k] = anth_seen.get(k, 0) + 1
-
     fixes.append(
         "Preflight (x1d_judge_policy) checks non-empty primary API env vars only — it does "
         "not certify live quota, RPM/RPD tiers, billing, model allowlists, or network reachability."
@@ -221,16 +207,8 @@ def _rollup_gemini_and_anthropic_notes(
         "Gemini judge HTTP 429 with RESOURCE_EXHAUSTED/free-tier quotas is classified as BLOCKED_RATE_LIMIT "
         "(apps_rg.runtime.judges.executive_summary_x1d) with bounded retries (APPS_RG_GEMINI_JUDGE_MAX_RETRIES)."
     )
-    fixes.append(
-        "Anthropic MODEL_BACKED_FAIL rows carry model-backed evaluator_mode=MODEL_BACKED — classify as judge "
-        "quality/threshold failures, distinct from BLOCKED_PROVIDER_UNAVAILABLE parsing."
-    )
-
     return {
         "gemini_signals_observed": gem_seen if gem_seen else {"UNKNOWN": "no_gemini_failure_blob_signal"},
-        "anthropic_signals_observed": anth_seen
-        if anth_seen
-        else {"UNKNOWN": "no_anthropic_model_backed_fail_blob_signal"},
         "fix_applied": fixes,
         "lanes_inspected_keys": sorted(lanes_out.keys()),
     }
@@ -243,7 +221,7 @@ def build_x1d_lane_judge_diagnostics(
 ) -> dict[str, Any]:
     """Build ``x1d_lane_judge_diagnostics`` for CI artifact + whole-run breakdown.
 
-    ``judge_rows`` entries match prove harness: keys ``lane``, ``gemini``, ``openai``, ``anthropic``,
+    ``judge_rows`` entries match prove harness: keys ``lane``, ``gemini``, and ``openai``,
     optional ``blocked_judges``, ``soft_failed_judges``, ``x3_code``.
 
     When ``lane_x1d_judge_blobs`` maps lane -> judges list (from ``x1d_llm_judge_outputs.json``),
@@ -449,7 +427,7 @@ def build_x1d_lane_judge_diagnostics(
         else:
             rollup_reason = "Lane rollup incomplete vs contract MODEL_BACKED_PASS for all providers"
 
-    exec_qual = _rollup_gemini_and_anthropic_notes(lanes_out=lanes_out, lane_blobs_map=blobs_map)
+    exec_qual = _rollup_proof_provider_notes(lanes_out=lanes_out, lane_blobs_map=blobs_map)
 
     mismatch_events = exec_mismatch_list
     mismatch_count = len(mismatch_events)

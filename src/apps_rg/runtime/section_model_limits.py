@@ -205,13 +205,32 @@ def _selector_models() -> dict[str, dict[str, str]]:
             )
         provider_key = str(value.get("provider_key") or "").strip()
         model = str(value.get("model") or "").strip()
+        reasoning_effort = str(value.get("reasoning_effort") or "").strip().lower()
         if not provider_key or not model:
             raise SectionModelSSOTError(
                 f"selector_models.{selector_role} requires provider_key and model in {_PROVIDER_PROFILES_PATH}"
             )
+        if reasoning_effort and reasoning_effort not in {
+            "none",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+        }:
+            raise SectionModelSSOTError(
+                f"selector_models.{selector_role} has invalid reasoning_effort "
+                f"{reasoning_effort!r} in {_PROVIDER_PROFILES_PATH}"
+            )
+        if provider_key == "openai_chatgpt" and not reasoning_effort:
+            raise SectionModelSSOTError(
+                f"selector_models.{selector_role} requires reasoning_effort for OpenAI "
+                f"in {_PROVIDER_PROFILES_PATH}"
+            )
         out[str(selector_role).strip().lower()] = {
             "provider_key": provider_key,
             "model": model,
+            "reasoning_effort": reasoning_effort,
         }
     return out
 
@@ -230,6 +249,22 @@ def resolve_selector_provider_model(selector_role: str) -> tuple[str, str, str]:
         row["model"],
         f"apps_rg/config/provider_profiles.yaml:selector_models.{role}.model",
     )
+
+
+def resolve_selector_reasoning_effort(selector_role: str) -> str:
+    """Return the explicit provider-native effort for an advisory selector."""
+    role = str(selector_role or "").strip().lower()
+    if not role:
+        raise SectionModelSSOTError(
+            f"Missing selector role for selector_models lookup in {_PROVIDER_PROFILES_PATH}"
+        )
+    selectors = _selector_models()
+    row = selectors.get(role)
+    if row is None:
+        raise SectionModelSSOTError(
+            f"Missing selector_models.{role} in {_PROVIDER_PROFILES_PATH}"
+        )
+    return row["reasoning_effort"]
 
 
 def selector_role_for_section(section_id: str, *, slot_kind: str | None = None) -> str:
@@ -254,6 +289,46 @@ def _ssot_model_by_section(profile_key: str = "external_claude_generator") -> di
         for k, v in raw.items()
         if str(k).strip() and str(v).strip()
     }
+
+
+def _ssot_effort_by_section(profile_key: str) -> dict[str, str]:
+    """Per-section inference effort from the provider-profiles SSOT."""
+    profiles = _provider_profiles()
+    raw = (profiles.get(profile_key) or {}).get("effort_by_section") or {}
+    if not isinstance(raw, dict):
+        return {}
+    return {
+        str(k).strip().lower(): str(v).strip().lower()
+        for k, v in raw.items()
+        if str(k).strip() and str(v).strip()
+    }
+
+
+def resolve_section_generation_effort(section_id: str | None) -> str:
+    """Resolve one proof-bearing section's provider-native inference effort."""
+    sid = str(section_id or "").strip().lower()
+    if not sid:
+        raise SectionModelSSOTError(
+            f"Missing section_id for generation effort resolution in {_PROVIDER_PROFILES_PATH}"
+        )
+    matches = [
+        (profile_key, efforts[sid])
+        for profile_key in ("external_claude_generator", "external_openai_generator")
+        for efforts in (_ssot_effort_by_section(profile_key),)
+        if sid in efforts
+    ]
+    if len(matches) != 1:
+        detail = "none" if not matches else ", ".join(profile for profile, _effort in matches)
+        raise SectionModelSSOTError(
+            f"Generation effort for section={sid!r} must resolve exactly once; found {detail} "
+            f"in {_PROVIDER_PROFILES_PATH}"
+        )
+    effort = matches[0][1]
+    if effort not in {"low", "medium", "high", "xhigh"}:
+        raise SectionModelSSOTError(
+            f"Invalid generation effort {effort!r} for section={sid!r} in {_PROVIDER_PROFILES_PATH}"
+        )
+    return effort
 
 
 def resolve_section_generation_model(
@@ -341,8 +416,10 @@ __all__ = [
     "external_claude_generation_model",
     "external_openai_generation_model",
     "external_openai_generation_model_source",
+    "resolve_section_generation_effort",
     "resolve_section_generation_model",
     "resolve_selector_provider_model",
+    "resolve_selector_reasoning_effort",
     "runtime_limit_float",
     "runtime_limit_mapping",
     "runtime_limit_int",

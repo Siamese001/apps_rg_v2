@@ -6,9 +6,12 @@ Sanity tests (pass today) prove divergence is transport/packet, not _make_model_
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
+
+from tests.helpers import apps_rg_model_pins as pins
 
 from apps_rg.repository_layout import resolve_repository_path
 
@@ -25,6 +28,7 @@ from apps_rg.runtime.judges.executive_summary_x1d import (
     JUDGE_REQUIRED_FIELDS,
     JUDGE_SCORE_SCHEMA,
     build_x1d_judge_system_prompt,
+    _call_gemini,
     _make_model_backed_output,
     _resolved_section_x1d_judge_max_output_tokens,
     run_llm_judges,
@@ -202,7 +206,6 @@ def test_run_llm_judges_passes_identical_user_prompt_to_each_provider(monkeypatc
 
     monkeypatch.setenv("GOOGLE_API_KEY", "test-google")
     monkeypatch.setenv("OPENAI_API_KEY", "test-openai")
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-anthropic")
     monkeypatch.setenv("APPS_RG_ENABLE_NETWORK_TESTS", "1")
     monkeypatch.setattr(
         "apps_rg.runtime.judges.section_judge_profile.resolve_section_proof_judge_model",
@@ -211,10 +214,6 @@ def test_run_llm_judges_passes_identical_user_prompt_to_each_provider(monkeypatc
     monkeypatch.setattr(
         "apps_rg.runtime.judges.executive_summary_x1d._call_openai",
         _capture("openai_chatgpt"),
-    )
-    monkeypatch.setattr(
-        "apps_rg.runtime.judges.executive_summary_x1d._call_anthropic",
-        _capture("anthropic_claude"),
     )
     monkeypatch.setattr(
         "apps_rg.runtime.judges.executive_summary_x1d._call_gemini",
@@ -274,14 +273,12 @@ def test_run_llm_judges_same_input_hash_all_providers(monkeypatch: pytest.Monkey
 
     monkeypatch.setenv("GOOGLE_API_KEY", "test-google")
     monkeypatch.setenv("OPENAI_API_KEY", "test-openai")
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-anthropic")
     monkeypatch.setenv("APPS_RG_ENABLE_NETWORK_TESTS", "1")
     monkeypatch.setattr(
         "apps_rg.runtime.judges.section_judge_profile.resolve_section_proof_judge_model",
         _fake_resolve,
     )
     monkeypatch.setattr("apps_rg.runtime.judges.executive_summary_x1d._call_openai", _stub)
-    monkeypatch.setattr("apps_rg.runtime.judges.executive_summary_x1d._call_anthropic", _stub)
     monkeypatch.setattr("apps_rg.runtime.judges.executive_summary_x1d._call_gemini", _stub)
 
     outputs = run_llm_judges(
@@ -302,9 +299,83 @@ def test_judge_packet_hash_deterministic() -> None:
 
 
 @pytest.mark.parametrize("provider_key", PROOF_JUDGE_PROVIDER_KEYS)
-def test_provider_uses_low_temperature(provider_key: str) -> None:
+def test_proof_provider_omits_sampling_temperature(provider_key: str) -> None:
     profile = build_provider_transport_profile(provider_key)
-    assert profile.temperature_is_low, provider_key
+    assert profile.temperature is None, provider_key
+
+
+def test_gemini_transport_declares_high_thinking() -> None:
+    profile = build_provider_transport_profile("gemini_pro")
+    assert profile.thinking_level == "high"
+
+
+def test_gemini_request_and_judge_receipts_record_high_thinking_without_temperature(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    provider_response = {
+        "candidates": [
+            {
+                "content": {
+                    "parts": [
+                        {
+                            "text": json.dumps(
+                                {
+                                    "score_scale": "0_to_5",
+                                    "score": 4.5,
+                                    "threshold": 4.0,
+                                    "pass": True,
+                                    "decisive_failure": False,
+                                    "findings": [],
+                                    "cited_sentence_indexes": [1],
+                                    "remediation_suggestions": [],
+                                }
+                            )
+                        }
+                    ]
+                },
+                "finishReason": "STOP",
+            }
+        ]
+    }
+
+    class _Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self) -> bytes:
+            return json.dumps(provider_response).encode("utf-8")
+
+    monkeypatch.setenv("APPS_RG_ENABLE_NETWORK_TESTS", "1")
+    monkeypatch.setattr(
+        "apps_rg.runtime.judges.executive_summary_x1d.urllib.request.urlopen",
+        lambda *_args, **_kwargs: _Response(),
+    )
+
+    output = _call_gemini(
+        "test-key",
+        "grade only",
+        pins.GEMINI_PROOF_JUDGE_MODEL,
+        "input-hash",
+        "gemini_pro",
+        artifact_base=tmp_path,
+        model_requested=pins.GEMINI_PROOF_JUDGE_MODEL,
+        thinking_level="high",
+        section_id="competencies",
+    )
+
+    request_path = next(tmp_path.glob("x1d_gemini_provider_request_*.json"))
+    request_receipt = json.loads(request_path.read_text(encoding="utf-8"))
+    generation_config = request_receipt["payload"]["generationConfig"]
+    assert generation_config["thinkingConfig"] == {"thinkingLevel": "high"}
+    assert "temperature" not in generation_config
+    assert request_receipt["thinking_level"] == "high"
+    assert request_receipt["temperature"] is None
+    assert output.reasoning_effort == "high"
+    assert output.to_dict()["thinking_level"] == "high"
 
 
 def test_openai_retry_attempt_token_budget_escalates_bounded() -> None:

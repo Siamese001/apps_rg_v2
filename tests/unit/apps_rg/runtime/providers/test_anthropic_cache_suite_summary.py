@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+from tests.helpers import apps_rg_model_pins as pins
+
 from apps_rg.runtime.providers.anthropic_cache_suite_summary import (
     discover_cache_receipts,
     write_suite_cache_summary,
@@ -16,7 +18,7 @@ def _write(path, payload) -> None:
 def _receipt(section: str, creation: int, read: int, savings: float) -> dict:
     return {
         "provider": "external_claude",
-        "model": "claude-sonnet-5",
+        "model": pins.CLAUDE_GENERATOR_MODEL,
         "section_id": section,
         "cache_enabled": True,
         "stable_prefix_hash": f"stable-{section}",
