@@ -67,6 +67,21 @@ denominator; it cannot make P1, P2, a guardrail, release, or production pass.
 Its `success_metric_receipt.v1.schema.json` receipt is always technical-only,
 non-promoting, and keeps G1-G6 diagnostic-only.
 
+## W1 receipt catalog
+
+`python -m apps_rg.evals.receipt_catalog` reads the tracked
+`receipt_catalog_manifest.v1.json` and emits one fail-closed qualification
+summary. The catalog keys every entry by input digest, evaluator version, data
+split, runtime-configuration digest, and authority tier. It requires one
+compatible holdout receipt for G1-G6, P1/P2, and each critical guardrail before
+reporting `PASS`; it still never authorizes release or production.
+
+`apps_eval` records can appear only as `regression_diagnostic` entries. A green
+snapshot/regression record therefore remains visible in the summary but cannot
+replace authoritative human-qualified receipts. Missing evidence emits
+`NOT_MEASURED`; duplicate, stale/tampered, incompatible, or under-authorized
+receipts emit `BLOCKED`.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
