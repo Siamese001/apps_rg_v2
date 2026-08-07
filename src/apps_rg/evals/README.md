@@ -99,6 +99,23 @@ holdout-identity exposure, invalid Apps Research admission, and an underpowered
 plan report `BLOCKED`. This benchmark-design receipt is technical-only and does
 not create human qualification, release, or production authority.
 
+## W3 human truth and material-claim authority
+
+`material_claim_authority.py` independently splits every rendered sentence or
+bullet into a material candidate, then requires one exact system-claim record
+for each candidate. Each record must bind a rendered-text locator, source ID,
+source excerpt digest, and graph-path ID before it can be handed to the existing
+source-byte and graph-path grounding evaluator. An omitted rendered statement,
+duplicate locator, altered claim text, or incomplete evidence binding fails
+closed.
+
+`python -m apps_rg.evals.material_claim_authority` also reads the tracked W3
+human-truth manifest. QREL and proof review each require two independent human
+reviews and one adjudication per item, and synthetic grades are forbidden. The
+tracked manifest deliberately remains `NOT_MEASURED` pending externally pinned
+completed review/adjudication receipts; neither this readiness check nor an
+inventory reconciliation creates human qualification or release authority.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
