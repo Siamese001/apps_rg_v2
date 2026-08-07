@@ -116,6 +116,20 @@ tracked manifest deliberately remains `NOT_MEASURED` pending externally pinned
 completed review/adjudication receipts; neither this readiness check nor an
 inventory reconciliation creates human qualification or release authority.
 
+## W4 finished-resume outcome
+
+`python -m apps_rg.evals.finished_resume_outcome` enforces P1 at the complete
+finished-resume level. It requires a frozen baseline, blinded pairs, two
+independent primary reviews and one adjudication per pair, all 11 runtime lanes,
+strictly positive utility effect and lower confidence bound, and more candidate
+than baseline preferences. Ties cannot establish superiority. Authenticity,
+grounding, ATS, readability, concision, and target relevance each require a
+preregistered non-inferiority margin and interval.
+
+Owner-solo review is recorded only as a complementary signal. A passing
+technical summary remains non-release-authorizing until the referenced human
+authority and completed-review receipts are independently verified.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
