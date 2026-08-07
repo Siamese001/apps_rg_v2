@@ -176,6 +176,21 @@ slice results, and paired or randomized ablations for retrieval, grounding,
 section generation, and whole-resume assembly. The tracked receipt is pending;
 no holdout result, human label, or release authorization is supplied by code.
 
+## W8 shadow, canary, rollback, and promotion
+
+`python -m apps_rg.evals.shadow_canary_promotion` validates source/model/
+provider/graph identity against the W7 receipt before it evaluates shadow or
+bounded-canary observations. Identity drift emits `STALE_SCOPE` and requires a
+new qualification. The receipt measures traffic and window coverage, P1/P2
+proxies, cost, stage failures, latency and error deltas, source/target/query
+distribution drift, reviewer disagreement, zero-tolerance guardrails, slices,
+and a digest-bound rollback rehearsal.
+
+Technical monitoring can become `TECHNICALLY_QUALIFIED_NOT_AUTHORIZED`, never
+production-authorizing by itself. `PROMOTION_AUTHORIZED` additionally requires
+a separately bound `human-promotion-authority://` receipt. The tracked W8
+manifest is pending and contains neither traffic observations nor authority.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
