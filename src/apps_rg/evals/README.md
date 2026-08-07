@@ -130,6 +130,20 @@ Owner-solo review is recorded only as a complementary signal. A passing
 technical summary remains non-release-authorizing until the referenced human
 authority and completed-review receipts are independently verified.
 
+## W5 evaluator criterion validity
+
+`python -m apps_rg.evals.evaluator_validity_registry` inventories every
+release-affecting evaluator: G1-G5, ATS/document, Apps Research-to-U0, privacy,
+fairness, operational, and the post-Exit judge. Each versioned card requires a
+mutation-suite version, declared slices, an externally referenced authorized
+human pilot, and preregistered critical-false-pass and false-fail upper bounds.
+The validator computes Wilson upper bounds from the pilot counts rather than
+accepting a supplied rate.
+
+Every tracked card remains `NOT_MEASURED` until that evidence exists. Synthetic
+human labels block the registry, and even a technically complete card registry
+does not independently authorize human qualification, release, or production.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
