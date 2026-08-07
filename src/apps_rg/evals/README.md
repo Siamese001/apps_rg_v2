@@ -162,6 +162,20 @@ manifest deliberately contains no attempts or SLO values and is therefore
 technical receipt still does not create human qualification, release, or
 production authority.
 
+## W7 frozen protected-holdout qualification
+
+`python -m apps_rg.evals.protected_holdout_qualification` validates the sealed
+W7 receipt. Before protected-holdout access it fingerprints source commit,
+metric/data files, provider-model pins, candidate and baseline configuration,
+decision rules, and the holdout index. A changed file or source commit produces
+`STALE_SCOPE`; it cannot be reused. The preregistration timestamp must precede
+holdout access, and a complete evaluation may expose the holdout exactly once.
+
+The receipt also requires P1/P2 intervals, G1-G6, zero-tolerance guardrails,
+slice results, and paired or randomized ablations for retrieval, grounding,
+section generation, and whole-resume assembly. The tracked receipt is pending;
+no holdout result, human label, or release authorization is supplied by code.
+
 ## Authority boundary
 
 This contract is declarative. It does not change the existing W6 authority,
