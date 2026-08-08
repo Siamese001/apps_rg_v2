@@ -27,9 +27,7 @@ def _reset_model() -> None:
     reset_bge_model_for_testing()
 
 
-def test_intent_vector_payload_uses_bge_when_model_available(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_intent_vector_payload_uses_bge_when_model_available(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     snap = tmp_path / "hub" / "models--BAAI--bge-m3" / "snapshots" / "abc"
     snap.mkdir(parents=True)
     (snap / "config.json").write_text("{}", encoding="utf-8")
@@ -37,8 +35,8 @@ def test_intent_vector_payload_uses_bge_when_model_available(
     bootstrap_apps_rg_embedding_env(repo_root=tmp_path)
 
     fake = MagicMock()
-    fake.encode.return_value = np.ones((1, 1024), dtype=np.float32)
-    with patch("apps_rg.cache.r1b_bge_embedding._get_bge_model", return_value=fake):
+    fake.encode.return_value = np.ones((1, 1024), dtype=np.float32).tolist()
+    with patch("apps_rg.cache.r1b_bge_embedding._get_bge_runtime", return_value=fake):
         payload = intent_vector_payload(intent_text="apps_rg|role|acme|svp", digest="abc")
     assert payload["embedding_model"] == "BAAI/bge-m3"
     assert payload["dimensions"] == 1024
@@ -53,16 +51,13 @@ def test_embed_texts_bge_batches_non_empty_texts_preserving_order() -> None:
             np.full((1024,), 2.0, dtype=np.float32),
         ],
         dtype=np.float32,
-    )
+    ).tolist()
 
-    with patch("apps_rg.cache.r1b_bge_embedding._get_bge_model", return_value=fake):
+    with patch("apps_rg.cache.r1b_bge_embedding._get_bge_runtime", return_value=fake):
         vectors = embed_texts_bge([" parent ", " ", "child"], batch_size=2)
 
     fake.encode.assert_called_once_with(
         ["parent", "child"],
-        convert_to_numpy=True,
-        normalize_embeddings=True,
-        show_progress_bar=False,
         batch_size=2,
     )
     assert vectors[0] is not None
@@ -74,7 +69,23 @@ def test_embed_texts_bge_batches_non_empty_texts_preserving_order() -> None:
     assert len(vectors[2]) == 1024
 
 
-def test_resolve_query_vector_falls_back_without_bge(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_embed_texts_bge_uses_bounded_profile_by_default() -> None:
+    fake = MagicMock()
+    fake.encode.return_value = np.ones((3, 1024), dtype=np.float32).tolist()
+
+    with patch("apps_rg.cache.r1b_bge_embedding._get_bge_runtime", return_value=fake):
+        vectors = embed_texts_bge(["parent", "child one", "child two"])
+
+    fake.encode.assert_called_once_with(
+        ["parent", "child one", "child two"],
+        batch_size=3,
+    )
+    assert all(vector is not None for vector in vectors)
+
+
+def test_resolve_query_vector_falls_back_without_bge(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("APPS_RG_TEST_HARNESS", "1")
     monkeypatch.setenv("EMBEDDING_ENABLED", "false")
     monkeypatch.setenv("HF_HOME", "/nonexistent")

@@ -189,7 +189,7 @@ def _build_projection_embedding_payloads(
     intent_text: str,
     digest: str,
     chunks: list[HistoricalOutputChunk],
-    batch_size: int = 64,
+    batch_size: int | None = None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Build parent + child embedding payloads with one BGE batch when possible."""
     chunk_texts: list[tuple[HistoricalOutputChunk, str]] = []

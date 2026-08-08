@@ -129,7 +129,9 @@ def _hf_hub_bge_snapshot_dir(model_id: str) -> Path | None:
     return None
 
 
-def _resolve_local_bge_path(model_id: str) -> tuple[str | None, bool, EmbeddingModelSource]:
+def _resolve_local_bge_path(
+    model_id: str,
+) -> tuple[str | None, bool, EmbeddingModelSource]:
     """Resolve BGE to an on-disk path only — no Hugging Face hub download."""
     explicit = os.environ.get("APPS_RG_EMBEDDING_MODEL_PATH", "").strip()
     if explicit:
@@ -268,9 +270,6 @@ def resolve_apps_rg_embedding_settings(
     else:
         model_source = "not_applicable"
 
-    semantic_cache_ineligible = not embeddings_enabled
-    dense_ineligible = not embeddings_enabled or not dense_requested
-
     if not embeddings_enabled:
         if dense_requested and embedding_required:
             return AppsRgEmbeddingSettings(
@@ -290,10 +289,7 @@ def resolve_apps_rg_embedding_settings(
                 dense_retrieval_ineligible=True,
                 route_result="FAIL_CLOSED",
                 decisive_reason=(
-                    "CHROMA_PERSIST_DIR configured but EMBEDDING_ENABLED is false; "
-                    "dense retrieval and Chroma query embeddings are forbidden. "
-                    "Set EMBEDDING_ENABLED=true and APPS_RG_EMBEDDING_MODEL_PATH "
-                    "to a local BGE directory for dense retrieval."
+                    "CHROMA_PERSIST_DIR configured but EMBEDDING_ENABLED is false; dense retrieval and Chroma query embeddings are forbidden. Set EMBEDDING_ENABLED=true and APPS_RG_EMBEDDING_MODEL_PATH to a local BGE directory for dense retrieval."
                 ),
                 chroma_persist_dir=chroma_dir,
             )
@@ -339,8 +335,7 @@ def resolve_apps_rg_embedding_settings(
             dense_retrieval_ineligible=True,
             route_result="FAIL_CLOSED",
             decisive_reason=(
-                "embeddings_enabled=true but APPS_RG_EMBEDDING_MODEL_PATH (or pre-provisioned "
-                f"artifacts/models/{CANONICAL_BGE_HF_ID}) is missing; no HF download permitted"
+                f"embeddings_enabled=true but APPS_RG_EMBEDDING_MODEL_PATH (or pre-provisioned artifacts/models/{CANONICAL_BGE_HF_ID}) is missing; no HF download permitted"
             ),
             chroma_persist_dir=chroma_dir,
         )
@@ -415,48 +410,38 @@ def assert_dense_retrieval_allowed(settings: AppsRgEmbeddingSettings) -> None:
 
 
 def load_bge_sentence_transformer(settings: AppsRgEmbeddingSettings) -> Any:
-    """Load BGE from explicit local path only — no hub slug, no remote resolution."""
+    """Compatibility loader using the app-owned local BGE constructor."""
     if not settings.embeddings_enabled:
-        raise AppsRgEmbeddingFailClosedError(
-            "SentenceTransformer/BGE load forbidden when embeddings_enabled=false"
-        )
+        raise AppsRgEmbeddingFailClosedError("SentenceTransformer/BGE load forbidden when embeddings_enabled=false")
     if not settings.embedding_model_resolved or not settings.embedding_model_path:
         raise AppsRgEmbeddingFailClosedError(settings.decisive_reason or "BGE path unresolved")
-    os.environ.setdefault("HF_HUB_OFFLINE", "1")
-    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
     device = (
         os.environ.get("APPS_RG_HYDRATION_DEVICE", "").strip()
         or os.environ.get("EMBEDDING_DEVICE", "").strip()
         or os.environ.get("VECTOR_DB_DEVICE", "").strip()
         or "cuda"
     ).lower()
-    if device == "cuda":
-        try:
-            import torch  # type: ignore[import]
-        except ImportError as exc:
-            raise AppsRgEmbeddingFailClosedError(
-                "torch is required for CUDA fact-vector hydration but is not installed"
-            ) from exc
-        if not bool(torch.cuda.is_available()):
-            raise AppsRgEmbeddingFailClosedError(
-                "EMBEDDING_DEVICE=cuda requested but torch.cuda.is_available() is false"
-            )
     try:
-        from sentence_transformers import SentenceTransformer  # type: ignore[import]
-    except ImportError as exc:
+        from apps_rg.runtime.bge_embedding import (
+            BgeEmbeddingContractError,
+            load_local_bge_model,
+            resolve_bge_runtime_key,
+        )
+
+        key = resolve_bge_runtime_key(
+            model_path=settings.embedding_model_path,
+            device=device,
+        )
+        return load_local_bge_model(key)
+    except (ImportError, BgeEmbeddingContractError) as exc:
         detail = str(exc)
         if "Application Control policy" in detail or "torch._C" in detail:
             raise AppsRgEmbeddingFailClosedError(
-                "PyTorch blocked by Windows Smart App Control (unsigned .pyd). "
-                "Use WSL: tools/apps_rg/Invoke-AppsRgSectionWsl.ps1, or disable SAC: "
-                "docs/guides/windows_smart_app_control_apps_rg.md"
+                "PyTorch blocked by Windows Smart App Control (unsigned .pyd). Use WSL: tools/apps_rg/Invoke-AppsRgSectionWsl.ps1, or disable SAC: docs/guides/windows_smart_app_control_apps_rg.md"
             ) from exc
         raise AppsRgEmbeddingFailClosedError(
-            "sentence-transformers required for BGE but not installed"
+            detail or "sentence-transformers required for BGE but not installed"
         ) from exc
-    path = settings.embedding_model_path
-    _logger.info("apps_rg BGE load: local path=%s device=%s (no HF hub)", path, device)
-    return SentenceTransformer(path, device=device, local_files_only=True)
 
 
 def write_embedding_settings_receipt(
@@ -489,11 +474,7 @@ def semantic_cache_r1b_eligibility(
     """
     reuse_flag_enabled = _env_truthy("APPS_RG_ENABLE_R1B_SEMANTIC_CACHE")
     s = settings or resolve_apps_rg_embedding_settings()
-    probeable = bool(
-        s.embeddings_enabled
-        and s.semantic_cache_enabled
-        and not s.semantic_cache_ineligible
-    )
+    probeable = bool(s.embeddings_enabled and s.semantic_cache_enabled and not s.semantic_cache_ineligible)
     reason = "eligible"
     status = "eligible"
     if not reuse_flag_enabled:
@@ -526,7 +507,9 @@ def semantic_cache_r1b_eligibility(
     }
 
 
-def semantic_cache_r1b_eligible(settings: AppsRgEmbeddingSettings | None = None) -> bool:
+def semantic_cache_r1b_eligible(
+    settings: AppsRgEmbeddingSettings | None = None,
+) -> bool:
     return bool(semantic_cache_r1b_eligibility(settings).get("eligible"))
 
 

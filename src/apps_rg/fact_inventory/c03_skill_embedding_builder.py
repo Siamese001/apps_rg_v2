@@ -47,12 +47,9 @@ def _assert_legacy_generation_not_retired(repository_root: Path) -> None:
             raise LegacyEmbeddingRetirementWave5Error("marker is not an object")
         validate_retirement_marker(marker)
     except (OSError, json.JSONDecodeError, LegacyEmbeddingRetirementWave5Error) as exc:
-        raise SkillEmbeddingBuildError(
-            f"legacy embedding retirement marker is invalid: {marker_path}"
-        ) from exc
+        raise SkillEmbeddingBuildError(f"legacy embedding retirement marker is invalid: {marker_path}") from exc
     raise SkillEmbeddingBuildError(
-        "legacy one-vector-per-skill generation is retired by "
-        f"{RETIREMENT_MARKER}; use the graph-evidence cluster pipeline"
+        f"legacy one-vector-per-skill generation is retired by {RETIREMENT_MARKER}; use the graph-evidence cluster pipeline"
     )
 
 
@@ -69,9 +66,7 @@ def build_local_model_manifest(model_path: Path | str) -> dict[str, Any]:
     if not root.is_dir():
         raise SkillEmbeddingBuildError(f"local BGE-M3 directory missing: {root}")
     files: list[dict[str, Any]] = []
-    for path in sorted(
-        (item for item in root.rglob("*") if item.is_file()), key=lambda p: p.as_posix()
-    ):
+    for path in sorted((item for item in root.rglob("*") if item.is_file()), key=lambda p: p.as_posix()):
         files.append(
             {
                 "path": path.relative_to(root).as_posix(),
@@ -109,42 +104,34 @@ def encode_bge_m3(
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
     try:
         import torch
-        from sentence_transformers import SentenceTransformer
     except ImportError as exc:
-        raise SkillEmbeddingBuildError(
-            "BGE-M3 runtime dependencies are unavailable"
-        ) from exc
+        raise SkillEmbeddingBuildError("BGE-M3 runtime dependencies are unavailable") from exc
     if device.startswith("cuda") and not torch.cuda.is_available():
         raise SkillEmbeddingBuildError("CUDA requested but unavailable")
-    model = SentenceTransformer(
-        str(Path(model_path).resolve()), device=device, local_files_only=True
+    from apps_rg.runtime.bge_embedding import (
+        BgeEmbeddingContractError,
+        get_bge_runtime,
     )
-    vectors = model.encode(
-        texts,
-        batch_size=batch_size,
-        convert_to_numpy=True,
-        normalize_embeddings=True,
-        show_progress_bar=False,
-    )
-    if tuple(vectors.shape) != (len(texts), MODEL_DIMENSION):
-        raise SkillEmbeddingBuildError(
-            f"BGE-M3 shape mismatch: expected {(len(texts), MODEL_DIMENSION)}, "
-            f"observed {tuple(vectors.shape)}"
-        )
+
+    try:
+        resident = get_bge_runtime(model_path=model_path, device=device)
+        vectors = resident.encode(texts, batch_size=batch_size)
+    except BgeEmbeddingContractError as exc:
+        raise SkillEmbeddingBuildError(str(exc)) from exc
+    resident_observation = resident.observation()
     runtime = {
-        "device": str(model.device),
+        "device": resident.key.device,
         "python_major_minor": f"{sys.version_info.major}.{sys.version_info.minor}",
         "torch_version": str(torch.__version__),
         "sentence_transformers_version": version("sentence-transformers"),
         "cuda_available": bool(torch.cuda.is_available()),
-        "cuda_device_name": (
-            str(torch.cuda.get_device_name(0)) if torch.cuda.is_available() else None
-        ),
+        "cuda_device_name": (str(torch.cuda.get_device_name(0)) if torch.cuda.is_available() else None),
         "fallback_used": False,
         "vector_count": len(texts),
         "dimension": MODEL_DIMENSION,
+        "resident_runtime": resident_observation,
     }
-    return runtime, [[float(value) for value in row] for row in vectors]
+    return runtime, vectors
 
 
 def _write_immutable_json(path: Path, payload: dict[str, Any]) -> str:
@@ -165,9 +152,7 @@ def _repository_path(path: Path, *, repository_root: Path) -> str:
     try:
         return path.resolve().relative_to(repository_root.resolve()).as_posix()
     except ValueError as exc:
-        raise SkillEmbeddingBuildError(
-            f"source path escapes repository root: {path}"
-        ) from exc
+        raise SkillEmbeddingBuildError(f"source path escapes repository root: {path}") from exc
 
 
 def build_assertion_embedding_generation(
@@ -184,9 +169,7 @@ def build_assertion_embedding_generation(
     graph_bytes = graph_path.read_bytes()
     graph = json.loads(graph_bytes)
     if reconcile_graph_authority(graph) != graph:
-        raise SkillEmbeddingBuildError(
-            "canonical graph requires reconciliation before embedding"
-        )
+        raise SkillEmbeddingBuildError("canonical graph requires reconciliation before embedding")
     candidate_fact_bytes = candidate_fact_path.read_bytes()
     base_resume_bytes = base_resume_path.read_bytes()
     facts = json.loads(candidate_fact_bytes)
@@ -205,12 +188,8 @@ def build_assertion_embedding_generation(
     corpus_file_sha256 = _write_immutable_json(corpus_path, corpus)
 
     model_manifest = build_local_model_manifest(model_path)
-    model_manifest_path = output_dir / (
-        f"bge_m3_model_manifest.{model_manifest['artifact_sha256']}.json"
-    )
-    model_manifest_file_sha256 = _write_immutable_json(
-        model_manifest_path, model_manifest
-    )
+    model_manifest_path = output_dir / (f"bge_m3_model_manifest.{model_manifest['artifact_sha256']}.json")
+    model_manifest_file_sha256 = _write_immutable_json(model_manifest_path, model_manifest)
 
     assertion_rows = sorted(corpus["assertions"], key=lambda row: row["assertion_id"])
     runtime, vectors = encode_bge_m3(
@@ -219,8 +198,7 @@ def build_assertion_embedding_generation(
         device=device,
     )
     vectors_by_assertion = {
-        str(row["assertion_id"]): vector
-        for row, vector in zip(assertion_rows, vectors, strict=True)
+        str(row["assertion_id"]): vector for row, vector in zip(assertion_rows, vectors, strict=True)
     }
     staging_db = output_dir / f".graph_skill_embeddings.build-{os.getpid()}.sqlite"
     projection = build_embedding_projection(
@@ -229,23 +207,17 @@ def build_assertion_embedding_generation(
         vectors_by_assertion,
         model_manifest,
     )
-    projection_path = output_dir / (
-        f"graph_skill_embeddings.{projection['generation_sha256']}.sqlite"
-    )
+    projection_path = output_dir / (f"graph_skill_embeddings.{projection['generation_sha256']}.sqlite")
     if projection_path.exists():
         if _file_sha256(projection_path) != projection["sqlite_sha256"]:
             staging_db.unlink(missing_ok=True)
-            raise SkillEmbeddingBuildError(
-                f"immutable projection collision: {projection_path}"
-            )
+            raise SkillEmbeddingBuildError(f"immutable projection collision: {projection_path}")
         staging_db.unlink()
     else:
         os.replace(staging_db, projection_path)
     projection_issues = validate_embedding_projection(projection_path, corpus=corpus)
     if projection_issues:
-        raise SkillEmbeddingBuildError(
-            "embedding projection invalid: " + ", ".join(projection_issues)
-        )
+        raise SkillEmbeddingBuildError("embedding projection invalid: " + ", ".join(projection_issues))
 
     manifest: dict[str, Any] = {
         "schema_version": "apps_rg.graph_skill_embedding_generation_manifest.v1",
@@ -255,9 +227,7 @@ def build_assertion_embedding_generation(
             "canonical_sha256": canonical_sha256(graph),
         },
         "candidate_fact_ledger": {
-            "path": _repository_path(
-                candidate_fact_path, repository_root=repository_root
-            ),
+            "path": _repository_path(candidate_fact_path, repository_root=repository_root),
             "file_sha256": hashlib.sha256(candidate_fact_bytes).hexdigest(),
             "canonical_sha256": canonical_sha256(facts),
         },
@@ -293,9 +263,7 @@ def build_assertion_embedding_generation(
     manifest["manifest_sha256"] = canonical_sha256(manifest)
     active_manifest_path = output_dir / "graph_skill_embedding_manifest.json"
     rendered_manifest = json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
-    staging_manifest = active_manifest_path.with_name(
-        f".{active_manifest_path.name}.staging-{os.getpid()}"
-    )
+    staging_manifest = active_manifest_path.with_name(f".{active_manifest_path.name}.staging-{os.getpid()}")
     staging_manifest.write_text(rendered_manifest, encoding="utf-8", newline="\n")
     os.replace(staging_manifest, active_manifest_path)
     return manifest

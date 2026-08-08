@@ -3,6 +3,7 @@
 W5 implementation with proper GateVerdict construction for G_METADATA_FILTER
 and other C0 gates with full reason field support.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -62,9 +63,7 @@ from apps_rg.runtime.bindings.c0_evidence_trace_map import (
 APPS_RG_C0_CERT_REF = "apps_rg::c0::resume_generation::v1"
 
 # Phase-1 C0 dense lane — explicit receipts (AG-4 / operator clarity).
-C0_DENSE_NA_NO_PERSIST = (
-    "c0_dense_lane_not_active_no_CHROMA_PERSIST_DIR_or_chroma_path_parameter"
-)
+C0_DENSE_NA_NO_PERSIST = "c0_dense_lane_not_active_no_CHROMA_PERSIST_DIR_or_chroma_path_parameter"
 C0_SPARSE_LANE_NA_REF = "ref:sparse:NOT_APPLICABLE:no_bm25_operator_lane_phase1"
 C0_GRAPH_LANE_NA_REF = "ref:graph:NOT_APPLICABLE:graphrag_deferred_phase1"
 C0_METADATA_FILTER_REF = "ref:metadata:chroma_where:apps_rg_fact_vectors:v1"
@@ -79,7 +78,9 @@ def _chroma_source_label(source_class: str, object_id: str) -> str:
 
 
 def _persistent_chroma_client(path: str) -> Any:
-    from agentic_core.L4_state.utils.client.chroma_client import chromadb_module as chroma_module
+    from agentic_core.L4_state.utils.client.chroma_client import (
+        chromadb_module as chroma_module,
+    )
     from chromadb.config import Settings
 
     return chroma_module.PersistentClient(
@@ -99,7 +100,9 @@ def _resolve_spine_graph_expansion_refs(
 
     from agentic_core.runtime.c0.c0_3_graph_rag_executor import maybe_run_graph_rag
     from apps_rg.integrations.c0_graph_adapter import _extract_fact_id
-    from apps_rg.fact_inventory.augmented_skills_graph import load_augmented_skills_graph
+    from apps_rg.fact_inventory.augmented_skills_graph import (
+        load_augmented_skills_graph,
+    )
     from apps_rg.runtime.c03_graphrag_bound import (
         _collect_graph_expansion_refs,
         _collect_graph_lineage_refs,
@@ -145,33 +148,33 @@ def _resolve_spine_graph_expansion_refs(
             merged_refs = (*exp, *lin)
             if merged_refs:
                 return tuple(dict.fromkeys(merged_refs))[:64]
-        except (OSError, ValueError, TypeError) as exc:  # guardian: allow-log-and-swallow -- P2 burndown: fail-soft optional boundary
+        except (
+            OSError,
+            ValueError,
+            TypeError,
+        ) as exc:  # guardian: allow-log-and-swallow -- P2 burndown: fail-soft optional boundary
             _logger.warning("spine graph static FEC fallback failed: %s", exc)
 
     return (C0_GRAPH_LANE_NA_REF,)
 
 
-_embedding_singleton: Any | None = None
-_embedding_singleton_path: str | None = None
-
-
-def _get_embedding_model() -> Any:
-    """Lazy explicit local BGE — patchable in tests; never HF hub slug lookup."""
-    global _embedding_singleton, _embedding_singleton_path
+def _get_embedding_runtime() -> Any:
+    """Resolve the process-owned local BGE runtime; never a hub slug."""
     from apps_rg.runtime.embedding_settings import (
         assert_dense_retrieval_allowed,
-        load_bge_sentence_transformer,
         resolve_apps_rg_embedding_settings,
     )
+    from apps_rg.runtime.bge_embedding import get_bge_runtime_for_settings
 
     settings = resolve_apps_rg_embedding_settings(chroma_persist_dir=_chroma_persist_dir_active())
     assert_dense_retrieval_allowed(settings)
-    path = settings.embedding_model_path or ""
-    if _embedding_singleton is not None and _embedding_singleton_path == path:
-        return _embedding_singleton
-    _embedding_singleton = load_bge_sentence_transformer(settings)
-    _embedding_singleton_path = path
-    return _embedding_singleton
+    return get_bge_runtime_for_settings(settings)
+
+
+def _get_embedding_model() -> Any:
+    """Backward-compatible model access without separate singleton ownership."""
+
+    return _get_embedding_runtime().model
 
 
 def _chroma_persist_dir_active() -> str | None:
@@ -202,9 +205,7 @@ def _evidence_source_class(item: Any) -> str:
 
 def _provisional_digest(items: list[EvidenceItem]) -> str:
     lines = sorted(
-        f"{getattr(i, 'source', '')}|"
-        f"{hashlib.sha256(i.content.encode('utf-8')).hexdigest()[:24]}"
-        for i in items
+        f"{getattr(i, 'source', '')}|{hashlib.sha256(i.content.encode('utf-8')).hexdigest()[:24]}" for i in items
     )
     return hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()
 
@@ -233,14 +234,10 @@ def _build_section_evidence_trace(
     del timestamp_iso  # reserved for future receipt alignment
     resume_text = str((app_payload.get("resume_payload") or {}).get("resume_text") or "")
     jd_text = str((app_payload.get("jd_payload") or {}).get("jd_text") or "")
-    sr_hash = (
-        hashlib.sha256(resume_text.encode("utf-8")).hexdigest()[:32] if resume_text else ""
-    )
+    sr_hash = hashlib.sha256(resume_text.encode("utf-8")).hexdigest()[:32] if resume_text else ""
     jd_h = hashlib.sha256(jd_text.encode("utf-8")).hexdigest()[:32] if jd_text else ""
     briefing_digest: str = str(
-        (app_payload.get("briefing") or {}).get("briefing_digest", "")
-        or app_payload.get("briefing_digest", "")
-        or ""
+        (app_payload.get("briefing") or {}).get("briefing_digest", "") or app_payload.get("briefing_digest", "") or ""
     )
     briefing_h = briefing_digest[:32] if briefing_digest else ""
     refs = tuple(str(getattr(it, "evidence_id", "") or it.source) for it in section_dense_items)
@@ -272,9 +269,7 @@ def _build_section_evidence_trace(
         retrieval_score=0.0,
         raw_dense_hit_count=int(raw_dense_hit_count),
         post_filter_survivor_count=(
-            len(section_dense_items)
-            if post_filter_survivor_count is None
-            else int(post_filter_survivor_count)
+            len(section_dense_items) if post_filter_survivor_count is None else int(post_filter_survivor_count)
         ),
         applied_where_filter=applied_where_filter,
         similarity_threshold=float(similarity_threshold),
@@ -286,14 +281,15 @@ def _build_section_evidence_trace(
 
 class C0EvidenceGapError(Exception):
     """C0 retrieval gap error — indicates read-only path failure.
-    
+
     This error is raised when C0 retrieval cannot proceed due to:
     - Missing or unavailable ChromaDB / fact_vectors collection
     - No evidence items available for retrieval
     - Required metadata filters cannot be applied
-    
+
     This is a READ-ONLY path failure — NOT a write failure.
     """
+
     pass
 
 
@@ -313,6 +309,7 @@ try:
     from apps_rg.runtime.profiles.retrieval_requirements import (
         get_normative_source_classes as _get_normative,
     )
+
     _NORMATIVE_SOURCE_CLASSES: tuple[str, ...] = _get_normative()
     if not _NORMATIVE_SOURCE_CLASSES:
         _NORMATIVE_SOURCE_CLASSES = _NORMATIVE_SOURCE_CLASSES_HARDCODED
@@ -329,12 +326,12 @@ def _build_gate_verdict(
     unknown_reason: str | None = None,
 ) -> GateVerdict:
     """W4: Build a single GateVerdict with proper reason fields.
-    
+
     Per GateVerdict contract:
     - NOT_APPLICABLE result requires not_applicable_reason field
     - UNKNOWN result requires unknown_reason field
     - PASS/PARTIAL/WEAK/etc do not set not_applicable_reason
-    
+
     Args:
         gate_id: The gate identifier (e.g., G_METADATA_FILTER)
         support_status: The support status from evidence evaluation
@@ -342,12 +339,12 @@ def _build_gate_verdict(
         timestamp_iso: ISO timestamp when evaluated
         result_mapping: Maps support_status to verdict result string
         unknown_reason: Required when result would be UNKNOWN
-        
+
     Returns:
         GateVerdict with all required fields populated
     """
     verdict_value = result_mapping.get(support_status, VERDICT_UNKNOWN)
-    
+
     # Build base reason based on status
     if support_status == STATUS_NOT_APPLICABLE:
         base_reason = unknown_reason or f"{gate_id} not applicable for this context"
@@ -355,7 +352,7 @@ def _build_gate_verdict(
         base_reason = unknown_reason or f"{gate_id} status could not be determined"
     else:
         base_reason = f"{gate_id} evaluated with status {support_status}"
-    
+
     # Build kwargs for GateVerdict
     gate_kwargs: dict[str, Any] = {
         "gate_id": gate_id,
@@ -366,15 +363,15 @@ def _build_gate_verdict(
         "evaluated_at": timestamp_iso,
         "evidence_digest": evidence_digest,
     }
-    
+
     # Per GateVerdict contract: NOT_APPLICABLE requires not_applicable_reason
     if verdict_value == VERDICT_NOT_APPLICABLE:
         gate_kwargs["not_applicable_reason"] = base_reason
-    
-    # Per GateVerdict contract: UNKNOWN requires unknown_reason  
+
+    # Per GateVerdict contract: UNKNOWN requires unknown_reason
     if verdict_value == VERDICT_UNKNOWN:
         gate_kwargs["unknown_reason"] = base_reason
-    
+
     return GateVerdict(**gate_kwargs)
 
 
@@ -400,9 +397,7 @@ def c0_retrieve_apps_rg(
         raise TypeError(f"Unexpected keyword arguments: {', '.join(sorted(kwargs))}")
     if hasattr(route, "grounding_required") and not route.grounding_required:
         raise ValueError(
-            f"C0 is conditional on grounding_required=True; "
-            f"grounding_required={route.grounding_required} blocks C0 retrieval. "
-            f"AG-2: File-only path does not invoke C0."
+            f"C0 is conditional on grounding_required=True; grounding_required={route.grounding_required} blocks C0 retrieval. AG-2: File-only path does not invoke C0."
         )
 
     ts = timestamp_iso or datetime.now(timezone.utc).isoformat()
@@ -420,8 +415,7 @@ def c0_retrieve_apps_rg(
 
     if apps_rg_c0_dense_sparse_mandatory() and not effective_chroma:
         raise C0EvidenceGapError(
-            "C0.2 dense+sparse mandatory for apps_rg: CHROMA_PERSIST_DIR required "
-            "(set via bootstrap or env) with EMBEDDING_ENABLED=true and local BGE path"
+            "C0.2 dense+sparse mandatory for apps_rg: CHROMA_PERSIST_DIR required (set via bootstrap or env) with EMBEDDING_ENABLED=true and local BGE path"
         )
 
     if effective_chroma:
@@ -437,14 +431,13 @@ def c0_retrieve_apps_rg(
         if _art_hint:
             try:
                 write_embedding_settings_receipt(_art_hint, emb_settings)
-            except OSError:  # guardian: allow-silent-swallow -- P2 burndown: receipt write is best-effort on C0 preflight
+            except (
+                OSError
+            ):  # guardian: allow-silent-swallow -- P2 burndown: receipt write is best-effort on C0 preflight
                 pass
         if not emb_settings.embeddings_enabled:
             raise C0EvidenceGapError(
-                "Chroma path is configured (parameter or CHROMA_PERSIST_DIR) but "
-                "EMBEDDING_ENABLED is not true. Set EMBEDDING_ENABLED=true and "
-                "APPS_RG_EMBEDDING_MODEL_PATH to a local BGE directory for dense retrieval, "
-                "or unset CHROMA_PERSIST_DIR for file-only C0."
+                "Chroma path is configured (parameter or CHROMA_PERSIST_DIR) but EMBEDDING_ENABLED is not true. Set EMBEDDING_ENABLED=true and APPS_RG_EMBEDDING_MODEL_PATH to a local BGE directory for dense retrieval, or unset CHROMA_PERSIST_DIR for file-only C0."
             )
         if emb_settings.embedding_required and not emb_settings.embedding_model_resolved:
             raise C0EvidenceGapError(emb_settings.decisive_reason)
@@ -465,9 +458,7 @@ def c0_retrieve_apps_rg(
             source_owner_or_authority: str,
         ) -> EvidenceItem:
             chunk_digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
-            evidence_digest = hashlib.sha256(
-                f"{source}:{source_ref}:{chunk_digest}".encode("utf-8")
-            ).hexdigest()
+            evidence_digest = hashlib.sha256(f"{source}:{source_ref}:{chunk_digest}".encode("utf-8")).hexdigest()
             return EvidenceItem(
                 source=source,
                 content=content,
@@ -489,9 +480,7 @@ def c0_retrieve_apps_rg(
                 freshness_status=STATUS_NOT_APPLICABLE,
                 acl_status=STATUS_NOT_APPLICABLE,
                 contradiction_status=STATUS_NOT_APPLICABLE,
-                not_applicable_reason=(
-                    "inline app payload context is not external retrieval proof"
-                ),
+                not_applicable_reason=("inline app payload context is not external retrieval proof"),
             )
 
         app_payload = getattr(validated_request, "app_payload", None) or {}
@@ -532,7 +521,9 @@ def c0_retrieve_apps_rg(
     if effective_chroma:
         try:
             client = _persistent_chroma_client(effective_chroma)
-            from apps_rg.runtime.c0.chroma_persistent_client import ensure_apps_rg_chroma_client
+            from apps_rg.runtime.c0.chroma_persistent_client import (
+                ensure_apps_rg_chroma_client,
+            )
 
             client = ensure_apps_rg_chroma_client(effective_chroma)
             from apps_rg.runtime.chroma_precomputed_collection import (
@@ -561,12 +552,12 @@ def c0_retrieve_apps_rg(
         except C0EvidenceGapError:
             raise
         except Exception as exc:  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
-            from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
+            from apps_rg.runtime.product_output_policy import (
+                product_fail_closed_runtime,
+            )
 
             if product_fail_closed_runtime():
-                raise C0EvidenceGapError(
-                    f"C0.2 dense lane failed on product path: {exc}"
-                ) from exc
+                raise C0EvidenceGapError(f"C0.2 dense lane failed on product path: {exc}") from exc
             _logger.warning("Chroma fact_vectors retrieval failed: %s", exc)
             chroma_retrieved = False
             dense_search_refs.append(f"dense:error:{exc.__class__.__name__}")
@@ -692,33 +683,28 @@ def c0_retrieve_apps_rg(
 
     evidence_strata: tuple[tuple[str, tuple[str, ...]], ...] = tuple()
     if chroma_lane_items:
-        eids = tuple(
-            str(getattr(it, "evidence_id", "") or it.source) for it in chroma_lane_items
-        )
+        eids = tuple(str(getattr(it, "evidence_id", "") or it.source) for it in chroma_lane_items)
         evidence_strata = (("CANONICAL", eids),)
 
     query_vec_ref = C0_QUERY_VEC_REF_BGE if chroma_dense_lane_completed else ""
-    metadata_filter_refs: tuple[str, ...] = (
-        (C0_METADATA_FILTER_REF,) if chroma_dense_lane_completed else tuple()
-    )
+    metadata_filter_refs: tuple[str, ...] = (C0_METADATA_FILTER_REF,) if chroma_dense_lane_completed else tuple()
     sparse_search_refs: tuple[str, ...] = _resolve_fec_sparse_search_refs(
         section_profile,
         sparse_receipt_refs,
     )
-    from apps_rg.runtime.c0_mandatory_policy import apps_rg_c0_dense_sparse_mandatory as _c02_mandatory
+    from apps_rg.runtime.c0_mandatory_policy import (
+        apps_rg_c0_dense_sparse_mandatory as _c02_mandatory,
+    )
 
     if _c02_mandatory():
         if not chroma_dense_lane_completed:
-            raise C0EvidenceGapError(
-                "C0.2 dense lane mandatory but fact_vectors dense retrieval did not complete"
-            )
+            raise C0EvidenceGapError("C0.2 dense lane mandatory but fact_vectors dense retrieval did not complete")
         if section_profile.any_sparse_enabled():
             if C0_SPARSE_LANE_NA_REF in sparse_search_refs:
                 raise C0EvidenceGapError("C0.2 sparse lane mandatory but sparse profile disabled")
             if any("UNAVAILABLE" in ref for ref in sparse_search_refs):
                 raise C0EvidenceGapError(
-                    "C0.2 sparse lane mandatory but BM25/sparse index unavailable: "
-                    + ",".join(sparse_search_refs[:3])
+                    "C0.2 sparse lane mandatory but BM25/sparse index unavailable: " + ",".join(sparse_search_refs[:3])
                 )
         gate_verdicts.append(
             _build_gate_verdict(
@@ -808,9 +794,7 @@ def _l1_evidence_plan_receipts(l1_plan: Any | None) -> tuple[str, tuple[str, ...
     support_expectation = dict(getattr(l1_plan, "support_expectation", None) or {})
     capsule = task_spec.get("apps_rg_planning_capsule")
     capsule_ref = str(
-        task_spec.get("apps_rg_planning_capsule_ref")
-        or support_expectation.get("apps_rg_evidence_plan_ref")
-        or ""
+        task_spec.get("apps_rg_planning_capsule_ref") or support_expectation.get("apps_rg_evidence_plan_ref") or ""
     ).strip()
     evidence_plan: Any = []
     if isinstance(capsule, Mapping):
@@ -838,8 +822,11 @@ def _l1_evidence_plan_receipts(l1_plan: Any | None) -> tuple[str, tuple[str, ...
 # W6: Retrieval Quality Span Emission (Observability-only, L6 is post-runtime)
 # =============================================================================
 
+
 def _emit_retrieval_quality_span(
-    evidence_items: list[Any],  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
+    evidence_items: list[
+        Any
+    ],  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
     support_status: str,
     gate_verdicts: list[Any],
     evidence_digest: str,
@@ -849,13 +836,13 @@ def _emit_retrieval_quality_span(
     run_id: str,
 ) -> dict[str, Any] | None:
     """Emit retrieval quality span for L6 observability.
-    
+
     W6 Invariants:
     - This is observability-only data for later L6 consumption
     - L6 is strictly post-runtime; no current-run rescue path
     - No X3 disposition changes
     - All W1-W5 invariants preserved
-    
+
     Args:
         evidence_items: List of EvidenceItem from retrieval
         support_status: Final support status (PASS, UNKNOWN, etc.)
@@ -865,39 +852,32 @@ def _emit_retrieval_quality_span(
         timestamp_iso: ISO timestamp string
         trace_id: Trace identifier for span correlation
         run_id: Run identifier for span correlation
-        
+
     Returns:
         Dictionary with span data and span_ref, or None if emission fails
     """
     try:
         # Count evidence items by source type
         evidence_count = len(evidence_items)
-        
+
         # Count excluded items (items that failed metadata filter)
         excluded_count = sum(
-            1 for item in evidence_items
-            if getattr(item, "metadata_score", 0.0) == 0.0
-            and getattr(item, "dense_score", 0.0) > 0.0
+            1
+            for item in evidence_items
+            if getattr(item, "metadata_score", 0.0) == 0.0 and getattr(item, "dense_score", 0.0) > 0.0
         )
 
-        metadata_filter_hits = sum(
-            1 for item in evidence_items
-            if getattr(item, "metadata_score", 0.0) > 0.0
-        )
+        metadata_filter_hits = sum(1 for item in evidence_items if getattr(item, "metadata_score", 0.0) > 0.0)
 
-        dense_hits = sum(
-            1 for item in evidence_items
-            if getattr(item, "source_type", "") == "fact_vectors"
-        )
+        dense_hits = sum(1 for item in evidence_items if getattr(item, "source_type", "") == "fact_vectors")
 
         section_retrieval_hits = sum(
-            1 for item in evidence_items
-            if getattr(item, "retrieval_run_ref", "") == "c0_section_retrieval:v1"
+            1 for item in evidence_items if getattr(item, "retrieval_run_ref", "") == "c0_section_retrieval:v1"
         )
-        
+
         # Gate verdict count
         gate_verdict_count = len(gate_verdicts)
-        
+
         # Build span payload
         span_payload: dict[str, Any] = {
             "span_kind": "retrieval_quality",
@@ -916,10 +896,10 @@ def _emit_retrieval_quality_span(
             "final_evidence_digest": evidence_digest,
             "chroma_retrieved": chroma_retrieved,
         }
-        
+
         # Generate span ref (deterministic for replay)
         span_ref = f"span:c0:retrieval_quality:{trace_id}:{run_id}:{evidence_digest[:16]}"
-        
+
         return {
             "span_ref": span_ref,
             "payload": span_payload,
@@ -933,14 +913,16 @@ def _emit_retrieval_quality_span(
 # W4: Section Retrieval Classes
 # =============================================================================
 
+
 @dataclass
 class SectionRetrievalBudget:
     """Budget tracker for section retrieval."""
+
     max_total_items: int
     max_sections: int = 5
     items_retrieved: int = 0
     sections_queried: int = 0
-    
+
     def record_retrieval(self, count: int) -> "SectionRetrievalBudget":
         """Record items retrieved and return updated budget."""
         return SectionRetrievalBudget(
@@ -949,7 +931,7 @@ class SectionRetrievalBudget:
             items_retrieved=self.items_retrieved + count,
             sections_queried=self.sections_queried,
         )
-    
+
     def record_section_query(self) -> "SectionRetrievalBudget":
         """Record a section query and return updated budget."""
         return SectionRetrievalBudget(
@@ -958,16 +940,16 @@ class SectionRetrievalBudget:
             items_retrieved=self.items_retrieved,
             sections_queried=self.sections_queried + 1,
         )
-    
+
     def can_retrieve_more(self, count: int) -> bool:
         """Check if more items can be retrieved."""
         return self.items_retrieved + count <= self.max_total_items
-    
+
     @property
     def budget_exhausted(self) -> bool:
         """Check if item budget is exhausted."""
         return self.items_retrieved >= self.max_total_items
-    
+
     @property
     def sections_budget_exhausted(self) -> bool:
         """Check if section budget is exhausted."""
@@ -977,6 +959,7 @@ class SectionRetrievalBudget:
 @dataclass
 class SectionRetrievalResult:
     """Result of section retrieval."""
+
     section_id: str
     evidence_items: list[EvidenceItem]
     status: str
@@ -986,21 +969,22 @@ class SectionRetrievalResult:
 @dataclass
 class SectionQueryResult:
     """Container for section query result - provides evidence_items attribute."""
+
     evidence_items: list[EvidenceItem]
     budget: SectionRetrievalBudget
 
 
 class SectionRetrievalProfile:
     """Profile for section-level retrieval configuration."""
-    
+
     # Class attribute for test compatibility (tests patch this)
     PROFILE_PATH = Path("apps_rg/config/domain_contract/section_retrieval_profile.yaml")
-    
+
     def __init__(self):
         self._config: dict[str, Any] = {}
         self._sections: list[dict[str, Any]] = []
         self._load_profile()
-    
+
     def _get_profile_path(self) -> Path:
         """Get profile path - uses class PROFILE_PATH for test compatibility."""
         # First check if class PROFILE_PATH exists (for test patching)
@@ -1010,43 +994,44 @@ class SectionRetrievalProfile:
         # Fallback to module-relative path
         module_dir = Path(__file__).parent.parent.parent  # apps_rg/
         return module_dir / "config" / "domain_contract" / "section_retrieval_profile.yaml"
-    
+
     def _load_profile(self) -> None:
         """Load profile from YAML."""
         profile_path = self._get_profile_path()
         if profile_path.exists():
             import yaml
+
             with open(profile_path, encoding="utf-8") as f:
                 self._config = yaml.safe_load(f)
                 self._sections = self._config.get("sections", [])
         else:
             self._config = {"enabled": False}
             self._sections = []
-    
+
     @property
     def enabled(self) -> bool:
         return self._config.get("enabled", False)
-    
+
     @property
     def collection_name(self) -> str:
         return "fact_vectors"
-    
+
     @property
     def allowed_source_classes(self) -> list[str]:
         return ["candidate_profile", "project_evidence"]
-    
+
     @property
     def max_total_items(self) -> int:
         return self._config.get("global_constraints", {}).get("max_total_evidence_items", 15)
-    
+
     @property
     def max_sections(self) -> int:
         return self._config.get("global_constraints", {}).get("max_sections_to_query", 5)
-    
+
     @property
     def max_query_budget(self) -> int:
         return self._config.get("global_constraints", {}).get("max_query_budget_ms", 5000)
-    
+
     def get_sections(self) -> list[dict[str, Any]]:
         """Get configured sections."""
         return self._sections
@@ -1065,7 +1050,7 @@ class SectionRetrievalProfile:
             if str(row.get("section_id") or "") in (section_id, canonical):
                 return row
         return None
-    
+
     def get_sparse_defaults(self) -> dict[str, Any]:
         return dict(self._config.get("sparse_lane_defaults") or {})
 
@@ -1277,9 +1262,7 @@ def _run_section_sparse_lane(
     meta_filter: dict[str, Any] | None = None
     req = section.get("required_metadata_filters") or {}
     if isinstance(req, dict) and req:
-        meta_filter = {
-            str(k): v for k, v in req.items() if not isinstance(v, (dict, list))
-        }
+        meta_filter = {str(k): v for k, v in req.items() if not isinstance(v, (dict, list))}
     allow = section.get("source_class_allowlist") or profile.allowed_source_classes
     if allow and len(allow) == 1:
         meta_filter = dict(meta_filter or {})
@@ -1320,14 +1303,21 @@ def _perform_bounded_section_retrieval(
     chroma_collection: Any | None = None,
     *,
     section_id_filter: str | None = None,
-) -> tuple[list[EvidenceItem], list[Any], str, list[str], list[tuple[str, float]], list[SectionEvidenceTrace]]:
+) -> tuple[
+    list[EvidenceItem],
+    list[Any],
+    str,
+    list[str],
+    list[tuple[str, float]],
+    list[SectionEvidenceTrace],
+]:
     """Perform bounded section retrieval from fact_vectors.
 
     Returns: (evidence_items, gate_verdicts, status, sparse_receipt_refs,
     support_score_profile, section_traces)
     """
     profile = SectionRetrievalProfile()
-    
+
     if not profile.enabled:
         # Historical contract: disabled profile reports NOT_APPLICABLE with no gate row
         # (callers treat this as "section machinery off", not a gate failure).
@@ -1362,7 +1352,9 @@ def _perform_bounded_section_retrieval(
     if chroma_collection is None and chroma_path:
         try:
             _probe_client = _persistent_chroma_client(chroma_path)
-            from apps_rg.runtime.c0.chroma_persistent_client import ensure_apps_rg_chroma_client
+            from apps_rg.runtime.c0.chroma_persistent_client import (
+                ensure_apps_rg_chroma_client,
+            )
 
             _probe_client = ensure_apps_rg_chroma_client(chroma_path)
             _probe_client.get_collection(profile.collection_name)
@@ -1373,8 +1365,7 @@ def _perform_bounded_section_retrieval(
                 evaluated_stage="C0",
                 result=VERDICT_UNKNOWN,
                 unknown_reason=(
-                    "fact_vectors collection unavailable or chroma_path not openable "
-                    f"({profile.collection_name})"
+                    f"fact_vectors collection unavailable or chroma_path not openable ({profile.collection_name})"
                 ),
                 evaluated_at=timestamp_iso,
                 evidence_digest=evidence_digest,
@@ -1385,22 +1376,17 @@ def _perform_bounded_section_retrieval(
         assert_dense_retrieval_allowed,
         resolve_apps_rg_embedding_settings,
     )
-    from apps_rg.runtime.bge_embedding import embed_text
 
     _sec_emb = resolve_apps_rg_embedding_settings(chroma_persist_dir=chroma_path)
     assert_dense_retrieval_allowed(_sec_emb)
-    model = _get_embedding_model()
+    embedding_runtime = _get_embedding_runtime()
     # G8: embedding identity is a run-level constant; capture once for per-section traces.
     _embedding_model_id = str(getattr(_sec_emb, "embedding_model_name", "") or "")
 
     sections = profile.get_sections()
     if section_id_filter:
         canonical = profile.resolve_section_id(section_id_filter)
-        sections = [
-            s
-            for s in sections
-            if str(s.get("section_id") or "") in (section_id_filter, canonical)
-        ]
+        sections = [s for s in sections if str(s.get("section_id") or "") in (section_id_filter, canonical)]
         if not sections:
             verdict = GateVerdict(
                 gate_id="G_SECTION_RETRIEVAL",
@@ -1413,20 +1399,45 @@ def _perform_bounded_section_retrieval(
             )
             return [], [verdict], "UNKNOWN", [], [], []
 
-    for section in sections:
+    prepared_sections = [
+        (section, query)
+        for section in sections
+        if (query := profile.build_query_for_section(section, app_payload))
+    ]
+    if prepared_sections:
+        from apps_rg.runtime.bge_embedding import resolve_bge_batch_size
+
+        try:
+            query_batch_size = resolve_bge_batch_size(
+                "c02_section_queries", len(prepared_sections)
+            )
+            query_vectors = embedding_runtime.encode(
+                [query for _section, query in prepared_sections],
+                batch_size=query_batch_size,
+            )
+            if len(query_vectors) != len(prepared_sections):
+                raise RuntimeError("C0.2 section-query embedding cardinality changed")
+        except Exception as exc:  # guardian: allow-broad-exception -- preserve existing fail-soft section retrieval boundary
+            _logger.warning("Section retrieval embedding batch failed: %s", exc)
+            prepared_sections = []
+            query_vectors = []
+    else:
+        query_vectors = []
+
+    for (section, query), qemb in zip(
+        prepared_sections, query_vectors, strict=True
+    ):
         if budget.sections_budget_exhausted or budget.budget_exhausted:
             break
-
-        query = profile.build_query_for_section(section, app_payload)
-        if not query:
-            continue
 
         try:
             if chroma_collection is not None:
                 collection = chroma_collection
             else:
                 client = _persistent_chroma_client(chroma_path or "")
-                from apps_rg.runtime.c0.chroma_persistent_client import ensure_apps_rg_chroma_client
+                from apps_rg.runtime.c0.chroma_persistent_client import (
+                    ensure_apps_rg_chroma_client,
+                )
 
                 client = ensure_apps_rg_chroma_client(chroma_path or "")
                 collection = client.get_collection(profile.collection_name)
@@ -1445,10 +1456,9 @@ def _perform_bounded_section_retrieval(
                         {"app": "apps_rg"},
                         {"source_class": {"$in": allow}},
                     ],
-                }
+            }
 
             nk = int(section.get("dense_top_k", section.get("max_k", 3)))
-            qemb = embed_text(model, query)
             result = collection.query(
                 query_embeddings=[qemb],
                 n_results=min(nk, 32),
@@ -1456,9 +1466,7 @@ def _perform_bounded_section_retrieval(
             )  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
 
             # G8: raw dense hits (post-where, pre exact-match), applied filter, embedding dim.
-            _raw_hit_count = (
-                len(result["ids"][0]) if result and result.get("ids") and result["ids"] else 0
-            )
+            _raw_hit_count = len(result["ids"][0]) if result and result.get("ids") and result["ids"] else 0
             try:
                 _where_filter_str = json.dumps(where, sort_keys=True, default=str)
             except (TypeError, ValueError):
@@ -1483,8 +1491,7 @@ def _perform_bounded_section_retrieval(
                     result = broad_result
                     _raw_hit_count = len(broad_result["ids"][0])
                     _where_filter_str = (
-                        json.dumps(_broad_where, sort_keys=True, default=str)
-                        + " (G7_fallback_from_section_filter)"
+                        json.dumps(_broad_where, sort_keys=True, default=str) + " (G7_fallback_from_section_filter)"
                     )
 
             section_dense_items: list[EvidenceItem] = []
@@ -1493,27 +1500,14 @@ def _perform_bounded_section_retrieval(
                     if budget.budget_exhausted:
                         break
 
-                    metadata = (
-                        result.get("metadatas", [[{}]])[0][i]
-                        if result.get("metadatas")
-                        else {}
-                    )
-                    document = (
-                        result.get("documents", [[""]])[0][i]
-                        if result.get("documents")
-                        else ""
-                    )
-                    distance = (
-                        result.get("distances", [[0.0]])[0][i]
-                        if result.get("distances")
-                        else 0.0
-                    )
+                    metadata = result.get("metadatas", [[{}]])[0][i] if result.get("metadatas") else {}
+                    document = result.get("documents", [[""]])[0][i] if result.get("documents") else ""
+                    distance = result.get("distances", [[0.0]])[0][i] if result.get("distances") else 0.0
                     dense = max(0.0, 1.0 - float(distance))
                     sc = str(metadata.get("source_class", "candidate_profile"))
                     anchor = str(metadata.get("citation_anchor", "") or "")
                     digest = str(
-                        metadata.get("chunk_digest", "")
-                        or hashlib.sha256(document.encode("utf-8")).hexdigest()[:32]
+                        metadata.get("chunk_digest", "") or hashlib.sha256(document.encode("utf-8")).hexdigest()[:32]
                     )
                     meta_score = _metadata_match_for_chunk(metadata, app_payload)
 
@@ -1522,11 +1516,7 @@ def _perform_bounded_section_retrieval(
                         content=document,
                         source_type="fact_vectors",
                         evidence_id=f"chroma:{doc_id}",
-                        source_id=str(
-                            metadata.get("source_document_id")
-                            or metadata.get("source_id")
-                            or doc_id
-                        ),
+                        source_id=str(metadata.get("source_document_id") or metadata.get("source_id") or doc_id),
                         source_version=str(metadata.get("source_version_hash") or ""),
                         citation_anchor=anchor,
                         chunk_digest=digest,
@@ -1545,9 +1535,7 @@ def _perform_bounded_section_retrieval(
                     section_dense_items.append(item)
                     budget = budget.record_retrieval(1)
 
-            sparse_outcome = _run_section_sparse_lane(
-                section, app_payload, profile, metadata_profile
-            )
+            sparse_outcome = _run_section_sparse_lane(section, app_payload, profile, metadata_profile)
             if sparse_outcome is not None:
                 sparse_receipt_refs.append(sparse_outcome.receipt_ref)
                 sparse_cfg = profile.section_sparse_config(section)
@@ -1562,20 +1550,23 @@ def _perform_bounded_section_retrieval(
                     lex_scores = [float(it.bm25_score) for it in section_dense_items if it.bm25_score > 0.0]
                     if lex_scores:
                         support_score_profile.append(
-                            (f"sparse:{section.get('section_id', 'section')}", sum(lex_scores) / len(lex_scores))
+                            (
+                                f"sparse:{section.get('section_id', 'section')}",
+                                sum(lex_scores) / len(lex_scores),
+                            )
                         )
                 dense_scores = [float(it.dense_score) for it in section_dense_items if it.dense_score > 0.0]
                 if dense_scores:
                     support_score_profile.append(
-                        (f"dense:{section.get('section_id', 'section')}", sum(dense_scores) / len(dense_scores))
+                        (
+                            f"dense:{section.get('section_id', 'section')}",
+                            sum(dense_scores) / len(dense_scores),
+                        )
                     )
 
             exact_fields = profile.section_sparse_config(section).get("exact_match_fields") or []
             if exact_fields and section_dense_items:
-                exact_phrases = [
-                    _payload_dotget(app_payload, str(field_path))
-                    for field_path in exact_fields
-                ]
+                exact_phrases = [_payload_dotget(app_payload, str(field_path)) for field_path in exact_fields]
                 exact_phrases = [p for p in exact_phrases if isinstance(p, str) and p.strip()]
                 if exact_phrases:
                     rebuilt: list[EvidenceItem] = []
@@ -1661,7 +1652,14 @@ def _perform_bounded_section_retrieval(
         verdicts.append(verdict)
         status = "EMPTY"
 
-    return evidence_items, verdicts, status, sparse_receipt_refs, support_score_profile, section_traces
+    return (
+        evidence_items,
+        verdicts,
+        status,
+        sparse_receipt_refs,
+        support_score_profile,
+        section_traces,
+    )
 
 
 def _resolve_fec_sparse_search_refs(
@@ -1689,16 +1687,16 @@ def _query_fact_vectors_for_section(
     timestamp_iso: str = "",
 ) -> SectionQueryResult:
     """Compatibility helper for legacy metadata-filter tests.
-    
+
     Product C0.2 retrieval uses ``_perform_bounded_section_retrieval``. This
     helper remains importable for older W5 tests that assert Chroma where-clause
     behavior, but it is not part of the product C0 public surface.
     """
     items: list[EvidenceItem] = []
-    
+
     if not query_text:
         return SectionQueryResult(evidence_items=[], budget=budget)
-    
+
     try:
         mp = metadata_profile or MetadataFilterProfile()
         allow = section.get("source_class_allowlist") or [
@@ -1717,10 +1715,7 @@ def _query_fact_vectors_for_section(
                 ],
             }
 
-        from apps_rg.runtime.bge_embedding import embed_text
-
-        model = _get_embedding_model()
-        qemb = embed_text(model, query_text)
+        qemb = _get_embedding_runtime().encode([query_text], batch_size=1)[0]
         nk = int(section.get("dense_top_k", section.get("max_k", 3)))
         result = collection.query(
             query_embeddings=[qemb],
@@ -1733,21 +1728,9 @@ def _query_fact_vectors_for_section(
                 if budget.budget_exhausted:
                     break
 
-                metadata = (
-                    result.get("metadatas", [[{}]])[0][i]
-                    if result.get("metadatas")
-                    else {}
-                )
-                document = (
-                    result.get("documents", [[""]])[0][i]
-                    if result.get("documents")
-                    else ""
-                )
-                distance = (
-                    result.get("distances", [[0.0]])[0][i]
-                    if result.get("distances")
-                    else 0.0
-                )
+                metadata = result.get("metadatas", [[{}]])[0][i] if result.get("metadatas") else {}
+                document = result.get("documents", [[""]])[0][i] if result.get("documents") else ""
+                distance = result.get("distances", [[0.0]])[0][i] if result.get("distances") else 0.0
                 dense_score = max(0.0, 1.0 - float(distance))
                 meta_score = _metadata_match_for_chunk(metadata, app_payload or {})
 
@@ -1774,9 +1757,11 @@ def _query_fact_vectors_for_section(
 # W5: Metadata Filter Classes
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class MetadataFilterResult:
     """Result of metadata match checking."""
+
     matched: bool
     match_type: str  # "exact", "partial", "none"
     metadata_score: float
@@ -1787,6 +1772,7 @@ class MetadataFilterResult:
 @dataclass
 class ClaimCheckResult:
     """Result of deterministic claim checking."""
+
     verified: bool
     support_status: str
     verification_method: str
@@ -1797,25 +1783,26 @@ class ClaimCheckResult:
 
 class MetadataFilterProfile:
     """Profile for metadata filtering on fact_vectors."""
-    
+
     PROFILE_PATH = Path("apps_rg/config/domain_contract/metadata_filter_profile.yaml")
-    
+
     def __init__(self):
         self._config: dict[str, Any] = {}
         self._filterable_fields: list[dict[str, Any]] = []
         self._load_profile()
-    
+
     def _load_profile(self) -> None:
         """Load profile from YAML."""
         if self.PROFILE_PATH.exists():
             import yaml
+
             with open(self.PROFILE_PATH, encoding="utf-8") as f:
                 self._config = yaml.safe_load(f)
                 self._filterable_fields = self._config.get("filterable_fields", [])
         else:
             self._config = self._default_config()
             self._filterable_fields = self._config.get("filterable_fields", [])
-    
+
     def _default_config(self) -> dict[str, Any]:
         """Default configuration."""
         return {
@@ -1903,7 +1890,7 @@ class MetadataFilterProfile:
                 break
 
         return {"$and": filters}
-    
+
     def check_metadata_match(
         self,
         evidence_metadata: dict[str, Any],
@@ -1912,7 +1899,7 @@ class MetadataFilterProfile:
     ) -> MetadataFilterResult:
         """Check if evidence metadata matches filter criteria."""
         evidence_value = evidence_metadata.get(filter_field, "")
-        
+
         if not evidence_value:
             return MetadataFilterResult(
                 matched=False,
@@ -1921,11 +1908,11 @@ class MetadataFilterProfile:
                 field_name=filter_field,
                 filter_value=filter_value,
             )
-        
+
         # Case-insensitive comparison
         ev_str = str(evidence_value).lower().strip()
         filt_str = str(filter_value).lower().strip()
-        
+
         if ev_str == filt_str:
             return MetadataFilterResult(
                 matched=True,
@@ -1954,17 +1941,17 @@ class MetadataFilterProfile:
 
 class DeterministicClaimChecker:
     """Deterministic claim checker for structured claims."""
-    
+
     SUPPORTED_CLAIM_TYPES = [
         "employer_match",
         "certification_match",
         "year_in_range",
         "title_match",
     ]
-    
+
     def __init__(self, profile: MetadataFilterProfile):
         self.profile = profile
-    
+
     def check_claim(
         self,
         claim_type: str,
@@ -1981,7 +1968,7 @@ class DeterministicClaimChecker:
                 claim_value=claim_value,
                 reason=f"Claim type {claim_type} not supported",
             )
-        
+
         if claim_type == "employer_match":
             return self._check_employer_match(claim_value, evidence_metadata_list)
         elif claim_type == "certification_match":
@@ -1990,7 +1977,7 @@ class DeterministicClaimChecker:
             return self._check_year_range(claim_value, evidence_metadata_list)
         elif claim_type == "title_match":
             return self._check_title_match(claim_value, evidence_metadata_list)
-        
+
         return ClaimCheckResult(
             verified=False,
             support_status="UNSUPPORTED",
@@ -1998,7 +1985,7 @@ class DeterministicClaimChecker:
             claim_type=claim_type,
             claim_value=claim_value,
         )
-    
+
     def _check_employer_match(
         self,
         claim_value: str,
@@ -2025,7 +2012,7 @@ class DeterministicClaimChecker:
             claim_value=claim_value,
             reason="Employer claim not verified in evidence",
         )
-    
+
     def _check_certification_match(
         self,
         claim_value: str,
@@ -2042,7 +2029,7 @@ class DeterministicClaimChecker:
                     claim_type="certification_match",
                     claim_value=claim_value,
                 )
-        
+
         return ClaimCheckResult(
             verified=False,
             support_status="WEAK_WITH_CAVEATS",
@@ -2051,7 +2038,7 @@ class DeterministicClaimChecker:
             claim_value=claim_value,
             reason="Certification claim not verified in evidence",
         )
-    
+
     def _check_year_range(
         self,
         claim_value: str,
@@ -2070,7 +2057,7 @@ class DeterministicClaimChecker:
                 claim_value=claim_value,
                 reason="Could not parse year range",
             )
-        
+
         for evidence in evidence_list:
             evidence_year = evidence.get("year", "")
             try:
@@ -2086,7 +2073,7 @@ class DeterministicClaimChecker:
                     )
             except ValueError:
                 continue
-        
+
         return ClaimCheckResult(
             verified=False,
             support_status="PARTIAL",
@@ -2095,7 +2082,7 @@ class DeterministicClaimChecker:
             claim_value=claim_value,
             reason="Year range does not overlap with evidence",
         )
-    
+
     def _check_title_match(
         self,
         claim_value: str,
@@ -2122,7 +2109,7 @@ class DeterministicClaimChecker:
             claim_value=claim_value,
             reason="Title claim not verified in evidence",
         )
-    
+
     def _parse_year_range(self, year_str: str) -> tuple[int, int]:
         """Parse year range string into (start, end)."""
         parts = year_str.split("-")
@@ -2135,7 +2122,7 @@ class DeterministicClaimChecker:
             return (start, end)
         else:
             raise ValueError(f"Invalid year range: {year_str}")
-    
+
     def check_all_claims(
         self,
         claims: list[tuple[str, str]],
@@ -2152,6 +2139,7 @@ class DeterministicClaimChecker:
 # ---------------------------------------------------------------------------
 # _compute_support_status — derives support_status from evidence items
 # ---------------------------------------------------------------------------
+
 
 def _compute_support_status(
     evidence_items: list,
@@ -2244,6 +2232,7 @@ __all__ = [
     "EvidenceItem",
     "c0_retrieve_apps_rg",
     "_build_gate_verdict",
+    "_get_embedding_runtime",
     "_get_embedding_model",
     "_NORMATIVE_SOURCE_CLASSES",
     "_NORMATIVE_SOURCE_CLASSES_HARDCODED",

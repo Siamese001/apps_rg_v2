@@ -30,9 +30,7 @@ def test_c0_binding_imports_without_prior_apps_rg_module_ordering() -> None:
     repo_root = src_root.parent
     env = dict(os.environ)
     prior_pythonpath = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = os.pathsep.join(
-        part for part in (str(src_root), str(repo_root), prior_pythonpath) if part
-    )
+    env["PYTHONPATH"] = os.pathsep.join(part for part in (str(src_root), str(repo_root), prior_pythonpath) if part)
     result = subprocess.run(
         [
             sys.executable,
@@ -56,9 +54,7 @@ class _FakeProfile:
     max_sections = 5
 
     def get_sections(self):
-        return [
-            {"section_id": "competencies", "source_class_allowlist": ["candidate_profile"], "dense_top_k": 3}
-        ]
+        return [{"section_id": "competencies", "source_class_allowlist": ["candidate_profile"], "dense_top_k": 3}]
 
     def resolve_section_id(self, section_id):
         return section_id
@@ -97,12 +93,16 @@ class _TwoCallCollection:
             return {"ids": [[]], "metadatas": [[]], "documents": [[]], "distances": [[]]}
         return {
             "ids": [["doc1"]],
-            "metadatas": [[{
-                "source_class": "candidate_profile",
-                "citation_anchor": "anchor1",
-                "chunk_digest": "digest1",
-                "source_document_id": "src1",
-            }]],
+            "metadatas": [
+                [
+                    {
+                        "source_class": "candidate_profile",
+                        "citation_anchor": "anchor1",
+                        "chunk_digest": "digest1",
+                        "source_document_id": "src1",
+                    }
+                ]
+            ],
             "documents": [["broad fallback evidence text"]],
             "distances": [[0.2]],
         }
@@ -112,7 +112,11 @@ class _TwoCallCollection:
 def _isolated(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(c0_binding, "SectionRetrievalProfile", _FakeProfile)
     monkeypatch.setattr(c0_binding, "MetadataFilterProfile", _FakeMetaProfile)
-    monkeypatch.setattr(c0_binding, "_get_embedding_model", lambda: object())
+    monkeypatch.setattr(
+        c0_binding,
+        "_get_embedding_runtime",
+        lambda: SimpleNamespace(encode=lambda texts, batch_size: [[0.1] * 1024 for _text in texts]),
+    )
     monkeypatch.setattr(c0_binding, "_run_section_sparse_lane", lambda *a, **k: None)
     # The standalone source baseline intentionally excludes the monorepo-only
     # ``tools.ingestion`` package.  Install a fixture-scoped import shim so this
