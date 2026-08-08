@@ -691,116 +691,31 @@ def _pin_matches_requested_run(sec_dir: Path, expected_run_id: str) -> tuple[boo
 
 
 def _assemble_from_pinned_dirs(repo_root: Path, artifact_dir: str) -> int:
-    """Stitch artifacts/apps_rg/_pinned/<section>/ outputs into a single markdown resume.
+    """Refuse retired mutable-section assembly.
 
-    Each pinned dir is the result of ``--section <id> --attempts N --pin`` accepting at
-    REAL_LLM with --accept allow|review. Assembly is mechanical: read the section's
-    canonical text artifact, drop empty/missing sections with a clear note, write the
-    combined markdown plus a small status JSON. A pin is only consumable by the same
-    integrated ``full_resume_<id>`` run that produced it; this prevents a section from a
-    prior run/day from being silently stitched into a fresh E2E run after API issues.
-    The assembled status stays blocked until every expected pinned section is present,
-    so a partial pin set can be inspected but never mislabeled as a finished 11/11.
-    No re-validation of X2/X3 — the pin already encoded the disposition.
+    A mutable shared pin directory cannot prove that its texts are bound to a
+    product terminal manifest. Product assembly is therefore available only
+    through the sealed whole-run output path.
     """
-    pin_root = repo_root / "artifacts" / "apps_rg" / "_pinned"
     out_dir = (
         Path(artifact_dir)
         if str(artifact_dir or "").strip()
         else (repo_root / "artifacts" / "apps_rg" / "_pinned" / "_assembled")
     )
     _wg.ensure_dir(out_dir)
-    expected_run_id = _integrated_run_id_for_path(out_dir)
-    md_lines: list[str] = []
     status: dict[str, Any] = {
         "sections": {},
-        "missing": [],
-        "invalid_pins": [],
         "assembled_at": out_dir.as_posix(),
-        "expected_integrated_run_id": expected_run_id,
-        "same_e2e_run_required": True,
+        "status": "blocked",
+        "complete": False,
+        "reason": "mutable_section_pins_retired",
+        "replacement": "sealed_whole_run_terminal_manifest",
     }
-    if not expected_run_id:
-        status["status"] = "blocked"
-        status["reason"] = "missing_e2e_run_context"
-        status_path = out_dir / "assemble_status.json"
-        _wg.write_text(status_path, json.dumps(status, indent=2), encoding="utf-8")
-        print(
-            "PIN_ASSEMBLY_REFUSED reason=missing_e2e_run_context "
-            "artifact_dir_must_be_inside_full_resume_run",
-            file=sys.stderr,
-            flush=True,
-        )
-        print(f"assemble_status={status_path.as_posix()}", flush=True)
-        return 5
-    for section_id, fname, label in _PINNED_SECTION_TEXT_FILES:
-        sec_dir = pin_root / section_id
-        text_path = sec_dir / fname
-        x3_path = sec_dir / "x3_disposition.json"
-        x3_code = ""
-        if x3_path.is_file():
-            try:
-                x3_code = str(json.loads(x3_path.read_text(encoding="utf-8")).get("x3_code") or "")
-            except (json.JSONDecodeError, OSError):
-                x3_code = "UNREADABLE"
-        if not text_path.is_file():
-            status["missing"].append(section_id)
-            status["sections"][section_id] = {"present": False, "x3": x3_code}
-            md_lines.append(f"## {label}\n\n_(no pinned artifact for `{section_id}`)_\n")
-            continue
-        pin_ok, pin_reason, pin_manifest = _pin_matches_requested_run(sec_dir, expected_run_id)
-        if not pin_ok:
-            status["invalid_pins"].append(section_id)
-            status["sections"][section_id] = {
-                "present": True,
-                "usable": False,
-                "x3": x3_code,
-                "source": text_path.as_posix(),
-                "pin_reason": pin_reason,
-                "pin_manifest": pin_manifest,
-            }
-            md_lines.append(
-                f"## {label}\n\n_(pinned artifact for `{section_id}` refused: {pin_reason})_\n"
-            )
-            continue
-        body = text_path.read_text(encoding="utf-8").strip()
-        status["sections"][section_id] = {
-            "present": True,
-            "usable": True,
-            "x3": x3_code,
-            "source": text_path.as_posix(),
-            "chars": len(body),
-            "pin_reason": pin_reason,
-        }
-        md_lines.append(f"## {label}\n\n{body}\n")
-    md = "# Resume (assembled from pinned sections)\n\n" + "\n".join(md_lines)
-    md_path = out_dir / "resume_assembled.md"
-    _wg.write_text(md_path, md, encoding="utf-8")
     status_path = out_dir / "assemble_status.json"
-    complete = not status["missing"] and not status["invalid_pins"]
-    status["complete"] = complete
-    if complete:
-        status["status"] = "assembled"
-    else:
-        status["status"] = "blocked"
-        status["reason"] = (
-            "invalid_section_pin_set"
-            if status["invalid_pins"]
-            else "incomplete_section_pin_set"
-        )
     _wg.write_text(status_path, json.dumps(status, indent=2), encoding="utf-8")
-    print(f"ASSEMBLED resume_md={md_path.as_posix()}", flush=True)
-    print(f"ASSEMBLE_STATUS missing={','.join(status['missing']) or 'none'}", flush=True)
-    if status["invalid_pins"]:
-        print(
-            f"ASSEMBLE_INVALID_PINS sections={','.join(status['invalid_pins'])}",
-            file=sys.stderr,
-            flush=True,
-        )
+    print("PIN_ASSEMBLY_REFUSED reason=mutable_section_pins_retired", file=sys.stderr, flush=True)
     print(f"assemble_status={status_path.as_posix()}", flush=True)
-    if status["invalid_pins"]:
-        return 5
-    return 0 if not status["missing"] else 4
+    return 5
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -962,12 +877,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--pin",
         action="store_true",
-        help="On accepting attempt, copy the artifact dir to artifacts/apps_rg/_pinned/<section>/.",
+        help="Retired: mutable section pins cannot be used for product assembly.",
     )
     p.add_argument(
         "--assemble-from-pinned",
         action="store_true",
-        help="Stitch artifacts/apps_rg/_pinned/<section>/ outputs into a single resume markdown and exit.",
+        help="Retired: product output must come from a sealed whole-run terminal manifest.",
     )
     # W7.1 patch-run mode: re-dispatch ONLY failed lanes of an existing integrated run
     # dir, then re-run the same aggregation/evidence chain. Inputs are re-derived from
@@ -1035,6 +950,13 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
             repo_root=find_repo_root(),
             artifact_dir=str(getattr(args, "artifact_dir", "") or ""),
         )
+    if bool(getattr(args, "pin", False)):
+        print(
+            "ERROR: --pin is retired; mutable section pins cannot produce a product artifact.",
+            file=sys.stderr,
+            flush=True,
+        )
+        return 2
     if getattr(args, "executive_summary", False):
         args.section = "executive_summary"
     if getattr(args, "unify_bullets", False):
@@ -1075,6 +997,14 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         return run_patch_from_cli(args)
 
     fresh_e2e = bool(getattr(args, "fresh_e2e", False))
+    if not fresh_e2e and not section_eff:
+        print(
+            "ERROR: whole-resume product runs require --fresh-e2e; "
+            "legacy compatibility paths cannot produce a product result.",
+            file=sys.stderr,
+            flush=True,
+        )
+        return 2
     if fresh_e2e:
         fresh_e2e_receipt = _prepare_fresh_e2e_run(
             _repo_root,

@@ -3,11 +3,13 @@ from __future__ import annotations
 import hashlib
 import json
 import runpy
+import subprocess
 import sys
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+import pytest
 from jsonschema import Draft202012Validator
 
 from apps_rg.evals.authoritative.artifacts import (
@@ -416,6 +418,7 @@ def test_grounding_resolves_source_bytes_and_rejects_self_resealed_fiction(tmp_p
         expected_authority_file_sha256=authority_sha,
     )
     assert blocked["status"] == "UNKNOWN"
+
     assert "PINNED_RECORD_DIFFERS_FROM_EXTERNAL_DIGEST" in blocked["unknown_reasons"]
 
 
@@ -598,6 +601,29 @@ def test_repeatability_requires_actual_controller_receipts(tmp_path: Path) -> No
         "legitimate_omission_vs_escalation": "GENERATE",
     }
     assert scenario_registry_digest()
+    workdir = tmp_path / "controller-workdir"
+    workdir.mkdir()
+    subprocess.run(["git", "-C", str(workdir), "init"], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(workdir), "config", "user.email", "tests@example.invalid"],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(workdir), "config", "user.name", "Apps RG tests"],
+        check=True,
+        capture_output=True,
+    )
+    (workdir / "controller-source.txt").write_text("controller source\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(workdir), "add", "."], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(workdir), "commit", "-m", "controller source"],
+        check=True,
+        capture_output=True,
+    )
+    source_commit = subprocess.check_output(
+        ["git", "-C", str(workdir), "rev-parse", "HEAD"], text=True
+    ).strip()
     scenarios = []
     for scenario_id, disposition in expected.items():
         input_path = tmp_path / f"{scenario_id}.json"
@@ -607,7 +633,7 @@ def test_repeatability_requires_actual_controller_receipts(tmp_path: Path) -> No
                 "scenario_id": scenario_id,
                 "input_path": str(input_path),
                 "command": [sys.executable, str(_RUNTIME_STUB)],
-                "workdir": str(tmp_path),
+                "workdir": str(workdir),
                 "execution_count": 3,
             }
         )
@@ -616,7 +642,7 @@ def test_repeatability_requires_actual_controller_receipts(tmp_path: Path) -> No
             "schema_version": PLAN_SCHEMA,
             "evaluation_id": "controller-test",
             "controller_id": "controller://pytest",
-            "source_commit": "1" * 40,
+            "source_commit": source_commit,
             "timeout_seconds": 30,
             "scenarios": scenarios,
         }
@@ -646,7 +672,7 @@ def test_repeatability_requires_actual_controller_receipts(tmp_path: Path) -> No
         expected_controller_manifest_digest=controller["record_digest"],
         stability_policy=policy,
         expected_stability_policy_digest=policy["record_digest"],
-        expected_source_commit="1" * 40,
+        expected_source_commit=source_commit,
     )
     assert receipt["status"] == "PASS"
     forged = deepcopy(controller)
@@ -658,9 +684,25 @@ def test_repeatability_requires_actual_controller_receipts(tmp_path: Path) -> No
         expected_controller_manifest_digest=controller["record_digest"],
         stability_policy=policy,
         expected_stability_policy_digest=policy["record_digest"],
-        expected_source_commit="1" * 40,
+        expected_source_commit=source_commit,
     )
     assert blocked["status"] == "UNKNOWN"
+
+    wrong_source = seal_record(
+        {
+            **{key: value for key, value in plan.items() if key != "record_digest"},
+            "source_commit": "0" * 40,
+        }
+    )
+    with pytest.raises(
+        RuntimeError, match="HEAD does not match declared source_commit"
+    ):
+        execute_controller_plan(
+            wrong_source,
+            output_root=tmp_path / "wrong-source-output",
+            expected_plan_digest=wrong_source["record_digest"],
+        )
+    assert not (tmp_path / "wrong-source-output").exists()
 
 
 def test_evaluator_validity_uses_authorized_human_criterion_labels(tmp_path: Path) -> None:

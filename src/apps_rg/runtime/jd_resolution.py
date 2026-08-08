@@ -13,24 +13,11 @@ import logging
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
-from urllib.request import Request, urlopen
 
 logger = logging.getLogger(__name__)
 
 # Extensions allowed for local JD artifacts (lowercased suffixes).
 ALLOWED_JD_SUFFIXES: frozenset[str] = frozenset({".txt", ".md", ".json", ".yaml", ".yml", ".markdown"})
-
-_ALLOWED_MIME_PREFIXES: tuple[str, ...] = ("text/",)
-_ALLOWED_MIME_EXACT: frozenset[str] = frozenset(
-    {
-        "application/json",
-        "application/yaml",
-        "application/x-yaml",
-    }
-)
-_URI_FETCH_MAX_BYTES = 2_000_000
 
 _DEFAULT_FILE = Path(__file__).resolve().parent.parent / "config" / "default_jd_targeting.txt"
 DEFAULT_JD_TARGETING_PATH: Path = _DEFAULT_FILE
@@ -160,34 +147,11 @@ def _looks_like_filesystem_ref(ref: str) -> bool:
     return any(low.endswith(s) for s in ALLOWED_JD_SUFFIXES)
 
 
-def _mime_allowed(ctype: str | None, *, url_path: str) -> bool:
-    if ctype:
-        primary = ctype.split(";")[0].strip().lower()
-        if primary in _ALLOWED_MIME_EXACT:
-            return True
-        if primary.startswith(_ALLOWED_MIME_PREFIXES):
-            return True
-    p = Path(urlparse(url_path).path or "")
-    return p.suffix.lower() in ALLOWED_JD_SUFFIXES
-
-
 def _fetch_uri(ref: str) -> tuple[str, str | None]:
-    req = Request(ref, headers={"User-Agent": "apps_rg-jd/1"})
-    with urlopen(req, timeout=45) as resp:  # noqa: S310 — intentional user-supplied JD URL
-        raw_ct = resp.headers.get("Content-Type")
-        ctype = raw_ct.split(";")[0].strip().lower() if raw_ct else None
-        if not _mime_allowed(ctype, url_path=ref):
-            raise JdResolutionError(
-                f"job description URI content-type not allowed (got {ctype!r} for {ref!r})"
-            )
-        raw = resp.read(_URI_FETCH_MAX_BYTES + 1)
-    if len(raw) > _URI_FETCH_MAX_BYTES:
-        raise JdResolutionError(f"job description URI response exceeds {_URI_FETCH_MAX_BYTES} bytes")
-    try:
-        text = raw.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        raise JdResolutionError(f"job description URI body is not valid utf-8: {ref!r}") from exc
-    return text, ctype
+    raise JdResolutionError(
+        "remote job description references are not supported; submit captured text "
+        "through the governed input bundle"
+    )
 
 
 def _load_ref_body(ref: str) -> tuple[str, str]:

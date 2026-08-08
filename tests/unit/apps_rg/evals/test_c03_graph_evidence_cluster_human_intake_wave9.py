@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import hmac
 import json
 from pathlib import Path
 
@@ -36,6 +37,7 @@ from apps_rg.fact_inventory.c03_graph_node_semantic_hardening import (
 )
 
 ROOT = Path(__file__).resolve().parents[4]
+AUTHORITY_SIGNING_SECRET = "test-w9-authority-signing-secret-0123456789"
 
 
 def _load(relative: Path | str) -> dict:
@@ -91,8 +93,7 @@ def _authority(
                 "qualification_ref": "cluster-relevance://qualified-human",
             }
         )
-    return _seal(
-        {
+    authority = {
             "schema_version": HUMAN_AUTHORITY_SCHEMA_VERSION,
             "authority_mode": "TRUSTED_HUMAN_ROSTER_APPROVAL",
             "official_authority_eligible": True,
@@ -109,9 +110,18 @@ def _authority(
             "issued_at": "2026-08-02T22:00:00Z",
             "authorized_participants": participants,
             "unknown_is_pass": False,
-        },
-        "receipt_digest",
-    )
+    }
+    signature_payload = json.dumps(
+        authority, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    authority["external_signature"] = {
+        "algorithm": "HMAC-SHA256",
+        "key_id": "c03-w9-human-authority-v1",
+        "signature": hmac.new(
+            AUTHORITY_SIGNING_SECRET.encode("utf-8"), signature_payload, hashlib.sha256
+        ).hexdigest(),
+    }
+    return _seal(authority, "receipt_digest")
 
 
 def _grade(cluster_id: str) -> int:
@@ -248,7 +258,8 @@ def _adjudication_bundle(
 
 
 @pytest.fixture
-def complete_inputs() -> dict:
+def complete_inputs(monkeypatch: pytest.MonkeyPatch) -> dict:
+    monkeypatch.setenv("APPS_RG_C03_W9_AUTHORITY_HMAC_KEY", AUTHORITY_SIGNING_SECRET)
     query_manifest = _load(QUERY_MANIFEST_PATH)
     registry = _load(REGISTRY_PATH)
     w8 = _load(W8_RECEIPT_PATH)
@@ -400,6 +411,47 @@ def test_nonhuman_or_unpinned_authority_is_rejected(complete_inputs: dict) -> No
 
     assert "AUTHORITY_EXTERNAL_FILE_PIN" in issues
     assert any(issue.startswith("AUTHORITY_NON_HUMAN") for issue in issues)
+
+
+def test_authority_signature_cannot_be_replaced_with_a_self_consistent_digest(
+    complete_inputs: dict,
+) -> None:
+    values = copy.deepcopy(complete_inputs)
+    values["authority"]["authorized_participants"][0]["identity_ref"] = (
+        "human-reviewer://forged-reviewer"
+    )
+    values["authority"]["authorized_participants"][0]["identity_hash"] = hashlib.sha256(
+        b"human-reviewer://forged-reviewer"
+    ).hexdigest()
+    values["authority"]["receipt_digest"] = canonical_sha256(
+        {key: value for key, value in values["authority"].items() if key != "receipt_digest"}
+    )
+
+    issues, _ = collect_human_authority_issues(
+        values["authority"],
+        w8_receipt=values["w8"],
+        packet_manifest=values["packet_manifest"],
+        trusted_file_sha256=values["authority_file_sha"],
+        observed_file_sha256=values["authority_file_sha"],
+    )
+
+    assert "AUTHORITY_EXTERNAL_SIGNATURE_INVALID" in issues
+
+
+def test_authority_requires_owner_held_signing_key(
+    complete_inputs: dict, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("APPS_RG_C03_W9_AUTHORITY_HMAC_KEY")
+
+    issues, _ = collect_human_authority_issues(
+        complete_inputs["authority"],
+        w8_receipt=complete_inputs["w8"],
+        packet_manifest=complete_inputs["packet_manifest"],
+        trusted_file_sha256=complete_inputs["authority_file_sha"],
+        observed_file_sha256=complete_inputs["authority_file_sha"],
+    )
+
+    assert "AUTHORITY_EXTERNAL_SIGNING_KEY_UNAVAILABLE" in issues
 
 
 def test_w9_blocked_receipt_is_readiness_not_human_evidence() -> None:

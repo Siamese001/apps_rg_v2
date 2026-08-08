@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from apps_rg.runtime.runtime_proof_layout import (
-    allocate_full_resume_artifact_dir,
+    allocate_product_full_resume_artifact_dir,
     find_repo_root,
 )
 
@@ -38,6 +38,22 @@ def _non_fresh_artifact_dir_result(artifact_dir: Path) -> dict[str, Any]:
     }
 
 
+def _unsafe_artifact_dir_result(*, detail: str) -> dict[str, Any]:
+    return {
+        "exit_status": "error",
+        "execution_status": "failed",
+        "outcome_authorized": False,
+        "product_authorized": False,
+        "pipeline_complete": False,
+        "observability_repair_required": False,
+        "completion_status": "BLOCKED",
+        "fault": "PRODUCT_ARTIFACT_DIR_UNSAFE",
+        "completion_fault": "PRODUCT_ARTIFACT_DIR_UNSAFE",
+        "artifact_dir_detail": detail,
+        "authority_contract_id": "apps_research_rg_e2e_authority",
+    }
+
+
 def _runtime_dependency_blocked_result(
     *, artifact_dir: Path, dependency_receipt_path: Path, dependency_receipt: dict[str, Any]
 ) -> dict[str, Any]:
@@ -61,6 +77,23 @@ def _runtime_dependency_blocked_result(
     }
 
 
+def _input_bundle_blocked_result(*, artifact_dir: Path, detail: str) -> dict[str, Any]:
+    return {
+        "exit_status": "error",
+        "execution_status": "failed",
+        "outcome_authorized": False,
+        "product_authorized": False,
+        "pipeline_complete": False,
+        "observability_repair_required": False,
+        "completion_status": "BLOCKED",
+        "fault": "PRODUCT_INPUT_REFERENCE_REJECTED",
+        "completion_fault": "PRODUCT_INPUT_REFERENCE_REJECTED",
+        "input_validation_detail": detail,
+        "artifact_dir": str(artifact_dir),
+        "authority_contract_id": "apps_research_rg_e2e_authority",
+    }
+
+
 def run_product_whole_run_from_primitives(
     *,
     target_company: str,
@@ -78,10 +111,31 @@ def run_product_whole_run_from_primitives(
     """Run preflight and the only product-authorizing whole-run orchestrator."""
 
     repo = find_repo_root()
-    art = allocate_full_resume_artifact_dir(repo, artifact_dir)
+    try:
+        art = allocate_product_full_resume_artifact_dir(repo, artifact_dir)
+    except ValueError as exc:
+        return _unsafe_artifact_dir_result(detail=str(exc))
     if art.exists() and any(art.iterdir()):
         return _non_fresh_artifact_dir_result(art)
     art.mkdir(parents=True, exist_ok=True)
+
+    from apps_rg.runtime.immutable_input_bundle import (
+        ProductInputBundleError,
+        freeze_product_inputs,
+    )
+
+    try:
+        inputs = freeze_product_inputs(
+            artifact_dir=art,
+            source_resume_text=source_resume_text,
+            source_resume_ref=resume_path,
+            jd=jd,
+            job_description_text=job_description_text,
+            job_description_ref=job_description_ref,
+            manual_brief=manual_brief,
+        )
+    except ProductInputBundleError as exc:
+        return _input_bundle_blocked_result(artifact_dir=art, detail=str(exc))
 
     from apps_rg.runtime.standalone_dependency_posture import (
         EXTERNAL_RUNTIME_BOUND,
@@ -95,11 +149,14 @@ def run_product_whole_run_from_primitives(
         receipt=dependency_receipt,
     )
     if dependency_receipt.get("status") != EXTERNAL_RUNTIME_BOUND:
-        return _runtime_dependency_blocked_result(
+        result = _runtime_dependency_blocked_result(
             artifact_dir=art,
             dependency_receipt_path=dependency_receipt_path,
             dependency_receipt=dependency_receipt,
         )
+        result["validated_input_bundle_ref"] = str(inputs.manifest_path)
+        result["validated_input_bundle_digest"] = inputs.digest
+        return result
 
     from apps_rg.runtime.e2e_preflight import (
         E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME,
@@ -122,6 +179,8 @@ def run_product_whole_run_from_primitives(
         result.setdefault("pipeline_complete", False)
         result.setdefault("observability_repair_required", False)
         result["authority_contract_id"] = "apps_research_rg_e2e_authority"
+        result["validated_input_bundle_ref"] = str(inputs.manifest_path)
+        result["validated_input_bundle_digest"] = inputs.digest
         return result
 
     from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
@@ -136,14 +195,16 @@ def run_product_whole_run_from_primitives(
             target_company=target_company,
             target_role=target_role,
             target_level=target_level,
-            jd=jd,
-            job_description_ref=job_description_ref,
-            job_description_text=job_description_text,
-            manual_brief=manual_brief,
-            resume_path=resume_path,
-            source_resume_text=source_resume_text,
+            jd=inputs.job_description_text,
+            job_description_ref="",
+            job_description_text=inputs.job_description_text,
+            manual_brief=inputs.manual_brief_ref,
+            resume_path="",
+            source_resume_text=inputs.source_resume_text,
             generation_mode=generation_mode,
             artifact_dir=str(art),
+            validated_input_bundle_ref=str(inputs.manifest_path),
+            validated_input_bundle_digest=inputs.digest,
             preflight_continuation_ref=str(
                 art / E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME
             ),
@@ -155,6 +216,8 @@ def run_product_whole_run_from_primitives(
         else:
             os.environ[envelope_env] = prior_envelope
     result["authority_contract_id"] = "apps_research_rg_e2e_authority"
+    result["validated_input_bundle_ref"] = str(inputs.manifest_path)
+    result["validated_input_bundle_digest"] = inputs.digest
     return result
 
 

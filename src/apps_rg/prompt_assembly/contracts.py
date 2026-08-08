@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -100,9 +101,21 @@ class EvidenceSource:
     source_tag: str = ""  # XML-style tag for fencing
     
     def to_tagged(self) -> str:
-        """Render as tagged content block."""
+        """Render external evidence in an escaped, non-executable data fence."""
         tag = self.source_tag or f"{self.source_type}"
-        return f"<{tag} confidence=\"{self.confidence}\">\n{self.content}\n</{tag}>"
+        if not tag.replace("_", "").isalnum():
+            raise PromptAssemblyError(
+                code="INVALID_EVIDENCE_TAG",
+                message=f"Evidence tag is not safe to render: {tag!r}",
+                slot_id="C0",
+            )
+        source = html.escape(str(self.source_type), quote=True)
+        escaped = html.escape(str(self.content), quote=False)
+        return (
+            f'<untrusted_data source="{source}">\n'
+            f'<{tag} confidence="{self.confidence}">\n{escaped}\n</{tag}>\n'
+            "</untrusted_data>"
+        )
 
 
 @dataclass

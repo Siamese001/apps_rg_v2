@@ -23,7 +23,10 @@ def _utc_now() -> str:
 
 def default_store_root(repo_root: Path | None = None) -> Path:
     env = os.environ.get("APPS_RG_R1B_CACHE_ROOT", "").strip()
-    if env:
+    # A product whole-run never accepts a caller-controlled cache-root
+    # override. Unit and offline harnesses may still isolate their fixtures.
+    product_envelope = os.environ.get("APPS_RG_WHOLE_RUN_ENVELOPE", "").strip().lower()
+    if env and product_envelope not in {"1", "true", "yes"}:
         p = Path(env)
         return p if p.is_absolute() else (Path.cwd() / p).resolve()
     root = repo_root or _find_repo_root()

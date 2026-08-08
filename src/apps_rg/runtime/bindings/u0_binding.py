@@ -194,7 +194,6 @@ def u0_validate_apps_rg(
     )
     from apps_rg.runtime.bindings.u0_rejection import (
         AppsRgIngressReasonCode,
-        AppsRgU0RejectedError,
         build_u0_rejected_notice,
     )
 
@@ -340,45 +339,11 @@ def u0_validate_apps_rg(
         l1_planning_profile_ref,
     )
 
-    existing_pm = dict(app_payload.get("profile_manifest") or {})
     l1_digest = l1_planning_profile_digest(allow_missing=allow_missing_profiles)
     profile_manifest: dict[str, Any] = {
-        **existing_pm,
         **pkg_ingest.profile_manifest_refs,
         "l1_planning_profile_ref": l1_planning_profile_ref(),
         "l1_planning_profile_digest": l1_digest,
-        "prompt_registry_ref": existing_pm.get(
-            "prompt_registry_ref",
-            pkg_ingest.profile_manifest_refs.get(
-                "prompt_registry_ref", _DEFAULT_PROMPT_REGISTRY_REF
-            ),
-        ),
-        "hitl_policy_ref": existing_pm.get(
-            "hitl_policy_ref",
-            pkg_ingest.profile_manifest_refs.get(
-                "hitl_policy_ref", _DEFAULT_HITL_POLICY_REF
-            ),
-        ),
-        "l0_policy_ref": existing_pm.get(
-            "l0_policy_ref",
-            pkg_ingest.profile_manifest_refs.get("l0_policy_ref", _DEFAULT_L0_POLICY_REF),
-        ),
-        "agent_spec_ref": existing_pm.get(
-            "agent_spec_ref",
-            pkg_ingest.profile_manifest_refs.get(
-                "agent_spec_ref", _DEFAULT_AGENT_SPEC_REF
-            ),
-        ),
-        "thresholds_ref": existing_pm.get(
-            "thresholds_ref",
-            pkg_ingest.profile_manifest_refs.get("thresholds_ref", _DEFAULT_THRESHOLDS_REF),
-        ),
-        "l5_governance_profile_ref": existing_pm.get(
-            "l5_governance_profile_ref",
-            pkg_ingest.profile_manifest_refs.get(
-                "l5_governance_profile_ref", _DEFAULT_L5_GOVERNANCE_PROFILE_REF
-            ),
-        ),
     }
     if "manifest_digest" not in profile_manifest or not profile_manifest["manifest_digest"]:
         profile_manifest["manifest_digest"] = hashlib.sha256(
@@ -460,6 +425,10 @@ def u0_validate_apps_rg(
         "task_class": APPS_RG_TASK_CLASS,
         "cert_ref": APPS_RG_U0_CERT_REF,
         "profile_manifest": profile_manifest,
+        "validated_input_bundle": {
+            "ref": str(app_payload.get("validated_input_bundle_ref") or ""),
+            "digest": str(app_payload.get("validated_input_bundle_digest") or ""),
+        },
         "task_spec": {
             "generation_mode": generation_mode,
             "task_class": APPS_RG_TASK_CLASS,

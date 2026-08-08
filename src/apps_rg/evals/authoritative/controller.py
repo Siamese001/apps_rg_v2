@@ -67,6 +67,50 @@ def _command_tokens(command: Sequence[str], *, input_path: Path, output_path: Pa
     ]
 
 
+def _git_value(workdir: Path, *arguments: str) -> str:
+    """Return one Git value from the exact checkout that will run the command."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(workdir), *arguments],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise ControllerExecutionError(
+            f"unable to inspect controller workdir Git identity: {type(exc).__name__}"
+        ) from exc
+    if completed.returncode != 0:
+        raise ControllerExecutionError("controller workdir is not a readable Git checkout")
+    return completed.stdout.strip()
+
+
+def _verified_workdir_identity(workdir: Path, *, source_commit: str) -> dict[str, str]:
+    """Prove that the process will execute the plan's exact clean source tree."""
+
+    head_commit = _git_value(workdir, "rev-parse", "HEAD")
+    if head_commit != source_commit:
+        raise ControllerExecutionError(
+            "controller workdir HEAD does not match declared source_commit"
+        )
+    expected_tree = _git_value(workdir, "rev-parse", f"{source_commit}^{{tree}}")
+    head_tree = _git_value(workdir, "rev-parse", "HEAD^{tree}")
+    tracked_changes = _git_value(workdir, "status", "--porcelain", "--untracked-files=no")
+    if head_tree != expected_tree:
+        raise ControllerExecutionError(
+            "controller workdir tree does not match declared source_commit"
+        )
+    if tracked_changes:
+        raise ControllerExecutionError("controller workdir has tracked source changes")
+    return {
+        "source_commit": head_commit,
+        "source_tree": head_tree,
+        "workdir": str(workdir),
+    }
+
+
 def execute_controller_plan(
     plan: Any,
     *,
@@ -101,9 +145,7 @@ def execute_controller_plan(
         raise ControllerExecutionError("controller identity, source commit, or timeout is invalid")
     if path_has_symlink_component(output_root.parent):
         raise ControllerExecutionError("controller output root must not use a symlink alias")
-    output_root.mkdir(parents=True, exist_ok=False)
-    scenario_rows: list[dict[str, Any]] = []
-    execution_receipts: list[dict[str, Any]] = []
+    validated_scenarios: list[tuple[Mapping[str, Any], Path, Path, dict[str, str]]] = []
     observed_scenario_ids: set[str] = set()
     for scenario in scenarios:
         if not isinstance(scenario, Mapping):
@@ -131,6 +173,23 @@ def execute_controller_plan(
         ):
             raise ControllerExecutionError(f"invalid controller scenario: {scenario_id}")
         observed_scenario_ids.add(scenario_id)
+        validated_scenarios.append(
+            (scenario, input_path, workdir, _verified_workdir_identity(workdir, source_commit=source_commit))
+        )
+
+    source_trees = {identity["source_tree"] for _, _, _, identity in validated_scenarios}
+    if len(source_trees) != 1:
+        raise ControllerExecutionError("controller scenarios resolve to different source trees")
+    source_tree = next(iter(source_trees))
+    output_root.mkdir(parents=True, exist_ok=False)
+    scenario_rows: list[dict[str, Any]] = []
+    execution_receipts: list[dict[str, Any]] = []
+    for scenario, input_path, workdir, identity in validated_scenarios:
+        scenario_id = str(scenario.get("scenario_id") or "")
+        command = scenario.get("command")
+        execution_count = scenario.get("execution_count")
+        assert isinstance(command, list)
+        assert isinstance(execution_count, int)
         input_digest = _file_sha256(input_path)
         runs: list[dict[str, Any]] = []
         for index in range(execution_count):
@@ -197,6 +256,8 @@ def execute_controller_plan(
                     "execution_id": execution_id,
                     "scenario_id": scenario_id,
                     "source_commit": source_commit,
+                    "source_tree": identity["source_tree"],
+                    "workdir": identity["workdir"],
                     "input_file_sha256": input_digest,
                     "command_digest": canonical_digest(tokens),
                     "started_at": started_at,
@@ -236,6 +297,7 @@ def execute_controller_plan(
             "evaluation_id": evaluation_id,
             "controller_id": controller_id,
             "source_commit": source_commit,
+            "source_tree": source_tree,
             "controller_plan_digest": expected_plan_digest,
             "runtime_invoked": True,
             "execution_receipts": execution_receipts,

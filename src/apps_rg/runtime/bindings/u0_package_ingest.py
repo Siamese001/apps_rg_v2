@@ -21,15 +21,49 @@ _PACKAGE_RELPATH = "apps_rg/config/domain_contract/runtime_customization_package
 
 
 def _resolve_repository_ref(base: Path, ref: str | Path) -> Path:
-    """Resolve a stable logical ref in either supported source layout."""
+    """Resolve a package-owned logical ref without permitting path escape."""
 
     candidate = Path(ref)
     if candidate.is_absolute():
-        return candidate
+        raise U0PackageValidationError(
+            "runtime package references must be repository-relative",
+            field="runtime_customization_package",
+            reason_code="absolute_repository_ref_rejected",
+        )
+    if ".." in candidate.parts:
+        raise U0PackageValidationError(
+            "runtime package references must not contain parent traversal",
+            field="runtime_customization_package",
+            reason_code="repository_ref_traversal_rejected",
+        )
     parts = candidate.parts
     if parts and parts[0] == "apps_rg":
-        return resolve_apps_rg_path(base, *parts[1:])
-    return base / candidate
+        unresolved = resolve_apps_rg_path(base, *parts[1:])
+        allowed_root = resolve_apps_rg_path(base).resolve()
+    else:
+        unresolved = base / candidate
+        allowed_root = base.resolve()
+    node = unresolved
+    while True:
+        if node.is_symlink():
+            raise U0PackageValidationError(
+                "runtime package references must not resolve through a symlink",
+                field="runtime_customization_package",
+                reason_code="repository_ref_symlink_rejected",
+            )
+        if node.resolve() == allowed_root or node.parent == node:
+            break
+        node = node.parent
+    resolved = unresolved.resolve()
+    try:
+        resolved.relative_to(allowed_root)
+    except ValueError as exc:
+        raise U0PackageValidationError(
+            "runtime package reference escapes its approved repository root",
+            field="runtime_customization_package",
+            reason_code="repository_ref_escape_rejected",
+        ) from exc
+    return resolved
 
 # Map core package profile_refs keys → apps_rg ingress RuntimeCustomizationPackage fields.
 _PROFILE_REF_FIELD_MAP: dict[str, str] = {
@@ -67,6 +101,12 @@ class AppsRgRuntimePackageRegistry:
         self._cache: dict[str, dict[str, Any]] = {}
 
     def load_app_registry(self, app_id: str) -> dict[str, Any] | None:
+        if app_id != "apps_rg":
+            raise U0PackageValidationError(
+                f"unapproved U0 app_id: {app_id!r}",
+                field="app_id",
+                reason_code="foreign_app_id_rejected",
+            )
         if app_id in self._cache:
             return self._cache[app_id]
         base = self.registry_base_path or repo_root()
@@ -176,7 +216,21 @@ class AppsRgRuntimePackageRegistry:
                 reason_code="package_not_mapping",
                 receipt={"package_path": str(package_path), "data_type": type(data).__name__},
             )
-        return RuntimeCustomizationPackage.from_dict(data)
+        package = RuntimeCustomizationPackage.from_dict(data)
+        declared_digest = str(data.get("package_digest") or "").strip()
+        computed_digest = package._compute_digest()
+        if not declared_digest or declared_digest != computed_digest:
+            raise U0PackageValidationError(
+                "runtime package digest is missing or does not match its package bytes",
+                field="runtime_customization_package",
+                reason_code="package_digest_mismatch",
+                receipt={
+                    "declared_package_digest": declared_digest,
+                    "computed_package_digest": computed_digest,
+                    "package_path": str(package_path),
+                },
+            )
+        return package
 
 
 @dataclass(frozen=True, slots=True)
@@ -202,6 +256,19 @@ def ingest_apps_rg_runtime_package(
 ) -> AppsRgU0PackageIngestResult:
     """Load and validate the apps_rg runtime customization package from app-owned registry."""
 
+    if app_id != "apps_rg":
+        raise U0PackageValidationError(
+            f"unapproved U0 app_id: {app_id!r}",
+            field="app_id",
+            reason_code="foreign_app_id_rejected",
+        )
+    if task_class != APPS_RG_TASK_CLASS:
+        raise U0PackageValidationError(
+            f"unapproved U0 task_class: {task_class!r}",
+            field="task_class",
+            reason_code="foreign_task_class_rejected",
+        )
+
     registry = AppsRgRuntimePackageRegistry()
     ctx = dict(request_context or {})
     package_ref, _schema_ref, reason = registry.resolve_default_package_ref(
@@ -215,6 +282,21 @@ def ingest_apps_rg_runtime_package(
             field="runtime_customization_package",
         )
 
+    registry_data = registry.load_app_registry(app_id) or {}
+    default_packages = registry_data.get("default_packages") or {}
+    task_config = default_packages.get(task_class) if isinstance(default_packages, dict) else None
+    expected_digest = (
+        str(task_config.get("package_digest") or "").strip()
+        if isinstance(task_config, dict)
+        else ""
+    )
+    if not expected_digest:
+        raise U0PackageValidationError(
+            "runtime package registry is missing the pinned package digest",
+            field="runtime_package_registry",
+            reason_code="registry_package_digest_missing",
+        )
+
     package = registry.load_package_from_ref(package_ref)
     if package is None:
         raise U0PackageValidationError(
@@ -222,11 +304,36 @@ def ingest_apps_rg_runtime_package(
             field="runtime_customization_package",
         )
 
-    digest = package.package_digest or package._compute_digest()
-    if digest != package.package_digest:
-        pkg_data = package.to_dict()
-        pkg_data["package_digest"] = digest
-        package = RuntimeCustomizationPackage.from_dict(pkg_data)
+    declared_digest = str(package.package_digest or "").strip()
+    computed_digest = package._compute_digest()
+    if not declared_digest or declared_digest != computed_digest:
+        raise U0PackageValidationError(
+            "runtime package digest is missing or does not match its package bytes",
+            field="runtime_customization_package",
+            reason_code="package_digest_mismatch",
+            receipt={
+                "declared_package_digest": declared_digest,
+                "computed_package_digest": computed_digest,
+                "package_ref": package_ref,
+            },
+        )
+    if declared_digest != expected_digest:
+        raise U0PackageValidationError(
+            "runtime package digest does not match the registry-pinned package digest",
+            field="runtime_customization_package",
+            reason_code="registry_package_digest_mismatch",
+            receipt={
+                "declared_package_digest": declared_digest,
+                "registry_package_digest": expected_digest,
+                "package_ref": package_ref,
+            },
+        )
+    if package.app_id != "apps_rg" or package.task_class != APPS_RG_TASK_CLASS:
+        raise U0PackageValidationError(
+            "runtime package identity does not match the fixed Apps RG U0 contract",
+            field="runtime_customization_package",
+            reason_code="package_identity_mismatch",
+        )
 
     is_valid, errors = package.validate_schema()
     if not is_valid:

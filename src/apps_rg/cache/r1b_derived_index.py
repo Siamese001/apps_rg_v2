@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import uuid
 from dataclasses import dataclass
@@ -25,6 +24,11 @@ from apps_rg.cache.r1b_intent_vector import (
 )
 from apps_rg.cache.r1b_models import HistoricalIntentRecord, HistoricalOutputChunk
 from apps_rg.cache.r1b_store import R1BSemanticCacheStore, default_store_root
+from apps_rg.cache.r1b_integrity import (
+    load_verified_json,
+    payload_sha256,
+    write_signed_json,
+)
 
 DERIVED_INDEX_SUBDIR = "derived_index"
 INDEX_MANIFEST = "manifest.json"
@@ -66,7 +70,10 @@ def durable_truth_root(projection_root: Path | str) -> Path:
 
 
 def derived_index_available(projection_root: Path | str) -> bool:
-    return (derived_index_root(projection_root) / INDEX_MANIFEST).is_file()
+    return load_verified_json(
+        derived_index_root(projection_root) / INDEX_MANIFEST,
+        artifact_kind="derived_index_manifest",
+    ) is not None
 
 
 def _fixture_fallback_enabled_for_tests(*, explicit_private_flag: bool) -> bool:
@@ -133,11 +140,7 @@ class IndexRefreshReceipt:
 
 
 def _load_durable_bundle(path: Path) -> dict[str, Any] | None:
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
-        return None
-    return data if isinstance(data, dict) else None
+    return load_verified_json(path, artifact_kind="durable_bundle")
 
 
 def _write_read_surface_refresh_receipt(
@@ -147,6 +150,7 @@ def _write_read_surface_refresh_receipt(
     bundle: dict[str, Any],
     before_snapshot: str,
     after_snapshot: str,
+    durable_bundle_sha256: str,
 ) -> str:
     receipts_dir = root / "durable" / "uwg_admitted" / "receipts"
     receipts_dir.mkdir(parents=True, exist_ok=True)
@@ -164,10 +168,11 @@ def _write_read_surface_refresh_receipt(
         "after_snapshot": after_snapshot,
         "policy_hash": str(bundle.get("policy_hash") or ""),
         "blueprint_hash": str(bundle.get("blueprint_hash") or ""),
+        "durable_bundle_sha256": durable_bundle_sha256,
         "status": "SUCCESS",
         "reason_codes": [],
     }
-    (root / rel).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_signed_json(root / rel, payload, artifact_kind="read_surface_refresh")
     return str(rel)
 
 
@@ -185,6 +190,7 @@ def project_durable_to_derived_index(projection_root: Path | str) -> IndexRefres
     projected = 0
     source_commit_refs: set[str] = set()
     source_refresh_refs: set[str] = set()
+    entry_payload_hashes: dict[str, str] = {}
     before_snapshot = ""
     for bundle_path in sorted(durable_intents.glob("*.json")):
         scanned += 1
@@ -214,12 +220,12 @@ def project_durable_to_derived_index(projection_root: Path | str) -> IndexRefres
             bundle=bundle,
             before_snapshot=before_snapshot,
             after_snapshot=after_snapshot,
+            durable_bundle_sha256=payload_sha256(bundle),
         )
         source_commit_refs.add(source_commit_ref)
         source_refresh_refs.add(refresh_ref)
         digest = record.normalized_intent_digest
         vec_payload = vector_payload(digest, intent_text=str(record.request_intent_text or ""))
-        vec = [float(x) for x in vec_payload.get("values") or []]
         entry = {
             "record_id": record.record_id,
             "normalized_intent_digest": digest,
@@ -229,6 +235,7 @@ def project_durable_to_derived_index(projection_root: Path | str) -> IndexRefres
             "gate_profile_hash": record.gate_profile_hash,
             "source_run_id": record.source_run_id,
             "durable_bundle_ref": str(bundle_path.relative_to(root)),
+            "durable_bundle_sha256": payload_sha256(bundle),
             "lookup_anchor": "HistoricalIntentRecord.request_intent_vector",
             "child_chunk_count": len(bundle.get("child_chunks") or []),
             "child_chunks_independent_index_identities": False,
@@ -243,13 +250,16 @@ def project_durable_to_derived_index(projection_root: Path | str) -> IndexRefres
             "blueprint_hash": str(bundle.get("blueprint_hash") or ""),
             "read_surface_role": "projection_not_truth",
         }
-        (vec_dir / f"{record.record_id}.json").write_text(
-            json.dumps(entry, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+        signed_entry = write_signed_json(
+            vec_dir / f"{record.record_id}.json",
+            entry,
+            artifact_kind="derived_index_entry",
         )
-        (digest_dir / f"{digest}.json").write_text(
-            json.dumps({"record_id": record.record_id}, indent=2) + "\n",
-            encoding="utf-8",
+        entry_payload_hashes[record.record_id] = payload_sha256(signed_entry)
+        write_signed_json(
+            digest_dir / f"{digest}.json",
+            {"record_id": record.record_id, "entry_payload_sha256": entry_payload_hashes[record.record_id]},
+            artifact_kind="derived_digest_pointer",
         )
         projected += 1
 
@@ -268,6 +278,7 @@ def project_durable_to_derived_index(projection_root: Path | str) -> IndexRefres
         "r1b_vs_c0": R1B_NOT_C0_FACT_VECTORS,
         "source_commit_receipt_refs": sorted(source_commit_refs),
         "source_refresh_receipt_refs": sorted(source_refresh_refs),
+        "entry_payload_sha256_by_record_id": entry_payload_hashes,
         "snapshot_id": f"r1b_derived_index:{refreshed_at}",
         "policy_hash": "",
         "blueprint_hash": "",
@@ -279,9 +290,10 @@ def project_durable_to_derived_index(projection_root: Path | str) -> IndexRefres
             loaded = _load_durable_bundle(first_bundle) or {}
             manifest["policy_hash"] = str(loaded.get("policy_hash") or "")
             manifest["blueprint_hash"] = str(loaded.get("blueprint_hash") or "")
-    (idx_root / INDEX_MANIFEST).write_text(
-        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    write_signed_json(
+        idx_root / INDEX_MANIFEST,
+        manifest,
+        artifact_kind="derived_index_manifest",
     )
     return IndexRefreshReceipt(
         refreshed_at_utc=manifest["refreshed_at_utc"],
@@ -293,6 +305,8 @@ def project_durable_to_derived_index(projection_root: Path | str) -> IndexRefres
 
 
 def list_derived_index_record_ids(projection_root: Path | str) -> list[str]:
+    if not derived_index_available(projection_root):
+        return []
     vec_dir = derived_index_root(projection_root) / INTENT_VECTORS_SUBDIR
     if not vec_dir.is_dir():
         return []
@@ -303,14 +317,24 @@ def load_derived_index_entry(
     projection_root: Path | str,
     record_id: str,
 ) -> dict[str, Any] | None:
-    path = derived_index_root(projection_root) / INTENT_VECTORS_SUBDIR / f"{record_id}.json"
+    index_root = derived_index_root(projection_root)
+    manifest = load_verified_json(
+        index_root / INDEX_MANIFEST,
+        artifact_kind="derived_index_manifest",
+    )
+    if not manifest:
+        return None
+    path = index_root / INTENT_VECTORS_SUBDIR / f"{record_id}.json"
     if not path.is_file():
         return None
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
-    except (json.JSONDecodeError, OSError):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
+    data = load_verified_json(path, artifact_kind="derived_index_entry")
+    if not data:
         return None
-    return data if isinstance(data, dict) else None
+    expected_hashes = manifest.get("entry_payload_sha256_by_record_id") or {}
+    expected = expected_hashes.get(record_id) if isinstance(expected_hashes, dict) else ""
+    if not expected or str(expected) != payload_sha256(data):
+        return None
+    return data
 
 
 def load_durable_record_and_chunks(
@@ -334,12 +358,9 @@ def load_durable_record_and_chunks(
     chunk_dir = root / DURABLE_CHUNKS_SUBDIR / record_id
     if chunk_dir.is_dir() and not chunks:
         for cf in sorted(chunk_dir.glob("*.json")):
-            try:
-                data = json.loads(cf.read_text(encoding="utf-8"))
-                if isinstance(data, dict):
-                    chunks.append(HistoricalOutputChunk.from_dict(data))
-            except (json.JSONDecodeError, OSError):
-                continue
+            data = load_verified_json(cf, artifact_kind="durable_chunk")
+            if data:
+                chunks.append(HistoricalOutputChunk.from_dict(data))
     return record, chunks
 
 
@@ -391,15 +412,27 @@ def lookup_r1b_via_derived_index(
         if not entry or not entry.get("cache_admissible"):
             continue
         refresh_ref = str(entry.get("source_refresh_receipt_ref") or "")
-        if not refresh_ref or not (root / refresh_ref).is_file():
+        refresh_path = root / refresh_ref if refresh_ref else None
+        if not refresh_path or not refresh_path.is_file():
+            refresh_reason = "read_surface_refresh_receipt_missing"
+        else:
+            refresh_reason = "read_surface_refresh_receipt_unverified"
+        refresh = (
+            load_verified_json(refresh_path, artifact_kind="read_surface_refresh")
+            if refresh_ref
+            else None
+        )
+        if not refresh or str(refresh.get("durable_bundle_sha256") or "") != str(
+            entry.get("durable_bundle_sha256") or ""
+        ):
             report.append(
                 {
                     "candidate_record_id": rid,
                     "similarity": 0.0,
                     "admissible": False,
-                    "reason": "read_surface_refresh_receipt_missing",
-                    "reason_codes": ["read_surface_refresh_receipt_missing"],
-                    "checks": {"read_surface_refresh_receipt_present": False},
+                    "reason": refresh_reason,
+                    "reason_codes": [refresh_reason],
+                    "checks": {"read_surface_refresh_receipt_verified": False},
                     "lookup_surface": "derived_index",
                     "durable_truth_ref": entry.get("durable_bundle_ref"),
                     "generation_required": True,
@@ -414,6 +447,11 @@ def lookup_r1b_via_derived_index(
         sim = cosine_similarity(query_vec, [float(x) for x in vals])
         record, chunks = load_durable_record_and_chunks(root, rid)
         if record is None:
+            continue
+        bundle = _load_durable_bundle(
+            root / str(entry.get("durable_bundle_ref") or "")
+        )
+        if not bundle or payload_sha256(bundle) != str(entry.get("durable_bundle_sha256") or ""):
             continue
         verdict = assess_candidate_for_reuse(
             record,
@@ -474,7 +512,8 @@ def resolve_r1b_projection_root(
     artifact_dir: Path | str | None = None,
 ) -> Path:
     env = os.environ.get("APPS_RG_R1B_CACHE_ROOT", "").strip()
-    if env:
+    product_envelope = os.environ.get("APPS_RG_WHOLE_RUN_ENVELOPE", "").strip().lower()
+    if env and product_envelope not in {"1", "true", "yes"}:
         p = Path(env)
         return p if p.is_absolute() else (Path.cwd() / p).resolve()
     if store_root:

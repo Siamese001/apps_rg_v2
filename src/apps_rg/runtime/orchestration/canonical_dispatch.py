@@ -13,8 +13,6 @@ import json
 import os
 from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
 
 from apps_rg.runtime.executive_summary_certification import (
     EXECUTIVE_SUMMARY_JUDGE_REVIEW_X3,
@@ -32,12 +30,8 @@ from apps_rg.runtime.runtime_proof_layout import (
 from apps_rg.runtime.section_cli_defaults import COMPETENCIES_DEFAULT_X1D_JUDGES
 from apps_rg.runtime.section_judge_policy import REQUIRED_JUDGE_PROVIDER_KEYS
 
-# This compatibility helper is non-product.  Product dispatch is routed through
+# This compatibility helper is non-product. Product dispatch is routed through
 # ``apps_rg.runtime.product_entry`` and requires exact X3D authority there.
-_COMPATIBILITY_SUCCESS_X3 = frozenset({"X3D_ALLOW_FINISH"})
-# Soft-fail review codes that should NOT cascade-block downstream lanes per Author-Gate
-# decision dec_19e6e344d5db19589 (architecture_choice, 2026-05-28).
-_REVIEW_BUT_NOT_BLOCKING_X3 = frozenset({"X3_REVIEW_JUDGE_SOFT_FAIL", "X3_REVIEW"})
 _HEADLINE_SECTION_ID = "headline"
 _EXEC_SUMMARY_SECTION_ID = "executive_summary"
 _UNIFY_BULLETS_SECTION_ID = "unify_bullets"
@@ -58,30 +52,38 @@ def _effective_lane_provider(raw: str | None) -> str:
     return s if s else resolve_apps_rg_modular_lane_provider()
 
 
-_BRIEF_FETCH_MAX_BYTES = 2_000_000
-
-
-def _fetch_url_text(url: str, *, max_bytes: int = _BRIEF_FETCH_MAX_BYTES) -> str:
-    """Fetch brief content from http(s); bounded read for CLI safety."""
-    req = Request(url, headers={"User-Agent": "apps_rg-cli/1"})  # noqa: S310
-    with urlopen(req, timeout=45) as resp:  # noqa: S310
-        raw = resp.read(max_bytes + 1)
-    if len(raw) > max_bytes:
-        return ""
-    return raw.decode("utf-8", errors="replace")
-
-
 def _read_optional_brief(path_or_url: str) -> str:
-    """Load research brief from local path or http(s) URL."""
+    """Load an inline or local non-product brief; never fetch remote content."""
     s = str(path_or_url).strip()
     if not s:
         return ""
     if s.startswith(("http://", "https://")):
-        try:
-            return _fetch_url_text(s)
-        except (HTTPError, URLError, OSError, ValueError):
-            return ""
+        return ""
     return _read_optional_file(s)
+
+
+def _block_non_product_compatibility_result(result: dict[str, Any]) -> dict[str, Any]:
+    """Prevent legacy execution evidence from being misread as product success."""
+
+    out = dict(result)
+    observed_exit = str(out.get("exit_status") or "unknown")
+    observed_execution = str(out.get("execution_status") or "unknown")
+    out.update(
+        {
+            "exit_status": "error",
+            "execution_status": "non_product_completed",
+            "outcome_authorized": False,
+            "product_authorized": False,
+            "pipeline_complete": False,
+            "observability_repair_required": False,
+            "completion_status": "BLOCKED",
+            "authority_classification": "NON_PRODUCT_COMPATIBILITY",
+            "fault": str(out.get("fault") or "NON_PRODUCT_COMPATIBILITY_NOT_AUTHORIZING"),
+            "observed_exit_status": observed_exit,
+            "observed_execution_status": observed_execution,
+        }
+    )
+    return out
 
 
 def _materialize_fallback_brief(
@@ -374,7 +376,6 @@ def run_canonical_full_resume_from_cli_primitives(
     from apps_rg.cache.whole_run_entrypoint_preflight import (
         ENTRYPOINT_CANONICAL_DISPATCH,
         build_cache_hit_dispatch_result,
-        maybe_ingest_r1b_post_exit,
         run_whole_run_cache_preflight,
     )
 
@@ -405,7 +406,7 @@ def run_canonical_full_resume_from_cli_primitives(
         hit_result["cache_preflight"] = evidence
         if preflight.r1a_hit:
             hit_result["artifact_dir"] = preflight.r1a_artifact_dir
-        return hit_result
+        return _block_non_product_compatibility_result(hit_result)
 
     write_cache_miss_receipt(art, preflight, evidence)
 
@@ -431,12 +432,6 @@ def run_canonical_full_resume_from_cli_primitives(
         correlation_id=rid or None,
     )
 
-    maybe_ingest_r1b_post_exit(
-        raw_request=raw_request,
-        artifact_dir=art,
-        runs_dir=art.parent,
-    )
-
     l7_path = art / "agentic_core_how_trace.json"
     l7_ok = bool(result.fault == "" and l7_path.is_file())
     exec_summary_block = executive_summary_certification_block(art)
@@ -446,29 +441,13 @@ def run_canonical_full_resume_from_cli_primitives(
         if exec_summary_blocked
         else result.x3_disposition
     )
-    soft_fail_review = (
-        result.fault == ""
-        and not exec_summary_blocked
-        and effective_x3 in _REVIEW_BUT_NOT_BLOCKING_X3
-    )
-    outcome = (
-        result.fault == ""
-        and not exec_summary_blocked
-        and (effective_x3 in _COMPATIBILITY_SUCCESS_X3 or soft_fail_review)
-    )
     result_fault = result.fault
-    # success_with_review keeps exit_status == "success" so phase1_dispatch_hard_failed()
-    # does NOT cascade-block downstream lanes; the review packet preserves the soft-fail
-    # for human inspection.
-    exit_status = "success" if outcome else "error"
-
-    return {
-        "exit_status": exit_status,
-        "execution_status": "completed" if outcome else "failed",
-        "outcome_authorized": outcome,
+    return _block_non_product_compatibility_result({
+        "exit_status": "success" if result_fault == "" and not exec_summary_blocked else "error",
+        "execution_status": "completed" if result_fault == "" and not exec_summary_blocked else "failed",
+        "outcome_authorized": False,
         "product_authorized": False,
         "pipeline_complete": False,
-        "authority_classification": "NON_PRODUCT_COMPATIBILITY",
         "x3_disposition": effective_x3,
         "fault": result_fault,
         "artifact_dir": str(art),
@@ -481,7 +460,7 @@ def run_canonical_full_resume_from_cli_primitives(
         "uwg_commit_receipt_ref": "",
         "apps_eval_record_ref": "",
         "l6_shadow_bridge_ref": "",
-    }
+    })
 
 
 def run_canonical_apps_rg_from_cli_primitives(
