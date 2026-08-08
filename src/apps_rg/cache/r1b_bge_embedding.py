@@ -13,7 +13,6 @@ from agentic_core.config.model_catalog import (
 )
 
 import logging
-import threading
 from typing import Any, Sequence
 
 from apps_rg.cache.r1b_constants import R1B_STORAGE_SUBSYSTEM
@@ -21,8 +20,6 @@ from apps_rg.cache.r1b_constants import R1B_STORAGE_SUBSYSTEM
 _logger = logging.getLogger(__name__)
 
 _BGE_DIM = BGE_M3_EMBEDDING_DIMENSION
-_model_lock = threading.Lock()
-_bge_model: Any = None
 
 
 def bge_embeddings_active() -> bool:
@@ -32,40 +29,36 @@ def bge_embeddings_active() -> bool:
     return bool(s.embeddings_enabled and s.embedding_model_resolved)
 
 
+def _get_bge_runtime() -> Any:
+    from apps_rg.runtime.bge_embedding import get_bge_runtime_for_settings
+    from apps_rg.runtime.embedding_settings import resolve_apps_rg_embedding_settings
+
+    settings = resolve_apps_rg_embedding_settings()
+    if not settings.embedding_model_resolved:
+        return None
+    try:
+        return get_bge_runtime_for_settings(settings)
+    except Exception as exc:  # guardian: allow-broad-exception -- optional test/CI fallback remains governed below
+        from apps_rg.runtime.embedding_settings import AppsRgEmbeddingFailClosedError
+        from apps_rg.runtime.product_output_policy import require_live_bge_embeddings
+
+        if require_live_bge_embeddings():
+            raise AppsRgEmbeddingFailClosedError(f"BGE-M3 load failed on product path: {exc}") from exc
+        _logger.warning("R1B BGE load failed (%s); using pseudo-digest fallback", exc)
+        return None
+
+
 def _get_bge_model() -> Any:
-    global _bge_model
-    if _bge_model is not None:
-        return _bge_model
-    with _model_lock:
-        if _bge_model is not None:
-            return _bge_model
-        from apps_rg.runtime.embedding_settings import (
-            load_bge_sentence_transformer,
-            resolve_apps_rg_embedding_settings,
-        )
+    """Backward-compatible access to the app-owned resident model."""
 
-        settings = resolve_apps_rg_embedding_settings()
-        if not settings.embedding_model_resolved:
-            return None
-        try:
-            _bge_model = load_bge_sentence_transformer(settings)
-        except Exception as exc:  # guardian: allow-broad-exception -- P2 burndown: BGE optional when embeddings off-path  # guardian: allow-return-none-swallow -- P2 burndown: pseudo-digest fallback when load fails
-            from apps_rg.runtime.embedding_settings import AppsRgEmbeddingFailClosedError
-            from apps_rg.runtime.product_output_policy import require_live_bge_embeddings
-
-            if require_live_bge_embeddings():
-                raise AppsRgEmbeddingFailClosedError(
-                    f"BGE-M3 load failed on product path: {exc}"
-                ) from exc
-            _logger.warning("R1B BGE load failed (%s); using pseudo-digest fallback", exc)
-            return None
-        return _bge_model
+    runtime = _get_bge_runtime()
+    return runtime.model if runtime is not None else None
 
 
 def reset_bge_model_for_testing() -> None:
-    global _bge_model
-    with _model_lock:
-        _bge_model = None
+    from apps_rg.runtime.bge_embedding import reset_bge_runtime_for_testing
+
+    reset_bge_runtime_for_testing()
 
 
 def _coerce_bge_vector(vec: Any) -> list[float]:
@@ -80,22 +73,15 @@ def embed_text_bge(text: str) -> list[float] | None:
     stripped = (text or "").strip()
     if not stripped:
         return None
-    model = _get_bge_model()
-    if model is None:
+    runtime = _get_bge_runtime()
+    if runtime is None:
         return None
-    encoded = model.encode(
-        [stripped],
-        convert_to_numpy=True,
-        normalize_embeddings=True,
-        show_progress_bar=False,
-    )
-    if encoded is None or len(encoded) != 1:
-        return None
-    rows = encoded.tolist() if hasattr(encoded, "tolist") else encoded
-    return _coerce_bge_vector(rows[0])
+    return _coerce_bge_vector(runtime.encode([stripped], batch_size=1)[0])
 
 
-def embed_texts_bge(texts: Sequence[str], *, batch_size: int = 64) -> list[list[float] | None]:
+def embed_texts_bge(
+    texts: Sequence[str], *, batch_size: int | None = None
+) -> list[list[float] | None]:
     """L2-normalized BGE-M3 embeddings, preserving input order for batch callers."""
     outputs: list[list[float] | None] = [None] * len(texts)
     indexed_texts: list[tuple[int, str]] = []
@@ -105,20 +91,20 @@ def embed_texts_bge(texts: Sequence[str], *, batch_size: int = 64) -> list[list[
             indexed_texts.append((idx, stripped))
     if not indexed_texts:
         return outputs
-    model = _get_bge_model()
-    if model is None:
+    runtime = _get_bge_runtime()
+    if runtime is None:
         return outputs
-    encode_kwargs: dict[str, Any] = {
-        "convert_to_numpy": True,
-        "normalize_embeddings": True,
-        "show_progress_bar": False,
-    }
-    if batch_size > 0:
-        encode_kwargs["batch_size"] = batch_size
-    encoded = model.encode([text for _idx, text in indexed_texts], **encode_kwargs)
-    if encoded is None or len(encoded) != len(indexed_texts):
-        return outputs
-    rows = encoded.tolist() if hasattr(encoded, "tolist") else encoded
+    from apps_rg.runtime.bge_embedding import resolve_bge_batch_size
+
+    selected_batch_size = resolve_bge_batch_size(
+        "r1b_projection",
+        len(indexed_texts),
+        requested=batch_size if batch_size is not None and batch_size > 0 else None,
+    )
+    rows = runtime.encode(
+        [text for _idx, text in indexed_texts],
+        batch_size=selected_batch_size,
+    )
     for (idx, _text), row in zip(indexed_texts, rows):
         outputs[idx] = _coerce_bge_vector(row)
     return outputs
@@ -126,7 +112,10 @@ def embed_texts_bge(texts: Sequence[str], *, batch_size: int = 64) -> list[list[
 
 def intent_vector_payload(*, intent_text: str, digest: str) -> dict[str, Any]:
     """Canonical vector JSON persisted under ``vectors/<record_id>.json``."""
-    from apps_rg.cache.r1b_intent_vector import normalized_intent_digest, pseudo_vector_from_digest
+    from apps_rg.cache.r1b_intent_vector import (
+        normalized_intent_digest,
+        pseudo_vector_from_digest,
+    )
 
     from apps_rg.runtime.embedding_settings import AppsRgEmbeddingFailClosedError
     from apps_rg.runtime.product_output_policy import require_live_bge_embeddings
@@ -176,7 +165,10 @@ def chunk_vector_payload(*, chunk_text: str, chunk_id: str) -> dict[str, Any]:
         raise AppsRgEmbeddingFailClosedError(
             f"BGE-M3 chunk embedding required; pseudo_digest forbidden (chunk_id={chunk_id!r})"
         )
-    from apps_rg.cache.r1b_intent_vector import normalized_intent_digest, pseudo_vector_from_digest
+    from apps_rg.cache.r1b_intent_vector import (
+        normalized_intent_digest,
+        pseudo_vector_from_digest,
+    )
 
     digest = normalized_intent_digest(text or chunk_id)
     return {
@@ -197,9 +189,7 @@ def resolve_query_vector(intent_text: str, digest: str) -> tuple[list[float], st
     if bge is not None:
         return bge, "bge_m3"
     if require_live_bge_embeddings():
-        raise AppsRgEmbeddingFailClosedError(
-            "BGE-M3 query vector required; pseudo_digest forbidden on product path"
-        )
+        raise AppsRgEmbeddingFailClosedError("BGE-M3 query vector required; pseudo_digest forbidden on product path")
     return pseudo_vector_from_digest(digest), "pseudo_digest"
 
 

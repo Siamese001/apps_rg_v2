@@ -154,7 +154,10 @@ def atoms_to_fact_vector_chunks(
             decision = _decide_write_back(atom)
             if decision.route != STAGE_FOR_FACT_VECTORS:
                 skipped.append(
-                    {"fact_id": fid, "reason": f"route_{decision.route}:{decision.operation}:{decision.reason}"}
+                    {
+                        "fact_id": fid,
+                        "reason": f"route_{decision.route}:{decision.operation}:{decision.reason}",
+                    }
                 )
                 continue
             operation = decision.operation
@@ -210,15 +213,17 @@ def upsert_fact_vector_chunks(
     from apps_rg.runtime.embedding_settings import (
         apply_apps_rg_embedding_env_guards,
         assert_dense_retrieval_allowed,
-        load_bge_sentence_transformer,
         resolve_apps_rg_embedding_settings,
     )
-    from apps_rg.runtime.bge_embedding import embed_text
+    from apps_rg.runtime.bge_embedding import (
+        get_bge_runtime_for_settings,
+        resolve_bge_batch_size,
+    )
 
     apply_apps_rg_embedding_env_guards(chroma_persist_dir=chroma_path)
     settings = resolve_apps_rg_embedding_settings(chroma_persist_dir=chroma_path)
     assert_dense_retrieval_allowed(settings)
-    model = load_bge_sentence_transformer(settings)
+    runtime = get_bge_runtime_for_settings(settings)
     from apps_rg.runtime.c0.chroma_persistent_client import ensure_apps_rg_chroma_client
 
     client = ensure_apps_rg_chroma_client(chroma_path)
@@ -228,19 +233,17 @@ def upsert_fact_vector_chunks(
         metadata={"hnsw:space": "cosine", "collection_role": "fact_vectors"},
     )
     atom_list = atoms if atoms is not None and len(atoms) == len(chunks) else [None] * len(chunks)
-    docs = [
-        chunk_to_chroma_document(c, a)
-        for c, a in zip(chunks, atom_list, strict=True)
-    ]
+    docs = [chunk_to_chroma_document(c, a) for c, a in zip(chunks, atom_list, strict=True)]
     ids = [d["id"] for d in docs]
     texts = [d["text"] for d in docs]
-    embeddings = [embed_text(model, t) for t in texts]
+    batch_size = resolve_bge_batch_size("c02_fact_vector_ingest", len(texts))
+    embeddings = runtime.encode(texts, batch_size=batch_size)
+    if len(embeddings) != len(texts):
+        raise RuntimeError(
+            "C0.2 embedding batch cardinality changed before Chroma upsert"
+        )
     metadatas = [
-        {
-            k: str(v) if not isinstance(v, (str, int, float, bool)) else v
-            for k, v in d["metadata"].items()
-        }
-        for d in docs
+        {k: str(v) if not isinstance(v, (str, int, float, bool)) else v for k, v in d["metadata"].items()} for d in docs
     ]
     collection.upsert(
         ids=ids,
@@ -319,9 +322,7 @@ def maybe_upsert_c02_fact_vectors(
     receipt["routed_to_semantic_cache"] = sum(
         1 for s in skipped if str(s.get("reason", "")).startswith("route_semantic_cache")
     )
-    receipt["rejected_ungrounded"] = sum(
-        1 for s in skipped if str(s.get("reason", "")).startswith("route_reject")
-    )
+    receipt["rejected_ungrounded"] = sum(1 for s in skipped if str(s.get("reason", "")).startswith("route_reject"))
     receipt["staged_count"] = 0
     receipt["promotion"] = {}
     try:
@@ -417,9 +418,7 @@ def promote_deferred_c02_fact_vectors_after_x3(
     artifact_dir = Path(artifact_dir_raw) if artifact_dir_raw else None
     x3_doc = _read_x3_for_artifact_dir(artifact_dir)
     resolved_run_id = str(
-        result.get("run_id")
-        or x3_doc.get("run_id")
-        or (artifact_dir.name if artifact_dir is not None else "")
+        result.get("run_id") or x3_doc.get("run_id") or (artifact_dir.name if artifact_dir is not None else "")
     ).strip()
     resolved_x3_code = str(x3_doc.get("x3_code") or result.get("x3_disposition") or "").strip()
     receipt["run_id"] = resolved_run_id

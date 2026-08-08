@@ -61,9 +61,9 @@ def _projection_chunk(chunk_id: str, text: str):
 
 
 def test_projection_embedding_payloads_batch_parent_and_chunks(monkeypatch: pytest.MonkeyPatch) -> None:
-    calls: list[tuple[list[str], int]] = []
+    calls: list[tuple[list[str], int | None]] = []
 
-    def fake_embed_texts(texts: list[str], *, batch_size: int = 64):
+    def fake_embed_texts(texts: list[str], *, batch_size: int | None = None):
         calls.append((list(texts), batch_size))
         return [
             [0.1] * 1024,
@@ -81,7 +81,7 @@ def test_projection_embedding_payloads_batch_parent_and_chunks(monkeypatch: pyte
         ],
     )
 
-    assert calls == [(["intent text", "chunk one", "chunk two"], 64)]
+    assert calls == [(["intent text", "chunk one", "chunk two"], None)]
     assert intent_payload["embedding_model"] == projection.BGE_M3_MODEL_ID
     assert intent_payload["dimensions"] == 1024
     assert intent_payload["values"] == [0.1] * 1024

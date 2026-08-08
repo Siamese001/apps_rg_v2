@@ -8,7 +8,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from agentic_core.config.model_catalog import BGE_M3_EMBEDDING_DIMENSION, BGE_M3_MODEL_ID
+from agentic_core.config.model_catalog import (
+    BGE_M3_EMBEDDING_DIMENSION,
+    BGE_M3_MODEL_ID,
+)
 from apps_rg.runtime.embedding_settings import (
     AppsRgEmbeddingFailClosedError,
     BGE_M3_DIMENSION,
@@ -81,9 +84,7 @@ def test_embedding_settings_alias_model_catalog() -> None:
     assert BGE_M3_DIMENSION == BGE_M3_EMBEDDING_DIMENSION
 
 
-def test_bootstrap_enables_bge_when_hf_snapshot_present(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_bootstrap_enables_bge_when_hf_snapshot_present(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     snap = tmp_path / "hub" / "models--BAAI--bge-m3" / "snapshots" / "abc123"
     snap.mkdir(parents=True)
     (snap / "config.json").write_text("{}", encoding="utf-8")
@@ -111,7 +112,9 @@ def test_bootstrap_respects_explicit_disable(monkeypatch: pytest.MonkeyPatch, tm
     assert s.embeddings_enabled is False
 
 
-def test_embeddings_disabled_marks_r1b_ineligible_and_disables_d2(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_embeddings_disabled_marks_r1b_ineligible_and_disables_d2(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("EMBEDDING_ENABLED", "false")
     monkeypatch.setenv("SEMANTIC_CACHE_D2_ENABLED", "1")
     s = apply_apps_rg_embedding_env_guards()
@@ -125,7 +128,9 @@ def test_embeddings_disabled_marks_r1b_ineligible_and_disables_d2(monkeypatch: p
     assert semantic_cache_r1b_eligible(s) is False
 
 
-def test_embeddings_disabled_chroma_configured_fail_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_embeddings_disabled_chroma_configured_fail_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     monkeypatch.setenv("EMBEDDING_ENABLED", "0")
     monkeypatch.setenv("CHROMA_PERSIST_DIR", "/tmp/chroma_test")
     s = resolve_apps_rg_embedding_settings()
@@ -145,9 +150,7 @@ def test_embeddings_disabled_does_not_load_sentence_transformer(
     st_mock.assert_not_called()
 
 
-def test_embeddings_enabled_missing_local_bge_fail_closed(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
+def test_embeddings_enabled_missing_local_bge_fail_closed(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setenv("EMBEDDING_ENABLED", "true")
     monkeypatch.setenv("CHROMA_PERSIST_DIR", "/tmp/chroma_test")
     monkeypatch.setenv("HF_HOME", str(tmp_path / "empty_hf"))
@@ -191,9 +194,9 @@ def test_c0_binding_get_embedding_model_blocked_when_disabled(
     monkeypatch.setenv("EMBEDDING_ENABLED", "false")
     monkeypatch.setenv("CHROMA_PERSIST_DIR", "/tmp/chroma_test")
     from apps_rg.runtime.bindings import c0_binding
+    from apps_rg.runtime.bge_embedding import reset_bge_runtime_for_testing
 
-    c0_binding._embedding_singleton = None
-    c0_binding._embedding_singleton_path = None
+    reset_bge_runtime_for_testing()
     with patch("sentence_transformers.SentenceTransformer") as st_mock:
         with pytest.raises(Exception):
             c0_binding._get_embedding_model()
