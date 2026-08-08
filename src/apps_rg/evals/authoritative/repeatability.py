@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Any, Mapping
 
@@ -35,6 +36,7 @@ _STABILITY_METRICS = (
     "semantic_output_stability",
     "output_quality_score_stability",
 )
+_COMMIT = re.compile(r"^[0-9a-f]{40}$")
 
 
 def semantic_run_digest(run: Mapping[str, Any]) -> str:
@@ -99,6 +101,9 @@ def evaluate_controller_bound_repeatability(
         reasons.append("CONTROLLER_RUNTIME_INVOCATION_NOT_PROVEN")
     if controller_manifest.get("source_commit") != expected_source_commit:
         reasons.append("CONTROLLER_SOURCE_COMMIT_MISMATCH")
+    source_tree = str(controller_manifest.get("source_tree") or "")
+    if not _COMMIT.fullmatch(source_tree):
+        reasons.append("CONTROLLER_SOURCE_TREE_INVALID")
     controller_id = str(controller_manifest.get("controller_id") or "")
     if not controller_id:
         reasons.append("CONTROLLER_ID_INVALID")
@@ -133,6 +138,10 @@ def evaluate_controller_bound_repeatability(
             reasons.append("CONTROLLER_EXECUTION_NONPASS")
         if receipt.get("source_commit") != expected_source_commit:
             reasons.append("CONTROLLER_EXECUTION_SOURCE_COMMIT_MISMATCH")
+        if receipt.get("source_tree") != source_tree:
+            reasons.append("CONTROLLER_EXECUTION_SOURCE_TREE_MISMATCH")
+        if not str(receipt.get("workdir") or ""):
+            reasons.append("CONTROLLER_EXECUTION_WORKDIR_MISSING")
         if receipt.get("controller_id") != controller_id:
             reasons.append("CONTROLLER_EXECUTION_IDENTITY_MISMATCH")
         if any(

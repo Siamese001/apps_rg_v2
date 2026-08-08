@@ -16,6 +16,7 @@ from apps_rg.cache.r1b_constants import (
     R1B_UWG_TARGET_SURFACE,
 )
 from apps_rg.cache.r1b_durable_write_guard import assert_r1b_durable_write_authority
+from apps_rg.cache.r1b_integrity import write_signed_json
 from apps_rg.cache.r1b_models import HistoricalIntentRecord, HistoricalOutputChunk
 
 
@@ -559,18 +560,19 @@ def write_uwg_admitted_projection(
         json.dumps(intent_embedding, indent=2) + "\n", encoding="utf-8"
     )
     intent_path = intents / f"{candidate.record.record_id}.json"
-    intent_path.write_text(
-        json.dumps(bundle, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    (receipts / f"{candidate.record.record_id}_uwg_commit.json").write_text(
-        json.dumps(outcome.to_dict(), indent=2) + "\n", encoding="utf-8"
+    write_signed_json(intent_path, bundle, artifact_kind="durable_bundle")
+    write_signed_json(
+        receipts / f"{candidate.record.record_id}_uwg_commit.json",
+        outcome.to_dict(),
+        artifact_kind="uwg_commit_receipt",
     )
     parent_chunks = chunks / candidate.record.record_id
     parent_chunks.mkdir(parents=True, exist_ok=True)
     for chunk in candidate.chunks:
-        (parent_chunks / f"{chunk.chunk_id}.json").write_text(
-            json.dumps(chunk.to_dict(), indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+        write_signed_json(
+            parent_chunks / f"{chunk.chunk_id}.json",
+            chunk.to_dict(),
+            artifact_kind="durable_chunk",
         )
     return intent_path
 

@@ -13,6 +13,8 @@ from __future__ import annotations
 import hashlib
 import importlib
 import json
+import re
+import subprocess
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from importlib import metadata as importlib_metadata
@@ -36,6 +38,7 @@ STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME: Final[str] = (
     "standalone_runtime_dependency_receipt.json"
 )
 EXTERNAL_RUNTIME_BOUND: Final[str] = "EXTERNAL_RUNTIME_BOUND"
+_GIT_OBJECT = re.compile(r"^[0-9a-f]{40}$")
 
 
 class StandaloneRuntimeDependencyError(RuntimeError):
@@ -80,7 +83,9 @@ def _read_contract(path: Path) -> tuple[dict[str, Any], str]:
     return value, _sha256_bytes(raw)
 
 
-def _validated_contract(value: Mapping[str, Any]) -> tuple[dict[str, str], list[dict[str, str]], dict[str, Any]]:
+def _validated_contract(
+    value: Mapping[str, Any],
+) -> tuple[dict[str, str], list[dict[str, str]], dict[str, Any], dict[str, Any]]:
     if value.get("schema_version") != STANDALONE_RUNTIME_DEPENDENCY_CONTRACT_SCHEMA_VERSION:
         raise StandaloneRuntimeDependencyError("unsupported standalone runtime contract schema")
     if value.get("contract_type") != "StandaloneRuntimeDependencyContract":
@@ -145,7 +150,25 @@ def _validated_contract(value: Mapping[str, Any]) -> tuple[dict[str, str], list[
         or not all(isinstance(claim, str) and claim for claim in normalized_policy["prohibited_claims"])
     ):
         raise StandaloneRuntimeDependencyError("standalone runtime resolution_policy is invalid")
-    return normalized_dependency, modules, normalized_policy
+    trust = value.get("runtime_trust")
+    if not isinstance(trust, Mapping):
+        raise StandaloneRuntimeDependencyError("standalone runtime trust pin is required")
+    normalized_trust = {
+        "mode": str(trust.get("mode") or ""),
+        "approved_repository_commit": str(trust.get("approved_repository_commit") or ""),
+        "approved_package_tree": str(trust.get("approved_package_tree") or ""),
+        "package_relative_path": str(trust.get("package_relative_path") or ""),
+        "require_clean_tracked_worktree": trust.get("require_clean_tracked_worktree"),
+    }
+    if (
+        normalized_trust["mode"] != "GIT_COMMIT_AND_PACKAGE_TREE_PIN"
+        or not _GIT_OBJECT.fullmatch(normalized_trust["approved_repository_commit"])
+        or not _GIT_OBJECT.fullmatch(normalized_trust["approved_package_tree"])
+        or normalized_trust["package_relative_path"] != "agentic_core"
+        or normalized_trust["require_clean_tracked_worktree"] is not True
+    ):
+        raise StandaloneRuntimeDependencyError("standalone runtime trust pin is invalid")
+    return normalized_dependency, modules, normalized_policy, normalized_trust
 
 
 def _module_file(module: ModuleType) -> Path | None:
@@ -176,6 +199,46 @@ def _distribution_metadata(distribution_name: str) -> dict[str, str]:
         "distribution_name": distribution_name,
         "status": "INSTALLED_METADATA_AVAILABLE",
         "version": str(distribution.version or ""),
+    }
+
+
+def _git_value(package_root: Path, *arguments: str) -> str:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(package_root), *arguments],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise StandaloneRuntimeDependencyError(
+            f"external agentic_core Git inspection failed: {type(exc).__name__}"
+        ) from exc
+    if completed.returncode != 0:
+        raise StandaloneRuntimeDependencyError("external agentic_core must resolve from a Git checkout")
+    return completed.stdout.strip()
+
+
+def _verify_runtime_trust(package_root: Path, trust: Mapping[str, Any]) -> dict[str, str]:
+    repository_root = Path(_git_value(package_root, "rev-parse", "--show-toplevel")).resolve()
+    package_relative_path = package_root.relative_to(repository_root).as_posix()
+    head_commit = _git_value(package_root, "rev-parse", "HEAD")
+    package_tree = _git_value(package_root, "rev-parse", f"HEAD:{package_relative_path}")
+    tracked_changes = _git_value(package_root, "status", "--porcelain", "--untracked-files=no")
+    if package_relative_path != trust["package_relative_path"]:
+        raise StandaloneRuntimeDependencyError("external agentic_core package path does not match trust pin")
+    if head_commit != trust["approved_repository_commit"]:
+        raise StandaloneRuntimeDependencyError("external agentic_core commit does not match trust pin")
+    if package_tree != trust["approved_package_tree"]:
+        raise StandaloneRuntimeDependencyError("external agentic_core tree does not match trust pin")
+    if tracked_changes:
+        raise StandaloneRuntimeDependencyError("external agentic_core checkout has tracked changes")
+    return {
+        "repository_root": str(repository_root),
+        "head_commit": head_commit,
+        "package_tree": package_tree,
+        "package_relative_path": package_relative_path,
     }
 
 
@@ -225,7 +288,7 @@ def verify_external_agentic_core_runtime(
     contract_digest = ""
     try:
         contract, contract_digest = _read_contract(path)
-        dependency, required_modules, policy = _validated_contract(contract)
+        dependency, required_modules, policy, trust = _validated_contract(contract)
     except StandaloneRuntimeDependencyError as exc:
         receipt = _base_receipt(
             repo=repo,
@@ -240,6 +303,7 @@ def verify_external_agentic_core_runtime(
                 "failure_class": type(exc).__name__,
                 "dependency": {},
                 "resolution_policy": {},
+                "runtime_trust": {},
                 "package": {},
                 "required_module_results": [],
                 "distribution_metadata": {},
@@ -258,6 +322,7 @@ def verify_external_agentic_core_runtime(
         {
             "dependency": dependency,
             "resolution_policy": policy,
+            "runtime_trust": trust,
             "package": {},
             "required_module_results": [],
             "distribution_metadata": _distribution_metadata(dependency["distribution_name"]),
@@ -301,6 +366,18 @@ def verify_external_agentic_core_runtime(
                 "status": "BLOCKED_AGENTIC_CORE_LOCAL_TO_STANDALONE",
                 "failure_code": "AGENTIC_CORE_MUST_BE_EXTERNAL_TO_STANDALONE_CHECKOUT",
                 "failure_class": "LocalShadow",
+            }
+        )
+        receipt["receipt_digest"] = _receipt_digest(receipt)
+        return receipt
+    try:
+        receipt["resolved_runtime_trust"] = _verify_runtime_trust(package_root, trust)
+    except StandaloneRuntimeDependencyError as exc:
+        receipt.update(
+            {
+                "status": "BLOCKED_AGENTIC_CORE_TRUST_PIN_MISMATCH",
+                "failure_code": "AGENTIC_CORE_RUNTIME_TRUST_PIN_MISMATCH",
+                "failure_class": type(exc).__name__,
             }
         )
         receipt["receipt_digest"] = _receipt_digest(receipt)
@@ -382,6 +459,15 @@ def validate_standalone_runtime_dependency_receipt(receipt: Mapping[str, Any]) -
             raise StandaloneRuntimeDependencyError("external runtime receipt module results are missing")
         if any(not isinstance(row, Mapping) or row.get("status") != "RESOLVED" for row in modules):
             raise StandaloneRuntimeDependencyError("external runtime receipt has unresolved modules")
+        runtime_trust = receipt.get("runtime_trust")
+        resolved_trust = receipt.get("resolved_runtime_trust")
+        if not isinstance(runtime_trust, Mapping) or not isinstance(resolved_trust, Mapping):
+            raise StandaloneRuntimeDependencyError("external runtime trust pin is missing")
+        if (
+            resolved_trust.get("head_commit") != runtime_trust.get("approved_repository_commit")
+            or resolved_trust.get("package_tree") != runtime_trust.get("approved_package_tree")
+        ):
+            raise StandaloneRuntimeDependencyError("external runtime trust pin does not match receipt")
 
 
 def require_external_agentic_core_runtime(**kwargs: Any) -> dict[str, Any]:

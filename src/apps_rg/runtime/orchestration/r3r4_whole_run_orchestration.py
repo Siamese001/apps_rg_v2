@@ -207,6 +207,8 @@ def _build_cli_ingress_envelope(
     generation_mode: str,
     auto_research_internal: bool,
     research_via: str | None,
+    validated_input_bundle_ref: str = "",
+    validated_input_bundle_digest: str = "",
 ) -> SimpleNamespace:
     request_id = f"req-{uuid.uuid4().hex}"
     run_id = str(uuid.uuid4())
@@ -243,6 +245,8 @@ def _build_cli_ingress_envelope(
         "source_channel": "apps_rg_cli",
         "auto_research_internal": auto_research_internal,
         "research_via": research_via,
+        "validated_input_bundle_ref": validated_input_bundle_ref,
+        "validated_input_bundle_digest": validated_input_bundle_digest,
     }
     return SimpleNamespace(
         app_payload=app_payload,
@@ -869,6 +873,8 @@ def run_whole_run_with_route_governance(
     research_via: str | None = None,
     preflight_continuation_ref: str = "",
     require_fresh_preflight: bool = True,
+    validated_input_bundle_ref: str = "",
+    validated_input_bundle_digest: str = "",
 ) -> dict[str, Any]:
     """Canonical whole-run path: L0 route + optional R3R4 research + R4 draft leg."""
     art = _default_artifact_dir(artifact_dir)
@@ -897,6 +903,8 @@ def run_whole_run_with_route_governance(
         generation_mode=generation_mode,
         auto_research_internal=auto_research_internal,
         research_via=research_via,
+        validated_input_bundle_ref=validated_input_bundle_ref,
+        validated_input_bundle_digest=validated_input_bundle_digest,
     )
     from apps_rg.runtime.e2e_preflight import (
         E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME,
@@ -1738,7 +1746,7 @@ def run_whole_run_with_route_governance(
             pre_uwg_eligible = False
             product_authority_error = f"{type(exc).__name__}:{exc}"
             result_fault = "PRODUCT_E2E_RECEIPT_AUTHORITY_FAILED"
-    if pre_uwg_eligible:
+    if pre_uwg_eligible and require_fresh_preflight:
         from apps_rg.runtime.post_x3_completion import complete_apps_rg_post_x3
 
         post_x3_completion = complete_apps_rg_post_x3(
@@ -1863,6 +1871,8 @@ def run_whole_run_with_route_governance(
                     or "post_x3_completion"
                 )
             )
+    elif pre_uwg_eligible:
+        result_fault = "FRESH_PREFLIGHT_REQUIRED_FOR_PRODUCT_AUTHORIZATION"
     elif not result_fault:
         result_fault = (
             "PRODUCT_X3D_ALLOW_FINISH_REQUIRED"
@@ -2020,6 +2030,29 @@ def run_whole_run_with_route_governance(
             payload["pipeline_complete"] = False
             payload["observability_repair_required"] = True
             payload["completion_status"] = "BLOCKED"
+    # Raw prompts and provider transport output are diagnostics, not product
+    # authority. Redact them before the optional review package and before the
+    # terminal manifest captures any artifact bindings.
+    if product_stage_ledger is not None and immutable_product_authorized and product_close_candidate:
+        try:
+            from apps_rg.runtime.product_artifact_privacy import redact_product_diagnostics
+
+            payload["product_diagnostic_redaction_receipt"] = str(
+                redact_product_diagnostics(art)
+            )
+        except Exception as exc:
+            product_authority_error = f"{type(exc).__name__}:{exc}"
+            product_close_candidate = False
+            payload.update(
+                {
+                    "exit_status": "error",
+                    "execution_status": "failed",
+                    "pipeline_complete": False,
+                    "observability_repair_required": True,
+                    "completion_status": "BLOCKED",
+                    "fault": "PRODUCT_DIAGNOSTIC_REDACTION_FAILED",
+                }
+            )
     review_zip = None
     if is_integrated_whole_run_artifact_dir(art):
         try:

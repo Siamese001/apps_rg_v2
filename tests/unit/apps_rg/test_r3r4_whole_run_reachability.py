@@ -1172,18 +1172,14 @@ def test_whole_run_success_requires_post_x3_uwg_eval_l6(
         require_fresh_preflight=False,
     )
 
-    assert result["exit_status"] == "success"
-    assert result["outcome_authorized"] is True
-    assert result["product_authorized"] is True
-    assert result["pipeline_complete"] is True
+    assert result["exit_status"] == "error"
+    assert result["outcome_authorized"] is False
+    assert result["product_authorized"] is False
+    assert result["pipeline_complete"] is False
     assert result["observability_repair_required"] is False
     assert output_contract_calls == [tmp_path / "full_resume_success01"]
-    assert post_x3_calls == [tmp_path / "full_resume_success01"]
-    assert result["uwg_commit_receipt_ref"] == "uwg/uwg_commit_receipt.json"
-    assert Path(result["apps_eval_record_ref"]).name == "eval_record.json"
-    assert Path(result["apps_eval_record_ref"]).parent.name == "apps_eval"
-    assert Path(result["l6_shadow_bridge_ref"]).name == "l6_shadow_bridge.json"
-    assert Path(result["l6_shadow_bridge_ref"]).parent.name == "apps_eval"
+    assert post_x3_calls == []
+    assert result["fault"] == "FRESH_PREFLIGHT_REQUIRED_FOR_PRODUCT_AUTHORIZATION"
 
 
 def test_whole_run_blocks_when_post_x3_l6_bridge_missing(
@@ -1275,8 +1271,8 @@ def test_whole_run_blocks_when_post_x3_l6_bridge_missing(
     )
 
     assert result["exit_status"] == "error"
-    assert result["outcome_authorized"] is True
-    assert result["product_authorized"] is True
+    assert result["outcome_authorized"] is False
+    assert result["product_authorized"] is False
     assert result["pipeline_complete"] is False
-    assert result["observability_repair_required"] is True
-    assert result["fault"] == "l6_shadow_bridge"
+    assert result["observability_repair_required"] is False
+    assert result["fault"] == "FRESH_PREFLIGHT_REQUIRED_FOR_PRODUCT_AUTHORIZATION"

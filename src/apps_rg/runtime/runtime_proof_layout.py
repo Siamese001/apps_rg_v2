@@ -198,6 +198,37 @@ def allocate_full_resume_artifact_dir(repo: Path, explicit: str = "") -> Path:
     return out
 
 
+def allocate_product_full_resume_artifact_dir(repo: Path, explicit: str = "") -> Path:
+    """Allocate a product run root inside the checkout-owned proof directory.
+
+    Product artifacts contain source résumé, targeting inputs, compiled prompts,
+    and provider output.  An arbitrary local/UNC destination would turn the
+    artifact argument into an exfiltration/write-redirection primitive.
+    """
+
+    repo = _canonical_runtime_repo_root(repo)
+    allowed_root = (repo / "artifacts" / "apps_rg" / "runtime_proofs").resolve()
+    if not str(explicit).strip():
+        return allocate_full_resume_artifact_dir(repo)
+    candidate = Path(explicit).expanduser().resolve()
+    try:
+        candidate.relative_to(allowed_root)
+    except ValueError as exc:
+        raise ValueError(
+            "product artifact_dir must resolve beneath checkout-owned "
+            f"runtime proofs ({allowed_root}); got {candidate}"
+        ) from exc
+    # A link at any existing path component can redirect protected payloads
+    # after the containment check.  Reject it rather than following it.
+    cursor = candidate
+    while cursor != allowed_root:
+        if cursor.exists() and cursor.is_symlink():
+            raise ValueError(f"product artifact_dir may not traverse symlink: {cursor}")
+        cursor = cursor.parent
+    candidate.mkdir(parents=True, exist_ok=True)
+    return candidate
+
+
 def allocate_section_spine_artifact_dir(
     repo: Path,
     lane: str,

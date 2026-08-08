@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
+import json
+import os
 import re
 from collections.abc import Mapping, Sequence
 from datetime import datetime
@@ -15,6 +18,9 @@ from apps_rg.fact_inventory.c03_graph_node_semantic_hardening import (
 
 CONTRACT_PATH = Path(
     "src/apps_rg/evals/c03_graph_evidence_cluster_human_intake_contract.v1.json"
+)
+AUTHORITY_TRUST_CONTRACT_PATH = Path(
+    "config/contracts/c03_w9_human_authority_trust.v1.json"
 )
 ARTIFACT_DIR = Path("artifacts/apps_rg/c03/graph_evidence_cluster_embeddings")
 W9_RECEIPT_PATH = ARTIFACT_DIR / "wave9_human_review_intake_receipt.json"
@@ -36,6 +42,7 @@ RECEIPT_SCHEMA_VERSION = "apps_rg.c03_cluster_embedding_w9_receipt.v1"
 W9_COMPLETION_MARKER = (
     "C03_CLUSTER_EMBEDDING_W9_INTAKE_READY_HUMAN_INPUTS_BLOCKED"
 )
+AUTHORITY_TRUST_SCHEMA_VERSION = "apps_rg.c03_w9_human_authority_trust.v1"
 
 COHORTS = ("reviewer_a", "reviewer_b")
 NON_HUMAN_TOKENS = {
@@ -82,6 +89,71 @@ def _valid_timestamp(value: object) -> bool:
     except ValueError:
         return False
     return parsed.tzinfo is not None
+
+
+def _authority_signature_payload(receipt: Mapping[str, Any]) -> bytes:
+    unsigned = dict(receipt)
+    unsigned.pop("receipt_digest", None)
+    unsigned.pop("external_signature", None)
+    return json.dumps(
+        unsigned, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+
+
+def _authority_trust_contract() -> dict[str, str]:
+    root = Path(__file__).resolve().parents[3]
+    path = root / AUTHORITY_TRUST_CONTRACT_PATH
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ClusterHumanIntakeError(
+            f"W9 authority trust contract is unreadable: {type(exc).__name__}"
+        ) from exc
+    if not isinstance(value, Mapping):
+        raise ClusterHumanIntakeError("W9 authority trust contract must be an object")
+    signature = value.get("signature")
+    if (
+        value.get("schema_version") != AUTHORITY_TRUST_SCHEMA_VERSION
+        or value.get("issuer_ref") != "authority-issuer://evaluation-owner"
+        or not isinstance(signature, Mapping)
+        or signature.get("algorithm") != "HMAC-SHA256"
+        or signature.get("key_id") != "c03-w9-human-authority-v1"
+        or signature.get("environment_variable") != "APPS_RG_C03_W9_AUTHORITY_HMAC_KEY"
+    ):
+        raise ClusterHumanIntakeError("W9 authority trust contract is invalid")
+    return {
+        "issuer_ref": str(value["issuer_ref"]),
+        "algorithm": str(signature["algorithm"]),
+        "key_id": str(signature["key_id"]),
+        "environment_variable": str(signature["environment_variable"]),
+    }
+
+
+def _authority_signature_issues(receipt: Mapping[str, Any]) -> list[str]:
+    try:
+        trust = _authority_trust_contract()
+    except ClusterHumanIntakeError:
+        return ["AUTHORITY_TRUST_CONTRACT"]
+    signature = receipt.get("external_signature")
+    if not isinstance(signature, Mapping):
+        return ["AUTHORITY_EXTERNAL_SIGNATURE"]
+    if set(signature) != {"algorithm", "key_id", "signature"}:
+        return ["AUTHORITY_EXTERNAL_SIGNATURE_FIELDS"]
+    if (
+        signature.get("algorithm") != trust["algorithm"]
+        or signature.get("key_id") != trust["key_id"]
+        or receipt.get("issuer_ref") != trust["issuer_ref"]
+    ):
+        return ["AUTHORITY_EXTERNAL_SIGNATURE_IDENTITY"]
+    secret = os.environ.get(trust["environment_variable"], "")
+    if len(secret) < 32:
+        return ["AUTHORITY_EXTERNAL_SIGNING_KEY_UNAVAILABLE"]
+    expected = hmac.new(
+        secret.encode("utf-8"), _authority_signature_payload(receipt), hashlib.sha256
+    ).hexdigest()
+    if not hmac.compare_digest(str(signature.get("signature") or ""), expected):
+        return ["AUTHORITY_EXTERNAL_SIGNATURE_INVALID"]
+    return []
 
 
 def _digest_matches(value: Mapping[str, Any], field: str) -> bool:
@@ -161,6 +233,7 @@ def collect_human_authority_issues(
         "issued_at",
         "authorized_participants",
         "unknown_is_pass",
+        "external_signature",
         "receipt_digest",
     }
     if set(receipt) != expected_keys:
@@ -175,6 +248,7 @@ def collect_human_authority_issues(
         issues.append("AUTHORITY_UNKNOWN_POLICY")
     if not _digest_matches(receipt, "receipt_digest"):
         issues.append("AUTHORITY_RECEIPT_DIGEST")
+    issues.extend(_authority_signature_issues(receipt))
     if not _is_sha256(trusted_file_sha256) or observed_file_sha256 != (
         trusted_file_sha256
     ):

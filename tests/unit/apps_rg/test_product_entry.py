@@ -38,7 +38,7 @@ def test_product_entry_mints_preflight_before_whole_run(
     monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
     monkeypatch.setattr(
         product_entry,
-        "allocate_full_resume_artifact_dir",
+        "allocate_product_full_resume_artifact_dir",
         lambda repo, explicit: run_dir,
     )
     _allow_external_runtime_dependency(monkeypatch, run_dir)
@@ -58,6 +58,10 @@ def test_product_entry_mints_preflight_before_whole_run(
         assert str(kwargs["preflight_continuation_ref"]).endswith(
             "e2e_preflight_continuation_receipt.json"
         )
+        assert kwargs["job_description_ref"] == ""
+        assert kwargs["source_resume_text"] == "inline resume"
+        assert kwargs["validated_input_bundle_digest"]
+        assert Path(str(kwargs["manual_brief"])).is_file()
         return {"product_authorized": False, "pipeline_complete": False}
 
     monkeypatch.setattr(
@@ -72,10 +76,14 @@ def test_product_entry_mints_preflight_before_whole_run(
     result = product_entry.run_product_whole_run_from_primitives(
         target_company="Anthropic",
         target_role="Manager",
+        source_resume_text="inline resume",
+        job_description_text="inline JD",
+        manual_brief="inline brief",
     )
 
     assert calls == ["preflight", "whole_run"]
     assert result["authority_contract_id"] == "apps_research_rg_e2e_authority"
+    assert Path(str(result["validated_input_bundle_ref"])).is_file()
     assert "APPS_RG_WHOLE_RUN_ENVELOPE" not in os.environ
 
 
@@ -90,7 +98,7 @@ def test_product_entry_restores_prior_envelope_after_orchestrator_error(
     monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
     monkeypatch.setattr(
         product_entry,
-        "allocate_full_resume_artifact_dir",
+        "allocate_product_full_resume_artifact_dir",
         lambda repo, explicit: run_dir,
     )
     _allow_external_runtime_dependency(monkeypatch, run_dir)
@@ -133,7 +141,7 @@ def test_product_entry_stops_when_preflight_blocks(
     monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
     monkeypatch.setattr(
         product_entry,
-        "allocate_full_resume_artifact_dir",
+        "allocate_product_full_resume_artifact_dir",
         lambda repo, explicit: run_dir,
     )
     _allow_external_runtime_dependency(monkeypatch, run_dir)
@@ -168,7 +176,7 @@ def test_product_entry_blocks_before_preflight_without_external_core_runtime(
     monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
     monkeypatch.setattr(
         product_entry,
-        "allocate_full_resume_artifact_dir",
+        "allocate_product_full_resume_artifact_dir",
         lambda repo, explicit: run_dir,
     )
     monkeypatch.setattr(
@@ -211,7 +219,7 @@ def test_product_entry_rejects_non_fresh_explicit_artifact_dir(
         artifact_dir=str(run_dir),
     )
 
-    assert result["fault"] == "PRODUCT_ARTIFACT_DIR_NOT_FRESH"
+    assert result["fault"] == "PRODUCT_ARTIFACT_DIR_UNSAFE"
     assert result["product_authorized"] is False
 
 

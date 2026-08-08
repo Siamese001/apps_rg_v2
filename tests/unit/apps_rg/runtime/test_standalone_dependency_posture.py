@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
 from pathlib import Path
+import subprocess
 from types import ModuleType
 
 import pytest
@@ -54,6 +56,49 @@ def _patch_imports(
     )
 
 
+def _trusted_contract(tmp_path: Path, package_root: Path) -> Path:
+    """Pin the synthetic external package exactly as production requires."""
+
+    subprocess.run(["git", "init", str(package_root)], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(package_root), "config", "user.email", "tests@example.invalid"],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(package_root), "config", "user.name", "Apps RG tests"],
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(["git", "-C", str(package_root), "add", "agentic_core"], check=True, capture_output=True)
+    subprocess.run(
+        ["git", "-C", str(package_root), "commit", "-m", "synthetic core"],
+        check=True,
+        capture_output=True,
+    )
+    head = subprocess.check_output(
+        ["git", "-C", str(package_root), "rev-parse", "HEAD"], text=True
+    ).strip()
+    tree = subprocess.check_output(
+        ["git", "-C", str(package_root), "rev-parse", "HEAD:agentic_core"], text=True
+    ).strip()
+    contract = json.loads(
+        (Path(__file__).resolve().parents[4] / "config/contracts/apps_rg_standalone_runtime_dependency.v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    contract["runtime_trust"] = {
+        "mode": "GIT_COMMIT_AND_PACKAGE_TREE_PIN",
+        "approved_repository_commit": head,
+        "approved_package_tree": tree,
+        "package_relative_path": "agentic_core",
+        "require_clean_tracked_worktree": True,
+    }
+    path = tmp_path / "runtime-contract.json"
+    path.write_text(json.dumps(contract), encoding="utf-8")
+    return path
+
+
 def test_external_source_runtime_receipt_proves_spine_sentinels(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -62,12 +107,13 @@ def test_external_source_runtime_receipt_proves_spine_sentinels(
 
     repo = tmp_path / "standalone"
     repo.mkdir()
-    modules = _external_modules(tmp_path / "external")
+    external = tmp_path / "external"
+    modules = _external_modules(external)
     _patch_imports(monkeypatch, modules)
 
     receipt = posture.verify_external_agentic_core_runtime(
         repo_root=repo,
-        contract_path=posture.standalone_runtime_dependency_contract_path(),
+        contract_path=_trusted_contract(tmp_path, external),
         generated_at_utc=datetime(2026, 8, 6, tzinfo=timezone.utc),
     )
 
@@ -131,14 +177,15 @@ def test_missing_required_core_module_is_a_fail_closed_runtime_boundary(
 
     repo = tmp_path / "standalone"
     repo.mkdir()
-    modules = _external_modules(tmp_path / "external")
+    external = tmp_path / "external"
+    modules = _external_modules(external)
     missing = _REQUIRED_MODULES[-1]
     del modules[missing]
     _patch_imports(monkeypatch, modules)
 
     receipt = posture.verify_external_agentic_core_runtime(
         repo_root=repo,
-        contract_path=posture.standalone_runtime_dependency_contract_path(),
+        contract_path=_trusted_contract(tmp_path, external),
     )
 
     assert receipt["status"] == "BLOCKED_REQUIRED_AGENTIC_CORE_MODULES_UNAVAILABLE"
@@ -150,6 +197,29 @@ def test_missing_required_core_module_is_a_fail_closed_runtime_boundary(
         "error_class": "ModuleNotFoundError",
     }
     posture.validate_standalone_runtime_dependency_receipt(receipt)
+
+
+def test_external_runtime_commit_or_tree_drift_is_fail_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime import standalone_dependency_posture as posture
+
+    repo = tmp_path / "standalone"
+    repo.mkdir()
+    external = tmp_path / "external"
+    modules = _external_modules(external)
+    contract_path = _trusted_contract(tmp_path, external)
+    (external / "agentic_core" / "__init__.py").write_text("# drift\n", encoding="utf-8")
+    _patch_imports(monkeypatch, modules)
+
+    receipt = posture.verify_external_agentic_core_runtime(
+        repo_root=repo,
+        contract_path=contract_path,
+    )
+
+    assert receipt["status"] == "BLOCKED_AGENTIC_CORE_TRUST_PIN_MISMATCH"
+    assert receipt["failure_code"] == "AGENTIC_CORE_RUNTIME_TRUST_PIN_MISMATCH"
 
 
 def test_invalid_dependency_contract_is_a_fail_closed_runtime_boundary(
@@ -180,11 +250,12 @@ def test_dependency_receipt_digest_rejects_a_promotion_like_claim(
 
     repo = tmp_path / "standalone"
     repo.mkdir()
-    modules = _external_modules(tmp_path / "external")
+    external = tmp_path / "external"
+    modules = _external_modules(external)
     _patch_imports(monkeypatch, modules)
     receipt = posture.verify_external_agentic_core_runtime(
         repo_root=repo,
-        contract_path=posture.standalone_runtime_dependency_contract_path(),
+        contract_path=_trusted_contract(tmp_path, external),
     )
     receipt["standalone_installability"] = "INDEPENDENTLY_INSTALLABLE"
 

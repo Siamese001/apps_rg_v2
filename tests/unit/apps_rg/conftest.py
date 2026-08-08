@@ -56,6 +56,9 @@ def _repository_artifact_isolation(
     isolated_env = {
         "APPS_RG_AUGMENTED_SKILLS_GRAPH_SQLITE_PATH": str(isolated_graph),
         "APPS_RG_R1B_CACHE_ROOT": str(session_root / "r1b_cache"),
+        # The unit harness owns this test-only secret. Production has no
+        # fallback: missing cache signing material fails cache reads closed.
+        "APPS_RG_R1B_CACHE_INTEGRITY_HMAC_KEY": "apps-rg-unit-test-cache-integrity-key-0001",
     }
     previous = {name: os.environ.get(name) for name in isolated_env}
     os.environ.update(isolated_env)

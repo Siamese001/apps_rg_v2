@@ -9,25 +9,11 @@ import hashlib
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
-from urllib.request import Request, urlopen
 
 from apps_rg.runtime.briefing_ssot import DEFAULT_TARGETING_BRIEFING_PATH, default_targeting_briefing_text
 
 # Extensions allowed for local briefing artifacts (lowercased suffixes).
 ALLOWED_BRIEFING_SUFFIXES: frozenset[str] = frozenset({".txt", ".md", ".json", ".yaml", ".yml", ".markdown"})
-
-_ALLOWED_MIME_PREFIXES: tuple[str, ...] = ("text/",)
-_ALLOWED_MIME_EXACT: frozenset[str] = frozenset(
-    {
-        "application/json",
-        "application/yaml",
-        "application/x-yaml",
-    }
-)
-_URI_FETCH_MAX_BYTES = 2_000_000
-
 
 class BriefingSource(StrEnum):
     RUN_SPECIFIC = "RUN_SPECIFIC"
@@ -68,34 +54,11 @@ def _looks_like_filesystem_ref(ref: str) -> bool:
     return any(low.endswith(s) for s in ALLOWED_BRIEFING_SUFFIXES)
 
 
-def _mime_allowed(ctype: str | None, *, url_path: str) -> bool:
-    if ctype:
-        primary = ctype.split(";")[0].strip().lower()
-        if primary in _ALLOWED_MIME_EXACT:
-            return True
-        if primary.startswith(_ALLOWED_MIME_PREFIXES):
-            return True
-    p = Path(urlparse(url_path).path or "")
-    return p.suffix.lower() in ALLOWED_BRIEFING_SUFFIXES
-
-
 def _fetch_uri(ref: str) -> tuple[str, str | None]:
-    req = Request(ref, headers={"User-Agent": "apps_rg-briefing/1"})
-    with urlopen(req, timeout=45) as resp:  # noqa: S310 — intentional user-supplied briefing URL
-        raw_ct = resp.headers.get("Content-Type")
-        ctype = raw_ct.split(";")[0].strip().lower() if raw_ct else None
-        if not _mime_allowed(ctype, url_path=ref):
-            raise BriefingResolutionError(
-                f"briefing URI content-type not allowed (got {ctype!r} for {ref!r})"
-            )
-        raw = resp.read(_URI_FETCH_MAX_BYTES + 1)
-    if len(raw) > _URI_FETCH_MAX_BYTES:
-        raise BriefingResolutionError(f"briefing URI response exceeds {_URI_FETCH_MAX_BYTES} bytes")
-    try:
-        text = raw.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        raise BriefingResolutionError(f"briefing URI body is not valid utf-8: {ref!r}") from exc
-    return text, ctype
+    raise BriefingResolutionError(
+        "remote briefing references are not supported; submit captured text "
+        "through the governed input bundle"
+    )
 
 
 def resolve_briefing_for_lanes(

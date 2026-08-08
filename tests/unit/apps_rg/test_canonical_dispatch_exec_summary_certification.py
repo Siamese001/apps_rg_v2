@@ -77,7 +77,7 @@ def test_canonical_full_resume_fails_on_exec_summary_judge_block(
     )
 
     assert result["exit_status"] == "error"
-    assert result["execution_status"] == "failed"
+    assert result["execution_status"] == "non_product_completed"
     assert result["outcome_authorized"] is False
     assert result["x3_disposition"] == "X3_REVIEW_JUDGE_SOFT_FAIL"
     assert result["executive_summary_certification_block"]["blocking_judge_ids"] == ["gemini_pro"]
