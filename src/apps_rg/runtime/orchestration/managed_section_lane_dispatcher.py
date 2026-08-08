@@ -5,7 +5,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Callable
 
-from apps_rg.runtime.orchestration.section_lane_concurrency import LaneWave, build_phase1_waves
+from apps_rg.runtime.orchestration.section_lane_concurrency import LaneWave, section_dag_dependencies
 from apps_rg.runtime.orchestration.section_lane_executor import (
     LaneDispatchOutcome,
     LaneExecutionContext,
@@ -44,6 +44,7 @@ class ProgressReporter:  # pragma: no cover - exercised via the public dispatche
         )
 
 _WAVE_ABORT_EXEC_STATUS = f"pre_run_blocked:{PHASE1_PRIOR_LANE_FAILED_BLOCKER}"
+_DEPENDENCY_FAILED_BLOCKER = "UPSTREAM_DEPENDENCY_FAILED"
 
 
 def _skipped_prior_lane_abort(lane: str) -> LaneDispatchOutcome:
@@ -59,6 +60,55 @@ def _skipped_prior_lane_abort(lane: str) -> LaneDispatchOutcome:
     )
 
 
+def _skipped_dependency(lane: str, dependencies: tuple[str, ...], reason: str) -> LaneDispatchOutcome:
+    """Return a truthful, non-dispatch outcome for a lane with failed prerequisites."""
+    return LaneDispatchOutcome(
+        lane=lane,
+        dispatch_result={
+            "blocked_by": list(dependencies),
+            "dependency_reason": reason,
+        },
+        exec_status=f"pre_run_blocked:{_DEPENDENCY_FAILED_BLOCKER}",
+    )
+
+
+def _outcome_succeeded(outcome: LaneDispatchOutcome | None) -> bool:
+    """Whether a completed lane is eligible to unlock direct dependents.
+
+    This intentionally accepts the legacy empty exit status produced by some
+    thin test/adapter call sites, but rejects all explicit dispatch faults,
+    error exits, and pre-run blocks.  Product-level acceptance remains checked
+    by ``dependency_ready_fn`` before a dependent is submitted.
+    """
+    if outcome is None or str(outcome.exec_status).startswith(("error:", "pre_run_blocked:")):
+        return False
+    result = outcome.dispatch_result if isinstance(outcome.dispatch_result, dict) else {}
+    if str(result.get("fault") or "").strip():
+        return False
+    return str(result.get("exit_status") or "").strip().lower() not in {
+        "error",
+        "failed",
+        "failure",
+    }
+
+
+def _readiness_result(
+    dependency_ready_fn: Callable[[str], bool | tuple[bool, str]] | None,
+    lane: str,
+) -> tuple[bool, str]:
+    """Evaluate an app-owned acceptance predicate without exposing scheduler internals."""
+    if dependency_ready_fn is None:
+        return True, ""
+    try:
+        value = dependency_ready_fn(lane)
+    except Exception as exc:  # guardian: readiness is a fail-closed app boundary
+        return False, f"readiness_exception:{exc!s}"
+    if isinstance(value, tuple):
+        ready, reason = value
+        return bool(ready), str(reason or "dependency_not_certified")
+    return bool(value), "" if value else "dependency_not_certified"
+
+
 def dispatch_phase1_lanes_managed(
     lanes_in_order: tuple[str, ...],
     ctx: LaneExecutionContext,
@@ -67,8 +117,17 @@ def dispatch_phase1_lanes_managed(
     parallel: bool,
     max_parallel: int = 2,
     should_skip_remaining_waves: Callable[[], bool] | None = None,
+    dependency_ready_fn: Callable[[str], bool | tuple[bool, str]] | None = None,
 ) -> dict[str, LaneDispatchOutcome]:
-    """Dispatch lanes in DAG waves; serial fallback is one lane at a time."""
+    """Dispatch Phase-1 lanes with a bounded, dependency-aware ready queue.
+
+    Parallel execution is work-conserving: as soon as a bullets lane completes
+    and its acceptance receipt validates, its paired narrative can start while
+    other independent bullets are still running.  The manifest's waves remain
+    an observability grouping, not an all-of-wave completion barrier.  A caller
+    that supplies ``should_skip_remaining_waves`` retains the legacy global
+    abort behavior for a true run-wide abort condition.
+    """
     outcomes: dict[str, LaneDispatchOutcome] = {}
 
     # §16 query-progress (constitutional): a Phase-1 dispatch runs N section lanes, each an
@@ -94,31 +153,73 @@ def dispatch_phase1_lanes_managed(
         reporter.done()
         return outcomes
 
-    waves = build_phase1_waves()
-    for wave in waves:
-        wave_lanes = [ln for ln in wave.lanes if ln in lanes_in_order]
-        if not wave_lanes:
-            continue
-        if should_skip_remaining_waves and should_skip_remaining_waves():
-            for lane in wave_lanes:
-                _record(lane, _skipped_prior_lane_abort(lane))
-            continue
-        cap = min(wave.max_parallel, max_parallel, len(wave_lanes))
-        if cap <= 1:
-            for lane in wave_lanes:
-                if should_skip_remaining_waves and should_skip_remaining_waves():
-                    _record(lane, _skipped_prior_lane_abort(lane))
+    selected = tuple(dict.fromkeys(lanes_in_order))
+    dependencies = section_dag_dependencies(lanes=selected)
+    pending = set(selected)
+    running: dict[Any, str] = {}
+    cap = max(1, min(int(max_parallel), len(selected) or 1))
+
+    with ThreadPoolExecutor(max_workers=cap) as pool:
+        while pending or running:
+            if should_skip_remaining_waves and should_skip_remaining_waves():
+                for lane in selected:
+                    if lane in pending:
+                        pending.remove(lane)
+                        _record(lane, _skipped_prior_lane_abort(lane))
+            made_progress = False
+
+            # A failed prerequisite blocks its descendants only.  Independent
+            # branches continue, preserving their receipts for diagnosis/rerun.
+            for lane in selected:
+                if lane not in pending:
                     continue
-                _record(lane, run_lane_in_context(ctx, lane, dispatch_fn=dispatch_fn))
-            continue
-        with ThreadPoolExecutor(max_workers=cap) as pool:
-            futs = {
-                pool.submit(run_lane_in_context, ctx, lane, dispatch_fn=dispatch_fn): lane
-                for lane in wave_lanes
-            }
-            for fut in as_completed(futs):
-                lane = futs[fut]
+                deps = dependencies.get(lane, ())
+                failed = tuple(dep for dep in deps if dep in outcomes and not _outcome_succeeded(outcomes[dep]))
+                if failed:
+                    pending.remove(lane)
+                    _record(lane, _skipped_dependency(lane, failed, "dependency_failed"))
+                    made_progress = True
+
+            # Submit deterministic ready lanes until the global provider-safe
+            # capacity is full.  This is deliberately a single shared cap, not
+            # a per-wave cap that can accidentally over-fan-out requests.
+            for lane in selected:
+                if len(running) >= cap or lane not in pending:
+                    continue
+                deps = dependencies.get(lane, ())
+                if not all(dep in outcomes and _outcome_succeeded(outcomes[dep]) for dep in deps):
+                    continue
+                ready, reason = _readiness_result(dependency_ready_fn, lane)
+                if not ready:
+                    pending.remove(lane)
+                    _record(lane, _skipped_dependency(lane, deps, reason))
+                    made_progress = True
+                    continue
+                pending.remove(lane)
+                fut = pool.submit(run_lane_in_context, ctx, lane, dispatch_fn=dispatch_fn)
+                running[fut] = lane
+                made_progress = True
+
+            if running:
+                fut = next(as_completed(tuple(running)))
+                lane = running.pop(fut)
                 _record(lane, fut.result())
+                continue
+
+            if pending and not made_progress:
+                # The manifest validator rejects cycles, so reaching here means
+                # a subset caller omitted or could not satisfy a prerequisite.
+                for lane in selected:
+                    if lane in pending:
+                        pending.remove(lane)
+                        _record(
+                            lane,
+                            _skipped_dependency(
+                                lane,
+                                dependencies.get(lane, ()),
+                                "dependencies_not_resolved",
+                            ),
+                        )
     for lane in lanes_in_order:
         if lane not in outcomes:
             _record(

@@ -89,6 +89,36 @@ def assert_section_dag_wave_order(manifest: dict[str, Any]) -> None:
                 )
 
 
+def section_dag_dependencies(*, lanes: tuple[str, ...] | None = None) -> dict[str, tuple[str, ...]]:
+    """Return the selected Phase-1 lanes' direct dependencies from the manifest SSOT.
+
+    ``waves`` remain useful operator-facing rollups, but they are not execution
+    barriers: a lane can become ready as soon as each direct dependency has a
+    certified outcome.  Dependencies outside ``lanes`` are deliberately omitted
+    so the existing single-section and subset dispatch callers retain their
+    self-contained semantics.
+    """
+    manifest = load_section_dag_manifest()
+    assert_section_dag_wave_order(manifest)
+    selected = set(lanes or GENERATED_LANES)
+    out: dict[str, tuple[str, ...]] = {}
+    for entry in manifest.get("lanes") or []:
+        if not isinstance(entry, dict):
+            continue
+        lane = str(entry.get("id") or "").strip()
+        if lane not in selected:
+            continue
+        deps = tuple(
+            dependency_id
+            for dependency_id in (
+                str(dep).strip() for dep in (entry.get("depends_on") or [])
+            )
+            if dependency_id in selected
+        )
+        out[lane] = deps
+    return out
+
+
 def build_phase1_waves() -> tuple[LaneWave, ...]:
     """Ordered waves respecting DAG; wave 0 exec solo when parallel mode on."""
     manifest = load_section_dag_manifest()
@@ -116,4 +146,5 @@ __all__ = [
     "load_section_dag_manifest",
     "phase1_parallel_enabled",
     "resolve_max_parallel",
+    "section_dag_dependencies",
 ]

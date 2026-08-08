@@ -835,10 +835,7 @@ def run_modular_resume_generation(
             )
 
             def _phase1_dispatch_one_lane(**kwargs: Any) -> dict[str, Any]:
-                nonlocal phase1_aborted, phase1_abort_reason
                 lane = str(kwargs.get("section") or "")
-                if phase1_aborted:
-                    return {"prior_abort": phase1_abort_reason, "exit_status": "error"}
                 upstream_spec = _narrative_upstream.get(lane)
                 if upstream_spec is not None:
                     upstream_lane, expected_ids = upstream_spec
@@ -867,16 +864,29 @@ def run_modular_resume_generation(
                         }
                 try:
                     result = run_canonical_apps_rg_from_cli_primitives(**kwargs)
-                    res = dict(result) if isinstance(result, dict) else {}
-                    if product_fail_closed_runtime() and phase1_dispatch_hard_failed(res):
-                        phase1_aborted = True
-                        phase1_abort_reason = f"dispatch_failed:{lane}"
-                    return res
+                    return dict(result) if isinstance(result, dict) else {}
                 except Exception as exc:  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
-                    if product_fail_closed_runtime():
-                        phase1_aborted = True
-                        phase1_abort_reason = f"dispatch_exception:{lane}:{exc!s}"
                     return {"fault": "exception", "error": str(exc), "exit_status": "error"}
+
+            def _phase1_dependency_ready(lane: str) -> tuple[bool, str]:
+                """Require a certified companion-bullet receipt before a narrative runs.
+
+                The L3 scheduler already waits for the manifest edge's dispatch
+                outcome.  This second, app-owned check is intentionally stricter:
+                a returned request is not enough; the selected companion bullets
+                must be finalized in this run's isolated sections root.
+                """
+                upstream_spec = _narrative_upstream.get(lane)
+                if upstream_spec is None:
+                    return True, ""
+                upstream_lane, expected_ids = upstream_spec
+                accepted = companion_accepted_in_modular_sections_root(
+                    repo,
+                    sections_root,
+                    upstream_section_id=upstream_lane,
+                    expected_bullet_ids=expected_ids,
+                )
+                return accepted, "" if accepted else PRE_RUN_UPSTREAM_NOT_FINALIZED_BLOCKER
 
             _lane_ctx = LaneExecutionContext(
                 sections_root=str(sections_root.resolve()),
@@ -899,21 +909,22 @@ def run_modular_resume_generation(
                     dispatch_fn=_phase1_dispatch_one_lane,
                     parallel=True,
                     max_parallel=_max_par,
-                    should_skip_remaining_waves=lambda: phase1_aborted,
+                    dependency_ready_fn=_phase1_dependency_ready,
                 )
                 for lane, oc in _outcomes.items():
                     lane_dispatch_results[lane] = dict(oc.dispatch_result)
                     if oc.exec_status.startswith("pre_run_blocked:"):
-                        # Wave skipped after a prior-lane fail-closed abort: preserve the
-                        # blocker semantics the serial path records. Don't let the generic
-                        # status recompute downgrade it to dispatch_error/LANE_DISPATCH_EXIT_ERROR.
+                        # A lane not dispatched by L3 has a typed dependency blocker.
+                        # Preserve it through materialization rather than letting generic
+                        # status recompute relabel it as LANE_DISPATCH_EXIT_ERROR.
                         lane_exec_status[lane] = oc.exec_status
+                        blocker = oc.exec_status.removeprefix("pre_run_blocked:") or PHASE1_PRIOR_LANE_FAILED_BLOCKER
                         emit_integrated_lane_pre_run_failure(
                             sections_root=sections_root,
                             integrated_dir=art,
                             repo_root=repo,
                             lane_id=lane,
-                            blocker=PHASE1_PRIOR_LANE_FAILED_BLOCKER,
+                            blocker=blocker,
                             dispatch_result=lane_dispatch_results[lane],
                             lane_exec_status=oc.exec_status,
                         )
