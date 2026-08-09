@@ -15,11 +15,12 @@ import importlib.util
 import json
 import os
 import sys
+import traceback
 import uuid
 from dataclasses import fields
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 
 W3_COMPLETION_SCHEMA = "apps_rg.l6_shadow_replay_completion.v1"
@@ -30,9 +31,18 @@ W3_BINDINGS_SCHEMA = "apps_rg.l6_section_apps_eval_bindings.v3"
 W3_BINDINGS_FILENAME = "l6_section_apps_eval_bindings.json"
 W3_BINDING_CLOSURE_SCHEMA = "apps_rg.l6_apps_eval_binding_closure_receipt.v2"
 W3_BINDING_CLOSURE_FILENAME = "l6_apps_eval_binding_closure_receipt.json"
+W3_CALIBRATION_SCHEMA = "apps_rg.l6_judge_human_calibration_status.v1"
+W3_CALIBRATION_FILENAME = "l6_judge_human_calibration_status.json"
+W3_ERROR_RECEIPT_SCHEMA = "apps_rg.post_runtime_stage_error.v1"
+W3_ERROR_SPAN_SCHEMA = "apps_rg.local_post_runtime_error_span.v1"
+W3_RESUME_RECEIPT_SCHEMA = "apps_rg.post_runtime_stage_resume.v1"
+W3_ERROR_RECEIPT_FILENAME = "failures/l6_shadow_error_receipt.json"
+W3_ERROR_SPAN_FILENAME = "failures/l6_shadow_error_span.json"
+W3_RESUME_RECEIPT_FILENAME = "failures/l6_shadow_resume_receipt.json"
 
 W2_COMPLETION_FILENAME = "w2_completion_receipt.json"
 W2_GUARD_FILENAME = "w2_zero_provider_guard_receipt.json"
+W2_SUPERSESSION_SCHEMA = "apps_rg.eval_package_supersession_manifest.v1"
 REQUIRED_ZERO_ACTIVITY_COUNTERS = frozenset(
     {
         "blocked_import_attempts",
@@ -127,6 +137,171 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> Path:
     )
     os.replace(temporary, path)
     return path
+
+
+def _write_semantic(path: Path, payload: Mapping[str, Any]) -> Path:
+    body = dict(payload)
+    body["semantic_digest"] = _canonical_digest(body)
+    return _atomic_write_json(path, body)
+
+
+def _stable_id(*parts: str, length: int) -> str:
+    raw = "\x1f".join(parts).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()[:length]
+
+
+def _emit_stage_failure(
+    *,
+    output: Path,
+    source_run_id: str,
+    exc: Exception,
+    attempt: int,
+) -> dict[str, Path]:
+    """Persist the real L6 boundary exception before propagating it."""
+
+    stage_id = "L6_SHADOW_OBSERVABILITY"
+    trace_id = _stable_id(
+        source_run_id,
+        stage_id,
+        type(exc).__name__,
+        str(exc),
+        str(attempt),
+        length=32,
+    )
+    span_id = _stable_id(trace_id, "span", length=16)
+    receipt_path = output / W3_ERROR_RECEIPT_FILENAME
+    span_path = output / W3_ERROR_SPAN_FILENAME
+    formatted = "".join(
+        traceback.format_exception(type(exc), exc, exc.__traceback__)
+    )
+    _write_semantic(
+        receipt_path,
+        {
+            "schema_version": W3_ERROR_RECEIPT_SCHEMA,
+            "status": "CAPTURED",
+            "wave": "W3",
+            "stage_id": stage_id,
+            "source_run_id": source_run_id,
+            "attempt": attempt,
+            "error_type": type(exc).__name__,
+            "error_module": type(exc).__module__,
+            "error_message": str(exc),
+            "traceback": formatted,
+            "trace_id": trace_id,
+            "span_id": span_id,
+            "recovery_action": "RESUME_FROM_L6_SAVED_W2",
+            "w1_replayed": False,
+            "w2_replayed": False,
+            "apps_eval_replayed": False,
+            "generation_replayed": False,
+            "judge_replayed": False,
+            "embedding_replayed": False,
+            "uwg_operation_attempted": False,
+            "provider_calls": 0,
+            "judge_calls": 0,
+            "embedding_calls": 0,
+            "model_calls": 0,
+            "network_attempts": 0,
+            "local_authority": True,
+        },
+    )
+    _write_semantic(
+        span_path,
+        {
+            "schema_version": W3_ERROR_SPAN_SCHEMA,
+            "status": "ERROR",
+            "wave": "W3",
+            "stage_id": stage_id,
+            "source_run_id": source_run_id,
+            "attempt": attempt,
+            "trace_id": trace_id,
+            "span_id": span_id,
+            "exception_type": type(exc).__name__,
+            "exception_message": str(exc),
+            "recovery_action": "RESUME_FROM_L6_SAVED_W2",
+            "provider_execution": False,
+            "apps_eval_execution": False,
+            "generation_execution": False,
+            "judge_execution": False,
+            "embedding_execution": False,
+            "uwg_execution": False,
+            "local_authority": True,
+            "remote_otel_role": "OPTIONAL_MIRROR_NOT_AUTHORITY",
+        },
+    )
+    return {"error_receipt": receipt_path, "error_span": span_path}
+
+
+def _emit_stage_resume(
+    *,
+    output: Path,
+    source_run_id: str,
+    w2: Mapping[str, Any],
+) -> Path | None:
+    error_path = output / W3_ERROR_RECEIPT_FILENAME
+    span_path = output / W3_ERROR_SPAN_FILENAME
+    if not error_path.is_file() and not span_path.is_file():
+        return None
+    if not error_path.is_file() or not span_path.is_file():
+        raise L6ShadowReplayError("W3 failure evidence is incomplete")
+    error = _read_json(error_path, label="w3_error_receipt")
+    span = _read_json(span_path, label="w3_error_span")
+    checks = {
+        "error_schema": error.get("schema_version") == W3_ERROR_RECEIPT_SCHEMA,
+        "error_semantic": _semantic_digest_valid(error),
+        "error_stage": error.get("stage_id") == "L6_SHADOW_OBSERVABILITY",
+        "error_source": error.get("source_run_id") == source_run_id,
+        "error_zero_upstream_replay": error.get("w1_replayed") is False
+        and error.get("w2_replayed") is False
+        and error.get("apps_eval_replayed") is False
+        and error.get("generation_replayed") is False
+        and error.get("judge_replayed") is False
+        and error.get("embedding_replayed") is False
+        and error.get("uwg_operation_attempted") is False,
+        "span_schema": span.get("schema_version") == W3_ERROR_SPAN_SCHEMA,
+        "span_semantic": _semantic_digest_valid(span),
+        "span_source": span.get("source_run_id") == source_run_id,
+        "span_zero_upstream_execution": span.get("provider_execution") is False
+        and span.get("apps_eval_execution") is False
+        and span.get("generation_execution") is False
+        and span.get("judge_execution") is False
+        and span.get("embedding_execution") is False
+        and span.get("uwg_execution") is False,
+        "identity": error.get("trace_id") == span.get("trace_id")
+        and error.get("span_id") == span.get("span_id"),
+    }
+    failures = sorted(name for name, passed in checks.items() if not passed)
+    if failures:
+        raise L6ShadowReplayError(
+            "w3_failure_evidence_invalid:" + ",".join(failures)
+        )
+    return _write_semantic(
+        output / W3_RESUME_RECEIPT_FILENAME,
+        {
+            "schema_version": W3_RESUME_RECEIPT_SCHEMA,
+            "status": "PASS",
+            "wave": "W3",
+            "stage_id": "L6_SHADOW_OBSERVABILITY",
+            "source_run_id": source_run_id,
+            "resume_from_stage": "L6_SHADOW_OBSERVABILITY",
+            "upstream_saved_artifacts_reused": True,
+            "w1_replayed": False,
+            "w2_replayed": False,
+            "apps_eval_replayed": False,
+            "generation_replayed": False,
+            "judge_replayed": False,
+            "embedding_replayed": False,
+            "uwg_operation_attempted": False,
+            "w2_completion_ref": w2["completion_path"].as_posix(),
+            "w2_completion_semantic_digest": w2["completion"][
+                "semantic_digest"
+            ],
+            "w2_guard_ref": w2["guard_path"].as_posix(),
+            "w2_guard_semantic_digest": w2["guard"]["semantic_digest"],
+            "error_receipt": _file_binding(error_path, relative_to=output),
+            "error_span": _file_binding(span_path, relative_to=output),
+        },
+    )
 
 
 def _semantic_digest_valid(payload: Mapping[str, Any]) -> bool:
@@ -242,7 +417,17 @@ def _validate_w2(output_dir: Path, source: Path) -> dict[str, Any]:
     l6_handoff_path = _resolve_binding(
         w2_dir, completion.get("l6_handoff"), label="w2_l6_handoff"
     )
+    supersession_path = _resolve_binding(
+        w2_dir,
+        completion.get("eval_package_supersession_manifest"),
+        label="w2_eval_package_supersession_manifest",
+    )
+    supersession = _read_json(
+        supersession_path,
+        label="w2_eval_package_supersession_manifest",
+    )
     seal_valid, seal_errors = _verify_eval_package_seal(eval_record_path.parent)
+    record_id = str(completion.get("record_id") or "")
     checks = {
         "completion_schema_exact": completion.get("schema_version")
         == "apps_rg.apps_eval_replay_completion.v1",
@@ -256,10 +441,26 @@ def _validate_w2(output_dir: Path, source: Path) -> dict[str, Any]:
         and completion.get("release_blocked") is True,
         "l6_handoff_only": completion.get("l6_handoff_emitted") is True
         and completion.get("l6_shadow_bridge_executed") is False,
-        "record_id_bound": bool(str(completion.get("record_id") or "")),
+        "record_id_bound": bool(record_id),
         "eval_seal_binding_exact": eval_seal_path
         == eval_record_path.parent / "apps_rg_eval_package_seal.json",
         "eval_package_seal_valid": seal_valid and not seal_errors,
+        "supersession_schema_exact": supersession.get("schema_version")
+        == W2_SUPERSESSION_SCHEMA,
+        "supersession_digest_valid": _semantic_digest_valid(supersession),
+        "supersession_pass": supersession.get("status") == "PASS"
+        and supersession.get("authoritative_record_id") == record_id,
+        "one_canonical_eval_package": supersession.get(
+            "canonical_package_count"
+        )
+        == 1
+        and supersession.get("canonical_package_ids") == [record_id]
+        and eval_record_path.parent.name == record_id,
+        "superseded_packages_recoverable": supersession.get(
+            "destructive_delete_performed"
+        )
+        is False
+        and supersession.get("packages_recoverable") is True,
         "guard_schema_exact": guard.get("schema_version")
         == "apps_rg.post_runtime_zero_provider_replay.v1",
         "guard_digest_valid": _semantic_digest_valid(guard),
@@ -286,6 +487,8 @@ def _validate_w2(output_dir: Path, source: Path) -> dict[str, Any]:
         "eval_record_path": eval_record_path,
         "scorecard_rows_path": scorecard_rows_path,
         "l6_handoff_path": l6_handoff_path,
+        "supersession": supersession,
+        "supersession_path": supersession_path,
     }
 
 
@@ -588,6 +791,10 @@ def _write_independent_bindings(
             binding = {
                 "section_id": lane_id,
                 "binding_status": status,
+                "source_evidence_status": "UNAVAILABLE_SOURCE_EVIDENCE",
+                "source_evidence_reason_codes": [
+                    "GOVERNED_V40_PACKAGE_MISSING"
+                ],
                 "evidence_class": "CONTRACT_ONLY_ADVISORY",
                 "l6_package_tier": "legacy" if legacy_path else "missing",
                 "l6_package_ref": _source_ref(source, legacy_path),
@@ -622,6 +829,20 @@ def _write_independent_bindings(
                 _read_json(closure_path, label=f"{lane_id}_observability_closure")
                 if closure_path
                 else {}
+            )
+            source_evidence_reason_codes = []
+            if observation_path is None:
+                source_evidence_reason_codes.append(
+                    "L6_MICROSTEP_OBSERVATIONS_MISSING"
+                )
+            if closure_path is None:
+                source_evidence_reason_codes.append(
+                    "L6_OBSERVABILITY_CLOSURE_MISSING"
+                )
+            source_evidence_status = (
+                "AVAILABLE_SOURCE_EVIDENCE"
+                if not source_evidence_reason_codes
+                else "UNAVAILABLE_SOURCE_EVIDENCE"
             )
             package_checks = {
                 "v40_schema": package.get("schema_version")
@@ -711,6 +932,10 @@ def _write_independent_bindings(
             binding = {
                 "section_id": lane_id,
                 "binding_status": "BOUND_PASS" if bound else "PARITY_FAIL",
+                "source_evidence_status": source_evidence_status,
+                "source_evidence_reason_codes": sorted(
+                    source_evidence_reason_codes
+                ),
                 "evidence_class": "APPS_EVAL_BOUND_PROOF"
                 if bound
                 else "CONTRACT_ONLY_ADVISORY",
@@ -774,6 +999,14 @@ def _write_independent_bindings(
         "sections_missing": sum(
             item.get("l6_package_tier") == "missing" for item in bindings
         ),
+        "sections_source_evidence_available": sum(
+            item.get("source_evidence_status") == "AVAILABLE_SOURCE_EVIDENCE"
+            for item in bindings
+        ),
+        "sections_source_evidence_unavailable": sum(
+            item.get("source_evidence_status") == "UNAVAILABLE_SOURCE_EVIDENCE"
+            for item in bindings
+        ),
         "sections_observability_closed": sum(
             item.get("binding_status") == "BOUND_PASS" for item in bindings
         ),
@@ -792,6 +1025,10 @@ def _write_independent_bindings(
         "unexpected_lane_ids": sorted(observed_set - expected_set),
         "binding_status_by_section": {
             str(item["section_id"]): str(item["binding_status"])
+            for item in bindings
+        },
+        "source_evidence_status_by_section": {
+            str(item["section_id"]): str(item["source_evidence_status"])
             for item in bindings
         },
     }
@@ -822,6 +1059,20 @@ def _write_independent_bindings(
         "no_legacy_bound_proof": all(
             item.get("l6_package_tier") != "legacy"
             or item.get("evidence_class") != "APPS_EVAL_BOUND_PROOF"
+            for item in bindings
+        ),
+        "source_evidence_availability_classified": all(
+            item.get("source_evidence_status")
+            in {
+                "AVAILABLE_SOURCE_EVIDENCE",
+                "UNAVAILABLE_SOURCE_EVIDENCE",
+            }
+            for item in bindings
+        ),
+        "unavailable_source_evidence_never_bound": all(
+            item.get("source_evidence_status")
+            != "UNAVAILABLE_SOURCE_EVIDENCE"
+            or item.get("binding_status") != "BOUND_PASS"
             for item in bindings
         ),
         "source_packages_immutable": all(
@@ -857,6 +1108,16 @@ def _write_independent_bindings(
         else "CONTRACT_ONLY_ADVISORY",
         "apps_eval_rows_bound": all_bound,
         "independent_observations": all_bound,
+        "unavailable_source_evidence_count": sum(
+            item.get("source_evidence_status") == "UNAVAILABLE_SOURCE_EVIDENCE"
+            for item in bindings
+        ),
+        "unavailable_source_evidence_section_ids": sorted(
+            str(item["section_id"])
+            for item in bindings
+            if item.get("source_evidence_status")
+            == "UNAVAILABLE_SOURCE_EVIDENCE"
+        ),
         "current_run_mutation_assertion": False,
         "direct_l4_write_assertion": False,
         "durable_write_assertion": False,
@@ -873,6 +1134,39 @@ def _write_independent_bindings(
         "closure": closure,
         "artifact_paths": artifact_paths,
     }
+
+
+def _emit_calibration_status(
+    *,
+    output_dir: Path,
+    source_run_id: str,
+    record_id: str,
+) -> tuple[dict[str, Any], Path]:
+    """Record why judge-vs-human calibration is intentionally not measured."""
+
+    payload: dict[str, Any] = {
+        "schema_version": W3_CALIBRATION_SCHEMA,
+        "status": "PASS",
+        "wave": "W3",
+        "source_run_id": source_run_id,
+        "eval_record_id": record_id,
+        "calibration_status": "NOT_MEASURED",
+        "human_labels_present": False,
+        "n_calibration_samples": 0,
+        "spearman_rho": None,
+        "p_value": None,
+        "informational_only": True,
+        "required_for_exit": False,
+        "release_authority_effect": "NONE",
+        "reason_code": "HUMAN_LABELS_NOT_PROVIDED_TO_ARTIFACT_REPLAY",
+        "human_grade_inference_attempted": False,
+        "provider_execution": False,
+        "judge_execution": False,
+        "uwg_operation_attempted": False,
+        "future_run_only": True,
+    }
+    path = _write_semantic(output_dir / W3_CALIBRATION_FILENAME, payload)
+    return _read_json(path, label="w3_calibration_status"), path
 
 
 def _emit_package_seal(
@@ -914,11 +1208,15 @@ def _verify_package_seal(
         errors.append("w3_package_seal_artifacts_missing")
         artifacts = []
     observed: dict[str, str] = {}
+    seen_roles: set[str] = set()
     for row in artifacts:
         if not isinstance(row, Mapping):
             errors.append("w3_package_seal_artifact_not_object")
             continue
         role = str(row.get("artifact_role") or "")
+        if role in seen_roles:
+            errors.append(f"w3_package_seal_duplicate_role:{role}")
+        seen_roles.add(role)
         path = (output_dir / str(row.get("artifact_ref") or "")).resolve()
         if not _contained(path, output_dir):
             errors.append(f"w3_package_seal_artifact_outside_root:{role}")
@@ -934,6 +1232,17 @@ def _verify_package_seal(
             errors.append(f"w3_package_seal_artifact_length_mismatch:{role}")
     if seal.get("artifact_count") != len(artifacts):
         errors.append("w3_package_seal_artifact_count_mismatch")
+    required_roles = {
+        "projection_l6_shadow_bridge",
+        "l6_section_apps_eval_bindings",
+        "l6_apps_eval_binding_closure",
+        "l6_judge_human_calibration_status",
+        *(f"{lane}_binding" for lane in EXPECTED_LANES),
+    }
+    errors.extend(
+        f"w3_package_seal_role_missing:{role}"
+        for role in sorted(required_roles - seen_roles)
+    )
     return not errors, errors, observed
 
 
@@ -997,9 +1306,40 @@ def _execute_once(
         scorecard_rows=scorecard_rows,
         scorecard_ref=w2["scorecard_rows_path"].as_posix(),
     )
+    calibration, calibration_path = _emit_calibration_status(
+        output_dir=output_dir,
+        source_run_id=source.name,
+        record_id=str(record.record_id or ""),
+    )
+    calibration_checks = {
+        "schema_exact": calibration.get("schema_version")
+        == W3_CALIBRATION_SCHEMA,
+        "semantic_digest_valid": _semantic_digest_valid(calibration),
+        "not_measured": calibration.get("calibration_status")
+        == "NOT_MEASURED",
+        "no_human_labels": calibration.get("human_labels_present") is False
+        and calibration.get("n_calibration_samples") == 0,
+        "metrics_absent": calibration.get("spearman_rho") is None
+        and calibration.get("p_value") is None,
+        "informational_only": calibration.get("informational_only") is True
+        and calibration.get("required_for_exit") is False
+        and calibration.get("release_authority_effect") == "NONE",
+        "no_human_grade_inference": calibration.get(
+            "human_grade_inference_attempted"
+        )
+        is False,
+    }
+    calibration_failed = sorted(
+        name for name, passed in calibration_checks.items() if not passed
+    )
+    if calibration_failed:
+        raise L6ShadowReplayError(
+            "w3_calibration_status_invalid:" + ",".join(calibration_failed)
+        )
     artifacts = {
         **projection_artifacts,
         **bindings["artifact_paths"],
+        "l6_judge_human_calibration_status": calibration_path,
     }
     seal_path = _emit_package_seal(
         output_dir=output_dir,
@@ -1019,6 +1359,9 @@ def _execute_once(
         "bridge_path": bridge_path,
         "projection_checks": projection_checks,
         "bindings": bindings,
+        "calibration": calibration,
+        "calibration_path": calibration_path,
+        "calibration_checks": calibration_checks,
         "seal_path": seal_path,
         "seal_artifact_digests": artifact_digests,
     }
@@ -1028,6 +1371,7 @@ def emit_w3_l6_shadow_replay(
     *,
     source_run: Path | str,
     output_dir: Path | str,
+    fault_injector: Callable[[str, int], None] | None = None,
 ) -> dict[str, Any]:
     """Execute and seal W3 twice without running Apps Eval, judges, or UWG."""
 
@@ -1037,17 +1381,41 @@ def emit_w3_l6_shadow_replay(
         raise L6ShadowReplayError("W3 output cannot be inside source run")
     w2 = _validate_w2(output, source)
 
-    first = _execute_once(source=source, output_dir=output, w2=w2)
+    def _execute(attempt: int) -> dict[str, Any]:
+        try:
+            if fault_injector is not None:
+                fault_injector("L6_SHADOW_OBSERVABILITY", attempt)
+            return _execute_once(source=source, output_dir=output, w2=w2)
+        except Exception as exc:
+            evidence = _emit_stage_failure(
+                output=output,
+                source_run_id=source.name,
+                exc=exc,
+                attempt=attempt,
+            )
+            raise L6ShadowReplayError(
+                "l6_shadow_stage_failed:"
+                f"{type(exc).__name__}:{exc}:"
+                f"receipt={evidence['error_receipt'].as_posix()}"
+            ) from exc
+
+    first = _execute(1)
     first_seal_sha = _sha256_file(first["seal_path"])
     first_artifact_digests = dict(first["seal_artifact_digests"])
-    second = _execute_once(source=source, output_dir=output, w2=w2)
+    second = _execute(2)
     second_seal_sha = _sha256_file(second["seal_path"])
     second_artifact_digests = dict(second["seal_artifact_digests"])
+    resume_path = _emit_stage_resume(
+        output=output,
+        source_run_id=source.name,
+        w2=w2,
+    )
 
     bindings = second["bindings"]
     summary = bindings["summary"]
     closure = bindings["closure"]
     bridge = second["bridge"]
+    calibration = second["calibration"]
     observed_lanes = set(summary.get("observed_lane_ids") or [])
     checks = {
         "w2_evidence_validated": all(w2["checks"].values()),
@@ -1063,6 +1431,29 @@ def emit_w3_l6_shadow_replay(
             f"{lane}_binding" in bindings["artifact_paths"]
             for lane in EXPECTED_LANES
         ),
+        "source_evidence_availability_explicit": (
+            int(summary.get("sections_source_evidence_available") or 0)
+            + int(summary.get("sections_source_evidence_unavailable") or 0)
+            == len(EXPECTED_LANES)
+            and set(
+                (summary.get("source_evidence_status_by_section") or {}).values()
+            )
+            <= {
+                "AVAILABLE_SOURCE_EVIDENCE",
+                "UNAVAILABLE_SOURCE_EVIDENCE",
+            }
+        ),
+        "unavailable_source_evidence_never_bound": bindings["closure"]
+        .get("checks", {})
+        .get("unavailable_source_evidence_never_bound")
+        is True,
+        "calibration_status_explicit": all(
+            second["calibration_checks"].values()
+        )
+        and calibration.get("calibration_status") == "NOT_MEASURED"
+        and calibration.get("human_labels_present") is False
+        and calibration.get("n_calibration_samples") == 0
+        and calibration.get("informational_only") is True,
         "shadow_verdict_explicit": closure.get("shadow_observability_verdict")
         in {"pass", "fail"},
         "release_state_explicit": closure.get("release_blocked")
@@ -1108,6 +1499,11 @@ def emit_w3_l6_shadow_replay(
         "alignment_source": "independent_persisted_observations",
         "apps_eval_rows_bound": bool(closure.get("apps_eval_rows_bound") is True),
         "evidence_class": str(closure.get("evidence_class") or ""),
+        "calibration_status": calibration["calibration_status"],
+        "human_labels_present": calibration["human_labels_present"],
+        "n_calibration_samples": calibration["n_calibration_samples"],
+        "calibration_informational_only": calibration["informational_only"],
+        "calibration_required_for_exit": calibration["required_for_exit"],
         "projection_readiness_decision": str(
             bridge.get("readiness_decision") or ""
         ),
@@ -1140,10 +1536,25 @@ def emit_w3_l6_shadow_replay(
             bindings["artifact_paths"]["l6_apps_eval_binding_closure"],
             relative_to=output,
         ),
+        "l6_judge_human_calibration_status": _file_binding(
+            second["calibration_path"],
+            relative_to=output,
+        ),
+        "stage_resume_receipt": (
+            _file_binding(resume_path, relative_to=output)
+            if resume_path is not None
+            else None
+        ),
         "w2_completion_ref": w2["completion_path"].as_posix(),
         "w2_completion_semantic_digest": w2["completion"]["semantic_digest"],
         "w2_guard_ref": w2["guard_path"].as_posix(),
         "w2_guard_semantic_digest": w2["guard"]["semantic_digest"],
+        "w2_eval_package_supersession_ref": w2[
+            "supersession_path"
+        ].as_posix(),
+        "w2_eval_package_supersession_semantic_digest": w2["supersession"][
+            "semantic_digest"
+        ],
         "eval_record_ref": w2["eval_record_path"].as_posix(),
         "eval_record_sha256": _sha256_file(w2["eval_record_path"]),
         "current_run_mutated": False,
@@ -1171,15 +1582,21 @@ def emit_w3_l6_shadow_replay(
         "l6_binding_closure_path": bindings["artifact_paths"][
             "l6_apps_eval_binding_closure"
         ].as_posix(),
+        "l6_calibration_status_path": second["calibration_path"].as_posix(),
     }
 
 
 __all__ = [
     "EXPECTED_LANES",
     "L6ShadowReplayError",
+    "W3_CALIBRATION_FILENAME",
+    "W3_CALIBRATION_SCHEMA",
     "W3_COMPLETION_FILENAME",
     "W3_COMPLETION_SCHEMA",
+    "W3_ERROR_RECEIPT_SCHEMA",
+    "W3_ERROR_SPAN_SCHEMA",
     "W3_PACKAGE_SEAL_FILENAME",
     "W3_PACKAGE_SEAL_SCHEMA",
+    "W3_RESUME_RECEIPT_SCHEMA",
     "emit_w3_l6_shadow_replay",
 ]

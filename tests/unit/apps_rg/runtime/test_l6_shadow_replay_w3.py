@@ -85,9 +85,128 @@ def test_legacy_l6_packages_remain_advisory_and_never_bind(
     assert result["closure"]["evidence_class"] == "CONTRACT_ONLY_ADVISORY"
     assert all(
         binding["binding_status"] == "LEGACY_PACKAGE_ADVISORY"
+        and binding["source_evidence_status"]
+        == "UNAVAILABLE_SOURCE_EVIDENCE"
+        and binding["source_evidence_reason_codes"]
+        == ["GOVERNED_V40_PACKAGE_MISSING"]
         and binding["evidence_class"] == "CONTRACT_ONLY_ADVISORY"
         for binding in result["payload"]["bindings"]
     )
+    assert result["summary"]["sections_source_evidence_available"] == 0
+    assert result["summary"]["sections_source_evidence_unavailable"] == 11
+    assert result["closure"]["checks"][
+        "source_evidence_availability_classified"
+    ] is True
+    assert result["closure"]["checks"][
+        "unavailable_source_evidence_never_bound"
+    ] is True
+
+
+def test_missing_l6_package_is_explicit_unavailable_source_evidence(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    output = tmp_path / "w3"
+    rows = [_scorecard_row(lane) for lane in subject.EXPECTED_LANES]
+    record = SimpleNamespace(
+        record_id="eval-record",
+        snapshot_digest="sha256:" + "1" * 64,
+        registry_digest="sha256:" + "1" * 64,
+    )
+
+    result = subject._write_independent_bindings(
+        source=source,
+        output_dir=output,
+        record=record,
+        scorecard_rows=rows,
+        scorecard_ref="sealed-scorecard.jsonl",
+    )
+
+    assert result["summary"]["sections_missing"] == 11
+    assert result["summary"]["sections_source_evidence_unavailable"] == 11
+    assert result["closure"]["unavailable_source_evidence_count"] == 11
+    assert all(
+        row["binding_status"] == "MISSING_PACKAGE"
+        and row["source_evidence_status"] == "UNAVAILABLE_SOURCE_EVIDENCE"
+        for row in result["payload"]["bindings"]
+    )
+
+
+def test_no_human_labels_emit_informational_not_measured_calibration(
+    tmp_path: Path,
+) -> None:
+    payload, path = subject._emit_calibration_status(
+        output_dir=tmp_path,
+        source_run_id="saved-run",
+        record_id="eval-record",
+    )
+
+    assert payload["schema_version"] == subject.W3_CALIBRATION_SCHEMA
+    assert payload["calibration_status"] == "NOT_MEASURED"
+    assert payload["human_labels_present"] is False
+    assert payload["n_calibration_samples"] == 0
+    assert payload["spearman_rho"] is None
+    assert payload["p_value"] is None
+    assert payload["informational_only"] is True
+    assert payload["required_for_exit"] is False
+    assert payload["release_authority_effect"] == "NONE"
+    assert payload["human_grade_inference_attempted"] is False
+    assert subject._semantic_digest_valid(
+        json.loads(path.read_text(encoding="utf-8"))
+    )
+
+
+def _captured_l6_failure(output: Path) -> dict[str, Path]:
+    try:
+        raise LookupError("injected L6 shadow failure")
+    except LookupError as exc:
+        return subject._emit_stage_failure(
+            output=output,
+            source_run_id="saved-run",
+            exc=exc,
+            attempt=1,
+        )
+
+
+def test_l6_failure_and_resume_bind_saved_w2_without_upstream_replay(
+    tmp_path: Path,
+) -> None:
+    paths = _captured_l6_failure(tmp_path)
+    error = json.loads(paths["error_receipt"].read_text(encoding="utf-8"))
+    span = json.loads(paths["error_span"].read_text(encoding="utf-8"))
+    assert error["schema_version"] == subject.W3_ERROR_RECEIPT_SCHEMA
+    assert error["stage_id"] == "L6_SHADOW_OBSERVABILITY"
+    assert "injected L6 shadow failure" in error["traceback"]
+    assert error["w1_replayed"] is False
+    assert error["w2_replayed"] is False
+    assert error["apps_eval_replayed"] is False
+    assert error["generation_replayed"] is False
+    assert span["apps_eval_execution"] is False
+    assert span["provider_execution"] is False
+
+    resume_path = subject._emit_stage_resume(
+        output=tmp_path,
+        source_run_id="saved-run",
+        w2={
+            "completion_path": tmp_path / "../w2/w2_completion_receipt.json",
+            "completion": {"semantic_digest": "sha256:w2-completion"},
+            "guard_path": tmp_path / "../w2/w2_zero_provider_guard_receipt.json",
+            "guard": {"semantic_digest": "sha256:w2-guard"},
+        },
+    )
+
+    assert resume_path is not None
+    resume = json.loads(resume_path.read_text(encoding="utf-8"))
+    assert resume["schema_version"] == subject.W3_RESUME_RECEIPT_SCHEMA
+    assert resume["status"] == "PASS"
+    assert resume["resume_from_stage"] == "L6_SHADOW_OBSERVABILITY"
+    assert resume["w1_replayed"] is False
+    assert resume["w2_replayed"] is False
+    assert resume["apps_eval_replayed"] is False
+    assert resume["generation_replayed"] is False
+    assert resume["w2_completion_semantic_digest"] == "sha256:w2-completion"
+    assert subject._semantic_digest_valid(resume)
 
 
 def test_eval_package_seal_reopens_every_bound_artifact(tmp_path: Path) -> None:
