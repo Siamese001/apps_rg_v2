@@ -19,7 +19,7 @@ from types import ModuleType
 from typing import Any, Mapping, Sequence
 
 
-INTEGRATED_EXECUTION_SCHEMA = "apps_rg.w5_integrated_execution.v1"
+INTEGRATED_EXECUTION_SCHEMA = "apps_rg.w5_integrated_execution.v2"
 INTEGRATED_EXECUTION_FILENAME = "integrated_execution_manifest.json"
 FAULT_QUALIFICATION_SCHEMA = "apps_rg.w5_production_fault_qualification.v1"
 FAULT_QUALIFICATION_FILENAME = "production_fault_qualification_manifest.json"
@@ -113,12 +113,34 @@ def _read_json(path: Path, *, label: str) -> dict[str, Any]:
     return value
 
 
+def _read_jsonl(path: Path, *, label: str) -> list[dict[str, Any]]:
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError) as exc:
+        raise W5EndToEndPipelineError(
+            f"{label}_unreadable:{type(exc).__name__}:{path}"
+        ) from exc
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(lines, start=1):
+        if not line.strip():
+            continue
+        try:
+            value = json.loads(line)
+        except (json.JSONDecodeError, TypeError) as exc:
+            raise W5EndToEndPipelineError(
+                f"{label}_invalid_json:{line_number}:{path}"
+            ) from exc
+        if not isinstance(value, dict):
+            raise W5EndToEndPipelineError(f"{label}_not_object:{line_number}:{path}")
+        rows.append(value)
+    return rows
+
+
 def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".tmp-{uuid.uuid4().hex[:8]}")
     temporary.write_text(
-        json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True)
-        + "\n",
+        json.dumps(dict(payload), ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
         newline="\n",
     )
@@ -182,10 +204,7 @@ def _saved_judge_inventory(source: Path) -> dict[str, Any]:
     artifacts: list[tuple[str, Path]] = [
         (
             lane,
-            source
-            / "modular_r4/sections"
-            / lane
-            / "x1d_llm_judge_outputs.json",
+            source / "modular_r4/sections" / lane / "x1d_llm_judge_outputs.json",
         )
         for lane in EXPECTED_LANES
     ]
@@ -229,17 +248,14 @@ def _saved_judge_inventory(source: Path) -> dict[str, Any]:
                     "provider_status": str(judge.get("provider_status") or ""),
                     "model_requested": str(judge.get("model_requested") or ""),
                     "model_actual": str(
-                        judge.get("model_actual")
-                        or judge.get("model_name")
-                        or ""
+                        judge.get("model_actual") or judge.get("model_name") or ""
                     ),
                     "pass": passed is True,
                     "provider_available": judge.get("provider_available") is True,
                     "provider_blocked": judge.get("provider_blocked") is True,
                     "mocked": judge.get("mocked") is True,
                     "advisory_only": judge.get("advisory_only") is True,
-                    "proof_eligible_judge": judge.get("proof_eligible_judge")
-                    is True,
+                    "proof_eligible_judge": judge.get("proof_eligible_judge") is True,
                     "fallback_used": judge.get("fallback_used") is True,
                     "artifact_ref": path.relative_to(source).as_posix(),
                     "artifact_sha256": _sha256_file(path),
@@ -270,9 +286,7 @@ def _saved_judge_inventory(source: Path) -> dict[str, Any]:
                 "judge_id": str(judge.get("judge_id") or ""),
                 "provider_name": str(judge.get("provider_name") or ""),
                 "model_actual": str(
-                    judge.get("model_actual")
-                    or judge.get("model_name")
-                    or ""
+                    judge.get("model_actual") or judge.get("model_name") or ""
                 ),
                 "provider_status": str(judge.get("provider_status") or ""),
                 "pass": judge.get("pass") is True,
@@ -318,21 +332,260 @@ def _saved_judge_inventory(source: Path) -> dict[str, Any]:
     }
     _require(checks, label=f"saved_judge_inventory_invalid:{source.name}")
     return {
-        "evidence_scope": (
-            "HISTORICAL_SAVED_JUDGE_OUTPUTS_NO_W5_JUDGE_EXECUTION"
-        ),
+        "evidence_scope": ("HISTORICAL_SAVED_JUDGE_OUTPUTS_NO_W5_JUDGE_EXECUTION"),
         "status": "PASS",
         "result_count": len(results),
         "passing_result_count": sum(row["pass"] is True for row in results),
-        "advisory_result_count": sum(
-            row["advisory_only"] is True for row in results
-        ),
+        "advisory_result_count": sum(row["advisory_only"] is True for row in results),
         "model_counts": dict(sorted(model_counts.items())),
         "provider_counts": dict(sorted(provider_counts.items())),
-        "actual_claude_model_result_count": len(claude_results),
+        "actual_claude_judge_result_count": len(claude_results),
         "legacy_claude_named_artifact_count": len(legacy_aliases),
         "legacy_claude_named_artifacts": legacy_aliases,
         "results": results,
+        "checks": checks,
+    }
+
+
+def _historical_model_route_inventory(source: Path) -> dict[str, Any]:
+    """Seal historical research and generation model-route evidence.
+
+    The inventory is deliberately diagnostic: ``status=PASS`` means every
+    source byte and expected failure was accounted for.  It does not convert
+    the historical Apps RG generation routes into successful authority.
+    """
+
+    ledger_path = source / "apps_research/runs/external_model_usage_ledger.jsonl"
+    events = _read_jsonl(ledger_path, label="apps_research_usage_ledger")
+    event_model_counts: dict[str, int] = {}
+    event_provider_counts: dict[str, int] = {}
+    claude_events: list[dict[str, Any]] = []
+    for event in events:
+        model = str(event.get("model") or event.get("requested_model") or "")
+        provider = str(event.get("provider") or "")
+        event_model_counts[model] = event_model_counts.get(model, 0) + 1
+        event_provider_counts[provider] = event_provider_counts.get(provider, 0) + 1
+        if any(
+            "claude" in str(event.get(field) or "").lower()
+            for field in ("model", "requested_model", "observed_model", "provider")
+        ):
+            claude_events.append(event)
+
+    successful_attempts = [
+        {
+            "logical_attempt": int(event.get("logical_attempt") or 0),
+            "logical_attempt_id": str(event.get("logical_attempt_id") or ""),
+            "section_id": str(event.get("section_id") or ""),
+            "provider": str(event.get("provider") or ""),
+            "requested_model": str(event.get("requested_model") or ""),
+            "observed_model": str(event.get("observed_model") or ""),
+            "total_tokens": int(event.get("total_tokens") or 0),
+            "outcome": str(event.get("outcome") or ""),
+            "provider_status": str(event.get("provider_status") or ""),
+            "model_pin_valid": event.get("model_pin_valid") is True,
+            "overall_success": event.get("overall_success") is True,
+            "application_output_valid": event.get("application_output_valid") is True,
+            "response_schema_valid": event.get("response_schema_valid") is True,
+        }
+        for event in events
+        if event.get("outcome") == "SUCCESS"
+    ]
+    success_model_counts: dict[str, int] = {}
+    for attempt in successful_attempts:
+        model = str(attempt["observed_model"])
+        success_model_counts[model] = success_model_counts.get(model, 0) + 1
+
+    lane_rows: list[dict[str, Any]] = []
+    for lane in EXPECTED_LANES:
+        lane_root = source / "modular_r4/sections" / lane
+        paths = {
+            "l2_execution_packet": lane_root / "l2_execution_packet.json",
+            "attempt_receipt": lane_root / "attempt_receipt.json",
+            "provider_request": lane_root / "provider_request.json",
+            "provider_response": lane_root / "provider_response.json",
+            "l2_handoff_receipt": lane_root / "l2_handoff_receipt.json",
+        }
+        docs = {
+            role: _read_json(path, label=f"model_route:{lane}:{role}")
+            for role, path in paths.items()
+        }
+        packet = docs["l2_execution_packet"]
+        attempt = docs["attempt_receipt"]
+        request = docs["provider_request"]
+        response = docs["provider_response"]
+        handoff = docs["l2_handoff_receipt"]
+        budget = packet.get("budget")
+        budget = dict(budget) if isinstance(budget, Mapping) else {}
+        local = attempt.get("local_check_results")
+        local = dict(local) if isinstance(local, Mapping) else {}
+        handoff_checks = handoff.get("checks")
+        handoff_checks = (
+            dict(handoff_checks) if isinstance(handoff_checks, Mapping) else {}
+        )
+        provider_envelope = response.get("provider_response")
+        provider_envelope = (
+            dict(provider_envelope) if isinstance(provider_envelope, Mapping) else {}
+        )
+        transport = provider_envelope.get("transport_response")
+        transport = dict(transport) if isinstance(transport, Mapping) else {}
+        raw_response = transport.get("raw_response")
+        raw_response = dict(raw_response) if isinstance(raw_response, Mapping) else {}
+        usage = raw_response.get("usage")
+        usage = dict(usage) if isinstance(usage, Mapping) else {}
+        input_tokens = int(usage.get("input_tokens") or 0)
+        output_tokens = int(usage.get("output_tokens") or 0)
+        total_tokens = int(usage.get("total_tokens") or 0)
+        ceiling = int(budget.get("max_tokens") or 0)
+        lane_rows.append(
+            {
+                "lane": lane,
+                "signed_target_model": str(packet.get("target_model") or ""),
+                "signed_canonical_provider": str(
+                    packet.get("canonical_provider") or ""
+                ),
+                "signed_allowed_models": [
+                    str(model) for model in (packet.get("allowed_models") or [])
+                ],
+                "signed_output_token_ceiling": ceiling,
+                "attempt_claimed_model": str(local.get("model_or_tool_name") or ""),
+                "attempt_claimed_provider_lane": str(local.get("provider_lane") or ""),
+                "provider_requested": str(request.get("provider_requested") or ""),
+                "provider_request_model": str(request.get("model") or ""),
+                "provider_request_max_tokens": int(request.get("max_tokens") or 0),
+                "provider_response_model": str(response.get("model") or ""),
+                "runtime_generation_status": str(
+                    response.get("runtime_generation_status") or ""
+                ),
+                "provider_attempted": response.get("provider_attempted") is True,
+                "provider_available": response.get("provider_available") is True,
+                "stub": response.get("stub") is True,
+                "observed_input_tokens": input_tokens,
+                "observed_output_tokens": output_tokens,
+                "observed_total_tokens": total_tokens,
+                "handoff_model_id_used": str(handoff.get("model_id_used") or ""),
+                "handoff_provider_lane_used": str(
+                    handoff.get("provider_lane_used") or ""
+                ),
+                "handoff_tokens_recorded": int(handoff.get("tokens_emitted") or 0),
+                "recorded_model_id_matches": handoff_checks.get("model_id_matches")
+                is True,
+                "recorded_token_budget_pass": handoff_checks.get("token_budget_pass")
+                is True,
+                "recomputed_output_token_budget_pass": output_tokens <= ceiling,
+                "handoff_status": str(handoff.get("handoff_status") or ""),
+                "artifacts": [
+                    _binding(path, root=source, role=role)
+                    for role, path in sorted(paths.items())
+                ],
+            }
+        )
+
+    checks = {
+        "apps_research_event_count_exact": len(events) == 17,
+        "apps_research_event_models_exact": event_model_counts
+        == {"gemini-3.6-flash": 7, "gpt-5.6-terra": 10},
+        "apps_research_event_providers_exact": event_provider_counts
+        == {"external_openai": 10, "google_gemini": 7},
+        "apps_research_successful_attempts_exact": len(successful_attempts) == 3
+        and success_model_counts == {"gemini-3.6-flash": 1, "gpt-5.6-terra": 2}
+        and all(
+            attempt["requested_model"] == attempt["observed_model"]
+            and attempt["model_pin_valid"] is True
+            and attempt["overall_success"] is True
+            and attempt["application_output_valid"] is True
+            and attempt["response_schema_valid"] is True
+            and attempt["provider_status"] == "VALIDATED_SUCCESS"
+            for attempt in successful_attempts
+        ),
+        "apps_research_no_claude": not claude_events,
+        "apps_rg_lane_count_exact": len(lane_rows) == len(EXPECTED_LANES),
+        "apps_rg_lane_ids_exact": {row["lane"] for row in lane_rows}
+        == set(EXPECTED_LANES),
+        "apps_rg_signed_claude_but_openai_route_exact": all(
+            row["signed_target_model"] == "claude-sonnet-5"
+            and row["signed_allowed_models"] == ["claude-sonnet-5"]
+            and row["signed_canonical_provider"] == "openai"
+            and row["attempt_claimed_model"] == "claude-sonnet-5"
+            and row["attempt_claimed_provider_lane"] == "openai"
+            and row["provider_requested"] == "external_openai"
+            and row["provider_request_model"] == "gpt-5.6-luna"
+            and row["provider_response_model"] == "gpt-5.6-luna"
+            and row["handoff_model_id_used"] == "gpt-5.6-luna"
+            and row["handoff_provider_lane_used"] == "openai"
+            for row in lane_rows
+        ),
+        "apps_rg_real_provider_outputs_exact": all(
+            row["runtime_generation_status"] == "REAL_LLM"
+            and row["provider_attempted"] is True
+            and row["provider_available"] is True
+            and row["stub"] is False
+            for row in lane_rows
+        ),
+        "apps_rg_recorded_model_failures_exact": all(
+            row["recorded_model_id_matches"] is False
+            and row["handoff_status"] == "FAIL"
+            for row in lane_rows
+        ),
+        "apps_rg_total_token_accounting_reproduced": all(
+            row["observed_input_tokens"] + row["observed_output_tokens"]
+            == row["observed_total_tokens"]
+            == row["handoff_tokens_recorded"]
+            for row in lane_rows
+        ),
+        "apps_rg_recorded_budget_failures_are_false": all(
+            row["recorded_token_budget_pass"] is False
+            and row["recomputed_output_token_budget_pass"] is True
+            for row in lane_rows
+        ),
+    }
+    _require(checks, label=f"historical_model_route_inventory_invalid:{source.name}")
+    return {
+        "evidence_scope": "HISTORICAL_SAVED_MODEL_ROUTES_NO_W5_MODEL_EXECUTION",
+        "status": "PASS",
+        "routing_outcome": "FAIL_MODEL_PIN_MISMATCH",
+        "token_accounting_outcome": "FALSE_FAILURE_TOTAL_VS_OUTPUT",
+        "apps_research": {
+            "usage_event_count": len(events),
+            "usage_event_model_counts": dict(sorted(event_model_counts.items())),
+            "usage_event_provider_counts": dict(sorted(event_provider_counts.items())),
+            "successful_attempt_count": len(successful_attempts),
+            "successful_attempt_model_counts": dict(
+                sorted(success_model_counts.items())
+            ),
+            "claude_usage_event_count": len(claude_events),
+            "successful_attempts": successful_attempts,
+            "ledger_artifact": _binding(
+                ledger_path,
+                root=source,
+                role="apps_research_external_model_usage_ledger",
+            ),
+        },
+        "apps_rg_generation": {
+            "lane_count": len(lane_rows),
+            "target_claude_lane_count": sum(
+                row["signed_target_model"] == "claude-sonnet-5" for row in lane_rows
+            ),
+            "actual_claude_lane_count": sum(
+                "claude" in str(row["provider_response_model"]).lower()
+                for row in lane_rows
+            ),
+            "model_mismatch_lane_count": sum(
+                row["recorded_model_id_matches"] is False for row in lane_rows
+            ),
+            "recorded_token_budget_failure_lane_count": sum(
+                row["recorded_token_budget_pass"] is False for row in lane_rows
+            ),
+            "recomputed_output_token_budget_failure_lane_count": sum(
+                row["recomputed_output_token_budget_pass"] is False for row in lane_rows
+            ),
+            "token_accounting_false_failure_lane_count": sum(
+                row["recorded_token_budget_pass"] is False
+                and row["recomputed_output_token_budget_pass"] is True
+                for row in lane_rows
+            ),
+            "lanes": lane_rows,
+        },
+        "artifact_count": 1 + (len(lane_rows) * 5),
         "checks": checks,
     }
 
@@ -388,14 +641,9 @@ def _stage_contract_inventory(
                 "sequence": entry_raw.get("sequence"),
                 "stage_id": str(entry_raw.get("stage_id") or ""),
                 "status": str(entry_raw.get("status") or ""),
-                "execution_complete": entry_raw.get("execution_complete")
-                is True,
-                "governed_outcome": str(
-                    entry_raw.get("governed_outcome") or ""
-                ),
-                "authority_effect": str(
-                    entry_raw.get("authority_effect") or ""
-                ),
+                "execution_complete": entry_raw.get("execution_complete") is True,
+                "governed_outcome": str(entry_raw.get("governed_outcome") or ""),
+                "authority_effect": str(entry_raw.get("authority_effect") or ""),
                 "evidence_bindings": bindings,
             }
         )
@@ -418,9 +666,7 @@ def _stage_contract_inventory(
         "status": "PASS",
         "entry_count": len(entries),
         "stage_sequence": [row["stage_id"] for row in entries],
-        "status_by_stage": {
-            row["stage_id"]: row["status"] for row in entries
-        },
+        "status_by_stage": {row["stage_id"]: row["status"] for row in entries},
         "entries": entries,
         "checks": checks,
     }
@@ -551,15 +797,12 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
         "w2_completion": replay / "w2/w2_completion_receipt.json",
         "w3_guard": replay / "w3/w3_zero_provider_guard_receipt.json",
         "w3_completion": replay / "w3/w3_completion_receipt.json",
-        "w3_calibration": replay
-        / "w3/l6_judge_human_calibration_status.json",
+        "w3_calibration": replay / "w3/l6_judge_human_calibration_status.json",
         "w4_guard": replay / "w4/w4_zero_provider_guard_receipt.json",
         "w4_completion": replay / "w4/w4_completion_receipt.json",
         "w4_stage_ledger": replay / "w4/terminal_stage_ledger.json",
-        "w4_terminal_manifest": replay
-        / "w4/terminal_non_product_manifest.json",
-        "w4_package_seal": replay
-        / "w4/w4_terminal_closeout_package_seal.json",
+        "w4_terminal_manifest": replay / "w4/terminal_non_product_manifest.json",
+        "w4_package_seal": replay / "w4/w4_terminal_closeout_package_seal.json",
     }
     docs = {role: _read_json(path, label=role) for role, path in paths.items()}
     w0 = docs["w0_receipt"]
@@ -572,6 +815,7 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
     terminal_manifest = docs["w4_terminal_manifest"]
     w4_package_seal = docs["w4_package_seal"]
     historical_judges = _saved_judge_inventory(source)
+    historical_model_routes = _historical_model_route_inventory(source)
     stage_contracts = _stage_contract_inventory(
         source=source,
         replay=replay,
@@ -615,12 +859,10 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
         "w2_exact": w2.get("eval_execution_complete") is True
         and w2.get("eval_verdict") == "fail"
         and w2.get("release_blocked") is True
-        and w2.get("preflight_verification_status")
-        == "UNVERIFIABLE_KEY_MATERIAL",
+        and w2.get("preflight_verification_status") == "UNVERIFIABLE_KEY_MATERIAL",
         "w3_exact": w3.get("l6_execution_complete") is True
         and w3.get("binding_closure_status") == "FAIL"
-        and w3.get("section_summary", {}).get("sections_total")
-        == len(EXPECTED_LANES)
+        and w3.get("section_summary", {}).get("sections_total") == len(EXPECTED_LANES)
         and calibration.get("calibration_status") == "NOT_MEASURED"
         and calibration.get("human_labels_present") is False
         and calibration.get("n_calibration_samples") == 0,
@@ -628,26 +870,28 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
         and w4.get("terminal_closed") is True
         and w4.get("stage_summary", {}).get("entry_count") == 21
         and w4.get("stage_summary", {}).get("x2_aggregation_status") == "PASS",
-        "w4_terminal_manifest_exact": terminal_manifest.get(
-            "schema_version"
-        )
+        "w4_terminal_manifest_exact": terminal_manifest.get("schema_version")
         == "apps_rg.terminal_non_product_manifest.v1"
         and terminal_manifest.get("status") == "SEALED"
         and terminal_manifest.get("manifest_type") == "TERMINAL_NON_PRODUCT"
         and terminal_manifest.get("bound_receipt_count") == 38
-        and terminal_manifest.get("remote_otel_role")
-        == "OPTIONAL_MIRROR_NOT_AUTHORITY"
+        and terminal_manifest.get("remote_otel_role") == "OPTIONAL_MIRROR_NOT_AUTHORITY"
         and _manifest_digest_valid(terminal_manifest),
         "w4_package_seal_exact": w4_package_seal.get("schema_version")
         == "apps_rg.terminal_closeout_package_seal.v1"
         and w4_package_seal.get("status") == "PASS"
         and _manifest_digest_valid(w4_package_seal),
-        "historical_judge_inventory_complete": historical_judges.get("status")
-        == "PASS"
+        "historical_judge_inventory_complete": historical_judges.get("status") == "PASS"
         and historical_judges.get("result_count") == 21
         and historical_judges.get("passing_result_count") == 21,
-        "stage_contract_inventory_complete": stage_contracts.get("status")
+        "historical_model_route_inventory_complete": historical_model_routes.get(
+            "status"
+        )
         == "PASS"
+        and historical_model_routes.get("routing_outcome") == "FAIL_MODEL_PIN_MISMATCH"
+        and historical_model_routes.get("token_accounting_outcome")
+        == "FALSE_FAILURE_TOTAL_VS_OUTPUT",
+        "stage_contract_inventory_complete": stage_contracts.get("status") == "PASS"
         and stage_contracts.get("entry_count") == 21,
     }
     _require(checks, label=f"integrated_chain_invalid:{source.name}")
@@ -660,14 +904,10 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
         "handoffs": handoffs,
         "l0_parallel": {
             "parallel_overlap_proven": True,
-            "max_active_workers_observed": w1_parallel[
-                "max_active_workers_observed"
-            ],
+            "max_active_workers_observed": w1_parallel["max_active_workers_observed"],
             "provider_or_model_execution": False,
             "scheduler": w1_parallel["scheduler"],
-            "configured_max_parallel": w1_parallel[
-                "configured_max_parallel"
-            ],
+            "configured_max_parallel": w1_parallel["configured_max_parallel"],
             "root_lanes": w1_parallel["root_lanes"],
             "dependencies": w1_parallel["dependencies"],
             "lane_results": w1_parallel["lane_results"],
@@ -676,6 +916,7 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
             ],
         },
         "historical_saved_judges": historical_judges,
+        "historical_model_routes": historical_model_routes,
         "contract_handoffs": stage_contracts,
         "apps_eval": {
             "execution_complete": True,
@@ -701,18 +942,12 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
             "terminal_closed": True,
             "stage_entry_count": 21,
             "x2_aggregation_status": "PASS",
-            "local_failure_event_count": w4["telemetry_summary"][
-                "event_count"
-            ],
-            "l6_lane_event_count": w4["telemetry_summary"][
-                "l6_lane_event_count"
-            ],
+            "local_failure_event_count": w4["telemetry_summary"]["event_count"],
+            "l6_lane_event_count": w4["telemetry_summary"]["l6_lane_event_count"],
             "l6_calibration_event_count": w4["telemetry_summary"][
                 "l6_calibration_event_count"
             ],
-            "bound_receipt_count": terminal_manifest[
-                "bound_receipt_count"
-            ],
+            "bound_receipt_count": terminal_manifest["bound_receipt_count"],
             "remote_otel_role": terminal_manifest["remote_otel_role"],
         },
         "checks": checks,
@@ -799,24 +1034,90 @@ def execute_integrated_replays(
         "wave_sequence": ["W0", "W1", "W2", "W3", "W4"],
         "full_chain_execution_count_per_run": 2,
         "historical_saved_judge_result_count": sum(
-            int(case["historical_saved_judges"]["result_count"])
-            for case in rows
+            int(case["historical_saved_judges"]["result_count"]) for case in rows
         ),
         "historical_saved_judge_pass_count": sum(
             int(case["historical_saved_judges"]["passing_result_count"])
             for case in rows
         ),
-        "historical_actual_claude_model_result_count": sum(
+        "historical_actual_claude_judge_result_count": sum(
+            int(case["historical_saved_judges"]["actual_claude_judge_result_count"])
+            for case in rows
+        ),
+        "historical_apps_research_usage_event_count": sum(
+            int(case["historical_model_routes"]["apps_research"]["usage_event_count"])
+            for case in rows
+        ),
+        "historical_apps_research_successful_attempt_count": sum(
             int(
-                case["historical_saved_judges"][
-                    "actual_claude_model_result_count"
+                case["historical_model_routes"]["apps_research"][
+                    "successful_attempt_count"
+                ]
+            )
+            for case in rows
+        ),
+        "historical_apps_research_claude_usage_event_count": sum(
+            int(
+                case["historical_model_routes"]["apps_research"][
+                    "claude_usage_event_count"
+                ]
+            )
+            for case in rows
+        ),
+        "historical_apps_rg_generation_lane_count": sum(
+            int(case["historical_model_routes"]["apps_rg_generation"]["lane_count"])
+            for case in rows
+        ),
+        "historical_apps_rg_target_claude_lane_count": sum(
+            int(
+                case["historical_model_routes"]["apps_rg_generation"][
+                    "target_claude_lane_count"
+                ]
+            )
+            for case in rows
+        ),
+        "historical_apps_rg_actual_claude_lane_count": sum(
+            int(
+                case["historical_model_routes"]["apps_rg_generation"][
+                    "actual_claude_lane_count"
+                ]
+            )
+            for case in rows
+        ),
+        "historical_apps_rg_model_mismatch_lane_count": sum(
+            int(
+                case["historical_model_routes"]["apps_rg_generation"][
+                    "model_mismatch_lane_count"
+                ]
+            )
+            for case in rows
+        ),
+        "historical_apps_rg_recorded_token_budget_failure_lane_count": sum(
+            int(
+                case["historical_model_routes"]["apps_rg_generation"][
+                    "recorded_token_budget_failure_lane_count"
+                ]
+            )
+            for case in rows
+        ),
+        "historical_apps_rg_recomputed_output_token_budget_failure_lane_count": sum(
+            int(
+                case["historical_model_routes"]["apps_rg_generation"][
+                    "recomputed_output_token_budget_failure_lane_count"
+                ]
+            )
+            for case in rows
+        ),
+        "historical_apps_rg_token_accounting_false_failure_lane_count": sum(
+            int(
+                case["historical_model_routes"]["apps_rg_generation"][
+                    "token_accounting_false_failure_lane_count"
                 ]
             )
             for case in rows
         ),
         "contract_handoff_entry_count": sum(
-            int(case["contract_handoffs"]["entry_count"])
-            for case in rows
+            int(case["contract_handoffs"]["entry_count"]) for case in rows
         ),
         "source_runs_mutated": False,
         "provider_calls": 0,
@@ -1015,21 +1316,15 @@ def execute_production_fault_qualification(
     )
 
     paths = {
-        "eval_error_receipt": replay
-        / "w2/failures/apps_eval_error_receipt.json",
+        "eval_error_receipt": replay / "w2/failures/apps_eval_error_receipt.json",
         "eval_error_span": replay / "w2/failures/apps_eval_error_span.json",
-        "eval_resume_receipt": replay
-        / "w2/failures/apps_eval_resume_receipt.json",
-        "eval_fault_guard": replay
-        / "w2/w2_fault_zero_provider_guard_receipt.json",
+        "eval_resume_receipt": replay / "w2/failures/apps_eval_resume_receipt.json",
+        "eval_fault_guard": replay / "w2/w2_fault_zero_provider_guard_receipt.json",
         "eval_success_guard": replay / "w2/w2_zero_provider_guard_receipt.json",
-        "l6_error_receipt": replay
-        / "w3/failures/l6_shadow_error_receipt.json",
+        "l6_error_receipt": replay / "w3/failures/l6_shadow_error_receipt.json",
         "l6_error_span": replay / "w3/failures/l6_shadow_error_span.json",
-        "l6_resume_receipt": replay
-        / "w3/failures/l6_shadow_resume_receipt.json",
-        "l6_fault_guard": replay
-        / "w3/w3_fault_zero_provider_guard_receipt.json",
+        "l6_resume_receipt": replay / "w3/failures/l6_shadow_resume_receipt.json",
+        "l6_fault_guard": replay / "w3/w3_fault_zero_provider_guard_receipt.json",
         "l6_success_guard": replay / "w3/w3_zero_provider_guard_receipt.json",
         "terminal_completion": replay / "w4/w4_completion_receipt.json",
     }
@@ -1049,8 +1344,7 @@ def execute_production_fault_qualification(
         and eval_resume.get("w1_replayed") is False
         and eval_resume.get("generation_replayed") is False
         and eval_resume.get("judge_replayed") is False,
-        "l6_real_boundary": l6_error.get("stage_id")
-        == "L6_SHADOW_OBSERVABILITY"
+        "l6_real_boundary": l6_error.get("stage_id") == "L6_SHADOW_OBSERVABILITY"
         and l6_error.get("error_type") == "ProductionBoundaryFault"
         and "controlled W3 production-boundary fault"
         in str(l6_error.get("traceback") or ""),
@@ -1062,12 +1356,9 @@ def execute_production_fault_qualification(
         and l6_resume.get("generation_replayed") is False,
         "fault_guards_failed": docs["eval_fault_guard"].get("status") == "FAIL"
         and docs["l6_fault_guard"].get("status") == "FAIL",
-        "resume_guards_passed": docs["eval_success_guard"].get("status")
-        == "PASS"
+        "resume_guards_passed": docs["eval_success_guard"].get("status") == "PASS"
         and docs["l6_success_guard"].get("status") == "PASS",
-        "terminal_recovered": docs["terminal_completion"].get(
-            "terminal_outcome"
-        )
+        "terminal_recovered": docs["terminal_completion"].get("terminal_outcome")
         == "BLOCKED_NON_PRODUCT"
         and docs["terminal_completion"].get("terminal_closed") is True,
     }
@@ -1155,9 +1446,7 @@ def _build_positive_fixture(root: Path) -> tuple[dict[str, str], dict[str, Any]]
                 "x2_failed_gate_ids": "",
                 "runtime_generation_status": "REAL_LLM",
                 "product_quality_status": "PASS",
-                "judges": [
-                    {"pass": True, "provider_status": "MODEL_BACKED_PASS"}
-                ],
+                "judges": [{"pass": True, "provider_status": "MODEL_BACKED_PASS"}],
             }
         )
         lane_root = root / "modular_r4/sections" / lane
@@ -1194,9 +1483,7 @@ def _build_positive_fixture(root: Path) -> tuple[dict[str, str], dict[str, Any]]
         _fixture_write(
             lane_root / "x2_gate_outputs.json",
             {
-                "gates": [
-                    {"gate_id": "x2_no_silent_mock_fallback", "pass": True}
-                ],
+                "gates": [{"gate_id": "x2_no_silent_mock_fallback", "pass": True}],
                 "failed_gates": [],
                 "x2_failed": 0,
             },
@@ -1333,9 +1620,7 @@ def _build_positive_fixture(root: Path) -> tuple[dict[str, str], dict[str, Any]]
         {
             "all_pass": True,
             "failed_gate_ids": [],
-            "gates": [
-                {"gate_id": "x2_all_required_sections_present", "pass": True}
-            ],
+            "gates": [{"gate_id": "x2_all_required_sections_present", "pass": True}],
         },
     )
     _fixture_write(
@@ -1701,29 +1986,30 @@ def verify_production_positive_control(
         "fixture_uwg_decision",
         "product_authorization",
         "terminal_state",
-        *(f"stage_authority_{stage}" for stage in (
-            "apps_rg_c0",
-            "apps_rg_pa",
-            "apps_rg_l2",
-            "x1_review",
-            "x2_aggregation",
-            "x3_disposition",
-        )),
+        *(
+            f"stage_authority_{stage}"
+            for stage in (
+                "apps_rg_c0",
+                "apps_rg_pa",
+                "apps_rg_l2",
+                "x1_review",
+                "x2_aggregation",
+                "x3_disposition",
+            )
+        ),
     }
     checks = {
         "schema": manifest.get("schema_version") == POSITIVE_CONTROL_SCHEMA,
         "status": manifest.get("status") == "PASS",
         "semantic": _semantic_valid(manifest),
         "qualification_only": manifest.get("qualification_only") is True,
-        "no_real_authority": manifest.get("production_authority_granted")
-        is False
+        "no_real_authority": manifest.get("production_authority_granted") is False
         and manifest.get("publication_allowed") is False,
         "no_execution": manifest.get("provider_execution") is False
         and manifest.get("judge_execution") is False
         and manifest.get("embedding_execution") is False,
         "model_pin_not_claimed": manifest.get("model_pin_qualified") is False,
-        "production_validators_passed": manifest.get("whole_run_exit_verified")
-        is True
+        "production_validators_passed": manifest.get("whole_run_exit_verified") is True
         and manifest.get("stage_authority_receipts_passed") == 6
         and manifest.get("product_eligibility_passed") is True
         and manifest.get("terminal_state_machine_passed") is True,

@@ -13,12 +13,8 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LOCAL_SRC_ROOT = REPO_ROOT / "src"
 REPLAY_MODULE_PATH = REPO_ROOT / "src/apps_rg/runtime/post_runtime_replay.py"
-PIPELINE_MODULE_PATH = (
-    REPO_ROOT / "src/apps_rg/runtime/w5_end_to_end_pipeline.py"
-)
-QUALIFICATION_MODULE_PATH = (
-    REPO_ROOT / "src/apps_rg/runtime/zero_llm_qualification.py"
-)
+PIPELINE_MODULE_PATH = REPO_ROOT / "src/apps_rg/runtime/w5_end_to_end_pipeline.py"
+QUALIFICATION_MODULE_PATH = REPO_ROOT / "src/apps_rg/runtime/zero_llm_qualification.py"
 
 
 def _load_module(name: str, path: Path) -> Any:
@@ -119,9 +115,7 @@ def main(argv: list[str] | None = None) -> int:
                 "status": "FAIL",
                 "provider_attempt_blocked": False,
                 "exception_type": "",
-                "controlled_attempt_counters": (
-                    controlled_guard.counters.to_dict()
-                ),
+                "controlled_attempt_counters": (controlled_guard.counters.to_dict()),
             }
 
         def _qualification_operation(
@@ -192,32 +186,52 @@ def main(argv: list[str] | None = None) -> int:
         ],
         "apps_eval_records": completion["apps_eval_records"],
         "l6_terminal_closures": completion["l6_terminal_closures"],
-        "non_product_terminal_manifests": completion[
-            "non_product_terminal_manifests"
+        "non_product_terminal_manifests": completion["non_product_terminal_manifests"],
+        "historical_saved_judge_results": completion["historical_saved_judge_results"],
+        "historical_saved_judge_passes": completion["historical_saved_judge_passes"],
+        "historical_actual_claude_judge_results": completion[
+            "historical_actual_claude_judge_results"
         ],
-        "historical_saved_judge_results": completion[
-            "historical_saved_judge_results"
+        "historical_apps_research_usage_events": completion[
+            "historical_apps_research_usage_events"
         ],
-        "historical_saved_judge_passes": completion[
-            "historical_saved_judge_passes"
+        "historical_apps_research_successful_attempts": completion[
+            "historical_apps_research_successful_attempts"
         ],
-        "historical_actual_claude_model_results": completion[
-            "historical_actual_claude_model_results"
+        "historical_apps_research_claude_usage_events": completion[
+            "historical_apps_research_claude_usage_events"
         ],
-        "contract_handoff_entries": completion[
-            "contract_handoff_entries"
+        "historical_apps_rg_generation_lanes": completion[
+            "historical_apps_rg_generation_lanes"
         ],
-        "eval_fault_recovered": completion[
-            "production_fault_qualification"
-        ]["eval_recovery_count"]
+        "historical_apps_rg_target_claude_lanes": completion[
+            "historical_apps_rg_target_claude_lanes"
+        ],
+        "historical_apps_rg_actual_claude_lanes": completion[
+            "historical_apps_rg_actual_claude_lanes"
+        ],
+        "historical_apps_rg_model_mismatch_lanes": completion[
+            "historical_apps_rg_model_mismatch_lanes"
+        ],
+        "historical_apps_rg_recorded_token_budget_failure_lanes": completion[
+            "historical_apps_rg_recorded_token_budget_failure_lanes"
+        ],
+        "historical_apps_rg_recomputed_output_token_budget_failure_lanes": completion[
+            "historical_apps_rg_recomputed_output_token_budget_failure_lanes"
+        ],
+        "historical_apps_rg_token_accounting_false_failure_lanes": completion[
+            "historical_apps_rg_token_accounting_false_failure_lanes"
+        ],
+        "contract_handoff_entries": completion["contract_handoff_entries"],
+        "eval_fault_recovered": completion["production_fault_qualification"][
+            "eval_recovery_count"
+        ]
         == 1,
-        "l6_fault_recovered": completion[
-            "production_fault_qualification"
-        ]["l6_recovery_count"]
+        "l6_fault_recovered": completion["production_fault_qualification"][
+            "l6_recovery_count"
+        ]
         == 1,
-        "positive_control_status": completion[
-            "production_positive_control"
-        ]["status"],
+        "positive_control_status": completion["production_positive_control"]["status"],
         "positive_control_production_validators": completion[
             "production_positive_control"
         ]["production_validator_count"],
@@ -236,9 +250,7 @@ def main(argv: list[str] | None = None) -> int:
         "new_uwg_operations": completion["new_uwg_operations"],
         "live_generation_executed": completion["live_generation_executed"],
         "live_model_pin_qualified": completion["live_model_pin_qualified"],
-        "production_authority_granted": completion[
-            "production_authority_granted"
-        ],
+        "production_authority_granted": completion["production_authority_granted"],
         "publication_allowed": completion["publication_allowed"],
         "qualification_dir": operation["qualification_dir"],
         "receipt_path": receipt["receipt_path"],

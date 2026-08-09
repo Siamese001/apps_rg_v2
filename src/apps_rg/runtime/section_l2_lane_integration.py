@@ -18,6 +18,35 @@ def _product_visible(runtime_payload: dict[str, Any]) -> bool:
     return bool(runtime_payload.get("product_visible", True))
 
 
+def _resolve_authority_model_lane(
+    *,
+    section_id: str,
+    provider_lane: str,
+    model_lane: str | None,
+) -> str:
+    """Resolve the model before E1/E2 signs the execution packet.
+
+    Provider routing can change before a lane starts (including a governed
+    Anthropic-limit route).  Signing the static PA compatibility model and
+    resolving the real provider model afterwards produced packets that named
+    Claude while the request executed OpenAI.  The authority packet must bind
+    the same provider-specific model that the section call will use.
+    """
+
+    explicit = str(model_lane or "").strip()
+    if explicit:
+        return explicit
+    provider = str(provider_lane or "").strip().lower()
+    from apps_rg.runtime.section_model_limits import (
+        external_openai_generation_model,
+        resolve_section_generation_model,
+    )
+
+    if provider == "external_openai":
+        return external_openai_generation_model(section_id=section_id)
+    return resolve_section_generation_model(section_id)
+
+
 def prepare_section_l2_before_provider(
     artifact_dir: Path,
     section_id: str,
@@ -37,12 +66,17 @@ def prepare_section_l2_before_provider(
     if _product_visible(runtime_payload):
         from apps_rg.runtime.section_l2_authority import prepare_section_l2_authority
 
+        resolved_model_lane = _resolve_authority_model_lane(
+            section_id=section_id,
+            provider_lane=provider_lane,
+            model_lane=model_lane,
+        )
         packet = prepare_section_l2_authority(
             artifact_dir,
             section_id,
             runtime_payload,
             provider_lane=provider_lane,
-            model_lane=model_lane,
+            model_lane=resolved_model_lane,
         )
     else:
         packet = build_l2_execution_packet_for_section(
