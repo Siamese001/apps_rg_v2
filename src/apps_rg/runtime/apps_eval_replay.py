@@ -11,14 +11,23 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import traceback
 import uuid
 from dataclasses import replace
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 
 W2_COMPLETION_SCHEMA = "apps_rg.apps_eval_replay_completion.v1"
 W2_COMPLETION_FILENAME = "w2_completion_receipt.json"
+W2_ERROR_RECEIPT_SCHEMA = "apps_rg.post_runtime_stage_error.v1"
+W2_ERROR_SPAN_SCHEMA = "apps_rg.local_post_runtime_error_span.v1"
+W2_RESUME_RECEIPT_SCHEMA = "apps_rg.post_runtime_stage_resume.v1"
+W2_SUPERSESSION_SCHEMA = "apps_rg.eval_package_supersession_manifest.v1"
+W2_ERROR_RECEIPT_FILENAME = "failures/apps_eval_error_receipt.json"
+W2_ERROR_SPAN_FILENAME = "failures/apps_eval_error_span.json"
+W2_RESUME_RECEIPT_FILENAME = "failures/apps_eval_resume_receipt.json"
+W2_SUPERSESSION_FILENAME = "eval_package_supersession_manifest.json"
 
 W1_RECONCILIATION_FILENAME = "w1_authoritative_reconciliation.json"
 W1_CORRECTION_FILENAME = "w1_authorization_correction_receipt.json"
@@ -233,10 +242,250 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
     os.replace(temporary, path)
 
 
+def _write_semantic(path: Path, payload: Mapping[str, Any]) -> Path:
+    body = dict(payload)
+    body["semantic_digest"] = _canonical_digest(body)
+    _atomic_write_json(path, body)
+    return path
+
+
+def _stable_id(*parts: str, length: int) -> str:
+    raw = "\x1f".join(parts).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()[:length]
+
+
+def _emit_stage_failure(
+    *,
+    output: Path,
+    source_run_id: str,
+    exc: Exception,
+    attempt: int,
+) -> dict[str, Path]:
+    """Persist the real Apps Eval exception before propagating it."""
+
+    stage_id = "APPS_EVAL"
+    trace_id = _stable_id(
+        source_run_id,
+        stage_id,
+        type(exc).__name__,
+        str(exc),
+        str(attempt),
+        length=32,
+    )
+    span_id = _stable_id(trace_id, "span", length=16)
+    receipt_path = output / W2_ERROR_RECEIPT_FILENAME
+    span_path = output / W2_ERROR_SPAN_FILENAME
+    formatted = "".join(
+        traceback.format_exception(type(exc), exc, exc.__traceback__)
+    )
+    _write_semantic(
+        receipt_path,
+        {
+            "schema_version": W2_ERROR_RECEIPT_SCHEMA,
+            "status": "CAPTURED",
+            "wave": "W2",
+            "stage_id": stage_id,
+            "source_run_id": source_run_id,
+            "attempt": attempt,
+            "error_type": type(exc).__name__,
+            "error_module": type(exc).__module__,
+            "error_message": str(exc),
+            "traceback": formatted,
+            "trace_id": trace_id,
+            "span_id": span_id,
+            "recovery_action": "RESUME_FROM_APPS_EVAL_SAVED_W1",
+            "generation_retry_attempted": False,
+            "generation_replayed": False,
+            "judge_replayed": False,
+            "embedding_replayed": False,
+            "uwg_operation_attempted": False,
+            "provider_calls": 0,
+            "judge_calls": 0,
+            "embedding_calls": 0,
+            "model_calls": 0,
+            "network_attempts": 0,
+            "local_authority": True,
+        },
+    )
+    _write_semantic(
+        span_path,
+        {
+            "schema_version": W2_ERROR_SPAN_SCHEMA,
+            "status": "ERROR",
+            "wave": "W2",
+            "stage_id": stage_id,
+            "source_run_id": source_run_id,
+            "attempt": attempt,
+            "trace_id": trace_id,
+            "span_id": span_id,
+            "exception_type": type(exc).__name__,
+            "exception_message": str(exc),
+            "recovery_action": "RESUME_FROM_APPS_EVAL_SAVED_W1",
+            "provider_execution": False,
+            "generation_execution": False,
+            "judge_execution": False,
+            "embedding_execution": False,
+            "uwg_execution": False,
+            "local_authority": True,
+            "remote_otel_role": "OPTIONAL_MIRROR_NOT_AUTHORITY",
+        },
+    )
+    return {"error_receipt": receipt_path, "error_span": span_path}
+
+
+def _emit_stage_resume(
+    *,
+    output: Path,
+    source_run_id: str,
+) -> Path | None:
+    error_path = output / W2_ERROR_RECEIPT_FILENAME
+    span_path = output / W2_ERROR_SPAN_FILENAME
+    if not error_path.is_file() and not span_path.is_file():
+        return None
+    if not error_path.is_file() or not span_path.is_file():
+        raise AppsEvalReplayError("W2 failure evidence is incomplete")
+    error = _read_json(error_path, label="w2_error_receipt")
+    span = _read_json(span_path, label="w2_error_span")
+    checks = {
+        "error_schema": error.get("schema_version") == W2_ERROR_RECEIPT_SCHEMA,
+        "error_semantic": _semantic_digest_valid(error),
+        "error_stage": error.get("stage_id") == "APPS_EVAL",
+        "error_source": error.get("source_run_id") == source_run_id,
+        "error_zero_upstream_replay": error.get("generation_replayed") is False
+        and error.get("judge_replayed") is False
+        and error.get("embedding_replayed") is False
+        and error.get("uwg_operation_attempted") is False,
+        "span_schema": span.get("schema_version") == W2_ERROR_SPAN_SCHEMA,
+        "span_semantic": _semantic_digest_valid(span),
+        "span_source": span.get("source_run_id") == source_run_id,
+        "span_zero_upstream_execution": span.get("provider_execution") is False
+        and span.get("generation_execution") is False
+        and span.get("judge_execution") is False
+        and span.get("embedding_execution") is False
+        and span.get("uwg_execution") is False,
+        "identity": error.get("trace_id") == span.get("trace_id")
+        and error.get("span_id") == span.get("span_id"),
+    }
+    failures = _failed_checks(checks)
+    if failures:
+        raise AppsEvalReplayError(
+            "w2_failure_evidence_invalid:" + ",".join(failures)
+        )
+    return _write_semantic(
+        output / W2_RESUME_RECEIPT_FILENAME,
+        {
+            "schema_version": W2_RESUME_RECEIPT_SCHEMA,
+            "status": "PASS",
+            "wave": "W2",
+            "stage_id": "APPS_EVAL",
+            "source_run_id": source_run_id,
+            "resume_from_stage": "APPS_EVAL",
+            "upstream_saved_artifacts_reused": True,
+            "w1_replayed": False,
+            "generation_replayed": False,
+            "judge_replayed": False,
+            "embedding_replayed": False,
+            "uwg_operation_attempted": False,
+            "error_receipt": _file_binding(error_path, relative_to=output),
+            "error_span": _file_binding(span_path, relative_to=output),
+        },
+    )
+
+
+def _tree_manifest(root: Path) -> dict[str, Any]:
+    files = [path for path in root.rglob("*") if path.is_file()]
+    rows = [
+        {
+            "artifact_ref": path.relative_to(root).as_posix(),
+            "byte_length": path.stat().st_size,
+            "sha256": _sha256_file(path),
+        }
+        for path in sorted(files)
+    ]
+    return {
+        "file_count": len(rows),
+        "total_bytes": sum(int(row["byte_length"]) for row in rows),
+        "files": rows,
+        "content_sha256": _canonical_digest(rows),
+    }
+
+
+def _supersede_unbound_eval_packages(
+    *,
+    output: Path,
+    authoritative_record_id: str,
+) -> tuple[dict[str, Any], Path]:
+    canonical_root = output / "apps_eval/apps_rg_current_resume_generation"
+    superseded_root = output / "superseded_apps_eval_packages"
+    superseded: list[dict[str, Any]] = []
+    if canonical_root.is_dir():
+        for candidate in sorted(canonical_root.iterdir()):
+            if not candidate.is_dir() or candidate.name == authoritative_record_id:
+                continue
+            destination = superseded_root / candidate.name
+            if destination.exists():
+                raise AppsEvalReplayError(
+                    f"superseded_eval_package_collision:{candidate.name}"
+                )
+            superseded_root.mkdir(parents=True, exist_ok=True)
+            candidate.replace(destination)
+            superseded.append(
+                {
+                    "record_id": candidate.name,
+                    "disposition": "SUPERSEDED_UNBOUND_DEVELOPMENT_PACKAGE",
+                    "artifact_ref": destination.relative_to(output).as_posix(),
+                    **_tree_manifest(destination),
+                }
+            )
+    if superseded_root.is_dir():
+        known_ids = {str(row["record_id"]) for row in superseded}
+        for candidate in sorted(superseded_root.iterdir()):
+            if not candidate.is_dir() or candidate.name in known_ids:
+                continue
+            if candidate.name == authoritative_record_id:
+                raise AppsEvalReplayError(
+                    "authoritative_eval_package_in_superseded_root"
+                )
+            superseded.append(
+                {
+                    "record_id": candidate.name,
+                    "disposition": "SUPERSEDED_UNBOUND_DEVELOPMENT_PACKAGE",
+                    "artifact_ref": candidate.relative_to(output).as_posix(),
+                    **_tree_manifest(candidate),
+                }
+            )
+    superseded.sort(key=lambda row: str(row["record_id"]))
+    canonical_ids = (
+        sorted(path.name for path in canonical_root.iterdir() if path.is_dir())
+        if canonical_root.is_dir()
+        else []
+    )
+    body: dict[str, Any] = {
+        "schema_version": W2_SUPERSESSION_SCHEMA,
+        "status": "PASS",
+        "authoritative_record_id": authoritative_record_id,
+        "canonical_record_ref": (
+            "apps_eval/apps_rg_current_resume_generation/"
+            f"{authoritative_record_id}"
+        ),
+        "superseded_package_count": len(superseded),
+        "superseded_packages": superseded,
+        "canonical_package_ids": canonical_ids,
+        "canonical_package_count": len(canonical_ids),
+        "destructive_delete_performed": False,
+        "packages_recoverable": True,
+    }
+    body["semantic_digest"] = _canonical_digest(body)
+    path = output / W2_SUPERSESSION_FILENAME
+    _atomic_write_json(path, body)
+    return body, path
+
+
 def emit_w2_apps_eval_replay(
     *,
     source_run: Path | str,
     output_dir: Path | str,
+    fault_injector: Callable[[str, int], None] | None = None,
 ) -> dict[str, Any]:
     """Emit one complete deterministic Apps Eval verdict without L6 execution."""
 
@@ -301,24 +550,39 @@ def emit_w2_apps_eval_replay(
     )
     snapshot = replace(snapshot, provenance=provenance)
 
-    def _evaluate() -> Any:
-        return run_current_snapshot_eval(
-            snapshot,
-            out_dir=str(output / "apps_eval"),
-            deterministic_only=True,
-            emit_l6_handoff=True,
-            emit_l6_shadow_bridge=False,
-            git_commit_override="",
-            platform_override="post-runtime-zero-provider",
-        )
+    def _evaluate(attempt: int) -> Any:
+        try:
+            if fault_injector is not None:
+                fault_injector("APPS_EVAL", attempt)
+            return run_current_snapshot_eval(
+                snapshot,
+                out_dir=str(output / "apps_eval"),
+                deterministic_only=True,
+                emit_l6_handoff=True,
+                emit_l6_shadow_bridge=False,
+                git_commit_override="",
+                platform_override="post-runtime-zero-provider",
+            )
+        except Exception as exc:
+            evidence = _emit_stage_failure(
+                output=output,
+                source_run_id=source.name,
+                exc=exc,
+                attempt=attempt,
+            )
+            raise AppsEvalReplayError(
+                "apps_eval_stage_failed:"
+                f"{type(exc).__name__}:{exc}:"
+                f"receipt={evidence['error_receipt'].as_posix()}"
+            ) from exc
 
-    first_record = _evaluate()
+    first_record = _evaluate(1)
     first_eval_record_path = Path(first_record.artifact_paths["eval_record"])
     first_eval_record_sha256 = _sha256_file(first_eval_record_path)
     first_seal_valid, first_seal_errors = verify_apps_rg_eval_package_seal(
         first_eval_record_path.parent
     )
-    record = _evaluate()
+    record = _evaluate(2)
     eval_record_path = Path(record.artifact_paths["eval_record"])
     eval_run_dir = eval_record_path.parent
     seal_valid, seal_errors = verify_apps_rg_eval_package_seal(eval_run_dir)
@@ -354,6 +618,14 @@ def emit_w2_apps_eval_replay(
     eval_seal_path = Path(record.artifact_paths["eval_package_seal"])
     coverage_path = Path(record.artifact_paths["coverage_matrix"])
     component_path = Path(record.artifact_paths["apps_rg_component_scorecard"])
+    resume_path = _emit_stage_resume(
+        output=output,
+        source_run_id=source.name,
+    )
+    supersession, supersession_path = _supersede_unbound_eval_packages(
+        output=output,
+        authoritative_record_id=str(record.record_id or ""),
+    )
 
     checks = {
         "w1_authority_validated": all(w1["checks"].values()),
@@ -399,6 +671,10 @@ def emit_w2_apps_eval_replay(
         "l6_shadow_bridge_not_executed": "l6_shadow_bridge"
         not in record.artifact_paths
         and not (eval_run_dir / "l6_shadow_bridge.json").exists(),
+        "unbound_packages_superseded": supersession.get("status") == "PASS"
+        and supersession.get("authoritative_record_id") == record.record_id
+        and supersession.get("canonical_package_count") == 1
+        and supersession.get("canonical_package_ids") == [record.record_id],
     }
     failures = _failed_checks(checks)
     completion: dict[str, Any] = {
@@ -446,6 +722,15 @@ def emit_w2_apps_eval_replay(
         "component_scorecard": _file_binding(component_path, relative_to=output),
         "coverage_matrix": _file_binding(coverage_path, relative_to=output),
         "l6_handoff": _file_binding(l6_handoff_path, relative_to=output),
+        "eval_package_supersession_manifest": _file_binding(
+            supersession_path,
+            relative_to=output,
+        ),
+        "stage_resume_receipt": (
+            _file_binding(resume_path, relative_to=output)
+            if resume_path is not None
+            else None
+        ),
         "w1_completion_ref": w1["paths"]["completion"].as_posix(),
         "w1_completion_semantic_digest": w1["completion"]["semantic_digest"],
         "w1_correction_ref": w1["paths"]["correction"].as_posix(),
