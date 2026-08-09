@@ -26,13 +26,14 @@ import uuid
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 
 
 W0_SOURCE_MANIFEST_SCHEMA = "apps_rg.post_runtime_replay_source_manifest.v1"
 W0_RECEIPT_SCHEMA = "apps_rg.post_runtime_zero_provider_preflight.v1"
 W0_RECEIPT_FILENAME = "w0_zero_provider_preflight_receipt.json"
 W0_SOURCE_MANIFEST_FILENAME = "source_manifest.json"
+GUARDED_REPLAY_RECEIPT_SCHEMA = "apps_rg.post_runtime_zero_provider_replay.v1"
 
 NO_PROVIDER_ENV = "APPS_RG_POST_RUNTIME_NO_PROVIDER"
 
@@ -308,10 +309,17 @@ class ZeroProviderReplayGuard:
         allowed_subprocess_commands: Iterable[Sequence[str]] = (),
     ) -> None:
         self.forbidden_import_prefixes = tuple(
-            sorted({str(prefix).strip() for prefix in forbidden_import_prefixes if str(prefix).strip()})
+            sorted(
+                {
+                    str(prefix).strip()
+                    for prefix in forbidden_import_prefixes
+                    if str(prefix).strip()
+                }
+            )
         )
         self.allowed_subprocess_commands = {
-            tuple(str(item) for item in command) for command in allowed_subprocess_commands
+            tuple(str(item) for item in command)
+            for command in allowed_subprocess_commands
         }
         self.counters = ReplayAttemptCounters()
         self.credentials_scrubbed: list[str] = []
@@ -425,8 +433,7 @@ class ZeroProviderReplayGuard:
             command = args[0] if args else "<unknown>"
             guard.counters.subprocess_attempts += 1
             raise SubprocessExecutionBlocked(
-                "shell execution is forbidden during post-runtime replay: "
-                f"{command!r}"
+                f"shell execution is forbidden during post-runtime replay: {command!r}"
             )
 
         socket.socket.connect = blocked_connect  # type: ignore[method-assign]
@@ -448,7 +455,9 @@ class ZeroProviderReplayGuard:
 
     def __enter__(self) -> "ZeroProviderReplayGuard":
         if self._active:
-            raise PostRuntimeReplaySafetyError("zero-provider replay guard is already active")
+            raise PostRuntimeReplaySafetyError(
+                "zero-provider replay guard is already active"
+            )
         self.preloaded_forbidden_modules = sorted(
             name for name in sys.modules if self.import_is_forbidden(name)
         )
@@ -506,6 +515,148 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
     os.replace(temporary, path)
 
 
+def run_guarded_artifact_replay(
+    *,
+    source_run: Path | str,
+    output_root: Path | str,
+    wave: str,
+    operation: Callable[[Path, Path], Mapping[str, Any]],
+    receipt_filename: str,
+    require_clean_import_state: bool = False,
+) -> dict[str, Any]:
+    """Run one deterministic artifact callback inside the W0 safety boundary.
+
+    The callback receives the immutable source root and a derived-output
+    directory outside that root.  This helper does not grant permission for
+    provider, judge, embedding, network, subprocess, Eval, L6, or UWG work;
+    all such escape paths remain blocked by :class:`ZeroProviderReplayGuard`.
+    """
+
+    source = Path(source_run).resolve(strict=True)
+    output = Path(output_root).resolve()
+    _validate_disjoint_roots(source, output)
+    before = build_source_manifest(source)
+    content_digest = str(before["content_sha256"])
+    replay_id = (
+        f"{_safe_component(source.name)}_{content_digest.removeprefix('sha256:')[:16]}"
+    )
+    normalized_wave = _safe_component(wave).upper()
+    replay_dir = output / replay_id
+    operation_dir = replay_dir / normalized_wave.lower()
+
+    guard = ZeroProviderReplayGuard()
+    operation_error: BaseException | None = None
+    operation_result: Mapping[str, Any] = {}
+    try:
+        with guard:
+            operation_result = operation(source, operation_dir)
+            if not isinstance(operation_result, Mapping):
+                raise PostRuntimeReplaySafetyError(
+                    "guarded artifact operation must return a mapping"
+                )
+    except BaseException as exc:  # noqa: BLE001 - receipt must preserve any failure
+        operation_error = exc
+
+    after = build_source_manifest(source)
+    source_delta = compare_source_manifests(before, after)
+    counters = guard.counters.to_dict()
+    zero_attempts = all(value == 0 for value in counters.values())
+    clean_import_state = not guard.preloaded_forbidden_modules
+    completion = operation_result.get("completion")
+    completion = dict(completion) if isinstance(completion, Mapping) else {}
+    operation_pass = completion.get("status") == "PASS"
+    status = (
+        "PASS"
+        if (
+            operation_error is None
+            and operation_pass
+            and source_delta["unchanged"]
+            and zero_attempts
+            and (clean_import_state or not require_clean_import_state)
+        )
+        else "FAIL"
+    )
+    receipt: dict[str, Any] = {
+        "schema_version": GUARDED_REPLAY_RECEIPT_SCHEMA,
+        "wave": normalized_wave,
+        "status": status,
+        "replay_id": replay_id,
+        "replay_mode": "POST_RUNTIME_ARTIFACT_ONLY",
+        "source_run": source.as_posix(),
+        "source_run_id": source.name,
+        "source_manifest_ref": f"../{W0_SOURCE_MANIFEST_FILENAME}",
+        "source_manifest_sha256": content_digest,
+        "source_file_count": int(before["file_count"]),
+        "source_total_bytes": int(before["total_bytes"]),
+        "source_unchanged": bool(source_delta["unchanged"]),
+        "source_delta": source_delta,
+        "credentials_scrubbed": guard.credentials_scrubbed,
+        "forced_offline_environment": dict(_FORCED_OFFLINE_ENV),
+        "forbidden_import_prefixes": list(guard.forbidden_import_prefixes),
+        "preloaded_forbidden_modules": guard.preloaded_forbidden_modules,
+        "clean_import_state_required": require_clean_import_state,
+        "clean_import_state": clean_import_state,
+        "attempt_counters": counters,
+        "provider_calls": counters["provider_calls"],
+        "judge_calls": counters["judge_calls"],
+        "embedding_calls": counters["embedding_calls"],
+        "model_calls": counters["model_calls"],
+        "network_attempts": counters["network_attempts"],
+        "subprocess_attempts": counters["subprocess_attempts"],
+        "model_span_delta": 0,
+        "model_span_delta_source": "zero_provider_process_guard",
+        "apps_eval_executed": False,
+        "l6_executed": False,
+        "uwg_operation_attempted": False,
+        "operation_completion_status": str(completion.get("status") or ""),
+        "operation_completion_semantic_digest": str(
+            completion.get("semantic_digest") or ""
+        ),
+        "scope_complete": status == "PASS",
+        "next_wave_authorized": status == "PASS",
+        "operation_error": (
+            {
+                "type": type(operation_error).__name__,
+                "message": str(operation_error)[:2000],
+            }
+            if operation_error is not None
+            else None
+        ),
+    }
+    receipt["semantic_digest"] = _canonical_digest(receipt)
+    _atomic_write_json(replay_dir / W0_SOURCE_MANIFEST_FILENAME, before)
+    _atomic_write_json(operation_dir / receipt_filename, receipt)
+
+    if not source_delta["unchanged"]:
+        raise SourceRunMutationDetected(
+            f"source run changed during {normalized_wave} replay: {source_delta}"
+        )
+    if operation_error is not None:
+        raise PostRuntimeReplaySafetyError(
+            f"{normalized_wave} guarded operation failed: "
+            f"{type(operation_error).__name__}: {operation_error}"
+        ) from operation_error
+    if require_clean_import_state and not clean_import_state:
+        raise PostRuntimeReplaySafetyError(
+            f"{normalized_wave} replay process preloaded forbidden modules: "
+            + ",".join(guard.preloaded_forbidden_modules[:20])
+        )
+    if not zero_attempts:
+        raise PostRuntimeReplaySafetyError(
+            f"{normalized_wave} zero-provider counters were non-zero: {counters}"
+        )
+    if not operation_pass:
+        raise PostRuntimeReplaySafetyError(
+            f"{normalized_wave} artifact operation did not complete: {completion}"
+        )
+    return {
+        **receipt,
+        "receipt_path": (operation_dir / receipt_filename).as_posix(),
+        "operation_dir": operation_dir.as_posix(),
+        "operation_result": dict(operation_result),
+    }
+
+
 def run_w0_zero_provider_preflight(
     *,
     source_run: Path | str,
@@ -520,8 +671,7 @@ def run_w0_zero_provider_preflight(
     before = build_source_manifest(source)
     content_digest = str(before["content_sha256"])
     replay_id = (
-        f"{_safe_component(source.name)}_"
-        f"{content_digest.removeprefix('sha256:')[:16]}"
+        f"{_safe_component(source.name)}_{content_digest.removeprefix('sha256:')[:16]}"
     )
     replay_dir = output / replay_id
 
@@ -622,6 +772,7 @@ def run_w0_zero_provider_preflight(
 
 __all__ = [
     "DEFAULT_FORBIDDEN_IMPORT_PREFIXES",
+    "GUARDED_REPLAY_RECEIPT_SCHEMA",
     "NetworkExecutionBlocked",
     "NO_PROVIDER_ENV",
     "PostRuntimeReplaySafetyError",
@@ -635,5 +786,6 @@ __all__ = [
     "ZeroProviderReplayGuard",
     "build_source_manifest",
     "compare_source_manifests",
+    "run_guarded_artifact_replay",
     "run_w0_zero_provider_preflight",
 ]

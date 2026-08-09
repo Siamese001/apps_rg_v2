@@ -1,4 +1,5 @@
 """Section lane X3 + spine Exit — aggregate_x3 judge math then ExitEvalPipeline authority."""
+
 from __future__ import annotations
 
 import hashlib
@@ -51,7 +52,9 @@ _FINAL_MATERIALIZED_FAILURE_FIELDS = frozenset(
 
 def _write_json(path: Path, doc: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -172,9 +175,13 @@ def _apply_final_materialized_hard_gate(x3_doc: dict[str, Any]) -> dict[str, Any
     )
     x3_doc.setdefault("final_materialized_acceptance_original_x3_code", original_code)
     if "pass" in x3_doc:
-        x3_doc.setdefault("final_materialized_acceptance_original_pass", bool(x3_doc.get("pass")))
+        x3_doc.setdefault(
+            "final_materialized_acceptance_original_pass", bool(x3_doc.get("pass"))
+        )
     if "pass_" in x3_doc:
-        x3_doc.setdefault("final_materialized_acceptance_original_pass_", bool(x3_doc.get("pass_")))
+        x3_doc.setdefault(
+            "final_materialized_acceptance_original_pass_", bool(x3_doc.get("pass_"))
+        )
     x3_doc["x3_code"] = FINAL_MATERIALIZED_BLOCK_X3_CODE
     x3_doc["pass"] = False
     x3_doc["pass_"] = False
@@ -201,7 +208,9 @@ def _final_x1d_judge_rows(artifact_dir: Path) -> list[dict[str, Any]]:
     return []
 
 
-def _declared_final_materialized_contracts(l2_output: dict[str, Any]) -> list[dict[str, Any]]:
+def _declared_final_materialized_contracts(
+    l2_output: dict[str, Any],
+) -> list[dict[str, Any]]:
     """Read lane-specific final materialization contracts declared by the final L2 artifact."""
     out: list[dict[str, Any]] = []
     selection_contract = l2_output.get("final_materialized_selection_contract")
@@ -211,12 +220,18 @@ def _declared_final_materialized_contracts(l2_output: dict[str, Any]) -> list[di
             {
                 "contract_id": "role_episode_final_materialized_selection_contract",
                 "pass": ok,
-                "expected_bullet_count": selection_contract.get("expected_bullet_count"),
+                "expected_bullet_count": selection_contract.get(
+                    "expected_bullet_count"
+                ),
                 "selected_unique_source_fact_count": selection_contract.get(
                     "selected_unique_source_fact_count"
                 ),
-                "rendered_bullet_count": selection_contract.get("rendered_bullet_count"),
-                "rendered_source_fact_ids": selection_contract.get("rendered_source_fact_ids"),
+                "rendered_bullet_count": selection_contract.get(
+                    "rendered_bullet_count"
+                ),
+                "rendered_source_fact_ids": selection_contract.get(
+                    "rendered_source_fact_ids"
+                ),
                 "contract_sha256": _sha256_json(selection_contract),
             }
         )
@@ -244,9 +259,15 @@ def _x1d_model_backed_passes(judges: list[dict[str, Any]]) -> list[str]:
             continue
         score = judge.get("normalized_score")
         threshold = judge.get("normalized_threshold")
-        if score is not None and threshold is not None and float(score) < float(threshold):
+        if (
+            score is not None
+            and threshold is not None
+            and float(score) < float(threshold)
+        ):
             continue
-        provider_key = str(judge.get("provider_key") or judge.get("judge_id") or "").strip()
+        provider_key = str(
+            judge.get("provider_key") or judge.get("judge_id") or ""
+        ).strip()
         if provider_key:
             out.append(provider_key)
     return out
@@ -296,9 +317,7 @@ def build_final_materialized_acceptance_contract(
         len(final_x1d_pass_keys) == len(final_x1d_model_backed_judges)
     )
     repair_ledger = _load_json(artifact_dir / "section_repair_ledger.json")
-    graph_claim_binding = _load_json(
-        artifact_dir / GRAPH_CLAIM_BINDINGS_ARTIFACT
-    )
+    graph_claim_binding = _load_json(artifact_dir / GRAPH_CLAIM_BINDINGS_ARTIFACT)
     graph_claim_binding_active = graph_claim_binding.get("active") is True
     declared_contracts = _declared_final_materialized_contracts(l2_output)
     declared_contract_failures = [
@@ -341,7 +360,9 @@ def build_final_materialized_acceptance_contract(
         "final_materialized_output_ref": output_ref,
         "final_materialized_output_present": final_output_present,
         "final_materialized_output_char_count": len(output_text),
-        "final_materialized_output_sha256": _sha256_text(output_text) if output_text else "",
+        "final_materialized_output_sha256": _sha256_text(output_text)
+        if output_text
+        else "",
         "l2_output_present": (artifact_dir / "l2_output.json").is_file(),
         "l2_output_sha256": _sha256_json(l2_output) if l2_output else "",
         "x2_gate_outputs_present": x2_present,
@@ -355,8 +376,12 @@ def build_final_materialized_acceptance_contract(
         "x2_current_final_materialized_binding": current_x2_binding,
         "final_claim_ledger_present": final_claim_ledger_present,
         "final_claim_ledger_row_count": len(final_claim_ledger),
-        "final_claim_ledger_sha256": _sha256_json(final_claim_ledger) if final_claim_ledger else "",
-        "x1d_judge_outputs_present": (artifact_dir / "x1d_llm_judge_outputs.json").is_file(),
+        "final_claim_ledger_sha256": _sha256_json(final_claim_ledger)
+        if final_claim_ledger
+        else "",
+        "x1d_judge_outputs_present": (
+            artifact_dir / "x1d_llm_judge_outputs.json"
+        ).is_file(),
         "x1d_judge_outputs_sha256": _sha256_json(x1d_doc) if x1d_doc else "",
         "x1d_judge_count": len(final_x1d_judges),
         "x1d_model_backed_judge_count": len(final_x1d_model_backed_judges),
@@ -367,7 +392,9 @@ def build_final_materialized_acceptance_contract(
         "repair_ledger_authoritative_l2_source": str(
             repair_ledger.get("authoritative_l2_source") or ""
         ),
-        "repair_ledger_authoritative_attempt": repair_ledger.get("authoritative_attempt"),
+        "repair_ledger_authoritative_attempt": repair_ledger.get(
+            "authoritative_attempt"
+        ),
         "declared_final_materialized_contracts": declared_contracts,
         "declared_final_materialized_contracts_all_pass": declared_contracts_all_pass,
         "declared_final_materialized_contract_failures": declared_contract_failures,
@@ -439,7 +466,7 @@ def persist_section_x3_mirror(
     x3_doc.setdefault("authority_scope", LANE_X3_MIRROR_AUTHORITY_SCOPE)
     x3_doc.setdefault("artifact_authority_scope", LANE_X3_MIRROR_AUTHORITY_SCOPE)
     x3_doc.setdefault("section_x3_mirror_only", True)
-    x3_doc.setdefault("core_exit_authority_ref", "exit_disposition_receipt.json")
+    x3_doc.setdefault("core_exit_authority_ref", "x3_disposition_receipt.json")
     x3_doc.setdefault("core_exit_authority_scope", CORE_EXIT_AUTHORITY_SCOPE)
     _write_json(artifact_dir / "x3_disposition.json", x3_doc)
     return x3_doc
@@ -540,6 +567,7 @@ def finalize_section_lane_x3(
     x3_result: Any | None = None,
     x3_doc_extra: dict[str, Any] | None = None,
     skip_exit_receipts: bool = True,
+    defer_graph_binding_l2_persistence: bool = False,
     **aggregate_kwargs: Any,
 ) -> Any:
     """Run lane aggregate_x3 and mirror to x3_disposition.json.
@@ -553,11 +581,14 @@ def finalize_section_lane_x3(
     elif aggregate_x3_fn is not None:
         x3 = aggregate_x3_fn(**aggregate_kwargs)
     else:
-        raise ValueError("finalize_section_lane_x3 requires aggregate_x3_fn or x3_result")
+        raise ValueError(
+            "finalize_section_lane_x3 requires aggregate_x3_fn or x3_result"
+        )
 
     graph_claim_binding = bind_final_claims_to_resume_graph_allocation(
         artifact_dir,
         section_id=section_id,
+        persist_l2_envelope=not defer_graph_binding_l2_persistence,
     )
     base_x3_doc = _x3_to_doc(x3)
     final_contract = build_final_materialized_acceptance_contract(

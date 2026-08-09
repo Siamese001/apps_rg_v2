@@ -8,10 +8,8 @@ if __name__ == "__main__":
         "Use: python -m apps_rg or python -m apps_rg --section <lane>"
     )
 
-import argparse
 import hashlib
 import json
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
@@ -21,7 +19,6 @@ from apps_rg.runtime.package.resume_package_manifest import (
     ResumePackageProofPaths,
     build_resume_package_manifest,
     load_json,
-    repo_root_default,
     resolve_resume_package_paths,
 )
 from apps_rg.runtime.package.apps_rg_full_resume_x3_eligibility import (
@@ -29,15 +26,19 @@ from apps_rg.runtime.package.apps_rg_full_resume_x3_eligibility import (
 )
 from apps_rg.runtime.product_output_policy import docx_output_required
 from apps_rg.runtime.disposition_authority import (
+    CORE_RUNTIME_AUTHORITY_ARTIFACT,
+    CORE_X3_DISPOSITION_RECEIPT_ARTIFACT,
     DISPOSITION_AUTHORITY_SPINE,
-    EXIT_DISPOSITION_RECEIPT_ARTIFACT,
     resolve_lane_x3_from_artifact_refs,
 )
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
 
-from apps_rg.runtime.package.resume_package_l6_audit import audit_l6_shadow_packet_for_lane
+from apps_rg.runtime.package.resume_package_l6_audit import (
+    audit_l6_shadow_packet_for_lane,
+)
 
 X3_ALLOW_CODE = "X3_ALLOW"
+CORE_LANE_X3_ALLOW_CODE = "X3D_ALLOW_FINISH"
 X3_BLOCKED_DETERMINISTIC = "X3_BLOCKED_DETERMINISTIC_GATES"
 X3_BLOCK_L6_HANDOFF_INCOMPLETE = "X3_BLOCK_L6_HANDOFF_INCOMPLETE"
 X3_REVIEW_SECTION = "X3_REVIEW_SECTION_JUDGE_STATUS"
@@ -75,13 +76,18 @@ def _x2_all_pass(blob: Mapping[str, Any]) -> tuple[bool, list[str]]:
 
 
 def _rollup_x2_failed_int(raw: Any) -> int | None:
-    if isinstance(raw, bool):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
+    if isinstance(
+        raw, bool
+    ):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
         return None
     if isinstance(raw, int):
         return raw
     try:
         return int(str(raw))
-    except (ValueError, TypeError):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
+    except (
+        ValueError,
+        TypeError,
+    ):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
         return None
 
 
@@ -144,7 +150,9 @@ def _merge_non_generation_guarantees(
     return ok, fused_out
 
 
-def _merge_l6_package_checks(per_lane: Mapping[str, Mapping[str, Any]]) -> tuple[dict[str, bool], bool]:
+def _merge_l6_package_checks(
+    per_lane: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, bool], bool]:
     """Merge per-lane L6 verifier checks into one aggregate; unify/ibm lane-only checks scoped."""
     agg: dict[str, bool] = {}
     fatal_bundle = False
@@ -169,7 +177,11 @@ def _merge_l6_package_checks(per_lane: Mapping[str, Mapping[str, Any]]) -> tuple
     return agg, fatal_bundle
 
 
-def _load_json_if_exists(path: Path) -> dict[str, Any]:  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
+def _load_json_if_exists(
+    path: Path,
+) -> dict[
+    str, Any
+]:  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
     if not path.is_file():
         return {}
     try:
@@ -185,7 +197,10 @@ def _load_optional_json(path: Path) -> dict[str, Any] | None:
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
         return raw if isinstance(raw, dict) else None
-    except (OSError, json.JSONDecodeError):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
+    except (
+        OSError,
+        json.JSONDecodeError,
+    ):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
         return None
 
 
@@ -196,7 +211,10 @@ def summarize_graph_skills_product_closeout(
     blob = cross_section_x2 if isinstance(cross_section_x2, Mapping) else {}
     graph_gate: Mapping[str, Any] | None = None
     for row in blob.get("gates") or []:
-        if isinstance(row, Mapping) and str(row.get("gate_id") or "") == "x2_cross_section_graph_coherence":
+        if (
+            isinstance(row, Mapping)
+            and str(row.get("gate_id") or "") == "x2_cross_section_graph_coherence"
+        ):
             graph_gate = row
             break
 
@@ -230,10 +248,16 @@ def summarize_graph_skills_product_closeout(
     observed = graph_gate.get("observed")
     receipt = observed if isinstance(observed, Mapping) else {}
     status = str(receipt.get("status") or graph_gate.get("verdict") or "UNKNOWN")
-    warnings = receipt.get("warnings") if isinstance(receipt.get("warnings"), list) else []
-    gate_pass = graph_gate.get("pass") is True or str(graph_gate.get("verdict") or "") == "PASS"
+    warnings = (
+        receipt.get("warnings") if isinstance(receipt.get("warnings"), list) else []
+    )
+    gate_pass = (
+        graph_gate.get("pass") is True or str(graph_gate.get("verdict") or "") == "PASS"
+    )
     ready = status == "PASS" and gate_pass and not warnings
-    closeout_status = "READY" if ready else ("ADVISORY_WARN" if status == "WARN" else "MISSING")
+    closeout_status = (
+        "READY" if ready else ("ADVISORY_WARN" if status == "WARN" else "MISSING")
+    )
     if status not in ("PASS", "WARN"):
         closeout_status = "MISSING"
 
@@ -247,19 +271,35 @@ def summarize_graph_skills_product_closeout(
         "graph_coherence_gate_present": True,
         "graph_coherence_gate_verdict": str(graph_gate.get("verdict") or status),
         "graph_coherence_gate_pass": bool(graph_gate.get("pass")),
-        "graph_coherence_gate_decisive_reason": str(graph_gate.get("decisive_reason") or ""),
-        "graph_coherence_gate_evidence_refs": list(graph_gate.get("evidence_refs") or []),
+        "graph_coherence_gate_decisive_reason": str(
+            graph_gate.get("decisive_reason") or ""
+        ),
+        "graph_coherence_gate_evidence_refs": list(
+            graph_gate.get("evidence_refs") or []
+        ),
         "product_closeout_status": "PASS" if gate_pass else "REVIEW",
         "active_section_count": int(receipt.get("active_section_count") or 0),
         "native_c03_section_count": int(receipt.get("native_c03_section_count") or 0),
-        "role_episode_section_count": int(receipt.get("role_episode_section_count") or 0),
-        "unique_graph_skill_node_count": int(receipt.get("unique_graph_skill_node_count") or 0),
-        "unique_source_fact_id_count": int(receipt.get("unique_source_fact_id_count") or 0),
-        "unique_role_episode_bundle_count": int(receipt.get("unique_role_episode_bundle_count") or 0),
+        "role_episode_section_count": int(
+            receipt.get("role_episode_section_count") or 0
+        ),
+        "unique_graph_skill_node_count": int(
+            receipt.get("unique_graph_skill_node_count") or 0
+        ),
+        "unique_source_fact_id_count": int(
+            receipt.get("unique_source_fact_id_count") or 0
+        ),
+        "unique_role_episode_bundle_count": int(
+            receipt.get("unique_role_episode_bundle_count") or 0
+        ),
         "warning_count": len(warnings),
         "warning_reason_codes": sorted(
             {
-                str(w.get("reason_code") or w.get("section_id") or "graph_materiality_warning")
+                str(
+                    w.get("reason_code")
+                    or w.get("section_id")
+                    or "graph_materiality_warning"
+                )
                 for w in warnings
                 if isinstance(w, Mapping)
             }
@@ -313,7 +353,9 @@ def evaluate_resume_package(
     for lane_key in GENERATED_LANES:
         row_raw = lanes.get(lane_key)
         if not isinstance(row_raw, dict):
-            deterministic_failed_ids["generated_lane_x2"].append(f"missing_lane_row:{lane_key}")
+            deterministic_failed_ids["generated_lane_x2"].append(
+                f"missing_lane_row:{lane_key}"
+            )
             lane_rows.append(
                 {
                     "lane_key": lane_key,
@@ -337,11 +379,14 @@ def evaluate_resume_package(
         authoritative_artifact = x3_auth.get("authoritative_artifact")
         disposition_authority = str(x3_auth.get("disposition_authority") or "lane")
         spine_x3_claimed = bool(x3_auth.get("spine_x3_claimed", False))
-        if authoritative_artifact == EXIT_DISPOSITION_RECEIPT_ARTIFACT:
+        if authoritative_artifact in {
+            CORE_RUNTIME_AUTHORITY_ARTIFACT,
+            CORE_X3_DISPOSITION_RECEIPT_ARTIFACT,
+        }:
             artifact_code = x3_auth.get("x3_code")
             recorded = artifact_code is not None
-            load_err = None if recorded else "exit_disposition_receipt_unreadable"
-            x_path = _resolve_repo_path(rr, refs.get(EXIT_DISPOSITION_RECEIPT_ARTIFACT))
+            load_err = None if recorded else "core_x3_authority_unreadable"
+            x_path = _resolve_repo_path(rr, refs.get(str(authoritative_artifact)))
         else:
             xp = refs.get("x3_disposition.json")
             x_path = _resolve_repo_path(rr, xp)
@@ -355,12 +400,17 @@ def evaluate_resume_package(
                 recorded = True
                 try:
                     raw_x3 = load_json(x_path)
-                    artifact_code = str(raw_x3.get("x3_code")) if isinstance(raw_x3, dict) else None
-                    if isinstance(raw_x3, dict) and raw_x3.get("spine_x3_claimed") is True:
+                    artifact_code = None
+                    if (
+                        isinstance(raw_x3, dict)
+                        and raw_x3.get("spine_x3_claimed") is True
+                    ):
                         deterministic_failed_ids["generated_lane_x2"].append(
                             f"lane_mirror_claims_spine_x3:{lane_key}"
                         )
-                        block_notes.append(f"{lane_key}:lane_x3_must_not_claim_spine_authority")
+                        block_notes.append(
+                            f"{lane_key}:lane_x3_must_not_claim_spine_authority"
+                        )
                 except OSError:
                     artifact_code = None
                     load_err = "x3_disposition_os_error"
@@ -376,7 +426,9 @@ def evaluate_resume_package(
         if artifact_code is not None and isinstance(x3_rollup, str):
             codes_match = artifact_code == x3_rollup
             if codes_match is False:
-                deterministic_failed_ids["generated_lane_x2"].append(f"x3_code_mismatch:{lane_key}")
+                deterministic_failed_ids["generated_lane_x2"].append(
+                    f"x3_code_mismatch:{lane_key}"
+                )
                 block_notes.append(f"{lane_key}:x3_code_mismatch_rollup_vs_artifact")
         if spine_x3_claimed and disposition_authority != DISPOSITION_AUTHORITY_SPINE:
             deterministic_failed_ids["generated_lane_x2"].append(
@@ -394,7 +446,11 @@ def evaluate_resume_package(
         if l2_path is not None and l2_path.is_file():
             try:
                 l2_doc = load_json(l2_path)
-                pq = str(l2_doc.get("product_quality_status") or "") if isinstance(l2_doc, dict) else ""
+                pq = (
+                    str(l2_doc.get("product_quality_status") or "")
+                    if isinstance(l2_doc, dict)
+                    else ""
+                )
             except (json.JSONDecodeError, OSError):
                 pq = ""
                 deterministic_failed_ids["generated_lane_x2"].append(
@@ -419,7 +475,9 @@ def evaluate_resume_package(
         refs_x2_raw = refs.get("x2_gate_outputs.json")
         refs_x2 = _resolve_repo_path(rr, refs_x2_raw)
         if refs_x2 is None or not refs_x2.is_file():
-            deterministic_failed_ids["generated_lane_x2"].append(f"missing_lane_x2_artifact_refs:{lane_key}")
+            deterministic_failed_ids["generated_lane_x2"].append(
+                f"missing_lane_x2_artifact_refs:{lane_key}"
+            )
             block_notes.append(f"{lane_key}:missing_x2_gate_outputs_file")
         else:
             try:
@@ -430,9 +488,13 @@ def evaluate_resume_package(
                         deterministic_failed_ids["generated_lane_x2"].extend(
                             [f"{lane_key}:{fid}" for fid in fids]
                         )
-                        block_notes.append(f"{lane_key}:lane_x2_not_all_pass:{','.join(fids)}")
+                        block_notes.append(
+                            f"{lane_key}:lane_x2_not_all_pass:{','.join(fids)}"
+                        )
             except (json.JSONDecodeError, OSError):
-                deterministic_failed_ids["generated_lane_x2"].append(f"lane_x2_unreadable:{lane_key}")
+                deterministic_failed_ids["generated_lane_x2"].append(
+                    f"lane_x2_unreadable:{lane_key}"
+                )
                 block_notes.append(f"{lane_key}:lane_x2_unreadable")
 
         if isinstance(xf_int, int) and xf_int > 0:
@@ -448,10 +510,14 @@ def evaluate_resume_package(
                 "rollup_x3_code": x3_rollup,
                 "disposition_authority": disposition_authority,
                 "x3_authoritative_artifact": authoritative_artifact,
-                "section_x3_mirror_only": bool(x3_auth.get("section_x3_mirror_only", True)),
+                "section_x3_mirror_only": bool(
+                    x3_auth.get("section_x3_mirror_only", True)
+                ),
                 "spine_x3_claimed": spine_x3_claimed,
                 "x3_recorded": recorded,
-                "x3_record_path_repo_relative": _repo_rel(rr, x_path) if recorded and x_path else None,
+                "x3_record_path_repo_relative": _repo_rel(rr, x_path)
+                if recorded and x_path
+                else None,
                 "x3_code_from_artifact": artifact_code,
                 "x3_codes_match": codes_match,
                 "artifact_load_error": load_err,
@@ -465,7 +531,11 @@ def evaluate_resume_package(
         l6pkt: dict[str, Any] | None = None
         l6_repo_rel: str | None = None
         if isinstance(lr, dict):
-            refs_m = lr.get("artifact_refs") if isinstance(lr.get("artifact_refs"), dict) else {}
+            refs_m = (
+                lr.get("artifact_refs")
+                if isinstance(lr.get("artifact_refs"), dict)
+                else {}
+            )
             rp = refs_m.get("l6_shadow_eval_package.json")
             px = _resolve_repo_path(rr, rp)
             if px is not None and px.is_file():
@@ -481,7 +551,9 @@ def evaluate_resume_package(
         if isinstance(l6pkt, dict):
             audit_row["observed_human_label_status"] = l6pkt.get("human_label_status")
             audit_row["observed_calibration_status"] = l6pkt.get("calibration_status")
-            audit_row["observed_runtime_approval_authority"] = l6pkt.get("runtime_approval_authority")
+            audit_row["observed_runtime_approval_authority"] = l6pkt.get(
+                "runtime_approval_authority"
+            )
         per_lane_l6_audit[lane_key] = audit_row
 
     ok_lc, fid_lc = _x2_all_pass(locked_x2)
@@ -514,7 +586,9 @@ def evaluate_resume_package(
             continue
         for item in items:
             agg_det.append(f"{layer}:{item}")
-    deterministic_failed_ids["deterministic_gate_failures_aggregate"] = sorted(set(agg_det))
+    deterministic_failed_ids["deterministic_gate_failures_aggregate"] = sorted(
+        set(agg_det)
+    )
 
     out_docx_repo: str | None = None
     if require_docx:
@@ -524,7 +598,9 @@ def evaluate_resume_package(
             docx_render_manifest=docx_render_manifest,
         )
         if not guarantees_ok:
-            block_notes.append("non_generation_guarantee_merge_failed_or_missing_sources")
+            block_notes.append(
+                "non_generation_guarantee_merge_failed_or_missing_sources"
+            )
 
         out_docx_repo = docx_render_manifest.get("output_docx")
         if not isinstance(out_docx_repo, str) or not out_docx_repo.strip():
@@ -554,9 +630,11 @@ def evaluate_resume_package(
                 apps_rg_w3_reasons.append("apps_rg_output_manifest_not_object")
             else:
                 run_root = am_path.parent.resolve()
-                apps_rg_w3_eligible, apps_rg_w3_reasons = evaluate_apps_rg_full_success_eligibility(
-                    manifest=am_blob,
-                    run_root=run_root,
+                apps_rg_w3_eligible, apps_rg_w3_reasons = (
+                    evaluate_apps_rg_full_success_eligibility(
+                        manifest=am_blob,
+                        run_root=run_root,
+                    )
                 )
         except (OSError, json.JSONDecodeError) as exc:
             apps_rg_w3_eligible = False
@@ -564,12 +642,18 @@ def evaluate_resume_package(
         if not apps_rg_w3_eligible:
             deterministic_failed_ids["apps_rg_l2_product_w3"].extend(apps_rg_w3_reasons)
             block_notes.append(
-                "apps_rg_w3_full_resume_product_ineligible:" + ";".join(apps_rg_w3_reasons)
+                "apps_rg_w3_full_resume_product_ineligible:"
+                + ";".join(apps_rg_w3_reasons)
             )
 
     prev_agg = list(deterministic_failed_ids["deterministic_gate_failures_aggregate"])
-    extra = [f"apps_rg_l2_product_w3:{r}" for r in deterministic_failed_ids["apps_rg_l2_product_w3"]]
-    deterministic_failed_ids["deterministic_gate_failures_aggregate"] = sorted(set(prev_agg + extra))
+    extra = [
+        f"apps_rg_l2_product_w3:{r}"
+        for r in deterministic_failed_ids["apps_rg_l2_product_w3"]
+    ]
+    deterministic_failed_ids["deterministic_gate_failures_aggregate"] = sorted(
+        set(prev_agg + extra)
+    )
 
     docx_layers = ("docx_manifest_x2", "docx_render_x2") if require_docx else ()
     deterministic_blocked = (
@@ -593,7 +677,7 @@ def evaluate_resume_package(
         lk = row.get("lane_key")
         code = row.get("rollup_x3_code") or ""
         code_s = str(code)
-        if code_s == X3_ALLOW_CODE:
+        if code_s == CORE_LANE_X3_ALLOW_CODE:
             rollup_x3_allow.append(lk)
         else:
             rollup_x3_non_allow.append({"lane_key": lk, "x3_code": code_s})
@@ -607,7 +691,8 @@ def evaluate_resume_package(
             rlp_summary_early = dict(raw_sum)
     asm_early = assembly_receipt if isinstance(assembly_receipt, Mapping) else {}
     product_review_required = bool(
-        asm_early.get("product_review_required") or rlp_summary_early.get("product_review_required")
+        asm_early.get("product_review_required")
+        or rlp_summary_early.get("product_review_required")
     )
 
     agg_l6_checks, fatal_l6 = _merge_l6_package_checks(per_lane_l6_audit)
@@ -626,7 +711,11 @@ def evaluate_resume_package(
 
     package_spine_receipt = _resolve_repo_path(
         rr,
-        (final_manifest.get("spine_exit_disposition_receipt_ref") if isinstance(final_manifest, Mapping) else None),
+        (
+            final_manifest.get("spine_exit_disposition_receipt_ref")
+            if isinstance(final_manifest, Mapping)
+            else None
+        ),
     )
     package_disposition_authority = "lane_rollup_aggregate"
     if package_spine_receipt is not None and package_spine_receipt.is_file():
@@ -644,8 +733,14 @@ def evaluate_resume_package(
         "constructor_module": CONSTRUCTOR_MODULE,
         "final_x3_code": final_code,
         "deterministic_blocked": deterministic_blocked,
-        "deterministic_failed_ids_by_layer": {k: v for k, v in deterministic_failed_ids.items() if k != "deterministic_gate_failures_aggregate"},
-        "deterministic_gate_failure_ids_aggregate": deterministic_failed_ids["deterministic_gate_failures_aggregate"],
+        "deterministic_failed_ids_by_layer": {
+            k: v
+            for k, v in deterministic_failed_ids.items()
+            if k != "deterministic_gate_failures_aggregate"
+        },
+        "deterministic_gate_failure_ids_aggregate": deterministic_failed_ids[
+            "deterministic_gate_failures_aggregate"
+        ],
         "block_notes_sorted_unique": sorted(set(block_notes)),
         "rollup_summary": rollup.get("summary") or rollup.get("status"),
         "section_level_x3": {
@@ -657,7 +752,9 @@ def evaluate_resume_package(
         },
         "non_generation_stage_guarantees": merged_calls,
         "non_generation_stage_guarantees_all_false": guarantees_ok,
-        "docx_path_repo_relative_observed_from_render_manifest": out_docx_repo if isinstance(out_docx_repo, str) else None,
+        "docx_path_repo_relative_observed_from_render_manifest": out_docx_repo
+        if isinstance(out_docx_repo, str)
+        else None,
         "rendered_docx_exists_on_disk": docx_ok,
         "explicit_waiver_policy_path": None,
         "waivers_loaded": [],
@@ -673,10 +770,16 @@ def evaluate_resume_package(
                     "l6_shadow_eval_ref_repo_relative": per_lane_l6_audit[lk].get(
                         "l6_shadow_eval_ref_repo_relative"
                     ),
-                    "incomplete_field_paths_sorted": per_lane_l6_audit[lk].get("incomplete_field_paths_sorted"),
+                    "incomplete_field_paths_sorted": per_lane_l6_audit[lk].get(
+                        "incomplete_field_paths_sorted"
+                    ),
                     "checks": per_lane_l6_audit[lk].get("checks") or {},
-                    "observed_human_label_status": per_lane_l6_audit[lk].get("observed_human_label_status"),
-                    "observed_calibration_status": per_lane_l6_audit[lk].get("observed_calibration_status"),
+                    "observed_human_label_status": per_lane_l6_audit[lk].get(
+                        "observed_human_label_status"
+                    ),
+                    "observed_calibration_status": per_lane_l6_audit[lk].get(
+                        "observed_calibration_status"
+                    ),
                     "observed_runtime_approval_authority": per_lane_l6_audit[lk].get(
                         "observed_runtime_approval_authority"
                     ),
@@ -694,10 +797,15 @@ def evaluate_resume_package(
         )
         == len(GENERATED_LANES),
         "generated_lane_rollup_x2_zero_failures_via_rollup_counters": sum(
-            1 for r in lane_rows if isinstance(r.get("rollup_x2_failed"), int) and int(r["rollup_x2_failed"]) == 0
+            1
+            for r in lane_rows
+            if isinstance(r.get("rollup_x2_failed"), int)
+            and int(r["rollup_x2_failed"]) == 0
         )
         == len(GENERATED_LANES),
-        "every_lane_x3_disposition_recorded": all(bool(r.get("x3_recorded")) for r in lane_rows),
+        "every_lane_x3_disposition_recorded": all(
+            bool(r.get("x3_recorded")) for r in lane_rows
+        ),
         "locked_copy_x2_all_pass": ok_lc,
         "final_resume_x2_all_pass": ok_fr,
         "docx_manifest_x2_all_pass": ok_dm,
@@ -705,7 +813,8 @@ def evaluate_resume_package(
         "docx_file_exists_observed_disk": docx_ok,
         "non_generation_no_provider_no_PROVIDER_MODEL_no_judge_aggregate": guarantees_ok,
         "every_lane_l6_handoff_audited": len(per_lane_l6_audit) == len(GENERATED_LANES),
-        "l6_handoff_agg_checks_all_true": len(agg_l6_checks) > 0 and all(agg_l6_checks.values()),
+        "l6_handoff_agg_checks_all_true": len(agg_l6_checks) > 0
+        and all(agg_l6_checks.values()),
         "l6_handoff_hard_pass_aggregate": bool(not l6_handoff_blocked),
         "apps_rg_l2_product_w3_enforced": apps_rg_w3_enforced,
         "apps_rg_l2_product_w3_eligible": apps_rg_w3_eligible,
@@ -724,9 +833,13 @@ def evaluate_resume_package(
         if deterministic_failed_ids[k]
     }
 
-    disposition["aggregate_pass_under_policy_no_waivers_yet"] = final_code == X3_ALLOW_CODE
+    disposition["aggregate_pass_under_policy_no_waivers_yet"] = (
+        final_code == X3_ALLOW_CODE
+    )
     disposition["explicit_waiver_needed_for_allow_when_section_review"] = (
-        deterministic_blocked is False and not l6_handoff_blocked and not all_sections_x3_allow
+        deterministic_blocked is False
+        and not l6_handoff_blocked
+        and not all_sections_x3_allow
     )
 
     disposition["apps_rg_full_resume_product_gate"] = {
@@ -735,7 +848,9 @@ def evaluate_resume_package(
         "reasons": list(apps_rg_w3_reasons),
         "manifest_path_repo_relative": apps_rg_manifest_rel,
     }
-    disposition["apps_rg_full_resume_outcome_authorized"] = bool(final_code == X3_ALLOW_CODE)
+    disposition["apps_rg_full_resume_outcome_authorized"] = bool(
+        final_code == X3_ALLOW_CODE
+    )
     if final_code == X3_ALLOW_CODE:
         apps_rg_prod_terminal = "SUCCESS"
     elif final_code == X3_BLOCKED_DETERMINISTIC:
@@ -750,8 +865,8 @@ def evaluate_resume_package(
         "; ".join(apps_rg_w3_reasons) if apps_rg_w3_reasons else None
     )
 
-    disposition["prior_final_resume_manifest_rollups_rollforward_note"] = final_manifest.get(
-        "rollup_id_source"
+    disposition["prior_final_resume_manifest_rollups_rollforward_note"] = (
+        final_manifest.get("rollup_id_source")
     )
 
     asm = asm_early
@@ -766,7 +881,10 @@ def evaluate_resume_package(
     assembly_product_allow = bool(asm.get("product_allow_claimed"))
     cross_product_pass = bool(asm.get("cross_section_x2_product_pass"))
     structural_x2_pass = bool(asm.get("structural_x2_all_pass") and ok_fr)
-    cross_structural_pass = bool(asm.get("cross_section_x2_structural_only") or asm.get("cross_section_x2_all_pass"))
+    cross_structural_pass = bool(
+        asm.get("cross_section_x2_structural_only")
+        or asm.get("cross_section_x2_all_pass")
+    )
 
     aggregate_coherence_pass = False
     coherence_rel = str(asm.get("full_resume_llm_coherence_review_json") or "").strip()
@@ -789,7 +907,9 @@ def evaluate_resume_package(
     from apps_rg.runtime.non_product_proof_stamp import package_rollup_non_product_stamp
 
     package_x3_allow = final_code == X3_ALLOW_CODE
-    disposition.update(package_rollup_non_product_stamp(package_x3_allow=package_x3_allow))
+    disposition.update(
+        package_rollup_non_product_stamp(package_x3_allow=package_x3_allow)
+    )
 
     disposition["aggregation_product_proof"] = {
         "assembly_receipt_v2_present": bool(asm),
@@ -797,14 +917,17 @@ def evaluate_resume_package(
         "cross_section_x2_structural_pass": cross_structural_pass,
         "cross_section_x2_product_pass": cross_product_pass,
         "graph_skills_closeout": graph_skills_closeout,
-        "aggregation_receipt_v2_complete": bool(asm.get("receipt_id") == "final_resume_assembly_receipt_v2"),
+        "aggregation_receipt_v2_complete": bool(
+            asm.get("receipt_id") == "final_resume_assembly_receipt_v2"
+        ),
         "aggregate_full_resume_coherence_pass": aggregate_coherence_pass,
         "product_review_required": product_review_required,
         "product_allow_claimed": False,
         "package_rollup_product_allow_claimed": package_product_allow_claimed,
         "review_lane_policy_summary": rlp_summary_early,
         "warn_policy": warn_blob,
-        "explicit_non_claims": list(asm.get("explicit_non_claims") or []) + list(rlp.get("explicit_non_claims") or []),
+        "explicit_non_claims": list(asm.get("explicit_non_claims") or [])
+        + list(rlp.get("explicit_non_claims") or []),
     }
     disposition["graph_skills_product_proof_closeout"] = graph_skills_closeout
     disposition["block_notes_sorted_unique"] = sorted(set(block_notes))
@@ -812,15 +935,23 @@ def evaluate_resume_package(
     return disposition
 
 
-def _lane_l6_manifest_extras(rollup_blob: Mapping[str, Any], rr: Path) -> dict[str, Any]:
+def _lane_l6_manifest_extras(
+    rollup_blob: Mapping[str, Any], rr: Path
+) -> dict[str, Any]:
     refs: dict[str, str | None] = {}
     sha_map: dict[str, str | None] = {}
-    lanes_d = rollup_blob.get("lanes") if isinstance(rollup_blob.get("lanes"), dict) else {}
+    lanes_d = (
+        rollup_blob.get("lanes") if isinstance(rollup_blob.get("lanes"), dict) else {}
+    )
     for lk in GENERATED_LANES:
         row = lanes_d.get(lk)
         rel: str | None = None
         if isinstance(row, dict):
-            ar = row.get("artifact_refs") if isinstance(row.get("artifact_refs"), dict) else {}
+            ar = (
+                row.get("artifact_refs")
+                if isinstance(row.get("artifact_refs"), dict)
+                else {}
+            )
             raw = ar.get("l6_shadow_eval_package.json")
             p = _resolve_repo_path(rr, raw)
             if p is not None and p.is_file():
@@ -855,7 +986,9 @@ def emit_resume_package_artifacts(
     assembly_dir = p.final_resume_json.parent
     assembly_receipt = _load_optional_json(assembly_dir / "final_resume_receipt.json")
     review_lane_policy = _load_optional_json(assembly_dir / "review_lane_policy.json")
-    cross_section_x2 = _load_optional_json(assembly_dir / "cross_section_x2_gate_outputs.json")
+    cross_section_x2 = _load_optional_json(
+        assembly_dir / "cross_section_x2_gate_outputs.json"
+    )
 
     out_doc = drm.get("output_docx") if isinstance(drm, Mapping) else None
     if not isinstance(out_doc, str):
@@ -888,19 +1021,32 @@ def emit_resume_package_artifacts(
     x3_path = p.package_x3_json()
     rc_path = p.package_receipt_json()
 
-    mf_path.write_text(json.dumps(manifest, indent=2, sort_keys=False) + "\n", encoding="utf-8")
-    x3_path.write_text(json.dumps(disposition, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+    mf_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=False) + "\n", encoding="utf-8"
+    )
+    x3_path.write_text(
+        json.dumps(disposition, indent=2, sort_keys=False) + "\n", encoding="utf-8"
+    )
 
     rr = p.repo_root
     receipt = {
         "receipt_id": "resume_package_receipt_v1",
         "emitted_at_utc": disposition["evaluated_at_utc"],
-        "resume_package_manifest_json": str(manifest["aggregated_proof_outputs"]["resume_package_manifest_json"]),
-        "resume_package_x3_disposition_json": str(manifest["aggregated_proof_outputs"]["resume_package_x3_disposition_json"]),
+        "resume_package_manifest_json": str(
+            manifest["aggregated_proof_outputs"]["resume_package_manifest_json"]
+        ),
+        "resume_package_x3_disposition_json": str(
+            manifest["aggregated_proof_outputs"]["resume_package_x3_disposition_json"]
+        ),
         "final_x3_code": disposition["final_x3_code"],
         "deterministic_blocked": disposition["deterministic_blocked"],
-        "deterministic_aggregate_failures_nonempty": len(disposition["deterministic_gate_failure_ids_aggregate"]) > 0,
-        "deterministic_aggregate_failures_sorted": disposition["deterministic_gate_failure_ids_aggregate"],
+        "deterministic_aggregate_failures_nonempty": len(
+            disposition["deterministic_gate_failure_ids_aggregate"]
+        )
+        > 0,
+        "deterministic_aggregate_failures_sorted": disposition[
+            "deterministic_gate_failure_ids_aggregate"
+        ],
         "rollup_id": rollup.get("rollup_id"),
         "repo_relative_package_dir": p.output_dir.relative_to(rr).as_posix(),
     }
@@ -908,7 +1054,9 @@ def emit_resume_package_artifacts(
     receipt["lanes_all_x3_allow"] = bool(rr_note.get("all_generated_lane_x3_allow"))
     agg_proof = disposition.get("aggregation_product_proof") or {}
     receipt["product_allow_claimed"] = False
-    receipt["package_rollup_product_allow_claimed"] = bool(agg_proof.get("package_rollup_product_allow_claimed"))
+    receipt["package_rollup_product_allow_claimed"] = bool(
+        agg_proof.get("package_rollup_product_allow_claimed")
+    )
     receipt.update(
         {
             k: disposition[k]
@@ -935,9 +1083,15 @@ def emit_resume_package_artifacts(
         )
     else:
         receipt["graph_skills_product_proof_closeout"] = graph_closeout
-    receipt["review_lane_policy_json"] = _repo_rel(rr, assembly_dir / "review_lane_policy.json")
-    receipt["coherent_rollup_policy_json"] = _repo_rel(rr, assembly_dir / "coherent_rollup_policy.json")
-    rc_path.write_text(json.dumps(receipt, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+    receipt["review_lane_policy_json"] = _repo_rel(
+        rr, assembly_dir / "review_lane_policy.json"
+    )
+    receipt["coherent_rollup_policy_json"] = _repo_rel(
+        rr, assembly_dir / "coherent_rollup_policy.json"
+    )
+    rc_path.write_text(
+        json.dumps(receipt, indent=2, sort_keys=False) + "\n", encoding="utf-8"
+    )
 
     return {
         "resume_package_manifest": manifest,
@@ -948,4 +1102,3 @@ def emit_resume_package_artifacts(
         "resume_package_x3_disposition_path": x3_path,
         "resume_package_receipt_path": rc_path,
     }
-

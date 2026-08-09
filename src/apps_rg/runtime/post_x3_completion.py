@@ -30,15 +30,19 @@ from agentic_core.L6_observability.shadow_eval.independent_parity import (
     read_jsonl,
     write_independent_parity,
 )
-from agentic_core.runtime.artifacts.integrated_runtime_emitter import compute_artifact_hash
+from agentic_core.runtime.artifacts.integrated_runtime_emitter import (
+    compute_artifact_hash,
+)
 from apps_rg.runtime.package.apps_rg_full_resume_x3_eligibility import (
-    evaluate_apps_rg_full_success_eligibility,
+    evaluate_apps_rg_product_authority_eligibility,
 )
 
 POST_X3_COMPLETION_RECEIPT = "apps_rg_post_x3_completion_receipt.json"
 POST_X3_AUTHORITY_ORDER_RECEIPT = "apps_rg_post_x3_authority_order_receipt.json"
 POST_X3_FAILURE_L6_SHADOW_BRIDGE = "post_x3_failure_l6_shadow_bridge.json"
-POST_X3_FAILURE_L6_APPS_EVAL_GRAIN_PARITY = "post_x3_failure_l6_apps_eval_grain_parity.json"
+POST_X3_FAILURE_L6_APPS_EVAL_GRAIN_PARITY = (
+    "post_x3_failure_l6_apps_eval_grain_parity.json"
+)
 L6_SECTION_APPS_EVAL_BINDINGS = "l6_section_apps_eval_bindings.json"
 L6_APPS_EVAL_BINDING_CLOSURE = "l6_apps_eval_binding_closure_receipt.json"
 UWG_DIR = "uwg"
@@ -120,7 +124,9 @@ def _json_ready(value: Any) -> Any:
 
 
 def _state_diffs_digest(state_diffs: list[Any]) -> str:
-    from agentic_core.L4_state.uwg.durable_write_gateway import compute_state_diffs_digest
+    from agentic_core.L4_state.uwg.durable_write_gateway import (
+        compute_state_diffs_digest,
+    )
 
     return compute_state_diffs_digest(state_diffs)
 
@@ -198,9 +204,7 @@ def _identity(
         or {}
     )
     identity = (
-        dict(identity_candidate)
-        if isinstance(identity_candidate, Mapping)
-        else {}
+        dict(identity_candidate) if isinstance(identity_candidate, Mapping) else {}
     )
     required = {
         "producer_app_id",
@@ -250,9 +254,7 @@ def _identity(
         "policy_hash": str(identity["policy_hash"]),
         "blueprint_hash": str(identity["blueprint_hash"]),
         "replay_key": f"identity:sha256:{identity_sha256}",
-        "route_contract_ref": (
-            f"route_contract.json#sha256:{route_contract_sha256}"
-        ),
+        "route_contract_ref": (f"route_contract.json#sha256:{route_contract_sha256}"),
     }
 
 
@@ -274,11 +276,11 @@ def _build_commit_packet(
     target_surface = "apps_rg_resume_package"
     clearance_proof_id = _digest_bound_ref(
         artifact_dir,
-        "exit_review_packet.json",
+        "apps_rg_whole_run_exit_review_packet.json",
     )
     x3_receipt_ref = _digest_bound_ref(
         artifact_dir,
-        "x3_disposition_receipt.json",
+        "apps_rg_whole_run_exit_review_packet.json",
     )
     output_manifest_ref = _digest_bound_ref(
         artifact_dir,
@@ -495,7 +497,9 @@ def _bind_completion_artifacts(
         "uwg_commit_receipt_ref": uwg_paths.get("uwg_commit_receipt", ""),
         "uwg_commit_receipt_id": commit_receipt_id,
         "apps_eval_record_ref": eval_record_path,
-        "apps_eval_record_sha256": f"sha256:{eval_record_hash}" if eval_record_hash else "",
+        "apps_eval_record_sha256": f"sha256:{eval_record_hash}"
+        if eval_record_hash
+        else "",
         "l6_shadow_bridge_ref": l6_bridge_path,
         "l6_shadow_bridge_sha256": f"sha256:{l6_bridge_hash}" if l6_bridge_hash else "",
         "l6_section_apps_eval_bindings_ref": str(
@@ -512,7 +516,9 @@ def _bind_completion_artifacts(
         "current_run_mutated": False,
     }
     _update_plain_manifest(artifact_dir / "r4_run_manifest.json", updates)
-    _update_envelope_payload(artifact_dir / "integrated_runtime_artifact_manifest.json", updates)
+    _update_envelope_payload(
+        artifact_dir / "integrated_runtime_artifact_manifest.json", updates
+    )
     _update_envelope_payload(artifact_dir / "agentic_core_spine_proof.json", updates)
 
 
@@ -609,8 +615,12 @@ def _lane_ids_from_rows(rows: list[Mapping[str, Any]]) -> list[str]:
     return lane_ids
 
 
-def _section_package_candidates(artifact_dir: Path, lane_id: str, *, legacy: bool) -> list[Path]:
-    name = "l6_shadow_eval_package.json" if legacy else "l6_v40_shadow_eval_package.json"
+def _section_package_candidates(
+    artifact_dir: Path, lane_id: str, *, legacy: bool
+) -> list[Path]:
+    name = (
+        "l6_shadow_eval_package.json" if legacy else "l6_v40_shadow_eval_package.json"
+    )
     candidates = [
         artifact_dir / "lanes" / lane_id / name,
         artifact_dir / "modular_r4" / "sections" / lane_id / name,
@@ -642,7 +652,11 @@ def _resolve_package_artifact_ref(
             candidates.append(raw.resolve())
         else:
             candidates.extend(
-                [(REPO_ROOT / raw).resolve(), (artifact_dir / raw).resolve(), (package_dir / raw).resolve()]
+                [
+                    (REPO_ROOT / raw).resolve(),
+                    (artifact_dir / raw).resolve(),
+                    (package_dir / raw).resolve(),
+                ]
             )
     candidates.append(package_dir / fallback_name)
     contained = [
@@ -650,7 +664,10 @@ def _resolve_package_artifact_ref(
         for path in candidates
         if path.resolve() == root or root in path.resolve().parents
     ]
-    return next((path for path in contained if path.is_file()), (package_dir / fallback_name).resolve())
+    return next(
+        (path for path in contained if path.is_file()),
+        (package_dir / fallback_name).resolve(),
+    )
 
 
 def _revalidate_observability_closure(
@@ -670,7 +687,9 @@ def _revalidate_observability_closure(
     root = artifact_dir.resolve()
     for name, ref in sorted(refs.items()):
         raw = Path(str(ref or ""))
-        candidates = [raw] if raw.is_absolute() else [REPO_ROOT / raw, artifact_dir / raw]
+        candidates = (
+            [raw] if raw.is_absolute() else [REPO_ROOT / raw, artifact_dir / raw]
+        )
         path = next(
             (
                 candidate.resolve()
@@ -705,21 +724,28 @@ def _revalidate_observability_closure(
         ):
             gaps.append(f"closure_identity_mismatch:{field}")
     seed = {
-        "runtime_exhaust_bundle_id": str(closure.get("runtime_exhaust_bundle_id") or ""),
+        "runtime_exhaust_bundle_id": str(
+            closure.get("runtime_exhaust_bundle_id") or ""
+        ),
         "runtime_exhaust_bundle_digest": str(
             closure.get("runtime_exhaust_bundle_digest") or ""
         ),
         "parent_run_id": str(closure.get("parent_run_id") or ""),
         "child_run_id": str(closure.get("child_run_id") or ""),
         "section_attempt_id": str(closure.get("section_attempt_id") or ""),
-        "microstep_contract_digest": str(closure.get("microstep_contract_digest") or ""),
+        "microstep_contract_digest": str(
+            closure.get("microstep_contract_digest") or ""
+        ),
         "registry_digest": str(closure.get("registry_digest") or ""),
         "checks": dict(closure.get("checks") or {}),
         "artifact_digests": recomputed,
     }
-    expected = "sha256:" + hashlib.sha256(
-        json.dumps(seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    ).hexdigest()
+    expected = (
+        "sha256:"
+        + hashlib.sha256(
+            json.dumps(seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+    )
     if str(closure.get("closure_digest") or "").lower() != expected.lower():
         gaps.append("observability_closure_digest_mismatch")
     return sorted(set(gaps))
@@ -735,16 +761,28 @@ def _emit_l6_section_apps_eval_bindings(
         for row in list(getattr(eval_record.scorecard, "scorecard_rows", []) or [])
         if isinstance(row, Mapping) and row.get("required", True)
     ]
-    scorecard_ref = str(getattr(eval_record, "artifact_paths", {}).get("scorecard_rows") or "")
+    scorecard_ref = str(
+        getattr(eval_record, "artifact_paths", {}).get("scorecard_rows") or ""
+    )
     bindings: list[dict[str, Any]] = []
     binding_dir = artifact_dir / "l6_apps_eval_bindings"
 
     for lane_id in _lane_ids_from_rows(scorecard_rows):
-        lane_rows = [row for row in scorecard_rows if str(row.get("lane_id") or "") == lane_id]
-        v40_path = _first_existing(_section_package_candidates(artifact_dir, lane_id, legacy=False))
-        legacy_path = _first_existing(_section_package_candidates(artifact_dir, lane_id, legacy=True))
+        lane_rows = [
+            row for row in scorecard_rows if str(row.get("lane_id") or "") == lane_id
+        ]
+        v40_path = _first_existing(
+            _section_package_candidates(artifact_dir, lane_id, legacy=False)
+        )
+        legacy_path = _first_existing(
+            _section_package_candidates(artifact_dir, lane_id, legacy=True)
+        )
         if v40_path is None:
-            status = "LEGACY_PACKAGE_ADVISORY" if legacy_path is not None else "MISSING_PACKAGE"
+            status = (
+                "LEGACY_PACKAGE_ADVISORY"
+                if legacy_path is not None
+                else "MISSING_PACKAGE"
+            )
             bindings.append(
                 {
                     "section_id": lane_id,
@@ -753,7 +791,9 @@ def _emit_l6_section_apps_eval_bindings(
                     "apps_eval_row_count": len(lane_rows),
                     "l6_package_tier": "legacy" if legacy_path is not None else "",
                     "l6_shadow_eval_package_ref": (
-                        _artifact_or_repo_rel(legacy_path, artifact_dir) if legacy_path else ""
+                        _artifact_or_repo_rel(legacy_path, artifact_dir)
+                        if legacy_path
+                        else ""
                     ),
                     "proof_gaps": [
                         "governed_v40_package_required_for_independent_binding"
@@ -784,7 +824,14 @@ def _emit_l6_section_apps_eval_bindings(
         proof_gaps: list[str] = []
         if not observation_path.is_file():
             proof_gaps.append("missing_persisted_l6_observations")
-        if str(closure.get("observability_closure_status") or closure.get("closure_status") or "") != "PASS":
+        if (
+            str(
+                closure.get("observability_closure_status")
+                or closure.get("closure_status")
+                or ""
+            )
+            != "PASS"
+        ):
             proof_gaps.append("observability_closure_not_pass")
         proof_gaps.extend(
             _revalidate_observability_closure(
@@ -802,18 +849,27 @@ def _emit_l6_section_apps_eval_bindings(
             observations = [
                 row
                 for row in read_jsonl(observation_path)
-                if str(row.get("lane_id") or "") == lane_id and row.get("required", True)
+                if str(row.get("lane_id") or "") == lane_id
+                and row.get("required", True)
             ]
             parity = build_independent_apps_eval_parity(
                 run_id=str(getattr(eval_record, "record_id", "") or ""),
-                runtime_exhaust_bundle_id=str(package.get("runtime_exhaust_bundle_id") or ""),
-                microstep_contract_digest=str(package.get("microstep_contract_digest") or ""),
+                runtime_exhaust_bundle_id=str(
+                    package.get("runtime_exhaust_bundle_id") or ""
+                ),
+                microstep_contract_digest=str(
+                    package.get("microstep_contract_digest") or ""
+                ),
                 apps_eval_scorecard_ref=scorecard_ref,
-                l6_observation_ref=_artifact_or_repo_rel(observation_path, artifact_dir),
+                l6_observation_ref=_artifact_or_repo_rel(
+                    observation_path, artifact_dir
+                ),
                 apps_eval_rows=lane_rows,
                 l6_observations=observations,
                 observation_origin=SEALED_APPS_RG_OBSERVATION_ORIGIN,
-                expected_observation_bundle_id=str(package.get("runtime_exhaust_bundle_id") or ""),
+                expected_observation_bundle_id=str(
+                    package.get("runtime_exhaust_bundle_id") or ""
+                ),
                 parent_run_id=str(package.get("parent_run_id") or ""),
                 child_run_id=str(package.get("child_run_id") or ""),
                 section_attempt_id=str(package.get("section_attempt_id") or ""),
@@ -842,22 +898,38 @@ def _emit_l6_section_apps_eval_bindings(
         bindings.append(
             {
                 "section_id": lane_id,
-                "artifact_dir_ref": _artifact_or_repo_rel(v40_path.parent, artifact_dir),
+                "artifact_dir_ref": _artifact_or_repo_rel(
+                    v40_path.parent, artifact_dir
+                ),
                 "l6_package_tier": "v40",
-                "l6_v40_shadow_eval_package_ref": _artifact_or_repo_rel(v40_path, artifact_dir),
+                "l6_v40_shadow_eval_package_ref": _artifact_or_repo_rel(
+                    v40_path, artifact_dir
+                ),
                 "l6_v40_shadow_eval_package_sha256": f"sha256:{_sha256_file(v40_path)}",
-                "l6_microstep_observations_ref": _artifact_or_repo_rel(observation_path, artifact_dir),
-                "l6_observability_closure_ref": _artifact_or_repo_rel(closure_path, artifact_dir),
+                "l6_microstep_observations_ref": _artifact_or_repo_rel(
+                    observation_path, artifact_dir
+                ),
+                "l6_observability_closure_ref": _artifact_or_repo_rel(
+                    closure_path, artifact_dir
+                ),
                 "independent_parity_ref": (
-                    _artifact_or_repo_rel(parity_path, artifact_dir) if parity_path.is_file() else ""
+                    _artifact_or_repo_rel(parity_path, artifact_dir)
+                    if parity_path.is_file()
+                    else ""
                 ),
                 "apps_eval_row_count": len(lane_rows),
-                "apps_eval_row_ids": [str(row.get("row_id") or "") for row in lane_rows],
+                "apps_eval_row_ids": [
+                    str(row.get("row_id") or "") for row in lane_rows
+                ],
                 "binding_status": "BOUND_PASS" if bound else "PARITY_FAIL",
-                "evidence_class": "APPS_EVAL_BOUND_PROOF" if bound else "CONTRACT_ONLY_ADVISORY",
+                "evidence_class": "APPS_EVAL_BOUND_PROOF"
+                if bound
+                else "CONTRACT_ONLY_ADVISORY",
                 "proof_gaps": proof_gaps,
                 "package_immutable": True,
-                "independent_observations": bool(parity.get("independent_observations") is True),
+                "independent_observations": bool(
+                    parity.get("independent_observations") is True
+                ),
                 "future_run_only": True,
                 "current_run_mutation_assertion": False,
                 "direct_l4_write_assertion": False,
@@ -865,10 +937,14 @@ def _emit_l6_section_apps_eval_bindings(
             }
         )
 
-    all_bound = bool(bindings) and all(item["binding_status"] == "BOUND_PASS" for item in bindings)
+    all_bound = bool(bindings) and all(
+        item["binding_status"] == "BOUND_PASS" for item in bindings
+    )
     summary = {
         "sections_total": len(bindings),
-        "sections_bound": sum(1 for item in bindings if item["binding_status"] == "BOUND_PASS"),
+        "sections_bound": sum(
+            1 for item in bindings if item["binding_status"] == "BOUND_PASS"
+        ),
         "sections_contract_only": sum(
             1 for item in bindings if item["evidence_class"] != "APPS_EVAL_BOUND_PROOF"
         ),
@@ -886,7 +962,9 @@ def _emit_l6_section_apps_eval_bindings(
     payload = {
         "schema_version": "apps_rg.l6_section_apps_eval_bindings.v2",
         "eval_record_id": str(getattr(eval_record, "record_id", "") or ""),
-        "eval_record_ref": str(getattr(eval_record, "artifact_paths", {}).get("eval_record") or ""),
+        "eval_record_ref": str(
+            getattr(eval_record, "artifact_paths", {}).get("eval_record") or ""
+        ),
         "summary": summary,
         "bindings": bindings,
         "current_run_mutation_assertion": False,
@@ -908,7 +986,9 @@ def _emit_l6_section_apps_eval_bindings(
             for item in bindings
         ),
     }
-    closure_failed = sorted(name for name, passed in closure_checks.items() if not passed)
+    closure_failed = sorted(
+        name for name, passed in closure_checks.items() if not passed
+    )
     binding_closure = {
         "schema_version": "apps_rg.l6_apps_eval_binding_closure_receipt.v1",
         "eval_record_id": str(getattr(eval_record, "record_id", "") or ""),
@@ -929,7 +1009,9 @@ def _emit_l6_section_apps_eval_bindings(
         "l6_apps_eval_binding_closure_ref": _repo_rel(closure_path, artifact_dir),
         "alignment_source": "independent_persisted_observations",
         "apps_eval_rows_bound": all_bound,
-        "evidence_class": "APPS_EVAL_BOUND_PROOF" if all_bound else "CONTRACT_ONLY_ADVISORY",
+        "evidence_class": "APPS_EVAL_BOUND_PROOF"
+        if all_bound
+        else "CONTRACT_ONLY_ADVISORY",
         "grain_parity_status": "PASS" if all_bound else "FAIL",
         "future_run_only": True,
         "current_run_mutated": False,
@@ -968,7 +1050,9 @@ def _complete_fact_vector_writeback_after_x3(
         if run_id and run_id not in candidate_run_ids:
             candidate_run_ids.append(run_id)
 
-    mode = str(os.environ.get("APPS_RG_FACT_VECTOR_PROMOTION_MODE", PROMOTION_MODE_DEFERRED)).strip()
+    mode = str(
+        os.environ.get("APPS_RG_FACT_VECTOR_PROMOTION_MODE", PROMOTION_MODE_DEFERRED)
+    ).strip()
     payload: dict[str, Any] = {
         "schema_version": "apps_rg.fact_vector_writeback_post_x3_completion.v1",
         "status": "EMPTY",
@@ -1023,7 +1107,9 @@ def _complete_fact_vector_writeback_after_x3(
     ]
     payload["status"] = "FAIL" if failures else "PASS"
     payload["reason"] = (
-        "fact_vector_writeback_chain_failed" if failures else "fact_vector_writeback_chain_complete"
+        "fact_vector_writeback_chain_failed"
+        if failures
+        else "fact_vector_writeback_chain_complete"
     )
     return payload
 
@@ -1038,7 +1124,9 @@ def _authority_order_receipt(
         "schema_version": "apps_rg.post_x3_authority_order.v1",
         "run_id": ids["run_id"],
         "request_id": ids["request_id"],
-        "uwg_commit_receipt_id": str(getattr(commit_receipt, "commit_receipt_id", "") or ""),
+        "uwg_commit_receipt_id": str(
+            getattr(commit_receipt, "commit_receipt_id", "") or ""
+        ),
         "exit_completed_before_uwg": True,
         "uwg_closed_before_l6": True,
         "runtime_boundary_crossed_before_l6": True,
@@ -1066,7 +1154,10 @@ def _complete_apps_rg_post_x3(
     generated = _generated_resume_path(art)
     manifest = _load_output_manifest(art)
     eligible, reasons = (
-        evaluate_apps_rg_full_success_eligibility(manifest=manifest, run_root=art)
+        evaluate_apps_rg_product_authority_eligibility(
+            manifest=manifest,
+            run_root=art,
+        )
         if manifest
         else (False, ["apps_rg_output_manifest_missing"])
     )
@@ -1137,7 +1228,9 @@ def _complete_apps_rg_post_x3(
         _write_json(receipt_path, payload)
         return payload
 
-    validation = gateway.get_validation_receipt(commit_receipt.uwg_validation_receipt_ref)
+    validation = gateway.get_validation_receipt(
+        commit_receipt.uwg_validation_receipt_ref
+    )
     if validation is None:
         payload = {
             "schema_version": "apps_rg.post_x3_completion.v2",
@@ -1260,7 +1353,10 @@ def _complete_apps_rg_post_x3(
         eval_record=eval_record,
     )
     coverage = dict(eval_record.scorecard.coverage_summary or {})
-    eval_pass = coverage.get("release_blocked") is False and coverage.get("coverage_complete") is True
+    eval_pass = (
+        coverage.get("release_blocked") is False
+        and coverage.get("coverage_complete") is True
+    )
     l6_pass = (
         l6_binding.get("grain_parity_status") == "PASS"
         and l6_binding.get("apps_eval_rows_bound") is True
@@ -1270,11 +1366,13 @@ def _complete_apps_rg_post_x3(
         artifact_dir=art,
         result=result,
     )
-    _write_json(art / "fact_vector_writeback_completion_receipt.json", fact_vector_writeback)
-    post_boundary_pass = eval_pass and l6_pass and fact_vector_writeback.get("status") != "FAIL"
-    pipeline_complete = bool(
-        post_boundary_pass and product_authorization_receipt_ref
+    _write_json(
+        art / "fact_vector_writeback_completion_receipt.json", fact_vector_writeback
     )
+    post_boundary_pass = (
+        eval_pass and l6_pass and fact_vector_writeback.get("status") != "FAIL"
+    )
+    pipeline_complete = bool(post_boundary_pass and product_authorization_receipt_ref)
     terminal_state.record_pipeline_completion(
         complete=pipeline_complete,
         failed=not pipeline_complete,
@@ -1402,6 +1500,40 @@ def complete_apps_rg_post_x3(
         )
         if commit_path is None:
             raise
+        from apps_rg.runtime.failure_evidence import (
+            atomic_write_json,
+            capture_failure_otel_evidence,
+            exception_failure_envelope,
+        )
+
+        failure_ref = art / "post_x3_reconciliation_failure.json"
+        failure = exception_failure_envelope(
+            exc,
+            stage="POST_X3_RECONCILIATION",
+            operation="complete_apps_rg_post_x3",
+            source_component="apps_rg.runtime.post_x3_completion",
+            artifact_dir=art,
+            integrated_artifact_dir=art,
+            dispatch_invoked=True,
+        )
+        otel = capture_failure_otel_evidence(
+            artifact_dir=art,
+            trace_root=str(failure.get("trace_root") or ""),
+            stage="POST_X3_RECONCILIATION",
+            operation="complete_apps_rg_post_x3",
+            filename="post_x3_reconciliation_otel_trace_snapshot.json",
+        )
+        atomic_write_json(
+            failure_ref,
+            {
+                "schema_version": "apps_rg.post_x3_reconciliation_failure.v1",
+                "status": "FAILED",
+                "failure": failure,
+                "otel_snapshot_ref": "post_x3_reconciliation_otel_trace_snapshot.json",
+                "otel_capture_status": str(otel.get("status") or ""),
+                "uwg_commit_receipt_ref": _repo_rel(commit_path, art),
+            },
+        )
         payload = {
             "schema_version": "apps_rg.post_x3_completion.v2",
             "generated_at_utc": _utc_now_iso(),
@@ -1414,13 +1546,13 @@ def complete_apps_rg_post_x3(
             "observability_repair_required": True,
             "failure_stage": "post_boundary_reconciliation",
             "reconciliation_error_type": type(exc).__name__,
+            "reconciliation_error_message": str(exc)[:2000],
+            "reconciliation_failure_ref": failure_ref.name,
             "durable_promotion_attempted": True,
             "durable_promotion_committed": True,
             "uwg": {
                 "commit_status": "COMMITTED",
-                "artifacts": {
-                    "uwg_commit_receipt": _repo_rel(commit_path, art)
-                },
+                "artifacts": {"uwg_commit_receipt": _repo_rel(commit_path, art)},
             },
         }
         _write_json(art / POST_X3_COMPLETION_RECEIPT, payload)

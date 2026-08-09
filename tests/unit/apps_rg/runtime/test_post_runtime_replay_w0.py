@@ -20,11 +20,14 @@ from apps_rg.runtime.post_runtime_replay import (
     ZeroProviderReplayGuard,
     build_source_manifest,
     compare_source_manifests,
+    run_guarded_artifact_replay,
     run_w0_zero_provider_preflight,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-REPLAY_TOOL = REPO_ROOT / "tools/apps_rg_standalone/reconcile_existing_run_post_runtime.py"
+REPLAY_TOOL = (
+    REPO_ROOT / "tools/apps_rg_standalone/reconcile_existing_run_post_runtime.py"
+)
 
 
 def _source_run(root: Path) -> Path:
@@ -172,3 +175,44 @@ def test_cli_enters_clean_guard_before_apps_rg_package_import(tmp_path: Path) ->
     assert receipt["clean_import_state"] is True
     assert receipt["preloaded_forbidden_modules"] == []
     assert all(value == 0 for value in receipt["attempt_counters"].values())
+
+
+def test_generic_artifact_callback_remains_inside_zero_provider_guard(
+    tmp_path: Path,
+) -> None:
+    source = _source_run(tmp_path)
+    output = tmp_path / "guarded_replay"
+
+    def _operation(source_root: Path, operation_dir: Path) -> dict[str, object]:
+        operation_dir.mkdir(parents=True, exist_ok=True)
+        (operation_dir / "derived.json").write_text(
+            json.dumps({"source": source_root.name}) + "\n",
+            encoding="utf-8",
+        )
+        completion = {
+            "schema_version": "test.completion.v1",
+            "status": "PASS",
+            "semantic_digest": "sha256:test",
+        }
+        return {"completion": completion}
+
+    first = run_guarded_artifact_replay(
+        source_run=source,
+        output_root=output,
+        wave="W1",
+        operation=_operation,
+        receipt_filename="guard.json",
+    )
+    second = run_guarded_artifact_replay(
+        source_run=source,
+        output_root=output,
+        wave="W1",
+        operation=_operation,
+        receipt_filename="guard.json",
+    )
+
+    assert first["status"] == "PASS"
+    assert first["semantic_digest"] == second["semantic_digest"]
+    assert first["source_unchanged"] is True
+    assert first["uwg_operation_attempted"] is False
+    assert all(value == 0 for value in first["attempt_counters"].values())

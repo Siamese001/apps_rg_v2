@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any, Mapping
@@ -12,6 +13,8 @@ DISPOSITION_AUTHORITY_BINDING_HELPER = "binding_helper"
 
 LANE_X3_ARTIFACT = "x3_disposition.json"
 EXIT_DISPOSITION_RECEIPT_ARTIFACT = "exit_disposition_receipt.json"
+CORE_X3_DISPOSITION_RECEIPT_ARTIFACT = "x3_disposition_receipt.json"
+CORE_RUNTIME_AUTHORITY_ARTIFACT = "apps_rg_core_runtime_authority.json"
 
 _VALID_AUTHORITIES = frozenset(
     {
@@ -60,53 +63,121 @@ def _x3_code_from_doc(doc: Mapping[str, Any]) -> str | None:
     return None
 
 
+def _canonical_digest(value: Any) -> str:
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
+    return "sha256:" + hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _core_x3_code(doc: Mapping[str, Any]) -> str | None:
+    payload = doc.get("payload")
+    payload = payload if isinstance(payload, Mapping) else doc
+    code = payload.get("x3_disposition") or payload.get("x3_code")
+    return str(code).strip() if str(code or "").strip() else None
+
+
+def _validated_core_authority_code(doc: Mapping[str, Any]) -> str | None:
+    body = dict(doc)
+    stored = str(body.pop("deterministic_digest", "") or "")
+    if not stored or stored != _canonical_digest(body):
+        return None
+    normalized = doc.get("normalized_contract")
+    if not isinstance(normalized, Mapping) or normalized.get("valid") is not True:
+        return None
+    x3 = normalized.get("x3")
+    if not isinstance(x3, Mapping):
+        return None
+    code = str(x3.get("x3_disposition") or "").strip()
+    return code or None
+
+
 def resolve_lane_x3_from_artifact_refs(
     *,
     artifact_refs: Mapping[str, Any],
     repo_root: Path,
 ) -> dict[str, Any]:
-    """Prefer ``exit_disposition_receipt.json`` over lane ``x3_disposition.json`` mirror."""
-    receipt_rel = str(artifact_refs.get(EXIT_DISPOSITION_RECEIPT_ARTIFACT) or "").strip()
+    """Resolve only producer-owned core X3 as lane authorization authority.
+
+    The app ``exit_disposition_receipt.json`` and ``x3_disposition.json`` are
+    retained as mirrors for diagnostics.  Neither may supply ``x3_code`` when
+    the producer-owned core receipt is missing or invalid.
+    """
+    core_authority_rel = str(
+        artifact_refs.get(CORE_RUNTIME_AUTHORITY_ARTIFACT) or ""
+    ).strip()
+    core_receipt_rel = str(
+        artifact_refs.get(CORE_X3_DISPOSITION_RECEIPT_ARTIFACT) or ""
+    ).strip()
+    receipt_rel = str(
+        artifact_refs.get(EXIT_DISPOSITION_RECEIPT_ARTIFACT) or ""
+    ).strip()
     mirror_rel = str(artifact_refs.get(LANE_X3_ARTIFACT) or "").strip()
 
+    core_authority_path = (
+        (repo_root / core_authority_rel).resolve() if core_authority_rel else None
+    )
+    core_receipt_path = (
+        (repo_root / core_receipt_rel).resolve() if core_receipt_rel else None
+    )
     receipt_path = (repo_root / receipt_rel).resolve() if receipt_rel else None
     mirror_path = (repo_root / mirror_rel).resolve() if mirror_rel else None
 
-    if receipt_path is not None and receipt_path.is_file():
-        doc = _load_json(receipt_path)
-        code = _x3_code_from_doc(doc)
-        authority = str(doc.get("disposition_authority") or DISPOSITION_AUTHORITY_LANE)
-        if authority not in _VALID_AUTHORITIES:
-            authority = DISPOSITION_AUTHORITY_LANE
-        return {
-            "x3_code": code,
-            "disposition_authority": authority,
-            "authoritative_artifact": EXIT_DISPOSITION_RECEIPT_ARTIFACT,
-            "section_x3_mirror_only": bool(doc.get("section_x3_mirror_only", True)),
-            "spine_x3_claimed": bool(doc.get("spine_x3_claimed", False)),
-            "canonical_exit_claimed": bool(doc.get("canonical_exit_claimed", False)),
-        }
+    mirror_doc = (
+        _load_json(mirror_path)
+        if mirror_path is not None and mirror_path.is_file()
+        else {}
+    )
+    exit_mirror_doc = (
+        _load_json(receipt_path)
+        if receipt_path is not None and receipt_path.is_file()
+        else {}
+    )
+    mirror_code = _x3_code_from_doc(mirror_doc) or _x3_code_from_doc(exit_mirror_doc)
 
-    if mirror_path is not None and mirror_path.is_file():
-        doc = _load_json(mirror_path)
-        code = _x3_code_from_doc(doc)
-        return {
-            "x3_code": code,
-            "disposition_authority": str(
-                doc.get("disposition_authority") or DISPOSITION_AUTHORITY_LANE
-            ),
-            "authoritative_artifact": LANE_X3_ARTIFACT,
-            "section_x3_mirror_only": True,
-            "spine_x3_claimed": False,
-            "canonical_exit_claimed": False,
-        }
+    if core_authority_path is not None and core_authority_path.is_file():
+        doc = _load_json(core_authority_path)
+        code = _validated_core_authority_code(doc)
+        if code:
+            return {
+                "x3_code": code,
+                "mirror_x3_code": mirror_code,
+                "disposition_authority": DISPOSITION_AUTHORITY_SPINE,
+                "authoritative_artifact": CORE_RUNTIME_AUTHORITY_ARTIFACT,
+                "section_x3_mirror_only": False,
+                "spine_x3_claimed": True,
+                "canonical_exit_claimed": True,
+                "outcome_authorized": doc.get("outcome_authorized") is True,
+            }
+
+    if core_receipt_path is not None and core_receipt_path.is_file():
+        doc = _load_json(core_receipt_path)
+        payload = doc.get("payload")
+        payload = dict(payload) if isinstance(payload, Mapping) else {}
+        code = _core_x3_code(doc)
+        valid = bool(
+            code
+            and doc.get("producer_component")
+            == "agentic_core.runtime.entrypoints.integrated_single_action_spine_run"
+            and doc.get("artifact_hash") == _canonical_digest(payload)
+        )
+        if valid:
+            return {
+                "x3_code": code,
+                "mirror_x3_code": mirror_code,
+                "disposition_authority": DISPOSITION_AUTHORITY_SPINE,
+                "authoritative_artifact": CORE_X3_DISPOSITION_RECEIPT_ARTIFACT,
+                "section_x3_mirror_only": False,
+                "spine_x3_claimed": True,
+                "canonical_exit_claimed": True,
+                "outcome_authorized": code == "X3D_ALLOW_FINISH",
+            }
 
     return {
         "x3_code": None,
+        "mirror_x3_code": mirror_code,
         "disposition_authority": DISPOSITION_AUTHORITY_LANE,
         "authoritative_artifact": None,
         "section_x3_mirror_only": True,
         "spine_x3_claimed": False,
         "canonical_exit_claimed": False,
+        "outcome_authorized": False,
     }
-

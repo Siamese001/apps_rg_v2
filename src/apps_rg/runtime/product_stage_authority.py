@@ -50,7 +50,9 @@ def _resolve_contained(root: Path, ref: str | Path) -> Path:
     try:
         target.relative_to(base)
     except ValueError as exc:
-        raise ProductStageAuthorityError(f"stage evidence escapes run root: {ref}") from exc
+        raise ProductStageAuthorityError(
+            f"stage evidence escapes run root: {ref}"
+        ) from exc
     if not target.is_file():
         raise ProductStageAuthorityError(f"stage evidence is missing: {ref}")
     return target
@@ -93,9 +95,7 @@ def mirror_external_authority_artifact(
     target = Path(artifact_dir) / AUTHORITY_SOURCE_DIR / relative_ref
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
-        raise ProductStageAuthorityError(
-            f"authority mirror already exists: {target}"
-        )
+        raise ProductStageAuthorityError(f"authority mirror already exists: {target}")
     raw = source_path.read_bytes()
     temporary = target.with_suffix(target.suffix + ".tmp")
     temporary.write_bytes(raw)
@@ -111,9 +111,11 @@ def _identity_matches(
     payload: Mapping[str, Any],
     identity: Mapping[str, Any],
 ) -> bool:
+    embedded = payload.get("identity")
+    if isinstance(embedded, Mapping):
+        return dict(embedded) == dict(identity)
     return all(
-        str(payload.get(receipt_field) or "")
-        == str(identity.get(identity_field) or "")
+        str(payload.get(receipt_field) or "") == str(identity.get(identity_field) or "")
         for receipt_field, identity_field in (
             ("run_id", "parent_run_id"),
             ("request_id", "request_id"),
@@ -163,23 +165,32 @@ def emit_runtime_stage_authority_receipts(
     root = Path(artifact_dir).resolve()
     witness_path = root / "runtime_execution_witness.json"
     terminal_path = root / "terminal_ret_packet.json"
-    review_path = root / "exit_review_packet.json"
-    x3_path = root / "x3_disposition_receipt.json"
+    from apps_rg.runtime.whole_run_exit import (
+        WHOLE_RUN_EXIT_ARTIFACT,
+        verify_whole_run_exit_review_packet,
+    )
+
+    whole_exit_path = root / WHOLE_RUN_EXIT_ARTIFACT
     witness = _payload(_read_json(witness_path))
     terminal = _payload(_read_json(terminal_path))
-    review = _payload(_read_json(review_path))
-    x3 = _payload(_read_json(x3_path))
+    whole_exit = _read_json(whole_exit_path)
+    whole_exit_valid, _whole_exit_errors = verify_whole_run_exit_review_packet(
+        root,
+        expected_identity=identity,
+    )
     runtime_identity = all(
-        _identity_matches(value, identity)
-        for value in (witness, terminal, review, x3)
+        _identity_matches(value, identity) for value in (witness, terminal, whole_exit)
     )
     c0 = witness.get("c0") if isinstance(witness.get("c0"), Mapping) else {}
     l2 = witness.get("l2") if isinstance(witness.get("l2"), Mapping) else {}
     x1 = witness.get("x1") if isinstance(witness.get("x1"), Mapping) else {}
     x2 = witness.get("x2") if isinstance(witness.get("x2"), Mapping) else {}
-    x3_witness = witness.get("x3") if isinstance(witness.get("x3"), Mapping) else {}
-    x3_code = str(x3.get("disposition") or x3.get("x3_code") or "")
-    review_x3 = str(review.get("x3_disposition") or review.get("disposition") or "")
+    signals = (
+        whole_exit.get("signals")
+        if isinstance(whole_exit.get("signals"), Mapping)
+        else {}
+    )
+    x3_code = str(whole_exit.get("x3_disposition") or "")
 
     prompt_candidates = (
         root / "compiled_prompt_artifact.json",
@@ -194,46 +205,86 @@ def emit_runtime_stage_authority_receipts(
     checks_by_stage: dict[str, dict[str, bool]] = {
         "APPS_RG_C0": {
             "runtime_identity_match": runtime_identity,
-            "c0_receipt_present": bool(c0),
-            "c0_status_authorized": str(c0.get("status") or "")
-            in {"PASS", "BYPASSED_PRELOADED_CONTEXT"},
+            "whole_run_exit_verified": whole_exit_valid,
+            "outer_runtime_c0_receipt_present": bool(c0),
+            "section_c0_support_pass": signals.get("c0_support_status") == "PASS",
+            "section_c0_evidence_present": int(
+                signals.get("c0_evidence_item_count") or 0
+            )
+            > 0,
         },
         "APPS_RG_PA": {
             "runtime_identity_match": runtime_identity,
-            "prompt_authority_receipt_present": prompt_path.is_file(),
+            "whole_run_exit_verified": whole_exit_valid,
+            "outer_prompt_boundary_receipt_present": prompt_path.is_file(),
+            "all_section_prompts_consumed_c0": signals.get("pa_consumed_c0") is True,
+            "all_section_evidence_treated_as_data": signals.get("pa_evidence_data_only")
+            is True,
+            "all_section_prompt_schemas_bound": signals.get("pa_schema_bound") is True,
         },
         "APPS_RG_L2": {
             "runtime_identity_match": runtime_identity,
             "l2_executed": l2.get("executed") is True,
             "l2_status_pass": l2.get("status") == "PASS",
-            "l2_fault_empty": not str(l2.get("fault") or terminal.get("l2_fault") or ""),
+            "l2_fault_empty": not str(
+                l2.get("fault") or terminal.get("l2_fault") or ""
+            ),
+            "whole_run_exit_verified": whole_exit_valid,
+            "all_section_l2_and_quality_gates_pass": signals.get(
+                "section_gates_overall"
+            )
+            == "PASS",
+            "all_authoritative_lane_contracts_pass": signals.get(
+                "authoritative_lane_contracts_pass"
+            )
+            is True,
+            "no_l2_handoff_failed_lanes": not list(
+                signals.get("l2_handoff_failed_lanes") or []
+            ),
+            "no_l2_spine_failed_lanes": not list(
+                signals.get("l2_spine_failed_lanes") or []
+            ),
+            "all_core_lane_x3_authorizing": not list(
+                signals.get("core_x3_non_authorizing_lanes") or []
+            ),
+            "no_mock_provider_pass": signals.get("mock_provider_pass") is False,
+            "no_direct_l4_write_bypass": signals.get("direct_l4_write_bypass") is False,
         },
         "X1_REVIEW": {
             "runtime_identity_match": runtime_identity,
             "x1_executed": x1.get("status") == "EXECUTED",
-            "review_packet_x3_authorizing": review_x3 == "X3D_ALLOW_FINISH",
+            "whole_run_exit_verified": whole_exit_valid,
+            "aggregate_x1d_pass": signals.get("x1d_overall") == "PASS",
+            "aggregate_judge_quorum_satisfied": signals.get("judge_quorum_satisfied")
+            is True,
         },
         "X2_AGGREGATION": {
             "runtime_identity_match": runtime_identity,
             "x2_executed": x2.get("status") == "EXECUTED",
-            "x2_no_failed_gates": not list(x2.get("failed_gate_ids") or ()),
-            "x2_disposition_authorizing": str(x2.get("disposition") or "")
-            == "X3D_ALLOW_FINISH",
+            "whole_run_exit_verified": whole_exit_valid,
+            "final_resume_x2_all_pass": signals.get("final_resume_x2_all_pass") is True,
+            "all_section_gates_pass": signals.get("section_gates_overall") == "PASS",
+            "no_unknown_lane_x2": signals.get("x2_unknown_lane") is False,
+            "final_assembly_product_release_eligible": signals.get(
+                "final_assembly_product_release_eligible"
+            )
+            is True,
         },
         "X3_DISPOSITION": {
             "runtime_identity_match": runtime_identity,
-            "x3_witness_emitted": x3_witness.get("status") == "EMITTED",
+            "whole_run_exit_verified": whole_exit_valid,
+            "apps_rg_whole_run_exit_pass": whole_exit.get("status") == "PASS",
             "x3_receipt_exact_authorizing_code": x3_code == "X3D_ALLOW_FINISH",
-            "unknown_never_pass": x3.get("unknown_never_pass") is True,
+            "unknown_never_pass": whole_exit.get("unknown_never_pass") is True,
         },
     }
     sources = {
-        "APPS_RG_C0": (witness_path,),
-        "APPS_RG_PA": (prompt_path,),
-        "APPS_RG_L2": (witness_path, terminal_path),
-        "X1_REVIEW": (witness_path, review_path),
-        "X2_AGGREGATION": (witness_path, review_path),
-        "X3_DISPOSITION": (x3_path, witness_path),
+        "APPS_RG_C0": (whole_exit_path, witness_path),
+        "APPS_RG_PA": (whole_exit_path, prompt_path),
+        "APPS_RG_L2": (whole_exit_path, witness_path, terminal_path),
+        "X1_REVIEW": (whole_exit_path, witness_path),
+        "X2_AGGREGATION": (whole_exit_path, witness_path),
+        "X3_DISPOSITION": (whole_exit_path, witness_path),
     }
     return {
         stage_id: _write_stage_receipt(
@@ -243,9 +294,60 @@ def emit_runtime_stage_authority_receipts(
             passed=all(checks.values()),
             checks=checks,
             source_refs=sources[stage_id],
+            derived_fields=(
+                {"x3_disposition": x3_code} if stage_id == "X3_DISPOSITION" else None
+            ),
         )
         for stage_id, checks in checks_by_stage.items()
     }
+
+
+def emit_terminal_non_product_authority_receipt(
+    *,
+    artifact_dir: Path,
+    identity: Mapping[str, Any],
+    decisive_stage_id: str,
+    decisive_receipt_ref: str | Path,
+    blocked_successor_stage_ids: Sequence[str] = (),
+) -> Path:
+    """Close one failed governed stage without converting it into product success."""
+
+    root = Path(artifact_dir).resolve()
+    decisive_path = _resolve_contained(root, decisive_receipt_ref)
+    decisive = _read_json(decisive_path)
+    decisive_status = str(decisive.get("status") or "").upper()
+    decisive_id = str(decisive.get("stage_id") or "").upper()
+    blocked_successors = tuple(
+        dict.fromkeys(
+            str(value or "").strip().upper()
+            for value in blocked_successor_stage_ids
+            if str(value or "").strip()
+        )
+    )
+    checks = {
+        "decisive_stage_id_match": decisive_id == str(decisive_stage_id).upper(),
+        "decisive_stage_failed": decisive_status in {"FAIL", "BLOCKED"},
+        "decisive_identity_match": decisive.get("identity") == dict(identity),
+        "product_authorization_denied": decisive_status != "PASS",
+        "blocked_successors_recorded": bool(blocked_successors),
+    }
+    return _write_stage_receipt(
+        artifact_dir=root,
+        stage_id="TERMINAL_NON_PRODUCT",
+        identity=identity,
+        passed=all(checks.values()),
+        checks=checks,
+        source_refs=(decisive_path,),
+        derived_fields={
+            "decisive_stage_id": str(decisive_stage_id).upper(),
+            "decisive_receipt_ref": decisive_path.relative_to(root).as_posix(),
+            "failed_stage_id": str(decisive_stage_id).upper(),
+            "causal_receipt_ref": decisive_path.relative_to(root).as_posix(),
+            "blocked_successor_stage_ids": list(blocked_successors),
+            "product_authorized": False,
+            "pipeline_complete": False,
+        },
+    )
 
 
 def emit_product_eligibility_authority_receipt(
@@ -253,35 +355,58 @@ def emit_product_eligibility_authority_receipt(
     artifact_dir: Path,
     identity: Mapping[str, Any],
 ) -> Path:
-    """Recompute product eligibility from manifest and exact output bytes."""
+    """Recompute product eligibility from output bytes and all prior authority."""
 
     from apps_rg.runtime.package.apps_rg_full_resume_x3_eligibility import (
-        evaluate_apps_rg_full_success_eligibility,
+        evaluate_apps_rg_product_authority_eligibility,
     )
 
     root = Path(artifact_dir).resolve()
     manifest_path = root / "apps_rg_output_manifest.json"
     manifest = _read_json(manifest_path)
-    eligible, reasons = evaluate_apps_rg_full_success_eligibility(
+    eligible, reasons = evaluate_apps_rg_product_authority_eligibility(
         manifest=manifest,
         run_root=root,
     )
     generated_ref = str(
-        manifest.get("generated_resume_json_relpath")
-        or "outputs/generated_resume.json"
+        manifest.get("generated_resume_json_relpath") or "outputs/generated_resume.json"
     )
     checks = {
-        "eligibility_validator_pass": bool(eligible),
+        "product_authority_eligibility_validator_pass": bool(eligible),
         "eligibility_reasons_empty": not reasons,
         "generated_output_present": _resolve_contained(root, generated_ref).is_file(),
     }
+    fixed_sources = (
+        manifest_path,
+        generated_ref,
+        "apps_rg_whole_run_exit_review_packet.json",
+        "e2e_preflight_product_entry_receipt.json",
+        "u0_receipt.json",
+        "modular_r4/final_resume_assembly/final_resume_receipt.json",
+    )
+    dynamic_patterns = (
+        "e2e_ledger_receipts/*_apps_rg_l1.json",
+        "e2e_ledger_receipts/*_apps_rg_l0.json",
+        "apps_research/runs/*/apps_research_apps_rg_handoff_v2.json",
+        "apps_research/runs/*/exit_disposition_receipt.json",
+    )
+    dynamic_sources: list[Path] = []
+    for pattern in dynamic_patterns:
+        matches = sorted(root.glob(pattern))
+        if len(matches) != 1:
+            raise ProductStageAuthorityError(
+                f"product eligibility requires exactly one source for {pattern}; "
+                f"observed={len(matches)}"
+            )
+        dynamic_sources.append(matches[0])
     return _write_stage_receipt(
         artifact_dir=root,
         stage_id="PRODUCT_ELIGIBILITY",
         identity=identity,
         passed=all(checks.values()),
         checks=checks,
-        source_refs=(manifest_path, generated_ref),
+        source_refs=(*fixed_sources, *dynamic_sources),
+        derived_fields={"eligibility_reasons": list(reasons)},
     )
 
 
@@ -432,12 +557,8 @@ def emit_mandatory_outputs_authority_receipt(
 
     marker_path = root / MANDATORY_OUTPUT_COMMIT_MANIFEST
     marker = _read_json(marker_path)
-    declared_required = {
-        str(value) for value in marker.get("required_artifacts") or ()
-    }
-    declared_artifacts = {
-        str(value) for value in (marker.get("artifacts") or {})
-    }
+    declared_required = {str(value) for value in marker.get("required_artifacts") or ()}
+    declared_artifacts = {str(value) for value in (marker.get("artifacts") or {})}
     product_minimum = {
         "APPS_RG_MANDATORY_RUN_OUTPUT.json",
         APPS_RG_MANDATORY_RUN_OUTPUT_MD,
@@ -488,5 +609,6 @@ __all__ = [
     "emit_post_boundary_authority_receipts",
     "emit_product_eligibility_authority_receipt",
     "emit_runtime_stage_authority_receipts",
+    "emit_terminal_non_product_authority_receipt",
     "mirror_external_authority_artifact",
 ]

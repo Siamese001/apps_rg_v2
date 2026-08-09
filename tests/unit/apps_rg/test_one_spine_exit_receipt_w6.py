@@ -1,4 +1,5 @@
 """Wave 6: section Exit spine receipts — ExitDispositionReceipt authority."""
+
 from __future__ import annotations
 
 import json
@@ -29,7 +30,11 @@ from apps_rg.runtime.section_l2_lane_integration import (
     prepare_section_l2_before_provider,
 )
 from apps_rg.runtime.section_l2_spine_receipt import SEALED_L2_ARTIFACT
-from tests.unit.apps_rg.test_one_spine_fec_bridge_w5a import W5A_SECTIONS, _args, _minimal_pool
+from tests.unit.apps_rg.test_one_spine_fec_bridge_w5a import (
+    W5A_SECTIONS,
+    _args,
+    _minimal_pool,
+)
 
 REPO = Path(__file__).resolve().parents[3]
 
@@ -97,7 +102,8 @@ def test_exit_disposition_receipt_single_x3(section_id: str, tmp_path: Path):
         artifact_dir=tmp_path,
     )
     assert edr["contract_type"] == "ExitDispositionReceipt"
-    assert edr["canonical_exit_claimed"] is True
+    assert edr["canonical_exit_claimed"] is False
+    assert edr["canonical_exit_authority_ref"] == "x3_disposition_receipt.json"
     assert edr["section_x3_authoritative"] is False
     assert edr["section_x3_mirror_only"] is True
     assert isinstance(edr.get("x3_disposition"), dict)
@@ -109,14 +115,18 @@ def test_exit_disposition_receipt_single_x3(section_id: str, tmp_path: Path):
 
 def test_product_visible_blocked_without_sealed_l2(tmp_path: Path):
     payload: dict = {"product_visible": True}
-    with pytest.raises(SectionExitSpinePreconditionError, match="SealedL2Artifact|sealed_l2"):
+    with pytest.raises(
+        SectionExitSpinePreconditionError, match="SealedL2Artifact|sealed_l2"
+    ):
         assert_section_exit_spine_preconditions(payload, tmp_path)
 
 
 def test_exit_bypass_flag_blocked(tmp_path: Path):
     _write_json(tmp_path / SEALED_L2_ARTIFACT, {"contract_type": "SealedL2Artifact"})
     payload = {"product_visible": True, "exit_bypass_without_sealed_l2": True}
-    with pytest.raises(SectionExitSpinePreconditionError, match="SealedL2Artifact|sealed_l2"):
+    with pytest.raises(
+        SectionExitSpinePreconditionError, match="SealedL2Artifact|sealed_l2"
+    ):
         assert_section_exit_spine_preconditions(payload, tmp_path)
 
 
@@ -136,7 +146,10 @@ def test_full_l2_then_exit_chain(tmp_path: Path, section_id: str):
         repo_root=REPO,
     )
     pool = _minimal_pool(section_id)
-    payload: dict = {"allowed_fact_ids": list(pool.allowed_fact_ids_ordered), "run_id": "w6_unit"}
+    payload: dict = {
+        "allowed_fact_ids": list(pool.allowed_fact_ids_ordered),
+        "run_id": "w6_unit",
+    }
     wire_spine_c0_fec_for_section(
         artifact_dir=tmp_path,
         section_id=section_id,
@@ -162,13 +175,18 @@ def test_full_l2_then_exit_chain(tmp_path: Path, section_id: str):
     assert (tmp_path / EXIT_REVIEW_PACKET_ARTIFACT).is_file()
     assert (tmp_path / EXIT_DISPOSITION_RECEIPT_ARTIFACT).is_file()
     assert (tmp_path / EXIT_SPINE_RECEIPT_ARTIFACT).is_file()
-    erp = json.loads((tmp_path / EXIT_REVIEW_PACKET_ARTIFACT).read_text(encoding="utf-8"))
+    erp = json.loads(
+        (tmp_path / EXIT_REVIEW_PACKET_ARTIFACT).read_text(encoding="utf-8")
+    )
     assert erp["sealed_l2_artifact_ref"] == SEALED_L2_ARTIFACT
     assert erp["section_x3_authoritative"] is False
     sealed = json.loads((tmp_path / SEALED_L2_ARTIFACT).read_text(encoding="utf-8"))
     assert sealed.get("canonical_exit_claimed") is False
-    edr = json.loads((tmp_path / EXIT_DISPOSITION_RECEIPT_ARTIFACT).read_text(encoding="utf-8"))
-    assert edr.get("canonical_exit_claimed") is True
+    edr = json.loads(
+        (tmp_path / EXIT_DISPOSITION_RECEIPT_ARTIFACT).read_text(encoding="utf-8")
+    )
+    assert edr.get("canonical_exit_claimed") is False
+    assert edr.get("canonical_exit_authority_ref") == "x3_disposition_receipt.json"
     assert edr.get("exit_review_packet_ref") == EXIT_REVIEW_PACKET_ARTIFACT
 
 
