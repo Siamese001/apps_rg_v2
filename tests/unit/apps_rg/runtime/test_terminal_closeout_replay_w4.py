@@ -244,6 +244,21 @@ def _build_prior_chain(tmp_path: Path) -> tuple[Path, Path]:
         w2_dir / "apps_eval" / "record" / "apps_rg_eval_package_seal.json",
         {"schema_version": "apps_eval.apps_rg_eval_package_seal.v1"},
     )
+    supersession_path = w2_dir / "eval_package_supersession_manifest.json"
+    _write_semantic(
+        supersession_path,
+        {
+            "schema_version": "apps_rg.eval_package_supersession_manifest.v1",
+            "status": "PASS",
+            "authoritative_record_id": "record-1",
+            "canonical_package_ids": ["record-1"],
+            "canonical_package_count": 1,
+            "superseded_package_count": 0,
+            "superseded_packages": [],
+            "destructive_delete_performed": False,
+            "packages_recoverable": True,
+        },
+    )
     w2_completion = _write_semantic(
         w2_dir / "w2_completion_receipt.json",
         {
@@ -263,6 +278,9 @@ def _build_prior_chain(tmp_path: Path) -> tuple[Path, Path]:
             "admission_failure_modes": ["admission.product_authority_invalid"],
             "eval_record": _file_binding(eval_record_path, root=w2_dir),
             "eval_package_seal": _file_binding(eval_seal_path, root=w2_dir),
+            "eval_package_supersession_manifest": _file_binding(
+                supersession_path, root=w2_dir
+            ),
         },
     )
     _guard(
@@ -277,18 +295,24 @@ def _build_prior_chain(tmp_path: Path) -> tuple[Path, Path]:
 
     w3_dir = replay / "w3"
     bindings = []
+    lane_binding_paths = {}
     for lane in subject.EXPECTED_LANES:
         row = {
             "section_id": lane,
             "binding_status": "LEGACY_PACKAGE_ADVISORY",
+            "source_evidence_status": "UNAVAILABLE_SOURCE_EVIDENCE",
+            "source_evidence_reason_codes": [
+                "GOVERNED_V40_PACKAGE_MISSING"
+            ],
             "evidence_class": "CONTRACT_ONLY_ADVISORY",
             "apps_eval_row_count": 10,
             "l6_observation_row_count": 0,
             "proof_gaps": ["governed_v40_package_required_for_independent_binding"],
         }
         bindings.append(row)
-        _write_json(
-            w3_dir / "independent_bindings" / f"{lane}.binding.json", row
+        lane_binding_paths[lane] = _write_json(
+            w3_dir / "independent_bindings" / f"{lane}.binding.json",
+            row,
         )
     bindings_payload = _write_semantic(
         w3_dir / "l6_section_apps_eval_bindings.json",
@@ -304,15 +328,58 @@ def _build_prior_chain(tmp_path: Path) -> tuple[Path, Path]:
             "schema_version": "apps_rg.l6_apps_eval_binding_closure_receipt.v2",
             "binding_closure_status": "FAIL",
             "apps_eval_rows_bound": False,
+            "unavailable_source_evidence_count": len(subject.EXPECTED_LANES),
+            "unavailable_source_evidence_section_ids": list(
+                subject.EXPECTED_LANES
+            ),
+            "checks": {
+                "source_evidence_availability_classified": True,
+                "unavailable_source_evidence_never_bound": True,
+            },
         },
     )
     assert closure["semantic_digest"]
+    calibration_path = w3_dir / "l6_judge_human_calibration_status.json"
+    _write_semantic(
+        calibration_path,
+        {
+            "schema_version": "apps_rg.l6_judge_human_calibration_status.v1",
+            "status": "PASS",
+            "calibration_status": "NOT_MEASURED",
+            "human_labels_present": False,
+            "n_calibration_samples": 0,
+            "spearman_rho": None,
+            "p_value": None,
+            "informational_only": True,
+            "required_for_exit": False,
+            "release_authority_effect": "NONE",
+        },
+    )
+    projection_bridge_path = _write_json(
+        w3_dir / "projection" / "l6_shadow_bridge.json",
+        {"schema_version": "apps_eval.l6_shadow_bridge.v2"},
+    )
     w3_artifacts = []
     for role, path in (
-        ("bindings", w3_dir / "l6_section_apps_eval_bindings.json"),
-        ("closure", w3_dir / "l6_apps_eval_binding_closure_receipt.json"),
+        (
+            "l6_section_apps_eval_bindings",
+            w3_dir / "l6_section_apps_eval_bindings.json",
+        ),
+        (
+            "l6_apps_eval_binding_closure",
+            w3_dir / "l6_apps_eval_binding_closure_receipt.json",
+        ),
+        ("l6_judge_human_calibration_status", calibration_path),
+        ("projection_l6_shadow_bridge", projection_bridge_path),
     ):
         w3_artifacts.append({"artifact_role": role, **_file_binding(path, root=w3_dir)})
+    for lane, path in lane_binding_paths.items():
+        w3_artifacts.append(
+            {
+                "artifact_role": f"{lane}_binding",
+                **_file_binding(path, root=w3_dir),
+            }
+        )
     w3_seal_body = {
         "schema_version": "apps_rg.l6_shadow_replay_package_seal.v1",
         "status": "PASS",
@@ -343,9 +410,22 @@ def _build_prior_chain(tmp_path: Path) -> tuple[Path, Path]:
             "release_blocked": True,
             "apps_eval_rows_bound": False,
             "w4_authorized": True,
+            "calibration_status": "NOT_MEASURED",
+            "human_labels_present": False,
+            "n_calibration_samples": 0,
+            "calibration_informational_only": True,
+            "calibration_required_for_exit": False,
             "section_summary": {
                 "sections_total": len(subject.EXPECTED_LANES),
                 "sections_bound": 0,
+                "sections_source_evidence_available": 0,
+                "sections_source_evidence_unavailable": len(
+                    subject.EXPECTED_LANES
+                ),
+                "source_evidence_status_by_section": {
+                    lane: "UNAVAILABLE_SOURCE_EVIDENCE"
+                    for lane in subject.EXPECTED_LANES
+                },
                 "observed_lane_ids": list(subject.EXPECTED_LANES),
             },
             "w3_package_seal": _file_binding(w3_seal_path, root=w3_dir),
@@ -354,6 +434,9 @@ def _build_prior_chain(tmp_path: Path) -> tuple[Path, Path]:
             ),
             "l6_apps_eval_binding_closure": _file_binding(
                 w3_closure_path, root=w3_dir
+            ),
+            "l6_judge_human_calibration_status": _file_binding(
+                calibration_path, root=w3_dir
             ),
         },
     )
@@ -393,8 +476,11 @@ def test_w4_closes_blocked_run_without_rewriting_runtime_truth(
     assert completion["new_uwg_operation_attempted"] is False
     assert completion["determinism_replay"]["execution_count"] == 2
     assert completion["determinism_replay"]["artifact_bytes_stable"] is True
-    assert completion["telemetry_summary"]["event_count"] == 16
+    assert completion["telemetry_summary"]["event_count"] == 17
     assert completion["telemetry_summary"]["l6_lane_event_count"] == 11
+    assert completion["telemetry_summary"]["l6_calibration_event_count"] == 1
+    assert completion["calibration_status"] == "NOT_MEASURED"
+    assert completion["human_labels_present"] is False
 
     ledger = json.loads(
         (replay / "w4" / subject.W4_LEDGER_FILENAME).read_text(encoding="utf-8")

@@ -35,6 +35,9 @@ W4_TELEMETRY_SUMMARY_SCHEMA = "apps_rg.local_failure_telemetry_summary.v1"
 W4_TELEMETRY_SUMMARY_FILENAME = "local_failure_telemetry_summary.json"
 W4_PACKAGE_SEAL_SCHEMA = "apps_rg.terminal_closeout_package_seal.v1"
 W4_PACKAGE_SEAL_FILENAME = "w4_terminal_closeout_package_seal.json"
+W2_SUPERSESSION_SCHEMA = "apps_rg.eval_package_supersession_manifest.v1"
+W3_CALIBRATION_SCHEMA = "apps_rg.l6_judge_human_calibration_status.v1"
+W3_CALIBRATION_FILENAME = "l6_judge_human_calibration_status.json"
 
 TERMINAL_OUTCOME = "BLOCKED_NON_PRODUCT"
 TERMINAL_STAGE_ID = "TERMINAL_NON_PRODUCT"
@@ -546,6 +549,47 @@ def _validate_prior_chain(
         w2_completion.get("eval_package_seal") or {}
     ).get("sha256"):
         raise TerminalCloseoutReplayError("w2_eval_seal_digest_mismatch")
+    w2_supersession_path = _resolve_relative_file(
+        w2_dir,
+        (
+            w2_completion.get("eval_package_supersession_manifest") or {}
+        ).get("artifact_ref"),
+        label="w2_eval_package_supersession_manifest",
+    )
+    if _sha256_file(w2_supersession_path) != (
+        w2_completion.get("eval_package_supersession_manifest") or {}
+    ).get("sha256"):
+        raise TerminalCloseoutReplayError(
+            "w2_eval_package_supersession_digest_mismatch"
+        )
+    w2_supersession = _read_json(
+        w2_supersession_path,
+        label="w2_eval_package_supersession_manifest",
+    )
+    _require_checks(
+        {
+            "schema_exact": w2_supersession.get("schema_version")
+            == W2_SUPERSESSION_SCHEMA,
+            "semantic_digest_valid": _semantic_digest_valid(w2_supersession),
+            "status_pass": w2_supersession.get("status") == "PASS",
+            "authoritative_record_exact": w2_supersession.get(
+                "authoritative_record_id"
+            )
+            == eval_record_id,
+            "canonical_package_exact": w2_supersession.get(
+                "canonical_package_count"
+            )
+            == 1
+            and w2_supersession.get("canonical_package_ids")
+            == [eval_record_id],
+            "superseded_packages_recoverable": w2_supersession.get(
+                "destructive_delete_performed"
+            )
+            is False
+            and w2_supersession.get("packages_recoverable") is True,
+        },
+        label="w2_eval_package_supersession_invalid",
+    )
 
     w3_dir = replay_root / "w3"
     w3_completion_path = w3_dir / "w3_completion_receipt.json"
@@ -553,11 +597,16 @@ def _validate_prior_chain(
     w3_seal_path = w3_dir / "w3_l6_shadow_package_seal.json"
     w3_bindings_path = w3_dir / "l6_section_apps_eval_bindings.json"
     w3_closure_path = w3_dir / "l6_apps_eval_binding_closure_receipt.json"
+    w3_calibration_path = w3_dir / W3_CALIBRATION_FILENAME
     w3_completion = _read_json(w3_completion_path, label="w3_completion")
     w3_guard = _read_json(w3_guard_path, label="w3_guard")
     w3_seal = _read_json(w3_seal_path, label="w3_package_seal")
     w3_bindings = _read_json(w3_bindings_path, label="w3_bindings")
     w3_closure = _read_json(w3_closure_path, label="w3_closure")
+    w3_calibration = _read_json(
+        w3_calibration_path,
+        label="w3_calibration",
+    )
     w3_summary = w3_completion.get("section_summary")
     w3_summary = dict(w3_summary) if isinstance(w3_summary, Mapping) else {}
     w3_binding_rows = w3_bindings.get("bindings")
@@ -600,6 +649,23 @@ def _validate_prior_chain(
             and w3_summary.get("sections_bound") == 0
             and set(w3_summary.get("observed_lane_ids") or [])
             == set(EXPECTED_LANES),
+            "source_evidence_availability_exact": (
+                int(w3_summary.get("sections_source_evidence_available") or 0)
+                + int(
+                    w3_summary.get("sections_source_evidence_unavailable") or 0
+                )
+                == len(EXPECTED_LANES)
+                and set(
+                    (
+                        w3_summary.get("source_evidence_status_by_section")
+                        or {}
+                    ).values()
+                )
+                <= {
+                    "AVAILABLE_SOURCE_EVIDENCE",
+                    "UNAVAILABLE_SOURCE_EVIDENCE",
+                }
+            ),
             "w4_authorized": w3_completion.get("w4_authorized") is True,
             "bindings_digest_valid": _semantic_digest_valid(w3_bindings),
             "binding_rows_exact": len(w3_binding_rows) == len(EXPECTED_LANES)
@@ -611,12 +677,56 @@ def _validate_prior_chain(
                 and row.get("binding_status")
                 in {"PARITY_FAIL", "LEGACY_PACKAGE_ADVISORY"}
                 and row.get("evidence_class") == "CONTRACT_ONLY_ADVISORY"
+                and row.get("source_evidence_status")
+                in {
+                    "AVAILABLE_SOURCE_EVIDENCE",
+                    "UNAVAILABLE_SOURCE_EVIDENCE",
+                }
+                and (
+                    row.get("source_evidence_status")
+                    != "UNAVAILABLE_SOURCE_EVIDENCE"
+                    or row.get("binding_status") != "BOUND_PASS"
+                )
                 for row in w3_binding_rows
             ),
             "closure_digest_valid": _semantic_digest_valid(w3_closure),
             "closure_fail_exact": w3_closure.get("binding_closure_status")
             == "FAIL"
             and w3_closure.get("apps_eval_rows_bound") is False,
+            "closure_availability_contract": (
+                (w3_closure.get("checks") or {}).get(
+                    "source_evidence_availability_classified"
+                )
+                is True
+                and (w3_closure.get("checks") or {}).get(
+                    "unavailable_source_evidence_never_bound"
+                )
+                is True
+                and w3_closure.get("unavailable_source_evidence_count")
+                == w3_summary.get("sections_source_evidence_unavailable")
+            ),
+            "calibration_schema_exact": w3_calibration.get("schema_version")
+            == W3_CALIBRATION_SCHEMA,
+            "calibration_digest_valid": _semantic_digest_valid(w3_calibration),
+            "calibration_not_measured_exact": w3_calibration.get(
+                "calibration_status"
+            )
+            == "NOT_MEASURED"
+            and w3_calibration.get("human_labels_present") is False
+            and w3_calibration.get("n_calibration_samples") == 0
+            and w3_calibration.get("spearman_rho") is None
+            and w3_calibration.get("p_value") is None
+            and w3_calibration.get("informational_only") is True
+            and w3_calibration.get("required_for_exit") is False
+            and w3_calibration.get("release_authority_effect") == "NONE",
+            "completion_calibration_exact": w3_completion.get(
+                "calibration_status"
+            )
+            == "NOT_MEASURED"
+            and w3_completion.get("human_labels_present") is False
+            and w3_completion.get("n_calibration_samples") == 0
+            and w3_completion.get("calibration_informational_only") is True
+            and w3_completion.get("calibration_required_for_exit") is False,
             "package_seal_binding_valid": _relative_binding_valid(
                 w3_completion.get("w3_package_seal"),
                 root=w3_dir,
@@ -631,6 +741,11 @@ def _validate_prior_chain(
                 w3_completion.get("l6_apps_eval_binding_closure"),
                 root=w3_dir,
                 expected=w3_closure_path,
+            ),
+            "calibration_binding_valid": _relative_binding_valid(
+                w3_completion.get("l6_judge_human_calibration_status"),
+                root=w3_dir,
+                expected=w3_calibration_path,
             ),
         },
         label="w3_evidence_invalid",
@@ -656,6 +771,18 @@ def _validate_prior_chain(
         label="w3_package_seal",
         default_namespace="w4",
     )
+    w3_seal_roles = {
+        str(row.get("artifact_role") or "")
+        for row in (w3_seal.get("artifacts") or [])
+        if isinstance(row, Mapping)
+    }
+    required_w3_seal_roles = {
+        "projection_l6_shadow_bridge",
+        "l6_section_apps_eval_bindings",
+        "l6_apps_eval_binding_closure",
+        "l6_judge_human_calibration_status",
+        *(f"{lane}_binding" for lane in EXPECTED_LANES),
+    }
     _require_checks(
         {
             "schema_exact": w3_seal.get("schema_version")
@@ -666,6 +793,8 @@ def _validate_prior_chain(
             "artifact_count_exact": w3_seal.get("artifact_count")
             == len(w3_seal.get("artifacts") or []),
             "all_artifacts_valid": seal_valid and not seal_errors,
+            "required_roles_present": required_w3_seal_roles
+            <= w3_seal_roles,
         },
         label="w3_package_seal_invalid",
     )
@@ -752,6 +881,7 @@ def _validate_prior_chain(
         "eval_record": eval_record,
         "eval_record_path": eval_record_path,
         "eval_seal_path": eval_seal_path,
+        "w2_supersession_path": w2_supersession_path,
         "w3_completion": w3_completion,
         "w3_completion_path": w3_completion_path,
         "w3_guard_path": w3_guard_path,
@@ -759,6 +889,8 @@ def _validate_prior_chain(
         "w3_bindings": w3_bindings,
         "w3_bindings_path": w3_bindings_path,
         "w3_closure_path": w3_closure_path,
+        "w3_calibration": w3_calibration,
+        "w3_calibration_path": w3_calibration_path,
         "source_ledger": source_ledger,
         "source_ledger_path": source_ledger_path,
         "source_receipt_paths": source_receipt_paths,
@@ -1056,9 +1188,22 @@ def _emit_stage_ledger(
                 "observed_run_verdict": "fail",
                 "grain_parity_status": "FAIL",
                 "apps_eval_rows_bound": False,
+                "source_evidence_unavailable_count": prior["w3_completion"][
+                    "section_summary"
+                ]["sections_source_evidence_unavailable"],
+                "calibration_status": prior["w3_calibration"][
+                    "calibration_status"
+                ],
+                "human_labels_present": False,
+                "n_calibration_samples": 0,
+                "calibration_informational_only": True,
                 "status_derivation": "W3_COMPLETION_RECEIPT",
                 "governed_outcome": "OBSERVABILITY_COMPLETED_WITH_FAILED_CLOSURE",
-                "cause_codes": ["ALL_REQUIRED_SECTIONS_NOT_BOUND"],
+                "cause_codes": [
+                    "ALL_REQUIRED_SECTIONS_NOT_BOUND",
+                    "UNAVAILABLE_SOURCE_EVIDENCE",
+                    "HUMAN_CALIBRATION_NOT_MEASURED",
+                ],
                 "authority_effect": "DENY_PRODUCT",
                 "blocked_successors": [],
                 "evidence_bindings": [
@@ -1074,6 +1219,11 @@ def _emit_stage_ledger(
                     ),
                     _binding(
                         prior["w3_closure_path"],
+                        namespace="replay_root",
+                        root=replay_root,
+                    ),
+                    _binding(
+                        prior["w3_calibration_path"],
                         namespace="replay_root",
                         root=replay_root,
                     ),
@@ -1191,12 +1341,22 @@ def _all_manifest_receipts(
                 root=replay_root,
             ),
             _binding(
+                prior["w2_supersession_path"],
+                namespace="replay_root",
+                root=replay_root,
+            ),
+            _binding(
                 prior["w3_guard_path"],
                 namespace="replay_root",
                 root=replay_root,
             ),
             _binding(
                 prior["w3_bindings_path"],
+                namespace="replay_root",
+                root=replay_root,
+            ),
+            _binding(
+                prior["w3_calibration_path"],
                 namespace="replay_root",
                 root=replay_root,
             ),
@@ -1541,6 +1701,10 @@ def _emit_local_telemetry(
                 "lane_id": lane_id,
                 "execution_complete": True,
                 "binding_status": row.get("binding_status"),
+                "source_evidence_status": row.get("source_evidence_status"),
+                "source_evidence_reason_codes": list(
+                    row.get("source_evidence_reason_codes") or []
+                ),
                 "evidence_class": row.get("evidence_class"),
                 "apps_eval_row_count": row.get("apps_eval_row_count"),
                 "l6_observation_row_count": row.get("l6_observation_row_count"),
@@ -1554,6 +1718,36 @@ def _emit_local_telemetry(
                 )
             ],
         )
+    add(
+        "L6_HUMAN_CALIBRATION_STATUS_RECORDED",
+        "L6_OBSERVABILITY",
+        {
+            "calibration_status": prior["w3_calibration"].get(
+                "calibration_status"
+            ),
+            "human_labels_present": prior["w3_calibration"].get(
+                "human_labels_present"
+            ),
+            "n_calibration_samples": prior["w3_calibration"].get(
+                "n_calibration_samples"
+            ),
+            "spearman_rho": prior["w3_calibration"].get("spearman_rho"),
+            "p_value": prior["w3_calibration"].get("p_value"),
+            "informational_only": prior["w3_calibration"].get(
+                "informational_only"
+            ),
+            "required_for_exit": prior["w3_calibration"].get(
+                "required_for_exit"
+            ),
+        },
+        [
+            _binding(
+                prior["w3_calibration_path"],
+                namespace="replay_root",
+                root=replay_root,
+            )
+        ],
+    )
     add(
         "APPS_EVAL_L6_BINDING_COMPLETED",
         "L6_OBSERVABILITY",
@@ -1616,6 +1810,9 @@ def _emit_local_telemetry(
         "event_count": len(events),
         "event_type_counts": dict(sorted(types.items())),
         "l6_lane_event_count": types["L6_LANE_OBSERVATION_COMPLETED"],
+        "l6_calibration_event_count": types[
+            "L6_HUMAN_CALIBRATION_STATUS_RECORDED"
+        ],
         "expected_l6_lane_event_count": len(EXPECTED_LANES),
         "required_boundary_events_present": all(
             types[name] > 0
@@ -1623,6 +1820,7 @@ def _emit_local_telemetry(
                 "EVAL_ADMISSION_OBSERVED",
                 "DETERMINISTIC_GRADING_COMPLETED",
                 "L6_LANE_OBSERVATION_COMPLETED",
+                "L6_HUMAN_CALIBRATION_STATUS_RECORDED",
                 "APPS_EVAL_L6_BINDING_COMPLETED",
                 "LEDGER_CLOSEOUT_COMPLETED",
                 "TERMINAL_SEALING_COMPLETED",
@@ -1885,7 +2083,8 @@ def emit_w4_terminal_closeout_replay(
         )
         is True
         and second["telemetry_summary"].get("l6_lane_event_count")
-        == len(EXPECTED_LANES),
+        == len(EXPECTED_LANES)
+        and second["telemetry_summary"].get("l6_calibration_event_count") == 1,
         "remote_collector_not_authority": second["telemetry_summary"].get(
             "remote_collector_role"
         )
@@ -1908,6 +2107,19 @@ def emit_w4_terminal_closeout_replay(
         "eval_execution_complete": True,
         "observed_run_verdict": "fail",
         "grain_parity_status": "FAIL",
+        "source_evidence_unavailable_count": prior["w3_completion"][
+            "section_summary"
+        ]["sections_source_evidence_unavailable"],
+        "calibration_status": prior["w3_calibration"]["calibration_status"],
+        "human_labels_present": prior["w3_calibration"][
+            "human_labels_present"
+        ],
+        "n_calibration_samples": prior["w3_calibration"][
+            "n_calibration_samples"
+        ],
+        "calibration_informational_only": prior["w3_calibration"][
+            "informational_only"
+        ],
         "release_blocked": True,
         "authoritative_x3_code": "X3A_DENY_REROUTE",
         "historical_authorization_disposition": (
@@ -1935,6 +2147,9 @@ def emit_w4_terminal_closeout_replay(
             "event_count": second["telemetry_summary"]["event_count"],
             "l6_lane_event_count": second["telemetry_summary"][
                 "l6_lane_event_count"
+            ],
+            "l6_calibration_event_count": second["telemetry_summary"][
+                "l6_calibration_event_count"
             ],
             "local_authority": second["telemetry_summary"]["local_authority"],
             "remote_collector_role": second["telemetry_summary"][
