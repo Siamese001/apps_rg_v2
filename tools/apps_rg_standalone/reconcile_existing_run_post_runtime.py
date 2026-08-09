@@ -18,6 +18,9 @@ APPS_EVAL_REPLAY_MODULE_PATH = (
 L6_SHADOW_REPLAY_MODULE_PATH = (
     REPO_ROOT / "src/apps_rg/runtime/l6_shadow_replay.py"
 )
+TERMINAL_CLOSEOUT_REPLAY_MODULE_PATH = (
+    REPO_ROOT / "src/apps_rg/runtime/terminal_closeout_replay.py"
+)
 DAG_MANIFEST_PATH = (
     REPO_ROOT
     / "src/apps_rg/config/domain_contract/workflow_manifest.resume_sections.v1.yaml"
@@ -88,6 +91,25 @@ def _load_l6_shadow_replay_module() -> object:
     return module
 
 
+def _load_terminal_closeout_replay_module() -> object:
+    """Load stdlib-only W4 closeout before installing the guard."""
+
+    module_name = "_apps_rg_terminal_closeout_replay"
+    spec = importlib.util.spec_from_file_location(
+        module_name,
+        TERMINAL_CLOSEOUT_REPLAY_MODULE_PATH,
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(
+            "unable to load terminal closeout replay: "
+            f"{TERMINAL_CLOSEOUT_REPLAY_MODULE_PATH}"
+        )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-run", type=Path, required=True)
@@ -99,13 +121,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "w1-authority",
             "w2-apps-eval",
             "w3-l6-shadow",
+            "w4-terminal-closeout",
         ),
         default="w0-preflight",
         help=(
             "W0 establishes the boundary; W1 reconciles saved authority and "
             "proves replay-only L0 parallel orchestration; W2 emits a sealed "
             "deterministic Apps Eval verdict without L6 execution; W3 runs "
-            "observer-only L6 and binds persisted lane observations."
+            "observer-only L6 and binds persisted lane observations; W4 "
+            "seals the blocked run as TERMINAL_NON_PRODUCT."
         ),
     )
     return parser.parse_args(argv)
@@ -165,7 +189,7 @@ def main(argv: list[str] | None = None) -> int:
                     "uwg_operation_attempted": False,
                 },
             )
-        else:
+        elif args.phase == "w3-l6-shadow":
             l6_shadow_replay = _load_l6_shadow_replay_module()
 
             def _operation(source: Path, output_dir: Path) -> object:
@@ -184,6 +208,28 @@ def main(argv: list[str] | None = None) -> int:
                 expected_activity={
                     "apps_eval_executed": False,
                     "l6_executed": True,
+                    "uwg_operation_attempted": False,
+                },
+            )
+        else:
+            terminal_closeout = _load_terminal_closeout_replay_module()
+
+            def _operation(source: Path, output_dir: Path) -> object:
+                return terminal_closeout.emit_w4_terminal_closeout_replay(
+                    source_run=source,
+                    output_dir=output_dir,
+                )
+
+            receipt = replay.run_guarded_artifact_replay(
+                source_run=args.source_run,
+                output_root=args.output_root,
+                wave="W4",
+                operation=_operation,
+                receipt_filename="w4_zero_provider_guard_receipt.json",
+                require_clean_import_state=True,
+                expected_activity={
+                    "apps_eval_executed": False,
+                    "l6_executed": False,
                     "uwg_operation_attempted": False,
                 },
             )
@@ -313,6 +359,56 @@ def main(argv: list[str] | None = None) -> int:
                     "artifact_ref"
                 ],
                 "w4_authorized": completion["w4_authorized"],
+            }
+        )
+    elif args.phase == "w4-terminal-closeout":
+        operation = receipt["operation_result"]
+        completion = operation["completion"]
+        stage_summary = completion["stage_summary"]
+        telemetry_summary = completion["telemetry_summary"]
+        summary.update(
+            {
+                "record_id": completion["record_id"],
+                "product_authorized": completion["product_authorized"],
+                "post_runtime_execution_complete": completion[
+                    "post_runtime_execution_complete"
+                ],
+                "eval_verdict": completion["eval_verdict"],
+                "observability_complete": completion[
+                    "observability_complete"
+                ],
+                "terminal_closed": completion["terminal_closed"],
+                "terminal_outcome": completion["terminal_outcome"],
+                "pipeline_complete": completion["pipeline_complete"],
+                "authoritative_x3_code": completion[
+                    "authoritative_x3_code"
+                ],
+                "historical_uwg_commit_observed": completion[
+                    "historical_uwg_commit_observed"
+                ],
+                "new_uwg_operation_attempted": completion[
+                    "new_uwg_operation_attempted"
+                ],
+                "stage_entry_count": stage_summary["entry_count"],
+                "stage_status_counts": stage_summary[
+                    "stage_status_counts"
+                ],
+                "x2_aggregation_status": stage_summary[
+                    "x2_aggregation_status"
+                ],
+                "local_failure_event_count": telemetry_summary[
+                    "event_count"
+                ],
+                "l6_lane_event_count": telemetry_summary[
+                    "l6_lane_event_count"
+                ],
+                "deterministic_replay_count": completion[
+                    "determinism_replay"
+                ]["execution_count"],
+                "deterministic_artifact_bytes_stable": completion[
+                    "determinism_replay"
+                ]["artifact_bytes_stable"],
+                "w5_authorized": completion["w5_authorized"],
             }
         )
     print(json.dumps(summary, sort_keys=True))
