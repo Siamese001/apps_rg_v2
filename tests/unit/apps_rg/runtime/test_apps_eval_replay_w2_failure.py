@@ -5,7 +5,33 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from apps_rg.runtime import apps_eval_replay as subject
+
+
+def test_w2_w1_contract_refs_are_output_root_independent() -> None:
+    refs = {
+        subject._w1_contract_ref(subject.W1_RECONCILIATION_FILENAME),
+        subject._w1_contract_ref(subject.W1_CORRECTION_FILENAME),
+        subject._w1_contract_ref(subject.W1_COMPLETION_FILENAME),
+        subject._w1_contract_ref(subject.W1_GUARD_FILENAME),
+    }
+
+    assert refs == {
+        "w1/w1_authoritative_reconciliation.json",
+        "w1/w1_authorization_correction_receipt.json",
+        "w1/w1_completion_receipt.json",
+        "w1/w1_zero_provider_guard_receipt.json",
+    }
+    assert all(not Path(ref).is_absolute() for ref in refs)
+    assert all("\\" not in ref for ref in refs)
+
+    with pytest.raises(
+        subject.AppsEvalReplayError,
+        match="unknown_w1_contract_artifact",
+    ):
+        subject._w1_contract_ref("unowned.json")
 
 
 def _captured_failure(output: Path) -> dict[str, Path]:

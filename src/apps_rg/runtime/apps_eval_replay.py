@@ -41,6 +41,25 @@ class AppsEvalReplayError(RuntimeError):
     """Raised when W1 authority or W2 deterministic evidence is invalid."""
 
 
+def _w1_contract_ref(filename: str) -> str:
+    """Return an output-root-independent reference to a W1 contract artifact.
+
+    Apps Eval incorporates snapshot provenance into its deterministic record
+    seed.  Absolute replay paths therefore cannot appear in provenance: the
+    same immutable source and W1 evidence must receive the same record ID in
+    every output directory.
+    """
+
+    if filename not in {
+        W1_RECONCILIATION_FILENAME,
+        W1_CORRECTION_FILENAME,
+        W1_COMPLETION_FILENAME,
+        W1_GUARD_FILENAME,
+    }:
+        raise AppsEvalReplayError(f"unknown_w1_contract_artifact:{filename}")
+    return f"w1/{filename}"
+
+
 def _canonical_digest(value: Any) -> str:
     raw = json.dumps(
         value,
@@ -533,18 +552,18 @@ def emit_w2_apps_eval_replay(
                 }
             ),
             "product_authorized": False,
-            "product_authorization_correction_ref": w1["paths"][
-                "correction"
-            ].as_posix(),
+            "product_authorization_correction_ref": _w1_contract_ref(
+                W1_CORRECTION_FILENAME
+            ),
             "product_authorization_correction_digest": correction[
                 "semantic_digest"
             ],
             "product_authorization_correction_disposition": correction[
                 "correction_disposition"
             ],
-            "w1_reconciliation_ref": w1["paths"][
-                "reconciliation"
-            ].as_posix(),
+            "w1_reconciliation_ref": _w1_contract_ref(
+                W1_RECONCILIATION_FILENAME
+            ),
             "w1_reconciliation_digest": reconciliation["semantic_digest"],
         }
     )
@@ -731,7 +750,7 @@ def emit_w2_apps_eval_replay(
             if resume_path is not None
             else None
         ),
-        "w1_completion_ref": w1["paths"]["completion"].as_posix(),
+        "w1_completion_ref": _w1_contract_ref(W1_COMPLETION_FILENAME),
         "w1_completion_semantic_digest": w1["completion"]["semantic_digest"],
         "w1_correction_ref": w1["paths"]["correction"].as_posix(),
         "w1_correction_semantic_digest": correction["semantic_digest"],
