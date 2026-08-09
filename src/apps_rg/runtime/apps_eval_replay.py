@@ -437,6 +437,39 @@ def _supersede_unbound_eval_packages(
     canonical_root = output / "apps_eval/apps_rg_current_resume_generation"
     superseded_root = output / "superseded_apps_eval_packages"
     superseded: list[dict[str, Any]] = []
+    rehomed_identity_collisions: list[dict[str, Any]] = []
+
+    # A prior buggy replay could assign the eventual authoritative record ID
+    # to output bytes containing output-root-dependent evidence references and
+    # then quarantine that package.  Preserve such historical bytes, but move
+    # them to a collision-explicit storage identity so the authoritative ID has
+    # exactly one canonical location.  This is a recoverable rename, not a
+    # deletion or an assertion that the stale bytes equal the new package.
+    stale_authoritative = superseded_root / authoritative_record_id
+    if stale_authoritative.is_dir():
+        stale_manifest = _tree_manifest(stale_authoritative)
+        content_sha256 = str(stale_manifest["content_sha256"])
+        suffix = content_sha256.removeprefix("sha256:")[:12]
+        destination = superseded_root / (
+            f"{authoritative_record_id}--stale-{suffix}"
+        )
+        if destination.exists():
+            raise AppsEvalReplayError(
+                "superseded_eval_package_collision:"
+                f"{destination.name}"
+            )
+        stale_authoritative.replace(destination)
+        rehomed_identity_collisions.append(
+            {
+                "original_record_id": authoritative_record_id,
+                "storage_record_id": destination.name,
+                "disposition": (
+                    "PRESERVED_STALE_PACKAGE_WITH_AUTHORITATIVE_ID"
+                ),
+                "artifact_ref": destination.relative_to(output).as_posix(),
+                **stale_manifest,
+            }
+        )
     if canonical_root.is_dir():
         for candidate in sorted(canonical_root.iterdir()):
             if not candidate.is_dir() or candidate.name == authoritative_record_id:
@@ -461,10 +494,6 @@ def _supersede_unbound_eval_packages(
         for candidate in sorted(superseded_root.iterdir()):
             if not candidate.is_dir() or candidate.name in known_ids:
                 continue
-            if candidate.name == authoritative_record_id:
-                raise AppsEvalReplayError(
-                    "authoritative_eval_package_in_superseded_root"
-                )
             superseded.append(
                 {
                     "record_id": candidate.name,
@@ -489,6 +518,10 @@ def _supersede_unbound_eval_packages(
         ),
         "superseded_package_count": len(superseded),
         "superseded_packages": superseded,
+        "rehomed_identity_collision_count": len(
+            rehomed_identity_collisions
+        ),
+        "rehomed_identity_collisions": rehomed_identity_collisions,
         "canonical_package_ids": canonical_ids,
         "canonical_package_count": len(canonical_ids),
         "destructive_delete_performed": False,

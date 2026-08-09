@@ -137,3 +137,47 @@ def test_w2_supersedes_unbound_packages_without_deleting_them(
         authoritative_record_id="record-final",
     )
     assert replayed == manifest
+
+
+def test_w2_rehomes_stale_package_that_reuses_authoritative_record_id(
+    tmp_path: Path,
+) -> None:
+    canonical = (
+        tmp_path
+        / "apps_eval/apps_rg_current_resume_generation/record-stable"
+    )
+    stale = tmp_path / "superseded_apps_eval_packages/record-stable"
+    canonical.mkdir(parents=True)
+    stale.mkdir(parents=True)
+    (canonical / "eval_record.json").write_text(
+        "canonical\n",
+        encoding="utf-8",
+    )
+    (stale / "eval_record.json").write_text(
+        "historical-root-dependent-bytes\n",
+        encoding="utf-8",
+    )
+
+    manifest, _ = subject._supersede_unbound_eval_packages(
+        output=tmp_path,
+        authoritative_record_id="record-stable",
+    )
+
+    assert canonical.is_dir()
+    assert not stale.exists()
+    assert manifest["canonical_package_ids"] == ["record-stable"]
+    assert manifest["rehomed_identity_collision_count"] == 1
+    collision = manifest["rehomed_identity_collisions"][0]
+    assert collision["original_record_id"] == "record-stable"
+    assert collision["storage_record_id"].startswith(
+        "record-stable--stale-"
+    )
+    assert collision["disposition"] == (
+        "PRESERVED_STALE_PACKAGE_WITH_AUTHORITATIVE_ID"
+    )
+    preserved = tmp_path / collision["artifact_ref"] / "eval_record.json"
+    assert preserved.read_text(encoding="utf-8") == (
+        "historical-root-dependent-bytes\n"
+    )
+    assert manifest["destructive_delete_performed"] is False
+    assert manifest["packages_recoverable"] is True
