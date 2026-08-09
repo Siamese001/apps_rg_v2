@@ -20,6 +20,7 @@ from apps_rg.runtime.disposition_authority import (
     EXIT_DISPOSITION_RECEIPT_ARTIFACT,
     resolve_lane_x3_from_artifact_refs,
 )
+from apps_rg.runtime.internal.generated_lane_contract import GENERATED_LANES
 from apps_rg.runtime.runtime_proof_layout import (
     is_accepted_real_llm_provider_bundle,
     load_latest_pointer,
@@ -101,20 +102,6 @@ def _collect_freshness(lane: str, base: Path, l2: Mapping[str, Any]) -> dict[str
 # SECTION_ORDER in lane_batch.py. The rollup readers (build_rollup / build_modular_lane_rollup)
 # aggregate by set membership, so order only affects display, not status. The parallel wave DAG
 # lives in workflow_manifest.resume_sections.v1.yaml and mirrors this dependency order.
-GENERATED_LANES: tuple[str, ...] = (
-    "competencies",
-    "unify_bullets",
-    "ibm_bullets",
-    "insurtech_bullets",
-    "ey_bullets",
-    "unify_narrative",
-    "ibm_narrative",
-    "insurtech_narrative",
-    "ey_narrative",
-    "executive_summary",
-    "headline",
-)
-
 REQUIRED_RELATIVE = (
     "l2_output.json",
     "x2_gate_outputs.json",

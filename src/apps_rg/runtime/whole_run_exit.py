@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from apps_rg.runtime.failure_evidence import atomic_write_json
-from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
+from apps_rg.runtime.internal.generated_lane_contract import GENERATED_LANES
 from apps_rg.runtime.authority_reconciliation import (
     CORE_RUNTIME_AUTHORITY_ARTIFACT,
     CORE_X3_DISPOSITION_ARTIFACT,
