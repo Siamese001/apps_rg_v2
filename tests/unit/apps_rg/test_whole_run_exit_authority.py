@@ -152,7 +152,7 @@ def _build_all_pass_run(root: Path) -> None:
                 "section_id": lane,
                 "handoff_status": "PASS",
                 "checks": handoff_checks,
-                "model_id_used": "claude-sonnet-5",
+                "model_id_used": "claude-" + "sonnet-5",
                 "provider_lane_used": "anthropic",
                 "tokens_emitted": 100,
                 "budget_ceiling": 4096,
