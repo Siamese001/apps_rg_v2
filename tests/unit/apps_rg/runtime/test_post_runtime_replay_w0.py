@@ -87,13 +87,20 @@ def test_guard_scrubs_credentials_and_blocks_every_escape_path(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("OPENAI_API_KEY", "must-not-be-observable")
+    monkeypatch.setenv("APPS_RG_ROUTE_HMAC_SECRET", "ephemeral-route-secret")
     monkeypatch.delenv("APPS_RG_POST_RUNTIME_NO_PROVIDER", raising=False)
     guard = ZeroProviderReplayGuard()
 
     with guard:
         assert "OPENAI_API_KEY" not in os.environ
+        assert "APPS_RG_ROUTE_HMAC_SECRET" not in os.environ
         assert os.environ["APPS_RG_POST_RUNTIME_NO_PROVIDER"] == "1"
         assert os.environ["APPS_EVAL_WITH_JUDGE"] == "0"
+
+        class _ImportTimePopenSubclass(subprocess.Popen):
+            pass
+
+        assert issubclass(_ImportTimePopenSubclass, subprocess.Popen)
 
         with pytest.raises(NetworkExecutionBlocked):
             socket.create_connection(("example.invalid", 443))
@@ -111,8 +118,10 @@ def test_guard_scrubs_credentials_and_blocks_every_escape_path(
             guard.block_attempt("embedding", "unit.embedding")
 
     assert os.environ["OPENAI_API_KEY"] == "must-not-be-observable"
+    assert os.environ["APPS_RG_ROUTE_HMAC_SECRET"] == "ephemeral-route-secret"
     assert "APPS_RG_POST_RUNTIME_NO_PROVIDER" not in os.environ
     assert "OPENAI_API_KEY" in guard.credentials_scrubbed
+    assert "APPS_RG_ROUTE_HMAC_SECRET" in guard.credentials_scrubbed
     assert guard.counters.network_attempts == 2
     assert guard.counters.subprocess_attempts == 1
     assert guard.counters.provider_calls == 1
@@ -216,3 +225,40 @@ def test_generic_artifact_callback_remains_inside_zero_provider_guard(
     assert first["source_unchanged"] is True
     assert first["uwg_operation_attempted"] is False
     assert all(value == 0 for value in first["attempt_counters"].values())
+
+
+def test_guard_requires_declared_eval_activity_to_match(
+    tmp_path: Path,
+) -> None:
+    source = _source_run(tmp_path)
+    output = tmp_path / "guarded_eval_replay"
+
+    def _operation(_source_root: Path, operation_dir: Path) -> dict[str, object]:
+        operation_dir.mkdir(parents=True, exist_ok=True)
+        return {
+            "completion": {
+                "schema_version": "test.completion.v1",
+                "status": "PASS",
+                "semantic_digest": "sha256:test",
+            },
+            "activity": {
+                "apps_eval_executed": True,
+                "l6_executed": False,
+                "uwg_operation_attempted": False,
+            },
+        }
+
+    result = run_guarded_artifact_replay(
+        source_run=source,
+        output_root=output,
+        wave="W2",
+        operation=_operation,
+        receipt_filename="guard.json",
+        expected_activity={"apps_eval_executed": True},
+    )
+
+    assert result["status"] == "PASS"
+    assert result["activity_matches"] is True
+    assert result["apps_eval_executed"] is True
+    assert result["l6_executed"] is False
+    assert result["uwg_operation_attempted"] is False

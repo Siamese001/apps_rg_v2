@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import base64
+import binascii
 import hashlib
 import hmac
 import json
@@ -67,6 +69,8 @@ _PREFLIGHT_CONTINUATION_RECEIPT = "e2e_preflight_continuation_receipt.json"
 _PREFLIGHT_CONSUMPTION_RECEIPT = (
     "e2e_preflight_continuation_consumption_receipt.json"
 )
+_ROUTE_HMAC_VERIFIER_KEYRING_ENV = "APPS_RG_ROUTE_HMAC_VERIFIER_KEYRING"
+_ROUTE_HMAC_VERIFIER_KEYRING_SCHEMA = "apps_rg.route_hmac_verifier_keyring.v1"
 
 
 def _as_text(value: Any) -> str:
@@ -99,12 +103,86 @@ def _bytes_digest(value: bytes) -> str:
     return "sha256:" + hashlib.sha256(value).hexdigest()
 
 
-def _hmac_signature(secret: str, body: Mapping[str, Any]) -> str:
+def _hmac_signature(secret: str | bytes, body: Mapping[str, Any]) -> str:
+    key = secret if isinstance(secret, bytes) else secret.encode("utf-8")
     return "hmac-sha256:" + hmac.new(
-        secret.encode("utf-8"),
+        key,
         _canonical_json_bytes(dict(body)),
         hashlib.sha256,
     ).hexdigest()
+
+
+def _resolve_hmac_verifier_key(
+    key_id: str,
+) -> tuple[bytes, dict[str, Any], list[str]]:
+    """Resolve replay-verification material without embedding it in run artifacts.
+
+    A stable, operator-owned keyring is preferred.  The legacy environment
+    secret remains a compatibility path for in-process current-run evaluation,
+    but the zero-provider replay guard removes it so historical replay cannot
+    silently depend on ephemeral key material.
+    """
+
+    normalized_key_id = _as_text(key_id)
+    keyring_ref = _as_text(os.environ.get(_ROUTE_HMAC_VERIFIER_KEYRING_ENV))
+    metadata: dict[str, Any] = {
+        "algorithm": "HMAC-SHA256",
+        "key_id": normalized_key_id,
+        "key_source": "",
+        "verifier_material_ref": keyring_ref,
+        "verifier_material_sha256": "",
+    }
+    if keyring_ref:
+        path = Path(keyring_ref).expanduser()
+        try:
+            raw = path.read_bytes()
+            payload = json.loads(raw)
+        except (OSError, json.JSONDecodeError, TypeError):
+            return b"", metadata, ["preflight_verifier_keyring_unreadable"]
+        metadata["verifier_material_ref"] = path.resolve().as_posix()
+        metadata["verifier_material_sha256"] = _bytes_digest(raw)
+        if not isinstance(payload, Mapping):
+            return b"", metadata, ["preflight_verifier_keyring_invalid"]
+        if payload.get("schema_version") != _ROUTE_HMAC_VERIFIER_KEYRING_SCHEMA:
+            return b"", metadata, ["preflight_verifier_keyring_schema_mismatch"]
+        keys = payload.get("keys")
+        keys = dict(keys) if isinstance(keys, Mapping) else {}
+        entry = keys.get(normalized_key_id)
+        entry = dict(entry) if isinstance(entry, Mapping) else {}
+        if not normalized_key_id or not entry:
+            return b"", metadata, ["preflight_verifier_key_id_not_found"]
+        if entry.get("algorithm") != "HMAC-SHA256":
+            return b"", metadata, ["preflight_verifier_algorithm_mismatch"]
+        if entry.get("status", "ACTIVE") != "ACTIVE":
+            return b"", metadata, ["preflight_verifier_key_not_active"]
+        try:
+            key = base64.b64decode(_as_text(entry.get("key_b64")), validate=True)
+        except (ValueError, binascii.Error):
+            return b"", metadata, ["preflight_verifier_key_encoding_invalid"]
+        if len(key) < 32:
+            return b"", metadata, ["preflight_verifier_key_too_short"]
+        metadata["key_source"] = "STABLE_VERIFIER_KEYRING"
+        return key, metadata, []
+
+    legacy_secret = _as_text(os.environ.get("APPS_RG_ROUTE_HMAC_SECRET"))
+    if legacy_secret:
+        metadata["key_source"] = "LEGACY_EPHEMERAL_ENV"
+        return legacy_secret.encode("utf-8"), metadata, []
+    return b"", metadata, ["preflight_verifier_key_material_missing"]
+
+
+def _preflight_verification_status(errors: list[str]) -> str:
+    if any(
+        error
+        in {
+            "preflight_verifier_key_material_missing",
+            "preflight_verifier_key_id_not_found",
+            "preflight_verifier_keyring_unreadable",
+        }
+        for error in errors
+    ):
+        return "UNVERIFIABLE_KEY_MATERIAL"
+    return "INVALID" if errors else "VERIFIED"
 
 
 def _parse_utc(value: Any) -> datetime:
@@ -585,10 +663,12 @@ def _verified_preflight(
     continuation = _json_object(continuation_path) if continuation_path is not None else {}
     consumption = _json_object(consumption_path) if consumption_path is not None else {}
 
-    secret = _as_text(os.environ.get("APPS_RG_ROUTE_HMAC_SECRET"))
     expected_key_id = _as_text(os.environ.get("APPS_RG_ROUTE_HMAC_KEY_ID"))
-    if not secret:
-        errors.append("preflight_route_signing_secret_missing")
+    continuation_key_id = _as_text(continuation.get("route_signing_key_id"))
+    verifier_key, verifier_metadata, verifier_errors = _resolve_hmac_verifier_key(
+        continuation_key_id
+    )
+    errors.extend(verifier_errors)
     continuation_body = {
         key: value
         for key, value in continuation.items()
@@ -613,9 +693,9 @@ def _verified_preflight(
         errors.append("preflight_continuation_artifact_dir_digest_mismatch")
     if continuation.get("continuation_payload_digest") != _payload_digest(continuation_body):
         errors.append("preflight_continuation_payload_digest_mismatch")
-    if not secret or not hmac.compare_digest(
+    if verifier_key and not hmac.compare_digest(
         _as_text(continuation.get("continuation_signature")),
-        _hmac_signature(secret, continuation_body) if secret else "",
+        _hmac_signature(verifier_key, continuation_body),
     ):
         errors.append("preflight_continuation_signature_invalid")
     if expected_key_id and continuation.get("route_signing_key_id") != expected_key_id:
@@ -645,9 +725,9 @@ def _verified_preflight(
         errors.append("preflight_consumption_payload_digest_mismatch")
     if consumption.get("consumer_id") != consumption_binding.get("consumer_id"):
         errors.append("preflight_consumption_consumer_mismatch")
-    if not secret or not hmac.compare_digest(
+    if verifier_key and not hmac.compare_digest(
         _as_text(consumption.get("consumption_signature")),
-        _hmac_signature(secret, consumption_body) if secret else "",
+        _hmac_signature(verifier_key, consumption_body),
     ):
         errors.append("preflight_consumption_signature_invalid")
     try:
@@ -659,7 +739,12 @@ def _verified_preflight(
     except (TypeError, ValueError):
         errors.append("preflight_timestamp_invalid")
 
-    return entry, entry_path.name, _bytes_digest(entry_raw), errors
+    verified_entry = dict(entry)
+    verified_entry["_apps_eval_verification"] = {
+        **verifier_metadata,
+        "status": _preflight_verification_status(errors),
+    }
+    return verified_entry, entry_path.name, _bytes_digest(entry_raw), errors
 
 
 def _find_identity_values(value: Any, key: str) -> set[str]:
@@ -745,12 +830,21 @@ def _normalize_live_snapshot(
             preflight,
         )
     )
+    preflight_verification = verified_preflight.get("_apps_eval_verification")
+    preflight_verification = (
+        dict(preflight_verification)
+        if isinstance(preflight_verification, Mapping)
+        else {}
+    )
     preflight_identity = verified_preflight.get("identity")
     preflight_identity = (
         dict(preflight_identity) if isinstance(preflight_identity, Mapping) else {}
     )
     if authoritative_identity and preflight_identity != authoritative_identity:
         preflight_errors.append("preflight_product_authorization_identity_mismatch")
+    preflight_verification_status = _preflight_verification_status(
+        preflight_errors
+    )
     resume_path = _generated_resume_path(artifact_dir)
     generated_resume = _json_object(resume_path) if resume_path is not None else {}
     sections = _normalize_sections(generated_resume) if generated_resume else {}
@@ -794,8 +888,22 @@ def _normalize_live_snapshot(
         provenance={
             "entrypoint": "agentic_core.runtime.entry.apps_rg_dispatch:dispatch_apps_rg_run",
             "preflight": _preflight_status(verified_preflight) or "unknown",
-            "preflight_verified": not preflight_errors,
+            "preflight_verified": preflight_verification_status == "VERIFIED"
+            and not preflight_errors,
+            "preflight_verification_status": preflight_verification_status,
             "preflight_verification_errors": sorted(set(preflight_errors)),
+            "preflight_verifier_key_id": _as_text(
+                preflight_verification.get("key_id")
+            ),
+            "preflight_verifier_key_source": _as_text(
+                preflight_verification.get("key_source")
+            ),
+            "preflight_verifier_material_ref": _as_text(
+                preflight_verification.get("verifier_material_ref")
+            ),
+            "preflight_verifier_material_sha256": _as_text(
+                preflight_verification.get("verifier_material_sha256")
+            ),
             "preflight_ref": preflight_ref,
             "preflight_digest": preflight_digest,
             "source_seal_verified": not product_authorization_errors,

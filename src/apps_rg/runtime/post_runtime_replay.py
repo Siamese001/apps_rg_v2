@@ -40,6 +40,7 @@ NO_PROVIDER_ENV = "APPS_RG_POST_RUNTIME_NO_PROVIDER"
 _CREDENTIAL_KEYS = frozenset(
     {
         "ANTHROPIC_API_KEY",
+        "APPS_RG_ROUTE_HMAC_SECRET",
         "AZURE_OPENAI_API_KEY",
         "COHERE_API_KEY",
         "GEMINI_API_KEY",
@@ -291,10 +292,28 @@ class _ForbiddenImportFinder(importlib.abc.MetaPathFinder):
     ) -> None:
         del path, target
         if self._guard.import_is_forbidden(fullname):
+            importers: list[str] = []
+            frame = sys._getframe(1)
+            while frame is not None:
+                module_name = str(frame.f_globals.get("__name__") or "")
+                module_location = (
+                    f"{module_name}:{frame.f_lineno}@{frame.f_code.co_filename}"
+                )
+                if (
+                    module_name
+                    and not module_name.startswith("importlib")
+                    and not module_name.startswith("_frozen_importlib")
+                    and module_location not in importers
+                ):
+                    importers.append(module_location)
+                    if len(importers) == 20:
+                        break
+                frame = frame.f_back
+            importer = ">".join(importers) or "unknown"
             self._guard.counters.blocked_import_attempts += 1
             self._guard.block_attempt(
                 _classify_forbidden_import(fullname),
-                f"import:{fullname}",
+                f"import:{fullname}:requested_by:{importer}",
             )
         return None
 
@@ -417,16 +436,19 @@ class ZeroProviderReplayGuard:
 
         original_popen = subprocess.Popen
 
-        def guarded_popen(*args: Any, **kwargs: Any) -> Any:
-            command = args[0] if args else kwargs.get("args")
-            shell = bool(kwargs.get("shell"))
-            if guard._command_allowed(command, shell=shell):
-                return original_popen(*args, **kwargs)
-            guard.counters.subprocess_attempts += 1
-            raise SubprocessExecutionBlocked(
-                "subprocess execution is forbidden during post-runtime replay: "
-                f"{command!r}"
-            )
+        class GuardedPopen(original_popen):
+            """Subclass-compatible Popen tripwire for import-time consumers."""
+
+            def __init__(self, *args: Any, **kwargs: Any) -> None:
+                command = args[0] if args else kwargs.get("args")
+                shell = bool(kwargs.get("shell"))
+                if not guard._command_allowed(command, shell=shell):
+                    guard.counters.subprocess_attempts += 1
+                    raise SubprocessExecutionBlocked(
+                        "subprocess execution is forbidden during post-runtime "
+                        f"replay: {command!r}"
+                    )
+                super().__init__(*args, **kwargs)
 
         def blocked_os_process(*args: Any, **kwargs: Any) -> Any:
             del kwargs
@@ -440,7 +462,7 @@ class ZeroProviderReplayGuard:
         socket.socket.connect_ex = blocked_connect_ex  # type: ignore[method-assign]
         socket.create_connection = blocked_create_connection
         socket.getaddrinfo = blocked_getaddrinfo
-        subprocess.Popen = guarded_popen  # type: ignore[assignment]
+        subprocess.Popen = GuardedPopen  # type: ignore[assignment]
         os.system = blocked_os_process  # type: ignore[assignment]
         os.popen = blocked_os_process  # type: ignore[assignment]
 
@@ -523,13 +545,14 @@ def run_guarded_artifact_replay(
     operation: Callable[[Path, Path], Mapping[str, Any]],
     receipt_filename: str,
     require_clean_import_state: bool = False,
+    expected_activity: Mapping[str, bool] | None = None,
 ) -> dict[str, Any]:
     """Run one deterministic artifact callback inside the W0 safety boundary.
 
     The callback receives the immutable source root and a derived-output
-    directory outside that root.  This helper does not grant permission for
-    provider, judge, embedding, network, subprocess, Eval, L6, or UWG work;
-    all such escape paths remain blocked by :class:`ZeroProviderReplayGuard`.
+    directory outside that root.  Provider, judge, embedding, network, and
+    subprocess escape paths remain blocked.  Deterministic Eval or later
+    artifact-only stages must declare their expected activity explicitly.
     """
 
     source = Path(source_run).resolve(strict=True)
@@ -565,6 +588,25 @@ def run_guarded_artifact_replay(
     completion = operation_result.get("completion")
     completion = dict(completion) if isinstance(completion, Mapping) else {}
     operation_pass = completion.get("status") == "PASS"
+    default_activity = {
+        "apps_eval_executed": False,
+        "l6_executed": False,
+        "uwg_operation_attempted": False,
+    }
+    expected = {
+        **default_activity,
+        **{
+            key: bool(value)
+            for key, value in dict(expected_activity or {}).items()
+            if key in default_activity
+        },
+    }
+    raw_activity = operation_result.get("activity")
+    raw_activity = dict(raw_activity) if isinstance(raw_activity, Mapping) else {}
+    observed_activity = {
+        key: bool(raw_activity.get(key, False)) for key in default_activity
+    }
+    activity_matches = observed_activity == expected
     status = (
         "PASS"
         if (
@@ -572,6 +614,7 @@ def run_guarded_artifact_replay(
             and operation_pass
             and source_delta["unchanged"]
             and zero_attempts
+            and activity_matches
             and (clean_import_state or not require_clean_import_state)
         )
         else "FAIL"
@@ -605,9 +648,14 @@ def run_guarded_artifact_replay(
         "subprocess_attempts": counters["subprocess_attempts"],
         "model_span_delta": 0,
         "model_span_delta_source": "zero_provider_process_guard",
-        "apps_eval_executed": False,
-        "l6_executed": False,
-        "uwg_operation_attempted": False,
+        "activity_expectation": expected,
+        "activity_observed": observed_activity,
+        "activity_matches": activity_matches,
+        "apps_eval_executed": observed_activity["apps_eval_executed"],
+        "l6_executed": observed_activity["l6_executed"],
+        "uwg_operation_attempted": observed_activity[
+            "uwg_operation_attempted"
+        ],
         "operation_completion_status": str(completion.get("status") or ""),
         "operation_completion_semantic_digest": str(
             completion.get("semantic_digest") or ""
@@ -644,6 +692,11 @@ def run_guarded_artifact_replay(
     if not zero_attempts:
         raise PostRuntimeReplaySafetyError(
             f"{normalized_wave} zero-provider counters were non-zero: {counters}"
+        )
+    if not activity_matches:
+        raise PostRuntimeReplaySafetyError(
+            f"{normalized_wave} activity mismatch: expected={expected} "
+            f"observed={observed_activity}"
         )
     if not operation_pass:
         raise PostRuntimeReplaySafetyError(
