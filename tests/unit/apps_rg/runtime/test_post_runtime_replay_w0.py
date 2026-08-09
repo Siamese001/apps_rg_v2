@@ -262,3 +262,38 @@ def test_guard_requires_declared_eval_activity_to_match(
     assert result["apps_eval_executed"] is True
     assert result["l6_executed"] is False
     assert result["uwg_operation_attempted"] is False
+
+
+def test_guard_requires_declared_w3_l6_activity_to_match(tmp_path: Path) -> None:
+    source = _source_run(tmp_path)
+    output = tmp_path / "guarded_l6_replay"
+
+    def _operation(_source_root: Path, operation_dir: Path) -> dict[str, object]:
+        operation_dir.mkdir(parents=True, exist_ok=True)
+        return {
+            "completion": {
+                "schema_version": "test.w3.completion.v1",
+                "status": "PASS",
+                "semantic_digest": "sha256:test",
+            },
+            "activity": {
+                "apps_eval_executed": False,
+                "l6_executed": True,
+                "uwg_operation_attempted": False,
+            },
+        }
+
+    result = run_guarded_artifact_replay(
+        source_run=source,
+        output_root=output,
+        wave="W3",
+        operation=_operation,
+        receipt_filename="guard.json",
+        expected_activity={"l6_executed": True},
+    )
+
+    assert result["status"] == "PASS"
+    assert result["activity_matches"] is True
+    assert result["apps_eval_executed"] is False
+    assert result["l6_executed"] is True
+    assert result["uwg_operation_attempted"] is False

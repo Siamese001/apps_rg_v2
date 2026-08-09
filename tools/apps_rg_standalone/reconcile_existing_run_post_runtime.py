@@ -15,6 +15,9 @@ AUTHORITY_MODULE_PATH = REPO_ROOT / "src/apps_rg/runtime/authority_reconciliatio
 APPS_EVAL_REPLAY_MODULE_PATH = (
     REPO_ROOT / "src/apps_rg/runtime/apps_eval_replay.py"
 )
+L6_SHADOW_REPLAY_MODULE_PATH = (
+    REPO_ROOT / "src/apps_rg/runtime/l6_shadow_replay.py"
+)
 DAG_MANIFEST_PATH = (
     REPO_ROOT
     / "src/apps_rg/config/domain_contract/workflow_manifest.resume_sections.v1.yaml"
@@ -67,18 +70,42 @@ def _load_apps_eval_replay_module() -> object:
     return module
 
 
+def _load_l6_shadow_replay_module() -> object:
+    """Load stdlib-only W3 orchestration before installing the guard."""
+
+    module_name = "_apps_rg_l6_shadow_replay"
+    spec = importlib.util.spec_from_file_location(
+        module_name,
+        L6_SHADOW_REPLAY_MODULE_PATH,
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(
+            f"unable to load L6 shadow replay: {L6_SHADOW_REPLAY_MODULE_PATH}"
+        )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-run", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument(
         "--phase",
-        choices=("w0-preflight", "w1-authority", "w2-apps-eval"),
+        choices=(
+            "w0-preflight",
+            "w1-authority",
+            "w2-apps-eval",
+            "w3-l6-shadow",
+        ),
         default="w0-preflight",
         help=(
             "W0 establishes the boundary; W1 reconciles saved authority and "
             "proves replay-only L0 parallel orchestration; W2 emits a sealed "
-            "deterministic Apps Eval verdict without L6 execution."
+            "deterministic Apps Eval verdict without L6 execution; W3 runs "
+            "observer-only L6 and binds persisted lane observations."
         ),
     )
     return parser.parse_args(argv)
@@ -116,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
                 receipt_filename="w1_zero_provider_guard_receipt.json",
                 require_clean_import_state=True,
             )
-        else:
+        elif args.phase == "w2-apps-eval":
             apps_eval_replay = _load_apps_eval_replay_module()
 
             def _operation(source: Path, output_dir: Path) -> object:
@@ -135,6 +162,28 @@ def main(argv: list[str] | None = None) -> int:
                 expected_activity={
                     "apps_eval_executed": True,
                     "l6_executed": False,
+                    "uwg_operation_attempted": False,
+                },
+            )
+        else:
+            l6_shadow_replay = _load_l6_shadow_replay_module()
+
+            def _operation(source: Path, output_dir: Path) -> object:
+                return l6_shadow_replay.emit_w3_l6_shadow_replay(
+                    source_run=source,
+                    output_dir=output_dir,
+                )
+
+            receipt = replay.run_guarded_artifact_replay(
+                source_run=args.source_run,
+                output_root=args.output_root,
+                wave="W3",
+                operation=_operation,
+                receipt_filename="w3_zero_provider_guard_receipt.json",
+                require_clean_import_state=True,
+                expected_activity={
+                    "apps_eval_executed": False,
+                    "l6_executed": True,
                     "uwg_operation_attempted": False,
                 },
             )
@@ -226,6 +275,44 @@ def main(argv: list[str] | None = None) -> int:
                     "l6_shadow_bridge_executed"
                 ],
                 "w3_authorized": completion["w3_authorized"],
+            }
+        )
+    elif args.phase == "w3-l6-shadow":
+        operation = receipt["operation_result"]
+        completion = operation["completion"]
+        section_summary = completion["section_summary"]
+        summary.update(
+            {
+                "record_id": completion["record_id"],
+                "l6_execution_complete": completion[
+                    "l6_execution_complete"
+                ],
+                "l6_shadow_observability_verdict": completion[
+                    "l6_shadow_observability_verdict"
+                ],
+                "binding_closure_status": completion[
+                    "binding_closure_status"
+                ],
+                "release_blocked": completion["release_blocked"],
+                "projection_consistency_only": completion[
+                    "projection_consistency_only"
+                ],
+                "apps_eval_rows_bound": completion["apps_eval_rows_bound"],
+                "evidence_class": completion["evidence_class"],
+                "sections_total": section_summary["sections_total"],
+                "sections_bound": section_summary["sections_bound"],
+                "sections_v40": section_summary["sections_v40"],
+                "sections_legacy": section_summary["sections_legacy"],
+                "deterministic_replay_count": completion[
+                    "determinism_replay"
+                ]["execution_count"],
+                "deterministic_artifact_bytes_stable": completion[
+                    "determinism_replay"
+                ]["artifact_bytes_stable"],
+                "w3_package_seal_ref": completion["w3_package_seal"][
+                    "artifact_ref"
+                ],
+                "w4_authorized": completion["w4_authorized"],
             }
         )
     print(json.dumps(summary, sort_keys=True))
