@@ -80,6 +80,10 @@ def test_w5_tripwire_is_controlled_and_excluded_from_execution_counts(
             "apps_eval_record_count": 2,
             "l6_closure_count": 2,
             "terminal_manifest_count": 2,
+            "historical_saved_judge_result_count": 42,
+            "historical_saved_judge_pass_count": 42,
+            "historical_actual_claude_model_result_count": 0,
+            "contract_handoff_entry_count": 42,
         },
         faults={
             "eval_failure_count": 1,
@@ -92,6 +96,10 @@ def test_w5_tripwire_is_controlled_and_excluded_from_execution_counts(
     )
     subject._verify_counts(counts)
     assert counts["provider_calls"] == 0
+    assert counts["historical_saved_judge_results"] == 42
+    assert counts["historical_saved_judge_passes"] == 42
+    assert counts["historical_actual_claude_model_results"] == 0
+    assert counts["contract_handoff_entries"] == 42
     assert counts["controlled_tripwire_provider_attempts"] == 1
     assert counts[
         "controlled_tripwire_attempts_excluded_from_execution_counts"

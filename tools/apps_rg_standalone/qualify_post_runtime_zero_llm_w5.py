@@ -195,6 +195,18 @@ def main(argv: list[str] | None = None) -> int:
         "non_product_terminal_manifests": completion[
             "non_product_terminal_manifests"
         ],
+        "historical_saved_judge_results": completion[
+            "historical_saved_judge_results"
+        ],
+        "historical_saved_judge_passes": completion[
+            "historical_saved_judge_passes"
+        ],
+        "historical_actual_claude_model_results": completion[
+            "historical_actual_claude_model_results"
+        ],
+        "contract_handoff_entries": completion[
+            "contract_handoff_entries"
+        ],
         "eval_fault_recovered": completion[
             "production_fault_qualification"
         ]["eval_recovery_count"]

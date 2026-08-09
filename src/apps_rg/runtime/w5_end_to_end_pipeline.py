@@ -41,6 +41,30 @@ EXPECTED_LANES: tuple[str, ...] = (
     "unify_narrative",
 )
 
+EXPECTED_STAGE_IDS: tuple[str, ...] = (
+    "FRESH_PREFLIGHT",
+    "APPS_RESEARCH_U0",
+    "APPS_RESEARCH_RUNTIME",
+    "APPS_RESEARCH_EXIT",
+    "HANDOFF_BUNDLE_COMMIT",
+    "APPS_RG_U0",
+    "APPS_RG_L1",
+    "APPS_RG_L0",
+    "APPS_RG_C0",
+    "APPS_RG_PA",
+    "APPS_RG_L2",
+    "X1_REVIEW",
+    "X2_AGGREGATION",
+    "X3_DISPOSITION",
+    "PRODUCT_ELIGIBILITY",
+    "UWG_COMMIT",
+    "POST_RUNTIME_W0_FIREWALL",
+    "POST_RUNTIME_W1_AUTHORITY",
+    "APPS_EVAL",
+    "L6_OBSERVABILITY",
+    "TERMINAL_NON_PRODUCT",
+)
+
 
 class W5EndToEndPipelineError(RuntimeError):
     """Raised when a real replay or governed positive control does not close."""
@@ -150,6 +174,256 @@ def _dag_manifest_path() -> Path:
         Path(__file__).resolve().parents[1]
         / "config/domain_contract/workflow_manifest.resume_sections.v1.yaml"
     )
+
+
+def _saved_judge_inventory(source: Path) -> dict[str, Any]:
+    """Inventory canonical saved judge results without executing a judge."""
+
+    artifacts: list[tuple[str, Path]] = [
+        (
+            lane,
+            source
+            / "modular_r4/sections"
+            / lane
+            / "x1d_llm_judge_outputs.json",
+        )
+        for lane in EXPECTED_LANES
+    ]
+    artifacts.extend(
+        [
+            (
+                "full_resume",
+                source
+                / "modular_r4/final_resume_assembly"
+                / "x1d_full_resume_judge_outputs.json",
+            ),
+            (
+                "competencies_graph_pool_selector",
+                source
+                / "modular_r4/sections/competencies"
+                / "competencies_graph_pool_selector_receipt.json",
+            ),
+        ]
+    )
+    results: list[dict[str, Any]] = []
+    for scope, path in artifacts:
+        doc = _read_json(path, label=f"saved_judges:{scope}")
+        raw_judges = doc.get("judges")
+        if isinstance(raw_judges, Mapping):
+            judges = [dict(raw_judges)]
+        elif isinstance(raw_judges, list):
+            judges = [dict(row) for row in raw_judges if isinstance(row, Mapping)]
+        else:
+            judges = []
+        for judge in judges:
+            passed = judge.get("pass")
+            if not isinstance(passed, bool):
+                passed = judge.get("pass_")
+            results.append(
+                {
+                    "scope": scope,
+                    "judge_id": str(judge.get("judge_id") or ""),
+                    "provider_name": str(judge.get("provider_name") or ""),
+                    "provider_key": str(judge.get("provider_key") or ""),
+                    "evaluator_mode": str(judge.get("evaluator_mode") or ""),
+                    "provider_status": str(judge.get("provider_status") or ""),
+                    "model_requested": str(judge.get("model_requested") or ""),
+                    "model_actual": str(
+                        judge.get("model_actual")
+                        or judge.get("model_name")
+                        or ""
+                    ),
+                    "pass": passed is True,
+                    "provider_available": judge.get("provider_available") is True,
+                    "provider_blocked": judge.get("provider_blocked") is True,
+                    "mocked": judge.get("mocked") is True,
+                    "advisory_only": judge.get("advisory_only") is True,
+                    "proof_eligible_judge": judge.get("proof_eligible_judge")
+                    is True,
+                    "fallback_used": judge.get("fallback_used") is True,
+                    "artifact_ref": path.relative_to(source).as_posix(),
+                    "artifact_sha256": _sha256_file(path),
+                }
+            )
+
+    alias_lanes = (
+        "competencies",
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets",
+    )
+    legacy_aliases: list[dict[str, Any]] = []
+    for lane in alias_lanes:
+        path = (
+            source
+            / "modular_r4/sections"
+            / lane
+            / "bullet_pool_claude_selector_judge.json"
+        )
+        judge = _read_json(path, label=f"legacy_selector_alias:{lane}")
+        legacy_aliases.append(
+            {
+                "scope": lane,
+                "artifact_ref": path.relative_to(source).as_posix(),
+                "artifact_sha256": _sha256_file(path),
+                "judge_id": str(judge.get("judge_id") or ""),
+                "provider_name": str(judge.get("provider_name") or ""),
+                "model_actual": str(
+                    judge.get("model_actual")
+                    or judge.get("model_name")
+                    or ""
+                ),
+                "provider_status": str(judge.get("provider_status") or ""),
+                "pass": judge.get("pass") is True,
+                "legacy_filename_only": True,
+            }
+        )
+
+    model_counts: dict[str, int] = {}
+    provider_counts: dict[str, int] = {}
+    for row in results:
+        model = str(row["model_actual"])
+        provider = str(row["provider_name"])
+        model_counts[model] = model_counts.get(model, 0) + 1
+        provider_counts[provider] = provider_counts.get(provider, 0) + 1
+    claude_results = [
+        row for row in results if "claude" in str(row["model_actual"]).lower()
+    ]
+    checks = {
+        "canonical_result_count_exact": len(results) == 21,
+        "all_results_model_backed_pass": all(
+            row["pass"] is True
+            and row["evaluator_mode"] == "MODEL_BACKED"
+            and row["provider_status"] == "MODEL_BACKED_PASS"
+            and row["provider_available"] is True
+            and row["provider_blocked"] is False
+            and row["mocked"] is False
+            and row["fallback_used"] is False
+            for row in results
+        ),
+        "model_counts_exact": model_counts
+        == {"gemini-3.6-flash": 12, "gpt-5.6-sol": 9},
+        "provider_counts_exact": provider_counts
+        == {"Google Gemini 3.6 Flash": 12, "OpenAI ChatGPT": 9},
+        "no_claude_model_result": not claude_results,
+        "legacy_alias_count_exact": len(legacy_aliases) == 5,
+        "legacy_aliases_are_openai": all(
+            row["model_actual"] == "gpt-5.6-sol"
+            and row["provider_name"] == "OpenAI ChatGPT"
+            and row["provider_status"] == "MODEL_BACKED_PASS"
+            and row["pass"] is True
+            for row in legacy_aliases
+        ),
+    }
+    _require(checks, label=f"saved_judge_inventory_invalid:{source.name}")
+    return {
+        "evidence_scope": (
+            "HISTORICAL_SAVED_JUDGE_OUTPUTS_NO_W5_JUDGE_EXECUTION"
+        ),
+        "status": "PASS",
+        "result_count": len(results),
+        "passing_result_count": sum(row["pass"] is True for row in results),
+        "advisory_result_count": sum(
+            row["advisory_only"] is True for row in results
+        ),
+        "model_counts": dict(sorted(model_counts.items())),
+        "provider_counts": dict(sorted(provider_counts.items())),
+        "actual_claude_model_result_count": len(claude_results),
+        "legacy_claude_named_artifact_count": len(legacy_aliases),
+        "legacy_claude_named_artifacts": legacy_aliases,
+        "results": results,
+        "checks": checks,
+    }
+
+
+def _stage_contract_inventory(
+    *,
+    source: Path,
+    replay: Path,
+    ledger: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Reopen every terminal-ledger handoff binding byte-for-byte."""
+
+    raw_entries = ledger.get("entries")
+    raw_entries = raw_entries if isinstance(raw_entries, list) else []
+    entries: list[dict[str, Any]] = []
+    all_bindings_valid = True
+    for entry_raw in raw_entries:
+        if not isinstance(entry_raw, Mapping):
+            all_bindings_valid = False
+            continue
+        bindings_raw = entry_raw.get("evidence_bindings")
+        bindings_raw = bindings_raw if isinstance(bindings_raw, list) else []
+        bindings: list[dict[str, Any]] = []
+        for binding_raw in bindings_raw:
+            if not isinstance(binding_raw, Mapping):
+                all_bindings_valid = False
+                continue
+            binding = dict(binding_raw)
+            namespace = str(binding.get("artifact_namespace") or "")
+            authority_root = {
+                "source_run": source,
+                "replay_root": replay,
+                "w4": replay / "w4",
+            }.get(namespace)
+            ref = str(binding.get("artifact_ref") or "")
+            candidate = (
+                (authority_root / ref).resolve()
+                if authority_root is not None and ref
+                else Path()
+            )
+            valid = bool(
+                authority_root is not None
+                and ref
+                and _contained(candidate, authority_root)
+                and candidate.is_file()
+                and binding.get("byte_length") == candidate.stat().st_size
+                and binding.get("sha256") == _sha256_file(candidate)
+            )
+            all_bindings_valid = all_bindings_valid and valid
+            bindings.append({**binding, "binding_valid": valid})
+        entries.append(
+            {
+                "sequence": entry_raw.get("sequence"),
+                "stage_id": str(entry_raw.get("stage_id") or ""),
+                "status": str(entry_raw.get("status") or ""),
+                "execution_complete": entry_raw.get("execution_complete")
+                is True,
+                "governed_outcome": str(
+                    entry_raw.get("governed_outcome") or ""
+                ),
+                "authority_effect": str(
+                    entry_raw.get("authority_effect") or ""
+                ),
+                "evidence_bindings": bindings,
+            }
+        )
+    checks = {
+        "entry_count_exact": len(entries) == len(EXPECTED_STAGE_IDS) == 21,
+        "stage_sequence_exact": [row["stage_id"] for row in entries]
+        == list(EXPECTED_STAGE_IDS),
+        "sequence_numbers_exact": [row["sequence"] for row in entries]
+        == list(range(21)),
+        "all_stages_execution_complete": all(
+            row["execution_complete"] is True for row in entries
+        ),
+        "all_stages_have_evidence": all(
+            bool(row["evidence_bindings"]) for row in entries
+        ),
+        "all_evidence_bindings_valid": all_bindings_valid,
+    }
+    _require(checks, label=f"stage_contract_inventory_invalid:{source.name}")
+    return {
+        "status": "PASS",
+        "entry_count": len(entries),
+        "stage_sequence": [row["stage_id"] for row in entries],
+        "status_by_stage": {
+            row["stage_id"]: row["status"] for row in entries
+        },
+        "entries": entries,
+        "checks": checks,
+    }
 
 
 def _install_minimal_apps_rg_namespace() -> None:
@@ -281,6 +555,7 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
         / "w3/l6_judge_human_calibration_status.json",
         "w4_guard": replay / "w4/w4_zero_provider_guard_receipt.json",
         "w4_completion": replay / "w4/w4_completion_receipt.json",
+        "w4_stage_ledger": replay / "w4/terminal_stage_ledger.json",
         "w4_terminal_manifest": replay
         / "w4/terminal_non_product_manifest.json",
         "w4_package_seal": replay
@@ -296,6 +571,12 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
     w4 = docs["w4_completion"]
     terminal_manifest = docs["w4_terminal_manifest"]
     w4_package_seal = docs["w4_package_seal"]
+    historical_judges = _saved_judge_inventory(source)
+    stage_contracts = _stage_contract_inventory(
+        source=source,
+        replay=replay,
+        ledger=docs["w4_stage_ledger"],
+    )
     guards = [docs[f"w{index}_guard"] for index in range(1, 5)]
     zero_keys = (
         "provider_calls",
@@ -361,6 +642,13 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
         == "apps_rg.terminal_closeout_package_seal.v1"
         and w4_package_seal.get("status") == "PASS"
         and _manifest_digest_valid(w4_package_seal),
+        "historical_judge_inventory_complete": historical_judges.get("status")
+        == "PASS"
+        and historical_judges.get("result_count") == 21
+        and historical_judges.get("passing_result_count") == 21,
+        "stage_contract_inventory_complete": stage_contracts.get("status")
+        == "PASS"
+        and stage_contracts.get("entry_count") == 21,
     }
     _require(checks, label=f"integrated_chain_invalid:{source.name}")
     return {
@@ -376,7 +664,19 @@ def _chain_contract(*, source: Path, replay: Path, output: Path) -> dict[str, An
                 "max_active_workers_observed"
             ],
             "provider_or_model_execution": False,
+            "scheduler": w1_parallel["scheduler"],
+            "configured_max_parallel": w1_parallel[
+                "configured_max_parallel"
+            ],
+            "root_lanes": w1_parallel["root_lanes"],
+            "dependencies": w1_parallel["dependencies"],
+            "lane_results": w1_parallel["lane_results"],
+            "dependency_admission_semantics": w1_parallel[
+                "dependency_admission_semantics"
+            ],
         },
+        "historical_saved_judges": historical_judges,
+        "contract_handoffs": stage_contracts,
         "apps_eval": {
             "execution_complete": True,
             "verdict": "fail",
@@ -498,6 +798,26 @@ def execute_integrated_replays(
         "cases": rows,
         "wave_sequence": ["W0", "W1", "W2", "W3", "W4"],
         "full_chain_execution_count_per_run": 2,
+        "historical_saved_judge_result_count": sum(
+            int(case["historical_saved_judges"]["result_count"])
+            for case in rows
+        ),
+        "historical_saved_judge_pass_count": sum(
+            int(case["historical_saved_judges"]["passing_result_count"])
+            for case in rows
+        ),
+        "historical_actual_claude_model_result_count": sum(
+            int(
+                case["historical_saved_judges"][
+                    "actual_claude_model_result_count"
+                ]
+            )
+            for case in rows
+        ),
+        "contract_handoff_entry_count": sum(
+            int(case["contract_handoffs"]["entry_count"])
+            for case in rows
+        ),
         "source_runs_mutated": False,
         "provider_calls": 0,
         "judge_calls": 0,
