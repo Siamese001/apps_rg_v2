@@ -146,6 +146,15 @@ def _span_processor_present(provider: Any | None) -> bool:
     return bool(processors)
 
 
+def _trace_exporter_endpoint(endpoint: str) -> str:
+    """Return the OTLP/HTTP trace signal URL for a configured base endpoint."""
+
+    normalized = str(endpoint or "").rstrip("/")
+    if normalized.endswith("/v1/traces"):
+        return normalized
+    return f"{normalized}/v1/traces"
+
+
 def current_otel_runtime_status() -> OTelRuntimeStatus:
     """Verify the installed provider instead of trusting configuration flags."""
 
@@ -254,7 +263,9 @@ def configure_otel_runtime(
             }
         )
     )
-    candidate.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=target)))
+    candidate.add_span_processor(
+        BatchSpanProcessor(OTLPSpanExporter(endpoint=_trace_exporter_endpoint(target)))
+    )
     trace.set_tracer_provider(candidate)
     installed = trace.get_tracer_provider()
     if installed is candidate:
