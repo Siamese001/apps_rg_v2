@@ -1,8 +1,8 @@
 # L1 Cognition and Reasoning Roadmap
 
-Status: Waves 0-2 implemented and verified; Waves 3-6 remain proposed.
+Status: Waves 0-3 implemented and verified; Waves 4-6 remain proposed.
 
-Branch baseline: local `main` at `52499a771d086b0b63c99916a0c4360ecb286ed5`
+Branch baseline: local `main` at `42f5c3d11519a23a9e4c1717d8be79d1ce1576e8`
 
 ## Decision
 
@@ -245,32 +245,46 @@ Exit criteria:
 Owner: apps_rg execution and lane owners. Keep the new receipt app-local to
 apps_rg_v2.
 
+Implementation: `reasoning_control_execution_receipt.py` now emits a
+digest-bound, per-unit L2/L3 execution sidecar from a verified L1 capsule.
+It records the L1 request separately from L2/L3 transport observation,
+provider/model configuration, candidate count, selection method, C0 obligation
+receipt references, and an explicit quality-certification result. W1 stores
+each sidecar under `reasoning_control_execution/<unit>.json` and reconciles
+its digest, applied-control summary, quality result, and C0 references with the
+unit outcome. Existing phase-1 lane records can substantiate temperature and
+self-consistency observations only; absent ToT/reflection transport evidence
+is recorded as `IGNORED`, never inferred from L1's requested values.
+
 Primary files:
 
+- `src/apps_rg/runtime/contracts/reasoning_control_execution_receipt.py`
 - `src/apps_rg/runtime/contracts/plan_execution_reconciliation.py`
-- `src/apps_rg/runtime/contracts/plan_execution_receipt.py`
 - `src/apps_rg/runtime/reasoning/section_reasoning_intensity.py`
-- Section lane provider/receipt adapters and their tests.
+- `src/apps_rg/runtime/bindings/l1_planning_capsule.py`
+- `tests/unit/apps_rg/runtime/contracts/test_reasoning_control_execution_receipt.py`
+- `tests/unit/apps_rg/runtime/contracts/test_plan_execution_reconciliation.py`
 
-1. Define a per-unit `reasoning_control_execution_receipt` that compares the L1
-   request with L2/L3 observation: supported, applied, adapted, ignored, or
-   blocked; provider/model configuration; candidate count; selection method;
-   and receipt reference.
-2. Extend W1 observations with applied controls and the C0 obligation receipt
-   references. A completed unit requires planned evidence/control reconciliation,
-   not merely an output file.
-3. Make a certification-required control fail quality certification when its
-   receipt says unsupported/ignored. Non-required unsupported controls remain
-   visible diagnostics rather than a false success.
-4. Only after these receipts exist, run controlled ablations to tune
-   self-consistency, ToT, or reflection where the transport proves support.
+1. The fixed app-local policy derives certification requirements from the
+   requested values. A capsule cannot lower that policy by declaring a required
+   control optional.
+2. A required control that is `UNSUPPORTED`, `IGNORED`, or `BLOCKED` denies
+   quality certification. Non-required controls remain visible diagnostics.
+3. W1 marks an otherwise-complete unit `BLOCKED` with
+   `REQUIRED_CONTROL_EXECUTION_ABSENT` until every certification-required
+   control is observed as `APPLIED` or `ADAPTED`.
+4. Controlled ablations may now be considered, but only for controls whose
+   L2/L3 receipt proves transport support and recorded execution. This receipt
+   remains execution observability; it neither promotes evidence nor authorizes
+   routing, Exit, release, or human qualification.
 
 Exit criteria:
 
 - `controls_applied` is only emitted by L2/L3 and is never copied from L1.
 - A singleton transport that ignores a requested knob cannot be certified as
   having applied it.
-- PA/L2 cannot use an unsupported candidate claim for a critical requirement.
+- A completed W1 unit cannot be quality-certified from an output file alone
+  when a certification-required control lacks execution proof.
 
 ### Wave 4 — Use the plan graph for governed scheduling and merge checks
 
