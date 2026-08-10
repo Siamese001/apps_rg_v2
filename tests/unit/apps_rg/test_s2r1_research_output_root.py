@@ -113,7 +113,7 @@ def test_publication_failure_stops_before_delegated_briefing(
     assert response["outcome"] == "ResearchDispatchFailure"
 
 
-def test_successful_publication_allows_research_stage_to_continue(
+def test_mock_publication_cannot_authorize_research_stage(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -130,10 +130,10 @@ def test_successful_publication_allows_research_stage_to_continue(
     )
 
     expected_root = (run_root / "apps_research" / "runs").resolve()
-    assert ok, reason
-    assert reason == "ResumeBriefingReady"
-    briefing = Path(brief_path)
-    assert briefing.is_file()
-    assert briefing.parent.parent == expected_root
+    assert not ok
+    assert reason == "APPS_RESEARCH_BLOCKED"
+    assert brief_path == ""
     response = json.loads((run_root / FILENAME_RESEARCH_BRIDGE_RESPONSE).read_text())
-    assert response["artifact_runs_root"] == str(expected_root)
+    assert response["outcome"] == "ResearchDispatchFailure"
+    assert response["r5_reason_code"] == "APPS_RESEARCH_BLOCKED"
+    assert expected_root.is_dir()

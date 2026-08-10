@@ -1,0 +1,1322 @@
+{
+  "run_id": "competencies_20260809_080012",
+  "lane_id": "competencies",
+  "prompt_id": "competencies_dispatch_v1",
+  "prompt_hash": "4d0bd598fe8a9000",
+  "input_payload_hash": "c37fdd0d548ef846",
+  "output_payload_hash": null,
+  "claim_ledger_hash": null,
+  "runtime_generation_status": "REAL_LLM",
+  "product_quality_status": "PASS",
+  "x2_failed_gates": [],
+  "x3_code": "X3_ALLOW",
+  "proof_eligible": true,
+  "judge_proof_eligible": true,
+  "proof_authority_receipt": {
+    "proof_authority": "graph_skills_plus_linked_source_facts",
+    "base_resume_usage": "calibration_only",
+    "jd_usage": "targeting_only",
+    "e0_usage": "style_only",
+    "new_gates_wired": [
+      "x2_competencies_capability_family_coverage",
+      "x2_competencies_no_default_fid_proof",
+      "x2_competencies_generic_category_blocked_without_graph",
+      "x2_competencies_e0_ngram_overlap",
+      "x2_competencies_base_ngram_overlap"
+    ]
+  },
+  "proof_pool_type": "augmented_skills_graph",
+  "proof_pool_type_role": "receipt_label_not_authority_switch",
+  "evidence_authority": {
+    "authority": "augmented_skills_graph",
+    "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "ledger_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json",
+    "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+    "ledger_digest": "8d51311d531d3adbeda76e89540372c40e084d1069e5aa708b012fb10a9a44c7",
+    "skills_authority_status": "PASS",
+    "block_reason": null,
+    "forbidden_as_product_authority": [
+      "base_resume",
+      "base_resume_fallback",
+      "broad_skills_ledger",
+      "candidate_fact_ledger",
+      "fallback_pool",
+      "legacy_pool",
+      "prompt_pool",
+      "proof_pool",
+      "selected_role_fact_set",
+      "srfs",
+      "unknown"
+    ]
+  },
+  "selection_scope": {
+    "section_id": "competencies",
+    "selection_method": "augmented_skills_graph_track_weighted_competencies",
+    "role_target_projection": "graph_ledger_substrate_with_optional_srfs_filter",
+    "jd_targeting_active": true,
+    "briefing_targeting_active": true,
+    "jd_ref": "targeting_only",
+    "briefing_ref": "targeting_only",
+    "section_slice": "competencies",
+    "allowed_fact_ids_count": 44,
+    "is_proof_authority": false
+  },
+  "selected_role_fact_set_used": false,
+  "broad_skills_ledger_used_as_authority": false,
+  "base_resume_claim_authority": false,
+  "srfs_section_id": "competencies",
+  "candidate_fact_pool_count": 8,
+  "allowed_fact_ids_count": 55,
+  "required_fact_ids_count": 7,
+  "fallback_used": false,
+  "fallback_reason": "",
+  "x2_srfs_gate_status": "NOT_APPLICABLE",
+  "srfs_allowed_fact_ids_count": 0,
+  "full_resume_srfs_supported": false,
+  "out_of_slice_fact_ids": [],
+  "claim_ledger_union_matches_required_fact_ids": false,
+  "graph_evidence_depth_pre_report": {
+    "schema": "graph_evidence_depth_report_v1",
+    "section_id": "competencies",
+    "packet_key": "selected_graph_evidence_plan",
+    "packet_shape": "facts",
+    "item_count": 8,
+    "rich_item_count": 7,
+    "unique_skill_count": 31,
+    "unique_detail_count": 13,
+    "detail_occurrence_count": 13,
+    "detail_reuse_count": 0,
+    "detail_reuse_ratio": 0.0,
+    "max_detail_frequency": 1,
+    "repeated_detail_ids": [],
+    "top_detail_frequencies": [
+      {
+        "detail_id": "metric_ibm_ai_driven_sales_frameworks",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_alliance_cosell_operating_cadence",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_client_facing_modernization_playbooks",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_executive_buyer_architecture_alignment",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_offering_accelerator_package_reuse",
+        "count": 1
+      }
+    ],
+    "item_rich_ratio": 0.875,
+    "skill_diversity_ratio": 1.0,
+    "detail_diversity_ratio": 1.0,
+    "semantic_coverage_pct": 0.875,
+    "axis_coverage_pct": 1.0,
+    "minimum_coverage_pct": 0.8,
+    "status": "insufficient_depth",
+    "thin_item_ids": [
+      "reb_ey_insurance_core_modernization"
+    ],
+    "items": [
+      {
+        "item_id": "reb_unify_partner_channel_cosell",
+        "label": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_partner_channel_cosell"
+        ],
+        "skill_ids": [
+          "skill_partner_cloud_vendor_joint_gtm",
+          "skill_partner_partner_led_ai_solutions",
+          "skill_partner_gtm_enablement",
+          "skill_partner_co_selling",
+          "skill_partner_partner_motions"
+        ],
+        "metric_ids": [
+          "metric_unify_partner_cosell_solution_motion_count",
+          "metric_unify_partner_enablement_asset_set"
+        ]
+      },
+      {
+        "item_id": "reb_unify_distributed_ecosystem_engineering",
+        "label": "Distributed cloud and data execution infrastructure",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_distributed_ecosystem_engineering"
+        ],
+        "skill_ids": [
+          "skill_sr_cloud_data_platform_engineering",
+          "skill_dense_sparse_exact_retrieval_design",
+          "skill_runtime_resilience_controls",
+          "skill_sr_w12_databricks_lakehouse_fundamentals",
+          "skill_provider_and_egress_governance"
+        ],
+        "metric_ids": [
+          "metric_unify_cloud_data_runtime_integration_patterns",
+          "metric_unify_high_availability_distributed_service_patterns"
+        ]
+      },
+      {
+        "item_id": "reb_unify_agentic_platform_architecture",
+        "label": "SVP Engineering agentic AI platform control-plane architecture",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_agentic_platform_architecture"
+        ],
+        "skill_ids": [
+          "skill_unify_agentic_runtime_proof_bundle_lineage",
+          "skill_governed_agentic_systems_architecture",
+          "skill_graph_aware_relationship_grounding",
+          "skill_unify_agentic_human_override_escalation_paths",
+          "skill_unify_agentic_tool_sandbox_egress_controls"
+        ],
+        "metric_ids": [
+          "metric_unify_policy_gated_agent_execution_surface",
+          "metric_unify_agentic_runtime_gate_verdict_contract_surface"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "label": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm"
+        ],
+        "skill_ids": [
+          "skill_partner_alliance_gtm_execution",
+          "skill_partner_joint_solution_development",
+          "skill_partner_hyperscaler_cosell",
+          "skill_partner_ibm_aws_alliance_joint_revenue",
+          "skill_sr_w12_hyperscaler_alliance_co_sell"
+        ],
+        "metric_ids": [
+          "metric_ibm_ai_driven_sales_frameworks",
+          "metric_ibm_alliance_cosell_operating_cadence"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_offering_accelerator_management",
+        "label": "Shaped reusable solution accelerators that packaged IBM cloud, data, and AI modernization patterns for repeatable client pursuits",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_offering_accelerator_management"
+        ],
+        "skill_ids": [
+          "skill_p2_tech_ibm_cloud_portfolio_anchor",
+          "skill_sr_w12_industry_reference_architecture",
+          "skill_p2_tech_demoable_accelerator",
+          "skill_p2_tech_reusable_accelerators"
+        ],
+        "metric_ids": [
+          "metric_ibm_offering_accelerator_package_reuse",
+          "metric_ibm_client_facing_modernization_playbooks"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_presales_solution_engineering",
+        "label": "Led technical discovery and solution mapping for enterprise financial-services pursuits",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_presales_solution_engineering"
+        ],
+        "skill_ids": [
+          "skill_p2_gtm_executive_buyer_alignment",
+          "skill_p2_gtm_solution_mapping",
+          "skill_partner_pre_sales",
+          "skill_p2_gtm_discovery_qualification"
+        ],
+        "metric_ids": [
+          "metric_ibm_presales_discovery_to_solution_handoff",
+          "metric_ibm_executive_buyer_architecture_alignment"
+        ]
+      },
+      {
+        "item_id": "reb_insurtech_regulated_aws_control_implementation",
+        "label": "Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 2,
+        "metric_count": 1,
+        "source_fact_ids": [
+          "reb_insurtech_regulated_aws_control_implementation"
+        ],
+        "skill_ids": [
+          "skill_soc2_zero_trust_security",
+          "skill_aws_iam_kms_cloudtrail_controls"
+        ],
+        "metric_ids": [
+          "metric_insurtech_sensitive_data_controls_count"
+        ]
+      },
+      {
+        "item_id": "reb_ey_insurance_core_modernization",
+        "label": "Led insurance core modernization by decomposing legacy policy and claims operations into configurable policy administration, product/rate rule templates, claims workflow requirements, billing/rating/underwriting handoffs, conversion mappings, and BI-ready data outputs; Guidewire was an implementation example, not the claim boundary.",
+        "packet_shape": "facts",
+        "rich": false,
+        "missing_axes": [
+          "metrics"
+        ],
+        "axis_hit_count": 1,
+        "axis_total": 2,
+        "skill_count": 1,
+        "metric_count": 0,
+        "source_fact_ids": [
+          "reb_ey_insurance_core_modernization"
+        ],
+        "skill_ids": [
+          "skill_insurance_core_to_bi_reporting_handoff"
+        ],
+        "metric_ids": []
+      }
+    ],
+    "weakest_link": {
+      "item_id": "reb_ey_insurance_core_modernization",
+      "label": "Led insurance core modernization by decomposing legacy policy and claims operations into configurable policy administration, product/rate rule templates, claims workflow requirements, billing/rating/underwriting handoffs, conversion mappings, and BI-ready data outputs; Guidewire was an implementation example, not the claim boundary.",
+      "packet_shape": "facts",
+      "rich": false,
+      "missing_axes": [
+        "metrics"
+      ],
+      "axis_hit_count": 1,
+      "axis_total": 2,
+      "skill_count": 1,
+      "metric_count": 0,
+      "source_fact_ids": [
+        "reb_ey_insurance_core_modernization"
+      ],
+      "skill_ids": [
+        "skill_insurance_core_to_bi_reporting_handoff"
+      ],
+      "metric_ids": []
+    },
+    "summary": "competencies: 7/8 rich items, 31 unique skills, 13 unique metrics, 88% semantic coverage, 100% axis coverage"
+  },
+  "graph_evidence_depth_report": {
+    "schema": "graph_evidence_depth_report_v1",
+    "section_id": "competencies",
+    "packet_key": "selected_graph_evidence_plan",
+    "packet_shape": "facts",
+    "item_count": 8,
+    "rich_item_count": 8,
+    "unique_skill_count": 31,
+    "unique_detail_count": 16,
+    "detail_occurrence_count": 16,
+    "detail_reuse_count": 0,
+    "detail_reuse_ratio": 0.0,
+    "max_detail_frequency": 1,
+    "repeated_detail_ids": [],
+    "top_detail_frequencies": [
+      {
+        "detail_id": "metric_ey_core_conversion_rule_traceability_count",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ey_core_integration_data_mapping_count",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_ai_driven_sales_frameworks",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_alliance_cosell_operating_cadence",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_client_facing_modernization_playbooks",
+        "count": 1
+      }
+    ],
+    "item_rich_ratio": 1.0,
+    "skill_diversity_ratio": 1.0,
+    "detail_diversity_ratio": 1.0,
+    "semantic_coverage_pct": 1.0,
+    "axis_coverage_pct": 1.0,
+    "minimum_coverage_pct": 0.8,
+    "status": "judge_grade",
+    "thin_item_ids": [],
+    "items": [
+      {
+        "item_id": "reb_unify_partner_channel_cosell",
+        "label": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_partner_channel_cosell"
+        ],
+        "skill_ids": [
+          "skill_partner_cloud_vendor_joint_gtm",
+          "skill_partner_partner_led_ai_solutions",
+          "skill_partner_gtm_enablement",
+          "skill_partner_co_selling",
+          "skill_partner_partner_motions"
+        ],
+        "metric_ids": [
+          "metric_unify_partner_cosell_solution_motion_count",
+          "metric_unify_partner_enablement_asset_set"
+        ]
+      },
+      {
+        "item_id": "reb_unify_distributed_ecosystem_engineering",
+        "label": "Distributed cloud and data execution infrastructure",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_distributed_ecosystem_engineering"
+        ],
+        "skill_ids": [
+          "skill_sr_cloud_data_platform_engineering",
+          "skill_dense_sparse_exact_retrieval_design",
+          "skill_runtime_resilience_controls",
+          "skill_sr_w12_databricks_lakehouse_fundamentals",
+          "skill_provider_and_egress_governance"
+        ],
+        "metric_ids": [
+          "metric_unify_cloud_data_runtime_integration_patterns",
+          "metric_unify_high_availability_distributed_service_patterns"
+        ]
+      },
+      {
+        "item_id": "reb_unify_agentic_platform_architecture",
+        "label": "SVP Engineering agentic AI platform control-plane architecture",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_agentic_platform_architecture"
+        ],
+        "skill_ids": [
+          "skill_unify_agentic_runtime_proof_bundle_lineage",
+          "skill_governed_agentic_systems_architecture",
+          "skill_graph_aware_relationship_grounding",
+          "skill_unify_agentic_human_override_escalation_paths",
+          "skill_unify_agentic_tool_sandbox_egress_controls"
+        ],
+        "metric_ids": [
+          "metric_unify_policy_gated_agent_execution_surface",
+          "metric_unify_agentic_runtime_gate_verdict_contract_surface"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "label": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm"
+        ],
+        "skill_ids": [
+          "skill_partner_alliance_gtm_execution",
+          "skill_partner_joint_solution_development",
+          "skill_partner_hyperscaler_cosell",
+          "skill_partner_ibm_aws_alliance_joint_revenue",
+          "skill_sr_w12_hyperscaler_alliance_co_sell"
+        ],
+        "metric_ids": [
+          "metric_ibm_ai_driven_sales_frameworks",
+          "metric_ibm_alliance_cosell_operating_cadence"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_offering_accelerator_management",
+        "label": "Shaped reusable solution accelerators that packaged IBM cloud, data, and AI modernization patterns for repeatable client pursuits",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_offering_accelerator_management"
+        ],
+        "skill_ids": [
+          "skill_p2_tech_ibm_cloud_portfolio_anchor",
+          "skill_sr_w12_industry_reference_architecture",
+          "skill_p2_tech_demoable_accelerator",
+          "skill_p2_tech_reusable_accelerators"
+        ],
+        "metric_ids": [
+          "metric_ibm_offering_accelerator_package_reuse",
+          "metric_ibm_client_facing_modernization_playbooks"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_presales_solution_engineering",
+        "label": "Led technical discovery and solution mapping for enterprise financial-services pursuits",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_presales_solution_engineering"
+        ],
+        "skill_ids": [
+          "skill_p2_gtm_executive_buyer_alignment",
+          "skill_p2_gtm_solution_mapping",
+          "skill_partner_pre_sales",
+          "skill_p2_gtm_discovery_qualification"
+        ],
+        "metric_ids": [
+          "metric_ibm_presales_discovery_to_solution_handoff",
+          "metric_ibm_executive_buyer_architecture_alignment"
+        ]
+      },
+      {
+        "item_id": "reb_insurtech_regulated_aws_control_implementation",
+        "label": "Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 2,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_insurtech_regulated_aws_control_implementation"
+        ],
+        "skill_ids": [
+          "skill_soc2_zero_trust_security",
+          "skill_aws_iam_kms_cloudtrail_controls"
+        ],
+        "metric_ids": [
+          "metric_insurtech_sensitive_data_controls_count",
+          "metric_insurtech_controls_mapped_count"
+        ]
+      },
+      {
+        "item_id": "reb_ey_insurance_core_modernization",
+        "label": "Led insurance core modernization by decomposing legacy policy and claims operations into configurable policy administration, product/rate rule templates, claims workflow requirements, billing/rating/underwriting handoffs, conversion mappings, and BI-ready data outputs; Guidewire was an implementation example, not the claim boundary.",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 1,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ey_insurance_core_modernization"
+        ],
+        "skill_ids": [
+          "skill_insurance_core_to_bi_reporting_handoff"
+        ],
+        "metric_ids": [
+          "metric_ey_core_conversion_rule_traceability_count",
+          "metric_ey_core_integration_data_mapping_count"
+        ]
+      }
+    ],
+    "weakest_link": {
+      "item_id": "reb_unify_partner_channel_cosell",
+      "label": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+      "packet_shape": "facts",
+      "rich": true,
+      "missing_axes": [],
+      "axis_hit_count": 2,
+      "axis_total": 2,
+      "skill_count": 5,
+      "metric_count": 2,
+      "source_fact_ids": [
+        "reb_unify_partner_channel_cosell"
+      ],
+      "skill_ids": [
+        "skill_partner_cloud_vendor_joint_gtm",
+        "skill_partner_partner_led_ai_solutions",
+        "skill_partner_gtm_enablement",
+        "skill_partner_co_selling",
+        "skill_partner_partner_motions"
+      ],
+      "metric_ids": [
+        "metric_unify_partner_cosell_solution_motion_count",
+        "metric_unify_partner_enablement_asset_set"
+      ]
+    },
+    "summary": "competencies: 8/8 rich items, 31 unique skills, 16 unique metrics, 100% semantic coverage, 100% axis coverage"
+  },
+  "graph_evidence_depth_post_report": {
+    "schema": "graph_evidence_depth_report_v1",
+    "section_id": "competencies",
+    "packet_key": "selected_graph_evidence_plan",
+    "packet_shape": "facts",
+    "item_count": 8,
+    "rich_item_count": 8,
+    "unique_skill_count": 31,
+    "unique_detail_count": 16,
+    "detail_occurrence_count": 16,
+    "detail_reuse_count": 0,
+    "detail_reuse_ratio": 0.0,
+    "max_detail_frequency": 1,
+    "repeated_detail_ids": [],
+    "top_detail_frequencies": [
+      {
+        "detail_id": "metric_ey_core_conversion_rule_traceability_count",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ey_core_integration_data_mapping_count",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_ai_driven_sales_frameworks",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_alliance_cosell_operating_cadence",
+        "count": 1
+      },
+      {
+        "detail_id": "metric_ibm_client_facing_modernization_playbooks",
+        "count": 1
+      }
+    ],
+    "item_rich_ratio": 1.0,
+    "skill_diversity_ratio": 1.0,
+    "detail_diversity_ratio": 1.0,
+    "semantic_coverage_pct": 1.0,
+    "axis_coverage_pct": 1.0,
+    "minimum_coverage_pct": 0.8,
+    "status": "judge_grade",
+    "thin_item_ids": [],
+    "items": [
+      {
+        "item_id": "reb_unify_partner_channel_cosell",
+        "label": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_partner_channel_cosell"
+        ],
+        "skill_ids": [
+          "skill_partner_cloud_vendor_joint_gtm",
+          "skill_partner_partner_led_ai_solutions",
+          "skill_partner_gtm_enablement",
+          "skill_partner_co_selling",
+          "skill_partner_partner_motions"
+        ],
+        "metric_ids": [
+          "metric_unify_partner_cosell_solution_motion_count",
+          "metric_unify_partner_enablement_asset_set"
+        ]
+      },
+      {
+        "item_id": "reb_unify_distributed_ecosystem_engineering",
+        "label": "Distributed cloud and data execution infrastructure",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_distributed_ecosystem_engineering"
+        ],
+        "skill_ids": [
+          "skill_sr_cloud_data_platform_engineering",
+          "skill_dense_sparse_exact_retrieval_design",
+          "skill_runtime_resilience_controls",
+          "skill_sr_w12_databricks_lakehouse_fundamentals",
+          "skill_provider_and_egress_governance"
+        ],
+        "metric_ids": [
+          "metric_unify_cloud_data_runtime_integration_patterns",
+          "metric_unify_high_availability_distributed_service_patterns"
+        ]
+      },
+      {
+        "item_id": "reb_unify_agentic_platform_architecture",
+        "label": "SVP Engineering agentic AI platform control-plane architecture",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_agentic_platform_architecture"
+        ],
+        "skill_ids": [
+          "skill_unify_agentic_runtime_proof_bundle_lineage",
+          "skill_governed_agentic_systems_architecture",
+          "skill_graph_aware_relationship_grounding",
+          "skill_unify_agentic_human_override_escalation_paths",
+          "skill_unify_agentic_tool_sandbox_egress_controls"
+        ],
+        "metric_ids": [
+          "metric_unify_policy_gated_agent_execution_surface",
+          "metric_unify_agentic_runtime_gate_verdict_contract_surface"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "label": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm"
+        ],
+        "skill_ids": [
+          "skill_partner_alliance_gtm_execution",
+          "skill_partner_joint_solution_development",
+          "skill_partner_hyperscaler_cosell",
+          "skill_partner_ibm_aws_alliance_joint_revenue",
+          "skill_sr_w12_hyperscaler_alliance_co_sell"
+        ],
+        "metric_ids": [
+          "metric_ibm_ai_driven_sales_frameworks",
+          "metric_ibm_alliance_cosell_operating_cadence"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_offering_accelerator_management",
+        "label": "Shaped reusable solution accelerators that packaged IBM cloud, data, and AI modernization patterns for repeatable client pursuits",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_offering_accelerator_management"
+        ],
+        "skill_ids": [
+          "skill_p2_tech_ibm_cloud_portfolio_anchor",
+          "skill_sr_w12_industry_reference_architecture",
+          "skill_p2_tech_demoable_accelerator",
+          "skill_p2_tech_reusable_accelerators"
+        ],
+        "metric_ids": [
+          "metric_ibm_offering_accelerator_package_reuse",
+          "metric_ibm_client_facing_modernization_playbooks"
+        ]
+      },
+      {
+        "item_id": "reb_ibm_presales_solution_engineering",
+        "label": "Led technical discovery and solution mapping for enterprise financial-services pursuits",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ibm_presales_solution_engineering"
+        ],
+        "skill_ids": [
+          "skill_p2_gtm_executive_buyer_alignment",
+          "skill_p2_gtm_solution_mapping",
+          "skill_partner_pre_sales",
+          "skill_p2_gtm_discovery_qualification"
+        ],
+        "metric_ids": [
+          "metric_ibm_presales_discovery_to_solution_handoff",
+          "metric_ibm_executive_buyer_architecture_alignment"
+        ]
+      },
+      {
+        "item_id": "reb_insurtech_regulated_aws_control_implementation",
+        "label": "Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 2,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_insurtech_regulated_aws_control_implementation"
+        ],
+        "skill_ids": [
+          "skill_soc2_zero_trust_security",
+          "skill_aws_iam_kms_cloudtrail_controls"
+        ],
+        "metric_ids": [
+          "metric_insurtech_sensitive_data_controls_count",
+          "metric_insurtech_controls_mapped_count"
+        ]
+      },
+      {
+        "item_id": "reb_ey_insurance_core_modernization",
+        "label": "Led insurance core modernization by decomposing legacy policy and claims operations into configurable policy administration, product/rate rule templates, claims workflow requirements, billing/rating/underwriting handoffs, conversion mappings, and BI-ready data outputs; Guidewire was an implementation example, not the claim boundary.",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 1,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_ey_insurance_core_modernization"
+        ],
+        "skill_ids": [
+          "skill_insurance_core_to_bi_reporting_handoff"
+        ],
+        "metric_ids": [
+          "metric_ey_core_conversion_rule_traceability_count",
+          "metric_ey_core_integration_data_mapping_count"
+        ]
+      }
+    ],
+    "weakest_link": {
+      "item_id": "reb_unify_partner_channel_cosell",
+      "label": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+      "packet_shape": "facts",
+      "rich": true,
+      "missing_axes": [],
+      "axis_hit_count": 2,
+      "axis_total": 2,
+      "skill_count": 5,
+      "metric_count": 2,
+      "source_fact_ids": [
+        "reb_unify_partner_channel_cosell"
+      ],
+      "skill_ids": [
+        "skill_partner_cloud_vendor_joint_gtm",
+        "skill_partner_partner_led_ai_solutions",
+        "skill_partner_gtm_enablement",
+        "skill_partner_co_selling",
+        "skill_partner_partner_motions"
+      ],
+      "metric_ids": [
+        "metric_unify_partner_cosell_solution_motion_count",
+        "metric_unify_partner_enablement_asset_set"
+      ]
+    },
+    "summary": "competencies: 8/8 rich items, 31 unique skills, 16 unique metrics, 100% semantic coverage, 100% axis coverage"
+  },
+  "graph_evidence_depth_comparison_report": {
+    "schema": "graph_evidence_depth_comparison_report_v1",
+    "section_id": "competencies",
+    "fix_label": "competencies_metric_floor_v1",
+    "pre_fix_report": {
+      "schema": "graph_evidence_depth_report_v1",
+      "section_id": "competencies",
+      "packet_key": "selected_graph_evidence_plan",
+      "packet_shape": "facts",
+      "status": "insufficient_depth",
+      "summary": "competencies: 7/8 rich items, 31 unique skills, 13 unique metrics, 88% semantic coverage, 100% axis coverage",
+      "item_count": 8,
+      "rich_item_count": 7,
+      "unique_skill_count": 31,
+      "unique_detail_count": 13,
+      "detail_occurrence_count": 13,
+      "detail_reuse_count": 0,
+      "detail_reuse_ratio": 0.0,
+      "item_rich_ratio": 0.875,
+      "skill_diversity_ratio": 1.0,
+      "detail_diversity_ratio": 1.0,
+      "semantic_coverage_pct": 0.875,
+      "axis_coverage_pct": 1.0,
+      "minimum_coverage_pct": 0.8,
+      "thin_item_ids": [
+        "reb_ey_insurance_core_modernization"
+      ],
+      "weakest_link": {
+        "item_id": "reb_ey_insurance_core_modernization",
+        "label": "Led insurance core modernization by decomposing legacy policy and claims operations into configurable policy administration, product/rate rule templates, claims workflow requirements, billing/rating/underwriting handoffs, conversion mappings, and BI-ready data outputs; Guidewire was an implementation example, not the claim boundary.",
+        "packet_shape": "facts",
+        "rich": false,
+        "missing_axes": [
+          "metrics"
+        ],
+        "axis_hit_count": 1,
+        "axis_total": 2,
+        "skill_count": 1,
+        "metric_count": 0,
+        "source_fact_ids": [
+          "reb_ey_insurance_core_modernization"
+        ],
+        "skill_ids": [
+          "skill_insurance_core_to_bi_reporting_handoff"
+        ],
+        "metric_ids": []
+      },
+      "max_detail_frequency": 1,
+      "repeated_detail_ids": [],
+      "top_detail_frequencies": [
+        {
+          "detail_id": "metric_ibm_ai_driven_sales_frameworks",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ibm_alliance_cosell_operating_cadence",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ibm_client_facing_modernization_playbooks",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ibm_executive_buyer_architecture_alignment",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ibm_offering_accelerator_package_reuse",
+          "count": 1
+        }
+      ]
+    },
+    "post_fix_report": {
+      "schema": "graph_evidence_depth_report_v1",
+      "section_id": "competencies",
+      "packet_key": "selected_graph_evidence_plan",
+      "packet_shape": "facts",
+      "status": "judge_grade",
+      "summary": "competencies: 8/8 rich items, 31 unique skills, 16 unique metrics, 100% semantic coverage, 100% axis coverage",
+      "item_count": 8,
+      "rich_item_count": 8,
+      "unique_skill_count": 31,
+      "unique_detail_count": 16,
+      "detail_occurrence_count": 16,
+      "detail_reuse_count": 0,
+      "detail_reuse_ratio": 0.0,
+      "item_rich_ratio": 1.0,
+      "skill_diversity_ratio": 1.0,
+      "detail_diversity_ratio": 1.0,
+      "semantic_coverage_pct": 1.0,
+      "axis_coverage_pct": 1.0,
+      "minimum_coverage_pct": 0.8,
+      "thin_item_ids": [],
+      "weakest_link": {
+        "item_id": "reb_unify_partner_channel_cosell",
+        "label": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+        "packet_shape": "facts",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "metric_count": 2,
+        "source_fact_ids": [
+          "reb_unify_partner_channel_cosell"
+        ],
+        "skill_ids": [
+          "skill_partner_cloud_vendor_joint_gtm",
+          "skill_partner_partner_led_ai_solutions",
+          "skill_partner_gtm_enablement",
+          "skill_partner_co_selling",
+          "skill_partner_partner_motions"
+        ],
+        "metric_ids": [
+          "metric_unify_partner_cosell_solution_motion_count",
+          "metric_unify_partner_enablement_asset_set"
+        ]
+      },
+      "max_detail_frequency": 1,
+      "repeated_detail_ids": [],
+      "top_detail_frequencies": [
+        {
+          "detail_id": "metric_ey_core_conversion_rule_traceability_count",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ey_core_integration_data_mapping_count",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ibm_ai_driven_sales_frameworks",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ibm_alliance_cosell_operating_cadence",
+          "count": 1
+        },
+        {
+          "detail_id": "metric_ibm_client_facing_modernization_playbooks",
+          "count": 1
+        }
+      ]
+    },
+    "delta": {
+      "item_count": 0,
+      "rich_item_count": 1,
+      "thin_item_count": -1,
+      "unique_skill_count": 0,
+      "unique_detail_count": 3,
+      "detail_occurrence_count": 3,
+      "detail_reuse_count": 0,
+      "max_detail_frequency": 0,
+      "item_rich_ratio_pp": 12.5,
+      "semantic_coverage_pp": 12.5,
+      "axis_coverage_pp": 0.0,
+      "detail_reuse_ratio_pp": 0.0
+    },
+    "summary": "competencies: 7/8 rich items -> 8/8 rich items; thin items 1 -> 0; semantic coverage 88% -> 100%; detail reuse 0% -> 0%",
+    "status_transition": "insufficient_depth->judge_grade",
+    "improved": true
+  },
+  "competency_capability_depth_report": {
+    "schema": "graph_evidence_depth_report_v1",
+    "section_id": "competencies",
+    "packet_key": "competency_capability_section_packet",
+    "packet_shape": "bundles",
+    "item_count": 9,
+    "rich_item_count": 9,
+    "unique_skill_count": 28,
+    "unique_detail_count": 9,
+    "detail_occurrence_count": 12,
+    "detail_reuse_count": 3,
+    "detail_reuse_ratio": 0.25,
+    "max_detail_frequency": 2,
+    "repeated_detail_ids": [
+      "fact_engineering_platform_001",
+      "fact_engineering_platform_003",
+      "fact_solutions_002"
+    ],
+    "top_detail_frequencies": [
+      {
+        "detail_id": "fact_engineering_platform_001",
+        "count": 2
+      },
+      {
+        "detail_id": "fact_engineering_platform_003",
+        "count": 2
+      },
+      {
+        "detail_id": "fact_solutions_002",
+        "count": 2
+      },
+      {
+        "detail_id": "fact_engineering_platform_002",
+        "count": 1
+      },
+      {
+        "detail_id": "fact_engineering_platform_004",
+        "count": 1
+      }
+    ],
+    "item_rich_ratio": 1.0,
+    "skill_diversity_ratio": 1.0,
+    "detail_diversity_ratio": 1.0,
+    "semantic_coverage_pct": 1.0,
+    "axis_coverage_pct": 1.0,
+    "minimum_coverage_pct": 0.8,
+    "status": "judge_grade",
+    "thin_item_ids": [],
+    "items": [
+      {
+        "item_id": "ccb_agentic_platforms",
+        "label": "Governed Agentic AI Platform Architecture",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 3,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "skill_ids": [
+          "skill_governed_agentic_systems_architecture",
+          "skill_reusable_agentic_platform_architecture",
+          "skill_agentic_control_plane_design"
+        ]
+      },
+      {
+        "item_id": "ccb_runtime_governance",
+        "label": "AI Runtime Governance & Control Gates",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "skill_ids": [
+          "skill_runtime_gate_mesh_design",
+          "skill_fail_closed_gate_semantics",
+          "skill_x1_x2_x3_exit_control",
+          "skill_policy_bound_runtime_design"
+        ]
+      },
+      {
+        "item_id": "ccb_retrieval_context_engineering",
+        "label": "Retrieval & Context Engineering",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_engineering_platform_003"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_003"
+        ],
+        "skill_ids": [
+          "skill_context_engineering",
+          "skill_dense_sparse_exact_retrieval_design",
+          "skill_graph_aware_relationship_grounding",
+          "skill_prompt_assembly_architecture"
+        ]
+      },
+      {
+        "item_id": "ccb_llmops_reliability",
+        "label": "LLMOps, Evaluation & Reliability",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "linked_fact_count": 2,
+        "source_fact_ids": [
+          "fact_engineering_platform_003",
+          "fact_engineering_platform_004"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_003",
+          "fact_engineering_platform_004"
+        ],
+        "skill_ids": [
+          "skill_audit_grade_observability",
+          "skill_output_quality_and_schema_gates",
+          "skill_fail_closed_gate_semantics",
+          "skill_runtime_resilience_controls"
+        ]
+      },
+      {
+        "item_id": "ccb_distributed_systems_engineering",
+        "label": "Distributed Systems & Cloud Data Engineering",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 3,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_engineering_platform_002"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_002"
+        ],
+        "skill_ids": [
+          "skill_sr_cloud_data_platform_engineering",
+          "skill_sr_microservices_integration_platform",
+          "skill_p2_tech_reference_architecture"
+        ]
+      },
+      {
+        "item_id": "ccb_platform_productization",
+        "label": "Platform Productization & Commercialization",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 3,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_engineering_platform_006"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_006"
+        ],
+        "skill_ids": [
+          "skill_agentic_platform_productization",
+          "skill_reusable_agentic_platform_architecture",
+          "skill_p2_tech_demoable_accelerator"
+        ]
+      },
+      {
+        "item_id": "ccb_partner_applied_ai_architecture",
+        "label": "Partner Applied AI Architecture",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 5,
+        "linked_fact_count": 3,
+        "source_fact_ids": [
+          "fact_partnerships_gtm_001",
+          "fact_solutions_001",
+          "fact_solutions_002"
+        ],
+        "linked_fact_ids": [
+          "fact_partnerships_gtm_001",
+          "fact_solutions_001",
+          "fact_solutions_002"
+        ],
+        "skill_ids": [
+          "skill_partner_joint_solution_development",
+          "skill_sr_w12_joint_ai_solution_development",
+          "skill_sr_w12_industry_reference_architecture",
+          "skill_partner_solution_architecture",
+          "skill_partner_ai_architecture_advisory"
+        ]
+      },
+      {
+        "item_id": "ccb_engineering_leadership",
+        "label": "Engineering Leadership & Operating Model",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 2,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_exec_001"
+        ],
+        "linked_fact_ids": [
+          "fact_exec_001"
+        ],
+        "skill_ids": [
+          "skill_svp_it_strategy_innovation",
+          "skill_commercial_board_level_stakeholder_alignment"
+        ]
+      },
+      {
+        "item_id": "ccb_data_governance_security",
+        "label": "Regulated Data Governance & Lineage Controls",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 2,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_solutions_002"
+        ],
+        "linked_fact_ids": [
+          "fact_solutions_002"
+        ],
+        "skill_ids": [
+          "skill_sr_basel_ccar_lineage_regulatory",
+          "skill_sr_enterprise_portfolio_data_governance"
+        ]
+      }
+    ],
+    "weakest_link": {
+      "item_id": "ccb_agentic_platforms",
+      "label": "Governed Agentic AI Platform Architecture",
+      "packet_shape": "bundles",
+      "rich": true,
+      "missing_axes": [],
+      "axis_hit_count": 2,
+      "axis_total": 2,
+      "skill_count": 3,
+      "linked_fact_count": 1,
+      "source_fact_ids": [
+        "fact_engineering_platform_001"
+      ],
+      "linked_fact_ids": [
+        "fact_engineering_platform_001"
+      ],
+      "skill_ids": [
+        "skill_governed_agentic_systems_architecture",
+        "skill_reusable_agentic_platform_architecture",
+        "skill_agentic_control_plane_design"
+      ]
+    },
+    "summary": "competencies: 9/9 rich items, 28 unique skills, 9 unique linked_facts, 100% semantic coverage, 100% axis coverage"
+  },
+  "x2_active_proof_pool_gate_status": "PASS",
+  "out_of_pool_fact_ids": [],
+  "c0_metrics_ref": "c0_metrics.json",
+  "support_status": "PASS",
+  "support_target_met": true,
+  "canonical_evidence_set_digest": "5b21b4c559b29e5d3ce3832bc730f78c70e2d714b4b9065f336982da8a8e911e",
+  "fec_allowed_fact_ids_digest": "5b21b4c559b29e5d3ce3832bc730f78c70e2d714b4b9065f336982da8a8e911e",
+  "c07_runtime_bound_evidence_digest": "ba528337c2caefbb701d88fa30256ba1aac31ca1950803cc5d01190b9ab84131",
+  "pa_c0_slot_digest": "5b21b4c559b29e5d3ce3832bc730f78c70e2d714b4b9065f336982da8a8e911e",
+  "provider_request_allowed_ids_digest": "5b21b4c559b29e5d3ce3832bc730f78c70e2d714b4b9065f336982da8a8e911e",
+  "claim_ledger_source_fact_ids_digest": "87431fc32fb056062d83e87a1b3cf8cfdec193f53e4eca7335d015fcf884ef7d",
+  "x2_active_pool_digest": "b666897d89be44b476670acdd7064cec4eff42afdcaa57184e0e6d4a3cc8d666",
+  "section_receipt_digest": "",
+  "canonical_evidence_digest_chain_ref": "canonical_evidence_digest_chain.json",
+  "canonical_evidence_invariants_pass": true
+}

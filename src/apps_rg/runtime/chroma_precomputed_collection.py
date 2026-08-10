@@ -12,7 +12,7 @@ from typing import Any
 
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
 
-from agentic_core.config.model_catalog import BGE_M3_EMBEDDING_DIMENSION
+from apps_rg.runtime.core_model_catalog import BGE_M3_EMBEDDING_DIMENSION
 
 FORBID_CHROMA_DEFAULT_EF_ENV = "APPS_RG_FORBID_CHROMA_DEFAULT_EF"
 CHROMA_DISABLE_DEFAULT_EMBEDDING_ENV = "CHROMA_DISABLE_DEFAULT_EMBEDDING"

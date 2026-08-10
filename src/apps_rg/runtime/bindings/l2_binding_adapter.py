@@ -12,8 +12,8 @@ import os
 from dataclasses import dataclass
 from typing import Any
 
-from agentic_core.runtime.contracts.compiled_prompt_artifact import CompiledPromptArtifact
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg.runtime.spine_contracts import CompiledPromptArtifact
+from apps_rg.runtime.spine_contracts import SealedL2Artifact
 from apps_rg.runtime.w3_execution_path_labels import (
     BUCKET_GOVERNED_PA_L2_EXIT,
     PLAN_SLUG,

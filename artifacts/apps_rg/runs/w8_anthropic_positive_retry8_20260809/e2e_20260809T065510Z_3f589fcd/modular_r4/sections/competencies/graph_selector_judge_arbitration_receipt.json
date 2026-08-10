@@ -1,0 +1,196 @@
+{
+  "schema_version": "graph_selector_judge_arbitration_receipt_v1",
+  "producer": "apps_rg.runtime.sections.competencies_lane_execution",
+  "section_id": "competencies",
+  "plan_id": "competencies:9ed090c68e2b22cd",
+  "plan_digest": "9ed090c68e2b22cd7cece857cd36450d94dbd423ff49fa54738c1a0aeea255ab",
+  "selector": {
+    "candidate_conservation_pass": true,
+    "selected_candidate_count": 62,
+    "rejected_candidate_count": 275
+  },
+  "deterministic_graph_gates": [
+    {
+      "gate_id": "x2_competencies_source_fact_concentration_limit",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "dominant_source_fact_id": "reb_unify_partner_channel_cosell",
+        "dominant_source_fact_category_share": 0.25,
+        "dominant_source_fact_category_count": 2,
+        "category_count": 8
+      },
+      "threshold": "dominant source_fact_id category share <= 0.75",
+      "failure_reason": null,
+      "evidence_ref": "x2_competencies_source_fact_concentration_limit",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_competencies_per_category_confidence_nonconstant",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "missing_confidence_category_labels": [],
+        "unique_selector_confidence_values": [
+          0.813,
+          0.821,
+          0.837,
+          0.841,
+          0.847,
+          0.889
+        ],
+        "unique_confidence_values": [
+          0.5579,
+          0.6091,
+          0.6532,
+          0.6685,
+          0.7768,
+          0.7785,
+          0.7909
+        ],
+        "category_count": 8
+      },
+      "threshold": "every category has numeric selector confidence/selection_score and decomposed per-category confidence values are nonconstant",
+      "failure_reason": null,
+      "evidence_ref": "x2_competencies_per_category_confidence_nonconstant",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_competencies_rejected_neighbor_audit_present",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "schema_ok": true,
+        "audit_status": "present",
+        "candidate_label_count": 35,
+        "candidate_variant_count": 36,
+        "selected_count": 8,
+        "rejected_neighbor_count": 28,
+        "graph_candidate_receipt_schema_ok": true,
+        "graph_candidate_conservation_pass": true,
+        "graph_rejected_candidate_count": 275
+      },
+      "threshold": "competencies_rejected_neighbor_audit_v1 with rejected neighbors OR graph_candidate_receipt_v1 with conserved selected/rejected candidates",
+      "failure_reason": null,
+      "evidence_ref": "x2_competencies_rejected_neighbor_audit_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_competencies_graph_traversal_sufficiency",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "target_role_profile": "ai_partnerships_gtm",
+        "candidate_nodes_visited_count": 85,
+        "selected_unique_leaf_skill_count": 30,
+        "selected_unique_metric_count": 16,
+        "selected_source_fact_count": 8,
+        "rejected_sibling_skill_count": 19,
+        "candidate_conservation": {
+          "candidate_count": 337,
+          "terminal_decision_count": 337,
+          "unexplained_candidate_count": 0,
+          "duplicate_candidate_path_ids": [],
+          "count_by_candidate_type": {
+            "leaf_skill": 165,
+            "metric_outcome": 100,
+            "role_episode_root": 35,
+            "source_fact": 37
+          },
+          "selected_by_candidate_type": {
+            "leaf_skill": 30,
+            "metric_outcome": 16,
+            "role_episode_root": 8,
+            "source_fact": 8
+          },
+          "rejected_by_candidate_type": {
+            "leaf_skill": 135,
+            "metric_outcome": 84,
+            "role_episode_root": 27,
+            "source_fact": 29
+          },
+          "role_episode_roots_total": 35,
+          "role_episode_roots_selected": 8,
+          "role_episode_roots_rejected": 27,
+          "role_episode_roots_unexplained": 0,
+          "pass": true
+        },
+        "rejected_eligible_root_count": 27,
+        "frontier_size_by_hop_depth": {
+          "0_role_episode_roots": 35,
+          "1_leaf_skill_candidates": 165,
+          "2_metric_outcome_candidates": 100,
+          "1_source_fact_candidates": 37
+        },
+        "graph_evidence_depth_status": "judge_grade",
+        "missing_role_axes": []
+      },
+      "threshold": ">=16 unique leaf skills, >=4 source facts, >=8 metrics, rejected siblings present, judge_grade depth, and required role axes covered",
+      "failure_reason": null,
+      "evidence_ref": "x2_competencies_graph_traversal_sufficiency",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_competencies_graph_granularity_gates",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "category_count": 8,
+        "min_unique_leaf_skills_per_category": 1,
+        "categories_missing_leaf_skills": [],
+        "min_unique_source_facts_per_category": 1,
+        "categories_missing_source_facts": [],
+        "dominant_source_fact_id": "reb_unify_partner_channel_cosell",
+        "dominant_source_fact_category_share": 0.25,
+        "source_fact_concentration_threshold": 0.75,
+        "target_role_profile": "ai_partnerships_gtm",
+        "required_role_axes": [
+          "co_sell",
+          "gtm_enablement",
+          "hyperscaler_alliance",
+          "joint_solution",
+          "partner_architecture",
+          "partner_motions"
+        ],
+        "missing_role_axes": []
+      },
+      "threshold": "each category has >=1 leaf skill and >=1 source fact, dominant fact reuse <= 0.75, and JD-critical axes covered",
+      "failure_reason": null,
+      "evidence_ref": "x2_competencies_graph_granularity_gates",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_competencies_selected_graph_evidence_depth_sufficient",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "status": "judge_grade",
+        "summary": "competencies: 8/8 rich items, 30 unique skills, 16 unique metrics, 100% semantic coverage, 100% axis coverage",
+        "thin_item_ids": []
+      },
+      "threshold": "selected_graph_evidence_plan must be judge_grade with no thin items",
+      "failure_reason": null,
+      "evidence_ref": "x2_competencies_selected_graph_evidence_depth_sufficient",
+      "pass": true
+    }
+  ],
+  "deterministic_graph_failures": [],
+  "judge_rows": [
+    {
+      "provider_key": "gemini_pro",
+      "provider_status": "MODEL_BACKED_PASS",
+      "evaluator_mode": "MODEL_BACKED",
+      "score": 1.0,
+      "pass": true,
+      "decisive_failure": false
+    },
+    {
+      "provider_key": "openai_chatgpt",
+      "provider_status": "MODEL_BACKED_PASS",
+      "evaluator_mode": "MODEL_BACKED",
+      "score": 0.8400000000000001,
+      "pass": true,
+      "decisive_failure": false
+    }
+  ],
+  "judge_failures": [],
+  "precedence_rule": "deterministic_graph_failure_blocks; judge_failure_reviews; all_clear_allows",
+  "final_disposition": "ALLOW",
+  "x3_code": "X3_ALLOW",
+  "pass": true,
+  "human_readable_explanation": "Selector and judge agreement cannot override deterministic graph proof gaps; any graph authority/traversal/granularity/concentration/confidence failure blocks."
+}

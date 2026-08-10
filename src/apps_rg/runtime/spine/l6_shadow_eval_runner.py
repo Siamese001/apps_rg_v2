@@ -47,6 +47,9 @@ L6_OBSERVABILITY_CLOSURE_RECEIPT_ARTIFACT = "l6_observability_closure_receipt.js
 L6_APPS_EVAL_BINDING_CLOSURE_RECEIPT_ARTIFACT = "l6_apps_eval_binding_closure_receipt.json"
 L5_CERTIFICATION_RECEIPT_ARTIFACT = "l5_certification_receipt.json"
 L5_CERTIFICATION_RECEIPT_SCHEMA = "apps_rg.l5_certification_receipt.v1"
+APP_SECTION_RUNTIME_EXHAUST_ARTIFACT = "apps_rg_section_runtime_exhaust_bundle.json"
+APP_SECTION_EXIT_ARTIFACT = "apps_rg_section_exit_disposition_receipt.json"
+APP_SECTION_ROUTE_ARTIFACT = "apps_rg_section_route_contract.json"
 
 APPS_RG_V40_STAGE_BY_FILE: dict[str, str] = {
     "runtime_exhaust_bundle.json": "EXIT",
@@ -198,6 +201,132 @@ def _validate_l5_certification_receipt(
             checks["unexpired"] = False
     failed = [f"L5_CERTIFICATION_{name.upper()}_INVALID" for name, ok in checks.items() if not ok]
     return not failed, sorted(failed), _repo_rel(repo_root, path), computed_digest
+
+
+def emit_l5_certification_receipt_from_core(
+    *,
+    artifact_dir: Path,
+    repo_root: Path,
+) -> Path:
+    """Project the completed pinned-core L5 receipt onto the sealed lane run."""
+
+    artifact_dir = Path(artifact_dir).resolve()
+    core_path = artifact_dir / "runtime_certification_binding.json"
+    native_exhaust_path = artifact_dir / APP_SECTION_RUNTIME_EXHAUST_ARTIFACT
+    product_path = artifact_dir / "product_certification_receipt.json"
+    if not (core_path.is_file() and native_exhaust_path.is_file() and product_path.is_file()):
+        raise RuntimeError("deferred L6 requires core, lane exhaust, and product certification receipts")
+    core_envelope = _load_json(core_path)
+    core = core_envelope.get("payload")
+    core = dict(core) if isinstance(core, Mapping) else {}
+    native = _load_json(native_exhaust_path)
+    product = _load_json(product_path)
+    recorded_core_digest = str(core_envelope.get("artifact_hash") or "")
+    computed_core_digest = _canonical_digest(core)
+    checks = {
+        "core_digest": bool(core) and recorded_core_digest == computed_core_digest,
+        "core_certified": str(core.get("cert_status") or "").lower() == "certified"
+        and str(core.get("certification_status") or "") == "L5_CERTIFIED",
+        "core_run_id": bool(str(core.get("run_id") or "").strip()),
+        "lane_run_id": bool(str(native.get("run_id") or "").strip()),
+        "product_certified": str(product.get("product_certification") or "")
+        == "ONE_SPINE_SECTION_CERTIFIED"
+        and product.get("required_chain_complete") is True
+        and product.get("proof_eligible") is True,
+        "product_lane_match": str(product.get("run_id") or "")
+        == str(native.get("run_id") or ""),
+    }
+    failed = sorted(name for name, passed in checks.items() if not passed)
+    if failed:
+        raise RuntimeError("invalid deferred L5 certification inputs:" + ",".join(failed))
+    payload: dict[str, Any] = {
+        "schema_version": L5_CERTIFICATION_RECEIPT_SCHEMA,
+        "certification_status": "PASS",
+        "scope": "apps_rg.l6_shadow_eval",
+        "run_id": str(native.get("run_id") or ""),
+        "parent_run_id": str(native.get("parent_run_id") or ""),
+        "child_run_id": str(native.get("child_run_id") or ""),
+        "section_attempt_id": str(native.get("section_attempt_id") or ""),
+        "tenant_id": str(native.get("tenant_id") or ""),
+        "source_core_run_id": str(core.get("run_id") or ""),
+        "source_core_certification_ref": _repo_rel(repo_root, core_path),
+        "source_core_certification_sha256": _sha256_file(core_path),
+        "source_lane_product_certification_ref": _repo_rel(repo_root, product_path),
+        "source_lane_product_certification_sha256": _sha256_file(product_path),
+        "checks": checks,
+    }
+    payload["receipt_digest"] = _canonical_digest(payload)
+    return _write_json(artifact_dir / L5_CERTIFICATION_RECEIPT_ARTIFACT, payload)
+
+
+def _section_source_exhaust(
+    artifact_dir: Path,
+    repo_root: Path,
+    *,
+    section_id: str,
+    session_id: str,
+    tenant_id: str,
+    l5_certification_ref: str,
+) -> dict[str, Any]:
+    """Adapt the dual producer namespace into one lane-scoped v40 exhaust."""
+
+    raw = dict(
+        from_section_artifacts(
+            artifact_dir,
+            repo_root,
+            section_id=section_id,
+            stage_by_file=APPS_RG_V40_STAGE_BY_FILE,
+            provider_lane="apps_rg",
+            session_id=session_id,
+            tenant_id=tenant_id,
+            l5_certification_ref=l5_certification_ref,
+        )
+    )
+    native_path = artifact_dir / APP_SECTION_RUNTIME_EXHAUST_ARTIFACT
+    native = _load_json(native_path) if native_path.is_file() else {}
+    if not native:
+        return raw
+    for key in (
+        "request_id",
+        "run_id",
+        "parent_run_id",
+        "child_run_id",
+        "section_attempt_id",
+        "session_id",
+        "tenant_id",
+        "trace_root",
+        "policy_hash",
+        "blueprint_hash",
+        "replay_key",
+    ):
+        value = str(native.get(key) or "").strip()
+        if value:
+            raw[key] = value
+    x3 = str(native.get("x3_code") or "").strip()
+    if x3:
+        raw["exit_disposition"] = x3
+        outcome = (
+            "normal_success"
+            if "ALLOW" in x3
+            else "safe_abstain"
+            if "ABSTAIN" in x3
+            else "policy_failure"
+            if any(label in x3 for label in ("DENY", "BLOCK", "FAIL"))
+            else "unresolved_unknown"
+        )
+        raw["terminal_class"] = outcome
+        raw["outcome_class"] = outcome
+    raw["completed_at"] = str(native.get("generated_at_utc") or raw.get("completed_at") or "")
+    raw["route_id"] = str(native.get("route_id") or raw.get("route_id") or section_id)
+    raw["l5_certification_ref"] = str(l5_certification_ref or "")
+    raw["source_lineage_manifest_ref"] = _repo_rel(repo_root, native_path)
+    native_exit = artifact_dir / APP_SECTION_EXIT_ARTIFACT
+    native_route = artifact_dir / APP_SECTION_ROUTE_ARTIFACT
+    if native_exit.is_file():
+        raw["exit_disposition_ref"] = _repo_rel(repo_root, native_exit)
+    if native_route.is_file():
+        raw["route_contract_ref"] = _repo_rel(repo_root, native_route)
+    return raw
 
 
 def _gate_pass(value: Any) -> bool:
@@ -392,33 +521,41 @@ def run_l6_v40_shadow_eval_for_section(
     artifact_dir = Path(artifact_dir)
     repo_root = Path(repo_root)
     l5_ref = l5_certification_ref or os.environ.get(APPS_RG_L6_V40_L5_CERTIFICATION_REF_ENV, "")
-    preliminary_exhaust = from_section_artifacts(
+    preliminary_exhaust = _section_source_exhaust(
         artifact_dir,
         repo_root,
         section_id=section_id,
-        stage_by_file=APPS_RG_V40_STAGE_BY_FILE,
-        provider_lane="apps_rg",
         session_id=session_id,
         tenant_id=tenant_id,
         l5_certification_ref=l5_ref,
+    )
+    from apps_model_telemetry.otel_runtime import capture_collector_snapshot
+
+    otel_snapshot = capture_collector_snapshot(
+        artifact_dir=artifact_dir,
+        trace_id=str(
+            preliminary_exhaust.get("trace_root")
+            or preliminary_exhaust.get("trace_id")
+            or ""
+        ),
+        filename="otel_trace_snapshot.json",
+        boundary="l6",
     )
     trace_reconciliation_paths = emit_trace_reconciliation_artifacts(
         artifact_dir=artifact_dir,
         repo_root=repo_root,
         section_id=section_id,
         run_id=str(preliminary_exhaust.get("run_id") or section_id),
+        otel_trace_snapshot=otel_snapshot,
     )
-    raw_exhaust = from_section_artifacts(
+    raw_exhaust = _section_source_exhaust(
         artifact_dir,
         repo_root,
         section_id=section_id,
-        stage_by_file=APPS_RG_V40_STAGE_BY_FILE,
-        provider_lane="apps_rg",
         session_id=session_id,
         tenant_id=tenant_id,
         l5_certification_ref=l5_ref,
     )
-    valid_v40, v40_gaps = validate_v40_shadow_exhaust(raw_exhaust)
     l5_valid, l5_gaps, l5_receipt_ref, l5_receipt_digest = (
         _validate_l5_certification_receipt(
             artifact_dir=artifact_dir,
@@ -427,6 +564,9 @@ def run_l6_v40_shadow_eval_for_section(
             raw_exhaust=raw_exhaust,
         )
     )
+    if l5_valid:
+        raw_exhaust["l5_certification_ref"] = l5_receipt_ref
+    valid_v40, v40_gaps = validate_v40_shadow_exhaust(raw_exhaust)
     if not l5_valid:
         valid_v40 = False
         v40_gaps = sorted({*v40_gaps, *l5_gaps})
@@ -583,6 +723,7 @@ __all__ = [
     "L6_V40_SHADOW_EVAL_SPANS_ARTIFACT",
     "L6_V40_SHADOW_EVAL_SPANS_JSONL_ARTIFACT",
     "emit_l6_apps_eval_binding_closure_receipt",
+    "emit_l5_certification_receipt_from_core",
     "l6_v40_shadow_eval_enabled",
     "maybe_run_l6_v40_shadow_eval_for_section",
     "run_l6_v40_shadow_eval_for_section",

@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 from apps_rg.runtime.claim_ledger.canonical_exec_summary_v2 import (
     build_canonical_claim_ledger_v2_payload,

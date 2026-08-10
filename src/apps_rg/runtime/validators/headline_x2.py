@@ -72,7 +72,7 @@ _EXECUTIVE_ABSTRACTION_RE = re.compile(
     r"(?:\bplatforms?\b|\barchitecture\b|\barchitectures\b|\bgovernance\b|"
     r"\becosystems?\b|\bcommercialization\b|\bregulated\b|\bsystems?\b|"
     r"\badoption\b|\boperating\s+model\b|\bco-?sell\b|\bmotions?\b|"
-    r"\bpartner\b|\benterprise\b|\bruntime\b|\binfrastructure\b|"
+    r"\bpartners?\b|\bpartnerships?\b|\balliances?\b|\benterprise\b|\bruntime\b|\binfrastructure\b|"
     r"\bproductization\b|\bcontrols?\b|\bcloud\s+data\b)",
     re.IGNORECASE,
 )
@@ -161,7 +161,10 @@ _HEADLINE_GENERIC_NOUN_STOPLIST: frozenset[str] = frozenset(
         # carry specific claims on their own. Allowing them as filler prevents the strict
         # grounding rule from forcing PROVIDER_MODEL into awkward compositions.
         "workflows", "pipelines", "harness", "orchestration", "instrumentation",
-        "observability", "reliability", "performance", "optimization", "programs",
+        # ``reliability`` is an evidence-bearing operating property, not role
+        # filler. Retry32 cited the exact root "Runtime reliability, ..." but
+        # the stoplist erased every content token from that segment.
+        "observability", "performance", "optimization", "programs",
         "services", "capabilities", "organizations", "functions", "foundations",
         "frameworks", "rigor", "discipline", "standards", "standardization",
         "practices", "methodology", "methodologies", "approach", "approaches",
@@ -180,11 +183,24 @@ _HEADLINE_GENERIC_NOUN_STOPLIST: frozenset[str] = frozenset(
 
 
 def _tokenize_for_grounding(text: str) -> set[str]:
-    """Lowercase content tokens (>=4 chars), strip punctuation, drop the generic stoplist."""
+    """Lowercase content tokens, drop generics, and normalize simple noun plurals.
+
+    The gate compares short display phrases with prose evidence.  Treating ``pursuit`` and
+    ``pursuits`` as different nouns creates a false negative without adding any grounding
+    protection, so use a deliberately narrow terminal-``s`` normalization.  Avoid words whose
+    singular form is not obtained that way (for example ``analysis`` or ``status``).
+    """
     if not text:
         return set()
     raw = re.findall(r"[A-Za-z][A-Za-z\-]{3,}", text.lower())
-    return {tok for tok in raw if tok not in _HEADLINE_GENERIC_NOUN_STOPLIST}
+    content = {tok for tok in raw if tok not in _HEADLINE_GENERIC_NOUN_STOPLIST}
+    normalized = set(content)
+    normalized.update(
+        tok[:-1]
+        for tok in content
+        if len(tok) > 4 and tok.endswith("s") and not tok.endswith(("ss", "us", "is"))
+    )
+    return normalized
 
 
 _HEADLINE_SEMANTIC_GROUNDING_GROUPS: dict[str, frozenset[str]] = {
@@ -225,16 +241,29 @@ _HEADLINE_SEGMENT_THEME_FAMILIES: dict[str, frozenset[str]] = {
 }
 
 
-def _headline_segment_theme_overlap_issues(segments: list[str]) -> list[str]:
+def headline_segment_theme_overlap_issues(segments: list[str]) -> list[str]:
     """Flag repeated high-signal theme families across X/Y/Z headline segments."""
     issues: list[str] = []
     family_segments: dict[str, list[str]] = {}
+    token_segments: dict[str, list[int]] = {}
     for idx, segment in enumerate(segments, start=2):
         tokens = set(re.findall(r"[A-Za-z][A-Za-z\-]{3,}", str(segment or "").lower()))
+        # Repeating ``runtime`` in two visible pillars is not harmless lexical
+        # reuse: it makes both pillars describe the same operating domain.  The
+        # Retry-14 judges independently rejected exactly that shape while the
+        # old deterministic gate incorrectly passed it.
+        if "runtime" in tokens:
+            token_segments.setdefault("runtime", []).append(idx)
         for family_name, family_tokens in _HEADLINE_SEGMENT_THEME_FAMILIES.items():
             hits = sorted(tokens & family_tokens)
             if len(hits) >= 2:
                 family_segments.setdefault(family_name, []).append(f"seg{idx}:{','.join(hits)}")
+    for token, segment_indexes in sorted(token_segments.items()):
+        if len(segment_indexes) >= 2:
+            issues.append(
+                f"repeated_positioning_token:{token}:"
+                + ",".join(f"seg{index}" for index in segment_indexes)
+            )
     for family_name, rows in sorted(family_segments.items()):
         if len(rows) >= 2:
             issues.append(f"semantic_theme_overlap:{family_name}:{';'.join(rows)}")
@@ -702,6 +731,44 @@ def check_headline_xyz_literal_grounding(
     return overall, observed, failure
 
 
+def evaluate_headline_literal_grounding(
+    *,
+    headline_line: str,
+    parsed_output: dict[str, Any] | None,
+    claim_ledger: list[dict[str, Any]],
+    proof_pool_metadata: dict[str, Any] | None,
+    allowed_fact_ids: set[str],
+) -> tuple[bool, dict[str, Any], str | None]:
+    """Evaluate the exact literal-grounding predicate shared by X2 and repair."""
+
+    bundles = (
+        proof_pool_metadata.get("headline_positioning_bundles")
+        if isinstance(proof_pool_metadata, dict)
+        else None
+    )
+    return check_headline_xyz_literal_grounding(
+        headline_line=headline_line,
+        claim_ledger=claim_ledger,
+        fact_id_to_text=_extract_plan_fact_text_map(parsed_output),
+        positioning_bundles=bundles if isinstance(bundles, list) else None,
+        allowed_fact_ids=allowed_fact_ids,
+    )
+
+
+def headline_executive_abstraction_report(headline_line: str) -> dict[str, Any]:
+    """Return the exact executive-abstraction observation used by X2."""
+
+    parts = [part.strip() for part in str(headline_line or "").split(" | ")]
+    if len(parts) != 4:
+        return {
+            "skipped": True,
+            "reason": "skipped_not_four_segments",
+            "display_tier": "executive_positioning",
+            "segments_missing_executive_abstraction": [],
+        }
+    return _headline_display_policy_report(parts[1:4])
+
+
 def headline_word_count(headline: str) -> int:
     flat = re.sub(r"\|", " ", headline.strip())
     return len([w for w in flat.split() if w.strip()])
@@ -929,7 +996,7 @@ def run_headline_x2_gates(
         uniq_low = [parts[i].lower() for i in (1, 2, 3)]
         if len(set(uniq_low)) < 3:
             seg_issues.append("duplicate_segment_theme")
-        seg_issues.extend(_headline_segment_theme_overlap_issues(parts[1:4]))
+        seg_issues.extend(headline_segment_theme_overlap_issues(parts[1:4]))
     add(
         "x2_headline_segments_quality",
         not seg_issues,
@@ -939,7 +1006,7 @@ def run_headline_x2_gates(
     )
 
     if pipe_ok:
-        display_policy = _headline_display_policy_report(parts[1:4])
+        display_policy = headline_executive_abstraction_report(h)
         standalone_vendor_segments = display_policy["standalone_vendor_architecture_segments"]
         missing_abstraction_segments = display_policy["segments_missing_executive_abstraction"]
         vendor_without_abstraction_segments = display_policy["vendor_terms_without_executive_abstraction"]
@@ -1209,23 +1276,15 @@ def run_headline_x2_gates(
         "x2_headline_source_supported",
         supported,
         sorted(ledger_ids),
-        "bul_* subset",
-        None if supported else "claim_ledger must cite allowed bul_* facts only.",
+        "source_fact_ids subset of active allowed_fact_ids",
+        None if supported else "claim_ledger must cite active allowed_fact_ids only.",
     )
 
-    fact_text_map = _extract_plan_fact_text_map(parsed_output)
-    _positioning_bundles_for_grounding = (
-        proof_pool_metadata.get("headline_positioning_bundles")
-        if isinstance(proof_pool_metadata, dict)
-        else None
-    )
-    grounding_pass, grounding_obs, grounding_fail = check_headline_xyz_literal_grounding(
+    grounding_pass, grounding_obs, grounding_fail = evaluate_headline_literal_grounding(
         headline_line=h,
+        parsed_output=parsed_output,
         claim_ledger=claim_ledger,
-        fact_id_to_text=fact_text_map,
-        positioning_bundles=_positioning_bundles_for_grounding
-        if isinstance(_positioning_bundles_for_grounding, list)
-        else None,
+        proof_pool_metadata=proof_pool_metadata,
         allowed_fact_ids=allowed_fact_ids,
     )
     add(
@@ -1591,6 +1650,9 @@ def run_headline_x2_gates(
 
 __all__ = [
     "check_headline_xyz_literal_grounding",
+    "evaluate_headline_literal_grounding",
+    "headline_executive_abstraction_report",
+    "headline_segment_theme_overlap_issues",
     "headline_runtime_self_check_truth",
     "headline_word_count",
     "polish_claim_text_when_headline_has_no_metrics",

@@ -1,0 +1,66 @@
+{
+  "attempt_count": 1,
+  "attempt_receipt_id": "attempt-738498500ee94d33b3a196fd81358236",
+  "authority_scope": "apps_rg_l2_envelope_adapter_receipts",
+  "canonical_l2_artifact_authority": false,
+  "decisive_reason_code": "E3_SECTION_OUTPUT_OBSERVED",
+  "determinism": {
+    "attempt_seed": "827800b4dd9c20cacd5fd4589cf9614266ec1134c6c22d2d4a202c5bc249f287",
+    "blueprint_hash": "ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+    "input_hash": "79fe25211fa202c3531562582ea06766f30153b253b16a7653581831f40c3a45",
+    "policy_hash": "d8a3e3ea46405ea0bda4210cd8b1b416f8131c4922594169c5ec852f10003679",
+    "prompt_hash": "ea3f73c03662c40c2814846fc0c50e9f0f16743128d1ac7af5cc3f1ed2ddd0d4",
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:eef1bf82cda1d462::v1"
+  },
+  "error_summary": null,
+  "execution_lane": "MODEL",
+  "generated_artifacts": [
+    "provider_request.json",
+    "provider_response.json",
+    "l2_output.json"
+  ],
+  "latency_ms": 0.0,
+  "lineage": {
+    "ancestry_chain": [
+      "R3_SIMPLE_GROUNDED_READ"
+    ],
+    "parent_plan_id": "8020359a-c1bb-43c9-a00a-d947f3a9230d",
+    "parent_route_id": "R3_SIMPLE_GROUNDED_READ",
+    "parent_step_id": "ibm_narrative",
+    "same_run_packet_family": "8020359a-c1bb-43c9-a00a-d947f3a9230d"
+  },
+  "local_check_results": {
+    "artifact_bytes_match": true,
+    "grounded_output": true,
+    "l2_output_file_digest": "ca797384871184207696a74da51ab4d571fd72ebcff5d1e32bcd953c3633c555",
+    "l2_output_ref": "l2_output.json",
+    "model_or_tool_name": "claude-sonnet-5",
+    "provider_lane": "openai",
+    "provider_request_digest": "3c94128b429549d4ea87ca65541997cbc88dc0225e62e015fcc98967721fed72",
+    "provider_request_ref": "provider_request.json",
+    "provider_response_digest": "41e45f0bfefb270f4bf08d611950c3715d85b1bec80d52d9084da69b68c4695b",
+    "provider_response_ref": "provider_response.json",
+    "replay_key_matches": true,
+    "token_usage_observed": true,
+    "tokens_used": 15927
+  },
+  "output_digest": "1a98eea6be122b2a4c689dcc8c3800f0b95d50687bd3d3d305a3474bb6e18d00",
+  "proposed_state_diff": {
+    "payload": {
+      "graph_claim_binding_contract_digest": "d933f2f9e17ca41323d8b0b6786dff028f7f3a523c0c447611e4ec05a3fea010",
+      "graph_claim_bindings": [],
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "resume_graph_allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2"
+    },
+    "section_id": "ibm_narrative",
+    "section_output_ref": "l2_output.json"
+  },
+  "quarantined_payload": null,
+  "result_class": "SUCCESS",
+  "return_code": 0,
+  "sealed_at": 671969.656,
+  "span_id": "section-l2-ibm_narrative",
+  "tokens_used": 15927,
+  "trace_id": "3da2370b-f1ae-4a16-955c-b48ffc256ab3",
+  "validation_packet_id": "section-val-79fe25211fa202c3"
+}

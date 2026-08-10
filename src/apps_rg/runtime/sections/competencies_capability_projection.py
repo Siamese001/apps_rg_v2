@@ -423,15 +423,37 @@ def _backfill_terms_for_category(
             )
 
 
-def _resolve_category_id(raw_label: str, raw_cid: str = "") -> str | None:
+def _resolve_category_id(
+    raw_label: str,
+    raw_cid: str = "",
+    *,
+    competency_bundle_id: str = "",
+) -> str | None:
     from apps_rg.runtime.sections.competencies_v3_contract import approved_category_id_by_label
 
+    # The graph-pool selector validates uniqueness using the selected
+    # competency bundle.  Provider-authored taxonomy IDs are display hints and
+    # can conflict with that accepted identity (for example an Engineering
+    # Leadership bundle mislabeled as ``llmops_reliability``).  Resolve the
+    # selector-authorized bundle first so projection cannot collapse two
+    # distinct accepted bundles into one taxonomy bucket.
+    if competency_bundle_id:
+        from apps_rg.runtime.sections.competency_capability_evidence import (
+            visible_graph_surface_taxonomy_for_bundle,
+        )
+
+        taxonomy_id, _ = visible_graph_surface_taxonomy_for_bundle(competency_bundle_id)
+        if taxonomy_id and label_for_category_id(taxonomy_id):
+            return taxonomy_id
     if raw_cid and label_for_category_id(raw_cid):
         return raw_cid
     resolved = resolve_approved_category_label(raw_label)
     if resolved:
         return approved_category_id_by_label().get(resolved.lower())
-    return approved_category_id_by_label().get(str(raw_label or "").strip().lower())
+    label_match = approved_category_id_by_label().get(str(raw_label or "").strip().lower())
+    if label_match:
+        return label_match
+    return None
 
 
 def _dedupe_terms(terms: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -534,6 +556,7 @@ def apply_executive_capability_projection(
         for row in tax.get("categories") or []
         if isinstance(row, dict) and row.get("category_id")
     }
+    bucket_sources: dict[str, list[dict[str, Any]]] = {key: [] for key in buckets}
 
     for cat in extract_categories(parsed):
         if not isinstance(cat, dict):
@@ -541,6 +564,7 @@ def apply_executive_capability_projection(
         cid = _resolve_category_id(
             str(cat.get("category_label") or ""),
             str(cat.get("category_id") or ""),
+            competency_bundle_id=str(cat.get("competency_bundle_id") or ""),
         )
         if not cid or cid not in buckets:
             changelog.append(
@@ -550,6 +574,7 @@ def apply_executive_capability_projection(
                 }
             )
             continue
+        bucket_sources[cid].append(cat)
         for raw_t in cat.get("terms") or []:
             coerced = _coerce_term_support(
                 raw_t if isinstance(raw_t, dict) else {"term": str(raw_t)},
@@ -587,7 +612,21 @@ def apply_executive_capability_projection(
                     cat_fact_ids.append(fs)
         if not cat_fact_ids and default_fid:
             cat_fact_ids = [default_fid]
+        source_categories = bucket_sources.get(cid) or []
+        source_category = max(
+            source_categories,
+            key=lambda item: float(
+                item.get("selection_score")
+                or item.get("selector_confidence")
+                or item.get("confidence")
+                or 0.0
+            ),
+            default={},
+        )
+        # Projection changes the display wrapper, not graph authority. Preserve
+        # the selected bundle, graph nodes, selector score, and lineage fields.
         new_cat = {
+            **source_category,
             "category_id": cid,
             "category_label": label,
             "terms": terms,

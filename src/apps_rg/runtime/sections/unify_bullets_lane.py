@@ -33,7 +33,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 try:
     from dotenv import load_dotenv
@@ -623,6 +623,59 @@ def _normalize_unify_source_fact_id_list(
     return out
 
 
+def _unify_slot_bound_source_scope(
+    runtime_payload: dict[str, Any],
+    *,
+    legacy_remap: dict[str, str] | None = None,
+) -> dict[str, set[str]]:
+    """Return the exact proof IDs each visible Unify slot may cite.
+
+    Graph roots, skills, and metric nodes are prompt provenance.  The Unify X2
+    contract deliberately limits the authored claim surface to the visible
+    ``bul_unify_*`` slot and its one frozen ``candidate_fact_id``.  Build that
+    boundary from the sealed plan so provider-added graph provenance cannot
+    leak into ``source_fact_ids``.
+    """
+    remap = legacy_remap or {}
+    scopes: dict[str, set[str]] = {}
+    plan = runtime_payload.get("selected_fact_plan") or {}
+    for fact in plan.get("facts") or []:
+        if not isinstance(fact, dict):
+            continue
+        slot_id = str(fact.get("fact_id") or "").strip()
+        if not slot_id.startswith("bul_unify_"):
+            continue
+        visible_id = remap.get(slot_id, slot_id)
+        candidate_id = str(fact.get("candidate_fact_id") or "").strip()
+        scopes[visible_id] = {
+            value for value in (visible_id, candidate_id) if value
+        }
+    return scopes
+
+
+def _clamp_unify_sources_to_slot(
+    source_fact_ids: list[str],
+    *,
+    bullet_id: str,
+    scope_by_slot: dict[str, set[str]],
+) -> tuple[list[str], list[str]]:
+    scope = scope_by_slot.get(bullet_id)
+    if not scope:
+        return list(dict.fromkeys(source_fact_ids)), []
+    kept: list[str] = []
+    dropped: list[str] = []
+    for source_id in source_fact_ids:
+        base_id = str(source_id).split("_metric_", 1)[0]
+        if source_id in scope or base_id == bullet_id:
+            if source_id not in kept:
+                kept.append(source_id)
+        else:
+            dropped.append(source_id)
+    if bullet_id not in kept:
+        kept.insert(0, bullet_id)
+    return kept, list(dict.fromkeys(dropped))
+
+
 def _normalize_unify_claim_ledger(
     parsed: dict[str, Any],
     *,
@@ -659,6 +712,11 @@ _UNIFY_SENIORITY_TENSE_REPAIRS: dict[str, str] = {
     "Establish ": "Established ",
     "Standardize ": "Standardized ",
     "Architect ": "Architected ",
+    # "Compressed" is an evidence-faithful outcome verb, but it is not part
+    # of the shared seniority-floor vocabulary.  "Accelerated" preserves the
+    # six-month-to-three-week claim while giving the deterministic X2 proxy a
+    # canonical executive action verb.
+    "Compressed ": "Accelerated ",
 }
 
 
@@ -727,8 +785,13 @@ def normalize_unify_parsed_without_ledger_synthesis(
         return parsed
     allowed = {str(x) for x in (runtime_payload.get("allowed_fact_ids") or [])}
     legacy_remap = _legacy_unify_to_ledger_id_map(runtime_payload)
+    scope_by_slot = _unify_slot_bound_source_scope(
+        runtime_payload,
+        legacy_remap=legacy_remap,
+    )
     protected_default = legacy_remap.get(PROTECTED_BULLET_DEFAULT, PROTECTED_BULLET_DEFAULT)
     normalized_bullets: list[dict[str, Any]] = []
+    source_scope_repairs: list[dict[str, Any]] = []
     for idx, bullet in enumerate((parsed.get("bullets") or [])[:6]):
         row = dict(bullet)
         bid = str(row.get("bullet_id", "")).strip()
@@ -740,11 +803,24 @@ def normalize_unify_parsed_without_ledger_synthesis(
             row["bullet_id"] = UNIFY_BULLET_IDS[idx]
         if not row.get("source_fact_ids"):
             row["source_fact_ids"] = [row["bullet_id"]]
-        row["source_fact_ids"] = _normalize_unify_source_fact_id_list(
+        normalized_source_ids = _normalize_unify_source_fact_id_list(
             row.get("source_fact_ids"),
             remap=legacy_remap,
             allowed=allowed,
         )
+        row["source_fact_ids"], dropped_source_ids = _clamp_unify_sources_to_slot(
+            normalized_source_ids,
+            bullet_id=row["bullet_id"],
+            scope_by_slot=scope_by_slot,
+        )
+        if dropped_source_ids:
+            source_scope_repairs.append(
+                {
+                    "operation": "normalize_source_fact_ids_to_slot_bound_evidence",
+                    "target_bullet_id": row["bullet_id"],
+                    "dropped_source_fact_ids": dropped_source_ids,
+                }
+            )
         bt = row.get("bullet_text")
         if isinstance(bt, str):
             row["bullet_text"] = _canonicalize_unify_gate_metric_text(bt)
@@ -770,6 +846,8 @@ def normalize_unify_parsed_without_ledger_synthesis(
         out["jd_alignment"] = {"targeting_only": True, "jd_used_as_proof": False}
     out.setdefault("gap_notes", [])
     out.setdefault("change_log", [])
+    if source_scope_repairs and isinstance(out.get("change_log"), list):
+        out["change_log"].extend(source_scope_repairs)
     out.setdefault("self_check", {"normalized_by_lane": True})
     _sync_unify_claim_ledger_to_bullets(out, remap=legacy_remap, allowed=allowed)
     _repair_protected_unify_bullet_metrics(
@@ -860,7 +938,7 @@ def _repair_protected_unify_bullet_metrics(
 
 
 def _repair_unify_bullet_seniority_tense(out: dict[str, Any]) -> bool:
-    """Normalize present-tense executive ownership verbs to resume past tense."""
+    """Normalize evidence-neutral openers to canonical resume seniority verbs."""
     changed = False
     for bullet in out.get("bullets") or []:
         if not isinstance(bullet, dict):
@@ -878,7 +956,7 @@ def _repair_unify_bullet_seniority_tense(out: dict[str, Any]) -> bool:
         changelog.append(
             {
                 "operation": "repair_unify_bullet_seniority_tense",
-                "reason": "normalize_present_tense_ownership_verb_for_resume_seniority_floor",
+                "reason": "normalize_evidence_neutral_opener_for_resume_seniority_floor",
             }
         )
     _sync_unify_claim_ledger_to_bullets(out)
@@ -1196,7 +1274,9 @@ def run_unify_bullets_execution(
     section_model = (
         external_openai_generation_model(section_id=LANE_KEY)
         if str(args.provider) == "external_openai"
-        else resolve_section_generation_model(LANE_KEY)
+        else resolve_section_generation_model(
+            LANE_KEY, provider_profile=str(args.provider)
+        )
     )
     provider_req, provider_payload = build_section_request(
         messages=messages,

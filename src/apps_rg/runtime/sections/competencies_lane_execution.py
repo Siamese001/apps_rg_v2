@@ -341,7 +341,9 @@ def run_competencies_lane_execution(
     section_model = (
         external_openai_generation_model(section_id="competencies")
         if str(args.provider) == "external_openai"
-        else resolve_section_generation_model("competencies")
+        else resolve_section_generation_model(
+            "competencies", provider_profile=str(args.provider)
+        )
     )
     provider_req, provider_payload = build_section_request(
         messages=messages,
@@ -1158,22 +1160,13 @@ def run_competencies_lane_execution(
         artifact_dir=artifact_dir,
         section_id="competencies",
         runtime_payload=runtime_payload,
+        defer_graph_binding_l2_persistence=True,
         x3_result=x3,
         x3_doc_extra={
             "proof_eligible": bool(bundle.get("proof_eligible")),
             "judge_proof_eligible": bundle.get("judge_proof_eligible"),
         },
     )
-    finalize_section_l2_after_output(
-        artifact_dir,
-        "competencies",
-        runtime_payload,
-        section_output_ref="competencies_section_output.json",
-    )
-    finalize_section_runtime_exhaust_before_l6(
-        artifact_dir, "competencies", runtime_payload, repo_root=REPO_ROOT
-    )
-    _mark_phase("x3_and_l2_finalize")
     l2_output["product_quality_status"] = product_quality_status
     l2_output["product_quality_reason"] = product_quality_reason
     attach_lane_proof_bundle_fields(
@@ -1291,7 +1284,25 @@ def run_competencies_lane_execution(
         artifact_dir / "competencies_section_output.json",
         REPO_ROOT,
     )
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        merge_resume_graph_claim_binding_fields,
+    )
+
+    l2_output = merge_resume_graph_claim_binding_fields(
+        l2_output,
+        artifact_dir=artifact_dir,
+    )
     write_json(artifact_dir / "l2_output.json", l2_output)
+    finalize_section_l2_after_output(
+        artifact_dir,
+        "competencies",
+        runtime_payload,
+        section_output_ref="competencies_section_output.json",
+    )
+    finalize_section_runtime_exhaust_before_l6(
+        artifact_dir, "competencies", runtime_payload, repo_root=REPO_ROOT
+    )
+    _mark_phase("x3_and_l2_finalize")
 
     l6_temp = float(args.temperature)
     l6_max = COMPETENCIES_MAX_OUTPUT_TOKENS
@@ -1335,14 +1346,6 @@ def run_competencies_lane_execution(
     if _rca_path.is_file():
         section_agg["l6_shadow_rca_sketch_ref"] = _artifact_repo_rel(_rca_path, REPO_ROOT)
     write_json(artifact_dir / "competencies_section_output.json", section_agg)
-
-    l2_output["l6_shadow_eval_package_ref"] = section_agg["l6_shadow_eval_package_ref"]
-    l2_output["l6_shadow_learning_ref"] = section_agg["l6_shadow_learning_ref"]
-    if section_agg.get("l6_future_run_proposals_ref"):
-        l2_output["l6_future_run_proposals_ref"] = section_agg["l6_future_run_proposals_ref"]
-    if section_agg.get("l6_shadow_rca_sketch_ref"):
-        l2_output["l6_shadow_rca_sketch_ref"] = section_agg["l6_shadow_rca_sketch_ref"]
-    write_json(artifact_dir / "l2_output.json", l2_output)
 
     rl2 = {
         "provider_attempted": args.provider,

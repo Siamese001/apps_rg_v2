@@ -1,0 +1,88 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 2.5,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Duplicate category group 'AI Platform Leadership' appears twice, leaving only 5 distinct categories.",
+      "Partner architecture category relies on generic GTM/sales terms rather than joint AI solution patterns or accelerators.",
+      "Mundane deal-support and customer-success terms lower SVP agentic specificity in platform leadership."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      6
+    ],
+    "remediation_suggestions": [
+      "Eliminate duplicate category group and maintain 6 to 8 unique category labels.",
+      "Add explicit partner mechanism terms such as joint solution patterns or reusable partner accelerators.",
+      "Replace generic deal-support terms with high-leverage SVP agentic architecture mechanisms."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "seniority_executive_relevance": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "generic_gtm_terms"
+        ]
+      },
+      "complementarity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "no_bullet_restatement": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "duplicate_category_group",
+          "fewer_than_6_unique_categories"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "mundane_competency_terms"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "generic_ecosystem_gtm_wording"
+        ]
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_020012_ff1b68b7597e\\x1d_gemini_provider_response_raw_20260809_020437_479.json",
+  "original_model": null,
+  "fallback_model": null
+}

@@ -517,8 +517,64 @@ def _emit_terminal_mandatory_closeout(
             print_stdout=False,
             emit_final_outputs=not final_resume_outputs_pre_emitted,
         )
-    except OSError as exc:
+    except Exception as exc:  # terminal evidence must not replace the upstream outcome
+        from apps_rg.runtime.failure_evidence import (
+            atomic_write_json,
+            capture_failure_otel_evidence,
+            exception_failure_envelope,
+        )
+
         prior_fault = str(payload.get("fault") or "")
+        identity_raw = payload.get("canonical_run_identity") or payload.get("identity") or {}
+        identity = dict(identity_raw) if isinstance(identity_raw, dict) else {}
+        for source, target in (
+            ("request_id", "request_id"),
+            ("trace_root", "trace_root"),
+            ("trace_id", "trace_id"),
+            ("tenant_id", "tenant_id"),
+        ):
+            if payload.get(source) and not identity.get(target):
+                identity[target] = payload[source]
+        closeout_failure = exception_failure_envelope(
+            exc,
+            stage="TERMINAL_MANDATORY_CLOSEOUT",
+            operation="emit_mandatory_run_outputs",
+            source_component="apps_rg.runtime.mandatory_run_outputs",
+            artifact_dir=artifact_dir,
+            integrated_artifact_dir=artifact_dir,
+            identity=identity,
+            run_id=str(payload.get("run_id") or artifact_dir.name),
+            dispatch_invoked=True,
+        )
+        otel = capture_failure_otel_evidence(
+            artifact_dir=artifact_dir,
+            trace_root=str(closeout_failure.get("trace_root") or ""),
+            stage="TERMINAL_MANDATORY_CLOSEOUT",
+            operation="emit_mandatory_run_outputs",
+            filename="terminal_closeout_otel_trace_snapshot.json",
+        )
+        receipt_path = artifact_dir / "terminal_closeout_failure.json"
+        receipt = {
+            "schema_version": "apps_rg.terminal_closeout_failure.v1",
+            "status": "FAILED",
+            "product_authorized": False,
+            "pipeline_complete": False,
+            "upstream_outcome": {
+                "fault": prior_fault,
+                "exit_status": str(payload.get("exit_status") or ""),
+                "execution_status": str(payload.get("execution_status") or ""),
+            },
+            "closeout_failure": closeout_failure,
+            "otel_snapshot_ref": "terminal_closeout_otel_trace_snapshot.json",
+            "otel_capture_status": str(otel.get("status") or ""),
+        }
+        receipt_written = False
+        receipt_write_error = ""
+        try:
+            atomic_write_json(receipt_path, receipt)
+            receipt_written = True
+        except OSError as receipt_exc:
+            receipt_write_error = f"{type(receipt_exc).__name__}:{receipt_exc}"
         payload.update(
             {
                 "exit_status": "error",
@@ -529,6 +585,12 @@ def _emit_terminal_mandatory_closeout(
                 "completion_fault": MANDATORY_OUTPUT_HARD_STOP_GATE_ID,
                 "mandatory_output_upstream_fault": prior_fault,
                 "mandatory_output_emit_error": str(exc),
+                "mandatory_output_emit_error_class": type(exc).__name__,
+                "terminal_closeout_failure_receipt": (
+                    str(receipt_path) if receipt_written else ""
+                ),
+                "terminal_closeout_failure_receipt_write_error": receipt_write_error,
+                "terminal_closeout_otel_capture_status": str(otel.get("status") or ""),
             }
         )
         return payload
@@ -724,6 +786,82 @@ def _activate_product_stage_ledger(
     return ledger
 
 
+def _emit_product_authority_activation_failure(
+    *,
+    artifact_dir: Path,
+    identity: dict[str, Any],
+    exc: BaseException,
+) -> Path:
+    """Persist the exact product-ledger activation failure and its checkpoint."""
+
+    from apps_rg.runtime.failure_evidence import (
+        atomic_write_json,
+        capture_failure_otel_evidence,
+        exception_failure_envelope,
+    )
+
+    root = Path(artifact_dir).resolve()
+    ledger_path = root / "e2e_stage_ledger.json"
+    entries: list[dict[str, Any]] = []
+    ledger_read_error = ""
+    if ledger_path.is_file():
+        try:
+            ledger_payload = json.loads(ledger_path.read_text(encoding="utf-8"))
+            entries_raw = (
+                ledger_payload.get("entries")
+                if isinstance(ledger_payload, dict)
+                else []
+            )
+            entries = [dict(item) for item in entries_raw or () if isinstance(item, dict)]
+        except (OSError, json.JSONDecodeError) as ledger_exc:
+            ledger_read_error = f"{type(ledger_exc).__name__}:{ledger_exc}"
+    last_entry = entries[-1] if entries else {}
+    failure = exception_failure_envelope(
+        exc,
+        stage="PRODUCT_E2E_AUTHORITY_ACTIVATION",
+        operation="activate_product_stage_ledger",
+        source_component="apps_rg.runtime.orchestration.r3r4_whole_run_orchestration",
+        artifact_dir=root,
+        integrated_artifact_dir=root,
+        identity=identity,
+        run_id=str(identity.get("parent_run_id") or root.name),
+        dispatch_invoked=True,
+    )
+    otel = capture_failure_otel_evidence(
+        artifact_dir=root,
+        trace_root=str(identity.get("trace_root") or ""),
+        stage="PRODUCT_E2E_AUTHORITY_ACTIVATION",
+        operation="activate_product_stage_ledger",
+        filename="product_e2e_authority_activation_otel_trace_snapshot.json",
+    )
+    receipt_path = root / "product_e2e_authority_activation_failure.json"
+    atomic_write_json(
+        receipt_path,
+        {
+            "schema_version": "apps_rg.product_e2e_authority_activation_failure.v1",
+            "status": "FAILED",
+            "product_authorized": False,
+            "pipeline_complete": False,
+            "failure": failure,
+            "ledger_checkpoint": {
+                "ledger_ref": ledger_path.name,
+                "ledger_present": ledger_path.is_file(),
+                "ledger_read_error": ledger_read_error,
+                "entry_count": len(entries),
+                "last_stage_id": str(last_entry.get("stage_id") or ""),
+                "last_stage_status": str(last_entry.get("status") or ""),
+                "next_stage_id": str(last_entry.get("next_stage_id") or ""),
+                "preidentity_ledger_present": (
+                    root / "e2e_stage_ledger_preidentity_non_product.json"
+                ).is_file(),
+            },
+            "otel_snapshot_ref": "product_e2e_authority_activation_otel_trace_snapshot.json",
+            "otel_capture_status": str(otel.get("status") or ""),
+        },
+    )
+    return receipt_path
+
+
 def _seal_product_terminal_authority(
     *,
     artifact_dir: Path,
@@ -830,7 +968,7 @@ def _seal_product_terminal_authority(
         artifact_dir=root,
         identity=identity,
         x3_code=_PRODUCT_SUCCESS_X3,
-        x3_receipt_ref="x3_disposition_receipt.json",
+        x3_receipt_ref="apps_rg_whole_run_exit_review_packet.json",
         terminal_state=terminal_state,
         promotion_status=promotion_status,
         promotion_receipt_ref=promotion_ref,
@@ -847,13 +985,209 @@ def _seal_product_terminal_authority(
         raise ProductE2EAuthorityError(
             "pipeline completion receipt did not close the product pipeline"
         )
+    from apps_model_telemetry.otel_runtime import capture_collector_snapshot
+
+    terminal_otel = capture_collector_snapshot(
+        artifact_dir=root,
+        trace_id=str(identity.get("trace_root") or ""),
+        filename="terminal_closeout_otel_trace_snapshot.json",
+        boundary="terminal_closeout",
+    )
     return {
         "terminal_manifest_ref": str(manifest_path),
         "pipeline_completion_receipt_ref": str(completion_path),
         "stage_ledger_seal_ref": str(
             root / "e2e_stage_ledger_seal_receipt.json"
         ),
+        "terminal_closeout_otel_snapshot_ref": str(
+            root / "terminal_closeout_otel_trace_snapshot.json"
+        ),
+        "terminal_closeout_otel_status": str(terminal_otel.get("status") or ""),
     }
+
+
+def _seal_pending_non_product_stage_ledger(
+    *,
+    artifact_dir: Path,
+    product_ledger: Any,
+    identity: dict[str, Any],
+) -> dict[str, str]:
+    """Finish a receipt-derived ledger after its first governed failure."""
+
+    from apps_rg.runtime.e2e_stage_ledger import verify_e2e_stage_ledger
+    from apps_rg.runtime.product_stage_authority import (
+        emit_product_eligibility_authority_receipt,
+        emit_runtime_stage_authority_receipts,
+        emit_terminal_non_product_authority_receipt,
+    )
+
+    root = Path(artifact_dir).resolve()
+    ledger_payload = json.loads(product_ledger.path.read_text(encoding="utf-8"))
+    entries = list(ledger_payload.get("entries") or ())
+    if not entries:
+        raise ProductE2EAuthorityError("cannot terminalize an empty product ledger")
+
+    expected_stage = str(entries[-1].get("next_stage_id") or "")
+    runtime_order = (
+        "APPS_RG_C0",
+        "APPS_RG_PA",
+        "APPS_RG_L2",
+        "X1_REVIEW",
+        "X2_AGGREGATION",
+        "X3_DISPOSITION",
+    )
+    if expected_stage in runtime_order:
+        runtime_authority = emit_runtime_stage_authority_receipts(
+            artifact_dir=root,
+            identity=identity,
+        )
+        start = runtime_order.index(expected_stage)
+        for stage_id in runtime_order[start:]:
+            receipt_ref = runtime_authority[stage_id]
+            entry = product_ledger.record_from_receipt(
+                stage_id=stage_id,
+                receipt_ref=receipt_ref,
+                artifact_refs=_authority_source_refs(receipt_ref),
+                next_stage_id=(
+                    "PRODUCT_ELIGIBILITY"
+                    if stage_id == "X3_DISPOSITION"
+                    else None
+                ),
+            )
+            if entry["status"] in {"FAIL", "BLOCKED"}:
+                break
+        ledger_payload = json.loads(product_ledger.path.read_text(encoding="utf-8"))
+        entries = list(ledger_payload.get("entries") or ())
+        expected_stage = str(entries[-1].get("next_stage_id") or "")
+    elif expected_stage == "PRODUCT_ELIGIBILITY":
+        receipt_ref = emit_product_eligibility_authority_receipt(
+            artifact_dir=root,
+            identity=identity,
+        )
+        product_ledger.record_from_receipt(
+            stage_id="PRODUCT_ELIGIBILITY",
+            receipt_ref=receipt_ref,
+            artifact_refs=_authority_source_refs(receipt_ref),
+        )
+        ledger_payload = json.loads(product_ledger.path.read_text(encoding="utf-8"))
+        entries = list(ledger_payload.get("entries") or ())
+        expected_stage = str(entries[-1].get("next_stage_id") or "")
+
+    if expected_stage != "TERMINAL_NON_PRODUCT":
+        raise ProductE2EAuthorityError(
+            f"product ledger has no decisive failed stage to terminalize: {expected_stage!r}"
+        )
+    decisive = entries[-1]
+    decisive_stage_id = str(decisive.get("stage_id") or "")
+    decisive_receipt_ref = str(decisive.get("authoritative_receipt_ref") or "")
+    stage_graph = ledger_payload.get("stage_graph")
+    stage_ids = (
+        list(stage_graph.get("stage_ids") or [])
+        if isinstance(stage_graph, dict)
+        else []
+    )
+    try:
+        decisive_index = stage_ids.index(decisive_stage_id)
+    except ValueError as exc:
+        raise ProductE2EAuthorityError(
+            f"decisive stage absent from frozen stage graph: {decisive_stage_id}"
+        ) from exc
+    blocked_successors = [
+        str(stage_id)
+        for stage_id in stage_ids[decisive_index + 1 :]
+        if str(stage_id) != "TERMINAL_NON_PRODUCT"
+    ]
+    if not blocked_successors:
+        raise ProductE2EAuthorityError(
+            f"decisive stage has no blocked successors: {decisive_stage_id}"
+        )
+    terminal_receipt = emit_terminal_non_product_authority_receipt(
+        artifact_dir=root,
+        identity=identity,
+        decisive_stage_id=decisive_stage_id,
+        decisive_receipt_ref=decisive_receipt_ref,
+        blocked_successor_stage_ids=blocked_successors,
+    )
+    terminal_entry = product_ledger.record_from_receipt(
+        stage_id="TERMINAL_NON_PRODUCT",
+        receipt_ref=terminal_receipt,
+        artifact_refs=_authority_source_refs(terminal_receipt),
+    )
+    if terminal_entry["status"] != "PASS":
+        raise ProductE2EAuthorityError("non-product terminal authority receipt blocked")
+    seal_path = product_ledger.seal(
+        terminal_state={
+            "product_authorized": False,
+            "pipeline_complete": False,
+            "observability_repair_required": False,
+        }
+    )
+    report = verify_e2e_stage_ledger(product_ledger.path)
+    if not report.valid or not report.complete or not report.sealed:
+        raise ProductE2EAuthorityError(
+            "non-product stage ledger verification failed: " + ";".join(report.errors)
+        )
+    from apps_model_telemetry.otel_runtime import capture_collector_snapshot
+
+    terminal_otel = capture_collector_snapshot(
+        artifact_dir=root,
+        trace_id=str(identity.get("trace_root") or ""),
+        filename="terminal_closeout_otel_trace_snapshot.json",
+        boundary="terminal_closeout",
+    )
+    return {
+        "terminal_non_product_receipt_ref": str(terminal_receipt),
+        "stage_ledger_seal_ref": str(seal_path),
+        "terminal_closeout_otel_snapshot_ref": str(
+            root / "terminal_closeout_otel_trace_snapshot.json"
+        ),
+        "terminal_closeout_otel_status": str(terminal_otel.get("status") or ""),
+    }
+
+
+def _record_closeout_stage_unless_sealed(
+    *,
+    stage_ledger: Any,
+    payload: dict[str, Any],
+) -> bool:
+    """Record legacy CLOSEOUT only while the selected ledger remains mutable.
+
+    Receipt-derived product ledgers close on either TERMINAL_NON_PRODUCT or the
+    product terminal seal.  Both paths deliberately make the ledger immutable
+    before the compatibility CLOSEOUT code below runs.  Presence of the seal is
+    therefore an instruction to verify the ledger, never to append another
+    compatibility entry to it.
+    """
+
+    from apps_rg.runtime.e2e_stage_ledger import E2E_STAGE_LEDGER_SEAL_FILENAME
+
+    if (Path(stage_ledger.path).parent / E2E_STAGE_LEDGER_SEAL_FILENAME).exists():
+        return False
+    record = getattr(stage_ledger, "record", None)
+    if not callable(record):
+        # Product-v2 ledgers are receipt-derived by construction and never
+        # accept caller-asserted compatibility rows.  Their incomplete state
+        # plus the mandatory failure output is the truthful checkpoint when a
+        # terminal authority step fails before the product seal can be issued.
+        return False
+    record(
+        stage_id="CLOSEOUT",
+        status="PASS" if payload.get("pipeline_complete") is True else "FAIL",
+        reason_code=(
+            "MANDATORY_CLOSEOUT_COMPLETE"
+            if payload.get("pipeline_complete") is True
+            else str(payload.get("fault") or "RUN_NOT_AUTHORIZED")
+        ),
+        output_refs={
+            "mandatory_run_output_json": str(
+                payload.get("mandatory_run_output_json") or ""
+            ),
+            "bcg_executive_output_md": str(
+                payload.get("bcg_executive_output_md") or ""
+            ),
+        },
+    )
+    return True
 
 
 def run_whole_run_with_route_governance(
@@ -1455,6 +1789,20 @@ def run_whole_run_with_route_governance(
                 research_ran=research_ran,
             )
         except Exception as exc:  # guardian: product activation is a fail-closed boundary
+            activation_failure_ref = ""
+            activation_failure_emit_error = ""
+            try:
+                activation_failure_ref = str(
+                    _emit_product_authority_activation_failure(
+                        artifact_dir=art,
+                        identity=dict(handoff_identity),
+                        exc=exc,
+                    )
+                )
+            except Exception as evidence_exc:  # preserve the primary activation failure
+                activation_failure_emit_error = (
+                    f"{type(evidence_exc).__name__}:{evidence_exc}"
+                )
             failed = _failure_payload(
                 artifact_dir=art,
                 route=route,
@@ -1468,6 +1816,12 @@ def run_whole_run_with_route_governance(
                     "pipeline_complete": False,
                     "observability_repair_required": False,
                     "e2e_authority_error": f"{type(exc).__name__}:{exc}",
+                    "product_e2e_authority_activation_failure_ref": (
+                        activation_failure_ref
+                    ),
+                    "product_e2e_authority_activation_failure_emit_error": (
+                        activation_failure_emit_error
+                    ),
                 }
             )
             failed.update(
@@ -1673,12 +2027,18 @@ def run_whole_run_with_route_governance(
         except OSError:
             section_status_md = None
 
+    from apps_rg.runtime.whole_run_exit import emit_whole_run_exit_review_packet
+
+    whole_run_exit = emit_whole_run_exit_review_packet(
+        artifact_dir=art,
+        identity=dict(raw_request["canonical_run_identity"]),
+    )
     exec_summary_block = executive_summary_certification_block(art)
     exec_summary_blocked = bool(exec_summary_block.get("blocked"))
     effective_x3 = (
         str(exec_summary_block.get("x3_disposition") or EXECUTIVE_SUMMARY_JUDGE_REVIEW_X3)
         if exec_summary_blocked
-        else result.x3_disposition
+        else str(whole_run_exit.get("x3_disposition") or "X3A_DENY_REROUTE")
     )
     pre_uwg_eligible = (
         result.fault == ""
@@ -1693,6 +2053,7 @@ def run_whole_run_with_route_governance(
     post_x3_completion: dict[str, Any] = {}
     result_fault = result.fault
     product_authority_error = ""
+    non_product_terminal_refs: dict[str, str] = {}
     if product_stage_ledger is not None and pre_uwg_eligible:
         from apps_rg.runtime.product_stage_authority import (
             emit_product_eligibility_authority_receipt,
@@ -1746,6 +2107,20 @@ def run_whole_run_with_route_governance(
             pre_uwg_eligible = False
             product_authority_error = f"{type(exc).__name__}:{exc}"
             result_fault = "PRODUCT_E2E_RECEIPT_AUTHORITY_FAILED"
+    if product_stage_ledger is not None and not pre_uwg_eligible:
+        try:
+            non_product_terminal_refs = _seal_pending_non_product_stage_ledger(
+                artifact_dir=art,
+                product_ledger=product_stage_ledger,
+                identity=dict(raw_request["canonical_run_identity"]),
+            )
+        except Exception as exc:  # guardian: preserve the primary product failure
+            terminal_error = f"{type(exc).__name__}:{exc}"
+            product_authority_error = (
+                f"{product_authority_error};{terminal_error}"
+                if product_authority_error
+                else terminal_error
+            )
     if pre_uwg_eligible and require_fresh_preflight:
         from apps_rg.runtime.post_x3_completion import complete_apps_rg_post_x3
 
@@ -1755,7 +2130,8 @@ def run_whole_run_with_route_governance(
                 "exit_status": "success",
                 "execution_status": "completed",
                 "outcome_authorized": True,
-                "x3_disposition": result.x3_disposition,
+                "x3_disposition": effective_x3,
+                "core_x3_disposition": result.x3_disposition,
                 "completion_disposition": effective_x3,
                 "fault": result.fault,
                 "artifact_dir": str(art),
@@ -1879,7 +2255,7 @@ def run_whole_run_with_route_governance(
             if not _product_x3_authorizes(effective_x3)
             else "PRODUCT_NOT_ELIGIBLE_FOR_UWG"
         )
-    if final_resume_outputs_pre_emitted:
+    if final_resume_outputs_pre_emitted and product_stage_ledger is None:
         apps_eval_completion = (
             post_x3_completion.get("apps_eval")
             if isinstance(post_x3_completion.get("apps_eval"), dict)
@@ -1972,7 +2348,11 @@ def run_whole_run_with_route_governance(
         "product_authorized": product_authorized,
         "pipeline_complete": pipeline_complete,
         "observability_repair_required": observability_repair_required,
-        "x3_disposition": result.x3_disposition,
+        "x3_disposition": effective_x3,
+        "core_x3_disposition": result.x3_disposition,
+        "apps_rg_whole_run_exit_review_packet": (
+            "apps_rg_whole_run_exit_review_packet.json"
+        ),
         "completion_disposition": effective_x3,
         "completion_status": "PASS" if pipeline_complete else "BLOCKED",
         "fault": result_fault,
@@ -2008,6 +2388,7 @@ def run_whole_run_with_route_governance(
             else ""
         ),
     }
+    payload.update(non_product_terminal_refs)
     if research_ran:
         payload["delegated_briefing"] = str(art / sr.FILENAME_DELEGATED_BRIEFING)
         payload["research_bridge_response"] = str(art / sr.FILENAME_RESEARCH_BRIDGE_RESPONSE)
@@ -2018,6 +2399,22 @@ def run_whole_run_with_route_governance(
         payload=payload,
         final_resume_outputs_pre_emitted=final_resume_outputs_pre_emitted,
     )
+    if not immutable_product_authorized:
+        # Failure closeout may materialize a gap-marked FINAL_RESUME_OUTPUT
+        # after the first Exit packet was emitted.  Re-derive the blocked
+        # packet now so its source bindings and diagnosis describe the final
+        # persisted failure state.  A product-authorized packet is immutable
+        # and is never rewritten here.
+        whole_run_exit = emit_whole_run_exit_review_packet(
+            artifact_dir=art,
+            identity=dict(raw_request["canonical_run_identity"]),
+        )
+        if not exec_summary_blocked:
+            effective_x3 = str(
+                whole_run_exit.get("x3_disposition") or "X3A_DENY_REROUTE"
+            )
+        payload["x3_disposition"] = effective_x3
+        payload["completion_disposition"] = effective_x3
     if immutable_product_authorized:
         # Mandatory closeout is post-boundary.  It may make the pipeline
         # incomplete, but it cannot revoke a UWG-closed current-run product.
@@ -2118,26 +2515,13 @@ def run_whole_run_with_route_governance(
                 )
         if product_authority_error:
             payload["product_e2e_authority_error"] = product_authority_error
-    stage_ledger.record(
-        stage_id="CLOSEOUT",
-        status="PASS" if payload.get("pipeline_complete") is True else "FAIL",
-        reason_code=(
-            "MANDATORY_CLOSEOUT_COMPLETE"
-            if payload.get("pipeline_complete") is True
-            else str(payload.get("fault") or "RUN_NOT_AUTHORIZED")
-        ),
-        output_refs={
-            "mandatory_run_output_json": str(
-                payload.get("mandatory_run_output_json") or ""
-            ),
-            "bcg_executive_output_md": str(
-                payload.get("bcg_executive_output_md") or ""
-            ),
-        },
+    active_ledger = product_stage_ledger or stage_ledger
+    _record_closeout_stage_unless_sealed(
+        stage_ledger=active_ledger,
+        payload=payload,
     )
     from apps_rg.runtime.e2e_stage_ledger import verify_e2e_stage_ledger
 
-    active_ledger = product_stage_ledger or stage_ledger
     ledger_report = verify_e2e_stage_ledger(active_ledger.path)
     payload["e2e_stage_ledger"] = str(active_ledger.path)
     payload["e2e_stage_ledger_valid"] = ledger_report.valid

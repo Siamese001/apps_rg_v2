@@ -8,7 +8,7 @@ from typing import Any
 from apps_rg.runtime.judges.executive_summary_x1d import JudgeOutput
 from apps_rg.runtime.judges.policy_backed_section_judges import run_policy_section_judges
 
-JUDGE_RUBRIC_VERSION = "headline_x1d_v4"
+JUDGE_RUBRIC_VERSION = "headline_x1d_v5"
 JUDGE_RUBRIC_REF = "apps_rg/runtime/judges/headline_x1d.py#HEADLINE_GRADE_ONLY_RUBRIC"
 
 HEADLINE_RUBRIC = """
@@ -20,7 +20,7 @@ Score contract:
 - score_scale must be "0_to_1" or "0_to_5" only.
 
 Rubric dimensions:
-1. factual_support: every substantive phrase in X/Y/Z is supported by claim_ledger source_fact_ids from the active proof pool only (bul_*, fact_*, or metric-suffixed IDs in allowed_fact_packet — never JD/briefing/target fields as proof).
+1. factual_support: every substantive phrase in X/Y/Z is supported by claim_ledger source_fact_ids present in allowed_fact_packet. Treat every ID explicitly present there as eligible, including graph-era reb_* role-episode roots and skill_* nodes as well as bul_*, fact_*, and metric-suffixed IDs. Never use an ID prefix as a reason to reject evidence that the packet explicitly allows; JD/briefing/target fields remain targeting-only and never proof.
 2. fixed_prefix_compliance: headline_line starts with "SVP Engineering | " and uses exactly three " | " separators.
 3. base_identity_fidelity: authentic to the base resume headline anchor; not rewritten to chase the JD.
 4. anti_keyword_stuffing: no ATS keyword bags, list-like segments, or semantically redundant variants of the same positioning theme across X/Y/Z.

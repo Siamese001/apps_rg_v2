@@ -68,7 +68,7 @@ def _record() -> HistoricalIntentRecord:
             "base_resume_digest": "resume",
             "final_resume_digest": "",
             "model_profile_hash": "",
-            "x3_disposition": "X3_ALLOW",
+            "x3_disposition": "X3D_ALLOW_FINISH",
             "proof_eligible": True,
             "generated_at_utc": "2026-05-18T00:00:00+00:00",
             "job_family": "",
@@ -106,7 +106,7 @@ def _candidate(tmp_path: Path) -> object:
     run_dir = tmp_path / "run"
     run_dir.mkdir()
     (run_dir / "x3_disposition.json").write_text(
-        json.dumps({"x3_code": "X3_ALLOW", "proof_eligible": True}),
+        json.dumps({"x3_code": "X3D_ALLOW_FINISH", "proof_eligible": True}),
         encoding="utf-8",
     )
     (run_dir / "run_manifest.json").write_text(
@@ -127,7 +127,7 @@ def _candidate(tmp_path: Path) -> object:
         "chunks": [c.to_dict() for c in ch],
         "exit_metadata": {
             "source_run_id": "run_w10",
-            "x3_disposition": "X3_ALLOW",
+            "x3_disposition": "X3D_ALLOW_FINISH",
             **l5_metadata,
         },
     }

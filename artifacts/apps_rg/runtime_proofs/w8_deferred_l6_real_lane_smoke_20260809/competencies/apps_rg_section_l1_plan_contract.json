@@ -1,0 +1,832 @@
+{
+  "contract_type": "L1PlanContract",
+  "contract_version": "apps_rg_spine_front_contracts_v1",
+  "producer_stage": "L1",
+  "consumer_stage": "L0",
+  "request_id": "req-c755a2d0a2464dbf913772e13b647666",
+  "run_id": "c6247910-ae95-43db-8c7a-6158357395f3",
+  "validated_request_ref": "validated_request.json",
+  "parent_contract_ref": "req-c755a2d0a2464dbf913772e13b647666",
+  "payload": {
+    "request_id": "req-c755a2d0a2464dbf913772e13b647666",
+    "run_id": "c6247910-ae95-43db-8c7a-6158357395f3",
+    "app_id": "apps_rg",
+    "trace_id": "08af59eb-1a83-49a6-822b-79ee227e0d01",
+    "task_plan": [
+      "validate_ingress",
+      "load_profiles",
+      "collect_evidence",
+      "generate_resume",
+      "assemble_output",
+      "exit_eval"
+    ],
+    "required_capabilities": [
+      "ingress_validation",
+      "evidence_collection",
+      "model_generation"
+    ],
+    "grounding_required": true,
+    "apps_research_call_required": false,
+    "model_generation_required": true,
+    "write_authority_present": false,
+    "tenant_id": "default",
+    "profile_manifest_digest": "cfb0af389a508046a5198b37f3add2608db70a1c78ca1c306a128ba5ea07d266",
+    "target_level": "",
+    "task_spec": {
+      "capability_requirements": [
+        "needs_strong_narrative",
+        "needs_long_context"
+      ],
+      "generation_mode": "strategic_tailor",
+      "task_class": "resume_generation",
+      "apps_rg_planning_capsule_ref": "sha256:420f9ef35b3c76d11fc578b67d82393c2f78f47906e44fd703c5240c6a19b709",
+      "apps_rg_planning_capsule": {
+        "schema_version": "apps_rg_l1_planning_capsule.v1",
+        "authority_class": "PLANNING_ADVISORY_ONLY",
+        "planning_status": "READY",
+        "request_id": "req-c755a2d0a2464dbf913772e13b647666",
+        "run_id": "c6247910-ae95-43db-8c7a-6158357395f3",
+        "trace_id": "08af59eb-1a83-49a6-822b-79ee227e0d01",
+        "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:686987e96381c87e::v1",
+        "planning_prior_refs": [
+          {
+            "ref": "apps_rg/profiles/rg_planning_profile.yaml",
+            "digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+            "authority_class": "PLANNING_PRIOR_ONLY"
+          }
+        ],
+        "intent_frame": {
+          "task_class": "resume_generation",
+          "generation_mode": "strategic_tailor",
+          "deliverable": "targeted_resume",
+          "target_company": "Anthropic",
+          "target_role": "Manager of Applied AI Architecture, Partnerships",
+          "target_level": "",
+          "assumptions": [
+            "target_level_may_be_inferred_downstream"
+          ],
+          "excluded_authority_claims": [
+            "route_selection",
+            "evidence_retrieval",
+            "prompt_assembly",
+            "model_execution",
+            "tool_execution",
+            "l4_write"
+          ]
+        },
+        "ambiguity_register": {
+          "schema_version": "apps_rg_ambiguity_register_v2",
+          "register_id": "amb-f38bdd45d2182cde",
+          "register_digest": "sha256:f38bdd45d2182cdef2d2dc1fda7e3ad561397679d186c1753fb0f9941c1ef5b2",
+          "generation_mode": "strategic_tailor",
+          "max_severity": "low",
+          "blocks_progress": false,
+          "hitl_hint": "optional",
+          "entries": [
+            {
+              "code": "TARGET_LEVEL_UNSPECIFIED",
+              "field": "target_level",
+              "severity": "low",
+              "blocks_progress": false,
+              "note": "Default downstream level policy may apply"
+            }
+          ]
+        },
+        "completion_criteria": [
+          "all_generated_factual_claims_have_provenance_anchors",
+          "output_satisfies_requested_formats",
+          "role_alignment_meets_threshold",
+          "unsupported_claims_blocked_or_marked_insufficient"
+        ],
+        "work_units": [
+          {
+            "unit_id": "executive_summary",
+            "unit_type": "narrative_section",
+            "criticality": "T3_CRITICAL_SECTION",
+            "support_target": "source_backed_executive_positioning",
+            "variance_class": "generation_variance",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "output_contract_ref": "apps_rg::output_contract::executive_summary",
+            "quality_floor_ref": "apps_rg::quality_floor::T3_CRITICAL_SECTION"
+          },
+          {
+            "unit_id": "headline",
+            "unit_type": "locked_or_low_variance_section",
+            "criticality": "T0_LOCKED_FACT",
+            "support_target": "concise_role_positioning",
+            "variance_class": "deterministic_guard",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "output_contract_ref": "apps_rg::output_contract::headline",
+            "quality_floor_ref": "apps_rg::quality_floor::T0_LOCKED_FACT"
+          },
+          {
+            "unit_id": "competencies",
+            "unit_type": "skills_section",
+            "criticality": "T2_QUALITY_SECTION",
+            "support_target": "jd_anchor_coverage",
+            "variance_class": "anchor_coverage",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "output_contract_ref": "apps_rg::output_contract::competencies",
+            "quality_floor_ref": "apps_rg::quality_floor::T2_QUALITY_SECTION"
+          },
+          {
+            "unit_id": "experience_block",
+            "unit_type": "evidence_heavy_section",
+            "criticality": "T2_QUALITY_SECTION",
+            "support_target": "metric_preserving_experience",
+            "variance_class": "evidence_support",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "output_contract_ref": "apps_rg::output_contract::experience_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T2_QUALITY_SECTION"
+          },
+          {
+            "unit_id": "skills_block",
+            "unit_type": "skills_section",
+            "criticality": "T2_QUALITY_SECTION",
+            "support_target": "jd_keyword_and_truth_alignment",
+            "variance_class": "anchor_coverage",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "output_contract_ref": "apps_rg::output_contract::skills_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T2_QUALITY_SECTION"
+          },
+          {
+            "unit_id": "education_block",
+            "unit_type": "locked_fact_section",
+            "criticality": "T0_LOCKED_FACT",
+            "support_target": "preserve_verbatim_education_facts",
+            "variance_class": "deterministic_guard",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "output_contract_ref": "apps_rg::output_contract::education_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T0_LOCKED_FACT"
+          },
+          {
+            "unit_id": "certifications_block",
+            "unit_type": "locked_fact_section",
+            "criticality": "T0_LOCKED_FACT",
+            "support_target": "preserve_verbatim_certification_facts",
+            "variance_class": "deterministic_guard",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "output_contract_ref": "apps_rg::output_contract::certifications_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T0_LOCKED_FACT"
+          }
+        ],
+        "dependency_sketch": [
+          {
+            "from": "role_analysis",
+            "to": "executive_summary",
+            "relation": "SUPPORTS"
+          },
+          {
+            "from": "source_resume_facts",
+            "to": "executive_summary",
+            "relation": "GROUNDS"
+          },
+          {
+            "from": "role_analysis",
+            "to": "headline",
+            "relation": "SUPPORTS"
+          },
+          {
+            "from": "source_resume_facts",
+            "to": "headline",
+            "relation": "GROUNDS"
+          },
+          {
+            "from": "role_analysis",
+            "to": "competencies",
+            "relation": "SUPPORTS"
+          },
+          {
+            "from": "source_resume_facts",
+            "to": "competencies",
+            "relation": "GROUNDS"
+          },
+          {
+            "from": "role_analysis",
+            "to": "experience_block",
+            "relation": "SUPPORTS"
+          },
+          {
+            "from": "source_resume_facts",
+            "to": "experience_block",
+            "relation": "GROUNDS"
+          },
+          {
+            "from": "role_analysis",
+            "to": "skills_block",
+            "relation": "SUPPORTS"
+          },
+          {
+            "from": "source_resume_facts",
+            "to": "skills_block",
+            "relation": "GROUNDS"
+          },
+          {
+            "from": "role_analysis",
+            "to": "education_block",
+            "relation": "SUPPORTS"
+          },
+          {
+            "from": "source_resume_facts",
+            "to": "education_block",
+            "relation": "GROUNDS"
+          },
+          {
+            "from": "role_analysis",
+            "to": "certifications_block",
+            "relation": "SUPPORTS"
+          },
+          {
+            "from": "source_resume_facts",
+            "to": "certifications_block",
+            "relation": "GROUNDS"
+          }
+        ],
+        "jd_obligation_plan": {
+          "schema_version": "apps_rg.jd_obligation_plan.v1",
+          "authority_class": "L1_TARGETING_ADVISORY_ONLY",
+          "source_binding": {
+            "source_class": "U0_VALIDATED_JD_PAYLOAD",
+            "jd_hash": "686987e96381c87eb6da5dbf4688b83cffb1bfbb46b652717fb0443a5ad30c9f",
+            "inline_text_present": false,
+            "inline_text_digest": ""
+          },
+          "extraction_status": "NO_INLINE_JD_TEXT",
+          "obligations": [],
+          "coverage": {
+            "obligation_count": 0,
+            "critical_count": 0,
+            "critical_mapped_count": 0,
+            "critical_escalated_count": 0,
+            "all_critical_obligations_resolved": true
+          },
+          "validation": {
+            "jd_is_targeting_input_not_candidate_evidence": true,
+            "no_evidence_retrieval": true,
+            "no_claim_generation": true,
+            "no_execution_path_selection": true
+          },
+          "obligation_plan_digest": "sha256:324591b840f18e9e5905f8d5a86a01ff2aeef6a39412fa8db3e1d94855f030c9"
+        },
+        "evidence_plan": [
+          {
+            "unit_id": "executive_summary",
+            "support_target": "source_backed_executive_positioning",
+            "query_intent": "collect_support_for_executive_summary",
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "contradiction_scan_expected": true,
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true
+          },
+          {
+            "unit_id": "headline",
+            "support_target": "concise_role_positioning",
+            "query_intent": "collect_support_for_headline",
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "contradiction_scan_expected": true,
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true
+          },
+          {
+            "unit_id": "competencies",
+            "support_target": "jd_anchor_coverage",
+            "query_intent": "collect_support_for_competencies",
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "contradiction_scan_expected": true,
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true
+          },
+          {
+            "unit_id": "experience_block",
+            "support_target": "metric_preserving_experience",
+            "query_intent": "collect_support_for_experience_block",
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "contradiction_scan_expected": true,
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true
+          },
+          {
+            "unit_id": "skills_block",
+            "support_target": "jd_keyword_and_truth_alignment",
+            "query_intent": "collect_support_for_skills_block",
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "contradiction_scan_expected": true,
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true
+          },
+          {
+            "unit_id": "education_block",
+            "support_target": "preserve_verbatim_education_facts",
+            "query_intent": "collect_support_for_education_block",
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "contradiction_scan_expected": true,
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true
+          },
+          {
+            "unit_id": "certifications_block",
+            "support_target": "preserve_verbatim_certification_facts",
+            "query_intent": "collect_support_for_certifications_block",
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "contradiction_scan_expected": true,
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true
+          }
+        ],
+        "prompt_plan": [
+          {
+            "unit_id": "executive_summary",
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "provenance_slots_required": true,
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "authority_class": "PA_ASSEMBLES_PROMPT"
+          },
+          {
+            "unit_id": "headline",
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "provenance_slots_required": true,
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "authority_class": "PA_ASSEMBLES_PROMPT"
+          },
+          {
+            "unit_id": "competencies",
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "provenance_slots_required": true,
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "authority_class": "PA_ASSEMBLES_PROMPT"
+          },
+          {
+            "unit_id": "experience_block",
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "provenance_slots_required": true,
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "authority_class": "PA_ASSEMBLES_PROMPT"
+          },
+          {
+            "unit_id": "skills_block",
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "provenance_slots_required": true,
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "authority_class": "PA_ASSEMBLES_PROMPT"
+          },
+          {
+            "unit_id": "education_block",
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "provenance_slots_required": true,
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "authority_class": "PA_ASSEMBLES_PROMPT"
+          },
+          {
+            "unit_id": "certifications_block",
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "provenance_slots_required": true,
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "authority_class": "PA_ASSEMBLES_PROMPT"
+          }
+        ],
+        "cognition_plan": [
+          {
+            "unit_id": "executive_summary",
+            "tier": "T3_CRITICAL_SECTION",
+            "variance_class": "generation_variance",
+            "requested_controls": {
+              "temperature": 0.42,
+              "tot_branches": 3.0,
+              "tot_depth": 2.0,
+              "self_consistency_samples": 5.0,
+              "reflexion_loops": 2.0
+            },
+            "self_consistency_intent": 5.0,
+            "reflexion_intent": 2.0,
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION"
+          },
+          {
+            "unit_id": "headline",
+            "tier": "T0_LOCKED_FACT",
+            "variance_class": "deterministic_guard",
+            "requested_controls": {
+              "temperature": 0.15,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0,
+              "self_consistency_samples": 1.0,
+              "reflexion_loops": 0.0
+            },
+            "self_consistency_intent": 1.0,
+            "reflexion_intent": 0.0,
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION"
+          },
+          {
+            "unit_id": "competencies",
+            "tier": "T2_QUALITY_SECTION",
+            "variance_class": "anchor_coverage",
+            "requested_controls": {
+              "temperature": 0.38,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0,
+              "self_consistency_samples": 2.0,
+              "reflexion_loops": 0.0
+            },
+            "self_consistency_intent": 2.0,
+            "reflexion_intent": 0.0,
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION"
+          },
+          {
+            "unit_id": "experience_block",
+            "tier": "T2_QUALITY_SECTION",
+            "variance_class": "evidence_support",
+            "requested_controls": {
+              "temperature": 0.32,
+              "tot_branches": 2.0,
+              "tot_depth": 2.0,
+              "self_consistency_samples": 3.0,
+              "reflexion_loops": 1.0
+            },
+            "self_consistency_intent": 3.0,
+            "reflexion_intent": 1.0,
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION"
+          },
+          {
+            "unit_id": "skills_block",
+            "tier": "T2_QUALITY_SECTION",
+            "variance_class": "anchor_coverage",
+            "requested_controls": {
+              "temperature": 0.38,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0,
+              "self_consistency_samples": 2.0,
+              "reflexion_loops": 0.0
+            },
+            "self_consistency_intent": 2.0,
+            "reflexion_intent": 0.0,
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION"
+          },
+          {
+            "unit_id": "education_block",
+            "tier": "T0_LOCKED_FACT",
+            "variance_class": "deterministic_guard",
+            "requested_controls": {
+              "temperature": 0.15,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0,
+              "self_consistency_samples": 1.0,
+              "reflexion_loops": 0.0
+            },
+            "self_consistency_intent": 1.0,
+            "reflexion_intent": 0.0,
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION"
+          },
+          {
+            "unit_id": "certifications_block",
+            "tier": "T0_LOCKED_FACT",
+            "variance_class": "deterministic_guard",
+            "requested_controls": {
+              "temperature": 0.15,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0,
+              "self_consistency_samples": 1.0,
+              "reflexion_loops": 0.0
+            },
+            "self_consistency_intent": 1.0,
+            "reflexion_intent": 0.0,
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION"
+          }
+        ],
+        "route_feature_hints": {
+          "multi_work_unit": true,
+          "merge_needed": true,
+          "candidate_selection_needed": true,
+          "grounding_needed": true,
+          "authority_class": "ADVISORY_ONLY",
+          "hitl_risk_hint": "low"
+        },
+        "validation": {
+          "no_route_selection": true,
+          "no_evidence_retrieval": true,
+          "no_prompt_assembly": true,
+          "no_model_call": true,
+          "no_tool_call": true,
+          "no_l4_write": true,
+          "profile_ref_digest_bound": true
+        },
+        "capsule_digest": "sha256:420f9ef35b3c76d11fc578b67d82393c2f78f47906e44fd703c5240c6a19b709"
+      },
+      "apps_rg_planning_status": "READY"
+    },
+    "query_spec": {
+      "jd_hash": "686987e96381c87eb6da5dbf4688b83cffb1bfbb46b652717fb0443a5ad30c9f",
+      "jd_targeting_mode": "RUN_SPECIFIC",
+      "resume_hash": "1144031050a890ca47ef7dfd077e59eaeb47b35230853d71923209751d73fdc4",
+      "target": {
+        "company": "Anthropic",
+        "level": "",
+        "role": "Manager of Applied AI Architecture, Partnerships"
+      }
+    },
+    "support_expectation": {
+      "fact_checked_required": true,
+      "min_ats": 70,
+      "min_quality": 0.75,
+      "per_bullet_required": true,
+      "provenance_required": true,
+      "source_quote_required": true,
+      "word_max": 1200,
+      "word_min": 400,
+      "apps_rg_evidence_plan_ref": "sha256:420f9ef35b3c76d11fc578b67d82393c2f78f47906e44fd703c5240c6a19b709"
+    },
+    "output_expectation": {
+      "fact_checked_required": true,
+      "formats": [
+        "json"
+      ],
+      "provenance_required": true,
+      "apps_rg_completion_criteria_ref": "sha256:420f9ef35b3c76d11fc578b67d82393c2f78f47906e44fd703c5240c6a19b709"
+    },
+    "policy_refs": {
+      "agent_spec_ref": "apps_rg/config/specs/agent_spec.resume_generation.v1.0.0.yaml",
+      "hitl_policy_ref": "apps_rg/config/hitl_trigger_policy.yaml",
+      "l0_policy_ref": "apps_rg/config/l0_policy.yaml",
+      "l5_governance_profile_ref": "apps_rg/profiles/rg_l5_governance_profile.yaml",
+      "manifest_digest": "a31e2bd1493543031b997e04e2b5bf13ec6b67358fb82671bfe292362b91c48c",
+      "prompt_registry_ref": "apps_rg/prompt_assembly/templates/registry.v1.yaml",
+      "thresholds_ref": "apps_rg/config/rg_thresholds.yaml"
+    },
+    "multiple_work_units_hint": true,
+    "merge_required_hint": true,
+    "per_unit_quality_selection_hint": true,
+    "candidate_generation_expected_hint": true,
+    "planning_timestamp": "",
+    "schema_version": "W6.0",
+    "otel_span_refs": [],
+    "audit_refs": [
+      "l1_capsule_digest:sha256:420f9ef35b3c76d11fc578b67d82393c2f78f47906e44fd703c5240c6a19b709",
+      "l1_planning_profile_digest:b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+      "l1_validation_receipt:l1val-req-c755-1a29cdc4acf130bf"
+    ],
+    "signature": "",
+    "posture": {
+      "read_only": true,
+      "external_call": false,
+      "write_intent": false,
+      "hitl_required": false,
+      "posture_class": "read_only"
+    },
+    "gate_verdict_refs": [],
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:686987e96381c87e::v1",
+    "snapshot_refs": [],
+    "l5_certification_ref": "l5:apps_rg:u0:fab6db5460ceb94b1dd41df3",
+    "non_authority_assertion": {
+      "no_evidence_retrieval": true,
+      "no_pa_assembly": true,
+      "no_model_call": true,
+      "no_c0_import": true
+    },
+    "planning_prior_refs": [
+      "apps_rg/profiles/rg_planning_profile.yaml"
+    ],
+    "route_hints": {
+      "authority_class": "ADVISORY_ONLY",
+      "execution_shape_hint": "multi_work_unit_managed_candidate",
+      "multi_work_unit_hint": "true",
+      "merge_needed_hint": "true",
+      "candidate_selection_needed_hint": "true",
+      "grounding_needed_hint": "true",
+      "hitl_risk_hint": "low",
+      "hitl_posture": "low"
+    },
+    "work_shape": "full_resume_generation",
+    "task_shape": "strategic_tailor",
+    "route_profile_ref": "apps_rg/config/domain_contract/route_profiles.yaml",
+    "prompt_bom_refs": [
+      "apps_rg/prompt_assembly/templates/registry.v1.yaml"
+    ],
+    "judge_eval_expectation_refs": [],
+    "validation_receipt_id": "l1val-req-c755-1a29cdc4acf130bf",
+    "ambiguity_register": {
+      "schema_version": "apps_rg_ambiguity_register_v2",
+      "register_id": "amb-f38bdd45d2182cde",
+      "register_digest": "sha256:f38bdd45d2182cdef2d2dc1fda7e3ad561397679d186c1753fb0f9941c1ef5b2",
+      "generation_mode": "strategic_tailor",
+      "max_severity": "low",
+      "blocks_progress": false,
+      "hitl_hint": "optional",
+      "entries": [
+        {
+          "code": "TARGET_LEVEL_UNSPECIFIED",
+          "field": "target_level",
+          "severity": "low",
+          "blocks_progress": false,
+          "note": "Default downstream level policy may apply"
+        }
+      ]
+    }
+  }
+}

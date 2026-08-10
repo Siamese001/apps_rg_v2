@@ -139,24 +139,44 @@ def legacy_term_from_v3(term: dict[str, Any]) -> dict[str, Any]:
 
 
 def category_v3_from_legacy(cat: dict[str, Any]) -> dict[str, Any]:
-    label = str(cat.get("category_label") or "").strip()
+    # External providers occasionally return the semantically equivalent
+    # ``category`` key even though the prompt requires ``category_label``.
+    # Canonicalize that bounded alias at the contract edge so selectors never
+    # receive an anonymous ``[] terms=...`` candidate.
+    label = str(
+        cat.get("category_label")
+        or cat.get("display_label")
+        or cat.get("resume_display_label")
+        or cat.get("category")
+        or ""
+    ).strip()
     resolved = resolve_approved_category_label(label) or label
     id_map = approved_category_id_by_label()
     cid = id_map.get(resolved.lower()) or str(cat.get("category_id") or "").strip()
     terms_raw = cat.get("terms") or []
     terms = [v3_term_from_legacy(t) for t in terms_raw if term_phrase(t) or isinstance(t, dict)]
-    return {
-        "category_id": cid or resolved.lower().replace(" ", "_")[:48],
-        "category_label": resolved,
-        "terms": terms,
-        "source_fact_ids": list(cat.get("source_fact_ids") or []),
-    }
+    out = dict(cat)
+    out.pop("category", None)
+    out.pop("display_label", None)
+    out.update(
+        {
+            "category_id": cid or resolved.lower().replace(" ", "_")[:48],
+            "category_label": resolved,
+            "terms": terms,
+            "source_fact_ids": list(cat.get("source_fact_ids") or []),
+        }
+    )
+    return out
 
 
 def legacy_category_from_v3(cat: dict[str, Any]) -> dict[str, Any]:
     label = str(cat.get("category_label") or "").strip()
     terms = [legacy_term_from_v3(t) for t in (cat.get("terms") or []) if isinstance(t, dict)]
+    # This is a compatibility projection, not a lossy schema downgrade.
+    # Preserve graph/bundle authority fields used by the selector and later
+    # claim-binding gates while translating only the term representation.
     out: dict[str, Any] = {
+        **cat,
         "category_label": label,
         "terms": terms,
     }

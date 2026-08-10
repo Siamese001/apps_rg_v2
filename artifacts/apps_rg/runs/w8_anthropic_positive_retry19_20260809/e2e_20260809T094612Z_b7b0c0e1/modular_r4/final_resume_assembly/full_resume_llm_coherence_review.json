@@ -1,0 +1,256 @@
+{
+  "schema": "apps_rg.full_resume_llm_coherence_review.v1",
+  "emitted_at_utc": "2026-08-09T09:57:11.687640+00:00",
+  "judge_roster": [
+    "gemini_pro",
+    "openai_chatgpt"
+  ],
+  "full_resume_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\final_resume_assembly\\final_resume.json",
+  "final_resume_hash": "f9ce801c25b865eb7c72a3c4958de3899ac8cf8f600903cc2768abdf17686c5c",
+  "target_company": "Anthropic",
+  "target_role": "Manager of Applied AI Architecture, Partnerships",
+  "candidate_evidence_packet": {
+    "schema": "apps_rg.full_resume_candidate_evidence_packet.v1",
+    "sha256": "45f12cabae401aedbce73c45416ad9a036a81175bab0bbf29073a6601556c7e2",
+    "section_count": 11,
+    "visible_claim_count": 55,
+    "selected_candidate_fact_count": 31,
+    "graph_claim_binding_count": 18
+  },
+  "criteria_scores": {
+    "mean_normalized_score": 0.84,
+    "model_backed_pass_count": 1.0,
+    "model_backed_total": 2.0
+  },
+  "judge_verdicts": [
+    {
+      "judge_id": "x1d_gemini_pro_full_resume_coherence",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\final_resume_assembly\\coherence_judge_providers\\x1d_gemini_provider_response_raw_20260809_095625_879.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "99bba3aa7a8f121d",
+      "output_hash": "890d242d865ab608",
+      "score": 4.8,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.96,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": null,
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": null,
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": null,
+      "pass": true,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_full_resume_coherence",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_FAIL",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\final_resume_assembly\\coherence_judge_providers\\x1d_openai_provider_response_raw_20260809_095711_685.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "99bba3aa7a8f121d",
+      "output_hash": "db38a5f7f8b31606",
+      "score": 3.6,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.72,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "S1 uses present-tense IBM-AWS leadership although the IBM role ended in 2022.",
+        "S2 redundantly repeats S1's alliance-modernization point.",
+        "S5 is vague and repeats “through,” weakening executive polish.",
+        "S6 is prospective and generic rather than evidence-led.",
+        "Competencies are clustered but over-dense and repeat co-sell, GraphRAG, telemetry, quota, and discovery content.",
+        "FSA appears in Early Career and Certifications, violating strict section ownership."
+      ],
+      "cited_sentence_indexes": [
+        1,
+        2,
+        5,
+        6
+      ],
+      "remediation_suggestions": [
+        "Align alliance claims with the documented role chronology.",
+        "Consolidate repetitive summary statements around current scope and proven outcomes.",
+        "Prune competencies that directly restate summary or experience language.",
+        "Resolve credential duplication through upstream section-governance review."
+      ],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": null,
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": false,
+          "severity": "minor",
+          "codes": [
+            "TEMPORAL_ROLE_TENSE_CONFLICT"
+          ]
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "SUMMARY_REPETITION",
+            "AWKWARD_SYNTAX",
+            "GENERIC_PROSPECTIVE_CLOSE"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": false,
+          "severity": "minor",
+          "codes": [
+            "COMPETENCY_DENSITY",
+            "CROSS_SECTION_REPETITION"
+          ]
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "REDUNDANT_SUMMARY_ARC",
+            "SECTION_OWNERSHIP_VIOLATION"
+          ]
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": null,
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": null,
+      "pass": false
+    }
+  ],
+  "aggregation_method": "quorum_majority_model_backed",
+  "pass_threshold": 0.8,
+  "quorum_required": 2,
+  "model_backed_pass_count": 1,
+  "model_backed_total": 2,
+  "provider_blocked_count": 0,
+  "blockers": [
+    "judge_fail:x1d_openai_chatgpt_full_resume_coherence"
+  ],
+  "warnings": [
+    "judge_dissent:x1d_openai_chatgpt_full_resume_coherence"
+  ],
+  "decisive_reason": "quorum_not_met",
+  "full_resume_coherence_pass": false,
+  "explicit_non_claims": [
+    "Section-level X2 PASS does not imply full_resume_coherence_pass.",
+    "MOCKED or BLOCKED judges do not count toward quorum pass.",
+    "UNKNOWN is not PASS.",
+    "Targeting context is not candidate proof; the candidate evidence packet is."
+  ],
+  "artifact_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\final_resume_assembly\\full_resume_llm_coherence_review.json",
+  "x1d_full_resume_judge_outputs_json": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\final_resume_assembly\\x1d_full_resume_judge_outputs.json",
+  "targeting_context_source": "ingress_raw.json"
+}

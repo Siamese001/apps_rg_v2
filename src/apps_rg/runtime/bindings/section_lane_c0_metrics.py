@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import (
     ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY,
     EvidenceItem,
     FinalEvidenceContract,

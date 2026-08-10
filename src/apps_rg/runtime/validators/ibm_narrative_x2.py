@@ -91,6 +91,57 @@ def _ledger_fact_ids(claim_ledger: list[dict[str, Any]]) -> set[str]:
     return ids
 
 
+def ibm_narrative_mechanism_support_observation(
+    narrative_sentence: str,
+    claim_ledger: list[dict[str, Any]],
+    companion_bullet_texts: str,
+) -> dict[str, Any]:
+    """Return the exact cited-companion mechanism support used by X2 and repair."""
+    from apps_rg.runtime.validators.narrative_quality_x2 import MECHANISM_VOCAB
+
+    if not str(companion_bullet_texts or "").strip():
+        return {
+            "mechanisms": [],
+            "cited_companion_ids": [],
+            "unsupported_mechanisms": [],
+            "support_by_mechanism": {},
+            "checked": False,
+        }
+
+    narrative_tokens = set(
+        re.findall(r"[a-z0-9]+", str(narrative_sentence or "").lower())
+    )
+    mechanism_hits = narrative_tokens.intersection(MECHANISM_VOCAB)
+    companion_by_id: dict[str, set[str]] = {}
+    for line in str(companion_bullet_texts or "").splitlines():
+        match = re.search(r"\b(bul_ibm_\d{3})\b\s*:\s*(.*)", line, re.I)
+        if match:
+            companion_by_id[match.group(1).lower()] = set(
+                re.findall(r"[a-z0-9]+", match.group(2).lower())
+            )
+    cited_ids = {value.lower() for value in _ledger_fact_ids(claim_ledger)}
+    cited_tokens = (
+        set().union(*(companion_by_id.get(value, set()) for value in cited_ids))
+        if cited_ids
+        else set()
+    )
+    support_by_mechanism = {
+        mechanism: sorted(
+            bullet_id
+            for bullet_id, tokens in companion_by_id.items()
+            if mechanism in tokens
+        )
+        for mechanism in sorted(mechanism_hits)
+    }
+    return {
+        "mechanisms": sorted(mechanism_hits),
+        "cited_companion_ids": sorted(cited_ids),
+        "unsupported_mechanisms": sorted(mechanism_hits - cited_tokens),
+        "support_by_mechanism": support_by_mechanism,
+        "checked": True,
+    }
+
+
 def _count_metric_hits(narrative: str) -> int:
     nl = narrative.lower()
     hits = 0
@@ -230,13 +281,97 @@ def check_ibm_narrative_claim_ledger_clause_decomposition(
     return True, detail
 
 
-def ibm_narrative_material_fact_ids_for_sentence(narrative_sentence: str) -> frozenset[str]:
-    nl = narrative_sentence.lower().strip()
+def ibm_narrative_material_fact_ids_for_sentence(
+    narrative_sentence: str,
+    companion_bullet_texts: str | None = None,
+) -> frozenset[str]:
+    nl = re.sub(r"[-_/]+", " ", narrative_sentence.lower().strip())
     ids: set[str] = set()
+    companion_rows: dict[str, str] = {}
+    for line in str(companion_bullet_texts or "").splitlines():
+        match = re.search(r"\b(bul_ibm_\d{3})\b\s*:\s*(.*)", line, re.I)
+        if match:
+            companion_rows[match.group(1).lower()] = re.sub(
+                r"[-_/]+", " ", match.group(2).lower()
+            )
     for fid, phrases in IBM_NARRATIVE_THEME_TRIGGERS:
-        if any(p in nl for p in phrases):
-            ids.add(fid)
+        for phrase in phrases:
+            normalized_phrase = re.sub(r"[-_/]+", " ", phrase.lower())
+            if normalized_phrase not in nl:
+                continue
+            if not companion_rows:
+                ids.add(fid)
+                break
+            # Theme phrases are synonyms within one family. A current bullet
+            # that says "alliance" supports a narrative that says
+            # "partnership" even when it does not repeat that exact token.
+            # Exact-phrase-only matching produced an impossible
+            # unsupported_companion_theme marker after the IBM allocation
+            # moved alliance execution from the legacy static slot.
+            normalized_family_phrases = {normalized_phrase}
+            if fid == "bul_ibm_005" and normalized_phrase in {
+                "partnership",
+                "alliance",
+            }:
+                normalized_family_phrases = {"partnership", "alliance"}
+            matching_companion_ids = {
+                bullet_id
+                for bullet_id, bullet_text in companion_rows.items()
+                if any(
+                    family_phrase in bullet_text
+                    for family_phrase in normalized_family_phrases
+                )
+            }
+            if matching_companion_ids:
+                # One visible theme needs one supporting finalized bullet, not
+                # every bullet that happens to repeat the same generic phrase.
+                # Prefer the theme's canonical slot when it still contains the
+                # phrase; otherwise choose the first current companion match.
+                # Expanding to all matches made a single phrase such as
+                # "financial services" consume three unrelated graph roots.
+                ids.add(
+                    fid.lower()
+                    if fid.lower() in matching_companion_ids
+                    else sorted(matching_companion_ids)[0]
+                )
+            else:
+                ids.add("unsupported_companion_theme:" + normalized_phrase.replace(" ", "_"))
     return frozenset(ids)
+
+
+def ibm_narrative_mechanism_fact_ids_for_sentence(
+    narrative_sentence: str,
+    companion_bullet_texts: str | None,
+) -> frozenset[str]:
+    """Resolve each visible mechanism to one current finalized bullet.
+
+    Ledger decomposition and the mechanism gate must use the same companion
+    evidence. Repeated generic mechanisms need one deterministic support root;
+    unsupported mechanisms intentionally return no id and remain X2 failures.
+    """
+    if not companion_bullet_texts:
+        return frozenset()
+    from apps_rg.runtime.validators.narrative_quality_x2 import MECHANISM_VOCAB
+
+    narrative_tokens = set(re.findall(r"[a-z0-9]+", str(narrative_sentence).lower()))
+    mechanisms = sorted(narrative_tokens.intersection(MECHANISM_VOCAB))
+    companion_by_id: dict[str, set[str]] = {}
+    for line in str(companion_bullet_texts).splitlines():
+        match = re.search(r"\b(bul_ibm_\d{3})\b\s*:\s*(.*)", line, re.I)
+        if match:
+            companion_by_id[match.group(1).lower()] = set(
+                re.findall(r"[a-z0-9]+", match.group(2).lower())
+            )
+    support_ids: set[str] = set()
+    for mechanism in mechanisms:
+        matching = sorted(
+            bullet_id
+            for bullet_id, tokens in companion_by_id.items()
+            if mechanism in tokens
+        )
+        if matching:
+            support_ids.add(matching[0])
+    return frozenset(support_ids)
 
 
 IBM_RESUME_JARGON_BANNED_PHRASES: tuple[str, ...] = (
@@ -580,7 +715,10 @@ def run_ibm_narrative_x2_gates(
         else f"Weak/consulting-stacked phrasing not allowed in sentence: {jargon_hits}",
     )
 
-    theme_required = ibm_narrative_material_fact_ids_for_sentence(narrative_sentence)
+    theme_required = ibm_narrative_material_fact_ids_for_sentence(
+        narrative_sentence,
+        companion_bullet_texts,
+    )
     if proof_source in ("srfs", "broad_skills_ledger"):
         theme_ok = (not theme_required) or bool(
             ledger_ids and all(is_id_in_active_proof_pool(s, allow_runtime_set) for s in ledger_ids)
@@ -614,6 +752,28 @@ def run_ibm_narrative_x2_gates(
         "ledger_covers_all_detected_themes",
         theme_fail,
     )
+
+    if companion_bullet_texts:
+        mechanism_observation = ibm_narrative_mechanism_support_observation(
+            narrative_sentence,
+            claim_ledger,
+            companion_bullet_texts,
+        )
+        unsupported_mechanisms = list(
+            mechanism_observation["unsupported_mechanisms"]
+        )
+        add(
+            "x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets",
+            not unsupported_mechanisms,
+            mechanism_observation,
+            "every visible mechanism occurs in a cited finalized companion bullet",
+            (
+                None
+                if not unsupported_mechanisms
+                else "Narrative mechanism is absent from cited finalized IBM bullets: "
+                + ", ".join(unsupported_mechanisms)
+            ),
+        )
 
     clause_ok, clause_detail = check_ibm_narrative_claim_ledger_clause_decomposition(
         narrative_sentence, claim_ledger
@@ -1008,4 +1168,6 @@ __all__ = [
     "count_ibm_narrative_metric_hits",
     "companion_ibm_bullets_have_full_metric_bundle",
     "ibm_narrative_material_fact_ids_for_sentence",
+    "ibm_narrative_mechanism_fact_ids_for_sentence",
+    "ibm_narrative_mechanism_support_observation",
 ]

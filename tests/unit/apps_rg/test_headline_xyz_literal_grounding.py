@@ -106,6 +106,32 @@ def test_grounded_headline_passes_when_each_segment_shares_specific_nouns() -> N
     assert all(seg["ground_pass"] for seg in observed["segments"])
 
 
+def test_literal_grounding_normalizes_simple_noun_plural_inflection() -> None:
+    headline = (
+        "SVP Engineering | Enterprise Pursuit Leadership | "
+        "Runtime Governance Rollback | Partner Portfolio Expansion"
+    )
+    claim_ledger = [
+        {"claim_text": "Enterprise Pursuit Leadership", "source_fact_ids": ["fact_pursuits"]},
+        {"claim_text": "Runtime Governance Rollback", "source_fact_ids": ["fact_runtime"]},
+        {"claim_text": "Partner Portfolio Expansion", "source_fact_ids": ["fact_partner"]},
+    ]
+    facts = {
+        "fact_pursuits": "Owned quota-aligned solution leadership across enterprise pursuits",
+        "fact_runtime": "Runtime reliability, governance, telemetry, evaluation, rollback",
+        "fact_partner": "Led partner portfolio expansion",
+    }
+
+    ok, observed, failure = check_headline_xyz_literal_grounding(
+        headline_line=headline,
+        claim_ledger=claim_ledger,
+        fact_id_to_text=facts,
+    )
+
+    assert ok is True, failure
+    assert "pursuit" in observed["segments"][0]["grounded_tokens"]
+
+
 def test_partial_grounding_fails_when_one_segment_is_pure_generic() -> None:
     """Two grounded + one generic still fails (closes the loophole)."""
     headline = (
@@ -308,3 +334,39 @@ def test_recite_does_not_touch_non_canonical_segments() -> None:
     )
     assert receipt["any_changed"] is False
     assert repaired == ledger
+
+
+def test_retry32_runtime_reliability_is_an_evidence_bearing_grounding_token() -> None:
+    headline = (
+        "SVP Engineering | Runtime Reliability Leadership | "
+        "Enterprise Solution Leadership | Alliance Co-Sell Motions"
+    )
+    facts = {
+        "reb_unify_runtime_reliability_governance": (
+            "Runtime reliability, governance, telemetry, evaluation, rollback"
+        ),
+        "reb_ibm_revenue_sales_target_execution": (
+            "Owned quota-aligned solution leadership across enterprise pursuits and "
+            "client portfolio expansion motions"
+        ),
+        "reb_ibm_aws_alliance_partner_cosell_gtm": (
+            "Led IBM-AWS alliance co-sell motions for financial-services modernization "
+            "opportunities"
+        ),
+    }
+    ledger = [
+        {"claim_text": "Runtime Reliability Leadership", "source_fact_ids": ["reb_unify_runtime_reliability_governance"]},
+        {"claim_text": "Enterprise Solution Leadership", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]},
+        {"claim_text": "Alliance Co-Sell Motions", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]},
+    ]
+
+    ok, observed, failure = check_headline_xyz_literal_grounding(
+        headline_line=headline,
+        claim_ledger=ledger,
+        fact_id_to_text=facts,
+        allowed_fact_ids=set(facts),
+    )
+
+    assert ok is True, failure
+    runtime = observed["segments"][0]
+    assert "reliability" in runtime["grounded_tokens"]

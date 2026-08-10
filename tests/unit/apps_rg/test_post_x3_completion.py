@@ -69,7 +69,10 @@ def _row() -> dict[str, object]:
 def _seed_product(tmp_path: Path) -> None:
     _write_json(
         tmp_path / "outputs" / "generated_resume.json",
-        {"schema_version": "master_resume_v2.16", "sections": {"summary": {"text": "ok"}}},
+        {
+            "schema_version": "master_resume_v2.16",
+            "sections": {"summary": {"text": "ok"}},
+        },
     )
     (tmp_path / "outputs" / "resume.docx").write_bytes(b"DOCX")
     _write_json(
@@ -103,10 +106,26 @@ def _seed_product(tmp_path: Path) -> None:
             }
         },
     )
-    _write_json(tmp_path / "runtime_identity_envelope.json", {"payload": {"run_id": "run-1"}})
-    _write_json(tmp_path / "r4_run_manifest.json", {"run_id": "run-1", "request_id": "req-1"})
-    _write_json(tmp_path / "exit_review_packet.json", {"payload": {"x3_disposition": "X3D"}})
-    _write_json(tmp_path / "x3_disposition_receipt.json", {"payload": {"x3_disposition": "X3D"}})
+    _write_json(
+        tmp_path / "runtime_identity_envelope.json", {"payload": {"run_id": "run-1"}}
+    )
+    _write_json(
+        tmp_path / "r4_run_manifest.json", {"run_id": "run-1", "request_id": "req-1"}
+    )
+    _write_json(
+        tmp_path / "exit_review_packet.json", {"payload": {"x3_disposition": "X3D"}}
+    )
+    _write_json(
+        tmp_path / "x3_disposition_receipt.json", {"payload": {"x3_disposition": "X3D"}}
+    )
+    _write_json(
+        tmp_path / "apps_rg_whole_run_exit_review_packet.json",
+        {
+            "schema_version": "apps_rg.whole_run_exit_review_packet.v1",
+            "status": "PASS",
+            "x3_disposition": "X3D_ALLOW_FINISH",
+        },
+    )
 
 
 def _seed_section_l6(tmp_path: Path) -> None:
@@ -161,7 +180,9 @@ def _seed_section_l6(tmp_path: Path) -> None:
     }
     digests = {
         "l6_microstep_observations": "sha256:"
-        + hashlib.sha256((lane_run / "l6_microstep_observations.jsonl").read_bytes()).hexdigest(),
+        + hashlib.sha256(
+            (lane_run / "l6_microstep_observations.jsonl").read_bytes()
+        ).hexdigest(),
         "l6_v40_shadow_eval_package": "sha256:"
         + hashlib.sha256(package_path.read_bytes()).hexdigest(),
     }
@@ -177,9 +198,14 @@ def _seed_section_l6(tmp_path: Path) -> None:
         "checks": checks,
         "artifact_digests": digests,
     }
-    closure_digest = "sha256:" + hashlib.sha256(
-        json.dumps(closure_seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    ).hexdigest()
+    closure_digest = (
+        "sha256:"
+        + hashlib.sha256(
+            json.dumps(closure_seed, sort_keys=True, separators=(",", ":")).encode(
+                "utf-8"
+            )
+        ).hexdigest()
+    )
     _write_json(
         lane_run / "l6_observability_closure_receipt.json",
         {
@@ -217,7 +243,9 @@ def _eval_record(tmp_path: Path, *, coverage_complete: bool = True) -> SimpleNam
         },
     )
     scorecard_rows.parent.mkdir(parents=True, exist_ok=True)
-    scorecard_rows.write_text(json.dumps(_row(), sort_keys=True) + "\n", encoding="utf-8")
+    scorecard_rows.write_text(
+        json.dumps(_row(), sort_keys=True) + "\n", encoding="utf-8"
+    )
     return SimpleNamespace(
         record_id="eval-1",
         snapshot_digest=_SNAPSHOT_DIGEST,
@@ -242,10 +270,12 @@ def _eval_record(tmp_path: Path, *, coverage_complete: bool = True) -> SimpleNam
     )
 
 
-def _install_fakes(tmp_path: Path, monkeypatch, events: list[str], *, coverage_complete: bool) -> None:
+def _install_fakes(
+    tmp_path: Path, monkeypatch, events: list[str], *, coverage_complete: bool
+) -> None:
     monkeypatch.setattr(
         subject,
-        "evaluate_apps_rg_full_success_eligibility",
+        "evaluate_apps_rg_product_authority_eligibility",
         lambda **kwargs: (True, []),
     )
     monkeypatch.setattr(
@@ -322,12 +352,16 @@ def test_uwg_closes_before_apps_eval_and_l6(tmp_path: Path, monkeypatch) -> None
     assert result["durable_promotion_committed"] is True
     assert result["authority_order"]["uwg_closed_before_l6"] is True
     assert result["authority_order"]["l6_influenced_current_uwg_decision"] is False
-    assert result["l6_shadow"]["alignment_source"] == "independent_persisted_observations"
+    assert (
+        result["l6_shadow"]["alignment_source"] == "independent_persisted_observations"
+    )
     assert result["l6_shadow"]["apps_eval_rows_bound"] is True
     assert result["l6_shadow"]["evidence_class"] == "APPS_EVAL_BOUND_PROOF"
     assert result["l6_shadow"]["grain_parity_status"] == "PASS"
     assert (tmp_path / subject.POST_X3_AUTHORITY_ORDER_RECEIPT).is_file()
-    assert (tmp_path / result["l6_shadow"]["l6_section_apps_eval_bindings_ref"]).is_file()
+    assert (
+        tmp_path / result["l6_shadow"]["l6_section_apps_eval_bindings_ref"]
+    ).is_file()
 
 
 def test_post_boundary_eval_failure_does_not_veto_current_uwg(
@@ -357,7 +391,9 @@ def test_post_boundary_eval_failure_does_not_veto_current_uwg(
     assert result["observability_repair_required"] is True
     assert result["failure_stage"] == "apps_eval_post_boundary"
     assert result["durable_promotion_committed"] is True
-    assert result["authority_order"]["apps_eval_influenced_current_uwg_decision"] is False
+    assert (
+        result["authority_order"]["apps_eval_influenced_current_uwg_decision"] is False
+    )
     assert result["l6_shadow"]["current_run_mutated"] is False
 
 
@@ -412,7 +448,9 @@ def test_legacy_package_is_advisory_not_bound_proof(tmp_path: Path) -> None:
         eval_record=eval_record,
     )
     payload = json.loads(
-        (tmp_path / result["l6_section_apps_eval_bindings_ref"]).read_text(encoding="utf-8")
+        (tmp_path / result["l6_section_apps_eval_bindings_ref"]).read_text(
+            encoding="utf-8"
+        )
     )
     headline = payload["bindings"][0]
     assert headline["binding_status"] == "LEGACY_PACKAGE_ADVISORY"
@@ -427,7 +465,11 @@ def test_latest_pointer_cannot_supply_certification_package(tmp_path: Path) -> N
         {"schema_version": "apps_rg.l6_v40_shadow_eval.v2"},
     )
     _write_json(
-        tmp_path / "modular_r4" / "sections" / "headline" / "latest_successful_real_run.json",
+        tmp_path
+        / "modular_r4"
+        / "sections"
+        / "headline"
+        / "latest_successful_real_run.json",
         {"run_dir": stale.as_posix()},
     )
     result = subject._emit_l6_section_apps_eval_bindings(
@@ -435,7 +477,9 @@ def test_latest_pointer_cannot_supply_certification_package(tmp_path: Path) -> N
         eval_record=_eval_record(tmp_path),
     )
     payload = json.loads(
-        (tmp_path / result["l6_section_apps_eval_bindings_ref"]).read_text(encoding="utf-8")
+        (tmp_path / result["l6_section_apps_eval_bindings_ref"]).read_text(
+            encoding="utf-8"
+        )
     )
     assert payload["bindings"][0]["binding_status"] == "MISSING_PACKAGE"
     assert payload["summary"]["apps_eval_rows_bound"] is False
@@ -451,8 +495,12 @@ def test_closure_byte_tamper_fails_binding(tmp_path: Path) -> None:
         eval_record=_eval_record(tmp_path),
     )
     payload = json.loads(
-        (tmp_path / result["l6_section_apps_eval_bindings_ref"]).read_text(encoding="utf-8")
+        (tmp_path / result["l6_section_apps_eval_bindings_ref"]).read_text(
+            encoding="utf-8"
+        )
     )
     binding = payload["bindings"][0]
     assert binding["binding_status"] == "PARITY_FAIL"
-    assert any("closure_artifact_digest_mismatch" in gap for gap in binding["proof_gaps"])
+    assert any(
+        "closure_artifact_digest_mismatch" in gap for gap in binding["proof_gaps"]
+    )

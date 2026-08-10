@@ -1,0 +1,101 @@
+{
+  "generation_mode": "model_competencies_graph_pool_adaptive_6_8_regen",
+  "section_lane": "competencies",
+  "initial_path_count": 4,
+  "total_paths_executed": 8,
+  "regen_rounds_executed": 1,
+  "adaptive_sc_enabled": true,
+  "max_path_count": 8,
+  "stop_reason": "selection_gate_passed",
+  "min_selection_score": 0.72,
+  "high_signal_selection_score": 0.84,
+  "selection_gate": {
+    "ok": true,
+    "section_lane": "competencies",
+    "final_category_count": 6,
+    "min_category_count": 6,
+    "max_category_count": 8,
+    "min_score_threshold": 0.72,
+    "categories_passing": [
+      "adoption readiness & value evaluation",
+      "alliance co-sell commercialization",
+      "partner ai solution evaluation & enablement",
+      "release reliability & delivery engineering",
+      "reusable partner solution architecture",
+      "technical team leadership & coaching"
+    ],
+    "categories_below_threshold": [],
+    "categories_missing": [],
+    "categories_in_merged": 6
+  },
+  "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass",
+  "source_path_by_slot": {
+    "partner ai solution evaluation & enablement": 3,
+    "adoption readiness & value evaluation": 3,
+    "technical team leadership & coaching": 3,
+    "alliance co-sell commercialization": 5,
+    "release reliability & delivery engineering": 3,
+    "reusable partner solution architecture": 5
+  },
+  "claude_selection_count": 8,
+  "candidate_category_count": 8,
+  "min_category_count": 6,
+  "max_category_count": 8,
+  "final_category_count": 6,
+  "phase_timings": [
+    {
+      "phase": "self_consistency_generation_round_0",
+      "started_at": "2026-08-08T20:45:03.615860+00:00",
+      "duration_s": 91.64,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 8
+    },
+    {
+      "phase": "selector_round_0",
+      "started_at": "2026-08-08T20:46:35.263187+00:00",
+      "duration_s": 8.0,
+      "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass"
+    },
+    {
+      "phase": "self_consistency_generation_round_1",
+      "started_at": "2026-08-08T20:46:43.260374+00:00",
+      "duration_s": 91.032,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 4
+    },
+    {
+      "phase": "selector_round_1",
+      "started_at": "2026-08-08T20:48:14.292029+00:00",
+      "duration_s": 8.609,
+      "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass"
+    }
+  ],
+  "e2e_closeout_mode": false,
+  "max_regen_rounds_allowed": 2,
+  "competencies_rejected_neighbor_audit": {
+    "schema_version": "competencies_rejected_neighbor_audit_v1",
+    "audit_status": "present",
+    "candidate_label_count": 14,
+    "candidate_variant_count": 14,
+    "selected_count": 6,
+    "rejected_neighbor_count": 8
+  },
+  "selector_empty": true,
+  "selector_selection_mode": "competencies_advisory_selector_adaptive_6_8_pass",
+  "selector_bullets_in_merged": 0,
+  "selector_selection_count": 8,
+  "selector_subthreshold_scores": [
+    0.88,
+    0.87,
+    0.85,
+    0.83,
+    0.82,
+    0.8,
+    0.76,
+    0.74
+  ],
+  "selector_block_reason": "selector_returned_no_candidates_above_threshold",
+  "competencies_rejected_neighbor_audit_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204352Z_9c505daf\\modular_r4\\sections\\competencies\\competencies_rejected_neighbor_audit.json"
+}

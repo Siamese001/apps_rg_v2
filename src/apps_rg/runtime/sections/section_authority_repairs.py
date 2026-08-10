@@ -425,6 +425,25 @@ def repair_exec_summary_thin_sentence_weave(parsed: dict[str, Any]) -> list[dict
 
 
 _MECHANISM_INVENTORY_REWRITES: tuple[tuple[re.Pattern[str], str], ...] = (
+    # Live W8 patch run: retain all three supported control themes while
+    # collapsing implementation-label prose into outcome-oriented language.
+    (
+        re.compile(
+            r"\broute\s+policy\s+dispatch,\s+replay\s+key\s+(?:(?:audit|controls)\s+)?manifest\s+lineage,\s+and\s+human\s+override\s+escalation\s+paths\b",
+            re.IGNORECASE,
+        ),
+        "governed routing, auditable runtime lineage, and human escalation paths",
+    ),
+    # Retry32: compress a three-item control inventory into the supported
+    # release-governance theme.  This removes the prose defect without adding
+    # evidence or changing the sentence's source bindings.
+    (
+        re.compile(
+            r"\bsecurity\s+gates,\s+human\s+override\s+paths,\s+and\s+runtime\s+proof[-\s]?bundle\s+lineage\b",
+            re.IGNORECASE,
+        ),
+        "governed release controls and runtime proof lineage",
+    ),
     (
         re.compile(r"\bdeterministic\s+routing,?\s+and\s+policy[-\s]?gated\b", re.IGNORECASE),
         "route selection and governed",
@@ -520,6 +539,242 @@ def repair_exec_summary_mechanism_inventory_sentences(parsed: dict[str, Any]) ->
         clog = list(parsed.get("change_log") or [])
         clog.extend(repairs)
         parsed["change_log"] = clog
+    return repairs
+
+
+def repair_exec_summary_causal_multi_root_allocation_rows(
+    parsed: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Clamp a causal sentence to the one frozen graph path its prose supports.
+
+    The final graph binder rejects causal claims that merge unrelated roots.
+    This repair changes attribution only: it selects the highest-overlap path
+    already assigned to the row and never changes visible prose or creates a
+    new fact.
+    """
+    if not isinstance(parsed, dict):
+        return []
+    plan = parsed.get("selected_fact_plan")
+    ledger = parsed.get("claim_ledger")
+    if not isinstance(plan, dict) or not isinstance(ledger, list):
+        return []
+
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        _CAUSAL_RE,
+        _assignment_aliases,
+        _fact_aliases_by_root,
+        _select_assignments_for_claim,
+    )
+
+    assignments = [
+        dict(row)
+        for row in plan.get("allocation_assignments") or []
+        if isinstance(row, dict)
+        and str(row.get("section_id") or "") == "executive_summary"
+    ]
+    if not assignments:
+        return []
+    aliases_by_root = _fact_aliases_by_root(plan)
+    aliases = {
+        str(row.get("claim_unit_id") or ""): _assignment_aliases(
+            row,
+            aliases_by_root=aliases_by_root,
+        )
+        for row in assignments
+    }
+
+    repairs: list[dict[str, Any]] = []
+    for index, raw_row in enumerate(ledger, start=1):
+        if not isinstance(raw_row, dict):
+            continue
+        claim_text = str(raw_row.get("claim_text") or raw_row.get("claim") or "").strip()
+        if not _CAUSAL_RE.search(claim_text):
+            continue
+        selected, _ = _select_assignments_for_claim(
+            raw_row,
+            section_id="executive_summary",
+            assignments=assignments,
+            aliases=aliases,
+        )
+        roots = {str(row.get("root_id") or "") for row in selected if row.get("root_id")}
+        if len(roots) <= 1:
+            continue
+        claim_tokens = _citation_repair_tokens(claim_text)
+
+        def rank(assignment: dict[str, Any]) -> tuple[int, float, float, str]:
+            support = " ".join(
+                str(assignment.get(key) or "")
+                for key in (
+                    "root_bundle_theme",
+                    "root_claim_text",
+                    "root_claim_action",
+                    "root_claim_scope",
+                    "root_claim_outcome",
+                    "skill_label",
+                )
+            )
+            return (
+                len(claim_tokens & _citation_repair_tokens(support)),
+                float(assignment.get("claim_entailment_score") or 0.0),
+                float(assignment.get("target_alignment_score") or 0.0),
+                str(assignment.get("claim_unit_id") or ""),
+            )
+
+        chosen = max(selected, key=rank)
+        chosen_unit = str(chosen.get("claim_unit_id") or "")
+        chosen_aliases = aliases.get(chosen_unit, set())
+        prior_ids = [
+            str(value).strip()
+            for value in raw_row.get("source_fact_ids") or []
+            if str(value).strip()
+        ]
+        kept = [value for value in prior_ids if value in chosen_aliases]
+        if not kept:
+            fallback = str(chosen.get("root_id") or chosen.get("fact_id") or "").strip()
+            if fallback:
+                kept = [fallback]
+        if not kept or kept == prior_ids:
+            continue
+        raw_row["source_fact_ids"] = list(dict.fromkeys(kept))
+        repairs.append(
+            {
+                "operation": "repair_exec_summary_causal_multi_root_allocation_row",
+                "reason": f"claim_{index}_clamped_to:{chosen_unit}",
+                "sentence_index": index,
+                "prior_source_fact_ids": prior_ids,
+                "source_fact_ids": raw_row["source_fact_ids"],
+            }
+        )
+
+    if repairs:
+        change_log = list(parsed.get("change_log") or [])
+        change_log.extend(repairs)
+        parsed["change_log"] = change_log
+    return repairs
+
+
+def repair_exec_summary_unallocated_metric_rows(
+    parsed: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Replace a rendered metric that the frozen allocation did not reserve.
+
+    The replacement is the selected graph path's own ``root_claim_text``.  It
+    removes an unsupported numeric outcome without weakening the exact-metric
+    binder or inventing substitute performance.
+    """
+    if not isinstance(parsed, dict):
+        return []
+    plan = parsed.get("selected_fact_plan")
+    ledger = parsed.get("claim_ledger")
+    text = str(parsed.get("resume_display_text") or "").strip()
+    if not isinstance(plan, dict) or not isinstance(ledger, list) or not text:
+        return []
+    sentences = [sentence for sentence in split_sentences(text) if str(sentence).strip()]
+    if len(sentences) != len(ledger):
+        return []
+
+    from apps_rg.runtime.c0.resume_graph_allocation import extract_exact_metric_value_unit
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        _assignment_aliases,
+        _fact_aliases_by_root,
+        _select_assignments_for_claim,
+    )
+
+    assignments = [
+        dict(row)
+        for row in plan.get("allocation_assignments") or []
+        if isinstance(row, dict)
+        and str(row.get("section_id") or "") == "executive_summary"
+    ]
+    if not assignments:
+        return []
+    aliases_by_root = _fact_aliases_by_root(plan)
+    aliases = {
+        str(row.get("claim_unit_id") or ""): _assignment_aliases(
+            row,
+            aliases_by_root=aliases_by_root,
+        )
+        for row in assignments
+    }
+
+    repairs: list[dict[str, Any]] = []
+    for index, raw_row in enumerate(ledger):
+        if not isinstance(raw_row, dict):
+            continue
+        claim_text = str(raw_row.get("claim_text") or raw_row.get("claim") or "").strip()
+        metric_value, metric_unit = extract_exact_metric_value_unit(claim_text)
+        if not metric_value and not metric_unit:
+            continue
+        selected, _ = _select_assignments_for_claim(
+            raw_row,
+            section_id="executive_summary",
+            assignments=assignments,
+            aliases=aliases,
+        )
+        if not selected:
+            continue
+        exact = [
+            assignment
+            for assignment in selected
+            if str(assignment.get("metric_value") or "") == metric_value
+            and str(assignment.get("metric_unit") or "") == metric_unit
+        ]
+        if len(exact) == 1:
+            continue
+        claim_tokens = _citation_repair_tokens(claim_text)
+
+        def rank(assignment: dict[str, Any]) -> tuple[int, float, float, str]:
+            support = " ".join(
+                str(assignment.get(key) or "")
+                for key in (
+                    "root_bundle_theme",
+                    "root_claim_text",
+                    "root_claim_action",
+                    "root_claim_scope",
+                    "root_claim_outcome",
+                )
+            )
+            return (
+                len(claim_tokens & _citation_repair_tokens(support)),
+                float(assignment.get("claim_entailment_score") or 0.0),
+                float(assignment.get("target_alignment_score") or 0.0),
+                str(assignment.get("claim_unit_id") or ""),
+            )
+
+        chosen = max(selected, key=rank)
+        replacement = str(
+            chosen.get("root_claim_text") or chosen.get("root_claim_action") or ""
+        ).strip()
+        if not replacement:
+            continue
+        if replacement[-1] not in ".!?":
+            replacement += "."
+        root_id = str(chosen.get("root_id") or "").strip()
+        fact_id = str(chosen.get("fact_id") or "").strip()
+        source_fact_ids = [value for value in (root_id, fact_id) if value]
+        if not source_fact_ids:
+            continue
+        sentences[index] = replacement
+        raw_row["claim"] = replacement[:80]
+        raw_row["claim_text"] = replacement
+        raw_row["source_fact_ids"] = list(dict.fromkeys(source_fact_ids))
+        repairs.append(
+            {
+                "operation": "repair_exec_summary_unallocated_metric_row",
+                "reason": (
+                    f"claim_{index + 1}_metric_{metric_value}_{metric_unit}_"
+                    f"not_reserved_by:{chosen.get('claim_unit_id')}"
+                ),
+                "sentence_index": index + 1,
+                "source_fact_ids": raw_row["source_fact_ids"],
+            }
+        )
+
+    if repairs:
+        parsed["resume_display_text"] = " ".join(sentences).strip()
+        change_log = list(parsed.get("change_log") or [])
+        change_log.extend(repairs)
+        parsed["change_log"] = change_log
     return repairs
 
 
@@ -729,6 +984,34 @@ def apply_exec_summary_display_authority_repairs(
             reason=str(_conflation_repairs[0].get("reason") or "")[:240],
             replaced_l2=True,
         )
+    _metric_allocation_repairs = repair_exec_summary_unallocated_metric_rows(parsed)
+    if _metric_allocation_repairs and artifact_dir is not None:
+        from apps_rg.runtime.section_repair_ledger import (
+            KIND_DETERMINISTIC_REWRITE,
+            record_repair,
+        )
+
+        record_repair(
+            artifact_dir,
+            kind=KIND_DETERMINISTIC_REWRITE,
+            operation="repair_exec_summary_unallocated_metric_row",
+            reason=str(_metric_allocation_repairs[0].get("reason") or "")[:240],
+            replaced_l2=True,
+        )
+    _graph_allocation_repairs = repair_exec_summary_causal_multi_root_allocation_rows(parsed)
+    if _graph_allocation_repairs and artifact_dir is not None:
+        from apps_rg.runtime.section_repair_ledger import (
+            KIND_DETERMINISTIC_REWRITE,
+            record_repair,
+        )
+
+        record_repair(
+            artifact_dir,
+            kind=KIND_DETERMINISTIC_REWRITE,
+            operation="repair_exec_summary_causal_multi_root_allocation_row",
+            reason=str(_graph_allocation_repairs[0].get("reason") or "")[:240],
+            replaced_l2=True,
+        )
     text = str(parsed.get("resume_display_text") or "").strip()
     clog = list(parsed.get("change_log") or [])
     repaired, removed = strip_exec_summary_credential_dump_sentences(text)
@@ -848,55 +1131,19 @@ _IBM_CAREER_BRIDGE_RE = re.compile(
     r"\s+(?:supported\s+later|subsequent\s+roles|later\s+production\s+ai)\b[^.]*\.?\s*$",
     re.IGNORECASE,
 )
-_IBM_MECHANISM_RE = re.compile(
-    r"\b(runtime|microservices|pipeline|api|telemetry|observability|kubernetes|lakehouse|hpc)\b",
-    re.IGNORECASE,
-)
-
-
 def sanitize_ibm_narrative_display_text(narrative_sentence: str) -> tuple[str, bool]:
-    """Strip meta tails and normalize IBM narrative opener/specificity."""
+    """Strip non-product meta/career tails without changing claim substance.
+
+    Specificity and opener quality are provider/X2 responsibilities. This
+    sanitizer must never introduce a mechanism, change an evidence-bearing
+    noun phrase, or replace a leadership verb after the claim ledger is built.
+    """
     text = str(narrative_sentence or "").strip()
     if not text:
         return text, False
     original = text
     text = _IBM_META_TAIL_RE.sub(".", text).strip()
     text = _IBM_CAREER_BRIDGE_RE.sub(".", text).strip()
-    text = re.sub(
-        r"^(?:At|In|As|With|During|While|Throughout|Across|Within|From|Upon|Amid)\s+IBM,\s+",
-        "",
-        text,
-        count=1,
-        flags=re.IGNORECASE,
-    )
-    text = re.sub(
-        r"^(?:led|successfully|also|built|delivered|designed|implemented|architected|scaled|productized)\b",
-        "Drove",
-        text,
-        count=1,
-        flags=re.IGNORECASE,
-    )
-    if not _IBM_MECHANISM_RE.search(text):
-        text = re.sub(
-            r"\bgoverned delivery discipline\b",
-            "governed runtime discipline",
-            text,
-            flags=re.IGNORECASE,
-        )
-        if not _IBM_MECHANISM_RE.search(text):
-            text = re.sub(
-                r"\breusable platform architecture\b",
-                "reusable runtime architecture",
-                text,
-                flags=re.IGNORECASE,
-            )
-    if not _IBM_MECHANISM_RE.search(text):
-        text = re.sub(
-            r"\bcloud modernization\b",
-            "runtime modernization",
-            text,
-            flags=re.IGNORECASE,
-        )
     text = re.sub(r"\s+\.", ".", text)
     text = re.sub(r"\.{2,}", ".", text)
     if text and text[-1] not in ".!?":

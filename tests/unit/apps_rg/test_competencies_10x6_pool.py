@@ -15,6 +15,7 @@ from apps_rg.runtime.judges.bullet_pool_claude_selector import (
     PoolSelectionResult,
     PoolSelectorUnavailableError,
     _call_anthropic_pool_selector,
+    _format_competency_pool,
     run_claude_bullet_pool_selection,
 )
 from apps_rg.runtime.providers.provider_contract import ProviderResult
@@ -40,10 +41,31 @@ from apps_rg.runtime.reasoning.employment_bullet_pool import (
     sc_path_count_for_lane,
 )
 from apps_rg.runtime.sections.section_product_shape_ssot import section_product_shape
+from apps_rg.runtime.sections.competencies_lane_runtime import normalize_parsed_output
+from apps_rg.runtime.sections.competencies_v3_contract import (
+    category_v3_from_legacy,
+    legacy_category_from_v3,
+    sync_categories_competencies,
+)
+from apps_rg.runtime.sections.competencies_capability_projection import (
+    apply_executive_capability_projection,
+)
 
 
-def _cat(label: str, terms: list[str]) -> dict:
-    return {
+_DISTINCT_GRAPH_BUNDLE_IDS = (
+    "ccb_partner_applied_ai_architecture",
+    "ccb_agentic_platforms",
+    "ccb_runtime_governance",
+    "ccb_retrieval_context_engineering",
+    "ccb_platform_productization",
+    "ccb_llmops_reliability",
+    "ccb_distributed_systems_engineering",
+    "ccb_engineering_leadership",
+)
+
+
+def _cat(label: str, terms: list[str], *, bundle_id: str | None = None) -> dict:
+    row = {
         "category_label": label,
         "terms": [
             {
@@ -56,6 +78,9 @@ def _cat(label: str, terms: list[str]) -> dict:
         ],
         "source_fact_ids": ["bul_001"],
     }
+    if bundle_id:
+        row["competency_bundle_id"] = bundle_id
+    return row
 
 
 def _path_with_categories(
@@ -69,7 +94,11 @@ def _path_with_categories(
         raw_output="",
         parsed={
             "competencies": [
-                _cat(f"Category_{path_index}_{i}", [f"t{i}a", f"t{i}b"])
+                _cat(
+                    f"Category_{path_index}_{i}",
+                    [f"t{i}a", f"t{i}b"],
+                    bundle_id=_DISTINCT_GRAPH_BUNDLE_IDS[i],
+                )
                 for i in range(n_categories)
             ],
             "claim_ledger": [],
@@ -164,18 +193,95 @@ def test_section_product_shape_competencies_adaptive_six_to_eight() -> None:
     assert "adaptive 6-8" in shape.shape_summary
 
 
-def test_evaluate_competencies_gate_accepts_six_passing_categories() -> None:
+@pytest.mark.parametrize("alias_key", ["category", "display_label"])
+def test_provider_category_alias_is_canonicalized_before_selector(alias_key: str) -> None:
+    raw_category = {
+        alias_key: "Partner Applied AI Architecture",
+        "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+        "graph_skill_node_ids": ["skill_partner_architecture"],
+        "terms": [
+            {
+                "text": "partner-led AI solution architecture",
+                "source_fact_id": "bul_001",
+                "source_fact_ids": ["bul_001"],
+            }
+        ],
+        "source_fact_ids": ["bul_001"],
+    }
+    normalized = normalize_parsed_output(
+        {"categories": [raw_category]},
+        {"selected_fact_plan": {"required_fact_ids": ["bul_001"]}},
+        {"bul_001"},
+    )
+    assert normalized is not None
+    category = normalized["categories"][0]
+    assert category["category_label"] == "Partner Applied AI Architecture"
+    assert "category" not in category
+    assert "display_label" not in category
+
+    canonical = category_v3_from_legacy(raw_category)
+    legacy = legacy_category_from_v3(canonical)
+    assert canonical["category_label"] == "Partner Applied AI Architecture"
+    assert canonical["competency_bundle_id"] == "ccb_partner_applied_ai_architecture"
+    assert legacy["competency_bundle_id"] == "ccb_partner_applied_ai_architecture"
+    assert legacy["graph_skill_node_ids"] == ["skill_partner_architecture"]
+
+    path = SelfConsistencyPath(
+        path_index=0,
+        temperature=0.35,
+        runtime_generation_status="REAL_LLM",
+        raw_output="",
+        parsed={"categories": [canonical]},
+        parse_error="",
+        provider_result=None,
+    )
+    pool_text = _format_competency_pool([path])
+    assert "[Partner Applied AI Architecture]" in pool_text
+    assert "[] terms=" not in pool_text
+
+    merged, source_map = merge_competencies_graph_pool_top_eight(
+        [path],
+        [
+            {
+                "category_label": "Partner Applied AI Architecture",
+                "path_index": 0,
+                "score": 0.9,
+                "passes": True,
+            }
+        ],
+        min_score_threshold=0.72,
+    )
+    assert merged["competencies"][0]["category_label"] == "Partner Applied AI Architecture"
+    assert source_map == {"partner applied ai architecture": 0}
+
+
+def test_evaluate_competencies_gate_rejects_text_only_family_smuggling() -> None:
     labels = [f"Cat_{i}" for i in range(COMPETENCIES_MIN_CATEGORY_COUNT)]
     selections = [
         {"category_label": lab, "path_index": 0, "score": 0.9, "passes": True} for lab in labels
     ]
-    merged = {"competencies": [_cat(lab, ["a", "b"]) for lab in labels]}
+    merged = {
+        "competencies": [
+            _cat(lab, ["a", "b"], bundle_id=_DISTINCT_GRAPH_BUNDLE_IDS[index])
+            for index, lab in enumerate(labels)
+        ]
+    }
+    merged["competencies"][0]["terms"].extend(
+        [
+            {"text": "distributed cloud infrastructure", "source_fact_ids": ["bul_001"]},
+            {"text": "engineering organization leadership", "source_fact_ids": ["bul_001"]},
+        ]
+    )
     gate = evaluate_competencies_selection_quality(
         selections=selections,
         merged_parsed=merged,
         min_score=min_competencies_selection_score(),
     )
-    assert gate.ok is True
+    assert gate.ok is False
+    assert gate.missing_capability_families == (
+        "distributed_infra",
+        "engineering_leadership",
+    )
     assert gate.categories_in_merged == COMPETENCIES_MIN_CATEGORY_COUNT
     assert gate.min_category_count == COMPETENCIES_MIN_CATEGORY_COUNT
     assert gate.max_category_count == COMPETENCIES_MAX_CATEGORY_COUNT
@@ -198,7 +304,277 @@ def test_merge_competencies_graph_pool_preserves_selector_scores() -> None:
         row.get("selection_score")
         for row in (merged.get("competencies") or [])
     ]
-    assert merged_scores == scores[:COMPETENCIES_MIN_CATEGORY_COUNT]
+    assert merged_scores == scores
+
+
+def test_graph_pool_preserves_all_eight_distinct_passing_selector_rows() -> None:
+    path = _path_with_categories(0)
+    assert path.parsed is not None
+    for index, row in enumerate(path.parsed["competencies"]):
+        if index >= COMPETENCIES_MIN_CATEGORY_COUNT:
+            row["terms"] = [
+                {
+                    "text": f"unsupported selected term {index}",
+                    "source_fact_ids": [f"not_allowed_{index}"],
+                }
+            ]
+    selections = [
+        {
+            "category_label": row["category_label"],
+            "path_index": 0,
+            "score": 0.95 - index * 0.01,
+            "passes": True,
+        }
+        for index, row in enumerate(path.parsed["competencies"])
+    ]
+
+    merged, _ = merge_competencies_graph_pool_top_eight(
+        [path],
+        selections,
+        min_score_threshold=0.72,
+        allowed_fact_ids={"bul_001"},
+    )
+
+    assert len(merged["competencies"]) == COMPETENCIES_MAX_CATEGORY_COUNT
+    assert {
+        row["competency_bundle_id"] for row in merged["competencies"]
+    } == set(_DISTINCT_GRAPH_BUNDLE_IDS)
+
+
+def test_graph_pool_merge_replaces_stale_anchor_categories_atomically() -> None:
+    path = _path_with_categories(0, COMPETENCIES_MIN_CATEGORY_COUNT)
+    assert path.parsed is not None
+    selected_rows = list(path.parsed["competencies"])
+    selected_bundle_ids = {
+        str(row["competency_bundle_id"]) for row in selected_rows
+    }
+    path.parsed["categories"] = [
+        _cat(
+            f"Stale anchor {index}",
+            [f"stale{index}a", f"stale{index}b"],
+            bundle_id=(
+                "ccb_distributed_systems_engineering"
+                if index == 0
+                else "ccb_agentic_platforms"
+            ),
+        )
+        for index in range(COMPETENCIES_MIN_CATEGORY_COUNT)
+    ]
+    selections = [
+        {
+            "category_label": row["category_label"],
+            "path_index": 0,
+            "score": 0.95 - index * 0.01,
+            "passes": True,
+        }
+        for index, row in enumerate(selected_rows)
+    ]
+
+    merged, _ = merge_competencies_graph_pool_top_eight(
+        [path], selections, min_score_threshold=0.72
+    )
+    sync_categories_competencies(merged)
+
+    assert {
+        str(row["competency_bundle_id"]) for row in merged["categories"]
+    } == selected_bundle_ids
+    assert {
+        str(row["competency_bundle_id"]) for row in merged["competencies"]
+    } == selected_bundle_ids
+    assert all(
+        not str(row["category_label"]).startswith("Stale anchor")
+        for row in merged["categories"]
+    )
+
+
+def test_graph_pool_deduplicates_bundle_and_taxonomy_identities() -> None:
+    path = _path_with_categories(0)
+    assert path.parsed is not None
+    path.parsed["competencies"][1]["competency_bundle_id"] = _DISTINCT_GRAPH_BUNDLE_IDS[0]
+    labels = [f"Category_0_{i}" for i in range(COMPETENCIES_FINAL_CATEGORY_COUNT)]
+    selections = [
+        {
+            "category_label": label,
+            "path_index": 0,
+            "score": 0.95 - index * 0.01,
+            "passes": True,
+        }
+        for index, label in enumerate(labels)
+    ]
+
+    merged, _ = merge_competencies_graph_pool_top_eight(
+        [path], selections, min_score_threshold=0.72
+    )
+    rows = merged["competencies"]
+    assert len(rows) == 7
+    bundle_ids = [row["competency_bundle_id"] for row in rows]
+    assert len(bundle_ids) == len(set(bundle_ids))
+    gate = evaluate_competencies_selection_quality(
+        selections=selections,
+        merged_parsed=merged,
+        min_score=0.72,
+    )
+    assert gate.ok is False
+    assert gate.missing_capability_families
+    assert gate.duplicate_bundle_ids == ()
+    assert gate.duplicate_taxonomy_category_ids == ()
+
+
+def test_graph_pool_keeps_selector_winner_with_one_of_three_allowed_terms() -> None:
+    path = _path_with_categories(0, COMPETENCIES_MIN_CATEGORY_COUNT)
+    assert path.parsed is not None
+    runtime_category = path.parsed["competencies"][2]
+    runtime_category["terms"] = [
+        {
+            "text": "allowed runtime graph control",
+            "source_fact_id": "bul_001",
+            "source_fact_ids": ["bul_001"],
+        },
+        {
+            "text": "unsupported candidate term one",
+            "source_fact_id": "not_allowed_1",
+            "source_fact_ids": ["not_allowed_1"],
+        },
+        {
+            "text": "unsupported candidate term two",
+            "source_fact_id": "not_allowed_2",
+            "source_fact_ids": ["not_allowed_2"],
+        },
+    ]
+    selections = [
+        {
+            "category_label": row["category_label"],
+            "path_index": 0,
+            "score": 0.95 - index * 0.01,
+            "passes": True,
+        }
+        for index, row in enumerate(path.parsed["competencies"])
+    ]
+
+    merged, _ = merge_competencies_graph_pool_top_eight(
+        [path],
+        selections,
+        min_score_threshold=0.72,
+        allowed_fact_ids={"bul_001"},
+    )
+
+    assert runtime_category["competency_bundle_id"] in {
+        row["competency_bundle_id"] for row in merged["competencies"]
+    }
+
+
+def test_taxonomy_projection_preserves_selected_graph_bundle_authority() -> None:
+    bundle_ids = _DISTINCT_GRAPH_BUNDLE_IDS[:6]
+    parsed = {
+        "categories": [
+            {
+                "category_id": bundle_id,
+                "category_label": f"Dynamic capability {index}",
+                "competency_bundle_id": bundle_id,
+                "graph_skill_node_ids": [f"skill_{index}"],
+                "selection_score": 0.9 - index * 0.01,
+                "terms": [
+                    {
+                        "term": f"Graph capability mechanism {index}",
+                        "source_fact_ids": ["bul_001"],
+                        "support_class": "FACT_ONLY",
+                    }
+                ],
+                "source_fact_ids": ["bul_001"],
+            }
+            for index, bundle_id in enumerate(bundle_ids)
+        ]
+    }
+
+    projected = apply_executive_capability_projection(
+        parsed,
+        allowed_fact_ids={"bul_001"},
+        allowed_skill_ids=set(),
+        skill_rows_by_id={},
+        resume_support_blob_lower="graph capability mechanism",
+    )
+    rows = projected["categories"]
+    assert len(rows) == 6
+    assert {row["competency_bundle_id"] for row in rows} == set(bundle_ids)
+    assert all(row["graph_skill_node_ids"] for row in rows)
+    assert len({row["category_id"] for row in rows}) == 6
+    assert not any(
+        change.get("operation") == "drop_unmapped_category"
+        for change in projected.get("change_log") or []
+    )
+
+
+def test_taxonomy_projection_prefers_selected_bundle_over_conflicting_model_category_id() -> None:
+    parsed = {
+        "categories": [
+            {
+                "category_id": "llmops_reliability",
+                "category_label": "Engineering Leadership for AI Platforms",
+                "competency_bundle_id": "ccb_engineering_leadership",
+                "graph_skill_node_ids": ["skill_engineering_leadership"],
+                "selection_score": 0.9,
+                "terms": [
+                    {
+                        "term": "AI engineering organization leadership",
+                        "source_fact_ids": ["bul_001"],
+                        "support_class": "FACT_ONLY",
+                    }
+                ],
+                "source_fact_ids": ["bul_001"],
+            }
+        ]
+    }
+
+    projected = apply_executive_capability_projection(
+        parsed,
+        allowed_fact_ids={"bul_001"},
+        allowed_skill_ids=set(),
+        skill_rows_by_id={},
+        resume_support_blob_lower="ai engineering organization leadership",
+    )
+
+    row = next(
+        item
+        for item in projected["categories"]
+        if item.get("competency_bundle_id") == "ccb_engineering_leadership"
+    )
+    assert row["category_id"] == "engineering_delivery_leadership"
+
+
+def test_normalize_accepts_only_packet_authorized_bundle_id_alias() -> None:
+    runtime_payload = {
+        "selected_fact_plan": {"required_fact_ids": ["bul_001"]},
+        "proof_pool_metadata": {
+            "competency_capability_section_packet": {
+                "competency_bundles": [
+                    {"competency_bundle_id": "ccb_retrieval_context_engineering"}
+                ]
+            }
+        },
+    }
+    normalized = normalize_parsed_output(
+        {
+            "categories": [
+                {
+                    "category_id": "ccb_retrieval_context_engineering",
+                    "display_label": "Retrieval & Context Engineering",
+                    "terms": [],
+                },
+                {
+                    "category_id": "ccb_model_invented",
+                    "display_label": "Invented Bundle",
+                    "terms": [],
+                },
+            ]
+        },
+        runtime_payload,
+        {"bul_001"},
+    )
+    assert normalized is not None
+    assert normalized["categories"][0]["competency_bundle_id"] == (
+        "ccb_retrieval_context_engineering"
+    )
+    assert "competency_bundle_id" not in normalized["categories"][1]
 
 
 def test_competencies_rejected_neighbor_audit_records_unselected_candidates() -> None:
@@ -265,7 +641,7 @@ def test_claude_competencies_selection_emits_high_signal_categories(monkeypatch:
         },
         mode="blocked_if_unavailable",
     )
-    assert pool.selection_mode == "competencies_advisory_selector_adaptive_6_8_pass"
+    assert pool.selection_mode == "competencies_advisory_selector_required_eight_pass"
     assert pool.judge_output is not None
     assert pool.judge_output.provider_key == "anthropic_claude"
     assert pool.judge_output.model_name == pins.COMPETENCIES_SELECTOR_MODEL
@@ -276,7 +652,61 @@ def test_claude_competencies_selection_emits_high_signal_categories(monkeypatch:
     assert audit["schema_version"] == "competencies_rejected_neighbor_audit_v1"
 
 
-def test_claude_competencies_selector_request_carries_sonnet_high(
+def test_governed_baseline_completes_a_missing_required_bundle() -> None:
+    from apps_rg.runtime.judges.bullet_pool_claude_selector import (
+        _complete_governed_required_bundle_selections,
+    )
+
+    provider_path = _path_with_categories(0)
+    baseline_categories = []
+    for index, bundle_id in enumerate(_DISTINCT_GRAPH_BUNDLE_IDS):
+        category = _cat(
+            f"Governed baseline {index}",
+            [f"governed supported capability {index}"],
+            bundle_id=bundle_id,
+        )
+        category["candidate_origin"] = "governed_required_bundle_baseline"
+        baseline_categories.append(category)
+    baseline_path = SelfConsistencyPath(
+        path_index=10_000,
+        temperature=0.0,
+        runtime_generation_status="GOVERNED_GRAPH_BASELINE",
+        raw_output="",
+        parsed={"competencies": baseline_categories, "categories": baseline_categories},
+        parse_error="",
+        provider_result=None,
+    )
+    selections = [
+        {
+            "category_label": f"Category_0_{index}",
+            "path_index": 0,
+            "score": 0.9,
+            "passes": True,
+        }
+        for index in range(COMPETENCIES_FINAL_CATEGORY_COUNT - 1)
+    ]
+
+    completed, additions, dropped = _complete_governed_required_bundle_selections(
+        [provider_path, baseline_path],
+        selections,
+        min_score_threshold=0.72,
+        targeting_context={
+            "allowed_fact_ids": ["bul_001"],
+            "allowed_skill_ids": [],
+            "resume_support_blob_lower": "",
+        },
+    )
+
+    assert len(completed) == COMPETENCIES_FINAL_CATEGORY_COUNT
+    assert dropped == []
+    assert [row["competency_bundle_id"] for row in additions] == [
+        "ccb_engineering_leadership"
+    ]
+    assert additions[0]["selection_origin"] == "governed_required_bundle_completion"
+    assert additions[0]["score_source"] == "deterministic_graph_fact_support_ratio"
+
+
+def test_claude_competencies_selector_request_reserves_output_room(
     tmp_path,
 ) -> None:
     judge_output, selection = _call_anthropic_pool_selector(
@@ -300,7 +730,7 @@ def test_claude_competencies_selector_request_carries_sonnet_high(
     assert payload["model"] == pins.COMPETENCIES_SELECTOR_MODEL
     assert payload["output_config"]["effort"] == (
         pins.COMPETENCIES_SELECTOR_REASONING_EFFORT
-    ) == "high"
+    ) == "low"
     assert payload["thinking"] == {"type": "adaptive", "display": "omitted"}
     assert payload["max_tokens"] > 0
     assert "temperature" not in payload
@@ -366,6 +796,16 @@ def test_competencies_no_parsed_paths_preserves_first_provider_error() -> None:
 
 def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.MonkeyPatch) -> None:
     paths = [_path_with_categories(i, n_categories=COMPETENCIES_FINAL_CATEGORY_COUNT) for i in range(4)]
+    baseline_categories: list[dict[str, object]] = []
+    for index, bundle_id in enumerate(_DISTINCT_GRAPH_BUNDLE_IDS):
+        category = _cat(
+            f"Governed baseline {index}",
+            [f"governed supported capability {index}"],
+            bundle_id=bundle_id,
+        )
+        category["candidate_origin"] = "governed_required_bundle_baseline"
+        baseline_categories.append(category)
+    selector_prompts: list[str] = []
 
     class _Judge:
         provider_key = "anthropic_claude"
@@ -413,9 +853,9 @@ def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.Monkey
         "apps_rg.runtime.judges.bullet_pool_claude_selector.bootstrap_apps_rg_env",
         lambda: None,
     )
-    monkeypatch.setattr(
-        "apps_rg.runtime.judges.bullet_pool_claude_selector._call_anthropic_pool_selector",
-        lambda **_: (
+    def _fake_selector(**kwargs: object) -> tuple[_Judge, dict[str, object]]:
+        selector_prompts.append(str(kwargs.get("prompt") or ""))
+        return (
             _Judge(),
             {
                 "selections": [
@@ -430,7 +870,11 @@ def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.Monkey
                 ],
                 "pool_summary": {},
             },
-        ),
+        )
+
+    monkeypatch.setattr(
+        "apps_rg.runtime.judges.bullet_pool_claude_selector._call_anthropic_pool_selector",
+        _fake_selector,
     )
 
     result, raw, parsed, err, meta = generate_bullet_lane_with_sc_and_claude(
@@ -439,7 +883,11 @@ def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.Monkey
         provider_payload={"model": "stub", "messages": []},
         parse_model_json=lambda r: (json.loads(r) if r.strip().startswith("{") else None, ""),
         normalize_parsed=lambda p: p,
-        targeting_context={"allowed_fact_ids": ["bul_001"], "resume_support_blob_lower": ""},
+        targeting_context={
+            "allowed_fact_ids": ["bul_001"],
+            "resume_support_blob_lower": "",
+            "governed_required_bundle_candidates": baseline_categories,
+        },
         judge_mode="mocked",
     )
     assert err == ""
@@ -452,6 +900,9 @@ def test_generate_competencies_graph_pool_lane_mocked(monkeypatch: pytest.Monkey
     assert parsed is not None
     assert len(parsed.get("competencies") or []) == COMPETENCIES_FINAL_CATEGORY_COUNT
     assert result is not None
+    assert selector_prompts
+    assert "=== PATH 10000" in selector_prompts[0]
+    assert "ccb_retrieval_context_engineering" in selector_prompts[0]
 
 
 def test_generate_competencies_graph_pool_lane_forced_sc_ignores_disable_toggle(

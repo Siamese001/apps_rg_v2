@@ -1,0 +1,173 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_competencies",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "BLOCKED_PROVIDER_UNAVAILABLE",
+      "provider_status": "BLOCKED_PROVIDER_UNAVAILABLE",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": false,
+      "provider_blocked": true,
+      "exact_provider_error": "Google Gemini 3.6 Flash judge call failed: TimeoutError: The read operation timed out",
+      "raw_response_ref": null,
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "18d71609a81b5383",
+      "output_hash": "",
+      "score": null,
+      "score_scale": null,
+      "normalized_score": null,
+      "threshold": 0.8,
+      "normalized_threshold": null,
+      "decisive_failure": false,
+      "findings": [
+        "Judge blocked - see exact_provider_error and raw_response_ref for details."
+      ],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [
+        "Review provider configuration and raw response artifact."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": null,
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": null,
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": null,
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": null,
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": null,
+      "pass": false
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_competencies",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final4_20260809\\e2e_20260809T130335Z_48856adf\\modular_r4\\sections\\competencies\\x1d_openai_provider_response_raw_20260809_130703_258.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "competencies_x1d_v4",
+      "input_hash": "18d71609a81b5383",
+      "output_hash": "55b025badcc3fed5",
+      "score": 4.3,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.86,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Runtime Governance and LLMOps partially overlap on fail-closed assurance.",
+        "Evaluation gauntlets is less recruiter-standard than the surrounding ATS language."
+      ],
+      "cited_sentence_indexes": [
+        3,
+        6
+      ],
+      "remediation_suggestions": [
+        "Differentiate LLMOps around evaluation evidence and production reliability.",
+        "Prefer established evaluation terminology over stylized phrasing."
+      ],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": null,
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [
+        "competencies_dimension_verdicts_normalized"
+      ],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "seniority_executive_relevance": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "complementarity": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "no_bullet_restatement": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "category_clarity": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "svp_agentic_specificity": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "partner_architecture_specificity": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "root_chronology_discipline": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": true,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "standard_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "competencies",
+      "pass": true
+    }
+  ],
+  "requested_judges": [
+    "gemini_pro",
+    "openai_chatgpt"
+  ],
+  "resume_graph_allocation_plan_digest": "ad78cea95a8518f36c4487d8732c0577494c0d98f4d4360743ed36ae605cf766",
+  "graph_claim_binding_contract_digest": "74414ebb57f013f0fe804ffc6655275ec01e6a390403afb682beae80021d9996",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json",
+  "resume_graph_claim_binding_active": true,
+  "resume_graph_claim_binding_pass": true
+}

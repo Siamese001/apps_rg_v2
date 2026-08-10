@@ -1,6 +1,7 @@
 """apps_research bridge for apps_rg managed R3R4 resume briefing delegation."""
 from __future__ import annotations
 
+import json
 import os
 import time
 import uuid
@@ -74,6 +75,83 @@ class AppsResearchBridge:
         self._capability_ref = capability_ref
         self._bridge_id = f"rg_research_bridge:{uuid.uuid4().hex[:8]}"
         self._artifact_runs_root = artifact_runs_root
+
+    def _persist_blocked_run_forensics(
+        self,
+        *,
+        raw: Any,
+        block_reason: str,
+        run_id: str,
+        trace_id: str,
+        request_id: str,
+    ) -> str:
+        """Persist the minimum producer evidence needed to diagnose a blocked handoff."""
+
+        if self._artifact_runs_root is None:
+            return ""
+        checkpoints: list[dict[str, Any]] = []
+        for checkpoint in tuple(getattr(raw, "hop_checkpoints", ()) or ()):
+            if isinstance(checkpoint, dict):
+                checkpoints.append(
+                    {
+                        key: checkpoint.get(key)
+                        for key in (
+                            "stage_id",
+                            "stage_name",
+                            "status",
+                            "duration_ms",
+                            "error",
+                        )
+                    }
+                )
+        fec_context = getattr(raw, "fec_run_context", None) or {}
+        brief = (
+            fec_context.get("company_brief")
+            if isinstance(fec_context, dict)
+            and isinstance(fec_context.get("company_brief"), dict)
+            else {}
+        )
+        brief_diagnostics = {
+            key: brief.get(key)
+            for key in (
+                "company",
+                "targeting_brief_disposition",
+                "targeting_brief_block_reason",
+                "targeting_brief_violations",
+                "_gate_verdict",
+                "_depth_profile",
+                "_sub_stages",
+            )
+            if key in brief
+        }
+        payload = {
+            "schema_version": "apps_research.blocked_run_forensics.v1",
+            "run_id": str(getattr(raw, "run_id", run_id) or run_id),
+            "trace_id": trace_id,
+            "request_id": request_id,
+            "handoff_authorized": False,
+            "block_reason": block_reason,
+            "producer_is_blocked": bool(getattr(raw, "is_blocked", False)),
+            "producer_block_reason": str(getattr(raw, "block_reason", "") or ""),
+            "hop_terminal_error": str(getattr(raw, "hop_terminal_error", "") or ""),
+            "hop_checkpoints": checkpoints,
+            "company_brief_diagnostics": brief_diagnostics,
+            "company_brief_text_present": bool(
+                str(getattr(raw, "company_brief_text", "") or "").strip()
+            ),
+        }
+        output = self._artifact_runs_root.resolve().parent / "apps_research_blocked_run_forensics.json"
+        try:
+            output.parent.mkdir(parents=True, exist_ok=True)
+            temporary = output.with_name(f".{uuid.uuid4().hex[:12]}.tmp")
+            temporary.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            os.replace(temporary, output)
+        except OSError:
+            return ""
+        return str(output)
 
     def fetch(
         self,
@@ -165,6 +243,7 @@ class AppsResearchBridge:
         from apps_research.integrations.searxng_readiness import runtime_base_url
         from apps_research.integrations.spine_handoff import run_research_via_spine
         from apps_research.types.research_types import ResearchRequest
+        from apps_model_telemetry.external_model_usage import external_model_usage_scope
 
         if not os.environ.get("SEARXNG_BASE_URL", "").strip():
             os.environ["SEARXNG_BASE_URL"] = runtime_base_url()
@@ -212,7 +291,48 @@ class AppsResearchBridge:
             },
         )
         runner = GovernedResearchRun()
-        return run_research_via_spine(research_request, runner=runner)
+        # The managed Apps RG product handoff requires the governed v2
+        # SearXNG path.  Leaving this as an ambient operator flag silently
+        # downgraded fresh E2E runs to legacy retrieval, which produced no
+        # per-family receipt and commonly blocked C0 as WEAK_WITH_CAVEATS.
+        # Scope the override to this synchronous producer call so unrelated
+        # apps_research consumers retain their own feature policy.
+        retrieval_v2_env = "APPS_RESEARCH_RETRIEVAL_V2"
+        prior_retrieval_v2 = os.environ.get(retrieval_v2_env)
+        os.environ[retrieval_v2_env] = "1"
+        try:
+            with external_model_usage_scope(
+                artifact_dir=self._artifact_runs_root,
+                run_id=run_id,
+                stage="L2.apps_research_company_brief",
+                trace_id=trace_root or trace_id,
+                app_id="apps_research",
+            ):
+                try:
+                    result = run_research_via_spine(research_request, runner=runner)
+                finally:
+                    if self._artifact_runs_root is not None:
+                        from apps_model_telemetry.otel_runtime import (
+                            capture_collector_snapshot,
+                        )
+
+                        boundary_root = self._artifact_runs_root.parent
+                        try:
+                            capture_collector_snapshot(
+                                artifact_dir=boundary_root,
+                                trace_id=trace_root or trace_id,
+                                filename="apps_research_handoff_otel_trace_snapshot.json",
+                                boundary="apps_research_handoff",
+                            )
+                        except (OSError, ValueError):
+                            # Collector persistence cannot replace the research outcome.
+                            pass
+        finally:
+            if prior_retrieval_v2 is None:
+                os.environ.pop(retrieval_v2_env, None)
+            else:
+                os.environ[retrieval_v2_env] = prior_retrieval_v2
+        return result
 
     def _translate(
         self,
@@ -284,6 +404,18 @@ class AppsResearchBridge:
                     brief_text = ""
 
         if is_blocked:
+            terminal_error = str(getattr(raw, "hop_terminal_error", "") or "").strip()
+            if block_reason == "missing_company_brief_text" and terminal_error:
+                block_reason = f"{block_reason}:{terminal_error}"
+            forensic_ref = self._persist_blocked_run_forensics(
+                raw=raw,
+                block_reason=block_reason,
+                run_id=run_id,
+                trace_id=trace_id,
+                request_id=request_id,
+            )
+            if forensic_ref:
+                block_reason = f"{block_reason}; forensic_ref={forensic_ref}"
             return ResearchResult(
                 run_id=str(getattr(raw, "run_id", run_id) or run_id),
                 trace_id=trace_id,
@@ -459,6 +591,8 @@ class MockAppsResearchBridge(AppsResearchBridge):
         raw.tenant_id = str(_kwargs.get("tenant_id") or "apps_research")
         raw.company_brief_text = self._mock_brief
         raw.support_coverage = self._mock_confidence
+        self._mock_provider_trace_id = raw.trace_root
+        self._mock_provider_run_id = raw.run_id
         raw.fec_run_context = {
             "company_brief": {
                 "apps_rg_targeting_brief_sidecar": self._mock_sidecar(raw.company_brief_text),
@@ -480,6 +614,47 @@ class MockAppsResearchBridge(AppsResearchBridge):
         normalized = str(brief_text or "").strip()
         generation_pin = company_brief_generation_pin()
         judge_pin = apps_rg_handoff_judge_pin()
+        trace_id = str(getattr(self, "_mock_provider_trace_id", "") or "mock-trace")
+        run_id = str(getattr(self, "_mock_provider_run_id", "") or "mock-run")
+
+        def provider_fixture(pin: Any, suffix: str) -> dict[str, Any]:
+            return {
+                "schema_version": "apps_research.provider_attempt_validation.v1",
+                "gateway_id": "apps_research.provider_gateway_v1",
+                "evidence_class": "TEST_FIXTURE",
+                "role": pin.role,
+                "provider": pin.provider,
+                "requested_model": pin.model,
+                "observed_model": pin.model,
+                "reasoning_effort": pin.reasoning_effort,
+                "attempt_id": f"mock-attempt-{suffix}",
+                "logical_attempt_id": f"{run_id}:logical:{suffix}",
+                "transport_attempt_id": f"{run_id}:logical:{suffix}:transport:1",
+                "run_id": run_id,
+                "trace_id": trace_id,
+                "request_digest": suffix * 64,
+                "provider_response_id": f"mock-response-{suffix}",
+                "lifecycle": {
+                    "local_dispatch_started": True,
+                    "request_bytes_sent": False,
+                    "response_headers_received": pin.provider == "google_gemini",
+                    "first_byte_received": pin.provider == "google_gemini",
+                    "sdk_response_returned": pin.provider == "external_openai",
+                    "remote_outcome": "PROVIDER_RESPONDED",
+                },
+                "transport_response_received": True,
+                "response_schema_valid": True,
+                "model_pin_valid": True,
+                "application_output_valid": True,
+                "overall_success": True,
+                "terminal_status": "SUCCESS",
+                "validation_reason": "ALL_VALIDATIONS_PASSED",
+                "ledger_event_digest": suffix * 64,
+                "usage": {},
+            }
+
+        generation_evidence = provider_fixture(generation_pin, "a")
+        judge_evidence = provider_fixture(judge_pin, "b")
         return {
             "schema_version": "apps_research.apps_rg_targeting_brief_sidecar/v1",
             "company_name": "Mock Co",
@@ -488,6 +663,7 @@ class MockAppsResearchBridge(AppsResearchBridge):
             "generation_model": generation_pin.model,
             "generation_reasoning_effort": generation_pin.reasoning_effort,
             "generation_model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
+            "generation_provider_evidence": generation_evidence,
             "provider_call_attempted": True,
             "generation_token_budget": 2048,
             "judge_name": judge_pin.provider_key,
@@ -500,7 +676,7 @@ class MockAppsResearchBridge(AppsResearchBridge):
                 "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
                 "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
                 "judge_name": judge_pin.provider_key,
-                "judge_provider": judge_pin.provider_key,
+                "judge_provider": judge_pin.provider,
                 "judge_model_requested": judge_pin.model,
                 "judge_model": judge_pin.model,
                 "thinking_level": judge_pin.reasoning_effort,
@@ -511,6 +687,7 @@ class MockAppsResearchBridge(AppsResearchBridge):
                 "score": 0.91,
                 "verdict": "PASS",
                 "provider_status": "MODEL_BACKED_PASS",
+                "provider_evidence": judge_evidence,
             },
             "role_archetype": "it_strategy",
             "required_sections_present": ["strategic mandate"],

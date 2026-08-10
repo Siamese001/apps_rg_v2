@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_113417",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 2,
+  "authoritative_l2_source": "regen_llm",
+  "attempt_1_x2_failed": false,
+  "attempt_1_x2_failed_gate_ids": [],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "regen_llm",
+      "operation": "ibm_narrative_theme_overpack_repair",
+      "reason": "x2_ibm_narrative_claim_theme_coverage:overpack",
+      "replaced_l2": true
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "regen_llm",
+      "failed_gate_ids": [],
+      "passed": true
+    }
+  ],
+  "authoritative_attempt_reason": "ibm_narrative_theme_overpack_repair_x2_pass"
+}

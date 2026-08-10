@@ -1,0 +1,939 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_unify_augmented_skills_graph_proof_pool_only",
+      "gate_type": "deterministic",
+      "observed_value": "augmented_skills_graph",
+      "threshold": "augmented_skills_graph",
+      "failure_reason": "ok",
+      "evidence_ref": "x2_unify_augmented_skills_graph_proof_pool_only",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_graph_only_no_base_resume_bullets",
+      "gate_type": "deterministic",
+      "observed_value": "graph_story_only",
+      "threshold": "no base hydration",
+      "failure_reason": "ok",
+      "evidence_ref": "x2_unify_graph_only_no_base_resume_bullets",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_required_top_level_json_keys",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [
+        "bullets",
+        "change_log",
+        "claim_ledger",
+        "gap_notes",
+        "jd_alignment",
+        "selected_fact_plan",
+        "self_check"
+      ],
+      "failure_reason": null,
+      "evidence_ref": "x2_required_top_level_json_keys",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_no_rewrite_intensity_model",
+      "gate_type": "deterministic",
+      "observed_value": "absent",
+      "threshold": "no rewrite_distribution / rewrite_intensity fields",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_no_rewrite_intensity_model",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_track_ranked_selection_method",
+      "gate_type": "deterministic",
+      "observed_value": "selected_graph_evidence_plan_unify_bullets",
+      "threshold": "augmented_skills_graph_unify_bullets_track_ranked",
+      "failure_reason": "selected_fact_plan must use graph track-ranked allocation (not company_hint / hydrate).",
+      "evidence_ref": "x2_unify_track_ranked_selection_method",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_not_legacy_six_pack_allocation",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "fact_engineering_platform_001",
+        "exp_unify_001",
+        "fact_engineering_platform_003",
+        "fact_engineering_platform_004",
+        "fact_engineering_platform_002",
+        "fact_engineering_platform_006"
+      ],
+      "threshold": "not fact_engineering_platform_001..006 in order",
+      "failure_reason": "Proof pool reverted to legacy sorted six-pack ledger order.",
+      "evidence_ref": "x2_unify_not_legacy_six_pack_allocation",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_no_archive_claim_verbatim",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "max consecutive word overlap < 8 vs ledger claim_text",
+      "failure_reason": "Bullet copies archive claim_text run: ",
+      "evidence_ref": "x2_unify_no_archive_claim_verbatim",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_claim_ledger_claim_text_non_empty",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "non-empty trimmed claim_text for every ledger row",
+      "failure_reason": null,
+      "evidence_ref": "x2_claim_ledger_claim_text_non_empty",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_text_claim_coverage_integrity",
+      "gate_type": "deterministic",
+      "observed_value": "structural_alignment_ok",
+      "threshold": "matches structural rebuild",
+      "failure_reason": null,
+      "evidence_ref": "x2_text_claim_coverage_integrity",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_bullet_count_6",
+      "gate_type": "deterministic",
+      "observed_value": 6,
+      "threshold": 6,
+      "failure_reason": "Must output exactly 6 bullets.",
+      "evidence_ref": "x2_unify_bullet_count_6",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_bullet_no_embedded_newline",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "single-line bullets",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_bullet_no_embedded_newline",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_bullet_single_thought",
+      "gate_type": "deterministic",
+      "observed_value": "1 sentence each",
+      "threshold": "len(split_sentences(bullet_text)) == 1",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_bullet_single_thought",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_bullet_no_paragraph_block",
+      "gate_type": "deterministic",
+      "observed_value": "<=320 chars",
+      "threshold": "max 320 chars per bullet",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_bullet_no_paragraph_block",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_protected_bullet_metrics_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "delegated_to_role_episode_metric_outcome_contract",
+      "threshold": "x2_unify_each_bullet_approved_metric_outcome_lineage + x2_unify_each_bullet_metric_outcome_surface_visible",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_protected_bullet_metrics_preserved",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_metrics_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "delegated_to_role_episode_metric_outcome_contract",
+      "threshold": "slot-specific approved metric_outcome_ids visible across all bullets",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_metrics_preserved",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_metric_anchor_bullet_ownership",
+      "gate_type": "deterministic",
+      "observed_value": "delegated_to_role_episode_metric_outcome_contract",
+      "threshold": "metric_outcome_ids anchored by resolved slot->role_episode_bundle map",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_metric_anchor_bullet_ownership",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_at_most_one_mechanism_dense_bullet",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "<=1 bullet with >=3 mechanism stack terms",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_at_most_one_mechanism_dense_bullet",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_only_fact_scope",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "bul_unify_001",
+        "bul_unify_002",
+        "bul_unify_003",
+        "bul_unify_004",
+        "bul_unify_005",
+        "bul_unify_006",
+        "exp_unify_001",
+        "fact_engineering_platform_001",
+        "fact_engineering_platform_002",
+        "fact_engineering_platform_003",
+        "fact_engineering_platform_004",
+        "fact_engineering_platform_006"
+      ],
+      "threshold": "slot-bound bul_unify_* or its exact graph source fact",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_only_fact_scope",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_ibm_fact_leakage",
+      "gate_type": "deterministic",
+      "observed_value": "bul_ibm_",
+      "threshold": "absent",
+      "failure_reason": "IBM fact leakage detected.",
+      "evidence_ref": "x2_no_ibm_fact_leakage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_insurtech_fact_leakage",
+      "gate_type": "deterministic",
+      "observed_value": "bul_insurtech_",
+      "threshold": "absent",
+      "failure_reason": "InsurTech fact leakage detected.",
+      "evidence_ref": "x2_no_insurtech_fact_leakage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_ey_fact_leakage",
+      "gate_type": "deterministic",
+      "observed_value": "bul_ey_",
+      "threshold": "absent",
+      "failure_reason": "EY fact leakage detected.",
+      "evidence_ref": "x2_no_ey_fact_leakage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_jd_only_claims",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "no JD copy as proof",
+      "failure_reason": "JD phrase copied into bullet proof.",
+      "evidence_ref": "x2_no_jd_only_claims",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_claim_ledger_coverage_100",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "output_ids": [
+          "bul_unify_001",
+          "bul_unify_002",
+          "bul_unify_003",
+          "bul_unify_004",
+          "bul_unify_005",
+          "bul_unify_006"
+        ],
+        "ledger_roots": [
+          "bul_unify_001",
+          "bul_unify_002",
+          "bul_unify_003",
+          "bul_unify_004",
+          "bul_unify_005",
+          "bul_unify_006",
+          "exp_unify_001",
+          "fact_engineering_platform_001",
+          "fact_engineering_platform_002",
+          "fact_engineering_platform_003",
+          "fact_engineering_platform_004",
+          "fact_engineering_platform_006"
+        ]
+      },
+      "threshold": [
+        "bul_unify_001",
+        "bul_unify_002",
+        "bul_unify_003",
+        "bul_unify_004",
+        "bul_unify_005",
+        "bul_unify_006"
+      ],
+      "failure_reason": "Every bul_unify_* bullet must appear in output and claim_ledger.",
+      "evidence_ref": "x2_claim_ledger_coverage_100",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_metric_fact_id_granularity",
+      "gate_type": "deterministic",
+      "observed_value": 6,
+      "threshold": "metric claims map to bul_unify_004/006",
+      "failure_reason": "Metric claims lack granular source_fact_ids.",
+      "evidence_ref": "x2_metric_fact_id_granularity",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_inline_source_tags",
+      "gate_type": "deterministic",
+      "observed_value": "inline tags",
+      "threshold": "absent",
+      "failure_reason": "Inline source tags found in bullet text.",
+      "evidence_ref": "x2_no_inline_source_tags",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_first_person",
+      "gate_type": "deterministic",
+      "observed_value": "first person",
+      "threshold": "absent",
+      "failure_reason": "First-person pronoun found.",
+      "evidence_ref": "x2_no_first_person",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_em_dash",
+      "gate_type": "deterministic",
+      "observed_value": "em dash",
+      "threshold": "absent",
+      "failure_reason": "Em dash found.",
+      "evidence_ref": "x2_no_em_dash",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_generic_filler",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "absent",
+      "failure_reason": "Generic filler phrase found.",
+      "evidence_ref": "x2_no_generic_filler",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_json_parse_valid",
+      "gate_type": "deterministic",
+      "observed_value": null,
+      "threshold": null,
+      "failure_reason": null,
+      "evidence_ref": "x2_json_parse_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_provider_requested_attempted",
+      "gate_type": "deterministic",
+      "observed_value": "external_claude->external_claude",
+      "threshold": "match",
+      "failure_reason": "Provider requested does not match attempted.",
+      "evidence_ref": "x2_provider_requested_attempted",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_silent_mock_fallback",
+      "gate_type": "deterministic",
+      "observed_value": "REAL_LLM",
+      "threshold": "REAL_LLM when PROVIDER_MODEL requested",
+      "failure_reason": "Silent mock fallback detected.",
+      "evidence_ref": "x2_no_silent_mock_fallback",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_x1d_required_judges_present",
+      "gate_type": "deterministic",
+      "observed_value": null,
+      "threshold": [
+        "gemini_pro"
+      ],
+      "failure_reason": null,
+      "evidence_ref": "x2_x1d_required_judges_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_x1d_schema_valid",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": "Blocked judges with invalid schema: []",
+      "evidence_ref": "x2_x1d_schema_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_bullet_graph_skill_node_ids_required",
+      "gate_type": "deterministic",
+      "observed_value": "all_present",
+      "threshold": "non-empty skill_ids_used or graph_skill_node_ids per bul_unify_* in change_log",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_bullet_graph_skill_node_ids_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_metric_source_required",
+      "gate_type": "deterministic",
+      "observed_value": "all_traceable",
+      "threshold": "metric_raw traces to plan_fact.metric_raw or approved metric_outcome_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_metric_source_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_bullet_seniority_floor",
+      "gate_type": "deterministic",
+      "observed_value": "all_pass",
+      "threshold": "score >= 1 (strong_verb OR scale_signal + no weak_verb)",
+      "failure_reason": null,
+      "evidence_ref": "x2_bullet_seniority_floor",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_bullet_technical_specificity_floor",
+      "gate_type": "deterministic",
+      "observed_value": "all_pass",
+      "threshold": "at least one named mechanism/technology per bullet",
+      "failure_reason": null,
+      "evidence_ref": "x2_bullet_technical_specificity_floor",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_generic_consulting_substitution",
+      "gate_type": "deterministic",
+      "observed_value": "all_pass",
+      "threshold": "zero consulting-speak substitution phrases per bullet",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_generic_consulting_substitution",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_base_resume_ngram_overlap_unify",
+      "gate_type": "deterministic",
+      "observed_value": "all_below_threshold",
+      "threshold": "<= 25% 4-gram overlap with base resume (WARN mode)",
+      "failure_reason": null,
+      "evidence_ref": "x2_base_resume_ngram_overlap_unify",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_e0_example_ngram_overlap_unify",
+      "gate_type": "deterministic",
+      "observed_value": "all_below_threshold",
+      "threshold": "<= 20% 4-gram overlap with E0 examples (WARN mode)",
+      "failure_reason": null,
+      "evidence_ref": "x2_e0_example_ngram_overlap_unify",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_bullets_active_proof_pool_source_fact_ids",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "section": "unify_bullets",
+        "proof_source": "augmented_skills_graph",
+        "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "proof_pool_digest": "df70807366ddf1fac0511b6764e44dd6cd9efbf25913601785424cb68336db07",
+        "canonical_evidence_set_digest": "df70807366ddf1fac0511b6764e44dd6cd9efbf25913601785424cb68336db07",
+        "id_alias_map": {
+          "bul_unify_001": "fact_engineering_platform_001",
+          "bul_unify_002": "exp_unify_001",
+          "bul_unify_003": "fact_engineering_platform_003",
+          "bul_unify_004": "fact_engineering_platform_004",
+          "bul_unify_005": "fact_engineering_platform_002",
+          "bul_unify_006": "fact_engineering_platform_006"
+        },
+        "claim_evidence_source_type": "augmented_skills_graph",
+        "claim_evidence_source_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "skills_authority_source_type": "augmented_skills_graph",
+        "skills_authority_status": "PASS",
+        "skills_authority_graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "legacy_broad_skills_ledger_skills_authority": false,
+        "broad_skills_ledger_claim_evidence_only": null,
+        "allowed_source_fact_ids_count": 61,
+        "source_fact_ids_checked": [
+          "fact_engineering_platform_001",
+          "bul_unify_001",
+          "exp_unify_001",
+          "bul_unify_002",
+          "fact_engineering_platform_003",
+          "bul_unify_003",
+          "fact_engineering_platform_004",
+          "bul_unify_004",
+          "fact_engineering_platform_002",
+          "bul_unify_005",
+          "fact_engineering_platform_006",
+          "bul_unify_006"
+        ],
+        "unsupported_source_fact_ids": [],
+        "rejected_non_proof_source_ids": [],
+        "jd_or_briefing_ids_rejected": [],
+        "x2_source_fact_pool_status": "PASS",
+        "decisive_reason": null,
+        "validator_name": "evaluate_proof_pool_source_fact_gate",
+        "skills_authority_x2_boundary": "PASS",
+        "x2_srfs_gate_status": "NOT_APPLICABLE",
+        "out_of_slice_fact_ids": [],
+        "srfs_allowed_fact_ids_count": 61,
+        "selected_role_fact_set_used": false,
+        "broad_skills_ledger_used": false,
+        "broad_skills_ledger_used_as_authority": false,
+        "base_resume_fallback_used": false,
+        "srfs_section_id": "unify_bullets"
+      },
+      "threshold": "active_proof_pool_allowlist_exact",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_bullets_active_proof_pool_source_fact_ids",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_input_usage_ledger_present",
+      "gate_type": "deterministic",
+      "observed_value": "section_input_usage_ledger_v1",
+      "threshold": "section_input_usage_ledger_v1",
+      "failure_reason": null,
+      "evidence_ref": "x2_section_input_usage_ledger_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_jd_used_as_required_targeting_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "required": true,
+        "used": true,
+        "authority": "TARGETING_INPUT",
+        "used_for": []
+      },
+      "threshold": "required_used_TARGETING_INPUT",
+      "failure_reason": null,
+      "evidence_ref": "x2_jd_used_as_required_targeting_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_briefing_used_as_required_context_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "required": true,
+        "used": true,
+        "authority": "CONTEXT_INPUT",
+        "used_for": []
+      },
+      "threshold": "required_used_CONTEXT_INPUT",
+      "failure_reason": null,
+      "evidence_ref": "x2_briefing_used_as_required_context_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_title_company_used_as_required_positioning_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "target_title": {
+          "required": true,
+          "used": true,
+          "authority": "POSITIONING_INPUT",
+          "used_for": []
+        },
+        "target_company": {
+          "required": true,
+          "used": true,
+          "authority": "POSITIONING_INPUT",
+          "used_for": []
+        }
+      },
+      "threshold": "required_used_POSITIONING_INPUT_both",
+      "failure_reason": null,
+      "evidence_ref": "x2_title_company_used_as_required_positioning_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_non_evidence_inputs_as_claim_evidence",
+      "gate_type": "deterministic",
+      "observed_value": false,
+      "threshold": false,
+      "failure_reason": null,
+      "evidence_ref": "x2_no_non_evidence_inputs_as_claim_evidence",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_non_evidence_inputs_in_source_fact_ids",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "row_scan_found_reserved_non_resume_ids": false,
+        "ledger_non_evidence_inputs_in_source_fact_ids": false
+      },
+      "threshold": "reserved_non_resume_ids_absent_in_source_fact_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_non_evidence_inputs_in_source_fact_ids",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_selected_fact_ids_only",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": "subset_of_ALLOWED_SOURCE_FACT_IDS",
+      "failure_reason": null,
+      "evidence_ref": "x2_selected_fact_ids_only",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_claims_supported_by_base_resume",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "displayed_claim_count": 6,
+        "claims_supported_by_selected_resume_facts": 6,
+        "claims_with_targeting_input_in_source_fact_ids": 0,
+        "claims_with_context_input_in_source_fact_ids": 0,
+        "unsupported_claim_count": 0,
+        "orphan_source_fact_id_count": 0
+      },
+      "threshold": "no_unsupported_and_no_non_evidence_source_fact_id_claim_rows",
+      "failure_reason": null,
+      "evidence_ref": "x2_section_claims_supported_by_base_resume",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_input_usage_accounting_consistent",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "ledger_summary": {
+          "displayed_claim_count": 6,
+          "claims_supported_by_selected_resume_facts": 6,
+          "claims_with_targeting_input_in_source_fact_ids": 0,
+          "claims_with_context_input_in_source_fact_ids": 0,
+          "unsupported_claim_count": 0,
+          "orphan_source_fact_id_count": 0
+        },
+        "runtime_summary": {
+          "displayed_claim_count": 6,
+          "claims_supported_by_selected_resume_facts": 6,
+          "claims_with_targeting_input_in_source_fact_ids": 0,
+          "claims_with_context_input_in_source_fact_ids": 0,
+          "unsupported_claim_count": 0,
+          "orphan_source_fact_id_count": 0
+        },
+        "coverage_overall_pass": true
+      },
+      "threshold": "ledger_matches_claim_scan_and_coverage_pass",
+      "failure_reason": null,
+      "evidence_ref": "x2_input_usage_accounting_consistent",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_each_bullet_approved_metric_outcome_lineage",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "missing_metric_outcome_ids": [],
+        "unapproved_metric_outcome_ids": [],
+        "slot_metric_allowlist": {
+          "bul_unify_001": [
+            "metric_unify_agentic_graphrag_context_pack_grounding_surface",
+            "metric_unify_agentic_human_override_escalation_surface",
+            "metric_unify_agentic_l0_route_policy_dispatch_surface",
+            "metric_unify_agentic_multi_agent_orchestration_contract_surface",
+            "metric_unify_agentic_replay_key_audit_manifest_surface",
+            "metric_unify_agentic_runtime_gate_verdict_contract_surface",
+            "metric_unify_agentic_runtime_proof_bundle_lineage_surface",
+            "metric_unify_agentic_tool_sandbox_egress_policy_surface",
+            "metric_unify_policy_gated_agent_execution_surface",
+            "metric_unify_replayable_runtime_traceability"
+          ],
+          "bul_unify_002": [
+            "metric_unify_cfo_aligned_adoption_motion_count",
+            "metric_unify_consumption_renewal_signal_instrumentation"
+          ],
+          "bul_unify_003": [
+            "metric_unify_audit_grade_runtime_observability_coverage",
+            "metric_unify_eval_telemetry_rollback_control_set"
+          ],
+          "bul_unify_004": [
+            "metric_unify_cycle_six_months_to_three_weeks",
+            "metric_unify_production_readiness_gate_set"
+          ],
+          "bul_unify_005": [
+            "metric_unify_cloud_data_runtime_integration_patterns",
+            "metric_unify_high_availability_distributed_service_patterns"
+          ],
+          "bul_unify_006": [
+            "metric_unify_20pct_gross_margin_expansion",
+            "metric_unify_22m_ip_led_revenue",
+            "metric_unify_team_scaled_8_to_28"
+          ]
+        }
+      },
+      "threshold": "every bul_unify_* change_log row records >=1 approved slot metric_outcome_id",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_each_bullet_approved_metric_outcome_lineage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_each_bullet_metric_outcome_surface_visible",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "visible_matches": {
+          "bul_unify_001": [
+            {
+              "metric_outcome_id": "metric_unify_policy_gated_agent_execution_surface",
+              "token": "policy-gated agent execution surface for governed enterprise AI workflows"
+            }
+          ],
+          "bul_unify_002": [
+            {
+              "metric_outcome_id": "metric_unify_cfo_aligned_adoption_motion_count",
+              "token": "CFO-aligned enterprise adoption motions tied to reusable AI platform commercialization"
+            }
+          ],
+          "bul_unify_003": [
+            {
+              "metric_outcome_id": "metric_unify_audit_grade_runtime_observability_coverage",
+              "token": "audit-grade runtime observability coverage for regulated AI workflows"
+            }
+          ],
+          "bul_unify_004": [
+            {
+              "metric_outcome_id": "metric_unify_cycle_six_months_to_three_weeks",
+              "token": "six months to three weeks"
+            }
+          ],
+          "bul_unify_005": [
+            {
+              "metric_outcome_id": "metric_unify_high_availability_distributed_service_patterns",
+              "token": "high-availability distributed service patterns for enterprise AI platforms"
+            }
+          ],
+          "bul_unify_006": [
+            {
+              "metric_outcome_id": "metric_unify_team_scaled_8_to_28",
+              "token": "engineering team from 8 to 28"
+            }
+          ]
+        },
+        "missing_visible_metric_surface": []
+      },
+      "threshold": "every bul_unify_* bullet_text surfaces a metric/surface_token from its approved metric_outcome_id",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_each_bullet_metric_outcome_surface_visible",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_metric_outcomes_distributed_by_slot",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "unique_visible_metric_outcome_ids": [
+          "metric_unify_audit_grade_runtime_observability_coverage",
+          "metric_unify_cfo_aligned_adoption_motion_count",
+          "metric_unify_cycle_six_months_to_three_weeks",
+          "metric_unify_high_availability_distributed_service_patterns",
+          "metric_unify_policy_gated_agent_execution_surface",
+          "metric_unify_team_scaled_8_to_28"
+        ],
+        "expected_metric_slots": 6
+      },
+      "threshold": ">=1 distinct visible metric_outcome_id per bul_unify_* slot",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_metric_outcomes_distributed_by_slot",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_graph_traversal_sufficiency",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "candidate_conservation": {
+          "eligible_role_episode_root_count": 8,
+          "selected_role_episode_root_count": 6,
+          "rejected_role_episode_root_count": 2,
+          "unexplained_selected_role_episode_bundle_ids": [],
+          "pass": true
+        },
+        "selected_role_episode_root_count": 6,
+        "selected_unique_leaf_skill_count": 31,
+        "selected_unique_metric_count": 21,
+        "rejected_sibling_skill_count": 8,
+        "rejected_sibling_metric_count": 4
+      },
+      "threshold": "candidate conservation + >=6 roots + >=20 skills + >=10 metrics + rejected sibling frontier",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_graph_traversal_sufficiency",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_unify_graph_granularity_gates",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "role_specific_axis_coverage": {
+          "required_axes": [
+            "agentic_platform_architecture",
+            "enterprise_adoption_revenue",
+            "runtime_reliability_governance",
+            "production_adoption_lifecycle",
+            "distributed_ecosystem_engineering",
+            "platform_commercialization_leadership"
+          ],
+          "selected_axes": [
+            "agentic_platform_architecture",
+            "enterprise_adoption_revenue",
+            "runtime_reliability_governance",
+            "production_adoption_lifecycle",
+            "distributed_ecosystem_engineering",
+            "platform_commercialization_leadership"
+          ],
+          "missing_axes": []
+        },
+        "frontier_size_by_hop_depth": {
+          "hop_0_role_episode_roots": 6,
+          "hop_1_graph_skill_nodes": 31,
+          "hop_2_metric_outcome_nodes": 21,
+          "rejected_hop_0_sibling_roots": 2,
+          "rejected_hop_1_sibling_skill_nodes": 8,
+          "rejected_hop_2_sibling_metric_nodes": 4
+        }
+      },
+      "threshold": "no missing role axes; skill frontier >=2x roots; metric frontier >= roots",
+      "failure_reason": null,
+      "evidence_ref": "x2_unify_graph_granularity_gates",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_c0_metrics_artifact_present",
+      "pass": true,
+      "reason": "c0_metrics artifact structurally valid",
+      "observed_value": {
+        "schema_version": "c0_metrics.v1",
+        "required_keys_present": [
+          "blocked_source_refs",
+          "briefing_source_type",
+          "citation_map",
+          "company_brief_provenance",
+          "evidence_counts",
+          "excluded_evidence_refs",
+          "final_evidence_digest",
+          "freshness_receipts",
+          "retrieval_mode",
+          "retrieval_sources",
+          "route_id",
+          "run_id",
+          "schema_version",
+          "source_class_coverage",
+          "support_score_profile",
+          "support_status",
+          "support_target_met"
+        ]
+      },
+      "expected_value": "c0_metrics.v1"
+    },
+    {
+      "gate_id": "x2_c0_support_status_gate",
+      "pass": true,
+      "reason": "support_status='PASS' support_target_met=True enum_ok=True minimum_safe=True",
+      "observed_value": {
+        "support_status": "PASS",
+        "support_target_met": true,
+        "c0_minimum_safe": true,
+        "canonical_enum": true
+      },
+      "expected_value": "non-blocking canonical support_status with evidence target"
+    },
+    {
+      "gate_id": "x2_fec_subset_of_canonical_evidence_pool",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "fec_count": 61,
+        "violations": []
+      },
+      "threshold": "fec_ids_subset_of_pool",
+      "failure_reason": null,
+      "evidence_ref": "x2_fec_subset_of_canonical_evidence_pool"
+    },
+    {
+      "gate_id": "x2_prompt_c0_ids_subset_of_fec",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "prompt_c0_count": 61,
+        "violations": []
+      },
+      "threshold": "prompt_c0_subset_of_fec",
+      "failure_reason": null,
+      "evidence_ref": "x2_prompt_c0_ids_subset_of_fec"
+    },
+    {
+      "gate_id": "x2_claim_ledger_source_fact_ids_subset_of_fec",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "ledger_id_count": 12,
+        "violations": []
+      },
+      "threshold": "claim_ledger_subset_of_fec",
+      "failure_reason": null,
+      "evidence_ref": "x2_claim_ledger_source_fact_ids_subset_of_fec"
+    },
+    {
+      "gate_id": "X2_BLOCK_ID_NAMESPACE_SPLIT",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "disjoint_without_alias": [],
+        "alias_map_size": 6
+      },
+      "threshold": "explicit_alias_map_or_unified_namespace",
+      "failure_reason": null,
+      "evidence_ref": "X2_BLOCK_ID_NAMESPACE_SPLIT"
+    },
+    {
+      "gate_id": "x2_active_pool_digest_matches_fec_digest",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "canonical_evidence_set_digest": "7750698f3d76dbb42ae34bbbf5d5e1a2fbbc18f221a8716eb13fba757511b5ba",
+        "fec_allowed_fact_ids_digest": "7750698f3d76dbb42ae34bbbf5d5e1a2fbbc18f221a8716eb13fba757511b5ba",
+        "fec_narrowed_from_pool": true
+      },
+      "threshold": "digest_equal_or_explicit_narrowing_receipt",
+      "failure_reason": null,
+      "evidence_ref": "x2_active_pool_digest_matches_fec_digest"
+    },
+    {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority",
+      "pass": true,
+      "observed_value": {
+        "allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+        "claim_count": 6,
+        "bound_claim_count": 6,
+        "binding_coverage": 1.0,
+        "metric_exactness_pass": true,
+        "orphan_allocation_claim_unit_ids": [],
+        "failure_reasons": []
+      },
+      "threshold": {
+        "binding_coverage": 1.0,
+        "metric_exactness": 1.0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "",
+      "evidence_ref": "graph_claim_bindings.json"
+    }
+  ],
+  "failed_gates": [],
+  "x2_passed": 63,
+  "x2_failed": 0,
+  "total_x2_gates": 63,
+  "rigor_convergence_audit": {
+    "status": "PASS",
+    "missing_rigor_critical_gates": []
+  },
+  "final_materialized_input_binding": {
+    "schema_version": "apps_rg.final_materialized_input_binding.v1",
+    "section_id": "unify_bullets",
+    "final_materialized_output_ref": "raw_model_output.txt",
+    "final_materialized_output_present": true,
+    "final_materialized_output_char_count": 1759027,
+    "final_materialized_output_sha256": "b3ed6e3591b9f643b0ffb236ca53dc97ddbe94df365cfc4b52b60e6c70c188fb",
+    "l2_output_present": true,
+    "l2_output_sha256": "032005c66f9e8abb0b78b758273fc595ce4e31f221c91ca88e33650bb0eb5910",
+    "final_claim_ledger_present": true,
+    "final_claim_ledger_row_count": 6,
+    "final_claim_ledger_sha256": "7b3ecb64a591014a232c19dee684966db208e80d33519d4008df586413b155fe"
+  },
+  "final_materialized_output_sha256": "b3ed6e3591b9f643b0ffb236ca53dc97ddbe94df365cfc4b52b60e6c70c188fb",
+  "final_claim_ledger_sha256": "7b3ecb64a591014a232c19dee684966db208e80d33519d4008df586413b155fe",
+  "l2_output_sha256": "032005c66f9e8abb0b78b758273fc595ce4e31f221c91ca88e33650bb0eb5910",
+  "resume_graph_allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+  "graph_claim_binding_contract_digest": "f0ea3feca26b5e9861db5208f85c50768f3650123b59e6ed2c0bec602a29b97e",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

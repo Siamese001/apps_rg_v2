@@ -1,0 +1,227 @@
+{
+  "current_run_mutation_assertion": false,
+  "first_blocking_gap": {
+    "apps_eval_row_id": "",
+    "artifact_digest": "",
+    "artifact_role": "run_bundle_index",
+    "child_run_id": "ibm_narrative_20260809_131105",
+    "component_id": "apps_rg.run_contract",
+    "current_run_mutation_assertion": false,
+    "decisive_reason_seen": "required artifact was not resolved by L6 shadow",
+    "deterministic_digest": "6dcbbf393630cd785f21eff6046ca224a27a65d531b0004aee63969027df77de",
+    "eval_verdict_seen": "NOT_RUN",
+    "future_run_only": true,
+    "future_run_recommendation": "Future-run only: harden artifact emission or registry mapping for U0.run_bundle_index.present.",
+    "gate_id": "u0_run_bundle_index_present",
+    "l4_write_assertion": false,
+    "lane_id": "",
+    "microstep_contract_digest": "sha256:d18a9dd3b8c318ec496ac2dd37021a9ce800166b11ee629064b4aa314ddaa1a5",
+    "microstep_id": "U0.run_bundle_index.present",
+    "observed_status": "MISSING",
+    "orphan_observation": false,
+    "parent_run_id": "",
+    "record_type": "L6MicrostepObservation",
+    "registry_digest": "sha256:d18a9dd3b8c318ec496ac2dd37021a9ce800166b11ee629064b4aa314ddaa1a5",
+    "required": true,
+    "root_cause_candidate": "COVERAGE_GAP",
+    "runtime_exhaust_bundle_id": "rxb-21e6baed900c448e832f585ca52753c9",
+    "schema_version": "agentic_core.l6_microstep_observation.v1",
+    "section_attempt_id": "ibm_narrative:ibm_narrative_20260809_131105:attempt:1",
+    "severity": "BLOCK",
+    "shadow_classification": "COVERAGE_GAP",
+    "source_ref": "",
+    "stage_id": "U0",
+    "subcomponent_id": "u0_runtime_package"
+  },
+  "first_gap_microstep_id": "U0.run_bundle_index.present",
+  "future_run_only": true,
+  "gap_count": 118,
+  "gap_groups_by_artifact_role": {
+    "component_scorecards": 1,
+    "coverage_matrix": 1,
+    "cross_section_x2_gate_outputs": 2,
+    "final_resume_json": 1,
+    "final_resume_x2_gate_outputs": 2,
+    "lane_l2_output": 10,
+    "lane_l6_shadow_eval_package": 22,
+    "lane_runtime_payload": 10,
+    "lane_x1d_llm_judge_outputs": 20,
+    "lane_x2_gate_outputs": 20,
+    "lane_x3_disposition": 20,
+    "pa_compiled_prompt": 2,
+    "regression_summary": 1,
+    "run_bundle_index": 1,
+    "scorecard_rows": 1,
+    "u0_runtime_package": 1,
+    "uwg_commit_receipt": 1,
+    "uwg_commit_request": 1,
+    "uwg_validation_receipt": 1
+  },
+  "gap_groups_by_lane": {
+    "UNKNOWN": 16,
+    "competencies": 10,
+    "executive_summary": 10,
+    "ey_bullets": 10,
+    "ey_narrative": 10,
+    "headline": 10,
+    "ibm_bullets": 10,
+    "ibm_narrative": 2,
+    "insurtech_bullets": 10,
+    "insurtech_narrative": 10,
+    "unify_bullets": 10,
+    "unify_narrative": 10
+  },
+  "gap_groups_by_shadow_classification": {
+    "COVERAGE_GAP": 118
+  },
+  "gap_groups_by_stage": {
+    "L2": 20,
+    "L6": 22,
+    "PA": 2,
+    "PACKAGE": 3,
+    "REGRESSION": 1,
+    "U0": 2,
+    "UWG": 3,
+    "X1D": 20,
+    "X2": 25,
+    "X3": 20
+  },
+  "l4_write_assertion": false,
+  "root_cause_candidates": [
+    "COVERAGE_GAP"
+  ],
+  "schema_version": "agentic_core.l6_microstep_rca.v1",
+  "top_repeated_gap_candidates": [
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "competencies",
+      "microstep_ids": [
+        "competencies.L6.shadow_package.non_mutating",
+        "competencies.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|competencies|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "executive_summary",
+      "microstep_ids": [
+        "executive_summary.L6.shadow_package.non_mutating",
+        "executive_summary.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|executive_summary|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "ey_bullets",
+      "microstep_ids": [
+        "ey_bullets.L6.shadow_package.non_mutating",
+        "ey_bullets.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|ey_bullets|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "ey_narrative",
+      "microstep_ids": [
+        "ey_narrative.L6.shadow_package.non_mutating",
+        "ey_narrative.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|ey_narrative|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "headline",
+      "microstep_ids": [
+        "headline.L6.shadow_package.non_mutating",
+        "headline.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|headline|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "ibm_bullets",
+      "microstep_ids": [
+        "ibm_bullets.L6.shadow_package.non_mutating",
+        "ibm_bullets.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|ibm_bullets|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "ibm_narrative",
+      "microstep_ids": [
+        "ibm_narrative.L6.shadow_package.non_mutating",
+        "ibm_narrative.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|ibm_narrative|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "insurtech_bullets",
+      "microstep_ids": [
+        "insurtech_bullets.L6.shadow_package.non_mutating",
+        "insurtech_bullets.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|insurtech_bullets|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "insurtech_narrative",
+      "microstep_ids": [
+        "insurtech_narrative.L6.shadow_package.non_mutating",
+        "insurtech_narrative.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|insurtech_narrative|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    },
+    {
+      "artifact_role": "lane_l6_shadow_eval_package",
+      "lane_id": "unify_bullets",
+      "microstep_ids": [
+        "unify_bullets.L6.shadow_package.non_mutating",
+        "unify_bullets.L6.shadow_package.present"
+      ],
+      "observed_status": "MISSING",
+      "recurrence_count": 2,
+      "recurrence_key": "L6|unify_bullets|lane_l6_shadow_eval_package|COVERAGE_GAP|MISSING",
+      "shadow_classification": "COVERAGE_GAP",
+      "stage_id": "L6"
+    }
+  ],
+  "trace_reconciliation_verdict": "OBSERVED"
+}

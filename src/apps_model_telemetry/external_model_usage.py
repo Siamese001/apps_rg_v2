@@ -11,6 +11,7 @@ from __future__ import annotations
 import contextlib
 import contextvars
 import hashlib
+import itertools
 import json
 import os
 import uuid
@@ -23,10 +24,11 @@ LEDGER_FILENAME = "external_model_usage_ledger.jsonl"
 EVENT_SCHEMA_VERSION = "apps.external_model_usage_event.v1"
 
 
-_usage_context: contextvars.ContextVar[dict[str, str] | None] = contextvars.ContextVar(
+_usage_context: contextvars.ContextVar[dict[str, Any] | None] = contextvars.ContextVar(
     "apps_external_model_usage_context",
     default=None,
 )
+_unscoped_attempt_sequence = itertools.count(1)
 
 
 def _canonical_json(value: Mapping[str, Any]) -> str:
@@ -134,6 +136,8 @@ def external_model_usage_scope(
     run_id: str | None = None,
     stage: str | None = None,
     section_id: str | None = None,
+    trace_id: str | None = None,
+    app_id: str | None = None,
 ) -> Iterator[None]:
     """Bind nested provider transports to one known run artifact directory."""
     fields = {
@@ -141,12 +145,37 @@ def external_model_usage_scope(
         "run_id": str(run_id or ""),
         "stage": str(stage or ""),
         "section_id": str(section_id or ""),
+        "trace_id": str(trace_id or ""),
+        "app_id": str(app_id or ""),
+        "_logical_attempt_sequence": 0,
     }
     token = _usage_context.set(fields)
     try:
         yield
     finally:
         _usage_context.reset(token)
+
+
+def current_external_model_usage_context() -> dict[str, str]:
+    """Return public fields from the current explicit run binding."""
+
+    scope = _usage_context.get() or {}
+    return {
+        str(key): str(value or "")
+        for key, value in scope.items()
+        if not str(key).startswith("_")
+    }
+
+
+def allocate_provider_logical_attempt() -> int:
+    """Allocate a distinct logical attempt inside the current run scope."""
+
+    scope = _usage_context.get()
+    if scope is None:
+        return next(_unscoped_attempt_sequence)
+    next_value = int(scope.get("_logical_attempt_sequence") or 0) + 1
+    scope["_logical_attempt_sequence"] = next_value
+    return next_value
 
 
 def append_external_model_usage(
@@ -166,6 +195,34 @@ def append_external_model_usage(
     provider_status: str | None = None,
     response_id: str | None = None,
     raw_response_ref: str | None = None,
+    evidence_event: str | None = None,
+    attempt_id: str | None = None,
+    logical_attempt_id: str | None = None,
+    transport_attempt_id: str | None = None,
+    trace_id: str | None = None,
+    app_id: str | None = None,
+    requested_model: str | None = None,
+    observed_model: str | None = None,
+    local_dispatch_started: bool | None = None,
+    request_bytes_sent: bool | None = None,
+    request_bytes_count: int | None = None,
+    request_bytes_proof: str | None = None,
+    response_headers_received: bool | None = None,
+    first_byte_received: bool | None = None,
+    sdk_response_returned: bool | None = None,
+    http_status_code: int | None = None,
+    failure_phase: str | None = None,
+    remote_outcome: str | None = None,
+    error_class: str | None = None,
+    evidence_digest: str | None = None,
+    gateway_id: str | None = None,
+    provider_role: str | None = None,
+    transport_response_received: bool | None = None,
+    response_schema_valid: bool | None = None,
+    model_pin_valid: bool | None = None,
+    application_output_valid: bool | None = None,
+    overall_success: bool | None = None,
+    validation_reason: str | None = None,
 ) -> dict[str, Any] | None:
     """Append one immutable provider-attempt event, returning the event.
 
@@ -197,6 +254,43 @@ def append_external_model_usage(
         "raw_response_ref": str(raw_response_ref or ""),
         **normalized,
     }
+    optional_evidence = {
+        "evidence_event": evidence_event,
+        "attempt_id": attempt_id,
+        "logical_attempt_id": logical_attempt_id,
+        "transport_attempt_id": transport_attempt_id,
+        "trace_id": trace_id if trace_id is not None else scope.get("trace_id"),
+        "app_id": app_id if app_id is not None else scope.get("app_id"),
+        "requested_model": requested_model,
+        "observed_model": observed_model,
+        "local_dispatch_started": local_dispatch_started,
+        "request_bytes_sent": request_bytes_sent,
+        "request_bytes_count": _nonnegative_int(request_bytes_count),
+        "request_bytes_proof": request_bytes_proof,
+        "response_headers_received": response_headers_received,
+        "first_byte_received": first_byte_received,
+        "sdk_response_returned": sdk_response_returned,
+        "http_status_code": _nonnegative_int(http_status_code),
+        "failure_phase": failure_phase,
+        "remote_outcome": remote_outcome,
+        "error_class": error_class,
+        "evidence_digest": evidence_digest,
+        "gateway_id": gateway_id,
+        "provider_role": provider_role,
+        "transport_response_received": transport_response_received,
+        "response_schema_valid": response_schema_valid,
+        "model_pin_valid": model_pin_valid,
+        "application_output_valid": application_output_valid,
+        "overall_success": overall_success,
+        "validation_reason": validation_reason,
+    }
+    event.update(
+        {
+            key: value
+            for key, value in optional_evidence.items()
+            if value is not None
+        }
+    )
     event["event_digest"] = _digest(event)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8", newline="\n") as handle:
@@ -225,7 +319,9 @@ def usage_telemetry(
 __all__ = [
     "EVENT_SCHEMA_VERSION",
     "LEDGER_FILENAME",
+    "allocate_provider_logical_attempt",
     "append_external_model_usage",
+    "current_external_model_usage_context",
     "external_model_usage_scope",
     "ledger_path",
     "normalize_usage",

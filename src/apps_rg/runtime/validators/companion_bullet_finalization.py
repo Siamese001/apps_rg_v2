@@ -167,13 +167,20 @@ def companion_run_dir_accepted(run_dir: Any, *, upstream_section_id: str, expect
     return status == ACCEPTED_FINALIZED_COMPANION_STATUS
 
 
-def _l2_from_modular_successful_pointer(repo: Path, upstream_section_id: str) -> Path | None:
+def _l2_from_modular_successful_pointer(
+    repo: Path,
+    upstream_section_id: str,
+    *,
+    expected_bullet_ids: tuple[str, ...],
+) -> Path | None:
     from apps_rg.runtime.runtime_proof_layout import (
         LATEST_SUCCESSFUL_REAL_FILENAME,
+        _canonical_runtime_repo_root,
         _read_json_dict,
         modular_sections_root_from_env,
     )
 
+    repo = _canonical_runtime_repo_root(repo)
     msr = modular_sections_root_from_env(repo)
     if msr is None:
         return None
@@ -184,7 +191,11 @@ def _l2_from_modular_successful_pointer(repo: Path, upstream_section_id: str) ->
     # same-envelope artifact first; the caller still validates its L2/X3
     # finalization state, so this is not a stale/global fallback.
     direct_l2 = msr / upstream_section_id / "l2_output.json"
-    if direct_l2.is_file():
+    if direct_l2.is_file() and companion_run_dir_accepted(
+        direct_l2.parent,
+        upstream_section_id=upstream_section_id,
+        expected_bullet_ids=expected_bullet_ids,
+    ):
         return direct_l2
     ptr = msr / upstream_section_id / LATEST_SUCCESSFUL_REAL_FILENAME
     data = _read_json_dict(ptr)
@@ -221,7 +232,11 @@ def resolve_companion_bullets_l2_path(
     envelope, or modular ``latest_successful_real_run.json`` from that same
     run tree. Global runtime_proofs scans are forbidden.
     """
-    modular_l2 = _l2_from_modular_successful_pointer(repo, upstream_section_id)
+    modular_l2 = _l2_from_modular_successful_pointer(
+        repo,
+        upstream_section_id,
+        expected_bullet_ids=expected_bullet_ids,
+    )
     if modular_l2 is not None:
         if companion_run_dir_accepted(
             modular_l2.parent,

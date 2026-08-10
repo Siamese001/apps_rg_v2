@@ -96,6 +96,31 @@ def _run_identity(run_id: str) -> dict[str, str]:
     }
 
 
+def test_pinned_baseline_accepts_only_checkout_line_ending_translation(tmp_path: Path) -> None:
+    from apps_rg.runtime.e2e_baseline import validate_pinned_baseline
+
+    contract = _write_passing_baseline(tmp_path)
+    payload = json.loads(contract.read_text(encoding="utf-8"))
+    mandatory = tmp_path / payload["baseline_run_dir"] / "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+    raw = mandatory.read_bytes()
+    lf = raw.replace(b"\r\n", b"\n")
+    crlf = lf.replace(b"\n", b"\r\n")
+    mandatory.write_bytes(lf)
+    payload["mandatory_output_sha256"] = hashlib.sha256(crlf).hexdigest()
+    contract.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = validate_pinned_baseline(tmp_path, contract)
+
+    assert result["mandatory_output_digest_match_mode"] == "line_ending_compatible"
+    mandatory.write_bytes(lf.replace(b'"success"', b'"failure"'))
+    try:
+        validate_pinned_baseline(tmp_path, contract)
+    except RuntimeError as exc:
+        assert "PINNED_BASELINE_DIGEST_MISMATCH" in str(exc)
+    else:
+        raise AssertionError("content alteration must not be accepted as an EOL translation")
+
+
 def test_missing_signing_config_emits_canonical_rca_without_running_dependencies(
     tmp_path: Path,
 ) -> None:
@@ -232,6 +257,86 @@ def test_runtime_preflight_failure_is_non_retriable_and_skips_bootstrap(tmp_path
     assert receipt["retry_policy"] == "NON_RETRIABLE_CONFIGURATION"
 
 
+def test_initial_otel_failure_emits_standard_terminal_evidence_before_dependencies(
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime.e2e_preflight import run_fresh_e2e_preflight
+
+    run_dir = tmp_path / "runs" / "otel-marker-failure"
+    run_dir.mkdir(parents=True)
+    calls: list[str] = []
+    outcome = run_fresh_e2e_preflight(
+        artifact_dir=run_dir,
+        e2e_run_id=run_dir.name,
+        repo_root=tmp_path,
+        baseline_ref=_write_passing_baseline(tmp_path),
+        environ={
+            "APPS_RG_ROUTE_HMAC_SECRET": "secret-value",
+            "APPS_RG_ROUTE_HMAC_KEY_ID": "local-key",
+        },
+        dependency_check=lambda: calls.append("dependency"),
+        runtime_check=lambda: calls.append("runtime"),
+        bootstrap=lambda: calls.append("bootstrap"),
+        initial_failure_code="COLLECTOR_MARKER_NOT_CAPTURED",
+        initial_failure_detail="The configured collector did not capture the per-run preflight marker.",
+    )
+
+    assert outcome.passed is False
+    assert outcome.exit_code == 2
+    assert calls == []
+    receipt = json.loads((run_dir / "e2e_preflight_receipt.json").read_text(encoding="utf-8"))
+    assert receipt["status"] == "BLOCKED"
+    assert receipt["failure_code"] == "COLLECTOR_MARKER_NOT_CAPTURED"
+    assert receipt["research_attempt_count"] == 0
+    ledger = json.loads((run_dir / "e2e_stage_ledger.json").read_text(encoding="utf-8"))
+    assert [(row["stage_id"], row["status"]) for row in ledger["entries"]] == [
+        ("PREFLIGHT", "BLOCKED"),
+        ("CLOSEOUT", "PASS"),
+    ]
+    mandatory = json.loads(
+        (run_dir / "APPS_RG_MANDATORY_RUN_OUTPUT.json").read_text(encoding="utf-8")
+    )
+    assert mandatory["result_summary"]["completion_fault"] == "COLLECTOR_MARKER_NOT_CAPTURED"
+    assert mandatory["result_summary"]["research_artifact_dir"] == "NOT_REACHED:PREFLIGHT"
+
+
+def test_external_runtime_dependency_failure_is_receipted_and_skips_runtime_and_bootstrap(
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime.e2e_preflight import run_fresh_e2e_preflight
+    from apps_rg.runtime import standalone_dependency_posture as posture
+
+    run_dir = tmp_path / "runs" / "dependency-failure"
+    run_dir.mkdir(parents=True)
+    calls: list[str] = []
+    invalid_contract = tmp_path / "invalid-runtime-contract.json"
+    invalid_contract.write_text("{}\n", encoding="utf-8")
+    dependency_receipt = posture.verify_external_agentic_core_runtime(
+        repo_root=tmp_path,
+        contract_path=invalid_contract,
+    )
+
+    outcome = run_fresh_e2e_preflight(
+        artifact_dir=run_dir,
+        e2e_run_id=run_dir.name,
+        repo_root=tmp_path,
+        baseline_ref=_write_passing_baseline(tmp_path),
+        environ={
+            "APPS_RG_ROUTE_HMAC_SECRET": "secret-value",
+            "APPS_RG_ROUTE_HMAC_KEY_ID": "local-key",
+        },
+        dependency_check=lambda: calls.append("dependency") or dependency_receipt,
+        runtime_check=lambda: calls.append("runtime"),
+        bootstrap=lambda: calls.append("bootstrap"),
+    )
+
+    assert outcome.passed is False
+    assert calls == ["dependency"]
+    receipt = json.loads((run_dir / "e2e_preflight_receipt.json").read_text(encoding="utf-8"))
+    assert receipt["failure_code"] == "EXTERNAL_RUNTIME_DEPENDENCY_PREFLIGHT_FAILED"
+    assert (run_dir / posture.STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME).is_file()
+
+
 def test_missing_key_id_alone_is_reported_without_running_dependencies(tmp_path: Path) -> None:
     from apps_rg.runtime.e2e_preflight import run_fresh_e2e_preflight
 
@@ -345,6 +450,59 @@ def test_product_continuation_is_signed_digest_bound_and_consumed_once(
     assert (run_dir / E2E_PREFLIGHT_CONTINUATION_CONSUMPTION_FILENAME).is_file()
     assert second.valid is False
     assert "continuation_already_consumed" in second.errors
+
+
+def test_apps_eval_accepts_two_stage_legacy_preflight_product_identity_binding(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    from apps_eval.adapters.apps_rg import _verified_preflight
+    from apps_rg.runtime.e2e_preflight import (
+        E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME,
+        bind_preflight_to_product_identity,
+        run_fresh_e2e_preflight,
+        validate_preflight_continuation,
+    )
+
+    secret = "two-stage-product-binding-secret"
+    key_id = "two-stage-key"
+    run_dir = tmp_path / "runs" / "two-stage-product-entry"
+    run_dir.mkdir(parents=True)
+    outcome = run_fresh_e2e_preflight(
+        artifact_dir=run_dir,
+        e2e_run_id=run_dir.name,
+        repo_root=tmp_path,
+        baseline_ref=_write_passing_baseline(tmp_path),
+        environ={
+            "APPS_RG_ROUTE_HMAC_SECRET": secret,
+            "APPS_RG_ROUTE_HMAC_KEY_ID": key_id,
+        },
+    )
+    assert outcome.passed is True
+    continuation_path = run_dir / E2E_PREFLIGHT_CONTINUATION_RECEIPT_FILENAME
+    validation = validate_preflight_continuation(
+        receipt_path=continuation_path,
+        secret=secret,
+        expected_e2e_run_id=run_dir.name,
+        expected_key_id=key_id,
+        consumer_id="apps_rg.whole_run.primary",
+        consume=True,
+        require_product_identity=False,
+    )
+    assert validation.valid is True
+    bind_preflight_to_product_identity(
+        validation=validation,
+        receipt_path=continuation_path,
+        secret=secret,
+        identity=_run_identity(run_dir.name),
+        consumer_id="apps_rg.whole_run.primary",
+    )
+    monkeypatch.setenv("APPS_RG_ROUTE_HMAC_SECRET", secret)
+    monkeypatch.setenv("APPS_RG_ROUTE_HMAC_KEY_ID", key_id)
+
+    _entry, _ref, _digest, errors = _verified_preflight(run_dir, {})
+
+    assert errors == []
 
 
 def test_product_continuation_rejects_tamper_and_expiry(tmp_path: Path) -> None:

@@ -68,7 +68,7 @@ def build_admissible_intent_record(
             "prompt_profile_hash": prompt_profile_hash,
             "model_profile_hash": "",
             "gate_profile_hash": gate_profile_hash,
-            "x3_disposition": "X3C",
+            "x3_disposition": "X3C_COMMIT_REQUEST_TO_UWG",
             "proof_eligible": True,
             "cache_admissible": True,
             "generated_at_utc": GENERATED_AT_UTC,
@@ -149,7 +149,7 @@ def write_post_exit_artifacts(
     (run_dir / "x3_disposition.json").write_text(
         json.dumps(
             {
-                "x3_code": "X3C",
+                "x3_code": "X3C_COMMIT_REQUEST_TO_UWG",
                 "proof_eligible": True,
                 "runtime_generation_status": "REAL_LLM",
                 "proceed_to_runtime": True,
@@ -193,7 +193,7 @@ def build_post_exit_eligibility(
         "chunks": [chunk.to_dict() for chunk in chunks],
         "exit_metadata": {
             "source_run_id": record.source_run_id,
-            "x3_disposition": "X3C",
+            "x3_disposition": "X3C_COMMIT_REQUEST_TO_UWG",
             "proof_eligible": True,
             "runtime_generation_status": "REAL_LLM",
             "exit_artifact_present": True,

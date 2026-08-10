@@ -1,0 +1,70 @@
+{
+  "section_id": "competencies",
+  "run_id": "competencies_20260809_130428",
+  "runtime_generation_status": "REAL_LLM",
+  "e2e_closeout_mode": false,
+  "max_regen_rounds_allowed": 2,
+  "lane_phases": [
+    {
+      "phase": "load_section_proof_for_lane",
+      "duration_s": 3.984,
+      "at": "2026-08-09T13:04:28.309933+00:00"
+    },
+    {
+      "phase": "compile_prompt",
+      "duration_s": 1.36,
+      "at": "2026-08-09T13:04:29.662607+00:00"
+    },
+    {
+      "phase": "prepare_l2_before_provider",
+      "duration_s": 0.187,
+      "at": "2026-08-09T13:04:29.857134+00:00"
+    },
+    {
+      "phase": "self_consistency_generation_and_selector",
+      "duration_s": 69.859,
+      "at": "2026-08-09T13:05:39.716563+00:00"
+    },
+    {
+      "phase": "deterministic_repairs",
+      "duration_s": 0.063,
+      "at": "2026-08-09T13:05:39.773690+00:00"
+    },
+    {
+      "phase": "x1d",
+      "duration_s": 83.484,
+      "at": "2026-08-09T13:07:03.263191+00:00"
+    },
+    {
+      "phase": "x2",
+      "duration_s": 0.282,
+      "at": "2026-08-09T13:07:03.538530+00:00"
+    },
+    {
+      "phase": "x3_and_l2_finalize",
+      "duration_s": 0.593,
+      "at": "2026-08-09T13:07:04.146614+00:00"
+    },
+    {
+      "phase": "l6_shadow",
+      "duration_s": 0.047,
+      "at": "2026-08-09T13:07:04.180512+00:00"
+    }
+  ],
+  "generation_selector_phases": [
+    {
+      "phase": "self_consistency_generation_round_0",
+      "started_at": "2026-08-09T13:04:29.858134+00:00",
+      "duration_s": 55.594,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 8
+    },
+    {
+      "phase": "selector_round_0",
+      "started_at": "2026-08-09T13:05:25.449032+00:00",
+      "duration_s": 14.25,
+      "selection_mode": "competencies_advisory_selector_required_eight_pass"
+    }
+  ]
+}

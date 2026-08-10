@@ -27,11 +27,40 @@ from apps_rg.runtime.providers.provider_attempt_spans import (
     summarize_provider_attempt_spans,
 )
 from apps_rg.runtime.providers.provider_contract import ProviderResult
-from apps_model_telemetry.external_model_usage import append_external_model_usage
+from apps_model_telemetry.execution_evidence import (
+    provider_attempt,
+    urlopen_with_transport_evidence,
+)
+from apps_model_telemetry.external_model_usage import (
+    allocate_provider_logical_attempt,
+    append_external_model_usage,
+    current_external_model_usage_context,
+)
 ExternalTransport = Callable[[dict[str, Any]], dict[str, Any]]
 
 DEFAULT_ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
 DEFAULT_OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
+_STDLIB_URLOPEN = urllib.request.urlopen
+
+
+def _urlopen_with_attempt_evidence(
+    request: urllib.request.Request,
+    *,
+    timeout: float,
+    evidence: Any,
+) -> Any:
+    """Use the instrumented product transport while preserving injected tests."""
+
+    current = urllib.request.urlopen
+    if current is not _STDLIB_URLOPEN:
+        return current(request, timeout=timeout)
+    return urlopen_with_transport_evidence(
+        request,
+        timeout=timeout,
+        evidence=evidence,
+    )
+
+
 def _openai_model_omits_temperature(model: Any) -> bool:
     capabilities = try_model_capabilities(str(model or ""))
     return bool(
@@ -285,6 +314,25 @@ class ExternalProvider:
             return self._anthropic_messages_transport(request)
         return self._openai_responses_transport(request)
 
+    def _transport_attempt_evidence(
+        self, request: Mapping[str, Any], *, transport_attempt: int
+    ):
+        context = request.get("_provider_attempt_context")
+        context = context if isinstance(context, Mapping) else {}
+        return provider_attempt(
+            artifact_dir=str(context.get("artifact_dir") or "") or None,
+            run_id=str(context.get("run_id") or ""),
+            trace_id=str(context.get("trace_id") or ""),
+            app_id=str(context.get("app_id") or "apps_rg"),
+            stage=str(context.get("stage") or "L2.section_generation"),
+            section_id=str(context.get("section_id") or ""),
+            provider=self.provider_profile.value,
+            requested_model=self.model,
+            request_digest=str(context.get("request_digest") or ""),
+            logical_attempt=int(context.get("logical_attempt") or 1),
+            transport_attempt=transport_attempt,
+        )
+
     def _anthropic_messages_transport(self, request: dict[str, Any]) -> dict[str, Any]:
         # STREAM the Messages API (SSE). Non-streaming holds the connection idle for the whole
         # server-side generation (~30s for a multi-thousand-token output); in the long-lived run
@@ -319,16 +367,21 @@ class ExternalProvider:
             "anthropic-version": "2023-06-01",
         }
         data = json.dumps(body).encode("utf-8")
-        # Short per-read timeout + retry. In the long-lived run process a streamed connection can
-        # stall mid-stream (no data on an otherwise-open socket); cap each read and reconnect rather
-        # than block to the wall-clock. A fresh stream completes in ~34s, so a retry recovers.
-        per_read = float(os.environ.get("APPS_RG_STREAM_READ_TIMEOUT_S") or 18.0)
+        # Keep one provider response alive for almost the full governed wall budget.  Replaying a
+        # request after response headers or a first byte can duplicate billable remote work and,
+        # for slower reasoning models, an 18-second socket timeout repeatedly discarded healthy
+        # HTTP 200 streams before their first text delta.
+        wall_budget = resolve_external_section_timeout_s(request.get("timeout_seconds"))
+        internal_budget = max(1.0, wall_budget - min(5.0, wall_budget * 0.1))
+        per_read = float(
+            os.environ.get("APPS_RG_STREAM_READ_TIMEOUT_S") or internal_budget
+        )
+        per_read = max(1.0, min(per_read, internal_budget))
         attempts_override = os.environ.get("APPS_RG_STREAM_ATTEMPTS", "").strip()
         if attempts_override:
-            _attempts = int(attempts_override)
+            _attempts = max(1, min(int(attempts_override), 2))
         else:
-            wall_budget = resolve_external_section_timeout_s(request.get("timeout_seconds"))
-            _attempts = max(8, int((wall_budget / max(per_read, 1.0)) + 0.999))
+            _attempts = 2
         # W2 transport-progress instrumentation: a slow-but-active streamed response must be
         # observable as PROGRESSING, not indistinguishable from a stall. ``progress_sink`` (an
         # optional dict the caller owns) is mutated IN PLACE as chunks arrive, so even when the
@@ -338,6 +391,7 @@ class ExternalProvider:
         progress = progress if isinstance(progress, dict) else None
         started_wall = datetime.now(timezone.utc).isoformat()
         t0 = time.monotonic()
+        deadline = t0 + internal_budget
         if progress is not None:
             progress.update(
                 {
@@ -357,6 +411,8 @@ class ExternalProvider:
         first_byte_after_s: float | None = None
         chunk_count = 0
         last_progress_after_s: float | None = None
+        attempt_state = request.get("_provider_attempt_state")
+        attempt_state = attempt_state if isinstance(attempt_state, dict) else {}
         for _attempt in range(_attempts):
             text_parts = []
             resolved_model = str(body["model"])
@@ -365,57 +421,96 @@ class ExternalProvider:
             stop_details = None
             chunk_count = 0
             first_byte_after_s = None
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("Anthropic stream exhausted its internal wall budget")
             try:
-                http_req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-                with urllib.request.urlopen(http_req, timeout=per_read) as resp:
-                    for raw_line in resp:
-                        line = raw_line.decode("utf-8", errors="replace").strip()
-                        if not line.startswith("data:"):
-                            continue
-                        payload = line[5:].strip()
-                        if not payload or payload == "[DONE]":
-                            continue
-                        try:
-                            event = json.loads(payload)
-                        except json.JSONDecodeError:
-                            continue
-                        now_after = time.monotonic() - t0
-                        if first_byte_after_s is None:
-                            first_byte_after_s = now_after
-                            if progress is not None:
-                                progress["first_byte_after_s"] = round(now_after, 4)
-                        chunk_count += 1
-                        last_progress_after_s = now_after
-                        etype = event.get("type")
-                        if etype == "message_start":
-                            msg = event.get("message") or {}
-                            resolved_model = str(msg.get("model") or resolved_model)
-                            if isinstance(msg.get("usage"), dict):
-                                usage.update(msg["usage"])
-                        elif etype == "content_block_delta":
-                            delta = event.get("delta") or {}
-                            if delta.get("type") == "text_delta":
-                                text_parts.append(str(delta.get("text") or ""))
-                        elif etype == "message_delta":
-                            delta = event.get("delta") or {}
-                            if isinstance(delta, dict):
-                                stop_reason = str(delta.get("stop_reason") or "") or stop_reason
-                                raw_stop_details = delta.get("stop_details")
-                                if isinstance(raw_stop_details, dict):
-                                    stop_details = dict(raw_stop_details)
-                            if isinstance(event.get("usage"), dict):
-                                usage.update(event["usage"])
-                        elif etype == "message_stop":
-                            break
-                        elif etype == "error":
-                            err = event.get("error") or {}
-                            raise ProviderGatewayError(
-                                f"anthropic stream error: {err.get('type')}: {err.get('message')}"
+                with self._transport_attempt_evidence(
+                    request, transport_attempt=_attempt + 1
+                ) as evidence:
+                    attempt_state["last_transport_attempt"] = _attempt + 1
+                    attempt_state.setdefault("attempt_ids", []).append(evidence.attempt_id)
+                    evidence.mark_local_dispatch_started()
+                    http_req = urllib.request.Request(
+                        url, data=data, headers=headers, method="POST"
+                    )
+                    try:
+                        response_context = _urlopen_with_attempt_evidence(
+                            http_req,
+                            timeout=min(per_read, remaining),
+                            evidence=evidence,
+                        )
+                    except HTTPError as exc:
+                        evidence.mark_response_headers(status_code=int(exc.code))
+                        evidence.failure_phase = "HTTP_RESPONSE"
+                        raise
+                    with response_context as resp:
+                        response_headers = getattr(resp, "headers", None)
+                        response_id = ""
+                        if response_headers is not None:
+                            response_id = str(
+                                response_headers.get("request-id")
+                                or response_headers.get("x-request-id")
+                                or ""
                             )
-                        if progress is not None:
-                            progress["chunk_count"] = chunk_count
-                            progress["last_progress_after_s"] = round(now_after, 4)
-                            progress["raw_output_chars"] = sum(len(p) for p in text_parts)
+                        evidence.mark_response_headers(
+                            status_code=getattr(resp, "status", None),
+                            provider_response_id=response_id,
+                        )
+                        for raw_line in resp:
+                            if not evidence.first_byte_received:
+                                evidence.mark_first_byte()
+                            line = raw_line.decode("utf-8", errors="replace").strip()
+                            if not line.startswith("data:"):
+                                continue
+                            payload = line[5:].strip()
+                            if not payload or payload == "[DONE]":
+                                continue
+                            try:
+                                event = json.loads(payload)
+                            except json.JSONDecodeError:
+                                continue
+                            now_after = time.monotonic() - t0
+                            if first_byte_after_s is None:
+                                first_byte_after_s = now_after
+                                if progress is not None:
+                                    progress["first_byte_after_s"] = round(now_after, 4)
+                            chunk_count += 1
+                            last_progress_after_s = now_after
+                            etype = event.get("type")
+                            if etype == "message_start":
+                                msg = event.get("message") or {}
+                                resolved_model = str(msg.get("model") or resolved_model)
+                                if isinstance(msg.get("usage"), dict):
+                                    usage.update(msg["usage"])
+                            elif etype == "content_block_delta":
+                                delta = event.get("delta") or {}
+                                if delta.get("type") == "text_delta":
+                                    text_parts.append(str(delta.get("text") or ""))
+                            elif etype == "message_delta":
+                                delta = event.get("delta") or {}
+                                if isinstance(delta, dict):
+                                    stop_reason = (
+                                        str(delta.get("stop_reason") or "") or stop_reason
+                                    )
+                                    raw_stop_details = delta.get("stop_details")
+                                    if isinstance(raw_stop_details, dict):
+                                        stop_details = dict(raw_stop_details)
+                                if isinstance(event.get("usage"), dict):
+                                    usage.update(event["usage"])
+                            elif etype == "message_stop":
+                                break
+                            elif etype == "error":
+                                err = event.get("error") or {}
+                                raise ProviderGatewayError(
+                                    "anthropic stream error: "
+                                    f"{err.get('type')}: {err.get('message')}"
+                                )
+                            if progress is not None:
+                                progress["chunk_count"] = chunk_count
+                                progress["last_progress_after_s"] = round(now_after, 4)
+                                progress["raw_output_chars"] = sum(len(p) for p in text_parts)
+                    evidence.finish(observed_model=resolved_model)
             except HTTPError:
                 raise
             except (
@@ -431,8 +526,12 @@ class ExternalProvider:
                 ConnectionError,
                 ProviderGatewayError,
             ):
-                if _attempt + 1 < _attempts:
-                    time.sleep(min(0.25 * (2 ** _attempt), 2.0))
+                response_started = bool(
+                    evidence.response_headers_received or evidence.first_byte_received
+                )
+                remaining = deadline - time.monotonic()
+                if not response_started and _attempt + 1 < _attempts and remaining > 0:
+                    time.sleep(min(0.25 * (2 ** _attempt), 2.0, remaining))
                     continue
                 raise
             break
@@ -488,18 +587,55 @@ class ExternalProvider:
         if not _openai_model_omits_temperature(body["model"]):
             body["temperature"] = float(request.get("temperature") or 0.0)
         url = str(request.get("base_url") or self.base_url or DEFAULT_OPENAI_RESPONSES_URL)
-        http_req = urllib.request.Request(
-            url,
-            data=json.dumps(body).encode("utf-8"),
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": f"Bearer {self.environ.get(self.api_key_env_var) or ''}",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(http_req, timeout=timeout_seconds) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+        attempt_state = request.get("_provider_attempt_state")
+        attempt_state = attempt_state if isinstance(attempt_state, dict) else {}
+        with self._transport_attempt_evidence(request, transport_attempt=1) as evidence:
+            attempt_state["last_transport_attempt"] = 1
+            attempt_state.setdefault("attempt_ids", []).append(evidence.attempt_id)
+            evidence.mark_local_dispatch_started()
+            http_req = urllib.request.Request(
+                url,
+                data=json.dumps(body).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": f"Bearer {self.environ.get(self.api_key_env_var) or ''}",
+                },
+                method="POST",
+            )
+            try:
+                response_context = _urlopen_with_attempt_evidence(
+                    http_req,
+                    timeout=timeout_seconds,
+                    evidence=evidence,
+                )
+            except HTTPError as exc:
+                evidence.mark_response_headers(status_code=int(exc.code))
+                evidence.failure_phase = "HTTP_RESPONSE"
+                raise
+            with response_context as resp:
+                response_headers = getattr(resp, "headers", None)
+                response_id = ""
+                if response_headers is not None:
+                    response_id = str(
+                        response_headers.get("x-request-id")
+                        or response_headers.get("request-id")
+                        or ""
+                    )
+                evidence.mark_response_headers(
+                    status_code=getattr(resp, "status", None),
+                    provider_response_id=response_id,
+                )
+                raw_body = resp.read()
+                if raw_body:
+                    evidence.mark_first_byte()
+                data = json.loads(raw_body.decode("utf-8"))
+            evidence.finish(
+                observed_model=str(data.get("model") or body["model"]),
+                provider_response_id=str(
+                    data.get("id") or data.get("response_id") or response_id
+                ),
+            )
         text = str(data.get("output_text") or "")
         if not text:
             parts: list[str] = []
@@ -580,6 +716,12 @@ class ExternalProvider:
         timeout_seconds: int | float | None = None,
     ) -> ProviderResult:
         attempt_started_at_utc = datetime.now(timezone.utc).isoformat()
+        usage_context = current_external_model_usage_context()
+        logical_attempt = allocate_provider_logical_attempt()
+        attempt_state: dict[str, Any] = {
+            "last_transport_attempt": 0,
+            "attempt_ids": [],
+        }
         reasoning_effort = str(getattr(compiled_prompt, "reasoning_effort", None) or "").strip().lower()
         capabilities = try_model_capabilities(self.model)
         if reasoning_effort and capabilities and not capabilities.supports_reasoning_effort(
@@ -609,7 +751,7 @@ class ExternalProvider:
             )
             span = build_provider_attempt_span(
                 attempt_kind="requested",
-                attempt_index=0,
+                attempt_index=logical_attempt,
                 provider=self.provider_profile.value,
                 model=str(model or self.model),
                 provider_attempted=provider_attempted,
@@ -631,6 +773,13 @@ class ExternalProvider:
             )
             response["provider_attempt_spans"] = [span]
             response["provider_attempt_timing_summary"] = summarize_provider_attempt_spans([span])
+            response["logical_attempt"] = logical_attempt
+            response["transport_attempt"] = int(
+                attempt_state.get("last_transport_attempt") or 0
+            )
+            response["transport_attempt_ids"] = list(
+                attempt_state.get("attempt_ids") or []
+            )
             return response
 
         prompt = _prompt_text(compiled_prompt)
@@ -655,8 +804,10 @@ class ExternalProvider:
                     provider_status=provider_status,
                     usage=raw_usage,
                     response_id=response_id,
-                    logical_attempt=1,
-                    transport_attempt=1,
+                    logical_attempt=logical_attempt,
+                    transport_attempt=int(
+                        attempt_state.get("last_transport_attempt") or 0
+                    ),
                 )
             except OSError:
                 # A full or unavailable artifact volume must not turn a completed
@@ -677,6 +828,14 @@ class ExternalProvider:
             "base_url": self.base_url,
             "timeout_seconds": provider_timeout_seconds,
             "progress_sink": progress_sink,
+            "_provider_attempt_context": {
+                **usage_context,
+                "app_id": usage_context.get("app_id") or "apps_rg",
+                "stage": usage_context.get("stage") or "L2.section_generation",
+                "request_digest": request_digest,
+                "logical_attempt": logical_attempt,
+            },
+            "_provider_attempt_state": attempt_state,
         }
         if reasoning_effort:
             request["reasoning_effort"] = reasoning_effort
@@ -712,11 +871,42 @@ class ExternalProvider:
             )
         transport = self.transport or self._default_transport
         try:
-            response = self._transport_with_wall_clock_timeout(
-                transport,
-                request,
-                timeout_seconds=provider_timeout_seconds,
-            )
+            if self.transport is None:
+                response = self._transport_with_wall_clock_timeout(
+                    transport,
+                    request,
+                    timeout_seconds=provider_timeout_seconds,
+                )
+            else:
+                with self._transport_attempt_evidence(
+                    request, transport_attempt=1
+                ) as evidence:
+                    attempt_state["last_transport_attempt"] = 1
+                    attempt_state["attempt_ids"].append(evidence.attempt_id)
+                    evidence.mark_local_dispatch_started()
+                    transport_request = {
+                        key: value
+                        for key, value in request.items()
+                        if not str(key).startswith("_")
+                    }
+                    response = self._transport_with_wall_clock_timeout(
+                        transport,
+                        transport_request,
+                        timeout_seconds=provider_timeout_seconds,
+                    )
+                    raw_response = (
+                        response.get("raw_response")
+                        if isinstance(response.get("raw_response"), Mapping)
+                        else {}
+                    )
+                    evidence.mark_sdk_response(
+                        observed_model=str(response.get("model") or self.model),
+                        provider_response_id=str(
+                            raw_response.get("id")
+                            or raw_response.get("response_id")
+                            or ""
+                        ),
+                    )
         except HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:1000]
             error = f"External provider HTTP {exc.code}: {detail or exc.reason}"

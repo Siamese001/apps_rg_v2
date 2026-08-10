@@ -22,6 +22,7 @@ from apps_rg.runtime.section_l2_lane_integration import (
 )
 from apps_rg.runtime.section_l2_spine_receipt import SEALED_L2_ARTIFACT
 from apps_rg.runtime.section_runtime_exhaust_lane_integration import (
+    core_runtime_callback_scope,
     finalize_section_runtime_exhaust_before_l6,
     gate_section_l6_shadow_after_exhaust,
 )
@@ -148,3 +149,33 @@ def test_full_exit_then_exhaust_chain(tmp_path: Path, section_id: str):
 
 def test_kill_switch_enabled_by_default():
     assert runtime_exhaust_kill_switch_enabled() is True
+
+
+def test_nested_core_defers_l6_until_lane_product_certification(tmp_path: Path):
+    _write_json(
+        tmp_path / EXIT_DISPOSITION_RECEIPT_ARTIFACT,
+        {
+            "run_id": "lane-run",
+            "x3_disposition": {"x3_code": "X3_ALLOW", "pass": True},
+        },
+    )
+    _write_json(tmp_path / SEALED_L2_ARTIFACT, {"contract_type": "SealedL2Artifact"})
+    _write_json(tmp_path / "runtime_identity_envelope.json", {"payload": {"run_id": "core-run"}})
+    _write_json(
+        tmp_path / "runtime_certification_binding.json",
+        {"payload": {"run_id": "core-run", "certification_status": "L5_CERTIFIED"}},
+    )
+
+    with core_runtime_callback_scope():
+        paths = finalize_section_runtime_exhaust_before_l6(
+            tmp_path,
+            "headline",
+            {"run_id": "lane-run", "product_visible": True},
+            repo_root=REPO,
+        )
+
+    deferred = json.loads(
+        paths["l6_deferred_until_core_certification"].read_text(encoding="utf-8")
+    )
+    assert deferred["status"] == "DEFERRED"
+    assert not (tmp_path / "l6_v40_shadow_eval_package.json").exists()

@@ -387,3 +387,34 @@ def test_apps_rg_live_runner_requires_existing_sealed_source_root(tmp_path: Path
                 emit_l6_handoff=True,
             )
         )
+
+
+def test_lane_artifact_index_binds_lane_scoped_identity(tmp_path: Path) -> None:
+    from apps_eval.adapters import apps_rg as subject
+
+    root = tmp_path / "run"
+    lane = root / "modular_r4" / "sections" / "headline"
+    lane.mkdir(parents=True)
+    (lane / "l2_output.json").write_text('{"status":"PASS"}', encoding="utf-8")
+    identity = {
+        "parent_run_id": "product-run",
+        "child_run_id": "headline-run",
+        "section_attempt_id": "headline:headline-run:attempt:1",
+        "runtime_exhaust_bundle_id": "rxb-headline",
+    }
+    (lane / "l6_v40_shadow_eval_package.json").write_text(
+        json.dumps({"section_id": "headline", **identity}), encoding="utf-8"
+    )
+    (lane / "l6_observability_closure_receipt.json").write_text(
+        json.dumps({"observability_closure_status": "PASS", **identity}),
+        encoding="utf-8",
+    )
+    manifest = subject.build_source_artifact_manifest(root)
+
+    index = subject._lane_artifact_index(
+        root,
+        manifest,
+        {"parent_run_id": "product-run", "child_run_id": "research-run"},
+    )
+
+    assert index["headline:lane_l2_output"]["payload"]["source_identity"] == identity

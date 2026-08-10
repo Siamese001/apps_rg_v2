@@ -1,0 +1,245 @@
+{
+  "deterministic_digest": "sha256:a6193c7bd4ead5c6a82771f63cc550dfe3e076c7fa12188679662354da3b4699",
+  "generated_at_utc": "2026-08-09T07:02:51.774220+00:00",
+  "normalized_contract": {
+    "errors": [],
+    "how_trace": {
+      "deterministic_digest": "sha256:8a6240eb9d604c53fed06ac873d25535ea80a43b95e558d623bcb2feba9d2676",
+      "source_recomputed_digest": "sha256:8a6240eb9d604c53fed06ac873d25535ea80a43b95e558d623bcb2feba9d2676",
+      "source_ref": "agentic_core_how_trace.json",
+      "source_stored_digest": "sha256:8a6240eb9d604c53fed06ac873d25535ea80a43b95e558d623bcb2feba9d2676"
+    },
+    "runtime_modes": {
+      "how_trace": "production",
+      "runtime_exhaust": "production",
+      "spine_proof": "production"
+    },
+    "spine_proof": {
+      "agentic_core_spine_status": "R4_SINGLE_ACTION_BLOCKED",
+      "blocking_gaps": [
+        "GOVERNED_EXIT_NOT_ALLOW_FINISH:X3A_DENY_REROUTE",
+        "HOW_TRACE_BLOCKED"
+      ],
+      "exit_code": 1,
+      "resolved_refs": {
+        "artifact_manifest_ref": {
+          "artifact_hash": "sha256:e0418c55daff33d36cbbc6ed3868070878ece084773b7c8c23875a917eb59b96",
+          "artifact_ref": "integrated_runtime_artifact_manifest.json",
+          "resolved": true
+        },
+        "how_trace_ref": {
+          "artifact_hash": "sha256:21978f31113931d7d21e52b3754d29f38644f59ad858d5415f079a3666750909",
+          "artifact_ref": "agentic_core_how_trace.json",
+          "resolved": true
+        },
+        "otel_or_runtime_trace_ref": {
+          "artifact_hash": "sha256:9b2a7e13ab86f0b47704c1d3632b8e69f63da208af118c77a2861d4e1a7a23ea",
+          "artifact_ref": "runtime_trace_snapshot.json",
+          "resolved": true
+        },
+        "runtime_c0_receipt_ref": {
+          "artifact_hash": "sha256:d9dcc149e811d551c816031b254ad7bc04377c648491424ef1c8453e0fddde74",
+          "artifact_ref": "c0_bypass_receipt.json",
+          "resolved": true
+        },
+        "runtime_exhaust_ref": {
+          "artifact_hash": "sha256:4a6c215e228f4e16d07ff7082bcac7089e0b2175b64a6ebf76a7670014b8ca79",
+          "artifact_ref": "runtime_exhaust_bundle.json",
+          "resolved": true
+        },
+        "runtime_exit_disposition_ref": {
+          "artifact_hash": "sha256:911cea41b01409a296fd192faa74bde105bc099a2d3d7cde5ec088d145c02730",
+          "artifact_ref": "x3_disposition_receipt.json",
+          "resolved": true
+        },
+        "runtime_identity_ref": {
+          "artifact_hash": "sha256:6132d1845db660153436c0d77cb8511abf9e005fe44911f18d17ef7ec8f3ca27",
+          "artifact_ref": "runtime_identity_envelope.json",
+          "resolved": true
+        },
+        "runtime_intake_ref": {
+          "artifact_hash": "sha256:b07f0c4b7c17ccab0c234d79ed775e9e86e9b80099bfbef3d0f815c568803fb7",
+          "artifact_ref": "validated_request.json",
+          "resolved": true
+        },
+        "runtime_l1_plan_ref": {
+          "artifact_hash": "sha256:92813edf2c3a77427627a0eab9e73d026875f7bb2384e4726fe22125008de970",
+          "artifact_ref": "l1_plan_contract.json",
+          "resolved": true
+        },
+        "runtime_l2_artifact_ref": {
+          "artifact_hash": "sha256:85f295c797989f4eb9ef6bceff9d9458606e68d4ff62abf129cffd62bfad1604",
+          "artifact_ref": "l2_sealed_artifact.json",
+          "resolved": true
+        },
+        "runtime_l3_bypass_ref": {
+          "artifact_hash": "sha256:dd0b5dcea9cb9d6913e72021753e425ee96773869883719f133583820cab06d9",
+          "artifact_ref": "l3_bypass_receipt.json",
+          "resolved": true
+        },
+        "runtime_prompt_assembly_ref": {
+          "artifact_hash": "sha256:0995617ad7bd313aba554d1e6c965ddd24a65cfec522a21de5ea05db896434f6",
+          "artifact_ref": "prompt_assembly_bypass_receipt.json",
+          "resolved": true
+        },
+        "runtime_route_contract_ref": {
+          "artifact_hash": "sha256:8635bedda18014db8e494790c6e49eda7f37096bc00e8263ba4a7aede6c6bc58",
+          "artifact_ref": "route_contract.json",
+          "resolved": true
+        }
+      },
+      "runtime_mode": "production",
+      "success": false
+    },
+    "valid": true,
+    "x3": {
+      "legacy_disposition": "X3A_DENY_REROUTE",
+      "source_ref": "x3_disposition_receipt.json",
+      "x3_disposition": "X3A_DENY_REROUTE"
+    }
+  },
+  "outcome_authorized": false,
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_authority",
+  "schema_version": "apps_rg.core_runtime_authority.v1",
+  "source_artifact_bindings": [
+    {
+      "artifact_ref": "runtime_identity_envelope.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:6132d1845db660153436c0d77cb8511abf9e005fe44911f18d17ef7ec8f3ca27",
+      "recorded_artifact_hash": "sha256:6132d1845db660153436c0d77cb8511abf9e005fe44911f18d17ef7ec8f3ca27"
+    },
+    {
+      "artifact_ref": "validated_request.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:b07f0c4b7c17ccab0c234d79ed775e9e86e9b80099bfbef3d0f815c568803fb7",
+      "recorded_artifact_hash": "sha256:b07f0c4b7c17ccab0c234d79ed775e9e86e9b80099bfbef3d0f815c568803fb7"
+    },
+    {
+      "artifact_ref": "l1_plan_contract.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:92813edf2c3a77427627a0eab9e73d026875f7bb2384e4726fe22125008de970",
+      "recorded_artifact_hash": "sha256:92813edf2c3a77427627a0eab9e73d026875f7bb2384e4726fe22125008de970"
+    },
+    {
+      "artifact_ref": "route_contract.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:8635bedda18014db8e494790c6e49eda7f37096bc00e8263ba4a7aede6c6bc58",
+      "recorded_artifact_hash": "sha256:8635bedda18014db8e494790c6e49eda7f37096bc00e8263ba4a7aede6c6bc58"
+    },
+    {
+      "artifact_ref": "l3_bypass_receipt.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:dd0b5dcea9cb9d6913e72021753e425ee96773869883719f133583820cab06d9",
+      "recorded_artifact_hash": "sha256:dd0b5dcea9cb9d6913e72021753e425ee96773869883719f133583820cab06d9"
+    },
+    {
+      "artifact_ref": "c0_bypass_receipt.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:d9dcc149e811d551c816031b254ad7bc04377c648491424ef1c8453e0fddde74",
+      "recorded_artifact_hash": "sha256:d9dcc149e811d551c816031b254ad7bc04377c648491424ef1c8453e0fddde74"
+    },
+    {
+      "artifact_ref": "prompt_assembly_bypass_receipt.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:0995617ad7bd313aba554d1e6c965ddd24a65cfec522a21de5ea05db896434f6",
+      "recorded_artifact_hash": "sha256:0995617ad7bd313aba554d1e6c965ddd24a65cfec522a21de5ea05db896434f6"
+    },
+    {
+      "artifact_ref": "terminal_ret_packet.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:e6c21545c57673e4bb72f71a8ebf2fcc0451d4837e1a23ff0dc989d191863ff6",
+      "recorded_artifact_hash": "sha256:e6c21545c57673e4bb72f71a8ebf2fcc0451d4837e1a23ff0dc989d191863ff6"
+    },
+    {
+      "artifact_ref": "exit_review_packet.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:a74f8890771fe82e39290e34bedd4426ae66147b37eb0aba7c5837418ebacbcc",
+      "recorded_artifact_hash": "sha256:a74f8890771fe82e39290e34bedd4426ae66147b37eb0aba7c5837418ebacbcc"
+    },
+    {
+      "artifact_ref": "x3_disposition_receipt.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:911cea41b01409a296fd192faa74bde105bc099a2d3d7cde5ec088d145c02730",
+      "recorded_artifact_hash": "sha256:911cea41b01409a296fd192faa74bde105bc099a2d3d7cde5ec088d145c02730"
+    },
+    {
+      "artifact_ref": "runtime_execution_witness.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:05b70a6e7a56fa7f6064891a4f563ea9acbfece002ff4ebe7368160a641bfd00",
+      "recorded_artifact_hash": "sha256:05b70a6e7a56fa7f6064891a4f563ea9acbfece002ff4ebe7368160a641bfd00"
+    },
+    {
+      "artifact_ref": "l2_sealed_artifact.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+      "recomputed_artifact_hash": "sha256:85f295c797989f4eb9ef6bceff9d9458606e68d4ff62abf129cffd62bfad1604",
+      "recorded_artifact_hash": "sha256:85f295c797989f4eb9ef6bceff9d9458606e68d4ff62abf129cffd62bfad1604"
+    },
+    {
+      "artifact_ref": "runtime_exhaust_bundle.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:4a6c215e228f4e16d07ff7082bcac7089e0b2175b64a6ebf76a7670014b8ca79",
+      "recorded_artifact_hash": "sha256:4a6c215e228f4e16d07ff7082bcac7089e0b2175b64a6ebf76a7670014b8ca79"
+    },
+    {
+      "artifact_ref": "runtime_trace_snapshot.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:9b2a7e13ab86f0b47704c1d3632b8e69f63da208af118c77a2861d4e1a7a23ea",
+      "recorded_artifact_hash": "sha256:9b2a7e13ab86f0b47704c1d3632b8e69f63da208af118c77a2861d4e1a7a23ea"
+    },
+    {
+      "artifact_ref": "agentic_core_how_trace.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:21978f31113931d7d21e52b3754d29f38644f59ad858d5415f079a3666750909",
+      "recorded_artifact_hash": "sha256:21978f31113931d7d21e52b3754d29f38644f59ad858d5415f079a3666750909"
+    },
+    {
+      "artifact_ref": "integrated_runtime_artifact_manifest.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:e0418c55daff33d36cbbc6ed3868070878ece084773b7c8c23875a917eb59b96",
+      "recorded_artifact_hash": "sha256:e0418c55daff33d36cbbc6ed3868070878ece084773b7c8c23875a917eb59b96"
+    },
+    {
+      "artifact_ref": "agentic_core_spine_proof.json",
+      "hash_matches": true,
+      "present": true,
+      "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+      "recomputed_artifact_hash": "sha256:b811c2de06d6685d20d5ea26385aa8d710e6c4a9aed6ddf01c7154a4c60543e0",
+      "recorded_artifact_hash": "sha256:b811c2de06d6685d20d5ea26385aa8d710e6c4a9aed6ddf01c7154a4c60543e0"
+    }
+  ],
+  "source_contract_violations": [],
+  "source_runtime_subject": "agentic_core",
+  "status": "BLOCKED"
+}

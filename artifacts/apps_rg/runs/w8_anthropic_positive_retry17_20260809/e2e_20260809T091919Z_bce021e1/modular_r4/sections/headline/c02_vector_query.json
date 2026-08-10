@@ -1,0 +1,33 @@
+{
+  "schema_version": "c02_vector_query_v1",
+  "section_id": "headline",
+  "retrieval_profile_ref": "apps_rg.headline.c0_profile",
+  "product_hybrid_required": true,
+  "product_hybrid_attempted": true,
+  "dense_attempted": true,
+  "sparse_attempted": true,
+  "bm25_available": true,
+  "failure_reason": "product_hybrid_bounded_section_retrieval",
+  "proof_classification": "PRODUCT_STRICT",
+  "product_hybrid": true,
+  "attempted": true,
+  "lanes": {
+    "dense": "completed",
+    "sparse": "completed",
+    "metadata": "completed"
+  },
+  "c0_authority_mode": "ledger_graph_primary",
+  "hybrid_enrichment_item_count": 4,
+  "c0_retrieval_mode": "ledger_plus_hybrid_retrieval",
+  "reason": "product_hybrid_bounded_section_retrieval",
+  "status": "PASS",
+  "dense_search_refs": [
+    "dense:fact_vectors:C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\data\\cache\\chromadb"
+  ],
+  "sparse_search_refs": [
+    "ref:sparse:lane:apps_rg.headline.sparse:status=OK:hits=1"
+  ],
+  "chroma_write_in_c02": false,
+  "fact_vector_index_preflight_status": "PASS",
+  "fact_vector_index_preflight_ref": "c02_fact_vector_index_preflight.json"
+}

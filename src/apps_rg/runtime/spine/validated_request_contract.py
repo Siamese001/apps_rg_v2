@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Mapping
 
 if TYPE_CHECKING:
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
+    from apps_rg.runtime.spine_contracts import ValidatedRequest
 
 CANONICAL_APPS_RG_VALIDATED_REQUEST_FILENAME = "apps_rg_u0_validated_request.json"
 _SCHEMA_VERSION = "apps_rg.validated_request_contract.v1"
@@ -112,8 +112,8 @@ def _tuple_values(body: dict[str, Any], *names: str) -> None:
 
 
 def _deserialize_validated_request(payload: Mapping[str, Any]) -> ValidatedRequest:
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-    from agentic_core.runtime.contracts.posture import RuntimePosture
+    from apps_rg.runtime.spine_contracts import ValidatedRequest
+    from apps_rg.runtime.spine_contracts import RuntimePosture
     from agentic_core.runtime.u0.reflection_receipt import AppsRgU0ReflectionReceipt
     from apps_rg.runtime.bindings.u0_binding import AppsRgU0AuthorityReceipt
 

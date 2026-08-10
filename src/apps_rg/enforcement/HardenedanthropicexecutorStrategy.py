@@ -11,7 +11,7 @@ import os
 import anthropic
 from dotenv import load_dotenv
 
-from agentic_core.mixins.hardening_mixin import HardeningMixin
+from apps_rg.runtime.core_mixins import HardeningMixin
 
 load_dotenv()
 

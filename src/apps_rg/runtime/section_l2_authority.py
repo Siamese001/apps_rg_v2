@@ -13,8 +13,8 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from agentic_core.runtime.contracts.origin import Origin
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg.runtime.spine_contracts import Origin
+from apps_rg.runtime.spine_contracts import SealedL2Artifact
 from apps_rg.runtime.bindings.l2_authority import (
     build_signed_execution_packet,
     freeze_execution_room,
@@ -127,27 +127,44 @@ def _gate_receipts_from_payload(payload: Mapping[str, Any]) -> tuple[AuthorityGa
     return tuple(receipts)
 
 
-def _token_usage(payload: Any) -> tuple[int, bool]:
+def _token_usage_for_keys(payload: Any, keys: tuple[str, ...]) -> tuple[int, bool]:
     if isinstance(payload, Mapping):
-        for key in ("total_tokens", "tokens_used", "output_tokens", "completion_tokens"):
+        for key in keys:
             value = payload.get(key)
             if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
                 return value, True
         for key in ("token_usage", "usage", "receipt", "provider_receipt", "meta"):
             if key in payload:
-                found, observed = _token_usage(payload[key])
+                found, observed = _token_usage_for_keys(payload[key], keys)
                 if observed:
                     return found, True
         for value in payload.values():
-            found, observed = _token_usage(value)
+            found, observed = _token_usage_for_keys(value, keys)
             if observed:
                 return found, True
     elif isinstance(payload, Sequence) and not isinstance(payload, (str, bytes, bytearray)):
         for value in payload:
-            found, observed = _token_usage(value)
+            found, observed = _token_usage_for_keys(value, keys)
             if observed:
                 return found, True
     return 0, False
+
+
+def _token_usage(payload: Any) -> tuple[int, bool]:
+    """Return emitted/output tokens, falling back to total only if unavailable.
+
+    ``SignedAppsRgL2ExecutionPacket.budget.max_tokens`` is an output-token
+    ceiling.  Comparing a provider's input+output total to it falsely rejected
+    every historical lane even though each emitted output was within budget.
+    """
+
+    emitted, observed = _token_usage_for_keys(
+        payload,
+        ("output_tokens", "completion_tokens"),
+    )
+    if observed:
+        return emitted, True
+    return _token_usage_for_keys(payload, ("total_tokens", "tokens_used"))
 
 
 def _provider_value(payload: Any, *keys: str) -> str:

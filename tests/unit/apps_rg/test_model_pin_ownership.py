@@ -67,7 +67,7 @@ def test_claude_selectors_remain_separate_from_proof_judges() -> None:
         assert selector["role"] == "advisory_selector"
         assert selector["review_after"] == "2026-11-07"
         assert selector["proof_eligible"] is False
-    assert selectors["competencies_graph_pool_selector"]["reasoning_effort"] == "high"
+    assert selectors["competencies_graph_pool_selector"]["reasoning_effort"] == "low"
     assert selectors["competencies_graph_pool_selector"]["owner"] == (
         "apps_rg.competencies_graph_pool"
     )
@@ -85,9 +85,23 @@ def test_active_manifest_includes_governed_selectors_and_apps_research() -> None
     ]
     assert competency_selector["provider_key"] == "anthropic_claude"
     assert competency_selector["model"] == "claude-sonnet-5"
-    assert competency_selector["effort"] == "high"
+    assert competency_selector["effort"] == "low"
     assert competency_selector["owner"] == "apps_rg.competencies_graph_pool"
     assert competency_selector["proof_eligible"] is False
+    competency_selector_backup = by_role[
+        (
+            "apps_rg",
+            "advisory_selector_backup",
+            "anthropic_limit.competencies_graph_pool_selector",
+        )
+    ]
+    assert competency_selector_backup["provider_key"] == "openai_chatgpt"
+    assert competency_selector_backup["proof_eligible"] is False
+    competencies_generator_backup = by_role[
+        ("apps_rg", "generator_backup", "anthropic_limit.competencies")
+    ]
+    assert competencies_generator_backup["provider_key"] == "external_openai"
+    assert competencies_generator_backup["proof_eligible"] is False
     assert (
         "apps_research",
         "generator",

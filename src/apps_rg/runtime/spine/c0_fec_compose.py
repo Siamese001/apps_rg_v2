@@ -663,7 +663,7 @@ def wire_spine_c0_fec_for_section(
         snap = bridge.bridge_doc.get("final_evidence_contract_snapshot") or {}
         support = str(snap.get("support_status") or bridge.bridge_doc.get("support_status") or "")
         if support:
-            from agentic_core.runtime.contracts.final_evidence_contract import (
+            from apps_rg.runtime.spine_contracts import (
                 FinalEvidenceContract,
             )
             from apps_rg.runtime.bindings.c0_binding import APPS_RG_C0_CERT_REF

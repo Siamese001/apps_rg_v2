@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import (
     FinalEvidenceContract,
     STATUS_NOT_APPLICABLE,
     STATUS_UNKNOWN,

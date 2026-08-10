@@ -198,6 +198,44 @@ def test_runtime_exhaust_bundle_records_inventory_trace_refs_and_exit_x3(
     assert bundle["artifact_inventory_count"] == len(bundle["artifact_inventory"])
 
 
+def test_runtime_exhaust_binds_nested_lane_to_canonical_product_identity(
+    tmp_path: Path,
+) -> None:
+    _write_json(
+        tmp_path / EXIT_DISPOSITION_RECEIPT_ARTIFACT,
+        {"run_id": "lane-run", "x3_disposition": {"x3_code": "X3_ALLOW"}},
+    )
+    _write_json(
+        tmp_path / "lane_dispatch_attempt.json",
+        {
+            "identity": {
+                "parent_run_id": "product-run",
+                "child_run_id": "research-run",
+                "request_id": "request-1",
+                "trace_root": "trace-1",
+                "tenant_id": "tenant-1",
+                "policy_hash": "sha256:" + "1" * 64,
+                "blueprint_hash": "sha256:" + "2" * 64,
+            }
+        },
+    )
+    _write_json(tmp_path / "route_contract.json", {"replay_key": "replay-1"})
+
+    bundle = subject.build_runtime_exhaust_bundle_for_section(
+        section_id="headline",
+        runtime_payload={"run_id": "lane-run"},
+        artifact_dir=tmp_path,
+        repo_root=tmp_path,
+    )
+
+    assert bundle["parent_run_id"] == "product-run"
+    assert bundle["child_run_id"] == "lane-run"
+    assert bundle["section_attempt_id"] == "headline:lane-run:attempt:1"
+    assert bundle["session_id"] == "research-run"
+    assert bundle["tenant_id"] == "tenant-1"
+    assert bundle["trace_root"] == "trace-1"
+
+
 def test_runtime_exhaust_receipt_status_and_l6_v40_flag(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

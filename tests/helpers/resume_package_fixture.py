@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -15,6 +16,12 @@ from apps_rg.runtime.package.resume_package_manifest import (
 from apps_rg.runtime.shadow.l6_handoff_packet import build_l6_shadow_handoff_dict
 
 _ART = RUNTIME_PROOFS
+_CORE_X3_ALLOW = "X3D_ALLOW_FINISH"
+
+
+def _digest(value: object) -> str:
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
+    return "sha256:" + hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
 def _mk_x2(pass_all: bool) -> dict[str, object]:
@@ -114,7 +121,16 @@ def _emit_lane_dir(repo_root: Path, lane_key: str) -> dict[str, str]:
         json.dumps(_mk_x2(True)), encoding="utf-8"
     )
     (lane_dir / "x3_disposition.json").write_text(
-        json.dumps(_x3_stub()), encoding="utf-8"
+        json.dumps(
+            {
+                **_x3_stub(),
+                "section_x3_authoritative": False,
+                "section_x3_mirror_only": True,
+                "spine_x3_claimed": False,
+                "core_exit_authority_ref": "x3_disposition_receipt.json",
+            }
+        ),
+        encoding="utf-8",
     )
     exhaust = {
         "schema_version": "section_runtime_exhaust_bundle_v1",
@@ -128,13 +144,56 @@ def _emit_lane_dir(repo_root: Path, lane_key: str) -> dict[str, str]:
         json.dumps(exhaust), encoding="utf-8"
     )
     (lane_dir / "exit_disposition_receipt.json").write_text(
-        json.dumps({"x3_code": X3_ALLOW_CODE, "run_id": run_id}),
+        json.dumps(
+            {
+                "x3_code": X3_ALLOW_CODE,
+                "run_id": run_id,
+                "section_x3_authoritative": False,
+                "section_x3_mirror_only": True,
+                "spine_x3_claimed": False,
+                "canonical_exit_claimed": False,
+            }
+        ),
+        encoding="utf-8",
+    )
+    core_payload = {"x3_disposition": _CORE_X3_ALLOW, "disposition": "X3D"}
+    (lane_dir / "x3_disposition_receipt.json").write_text(
+        json.dumps(
+            {
+                "producer_component": (
+                    "agentic_core.runtime.entrypoints."
+                    "integrated_single_action_spine_run"
+                ),
+                "artifact_hash": _digest(core_payload),
+                "payload": core_payload,
+            }
+        ),
+        encoding="utf-8",
+    )
+    core_authority = {
+        "schema_version": "apps_rg.core_runtime_authority.v1",
+        "source_artifact_bindings": [
+            {
+                "artifact_ref": "x3_disposition_receipt.json",
+                "present": True,
+                "hash_matches": True,
+            }
+        ],
+        "normalized_contract": {
+            "valid": True,
+            "x3": {"x3_disposition": _CORE_X3_ALLOW},
+            "spine_proof": {"success": True},
+        },
+        "status": "PASS",
+        "outcome_authorized": True,
+    }
+    core_authority["deterministic_digest"] = _digest(core_authority)
+    (lane_dir / "apps_rg_core_runtime_authority.json").write_text(
+        json.dumps(core_authority),
         encoding="utf-8",
     )
     (lane_dir / "l6_shadow_handoff_receipt.json").write_text(
-        json.dumps(
-            {"section_id": lane_key, "run_id": run_id, "handoff_sealed": True}
-        ),
+        json.dumps({"section_id": lane_key, "run_id": run_id, "handoff_sealed": True}),
         encoding="utf-8",
     )
 
@@ -157,6 +216,15 @@ def _emit_lane_dir(repo_root: Path, lane_key: str) -> dict[str, str]:
         ),
         "x2_gate_outputs.json": f"{_ART}/synth_lane_{lane_key}/x2_gate_outputs.json",
         "x3_disposition.json": f"{_ART}/synth_lane_{lane_key}/x3_disposition.json",
+        "exit_disposition_receipt.json": (
+            f"{_ART}/synth_lane_{lane_key}/exit_disposition_receipt.json"
+        ),
+        "x3_disposition_receipt.json": (
+            f"{_ART}/synth_lane_{lane_key}/x3_disposition_receipt.json"
+        ),
+        "apps_rg_core_runtime_authority.json": (
+            f"{_ART}/synth_lane_{lane_key}/apps_rg_core_runtime_authority.json"
+        ),
         "l6_shadow_eval_package.json": (
             f"{_ART}/synth_lane_{lane_key}/l6_shadow_eval_package.json"
         ),
@@ -171,7 +239,7 @@ def _write_minimal_fixture_tree(repo_root: Path) -> ResumePackageProofPaths:
         lanes[lane_key] = {
             "runtime_generation_status": "REAL_LLM",
             "x2_failed": 0,
-            "x3_code": X3_ALLOW_CODE,
+            "x3_code": _CORE_X3_ALLOW,
             "artifact_refs": refs,
         }
 

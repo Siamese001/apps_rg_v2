@@ -214,7 +214,10 @@ def test_exit_spine_receipt_requires_sealed_l2_and_canonical_exit_receipt(
         artifact_dir=tmp_path,
     )
     assert passing["exit_spine_status"] == "PASS"
-    assert passing["canonical_exit_claimed_on_exit_receipt"] is True
+    assert passing["canonical_exit_claimed_on_exit_receipt"] is False
+    assert passing["canonical_exit_authority_ref"] == (
+        subject.CORE_X3_DISPOSITION_RECEIPT_ARTIFACT
+    )
     assert passing["canonical_exit_claimed_on_sealed_l2"] is False
     assert "exit_disposition_receipt" in passing["observed_chain"]
     assert passing["product_certification"] == "NOT_CLAIMED"
@@ -253,9 +256,14 @@ def test_emit_section_exit_spine_artifacts_writes_files_and_payload_refs(
     }
     assert all(path.is_file() for path in paths.values())
     assert payload["exit_review_packet_ref"] == subject.EXIT_REVIEW_PACKET_ARTIFACT
-    assert payload["exit_disposition_receipt_ref"] == subject.EXIT_DISPOSITION_RECEIPT_ARTIFACT
+    assert (
+        payload["exit_disposition_receipt_ref"]
+        == subject.EXIT_DISPOSITION_RECEIPT_ARTIFACT
+    )
     assert payload["exit_spine_receipt_ref"] == subject.EXIT_SPINE_RECEIPT_ARTIFACT
-    assert payload["canonical_exit_authority_ref"] == subject.EXIT_DISPOSITION_RECEIPT_ARTIFACT
+    assert payload["canonical_exit_authority_ref"] == (
+        subject.CORE_X3_DISPOSITION_RECEIPT_ARTIFACT
+    )
     assert payload["section_x3_authoritative"] is False
 
     x1 = _read_json(paths["section_exit_x1_result"])
@@ -266,6 +274,9 @@ def test_emit_section_exit_spine_artifacts_writes_files_and_payload_refs(
     assert x1["checkout_status"] == "PASS"
     assert x2["aggregation_status"] == "PASS"
     assert edr["x3_code"] == "X3_ALLOW"
-    assert edr["canonical_exit_claimed"] is True
+    assert edr["canonical_exit_claimed"] is False
+    assert edr["canonical_exit_authority_ref"] == (
+        subject.CORE_X3_DISPOSITION_RECEIPT_ARTIFACT
+    )
     assert receipt["exit_spine_status"] == "PASS"
     assert receipt["runtime_exhaust_bundle_claimed"] is False

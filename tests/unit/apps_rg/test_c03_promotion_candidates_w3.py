@@ -7,9 +7,6 @@ from pathlib import Path
 
 import pytest
 
-from apps_rg.fact_inventory.track_weighted_graph_expansion import (
-    TrackWeightedExpansionContractError,
-)
 from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.c0.c03_allowlist_coherence import (
     build_exec_summary_allowlist_receipt,
@@ -118,17 +115,16 @@ def test_persist_promotion_candidates_artifact(tmp_path: Path) -> None:
     assert loaded["candidate_count"] == 1
 
 
-def test_brown_pool_does_not_emit_promotion_candidates_without_seed_hop_paths(
+def test_brown_pool_reports_promotion_candidates_without_auto_promoting(
     brown_jd: str,
 ) -> None:
-    with pytest.raises(
-        TrackWeightedExpansionContractError,
-        match="seed_fact_ids have no matching track-weighted graph hop paths",
-    ):
-        resolve_section_proof_pool(
-            section="executive_summary",
-            target_company="Brown & Brown",
-            target_role="SVP IT Strategy & Innovation",
-            jd_text=brown_jd,
-            product_visible=False,
-        )
+    pool = resolve_section_proof_pool(
+        section="executive_summary",
+        target_company="Brown & Brown",
+        target_role="SVP IT Strategy & Innovation",
+        jd_text=brown_jd,
+        product_visible=False,
+    )
+    promotion = pool.proof_pool_metadata["c03_promotion_candidates"]
+    assert promotion["promoted_fact_ids"] == []
+    assert promotion["auto_promote_enabled"] is False

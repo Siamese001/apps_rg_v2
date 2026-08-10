@@ -283,7 +283,12 @@ def run_ibm_narrative_lane_execution(
             parsed, parse_error = parse_model_json(raw_output)
             if parsed is None and str(args.provider) == "external_claude":
                 raw_output, parsed, parse_error = retry_provider_for_parse(
-                    messages, provider_payload, raw_output, parse_error
+                    messages,
+                    provider_payload,
+                    raw_output,
+                    parse_error,
+                    artifact_dir=artifact_dir,
+                    run_id=str(runtime_payload.get("run_id") or ""),
                 )
                 if parsed is not None:
                     from apps_rg.runtime.section_repair_ledger import KIND_MECHANICAL, record_repair
@@ -296,7 +301,7 @@ def run_ibm_narrative_lane_execution(
                         replaced_l2=False,
                     )
             if parsed is not None:
-                parsed = normalize_parsed_output(parsed, runtime_payload)
+                parsed = normalize_parsed_output(parsed, runtime_payload, companion_text)
                 _pre_metric_raw = raw_output
                 raw_output, parsed = retry_provider_for_metric_budget(
                     messages,
@@ -305,6 +310,8 @@ def run_ibm_narrative_lane_execution(
                     parsed,
                     companion_text,
                     runtime_payload,
+                    artifact_dir=artifact_dir,
+                    run_id=str(runtime_payload.get("run_id") or ""),
                 )
                 if raw_output != _pre_metric_raw:
                     from apps_rg.runtime.section_repair_ledger import KIND_REGEN_LLM, record_repair
@@ -330,8 +337,10 @@ def run_ibm_narrative_lane_execution(
                         reason="deterministic_pre_x2",
                         replaced_l2=False,
                     )
-                parsed = normalize_parsed_output(parsed, runtime_payload)
-                remap_ibm_narrative_claim_ledger_to_fact_pool(parsed, runtime_payload)
+                parsed = normalize_parsed_output(parsed, runtime_payload, companion_text)
+                remap_ibm_narrative_claim_ledger_to_fact_pool(
+                    parsed, runtime_payload, companion_text
+                )
                 from apps_rg.runtime.sections.ibm_canonical_hydration import (
                     decompose_ibm_narrative_claim_ledger_by_clause,
                 )
@@ -340,6 +349,7 @@ def run_ibm_narrative_lane_execution(
                     parsed,
                     narrative_sentence=str(parsed.get("narrative_sentence") or ""),
                     allowed_fact_ids={str(x) for x in (runtime_payload.get("allowed_fact_ids") or [])},
+                    companion_bullet_texts=companion_text,
                 )
                 # Theme-citation derivation (first-run wiring, plan
                 # apps-rg-aig-remaining-lanes-closeout-d4e1f7 W4; clause-grounded
@@ -363,6 +373,7 @@ def run_ibm_narrative_lane_execution(
                     allowed_fact_ids={
                         str(x) for x in (runtime_payload.get("allowed_fact_ids") or [])
                     },
+                    companion_bullet_texts=companion_text,
                 )
                 redact_banned_lexicon_from_attestation_change_log(parsed)
                 if _bound_theme_ids:
@@ -381,8 +392,10 @@ def run_ibm_narrative_lane_execution(
                 # Theme-overpack rung (b8c3d1; live flap postW4fix_20260610_2200): the
                 # ', establishing' decomposer (max 2 rows) + max 2 bul_ibm_* roots per row
                 # cap the ledger union at 4 roots, so a sentence tripping 5 theme triggers
-                # can never pass theme-coverage AND clause-decomposition together. ONE
-                # bounded same-authority regen (headline content-signal idiom, PR #284):
+                # can never pass theme-coverage AND clause-decomposition together. The same
+                # bounded same-authority rung also handles a mechanism-only cited-companion
+                # support failure, which otherwise bypasses repair because its theme count is
+                # already in budget (live retry8_20260809). Fail-closed acceptance:
                 # fail-closed acceptance — regen adopted only when parse ok, ≤4 themes,
                 # and the full deterministic chain passes both predicates; else attempt 1
                 # stands and X2 fails honestly. Receipt:
@@ -397,6 +410,7 @@ def run_ibm_narrative_lane_execution(
                         runtime_payload=runtime_payload,
                         artifact_dir=artifact_dir,
                         runtime_generation_status=runtime_generation_status,
+                        companion_text=companion_text,
                     )
                 )
                 redact_banned_lexicon_from_attestation_change_log(parsed)
@@ -415,6 +429,28 @@ def run_ibm_narrative_lane_execution(
         if parsed is not None and isinstance(parsed, dict):
             parsed["narrative_sentence"] = narrative
             if _sanitized:
+                # Meta-tail deletion changes the visible claim boundary. Rebuild
+                # clause rows from the final materialized sentence so no stale
+                # pre-sanitization claim text can survive into graph binding.
+                from apps_rg.runtime.sections.ibm_canonical_hydration import (
+                    bind_missing_ibm_narrative_theme_citations as _rebind_themes,
+                    decompose_ibm_narrative_claim_ledger_by_clause as _redecompose_ledger,
+                )
+
+                _allowed = {
+                    str(x) for x in (runtime_payload.get("allowed_fact_ids") or [])
+                }
+                _redecompose_ledger(
+                    parsed,
+                    narrative_sentence=narrative,
+                    allowed_fact_ids=_allowed,
+                    companion_bullet_texts=companion_text,
+                )
+                _rebind_themes(
+                    parsed,
+                    allowed_fact_ids=_allowed,
+                    companion_bullet_texts=companion_text,
+                )
                 from apps_rg.runtime.section_repair_ledger import KIND_MECHANICAL, record_repair
 
                 record_repair(
@@ -645,6 +681,7 @@ def run_ibm_narrative_lane_execution(
         artifact_dir=artifact_dir,
         section_id="ibm_narrative",
         runtime_payload=runtime_payload,
+        defer_graph_binding_l2_persistence=True,
         aggregate_x3_fn=_aggregate_ibm_narrative_x3,
         resume_display_text=narrative or raw_output,
         claim_ledger=claim_ledger,
@@ -655,11 +692,6 @@ def run_ibm_narrative_lane_execution(
         canonical_claims_for_hash=canon_doc.get("claims"),
         section_input_usage_ledger=usage_doc,
     )
-    finalize_section_l2_after_output(artifact_dir, "ibm_narrative", runtime_payload)
-    finalize_section_runtime_exhaust_before_l6(
-        artifact_dir, "ibm_narrative", runtime_payload, repo_root=REPO_ROOT
-    )
-
     bundle = compute_lane_proof_bundle(
         args,
         section_id="ibm_narrative",
@@ -761,7 +793,19 @@ def run_ibm_narrative_lane_execution(
     l2_output["proof_class"] = proof_class_label
     l2_output["certification_class"] = certification_class_label
     l2_output["decisive_accounting_label"] = decisive_accounting_label_value
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        merge_resume_graph_claim_binding_fields,
+    )
+
+    l2_output = merge_resume_graph_claim_binding_fields(
+        l2_output,
+        artifact_dir=artifact_dir,
+    )
     write_json(artifact_dir / "l2_output.json", l2_output)
+    finalize_section_l2_after_output(artifact_dir, "ibm_narrative", runtime_payload)
+    finalize_section_runtime_exhaust_before_l6(
+        artifact_dir, "ibm_narrative", runtime_payload, repo_root=REPO_ROOT
+    )
 
     l6_temp = float(args.temperature)
     l6_max = NARRATIVE_MAX_OUTPUT_TOKENS

@@ -1,0 +1,96 @@
+{
+  "generation_mode": "model_competencies_graph_pool_adaptive_6_8_regen",
+  "section_lane": "competencies",
+  "initial_path_count": 4,
+  "total_paths_executed": 4,
+  "regen_rounds_executed": 0,
+  "adaptive_sc_enabled": true,
+  "max_path_count": 8,
+  "stop_reason": "selection_gate_passed",
+  "min_selection_score": 0.72,
+  "high_signal_selection_score": 0.84,
+  "selection_gate": {
+    "ok": true,
+    "section_lane": "competencies",
+    "final_category_count": 8,
+    "min_category_count": 6,
+    "max_category_count": 8,
+    "min_score_threshold": 0.72,
+    "categories_passing": [
+      "ai runtime governance & control gates",
+      "distributed systems & cloud data engineering",
+      "engineering leadership & operating model",
+      "governed agentic ai platform architecture",
+      "llmops, evaluation & reliability",
+      "partner applied ai architecture",
+      "platform productization & commercialization",
+      "retrieval & context engineering"
+    ],
+    "categories_below_threshold": [],
+    "categories_missing": [],
+    "categories_in_merged": 8,
+    "bundle_ids_missing": [],
+    "duplicate_bundle_ids": [],
+    "taxonomy_category_ids_missing": [],
+    "duplicate_taxonomy_category_ids": [],
+    "missing_capability_families": []
+  },
+  "selection_mode": "competencies_advisory_selector_required_eight_pass",
+  "source_path_by_slot": {
+    "governed agentic ai platform architecture": 10000,
+    "ai runtime governance & control gates": 10000,
+    "partner applied ai architecture": 10000,
+    "llmops, evaluation & reliability": 10000,
+    "platform productization & commercialization": 10000,
+    "retrieval & context engineering": 10000,
+    "engineering leadership & operating model": 10000,
+    "distributed systems & cloud data engineering": 10000
+  },
+  "claude_selection_count": 8,
+  "candidate_category_count": 8,
+  "min_category_count": 6,
+  "max_category_count": 8,
+  "final_category_count": 8,
+  "phase_timings": [
+    {
+      "phase": "self_consistency_generation_round_0",
+      "started_at": "2026-08-09T12:19:43.716372+00:00",
+      "duration_s": 101.063,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 8
+    },
+    {
+      "phase": "selector_round_0",
+      "started_at": "2026-08-09T12:21:24.776790+00:00",
+      "duration_s": 9.531,
+      "selection_mode": "competencies_advisory_selector_required_eight_pass"
+    }
+  ],
+  "e2e_closeout_mode": false,
+  "max_regen_rounds_allowed": 2,
+  "competencies_rejected_neighbor_audit": {
+    "schema_version": "competencies_rejected_neighbor_audit_v1",
+    "audit_status": "present",
+    "candidate_label_count": 36,
+    "candidate_variant_count": 36,
+    "selected_count": 8,
+    "rejected_neighbor_count": 28
+  },
+  "selector_empty": true,
+  "selector_selection_mode": "competencies_advisory_selector_required_eight_pass",
+  "selector_bullets_in_merged": 0,
+  "selector_selection_count": 8,
+  "selector_subthreshold_scores": [
+    0.88,
+    0.87,
+    0.85,
+    0.86,
+    0.83,
+    0.85,
+    0.87,
+    0.84
+  ],
+  "selector_block_reason": "selector_returned_no_candidates_above_threshold",
+  "competencies_rejected_neighbor_audit_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_controlled_negative_missing_otel_20260809\\e2e_20260809T121839Z_a5e1aaa1\\modular_r4\\sections\\competencies\\competencies_rejected_neighbor_audit.json"
+}

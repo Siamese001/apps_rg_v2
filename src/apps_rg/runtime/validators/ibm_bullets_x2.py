@@ -308,6 +308,56 @@ def _combined_bullet_text(bullets: list[dict[str, Any]]) -> str:
     return "\n".join(str(b.get("bullet_text", "")) for b in bullets)
 
 
+_SEMANTIC_OVERLAP_TOKEN_RE = re.compile(r"[a-z0-9]+")
+_SEMANTIC_OVERLAP_STOPWORDS = frozenset(
+    {"a", "an", "and", "for", "in", "of", "on", "the", "to", "with"}
+)
+
+
+def ibm_cross_bullet_semantic_overlap_violations(
+    bullets: list[dict[str, Any]],
+    *,
+    max_jaccard: float = 0.60,
+) -> list[dict[str, Any]]:
+    """Return pairs that repeat the same IBM outcome/mechanism in different words.
+
+    Provider grading already evaluates cross-bullet diversity, but a soft model-backed
+    pass cannot authorize a pair whose content words are two-thirds identical.  This
+    deterministic backstop evaluates the final materialized display, after frozen C0
+    allocation projection, so a provider draft cannot hide a later rehydration defect.
+    """
+
+    token_rows: list[tuple[str, set[str]]] = []
+    for row in bullets:
+        if not isinstance(row, dict):
+            continue
+        bullet_id = str(row.get("bullet_id") or "").strip()
+        tokens = {
+            token
+            for token in _SEMANTIC_OVERLAP_TOKEN_RE.findall(
+                str(row.get("bullet_text") or "").casefold()
+            )
+            if token not in _SEMANTIC_OVERLAP_STOPWORDS
+        }
+        if bullet_id and tokens:
+            token_rows.append((bullet_id, tokens))
+
+    violations: list[dict[str, Any]] = []
+    for index, (left_id, left_tokens) in enumerate(token_rows):
+        for right_id, right_tokens in token_rows[index + 1 :]:
+            union = left_tokens | right_tokens
+            similarity = len(left_tokens & right_tokens) / len(union) if union else 0.0
+            if similarity >= max_jaccard:
+                violations.append(
+                    {
+                        "bullet_ids": [left_id, right_id],
+                        "token_jaccard": round(similarity, 3),
+                        "shared_tokens": sorted(left_tokens & right_tokens),
+                    }
+                )
+    return violations
+
+
 def ibm_bullet_text_has_taxonomy_label_prefix(text: str) -> bool:
     """True when ``bullet_text`` starts with a category-style ``Title: `` prefix (deterministic gate helper)."""
 
@@ -517,6 +567,19 @@ def run_ibm_bullets_x2_gates(
     combined_lower = combined.lower()
 
     add("x2_ibm_bullet_count_5", len(bullets) == 5, len(bullets), 5, "Must output exactly 5 IBM bullets.")
+
+    semantic_overlap = ibm_cross_bullet_semantic_overlap_violations(bullets)
+    add(
+        "x2_ibm_cross_bullet_semantic_overlap_zero",
+        not semantic_overlap,
+        semantic_overlap or "none",
+        "pairwise_content_token_jaccard<0.60",
+        (
+            f"Near-duplicate IBM bullet pairs: {semantic_overlap}"
+            if semantic_overlap
+            else None
+        ),
+    )
 
     from apps_rg.runtime.validators.bullet_line_discipline_x2 import (
         register_bullet_line_discipline_x2_gates,

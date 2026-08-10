@@ -6,11 +6,48 @@ from pathlib import Path
 
 from apps_rg.runtime.validators.executive_summary_x2 import (
     EXEC_SUMMARY_MAX_WORDS,
+    check_c03_selected_fact_ids_claimable_subset_allowed_fact_ids,
     check_exec_summary_no_mechanism_inventory,
     check_exec_summary_paragraph_max_words,
     check_prompt_template_authority,
     run_x2_gates,
 )
+
+
+def test_c03_allowlist_accepts_extra_correctly_filtered_context_facts() -> None:
+    ok, reason = check_c03_selected_fact_ids_claimable_subset_allowed_fact_ids(
+        allowed_fact_ids={"fact_allowed"},
+        proof_pool_metadata={
+            "track_weighted_graph_expansion": {
+                "selected_facts": [
+                    {"fact_id": "fact_allowed"},
+                    {"fact_id": "fact_filtered_used"},
+                ]
+            },
+            "c03_filtered_out_fact_ids": [
+                "fact_filtered_used",
+                "fact_filtered_not_used",
+            ],
+        },
+    )
+
+    assert ok is True
+    assert reason is None
+
+
+def test_c03_allowlist_rejects_unaccounted_out_of_pool_expansion() -> None:
+    ok, reason = check_c03_selected_fact_ids_claimable_subset_allowed_fact_ids(
+        allowed_fact_ids={"fact_allowed"},
+        proof_pool_metadata={
+            "track_weighted_graph_expansion": {
+                "selected_facts": [{"fact_id": "fact_unaccounted"}]
+            },
+            "c03_filtered_out_fact_ids": ["fact_other"],
+        },
+    )
+
+    assert ok is False
+    assert reason and "missing=['fact_unaccounted']" in reason
 
 EXEC_SUMMARY_CRITICAL_GATES = frozenset(
     {

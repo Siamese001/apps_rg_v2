@@ -1,0 +1,198 @@
+{
+  "generated_at_utc": "2026-08-09T09:21:58.169244+00:00",
+  "local_artifact_refs": {
+    "commit_request.json": null,
+    "exit_review_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/modular_r4/sections/competencies/exit_review_packet.json",
+    "l6_v40_shadow_eval_package.json": null,
+    "provider_response.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/modular_r4/sections/competencies/provider_response.json",
+    "state_commit_receipt.json": null,
+    "uwg_block_receipt.json": null,
+    "uwg_commit_receipt.json": null,
+    "uwg_validation_receipt.json": null,
+    "x1d_llm_judge_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/modular_r4/sections/competencies/x1d_llm_judge_outputs.json",
+    "x2_gate_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/modular_r4/sections/competencies/x2_gate_outputs.json",
+    "x3_disposition.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/modular_r4/sections/competencies/x3_disposition.json"
+  },
+  "local_json_load_issues": [],
+  "local_provider_attempt_span_count": 1,
+  "local_provider_attempt_span_source": "provider_response.provider_attempt_spans",
+  "local_provider_attempt_timing_summary": {
+    "accepted_output_model": "gpt-5.6-luna",
+    "accepted_output_provider": "external_openai",
+    "attempted_count": 1,
+    "fallback_attempt_count": 0,
+    "fallback_attempted": false,
+    "models": [
+      "gpt-5.6-luna"
+    ],
+    "providers": [
+      "external_openai"
+    ],
+    "runtime_generation_statuses": [
+      "REAL_LLM"
+    ],
+    "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+    "span_count": 1,
+    "total_duration_seconds": 13.920603
+  },
+  "otel_provider_attempt_span_count": 0,
+  "otel_snapshot_available": true,
+  "otel_snapshot_ref": "provided",
+  "otel_span_count": 0,
+  "producer": "apps_rg.runtime.observability.trace_reconciliation",
+  "row_export_digest": "sha256:30eb3e1cd14e03446fe5abb4c947287daffaff70e5ad68cbc69ca52bf75df910",
+  "row_export_ref": "trace_reconciliation_rows.jsonl",
+  "rows": [
+    {
+      "check_id": "otel_snapshot.available",
+      "expected_value": "bounded OTel trace snapshot or explicit unavailable receipt",
+      "future_run_only": true,
+      "observed_value": {
+        "snapshot_ref": "provided",
+        "span_count": 0
+      },
+      "reason": "OTel snapshot available for post-run reconciliation",
+      "row_id": "ac1dd90ab85fc44e51a4",
+      "run_id": "competencies_20260809_092022",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "WARN",
+      "source_refs": {
+        "otel_snapshot_ref": "provided"
+      },
+      "stage_id": "L7",
+      "verdict": "PASS"
+    },
+    {
+      "check_id": "l7_provider_attempts.local_receipts",
+      "expected_value": "apps_rg_provider_attempt_timing_summary_v1",
+      "future_run_only": true,
+      "observed_value": {
+        "accepted_output_model": "gpt-5.6-luna",
+        "accepted_output_provider": "external_openai",
+        "attempted_count": 1,
+        "fallback_attempt_count": 0,
+        "fallback_attempted": false,
+        "models": [
+          "gpt-5.6-luna"
+        ],
+        "providers": [
+          "external_openai"
+        ],
+        "runtime_generation_statuses": [
+          "REAL_LLM"
+        ],
+        "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+        "span_count": 1,
+        "total_duration_seconds": 13.920603
+      },
+      "reason": "local provider-attempt receipts present",
+      "row_id": "dd671f5874141a9fcfce",
+      "run_id": "competencies_20260809_092022",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "WARN",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "PASS"
+    },
+    {
+      "check_id": "l7_provider_attempts.otel_mirror",
+      "expected_value": "same provider attempt identity/order",
+      "future_run_only": true,
+      "observed_value": {
+        "local_provider_keys": [
+          [
+            "1",
+            "external_openai",
+            "gpt-5.6-luna"
+          ]
+        ],
+        "otel_provider_keys": []
+      },
+      "reason": "OTel provider-attempt spans do not match local receipt order",
+      "row_id": "b57bc09dbfa9004f7404",
+      "run_id": "competencies_20260809_092022",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "FAIL"
+    },
+    {
+      "check_id": "l7_provider_attempts.timing_drift",
+      "expected_value": "<=0.25s duration drift when both sides expose timing",
+      "future_run_only": true,
+      "observed_value": [],
+      "reason": "provider-attempt timing drift not observed or not applicable",
+      "row_id": "341c11713a356215ec4c",
+      "run_id": "competencies_20260809_092022",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "NOT_APPLICABLE"
+    },
+    {
+      "check_id": "x3_disposition.otel_mirror",
+      "expected_value": "local X3 code present in OTel span attributes",
+      "future_run_only": true,
+      "observed_value": {
+        "local_x3": "X3_BLOCK",
+        "otel_x3_values": []
+      },
+      "reason": "OTel X3 disposition attribute missing or mismatched",
+      "row_id": "1f6c9aa14076b663865e",
+      "run_id": "competencies_20260809_092022",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "MAJOR",
+      "source_refs": {
+        "x3_disposition_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/modular_r4/sections/competencies/x3_disposition.json"
+      },
+      "stage_id": "X3",
+      "verdict": "FAIL"
+    },
+    {
+      "check_id": "uwg_handoff.otel_mirror",
+      "expected_value": "UWG local receipt plus optional mirrored OTel span",
+      "future_run_only": true,
+      "observed_value": {
+        "uwg_local_refs": {},
+        "uwg_otel_spans": []
+      },
+      "reason": "no UWG refs in this artifact directory",
+      "row_id": "e857ae0a9ff7208b497b",
+      "run_id": "competencies_20260809_092022",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "WARN",
+      "source_refs": {},
+      "stage_id": "UWG",
+      "verdict": "NOT_APPLICABLE"
+    }
+  ],
+  "rows_digest": "sha256:30eb3e1cd14e03446fe5abb4c947287daffaff70e5ad68cbc69ca52bf75df910",
+  "run_id": "competencies_20260809_092022",
+  "schema_version": "apps_rg.trace_reconciliation.v1",
+  "section_id": "competencies",
+  "summary": {
+    "current_run_mutation_assertion": false,
+    "fail_count": 2,
+    "future_run_only": true,
+    "not_applicable_count": 2,
+    "proof_authority": "local_receipts",
+    "row_count": 6,
+    "warn_count": 0
+  },
+  "trace_root": "",
+  "trace_verdict": "TRACE_MISMATCH"
+}

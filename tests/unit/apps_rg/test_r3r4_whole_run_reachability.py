@@ -12,7 +12,15 @@ from types import SimpleNamespace
 import pytest
 
 from apps_rg.repository_layout import resolve_apps_rg_path
+from apps_rg.integrations.apps_research_bridge import EvidenceItem, ResearchResult
 from apps_rg.prerequisites.briefing_validator import validate_apps_research_handoff
+from apps_research.integrations.apps_rg_handoff import (
+    persist_apps_rg_targeting_brief_artifacts,
+)
+from tests.unit.apps_research.test_apps_rg_handoff_canonical_exit import (
+    _record,
+    _record_for_identity,
+)
 from apps_rg.runtime.dispatch.spine_stage_receipts import (
     FILENAME_DELEGATED_BRIEFING,
     FILENAME_L1_PLANNING_CAPSULE,
@@ -39,6 +47,81 @@ _TRACE_UUID = uuid_module.UUID("33333333-3333-3333-3333-333333333333")
 _JD_TEXT = "Target JD text for route-decision pytest."
 
 
+def _publish_observed_fixture_result(
+    *,
+    runs_root: Path,
+    target_company: str,
+    target_role: str,
+    request_id: str,
+    run_id: str,
+    trace_id: str,
+    tenant_id: str = "default",
+    jd_text: str = _JD_TEXT,
+) -> ResearchResult:
+    base = _record(run_id)
+    producer_record = _record_for_identity(
+        run_id=run_id,
+        trace_id=trace_id,
+        request_id=request_id,
+        tenant_id=tenant_id,
+    )
+    bundle = persist_apps_rg_targeting_brief_artifacts(
+        record=producer_record,
+        target_company=target_company,
+        target_role=target_role,
+        jd_text=jd_text,
+        runs_root=runs_root,
+    )
+    return ResearchResult(
+        run_id=run_id,
+        trace_id=trace_id,
+        request_id=request_id,
+        is_blocked=False,
+        block_reason="",
+        is_stale=False,
+        age_days=0.0,
+        evidence_items=(
+            EvidenceItem(
+                source_id="observed-fixture",
+                label="Observed provider fixture",
+                uri="test://observed-provider-fixture",
+                source_type="provider_response",
+                field_ref="company_brief",
+                confidence=0.91,
+            ),
+        ),
+        confidence_score=base.confidence_score,
+        result_hash=bundle.bundle_manifest_digest,
+        company_brief_hash=bundle.brief_sha256,
+        fetch_duration_ms=0.0,
+        audit_ref=str(bundle.run_dir),
+        research_artifact_dir=str(bundle.run_dir),
+        briefing_artifact_path=str(bundle.briefing_path),
+        company_brief_text=base.company_brief_text,
+        apps_research_handoff_envelope=bundle.envelope,
+        brief_sha256=bundle.brief_sha256,
+        result_metadata_digest=bundle.result_metadata_digest,
+        bundle_manifest_digest=bundle.bundle_manifest_digest,
+        apps_research_u0_receipt=json.loads(bundle.u0_receipt_path.read_text(encoding="utf-8")),
+    )
+
+
+class _ObservedFixtureBridge:
+    def __init__(self, artifact_runs_root: Path) -> None:
+        self._artifact_runs_root = artifact_runs_root
+
+    def fetch(self, **kwargs) -> ResearchResult:
+        return _publish_observed_fixture_result(
+            runs_root=self._artifact_runs_root,
+            target_company=kwargs["company_name"],
+            target_role=kwargs["job_title"],
+            request_id=kwargs["request_id"],
+            run_id=kwargs["run_id"],
+            trace_id=kwargs["trace_id"],
+            jd_text=kwargs.get("job_description_text") or _JD_TEXT,
+        )
+
+
 def test_product_x3_taxonomy_rejects_legacy_success_aliases() -> None:
     assert _product_x3_authorizes("X3D_ALLOW_FINISH") is True
     for legacy_alias in ("X3D", "X3C", "EXIT_OK", "EXIT_PARTIAL", "ALLOW"):
@@ -61,6 +144,11 @@ def _stable_cli_run_identity(monkeypatch: pytest.MonkeyPatch) -> None:
                 return uuid_module.uuid4()
 
     monkeypatch.setattr(orch, "uuid", _UuidProxy())
+    monkeypatch.setattr(
+        orch,
+        "_research_bridge",
+        lambda *, artifact_runs_root: _ObservedFixtureBridge(artifact_runs_root),
+    )
 
 
 def test_research_enabled_when_brief_missing_and_auto_research_on() -> None:
@@ -82,24 +170,17 @@ def _write_authorized_apps_research_handoff(
     run_id: str = str(_RUN_UUID),
     trace_id: str = str(_TRACE_UUID),
 ) -> tuple[Path, Path]:
-    from apps_rg.integrations.apps_research_bridge import MockAppsResearchBridge
-
     jd_text = _JD_TEXT
     jd = tmp_path / "jd.txt"
     jd.write_text(jd_text, encoding="utf-8")
-    bridge = MockAppsResearchBridge(
-        confidence_score=0.9,
-        artifact_runs_root=tmp_path / "authorized_handoff_runs",
-    )
-    result = bridge.fetch(
-        company_name=target_company,
-        job_title=target_role,
-        capability_ref="apps_research.v2",
+    result = _publish_observed_fixture_result(
+        runs_root=tmp_path / "authorized_handoff_runs",
+        target_company=target_company,
+        target_role=target_role,
         request_id=request_id,
         run_id=run_id,
         trace_id=trace_id,
-        tenant_id="default",
-        job_description_text=jd_text,
+        jd_text=jd_text,
     )
     assert not result.is_blocked, result.block_reason
     return Path(result.briefing_artifact_path), jd
@@ -912,7 +993,8 @@ def test_whole_run_hard_fails_without_complete_section_forensics(
     assert result["outcome_authorized"] is False
     assert result["fault"] == "L2_EXECUTION_ERROR:test"
     assert result["completion_fault"] == E2E_SECTION_FORENSICS_GATE_ID
-    assert result["x3_disposition"] == "X3A"
+    assert result["x3_disposition"] == "X3A_DENY_REROUTE"
+    assert result["core_x3_disposition"] == "X3A"
     assert result["completion_status"] == "BLOCKED"
 
 
@@ -1015,7 +1097,8 @@ def test_whole_run_fails_when_exec_summary_judge_not_certified(
     assert result["exit_status"] == "error"
     assert result["execution_status"] == "failed"
     assert result["outcome_authorized"] is False
-    assert result["x3_disposition"] == "X3D"
+    assert result["x3_disposition"] == "X3_REVIEW_JUDGE_SOFT_FAIL"
+    assert result["core_x3_disposition"] == "X3D"
     assert result["completion_disposition"] == "X3_REVIEW_JUDGE_SOFT_FAIL"
     assert result["executive_summary_certification_block"]["blocking_judge_ids"] == ["gemini_pro"]
 
@@ -1152,6 +1235,10 @@ def test_whole_run_success_requires_post_x3_uwg_eval_l6(
         _fake_post_x3,
     )
     monkeypatch.setattr(
+        "apps_rg.runtime.whole_run_exit.emit_whole_run_exit_review_packet",
+        lambda **kwargs: {"x3_disposition": "X3D_ALLOW_FINISH"},
+    )
+    monkeypatch.setattr(
         orch,
         "_default_artifact_dir",
         lambda explicit: tmp_path / "full_resume_success01",
@@ -1248,6 +1335,10 @@ def test_whole_run_blocks_when_post_x3_l6_bridge_missing(
             "x3_to_uwg_to_eval_to_l6_completed": False,
             "failure_stage": "l6_shadow_bridge",
         },
+    )
+    monkeypatch.setattr(
+        "apps_rg.runtime.whole_run_exit.emit_whole_run_exit_review_packet",
+        lambda **kwargs: {"x3_disposition": "X3D_ALLOW_FINISH"},
     )
     monkeypatch.setattr(
         orch,

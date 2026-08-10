@@ -11,7 +11,7 @@ import json
 import uuid
 from typing import Any
 
-from agentic_core.runtime.contracts.compiled_prompt_artifact import (
+from apps_rg.runtime.spine_contracts import (
     CompiledPromptArtifact as CoreCompiledPromptArtifact,
     PromptBlock,
 )

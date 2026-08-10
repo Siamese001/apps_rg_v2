@@ -178,19 +178,56 @@ def runtime_limit_mapping(path: str) -> dict[str, Any]:
 SECTION_MODEL_MAX_MODEL_LEN: Final[int] = runtime_limit_int("section_context_window")
 
 
-def _required_section_model(profile_key: str, section_id: str | None) -> str:
+def _profile_section_mapping(profile_key: str, mapping_key: str) -> dict[str, str]:
+    """Return one normalized per-section mapping from a provider profile."""
+    profiles = _provider_profiles()
+    raw = (profiles.get(profile_key) or {}).get(mapping_key) or {}
+    if not isinstance(raw, dict):
+        return {}
+    return {
+        str(k).strip().lower(): str(v).strip()
+        for k, v in raw.items()
+        if str(k).strip() and str(v).strip()
+    }
+
+
+def _required_section_value(
+    profile_key: str,
+    mapping_key: str,
+    section_id: str | None,
+) -> str:
     sid = str(section_id or "").strip().lower()
     if not sid:
         raise SectionModelSSOTError(
-            f"Missing section_id for profiles.{profile_key}.model_by_section lookup in {_PROVIDER_PROFILES_PATH}"
+            f"Missing section_id for profiles.{profile_key}.{mapping_key} lookup in {_PROVIDER_PROFILES_PATH}"
         )
-    by_section = _ssot_model_by_section(profile_key)
+    by_section = _profile_section_mapping(profile_key, mapping_key)
     model = by_section.get(sid)
     if not model:
         raise SectionModelSSOTError(
-            f"Missing profiles.{profile_key}.model_by_section.{sid} in {_PROVIDER_PROFILES_PATH}"
+            f"Missing profiles.{profile_key}.{mapping_key}.{sid} in {_PROVIDER_PROFILES_PATH}"
         )
     return model
+
+
+def _required_section_model(profile_key: str, section_id: str | None) -> str:
+    return _required_section_value(profile_key, "model_by_section", section_id)
+
+
+def _anthropic_limit_preflight_active(environ: Mapping[str, str] | None) -> bool:
+    # Lazy import avoids making provider routing a module-import prerequisite for
+    # the model SSOT constants declared below.
+    from apps_rg.runtime.providers.anthropic_limit_preflight import (  # noqa: PLC0415
+        resolve_anthropic_limit_preflight_route,
+    )
+
+    return resolve_anthropic_limit_preflight_route(environ).active
+
+
+def _provider_profile_value(provider_profile: object | None) -> str:
+    if provider_profile is None:
+        return ""
+    return str(getattr(provider_profile, "value", provider_profile) or "").strip().lower()
 
 
 def _selector_models() -> dict[str, dict[str, str]]:
@@ -227,15 +264,52 @@ def _selector_models() -> dict[str, dict[str, str]]:
                 f"selector_models.{selector_role} requires reasoning_effort for OpenAI "
                 f"in {_PROVIDER_PROFILES_PATH}"
             )
+        backup = value.get("anthropic_limit_backup") or {}
+        if not isinstance(backup, dict):
+            raise SectionModelSSOTError(
+                f"selector_models.{selector_role}.anthropic_limit_backup must be a mapping "
+                f"in {_PROVIDER_PROFILES_PATH}"
+            )
+        backup_provider_key = str(backup.get("provider_key") or "").strip()
+        backup_model = str(backup.get("model") or "").strip()
+        backup_effort = str(backup.get("reasoning_effort") or "").strip().lower()
+        if backup and (not backup_provider_key or not backup_model):
+            raise SectionModelSSOTError(
+                f"selector_models.{selector_role}.anthropic_limit_backup requires provider_key "
+                f"and model in {_PROVIDER_PROFILES_PATH}"
+            )
+        if backup_effort and backup_effort not in {
+            "none",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+        }:
+            raise SectionModelSSOTError(
+                f"selector_models.{selector_role}.anthropic_limit_backup has invalid "
+                f"reasoning_effort {backup_effort!r} in {_PROVIDER_PROFILES_PATH}"
+            )
+        if backup_provider_key == "openai_chatgpt" and not backup_effort:
+            raise SectionModelSSOTError(
+                f"selector_models.{selector_role}.anthropic_limit_backup requires "
+                f"reasoning_effort for OpenAI in {_PROVIDER_PROFILES_PATH}"
+            )
         out[str(selector_role).strip().lower()] = {
             "provider_key": provider_key,
             "model": model,
             "reasoning_effort": reasoning_effort,
+            "backup_provider_key": backup_provider_key,
+            "backup_model": backup_model,
+            "backup_reasoning_effort": backup_effort,
         }
     return out
 
 
-def resolve_selector_provider_model(selector_role: str) -> tuple[str, str, str]:
+def resolve_selector_provider_model(
+    selector_role: str,
+    environ: Mapping[str, str] | None = None,
+) -> tuple[str, str, str]:
     """Return ``(provider_key, model, model_source)`` for an advisory pool selector."""
     role = str(selector_role or "").strip().lower()
     if not role:
@@ -244,6 +318,20 @@ def resolve_selector_provider_model(selector_role: str) -> tuple[str, str, str]:
     row = selectors.get(role)
     if row is None:
         raise SectionModelSSOTError(f"Missing selector_models.{role} in {_PROVIDER_PROFILES_PATH}")
+    if (
+        row["provider_key"] == "anthropic_claude"
+        and _anthropic_limit_preflight_active(environ)
+    ):
+        if not row["backup_provider_key"] or not row["backup_model"]:
+            raise SectionModelSSOTError(
+                f"Missing selector_models.{role}.anthropic_limit_backup in {_PROVIDER_PROFILES_PATH}"
+            )
+        return (
+            row["backup_provider_key"],
+            row["backup_model"],
+            "apps_rg/config/provider_profiles.yaml:"
+            f"selector_models.{role}.anthropic_limit_backup.model",
+        )
     return (
         row["provider_key"],
         row["model"],
@@ -251,7 +339,10 @@ def resolve_selector_provider_model(selector_role: str) -> tuple[str, str, str]:
     )
 
 
-def resolve_selector_reasoning_effort(selector_role: str) -> str:
+def resolve_selector_reasoning_effort(
+    selector_role: str,
+    environ: Mapping[str, str] | None = None,
+) -> str:
     """Return the explicit provider-native effort for an advisory selector."""
     role = str(selector_role or "").strip().lower()
     if not role:
@@ -264,6 +355,16 @@ def resolve_selector_reasoning_effort(selector_role: str) -> str:
         raise SectionModelSSOTError(
             f"Missing selector_models.{role} in {_PROVIDER_PROFILES_PATH}"
         )
+    if (
+        row["provider_key"] == "anthropic_claude"
+        and _anthropic_limit_preflight_active(environ)
+    ):
+        if not row["backup_reasoning_effort"]:
+            raise SectionModelSSOTError(
+                f"Missing selector_models.{role}.anthropic_limit_backup.reasoning_effort "
+                f"in {_PROVIDER_PROFILES_PATH}"
+            )
+        return row["backup_reasoning_effort"]
     return row["reasoning_effort"]
 
 
@@ -280,43 +381,64 @@ def selector_role_for_section(section_id: str, *, slot_kind: str | None = None) 
 
 def _ssot_model_by_section(profile_key: str = "external_claude_generator") -> dict[str, str]:
     """Per-section model pins from the provider-profiles SSOT."""
-    profiles = _provider_profiles()
-    raw = (profiles.get(profile_key) or {}).get("model_by_section") or {}
-    if not isinstance(raw, dict):
-        return {}
-    return {
-        str(k).strip().lower(): str(v).strip()
-        for k, v in raw.items()
-        if str(k).strip() and str(v).strip()
-    }
+    return _profile_section_mapping(profile_key, "model_by_section")
 
 
 def _ssot_effort_by_section(profile_key: str) -> dict[str, str]:
     """Per-section inference effort from the provider-profiles SSOT."""
-    profiles = _provider_profiles()
-    raw = (profiles.get(profile_key) or {}).get("effort_by_section") or {}
-    if not isinstance(raw, dict):
-        return {}
     return {
-        str(k).strip().lower(): str(v).strip().lower()
-        for k, v in raw.items()
-        if str(k).strip() and str(v).strip()
+        section_id: effort.lower()
+        for section_id, effort in _profile_section_mapping(
+            profile_key, "effort_by_section"
+        ).items()
     }
 
 
-def resolve_section_generation_effort(section_id: str | None) -> str:
+def resolve_section_generation_effort(
+    section_id: str | None,
+    environ: Mapping[str, str] | None = None,
+    *,
+    provider_profile: object | None = None,
+) -> str:
     """Resolve one proof-bearing section's provider-native inference effort."""
     sid = str(section_id or "").strip().lower()
     if not sid:
         raise SectionModelSSOTError(
             f"Missing section_id for generation effort resolution in {_PROVIDER_PROFILES_PATH}"
         )
-    matches = [
+    provider_value = _provider_profile_value(provider_profile)
+    if provider_value:
+        if provider_value == "external_claude":
+            effort = _required_section_value(
+                "external_claude_generator", "effort_by_section", sid
+            )
+        elif provider_value == "external_openai":
+            primary = _ssot_effort_by_section("external_openai_generator")
+            if sid in primary:
+                effort = primary[sid]
+            elif _anthropic_limit_preflight_active(environ):
+                effort = _required_section_value(
+                    "external_openai_generator",
+                    "anthropic_limit_backup_effort_by_section",
+                    sid,
+                )
+            else:
+                raise SectionModelSSOTError(
+                    f"Missing profiles.external_openai_generator.effort_by_section.{sid} "
+                    f"and Anthropic-limit preflight is inactive in {_PROVIDER_PROFILES_PATH}"
+                )
+        else:
+            raise SectionModelSSOTError(
+                f"Unsupported generation provider_profile={provider_value!r} for section={sid!r}"
+            )
+        matches = [(provider_value, effort)]
+    else:
+        matches = [
         (profile_key, efforts[sid])
         for profile_key in ("external_claude_generator", "external_openai_generator")
         for efforts in (_ssot_effort_by_section(profile_key),)
         if sid in efforts
-    ]
+        ]
     if len(matches) != 1:
         detail = "none" if not matches else ", ".join(profile for profile, _effort in matches)
         raise SectionModelSSOTError(
@@ -334,6 +456,8 @@ def resolve_section_generation_effort(section_id: str | None) -> str:
 def resolve_section_generation_model(
     section_id: str | None,
     environ: Mapping[str, str] | None = None,
+    *,
+    provider_profile: object | None = None,
 ) -> str:
     """THE single resolver for the apps_rg per-section generator model (SSOT-backed).
 
@@ -343,10 +467,31 @@ def resolve_section_generation_model(
     Missing/unknown section ids fail closed. Provider-level default models are intentionally not
     supported for proof-bearing apps_rg lanes.
     """
-    _ = environ
     sid = str(section_id or "").strip().lower()
     if not sid:
         raise SectionModelSSOTError(f"Missing section_id for generation model resolution in {_PROVIDER_PROFILES_PATH}")
+
+    provider_value = _provider_profile_value(provider_profile)
+    if provider_value == "external_claude":
+        return _required_section_model("external_claude_generator", sid)
+    if provider_value == "external_openai":
+        primary = _ssot_model_by_section("external_openai_generator")
+        if sid in primary:
+            return primary[sid]
+        if _anthropic_limit_preflight_active(environ):
+            return _required_section_value(
+                "external_openai_generator",
+                "anthropic_limit_backup_model_by_section",
+                sid,
+            )
+        raise SectionModelSSOTError(
+            f"Missing profiles.external_openai_generator.model_by_section.{sid} and "
+            f"Anthropic-limit preflight is inactive in {_PROVIDER_PROFILES_PATH}"
+        )
+    if provider_value:
+        raise SectionModelSSOTError(
+            f"Unsupported generation provider_profile={provider_value!r} for section={sid!r}"
+        )
 
     matches = [
         (profile_key, models[sid])
@@ -372,7 +517,9 @@ def external_claude_generation_model(
     section_id: str | None = None,
 ) -> str:
     """Claude generator model for one explicit section."""
-    return resolve_section_generation_model(section_id, environ)
+    return resolve_section_generation_model(
+        section_id, environ, provider_profile="external_claude"
+    )
 
 
 def external_openai_generation_model(
@@ -384,11 +531,15 @@ def external_openai_generation_model(
 
     OpenAI generator model for one explicit section. Missing/unknown section ids fail closed.
     """
-    _ = environ
-    return _required_section_model("external_openai_generator", section_id)
+    return resolve_section_generation_model(
+        section_id, environ, provider_profile="external_openai"
+    )
 
 
-def external_openai_generation_model_source(section_id: str | None = None) -> str:
+def external_openai_generation_model_source(
+    section_id: str | None = None,
+    environ: Mapping[str, str] | None = None,
+) -> str:
     """YAML path that resolved the OpenAI generation model for runtime receipts."""
     sid = str(section_id or "").strip().lower()
     if sid and sid in _ssot_model_by_section("external_openai_generator"):
@@ -396,6 +547,15 @@ def external_openai_generation_model_source(section_id: str | None = None) -> st
             "apps_rg/config/provider_profiles.yaml:"
             f"profiles.external_openai_generator.model_by_section.{sid}"
         )
+    if sid and _anthropic_limit_preflight_active(environ):
+        backup = _profile_section_mapping(
+            "external_openai_generator", "anthropic_limit_backup_model_by_section"
+        )
+        if sid in backup:
+            return (
+                "apps_rg/config/provider_profiles.yaml:profiles."
+                f"external_openai_generator.anthropic_limit_backup_model_by_section.{sid}"
+            )
     raise SectionModelSSOTError(
         f"Missing profiles.external_openai_generator.model_by_section.{sid or '<empty>'} in {_PROVIDER_PROFILES_PATH}"
     )

@@ -5,6 +5,7 @@ Emitted at the root of ``artifacts/apps_rg/runs/<run_id>/`` (integrated R4) and
 
 Does not move or rename legacy artifacts; only adds a sidecar index.
 """
+
 from __future__ import annotations
 
 import json
@@ -275,8 +276,14 @@ def _extra_file_entries(
             rel_from_bundle = child.resolve().relative_to(run_dir.resolve()).as_posix()
             if rel_from_bundle in indexed_relpaths:
                 continue
-            ct: ContentType = "application/json" if name.endswith(".json") else (
-                "text/plain" if name.endswith(".txt") else "application/octet-stream"
+            ct: ContentType = (
+                "application/json"
+                if name.endswith(".json")
+                else (
+                    "text/plain"
+                    if name.endswith(".txt")
+                    else "application/octet-stream"
+                )
             )
             rel_str = _posix_relative_to_repo(repo_root, child)
             out.append(
@@ -295,53 +302,328 @@ def _extra_file_entries(
 
 # Integrated run — known roles (flat + outputs/). required=T = spine contract expectation.
 _INTEGRATED_KNOWN: tuple[tuple[str, str, str, bool, str], ...] = (
-    ("spine_terminal_ret_packet", "terminal_ret_packet.json", "application/json", True, "integrated_single_action_spine"),
-    ("spine_runtime_identity_envelope", "runtime_identity_envelope.json", "application/json", True, "integrated_single_action_spine"),
-    ("spine_r4_run_manifest", "r4_run_manifest.json", "application/json", True, "integrated_single_action_spine"),
-    ("audit_l7_route_family_coverage", "agentic_core_l7_route_family_coverage.json", "application/json", True, "integrated_single_action_spine"),
-    ("audit_how_trace", "agentic_core_how_trace.json", "application/json", True, "integrated_single_action_spine"),
-    ("audit_spine_proof", "agentic_core_spine_proof.json", "application/json", False, "integrated_single_action_spine"),
-    ("narrative_run_report", "run_report.json", "application/json", False, "apps_rg_narrative_or_auxiliary"),
+    (
+        "spine_terminal_ret_packet",
+        "terminal_ret_packet.json",
+        "application/json",
+        True,
+        "integrated_single_action_spine",
+    ),
+    (
+        "spine_runtime_identity_envelope",
+        "runtime_identity_envelope.json",
+        "application/json",
+        True,
+        "integrated_single_action_spine",
+    ),
+    (
+        "spine_r4_run_manifest",
+        "r4_run_manifest.json",
+        "application/json",
+        True,
+        "integrated_single_action_spine",
+    ),
+    (
+        "audit_l7_route_family_coverage",
+        "agentic_core_l7_route_family_coverage.json",
+        "application/json",
+        True,
+        "integrated_single_action_spine",
+    ),
+    (
+        "audit_how_trace",
+        "agentic_core_how_trace.json",
+        "application/json",
+        True,
+        "integrated_single_action_spine",
+    ),
+    (
+        "audit_spine_proof",
+        "agentic_core_spine_proof.json",
+        "application/json",
+        False,
+        "integrated_single_action_spine",
+    ),
+    (
+        "core_runtime_authority",
+        "apps_rg_core_runtime_authority.json",
+        "application/json",
+        True,
+        "apps_rg.runtime.orchestration.core_runtime_authority",
+    ),
+    (
+        "narrative_run_report",
+        "run_report.json",
+        "application/json",
+        False,
+        "apps_rg_narrative_or_auxiliary",
+    ),
 )
 
 _INTEGRATED_OPTIONAL_OUTPUTS: tuple[tuple[str, str, str, bool, str], ...] = (
-    ("product_final_resume_output_text", FINAL_RESUME_OUTPUT_TXT, "text/plain", True, "apps_rg_final_resume_output_gate"),
-    ("product_final_resume_output_json", FINAL_RESUME_OUTPUT_JSON, "application/json", True, "apps_rg_final_resume_output_gate"),
-    ("product_final_resume_spine_json", FINAL_RESUME_ASSEMBLY_JSON_RELPATH, "application/json", True, "apps_rg_final_resume_assembly"),
-    ("product_resume_json_flat", "generated_resume.json", "application/json", False, "apps_rg_resume_assembly"),
-    ("product_resume_docx_branded", "Amit_Ayer_Resume.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", False, "apps_rg_docx_export"),
-    ("product_resume_json_outputs", "outputs/generated_resume.json", "application/json", False, "apps_rg_resume_assembly"),
-    ("product_resume_docx_outputs", FINAL_RESUME_DOCX_RELPATH, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", True, "apps_rg_docx_export"),
-    ("spine_integrated_manifest", "integrated_runtime_artifact_manifest.json", "application/json", False, "integrated_single_action_spine"),
-    ("spine_exit_review_packet", "exit_review_packet.json", "application/json", False, "integrated_single_action_spine"),
-    ("spine_runtime_exhaust", "runtime_exhaust_bundle.json", "application/json", False, "integrated_single_action_spine"),
+    (
+        "telemetry_runtime_receipt",
+        "otel_runtime_receipt.json",
+        "application/json",
+        False,
+        "apps_model_telemetry.otel_runtime",
+    ),
+    (
+        "telemetry_collector_preflight",
+        "otel_collector_preflight.json",
+        "application/json",
+        False,
+        "apps_model_telemetry.otel_runtime",
+    ),
+    (
+        "telemetry_collector_preflight_snapshot",
+        "otel_preflight_snapshot.json",
+        "application/json",
+        False,
+        "apps_model_telemetry.otel_runtime",
+    ),
+    (
+        "telemetry_collector_checkpoint",
+        "otel_collector_checkpoint.json",
+        "application/json",
+        False,
+        "apps_model_telemetry.otel_runtime",
+    ),
+    (
+        "product_final_resume_output_text",
+        FINAL_RESUME_OUTPUT_TXT,
+        "text/plain",
+        True,
+        "apps_rg_final_resume_output_gate",
+    ),
+    (
+        "product_final_resume_output_json",
+        FINAL_RESUME_OUTPUT_JSON,
+        "application/json",
+        True,
+        "apps_rg_final_resume_output_gate",
+    ),
+    (
+        "product_final_resume_spine_json",
+        FINAL_RESUME_ASSEMBLY_JSON_RELPATH,
+        "application/json",
+        True,
+        "apps_rg_final_resume_assembly",
+    ),
+    (
+        "product_resume_json_flat",
+        "generated_resume.json",
+        "application/json",
+        False,
+        "apps_rg_resume_assembly",
+    ),
+    (
+        "product_resume_docx_branded",
+        "Amit_Ayer_Resume.docx",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        False,
+        "apps_rg_docx_export",
+    ),
+    (
+        "product_resume_json_outputs",
+        "outputs/generated_resume.json",
+        "application/json",
+        False,
+        "apps_rg_resume_assembly",
+    ),
+    (
+        "product_resume_docx_outputs",
+        FINAL_RESUME_DOCX_RELPATH,
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        True,
+        "apps_rg_docx_export",
+    ),
+    (
+        "spine_integrated_manifest",
+        "integrated_runtime_artifact_manifest.json",
+        "application/json",
+        False,
+        "integrated_single_action_spine",
+    ),
+    (
+        "spine_exit_review_packet",
+        "exit_review_packet.json",
+        "application/json",
+        False,
+        "integrated_single_action_spine",
+    ),
+    (
+        "spine_runtime_exhaust",
+        "runtime_exhaust_bundle.json",
+        "application/json",
+        False,
+        "integrated_single_action_spine",
+    ),
 )
 
 # Lane seam — filenames commonly emitted by section lanes (canonical ``python -m apps_rg --section`` runtime proofs).
 _LANE_CORE: tuple[tuple[str, str, str, bool, str], ...] = (
-    ("lane_run_manifest", "run_manifest.json", "application/json", True, "runtime_proof_layout.finalize_runtime_proof_run"),
-    ("lane_l2_output", "l2_output.json", "application/json", True, "apps_rg_canonical_section_runtime"),
-    ("lane_runtime_payload", "runtime_payload.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("prompt_compiled_text", "compiled_prompt.txt", "text/plain", False, "apps_rg_canonical_section_runtime"),
-    ("prompt_compiled_artifact", "compiled_prompt_artifact.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("prompt_selection_trace", "prompt_selection_trace.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("provider_request", "provider_request.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("provider_response", "provider_response.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("judge_x1d_outputs", "x1d_llm_judge_outputs.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("gate_x2_outputs", "x2_gate_outputs.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("disposition_x3", "x3_disposition.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("l6_shadow_eval_package", "l6_shadow_eval_package.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("fact_check_result", "fact_check_result.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("repair_receipt", "repair_receipt.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("section_metric_receipt", "section_metric_receipt.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("lane_c0_metrics", "c0_metrics.json", "application/json", False, "apps_rg.runtime.bindings.section_lane_c0_metrics"),
-    ("claim_ledger", "claim_ledger.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("text_claim_coverage", "text_claim_coverage.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("selected_fact_plan", "selected_fact_plan.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("stage_sequence", "stage_sequence.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("artifact_inventory", "artifact_inventory.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("runtime_exhaust_bundle", "runtime_exhaust_bundle.json", "application/json", False, "apps_rg_canonical_section_runtime"),
-    ("section_runtime_proof_bundle", "section_runtime_proof_bundle.json", "application/json", False, "apps_rg_canonical_section_runtime"),
+    (
+        "lane_run_manifest",
+        "run_manifest.json",
+        "application/json",
+        True,
+        "runtime_proof_layout.finalize_runtime_proof_run",
+    ),
+    (
+        "lane_l2_output",
+        "l2_output.json",
+        "application/json",
+        True,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "lane_runtime_payload",
+        "runtime_payload.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "prompt_compiled_text",
+        "compiled_prompt.txt",
+        "text/plain",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "prompt_compiled_artifact",
+        "compiled_prompt_artifact.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "prompt_selection_trace",
+        "prompt_selection_trace.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "provider_request",
+        "provider_request.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "provider_response",
+        "provider_response.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "judge_x1d_outputs",
+        "x1d_llm_judge_outputs.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "gate_x2_outputs",
+        "x2_gate_outputs.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "disposition_x3",
+        "x3_disposition.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "l6_shadow_eval_package",
+        "l6_shadow_eval_package.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "fact_check_result",
+        "fact_check_result.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "repair_receipt",
+        "repair_receipt.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "section_metric_receipt",
+        "section_metric_receipt.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "lane_c0_metrics",
+        "c0_metrics.json",
+        "application/json",
+        False,
+        "apps_rg.runtime.bindings.section_lane_c0_metrics",
+    ),
+    (
+        "claim_ledger",
+        "claim_ledger.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "text_claim_coverage",
+        "text_claim_coverage.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "selected_fact_plan",
+        "selected_fact_plan.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "stage_sequence",
+        "stage_sequence.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "artifact_inventory",
+        "artifact_inventory.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "runtime_exhaust_bundle",
+        "runtime_exhaust_bundle.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
+    (
+        "section_runtime_proof_bundle",
+        "section_runtime_proof_bundle.json",
+        "application/json",
+        False,
+        "apps_rg_canonical_section_runtime",
+    ),
 )
 
 _HEADLINE_PROOF_STRICT_SUFFIXES: frozenset[str] = frozenset(
@@ -363,6 +645,14 @@ _HEADLINE_PROOF_STRICT_SUFFIXES: frozenset[str] = frozenset(
 _CANONICAL_HEADLINE_PRODUCER = "apps_rg_canonical_section_headline"
 
 
+def _load_json_mapping(path: Path) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return dict(payload) if isinstance(payload, Mapping) else {}
+
+
 def build_integrated_run_bundle_document(
     repo_root: Path,
     artifact_dir: Path,
@@ -375,9 +665,22 @@ def build_integrated_run_bundle_document(
     rid = str(run_id or "").strip() or artifact_dir.name
     entries: list[dict[str, Any]] = []
     indexed_relpaths: set[str] = set()
-    for role, suffix, ct, req, prod in (*_INTEGRATED_KNOWN, *_INTEGRATED_OPTIONAL_OUTPUTS):
+    for role, suffix, ct, req, prod in (
+        *_INTEGRATED_KNOWN,
+        *_INTEGRATED_OPTIONAL_OUTPUTS,
+    ):
         indexed_relpaths.add(suffix.replace("\\", "/"))
-        entries.append(_file_entry(repo_root, artifact_dir, role=role, relative_suffix=suffix, content_type=ct, required=req, producer=prod))
+        entries.append(
+            _file_entry(
+                repo_root,
+                artifact_dir,
+                role=role,
+                relative_suffix=suffix,
+                content_type=ct,
+                required=req,
+                producer=prod,
+            )
+        )
     entries.extend(
         _extra_file_entries(
             repo_root,
@@ -392,7 +695,9 @@ def build_integrated_run_bundle_document(
     doc: dict[str, Any] = {
         "schema_version": _SCHEMA_VERSION,
         "run_id": rid,
-        "correlation_id": correlation_id if (correlation_id and str(correlation_id).strip()) else None,
+        "correlation_id": correlation_id
+        if (correlation_id and str(correlation_id).strip())
+        else None,
         "created_at": _ts(),
         "bundle_kind": "integrated_run",
         "root_path": _posix_relative_to_repo(repo_root, artifact_dir.resolve()),
@@ -402,6 +707,30 @@ def build_integrated_run_bundle_document(
     }
     if log_meta.get("mode") == "disk" and log_meta.get("log_root_path"):
         doc["log_root_path"] = log_meta["log_root_path"]
+    runtime_receipt = _load_json_mapping(artifact_dir / "otel_runtime_receipt.json")
+    collector_receipt = _load_json_mapping(
+        artifact_dir / "otel_collector_preflight.json"
+    )
+    runtime_active = runtime_receipt.get("active") is True
+    collector_passed = collector_receipt.get("status") == "PASS"
+    configured = bool(runtime_receipt or collector_receipt)
+    doc["telemetry_activation"] = {
+        "status": (
+            "NOT_CONFIGURED"
+            if not configured
+            else "CONSISTENT"
+            if runtime_active and collector_passed
+            else "INCONSISTENT"
+        ),
+        "runtime_active": runtime_active,
+        "runtime_reason": str(runtime_receipt.get("reason") or ""),
+        "global_provider_verified": runtime_receipt.get(
+            "global_provider_verified"
+        )
+        is True,
+        "collector_preflight_status": str(collector_receipt.get("status") or ""),
+        "collector_preflight_reason": str(collector_receipt.get("reason") or ""),
+    }
     return doc
 
 
@@ -420,7 +749,11 @@ def build_lane_runtime_proof_bundle_document(
     for role, suffix, ct, req, prod in _LANE_CORE:
         indexed_relpaths.add(suffix.replace("\\", "/"))
         norm_suf = suffix.replace("\\", "/")
-        if proof_contract_strict and lane == "headline" and norm_suf in _HEADLINE_PROOF_STRICT_SUFFIXES:
+        if (
+            proof_contract_strict
+            and lane == "headline"
+            and norm_suf in _HEADLINE_PROOF_STRICT_SUFFIXES
+        ):
             req = True
             prod = _CANONICAL_HEADLINE_PRODUCER
         entries.append(
@@ -432,7 +765,9 @@ def build_lane_runtime_proof_bundle_document(
                 content_type=ct,
                 required=req,
                 producer=prod,
-                notes=f"lane={lane}" if role in ("lane_run_manifest", "lane_l2_output") else None,
+                notes=f"lane={lane}"
+                if role in ("lane_run_manifest", "lane_l2_output")
+                else None,
             )
         )
     extra_prod = (
@@ -510,7 +845,10 @@ def build_lane_runtime_proof_bundle_document(
 def write_run_bundle_index(artifact_dir: Path, document: Mapping[str, Any]) -> None:
     path = artifact_dir / RUN_BUNDLE_INDEX_FILENAME
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(dict(document), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(dict(document), indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
 
 def emit_integrated_run_bundle_index(
@@ -601,7 +939,14 @@ def assert_run_bundle_index_document_shape(doc: Mapping[str, Any]) -> None:
     for i, e in enumerate(entries):
         if not isinstance(e, Mapping):
             raise ValueError(f"entries[{i}] must be an object")
-        for ek in ("role", "relative_path", "content_type", "required", "exists", "producer"):
+        for ek in (
+            "role",
+            "relative_path",
+            "content_type",
+            "required",
+            "exists",
+            "producer",
+        ):
             if ek not in e:
                 raise ValueError(f"entries[{i}] missing key: {ek}")
 

@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from agentic_core.config.model_catalog import (
+from apps_rg.runtime.core_model_catalog import (
     BGE_M3_EMBEDDING_DIMENSION,
     BGE_M3_MODEL_ID,
 )

@@ -124,6 +124,20 @@ def test_redundant_partner_ecosystem_segments_fail_segments_quality() -> None:
     )
 
 
+def test_retry14_repeated_runtime_pillars_fail_segments_quality() -> None:
+    hl = (
+        "SVP Engineering | Alliance GTM Leadership | Runtime Reliability Governance | "
+        "Telemetry Evaluation Runtime"
+    )
+    gates = run_headline_x2_gates(headline_line=hl, **_base_kwargs(hl))
+    by_id = {g.gate_id: g for g in gates}
+
+    assert "x2_headline_segments_quality" in _failed_ids(gates)
+    assert "repeated_positioning_token:runtime:seg3,seg4" in str(
+        by_id["x2_headline_segments_quality"].observed_value
+    )
+
+
 def test_standalone_vendor_architecture_segment_fails() -> None:
     hl = "SVP Engineering | Databricks Lakehouse | Enterprise AI Platforms | Partner Co-Sell Motions"
     gates = run_headline_x2_gates(headline_line=hl, **_base_kwargs(hl))

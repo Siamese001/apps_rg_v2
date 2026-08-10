@@ -1,0 +1,1641 @@
+{
+  "schema_version": "apps_rg.section_failure_forensics.v1",
+  "generated_at_utc": "2026-08-09T07:37:20Z",
+  "section_id": "ibm_bullets",
+  "failure_type": "independent_failure",
+  "failed_gate_ids": [
+    "x2_bullet_technical_specificity_floor"
+  ],
+  "current_output": {
+    "present": true,
+    "ref": "ibm_bullets_output.txt",
+    "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\ibm_bullets_output.txt",
+    "text": "- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\n- bul_ibm_002: Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions.\n- bul_ibm_003: Built decision-support data models and BI views that connected modernization programs to executive operating decisions\n- bul_ibm_004: Owned quota-aligned solution leadership and pipeline governance across enterprise pursuits and client portfolio expansion motions.\n- bul_ibm_005: Led technical discovery and solution mapping for enterprise financial-services pursuits",
+    "sha256": "e2cdaeaf04cf3e87733fdc39b4e2bb33149184117563fcc8395dc9c86ccd9214",
+    "source": "display_text_file"
+  },
+  "last_successful_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "missing_lane_dir",
+    "baseline_run_dir": "",
+    "baseline_found": false,
+    "baseline_lane_dir": "",
+    "baseline_display_txt_path": ""
+  },
+  "input_hash_comparison": {
+    "current_scenario_hash": "1fd8ce41e41c20dcb3cfe312224b3dcc711b93298adce9331436ca1aa181e042",
+    "baseline_scenario_hash": "",
+    "match": false,
+    "current": {
+      "target_company": "Anthropic",
+      "target_role": "Manager of Applied AI Architecture, Partnerships",
+      "manual_brief": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\apps_research\\runs\\r-a2c5cbf2348185f5b43843f6\\briefing.md",
+      "jd": "",
+      "generation_mode": "strategic_tailor",
+      "scenario_hash": "1fd8ce41e41c20dcb3cfe312224b3dcc711b93298adce9331436ca1aa181e042"
+    },
+    "baseline": {}
+  },
+  "selected_fact_plan_comparison": {
+    "artifact": "selected_fact_plan.json",
+    "current_present": true,
+    "baseline_present": false,
+    "current_hash": "22ca82c40ea841a117e9f9ac8451d2c6e07815f739e93e1b4bc0ea9d6dbe0e03",
+    "baseline_hash": "",
+    "match": false
+  },
+  "provider_request_hash_comparison": {
+    "artifact": "provider_request.json",
+    "current_present": true,
+    "baseline_present": false,
+    "current_hash": "d7ecc1b64a2837536b028aec8eadeb292057dcc3c7324c1caad0da75f3722cbc",
+    "baseline_hash": "",
+    "match": false
+  },
+  "revision_comparison": {
+    "baseline": {
+      "status": "NO_PRIOR_PASSING_RUN",
+      "git_commit": "",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_applicable"
+    },
+    "current": {
+      "status": "IDENTIFIED",
+      "git_commit": "cba1303f044f24af364b888122971cab7a972457",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_derivable_from_local_history"
+    }
+  },
+  "difference_summary": {
+    "baseline_status": "NO_PRIOR_PASSING_RUN",
+    "inputs_match": false,
+    "selected_fact_plan_match": false,
+    "provider_request_match": false,
+    "materialized_output_match": false,
+    "baseline_x2": "NOT_OBSERVED",
+    "current_x2": "FAIL",
+    "baseline_x3": "NOT_OBSERVED",
+    "current_x3": "X3_BLOCK",
+    "baseline_judges": "NOT_OBSERVED",
+    "current_judges": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 4/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.74/5 vs 0.72 PASS",
+    "failed_gate_ids": [
+      "x2_bullet_technical_specificity_floor"
+    ]
+  },
+  "comparison_complete": false,
+  "output_bisect": {
+    "schema_version": "apps_rg.output_bisect.v1",
+    "section_id": "ibm_bullets",
+    "scope": "NO_PRIOR_BASELINE",
+    "first_observed_divergence": {
+      "order": 1,
+      "stage": "u0_ingress",
+      "prior_value": "NOT_OBSERVED",
+      "current_value": "391176d4c9635fd068c20512391dd22429742d535f9c4dd115cbde2cbb11e97c",
+      "prior_detail": "NOT_OBSERVED",
+      "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\apps_research\\runs\\r-a2c5cbf2348185f5b43843f6\\briefing.md",
+      "match": false,
+      "classification": "CORRELATED_ONLY",
+      "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+      "prior_evidence_ref": "",
+      "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\ingress_raw.json"
+    },
+    "first_causally_relevant_divergence": {},
+    "ingestion_to_outcome_lineage": [
+      {
+        "order": 1,
+        "stage": "u0_ingress",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "391176d4c9635fd068c20512391dd22429742d535f9c4dd115cbde2cbb11e97c",
+        "prior_detail": "NOT_OBSERVED",
+        "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\apps_research\\runs\\r-a2c5cbf2348185f5b43843f6\\briefing.md",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\ingress_raw.json"
+      },
+      {
+        "order": 2,
+        "stage": "u0_payload",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "c6992f03549588be81856fec7785b938beb170b1d46f66db3d803a68fee40e19",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\u0_receipt.json"
+      },
+      {
+        "order": 3,
+        "stage": "jd_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "8538b12272eb74d73be0dd36a74a2a81a8fbfd197a43d5b51c9e095e81f3f75b",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 4,
+        "stage": "briefing_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "1f6a61b95747c1b0b513e7014441a777fb26f117f8e105ace7aa48b9c339303b",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 5,
+        "stage": "targeting_bundle",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 6,
+        "stage": "proof_pool",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 7,
+        "stage": "selected_fact_plan",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "22ca82c40ea841a117e9f9ac8451d2c6e07815f739e93e1b4bc0ea9d6dbe0e03",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 8,
+        "stage": "provider_request",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "0d3557c22242ad285936006767b25e9f1c62afb5d9c191341b82e663ab2d8990",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\provider_request.json"
+      },
+      {
+        "order": 9,
+        "stage": "initial_candidate",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\raw_model_output.txt"
+      },
+      {
+        "order": 10,
+        "stage": "retry_loop",
+        "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": true,
+        "classification": "RULED_OUT",
+        "reason": "The evidence is identical at this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\synthesis_regen_receipt.json"
+      },
+      {
+        "order": 11,
+        "stage": "deterministic_finalization",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\executive_summary_finalize_coherence.json"
+      },
+      {
+        "order": 12,
+        "stage": "final_x2",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "5f05281ea7e15244bc02d01cfde7e8ccf0623ff1c105e4857286a021fcf0f69d",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "order": 13,
+        "stage": "judges",
+        "prior_value": "NO_JUDGE_ROWS",
+        "current_value": "09378f9e609851db8386530ae84ad93babe46d065927d0089284a5523457e7d1",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x1d_llm_judge_outputs.json"
+      },
+      {
+        "order": 14,
+        "stage": "x3",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "X3_BLOCK",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x3_disposition.json"
+      }
+    ],
+    "prior_attempt_timeline": [
+      {
+        "run": "prior_passing",
+        "sequence": 1,
+        "phase": "lane_resolution",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "no prior passing lane was found",
+        "repair_or_action": "none",
+        "gate_scope": "NONE",
+        "gate_result": "NOT_APPLICABLE",
+        "failed_gate_ids": [],
+        "judge_result": "NO_PRIOR_PASSING_RUN",
+        "disposition": "NO_BASELINE",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "",
+        "complete": true
+      }
+    ],
+    "current_attempt_timeline": [
+      {
+        "run": "current_failure",
+        "sequence": 1,
+        "phase": "initial_generation",
+        "attempt": 0,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "initial candidate",
+        "repair_or_action": "dispatch provider generation",
+        "gate_scope": "FULL_X2",
+        "gate_result": "PASS_OR_NOT_TRIGGERED",
+        "failed_gate_ids": [],
+        "judge_result": "PENDING",
+        "disposition": "ADVANCED_TO_X2",
+        "acceptance_scope": "INITIAL_CANDIDATE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\raw_model_output.txt",
+        "complete": false
+      },
+      {
+        "run": "current_failure",
+        "sequence": 2,
+        "phase": "deterministic_repair",
+        "attempt": 1,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "graph_plan_fact_id_alignment",
+        "repair_or_action": "align_ibm_claim_ledger_from_canonical_facts",
+        "gate_scope": "PRE_FINAL_X2",
+        "gate_result": "NO_CHANGE",
+        "failed_gate_ids": [],
+        "judge_result": "NOT_REACHED",
+        "disposition": "BLOCKED_OR_LEDGER_ONLY",
+        "acceptance_scope": "DETERMINISTIC_REWRITE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_repair_ledger.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 3,
+        "phase": "deterministic_repair",
+        "attempt": 2,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "surface_fact_backed_metric_tokens_model_dropped",
+        "repair_or_action": "inject_ibm_plan_fact_metric_anchors",
+        "gate_scope": "PRE_FINAL_X2",
+        "gate_result": "NO_CHANGE",
+        "failed_gate_ids": [],
+        "judge_result": "NOT_REACHED",
+        "disposition": "BLOCKED_OR_LEDGER_ONLY",
+        "acceptance_scope": "DETERMINISTIC_REWRITE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_repair_ledger.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 4,
+        "phase": "final_x2",
+        "attempt": 1,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "all deterministic product gates",
+        "repair_or_action": "evaluate full X2 gate set",
+        "gate_scope": "FULL_X2",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [
+          "x2_bullet_technical_specificity_floor"
+        ],
+        "judge_result": "NOT_REACHED_X2_FAILED",
+        "disposition": "BLOCKED",
+        "acceptance_scope": "PRODUCT_GATE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 5,
+        "phase": "judge_panel",
+        "attempt": "gemini_pro",
+        "candidate_digest": "0f2025e33d80bddb",
+        "word_count": 0,
+        "trigger_or_input": "Bullets 2 and 4 use repetitive phrasing regarding quota-aligned solution leadership across enterprise pursuits and expansion motions.",
+        "repair_or_action": "grade candidate",
+        "gate_scope": "X1D_MODEL_BACKED_JUDGE",
+        "gate_result": "PASS",
+        "failed_gate_ids": [],
+        "judge_result": "4.0/4.0 MODEL_BACKED_PASS",
+        "disposition": "JUDGE_PASS",
+        "acceptance_scope": "MODEL_BACKED_GRADE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x1d_gemini_provider_response_raw_20260809_073459_936.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 6,
+        "phase": "judge_panel",
+        "attempt": "openai_chatgpt",
+        "candidate_digest": "2698200c074204c1",
+        "word_count": 0,
+        "trigger_or_input": "Employment pool selector: 5 slots, min_score=0.74, threshold=0.72, gate_ok=True",
+        "repair_or_action": "grade candidate",
+        "gate_scope": "X1D_MODEL_BACKED_JUDGE",
+        "gate_result": "PASS",
+        "failed_gate_ids": [],
+        "judge_result": "0.74/0.72 MODEL_BACKED_PASS",
+        "disposition": "JUDGE_PASS",
+        "acceptance_scope": "MODEL_BACKED_GRADE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x1d_openai_provider_response_raw_20260809_073448_059.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 7,
+        "phase": "judge_retry_status",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "all configured judges passed",
+        "repair_or_action": "no judge retry required",
+        "gate_scope": "JUDGE_REMEDIATION",
+        "gate_result": "NOT_NEEDED",
+        "failed_gate_ids": [],
+        "judge_result": "NOT_NEEDED_ALL_JUDGES_PASSED",
+        "disposition": "NO_RETRY",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\judge_remediation_cycles.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 8,
+        "phase": "x3_disposition",
+        "attempt": "-",
+        "candidate_digest": "e2cdaeaf04cf3e87",
+        "word_count": 0,
+        "trigger_or_input": "X2 deterministic gate failure",
+        "repair_or_action": "authorize or block product output",
+        "gate_scope": "X3",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [
+          "x2_bullet_technical_specificity_floor"
+        ],
+        "judge_result": "MODEL_BACKED",
+        "disposition": "X3_BLOCK",
+        "acceptance_scope": "PRODUCT_AUTHORIZATION",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x3_disposition.json",
+        "complete": true
+      }
+    ],
+    "gate_matrix": [
+      {
+        "gate_id": "X2_BLOCK_ID_NAMESPACE_SPLIT",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'disjoint_without_alias': [], 'alias_map_size': 5}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_active_pool_digest_matches_fec_digest",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'canonical_evidence_set_digest': 'afe43974c923915a1a5ef47460f8ae497e23fc9b98779a38e7108cca9f7251b8', 'fec_allowed_fact_ids_digest': 'afe43974c923915a1a5ef47460f8ae497e23fc9b98779a38e7108cca9f7251b8', 'fec_narrowed_from_pool': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_base_resume_ngram_overlap_ibm",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "all_below_threshold",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_briefing_used_as_required_context_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'required': True, 'used': True, 'authority': 'CONTEXT_INPUT', 'used_for': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_bullet_seniority_floor",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "all_pass",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_bullet_technical_specificity_floor",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "bul_ibm_002: no named mechanism/technology in bullet text",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_c0_metrics_artifact_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'schema_version': 'c0_metrics.v1', 'required_keys_present': ['blocked_source_refs', 'briefing_source_type', 'citation_map', 'company_brief_provenance', 'evidence_counts', 'excluded_evidence_refs', 'final_evidence_digest', 'freshness_receipts', 'retrieval_mode', 'retrieval_sources', 'route_id', 'run_id', 'schema_version', 'source_class_coverage', 'support_score_profile', 'support_status', 'support_target_met']}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_c0_support_status_gate",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'support_status': 'PASS', 'support_target_met': True, 'c0_minimum_safe': True, 'canonical_enum': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_claim_ledger_claim_text_non_empty",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_claim_ledger_coverage_100",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Every bul_ibm_* bullet must appear in output and claim_ledger.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_claim_ledger_source_fact_ids_subset_of_fec",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'ledger_id_count': 5, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_e0_example_ngram_overlap_ibm",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "all_below_threshold",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_fec_subset_of_canonical_evidence_pool",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'fec_count': 39, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_augmented_skills_graph_proof_pool_only",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_bullet_count_5",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Must output exactly 5 IBM bullets.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_bullet_graph_skill_node_ids_required",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "all_present",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_bullet_no_embedded_newline",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_bullet_no_paragraph_block",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "<=320 chars",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_bullet_role_episode_bundle_id_required",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "all_present",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_bullet_single_thought",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "1 sentence each",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_bullets_active_proof_pool_source_fact_ids",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'section': 'ibm_bullets', 'proof_source': 'augmented_skills_graph', 'proof_pool_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'proof_pool_digest': 'afe43974c923915a1a5ef47460f8ae497e23fc9b98779a38e7108cca9f7251b8', 'canonical_evidence_set_digest': 'afe43974c923915a1a5ef47460f8ae497e23fc9b98779a38e7108cca9f7251b8', 'id_alias_map': {'bul_ibm_001': 'fact_partnerships_gtm_002', 'bul_ibm_002': 'fact_revenue_ops_002', 'bul_ibm_003': 'fact_revenue_ops_005', 'bul_ibm_004': 'fact_revenue_ops_003', 'bul_ibm_005': 'fact_revenue_ops_001'}, 'claim_evidence_source_type': 'augmented_skills_graph', 'claim_evidence_source_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'skills_authority_source_type': 'augmented_skills_graph', 'skills_authority_status': 'PASS', 'skills_authority_graph_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'legacy_broad_skills_ledger_skills_authority': False, 'broad_skills_ledger_claim_evidence_only': None, 'allowed_source_fact_ids_count': 39, 'source_fact_ids_checked': ['bul_ibm_001', 'bul_ibm_002', 'bul_ibm_003', 'bul_ibm_004', 'bul_ibm_005'], 'unsupported_source_fact_ids': [], 'rejected_non_proof_source_ids': [], 'jd_or_briefing_ids_rejected': [], 'x2_source_fact_pool_status': 'PASS', 'decisive_reason': None, 'validator_name': 'evaluate_proof_pool_source_fact_gate', 'skills_authority_x2_boundary': 'PASS', 'x2_srfs_gate_status': 'NOT_APPLICABLE', 'out_of_slice_fact_ids': [], 'srfs_allowed_fact_ids_count': 39, 'selected_role_fact_set_used': False, 'broad_skills_ledger_used': False, 'broad_skills_ledger_used_as_authority': False, 'base_resume_fallback_used': False, 'srfs_section_id': 'ibm_bullets'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_graph_only_no_base_resume_bullets",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_hold_metric_forbidden_in_output",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_metric_anchor_bullet_ownership",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_metric_outcome_id_required_when_has_metric",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "all_traceable",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_metrics_preserved",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'forbidden_absent': True, 'promotable_ids': ['metric_ibm_onprem_to_aws_modernization_waves', 'metric_ibm_regulated_reference_architecture_reuse', 'metric_ibm_stress_test_cycle_weeks_to_hours', 'metric_ibm_decision_support_scenario_traceability', 'metric_ibm_presales_discovery_to_solution_handoff', 'metric_ibm_executive_buyer_architecture_alignment', 'metric_ibm_offering_accelerator_package_reuse', 'metric_ibm_client_facing_modernization_playbooks', 'metric_ibm_quota_aligned_solution_cadence', 'metric_ibm_revenue_target_solution_validation', 'metric_ibm_text_signal_to_review_queue', 'metric_ibm_ml_output_business_action_packaging', 'metric_ibm_budget_portfolio_bi_views', 'metric_ibm_modeling_delivery_cost_assumption_traceability', 'metric_ibm_value_realization_account_reviews', 'metric_ibm_adoption_risk_to_expansion_readiness', 'metric_ibm_20pct_joint_revenue_growth', 'metric_ibm_alliance_cosell_operating_cadence', 'metric_ibm_ai_driven_sales_frameworks', 'metric_ibm_release_gate_security_scanning_coverage', 'metric_ibm_deployment_blueprint_repeatability']}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_narrative_slot_reservation",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_no_rewrite_intensity_model",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "absent",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_only_fact_scope",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "['bul_ibm_001', 'bul_ibm_002', 'bul_ibm_003', 'bul_ibm_004', 'bul_ibm_005']",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_ibm_role_episode_bundles_in_proof_pool",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'bundles_present': True, 'flat_skill_only': False, 'consumption_mode': 'role_episode_bundle_required'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_input_usage_accounting_consistent",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'ledger_summary': {'displayed_claim_count': 5, 'claims_supported_by_selected_resume_facts': 5, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'runtime_summary': {'displayed_claim_count': 5, 'claims_supported_by_selected_resume_facts': 5, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'coverage_overall_pass': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_jd_used_as_required_targeting_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'required': True, 'used': True, 'authority': 'TARGETING_INPUT', 'used_for': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_json_parse_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_metric_fact_id_granularity",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Metric claims lack matching bul_ibm_* source_fact_ids in claim_ledger.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_agentic_inflation",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Agentic inflation language in IBM bullets.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_em_dash",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Em dash found.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_first_person",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "First-person pronoun found.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_generic_consulting_substitution",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "all_pass",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_generic_filler",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Generic filler phrase found.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_inline_source_tags",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Inline source tags found in bullet text.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_jd_only_claims",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "JD phrase copied into bullet proof.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_non_evidence_inputs_as_claim_evidence",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_non_evidence_inputs_in_source_fact_ids",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'row_scan_found_reserved_non_resume_ids': False, 'ledger_non_evidence_inputs_in_source_fact_ids': False}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_silent_mock_fallback",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Silent mock fallback detected.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_taxonomy_label_prefix_in_display_text",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "bullet_text must not start with a category-style Title: prefix.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_unify_fact_leakage",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Unify bullet fact leakage detected.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_unify_runtime_terms",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Unify runtime vocabulary leaked into IBM bullets.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_prompt_c0_ids_subset_of_fec",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'prompt_c0_count': 39, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_provider_requested_attempted",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Provider requested does not match attempted.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_required_top_level_json_keys",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_resume_graph_claim_binding",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'allocation_plan_digest': '84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df', 'claim_count': 5, 'bound_claim_count': 5, 'binding_coverage': 1.0, 'metric_exactness_pass': True, 'orphan_allocation_claim_unit_ids': [], 'failure_reasons': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_section_claims_supported_by_base_resume",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'displayed_claim_count': 5, 'claims_supported_by_selected_resume_facts': 5, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_section_input_usage_ledger_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "section_input_usage_ledger_v1",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_selected_fact_ids_only",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_text_claim_coverage_integrity",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "structural_alignment_ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_title_company_used_as_required_positioning_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'target_title': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}, 'target_company': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_x1d_required_judges_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_x1d_schema_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Blocked judges with invalid schema: []",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\x2_gate_outputs.json"
+      }
+    ],
+    "judge_matrix": [
+      {
+        "judge": "gemini_pro",
+        "prior": "NOT_OBSERVED",
+        "current": "4.0/4.0 PASS",
+        "reason": ""
+      },
+      {
+        "judge": "openai_chatgpt",
+        "prior": "NOT_OBSERVED",
+        "current": "0.74/0.72 PASS",
+        "reason": ""
+      }
+    ],
+    "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+    "code_bindings": [
+      {
+        "role": "revision comparison",
+        "file": "",
+        "symbol": "",
+        "baseline_symbol_hash": "",
+        "current_symbol_hash": "",
+        "changed_between_revisions": false,
+        "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+      }
+    ],
+    "underlying_root_cause": {
+      "downstream_root_cause": {
+        "status": "ISOLATED_TO_UPSTREAM_SECTION",
+        "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+      }
+    },
+    "layperson_explanation": [
+      "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+      "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\apps_research\\runs\\r-a2c5cbf2348185f5b43843f6\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+      "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (x2_bullet_technical_specificity_floor), so 4.0/4.0 MODEL_BACKED_PASS and the resume remained blocked."
+    ]
+  },
+  "layperson_explanation": [
+    "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+    "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\apps_research\\runs\\r-a2c5cbf2348185f5b43843f6\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+    "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (x2_bullet_technical_specificity_floor), so 4.0/4.0 MODEL_BACKED_PASS and the resume remained blocked."
+  ],
+  "retry_attempts": [
+    {
+      "ref": "employment_bullet_regen.json",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\employment_bullet_regen.json",
+      "json": {
+        "schema_version": "employment_bullet_regen.v2",
+        "artifact_contract": "bounded_round_receipt",
+        "rounds": [
+          {
+            "regen_round": 0,
+            "batch_paths": 2,
+            "requested_batch_paths": 2,
+            "total_paths": 2,
+            "initial_path_count": 2,
+            "max_path_count": 4,
+            "adaptive_sc_enabled": true,
+            "batch_reason": "initial",
+            "gate": {
+              "ok": true,
+              "section_lane": "ibm_bullets",
+              "final_bullet_count": 5,
+              "min_score_threshold": 0.72,
+              "slots_passing": [
+                "bul_ibm_001",
+                "bul_ibm_002",
+                "bul_ibm_003",
+                "bul_ibm_004",
+                "bul_ibm_005"
+              ],
+              "slots_below_threshold": [],
+              "slots_missing": [],
+              "bullets_in_merged": 5,
+              "unique_source_fact_ids": [],
+              "unique_source_fact_count": 0,
+              "duplicate_source_fact_ids": [],
+              "slots_missing_source_fact_ids": [],
+              "proof_unique_source_fact_gate_active": false
+            },
+            "selection_mode": "openai_chatgpt_employment_top_n_pass"
+          }
+        ]
+      }
+    }
+  ],
+  "retry_outputs": [
+    {
+      "ref": "employment_bullet_regen.json",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\employment_bullet_regen.json",
+      "json": {
+        "schema_version": "employment_bullet_regen.v2",
+        "artifact_contract": "bounded_round_receipt",
+        "rounds": [
+          {
+            "regen_round": 0,
+            "batch_paths": 2,
+            "requested_batch_paths": 2,
+            "total_paths": 2,
+            "initial_path_count": 2,
+            "max_path_count": 4,
+            "adaptive_sc_enabled": true,
+            "batch_reason": "initial",
+            "gate": {
+              "ok": true,
+              "section_lane": "ibm_bullets",
+              "final_bullet_count": 5,
+              "min_score_threshold": 0.72,
+              "slots_passing": [
+                "bul_ibm_001",
+                "bul_ibm_002",
+                "bul_ibm_003",
+                "bul_ibm_004",
+                "bul_ibm_005"
+              ],
+              "slots_below_threshold": [],
+              "slots_missing": [],
+              "bullets_in_merged": 5,
+              "unique_source_fact_ids": [],
+              "unique_source_fact_count": 0,
+              "duplicate_source_fact_ids": [],
+              "slots_missing_source_fact_ids": [],
+              "proof_unique_source_fact_gate_active": false
+            },
+            "selection_mode": "openai_chatgpt_employment_top_n_pass"
+          }
+        ]
+      }
+    },
+    {
+      "ref": "raw_model_output.txt",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\raw_model_output.txt",
+      "json": {
+        "bullets": [
+          {
+            "bullet_id": "bul_ibm_001",
+            "bullet_text": "Led enterprise IBM-AWS alliance co-sell motions for financial-services modernization, aligning AWS reference architecture, microservices, and cloud-native solution design to client pursuits.",
+            "has_metric": false,
+            "metric_raw": "",
+            "source_fact_ids": [
+              "bul_ibm_001"
+            ]
+          },
+          {
+            "bullet_id": "bul_ibm_002",
+            "bullet_text": "Owned quota-aligned solution leadership across enterprise pursuits and portfolio expansion motions, translating HPC stress testing and decision-support analytics into executive workflows.",
+            "has_metric": false,
+            "metric_raw": "",
+            "source_fact_ids": [
+              "bul_ibm_002"
+            ]
+          },
+          {
+            "bullet_id": "bul_ibm_003",
+            "bullet_text": "Built enterprise decision-support data models and BI views through pre-sales discovery, connecting modernization programs to executive operating decisions and delivery-ready solution handoffs.",
+            "has_metric": false,
+            "metric_raw": "",
+            "source_fact_ids": [
+              "bul_ibm_003"
+            ]
+          },
+          {
+            "bullet_id": "bul_ibm_004",
+            "bullet_text": "Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion, using governed BI data models, documentation standards, and reference architecture to support modernization decisions.",
+            "has_metric": false,
+            "metric_raw": "",
+            "source_fact_ids": [
+              "bul_ibm_004"
+            ]
+          },
+          {
+            "bullet_id": "bul_ibm_005",
+            "bullet_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits through IBM-AWS co-sell motions, aligning AWS solution roadmaps, partner architecture, and executive sponsors.",
+            "has_metric": false,
+            "metric_raw": "",
+            "source_fact_ids": [
+              "bul_ibm_005"
+            ]
+          }
+        ],
+        "change_log": [
+          {
+            "bullet_id": "bul_ibm_001",
+            "fact_ids_used": [
+              "bul_ibm_001"
+            ],
+            "graph_skill_node_ids": [
+              "skill_sr_cloud_data_platform_engineering"
+            ],
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_aws_modernization_architecture"
+          },
+          {
+            "bullet_id": "bul_ibm_002",
+            "fact_ids_used": [
+              "bul_ibm_002"
+            ],
+            "graph_skill_node_ids": [
+              "skill_sr_cloud_data_platform_engineering"
+            ],
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_cognitive_business_decision_support"
+          },
+          {
+            "bullet_id": "bul_ibm_003",
+            "fact_ids_used": [
+              "bul_ibm_003",
+              "fact_revenue_ops_001"
+            ],
+            "graph_skill_node_ids": [
+              "skill_partner_pre_sales",
+              "skill_p2_gtm_discovery_qualification",
+              "skill_p2_gtm_gtm_solution_mapping"
+            ],
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_presales_solution_engineering"
+          },
+          {
+            "bullet_id": "bul_ibm_004",
+            "fact_ids_used": [
+              "bul_ibm_004"
+            ],
+            "graph_skill_node_ids": [
+              "skill_sr_cloud_data_platform_engineering",
+              "skill_sr_enterprise_portfolio_data_governance"
+            ],
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support"
+          },
+          {
+            "bullet_id": "bul_ibm_005",
+            "fact_ids_used": [
+              "bul_ibm_005"
+            ],
+            "graph_skill_node_ids": [
+              "skill_partner_ibm_aws_alliance_joint_revenue",
+              "skill_partner_cloud_vendor_joint_gtm",
+              "skill_partner_hyperscaler_cosell",
+              "skill_partner_joint_solution_development"
+            ],
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm"
+          }
+        ],
+        "claim_ledger": [
+          {
+            "claim_text": "Led enterprise IBM-AWS alliance co-sell motions for financial-services modernization using AWS reference architecture, microservices, and cloud-native solution design.",
+            "source_fact_ids": [
+              "bul_ibm_001"
+            ]
+          },
+          {
+            "claim_text": "Owned quota-aligned solution leadership across enterprise pursuits and portfolio expansion motions, translating HPC stress testing and decision-support analytics into executive workflows.",
+            "source_fact_ids": [
+              "bul_ibm_002"
+            ]
+          },
+          {
+            "bullet_id": "bul_ibm_003",
+            "claim_text": "Built decision-support data models and BI views through pre-sales discovery to connect modernization programs with executive operating decisions and solution handoffs.",
+            "source_fact_ids": [
+              "bul_ibm_003"
+            ]
+          },
+          {
+            "claim_text": "Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion using governed BI data models, documentation standards, and reference architecture.",
+            "source_fact_ids": [
+              "bul_ibm_004"
+            ]
+          },
+          {
+            "claim_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits through IBM-AWS co-sell motions using AWS solution roadmaps and partner architecture.",
+            "source_fact_ids": [
+              "bul_ibm_005"
+            ]
+          }
+        ],
+        "gap_notes": [
+          "No IBM proof was used for Anthropic-specific products, AI safety claims, or Claude implementation patterns.",
+          "Approved differentiated metrics were not surfaced because the selected slot facts did not bind those metrics under the applicable slot constraints."
+        ],
+        "jd_alignment": {
+          "briefing_used_as_proof": false,
+          "jd_used_as_proof": false,
+          "selected_briefing_themes": [
+            "Cloud, technology, and services partner coordination",
+            "Technical consistency across partner-delivered solutions",
+            "Architecture quality and implementation credibility",
+            "Shared ownership of solution design and customer outcomes",
+            "Reliable and controlled enterprise adoption"
+          ],
+          "selected_jd_themes": [
+            "Enterprise AI architecture translated into deployable customer workflows",
+            "Partner-ready reference patterns and implementation governance",
+            "Cloud and services ecosystem coordination",
+            "Cross-functional alignment across technical, commercial, and partner stakeholders",
+            "Repeatable solution packaging and customer adoption"
+          ],
+          "targeting_only": true,
+          "targeting_rationale": "Ordering emphasizes alliance GTM, enterprise solution leadership, architecture, BI decision support, and technical discovery to foreground evidence relevant to applied AI architecture and partnerships."
+        },
+        "selected_fact_plan": {
+          "bul_ibm_001": {
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_aws_modernization_architecture",
+            "selected_fact_ids": [
+              "bul_ibm_001"
+            ]
+          },
+          "bul_ibm_002": {
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_cognitive_business_decision_support",
+            "selected_fact_ids": [
+              "bul_ibm_002"
+            ]
+          },
+          "bul_ibm_003": {
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_presales_solution_engineering",
+            "selected_fact_ids": [
+              "bul_ibm_003"
+            ]
+          },
+          "bul_ibm_004": {
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support",
+            "selected_fact_ids": [
+              "bul_ibm_004"
+            ]
+          },
+          "bul_ibm_005": {
+            "metric_outcome_ids": [],
+            "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "selected_fact_ids": [
+              "bul_ibm_005"
+            ]
+          }
+        },
+        "self_check": {
+          "bullets_composed_from_role_episode_bundles": true,
+          "no_archive_prose_copy": true,
+          "no_verbatim_base_resume_copy": true
+        }
+      }
+    },
+    {
+      "ref": "parsed_output.json",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\parsed_output.json",
+      "json": {
+        "parsed": {
+          "bullets": [
+            {
+              "bullet_id": "bul_ibm_001",
+              "bullet_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.",
+              "has_metric": true,
+              "metric_raw": "20% joint revenue growth",
+              "source_fact_ids": [
+                "bul_ibm_001"
+              ]
+            },
+            {
+              "bullet_id": "bul_ibm_002",
+              "bullet_text": "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions.",
+              "has_metric": false,
+              "metric_raw": null,
+              "source_fact_ids": [
+                "bul_ibm_002"
+              ]
+            },
+            {
+              "bullet_id": "bul_ibm_003",
+              "bullet_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions",
+              "has_metric": false,
+              "metric_raw": null,
+              "source_fact_ids": [
+                "bul_ibm_003"
+              ]
+            },
+            {
+              "bullet_id": "bul_ibm_004",
+              "bullet_text": "Owned quota-aligned solution leadership and pipeline governance across enterprise pursuits and client portfolio expansion motions.",
+              "has_metric": false,
+              "metric_raw": null,
+              "source_fact_ids": [
+                "bul_ibm_004"
+              ]
+            },
+            {
+              "bullet_id": "bul_ibm_005",
+              "bullet_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits",
+              "has_metric": false,
+              "metric_raw": null,
+              "source_fact_ids": [
+                "bul_ibm_005"
+              ]
+            }
+          ],
+          "selected_fact_plan": {
+            "bul_ibm_001": {
+              "role_episode_bundle_id": "reb_ibm_aws_modernization_architecture",
+              "selected_fact_ids": [
+                "bul_ibm_001"
+              ],
+              "metric_outcome_ids": []
+            },
+            "bul_ibm_002": {
+              "role_episode_bundle_id": "reb_ibm_cognitive_business_decision_support",
+              "selected_fact_ids": [
+                "bul_ibm_002"
+              ],
+              "metric_outcome_ids": []
+            },
+            "bul_ibm_003": {
+              "role_episode_bundle_id": "reb_ibm_presales_solution_engineering",
+              "selected_fact_ids": [
+                "bul_ibm_003"
+              ],
+              "metric_outcome_ids": []
+            },
+            "bul_ibm_004": {
+              "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support",
+              "selected_fact_ids": [
+                "bul_ibm_004"
+              ],
+              "metric_outcome_ids": []
+            },
+            "bul_ibm_005": {
+              "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "selected_fact_ids": [
+                "bul_ibm_005"
+              ],
+              "metric_outcome_ids": []
+            }
+          },
+          "claim_ledger": [
+            {
+              "claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.",
+              "source_fact_ids": [
+                "bul_ibm_001"
+              ]
+            },
+            {
+              "claim_text": "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions.",
+              "source_fact_ids": [
+                "bul_ibm_002"
+              ]
+            },
+            {
+              "claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions",
+              "source_fact_ids": [
+                "bul_ibm_003"
+              ]
+            },
+            {
+              "claim_text": "Owned quota-aligned solution leadership and pipeline governance across enterprise pursuits and client portfolio expansion motions.",
+              "source_fact_ids": [
+                "bul_ibm_004"
+              ]
+            },
+            {
+              "claim_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits",
+              "source_fact_ids": [
+                "bul_ibm_005"
+              ]
+            }
+          ],
+          "jd_alignment": {
+            "selected_jd_themes": [
+              "Enterprise AI architecture translated into deployable customer workflows",
+              "Partner-ready reference patterns and implementation governance",
+              "Cloud and services ecosystem coordination",
+              "Cross-functional alignment across technical, commercial, and partner stakeholders",
+              "Repeatable solution packaging and customer adoption"
+            ],
+            "selected_briefing_themes": [
+              "Cloud, technology, and services partner coordination",
+              "Technical consistency across partner-delivered solutions",
+              "Architecture quality and implementation credibility",
+              "Shared ownership of solution design and customer outcomes",
+              "Reliable and controlled enterprise adoption"
+            ],
+            "targeting_rationale": "Ordering emphasizes alliance GTM, enterprise solution leadership, architecture, BI decision support, and technical discovery to foreground evidence relevant to applied AI architecture and partnerships.",
+            "targeting_only": true,
+            "jd_used_as_proof": false,
+            "briefing_used_as_proof": false
+          },
+          "gap_notes": [
+            "No IBM proof was used for Anthropic-specific products, AI safety claims, or Claude implementation patterns.",
+            "Approved differentiated metrics were not surfaced because the selected slot facts did not bind those metrics under the applicable slot constraints."
+          ],
+          "change_log": [
+            {
+              "bullet_id": "bul_ibm_001",
+              "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "graph_skill_node_ids": [
+                "skill_partner_joint_solution_development"
+              ],
+              "fact_ids_used": [
+                "bul_ibm_001"
+              ],
+              "metric_outcome_ids": [],
+              "allocation_claim_unit_id": "ibm_bullets:bul_ibm_001"
+            },
+            {
+              "bullet_id": "bul_ibm_002",
+              "role_episode_bundle_id": "reb_ibm_revenue_sales_target_execution",
+              "graph_skill_node_ids": [
+                "skill_partner_pnl_oversight"
+              ],
+              "fact_ids_used": [
+                "bul_ibm_002"
+              ],
+              "metric_outcome_ids": [],
+              "allocation_claim_unit_id": "ibm_bullets:bul_ibm_002"
+            },
+            {
+              "bullet_id": "bul_ibm_003",
+              "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support",
+              "graph_skill_node_ids": [
+                "skill_sr_cloud_data_platform_engineering"
+              ],
+              "fact_ids_used": [
+                "bul_ibm_003",
+                "fact_revenue_ops_001"
+              ],
+              "metric_outcome_ids": [],
+              "allocation_claim_unit_id": "ibm_bullets:bul_ibm_003"
+            },
+            {
+              "bullet_id": "bul_ibm_004",
+              "role_episode_bundle_id": "reb_ibm_revenue_sales_target_execution",
+              "graph_skill_node_ids": [
+                "skill_p2_gtm_enterprise_deal_support"
+              ],
+              "fact_ids_used": [
+                "bul_ibm_004"
+              ],
+              "metric_outcome_ids": [],
+              "allocation_claim_unit_id": "ibm_bullets:bul_ibm_004"
+            },
+            {
+              "bullet_id": "bul_ibm_005",
+              "role_episode_bundle_id": "reb_ibm_presales_solution_engineering",
+              "graph_skill_node_ids": [
+                "skill_p2_gtm_executive_buyer_alignment"
+              ],
+              "fact_ids_used": [
+                "bul_ibm_005"
+              ],
+              "metric_outcome_ids": [],
+              "allocation_claim_unit_id": "ibm_bullets:bul_ibm_005"
+            },
+            {
+              "operation": "skip_ibm_locked_metric_anchor",
+              "reason": "plan_fact_metric_does_not_match_canonical:bul_ibm_002 (canonical=weeks to hours, plan_metric='', has_metric=False) — graph selector chose this fact intentionally; do not append canonical-metric suffix"
+            },
+            {
+              "operation": "skip_ibm_locked_metric_anchor",
+              "reason": "plan_fact_metric_does_not_match_canonical:bul_ibm_005 (canonical=20%, plan_metric='', has_metric=False) — graph selector chose this fact intentionally; do not append canonical-metric suffix"
+            }
+          ],
+          "self_check": {
+            "bullets_composed_from_role_episode_bundles": true,
+            "no_verbatim_base_resume_copy": true,
+            "no_archive_prose_copy": true
+          },
+          "frozen_allocation_display_rehydrated": true
+        },
+        "parse_error": "",
+        "parse_status": "OK"
+      }
+    }
+  ],
+  "repair_ledger": {
+    "present": true,
+    "artifacts": [
+      {
+        "ref": "section_repair_ledger.json",
+        "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\section_repair_ledger.json",
+        "json": {
+          "schema_version": 1,
+          "section_id": "ibm_bullets",
+          "run_id": "ibm_bullets_20260809_073424",
+          "product_fail_closed": true,
+          "scored_attempt_number": 1,
+          "authoritative_attempt_number": 1,
+          "authoritative_l2_source": "initial_llm",
+          "attempt_1_x2_failed": true,
+          "attempt_1_x2_failed_gate_ids": [
+            "x2_bullet_technical_specificity_floor"
+          ],
+          "repairs": [
+            {
+              "seq": 1,
+              "kind": "mechanical",
+              "operation": "align_ibm_claim_ledger_from_canonical_facts",
+              "reason": "graph_plan_fact_id_alignment",
+              "replaced_l2": false
+            },
+            {
+              "seq": 2,
+              "kind": "mechanical",
+              "operation": "inject_ibm_plan_fact_metric_anchors",
+              "reason": "surface_fact_backed_metric_tokens_model_dropped",
+              "replaced_l2": false
+            }
+          ],
+          "x2_runs": [
+            {
+              "run": 1,
+              "after_l2_source": "initial_llm",
+              "failed_gate_ids": [
+                "x2_bullet_technical_specificity_floor"
+              ],
+              "passed": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "final_materialized_output": {
+    "present": true,
+    "ref": "ibm_bullets_output.txt",
+    "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets\\ibm_bullets_output.txt",
+    "text": "- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\n- bul_ibm_002: Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions.\n- bul_ibm_003: Built decision-support data models and BI views that connected modernization programs to executive operating decisions\n- bul_ibm_004: Owned quota-aligned solution leadership and pipeline governance across enterprise pursuits and client portfolio expansion motions.\n- bul_ibm_005: Led technical discovery and solution mapping for enterprise financial-services pursuits",
+    "sha256": "e2cdaeaf04cf3e87733fdc39b4e2bb33149184117563fcc8395dc9c86ccd9214",
+    "source": "display_text_file"
+  },
+  "exact_code_surface": {
+    "producer_files": [
+      "apps_rg/runtime/section_failure_forensics.py",
+      "apps_rg/runtime/sections/role_episode_lane.py"
+    ],
+    "artifact_refs": [
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry10_20260809/e2e_20260809T073104Z_c0030da0/modular_r4/sections/ibm_bullets/x2_gate_outputs.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry10_20260809/e2e_20260809T073104Z_c0030da0/modular_r4/sections/ibm_bullets/x3_disposition.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry10_20260809/e2e_20260809T073104Z_c0030da0/modular_r4/sections/ibm_bullets/l2_output.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry10_20260809/e2e_20260809T073104Z_c0030da0/modular_r4/sections/ibm_bullets/selected_fact_plan.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry10_20260809/e2e_20260809T073104Z_c0030da0/modular_r4/sections/ibm_bullets/provider_request.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry10_20260809/e2e_20260809T073104Z_c0030da0/modular_r4/sections/ibm_bullets/integrated_lane_pre_run_failure.json"
+    ],
+    "lane_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\modular_r4\\sections\\ibm_bullets"
+  },
+  "why_it_passed_before": "The pinned prior-pass baseline was unavailable, so this RCA cannot claim a clean passing comparison.",
+  "why_it_failed_now": "The section's final materialized artifact did not pass x2_bullet_technical_specificity_floor.",
+  "required_fix": [
+    "Make `ibm_bullets` gate final displayed output, not intermediate provider output.",
+    "Bind the failed gate evidence (`x2_bullet_technical_specificity_floor`) to the producer/parser contract that emitted the artifact.",
+    "Record retry and repair outputs in the lane ledger so repeated LLM variance is explainable."
+  ],
+  "baseline_confidence": "pinned_baseline_unavailable",
+  "baseline_run_dir": ""
+}

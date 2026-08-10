@@ -1,0 +1,356 @@
+{
+  "schema_version": "apps_rg.final_resume_output.v1",
+  "generated_at_utc": "2026-08-08T21:51:29Z",
+  "required": true,
+  "status": "FAIL",
+  "failed_gate_ids": [
+    "final_resume_no_gap_markers"
+  ],
+  "run_root": "artifacts/apps_rg/runs/w1_live/e2e_20260808T214028Z_8eadd696",
+  "final_resume_json": {
+    "relpath": "modular_r4/final_resume_assembly/final_resume.json",
+    "exists": true,
+    "bytes": 19103605,
+    "sha256": "9cae149fcf35d5a1a8839cdbeb2cf9bdf4c47330f5cf59c6bcc59d091ab50b09"
+  },
+  "rendered_resume_text": {
+    "relpath": "FINAL_RESUME_OUTPUT.txt",
+    "exists": true,
+    "bytes": 7398,
+    "sha256": "8bf8f246cc758c47bef3a9d6c064f269b404cd82159910346533918defc49b68"
+  },
+  "resume_docx": {
+    "relpath": "outputs/resume.docx",
+    "exists": true,
+    "bytes": 5073,
+    "sha256": "8e505bf076eba57c6cf47db9dc08506f3c3b287ca9211bcf7a85318421217858"
+  },
+  "rendered_order": [
+    "candidate_header",
+    "headline",
+    "executive_summary",
+    "competencies",
+    "professional_experience",
+    "education",
+    "certifications"
+  ],
+  "base_resume_role_facts": [
+    {
+      "role_key": "unify",
+      "employer": "Unify Consulting",
+      "title": "SVP Engineering, Agentic AI Platforms",
+      "location": "Boca Raton, FL",
+      "start_date": "2023-02",
+      "end_date": "present",
+      "is_current": true
+    },
+    {
+      "role_key": "ibm",
+      "employer": "IBM",
+      "title": "Partner",
+      "location": "Edgewater, NJ",
+      "start_date": "2017-04",
+      "end_date": "2022-10",
+      "is_current": false
+    },
+    {
+      "role_key": "insurtech",
+      "employer": "InsurTech Cloud Solutions",
+      "title": "Chief Technology Officer",
+      "location": "New York, NY",
+      "start_date": "2014-04",
+      "end_date": "2017-03",
+      "is_current": false
+    },
+    {
+      "role_key": "ey",
+      "employer": "Ernst & Young",
+      "title": "Principal",
+      "location": "New York, NY",
+      "start_date": "2009-10",
+      "end_date": "2014-03",
+      "is_current": false
+    },
+    {
+      "role_key": "early_career",
+      "employer": "Early Career Roles",
+      "title": "Actuarial Consultant and Quantitative Roles",
+      "location": "Philadelphia, PA",
+      "start_date": "2002-10",
+      "end_date": "2009-09",
+      "is_current": false
+    }
+  ],
+  "content_sources": {
+    "identity_contact_source": "base_resume_locked_profile",
+    "role_header_source": "final_resume.locked_copy_invariants",
+    "generated_content_source": "final_resume.sections[].l2_output_snapshot",
+    "education_certification_source": "final_resume.sections[].copied_text_exact",
+    "locked_copy_source": "final_resume.sections[].copied_text_exact"
+  },
+  "gates": [
+    {
+      "gate_id": "final_resume_json_spine_present",
+      "pass": true,
+      "observed_value": "artifacts/apps_rg/runs/w1_live/e2e_20260808T214028Z_8eadd696/modular_r4/final_resume_assembly/final_resume.json",
+      "threshold": "modular_r4/final_resume_assembly/final_resume.json",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_rendered_text_present",
+      "pass": true,
+      "observed_value": {
+        "relpath": "FINAL_RESUME_OUTPUT.txt",
+        "exists": true,
+        "bytes": 7398,
+        "sha256": "8bf8f246cc758c47bef3a9d6c064f269b404cd82159910346533918defc49b68"
+      },
+      "threshold": "nonempty text output",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_docx_present_nonempty",
+      "pass": true,
+      "observed_value": {
+        "relpath": "outputs/resume.docx",
+        "exists": true,
+        "bytes": 5073,
+        "sha256": "8e505bf076eba57c6cf47db9dc08506f3c3b287ca9211bcf7a85318421217858"
+      },
+      "threshold": "nonempty DOCX output",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_rendered_order_valid",
+      "pass": true,
+      "observed_value": {
+        "EXECUTIVE SUMMARY": 243,
+        "ENGINEERING & PLATFORM COMPETENCIES": 1292,
+        "PROFESSIONAL EXPERIENCE": 3063,
+        "EDUCATION": 6821,
+        "CERTIFICATIONS": 6985
+      },
+      "threshold": [
+        "candidate_header",
+        "headline",
+        "executive_summary",
+        "competencies",
+        "professional_experience",
+        "education",
+        "certifications"
+      ],
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_docx_order_valid",
+      "pass": true,
+      "observed_value": {
+        "EXECUTIVE SUMMARY": 241,
+        "ENGINEERING & PLATFORM COMPETENCIES": 1289,
+        "PROFESSIONAL EXPERIENCE": 3059,
+        "EDUCATION": 6811,
+        "CERTIFICATIONS": 6974
+      },
+      "threshold": [
+        "candidate_header",
+        "headline",
+        "executive_summary",
+        "competencies",
+        "professional_experience",
+        "education",
+        "certifications"
+      ],
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_base_role_headers_preserved",
+      "pass": true,
+      "observed_value": {
+        "role_headers": {
+          "unify": [
+            "Unify Consulting — SVP Engineering, Agentic AI Platforms",
+            "Boca Raton, FL | Feb 2023 – Present"
+          ],
+          "ibm": [
+            "IBM — Partner",
+            "Edgewater, NJ | Apr 2017 – Oct 2022"
+          ],
+          "insurtech": [
+            "InsurTech Cloud Solutions — Chief Technology Officer",
+            "New York, NY | Apr 2014 – Mar 2017"
+          ],
+          "ey": [
+            "Ernst & Young — Principal",
+            "New York, NY | Oct 2009 – Mar 2014"
+          ],
+          "early_career": [
+            "Early Career Roles — Actuarial Consultant and Quantitative Roles",
+            "Philadelphia, PA | Oct 2002 – Sep 2009"
+          ]
+        },
+        "positions": {
+          "unify": [
+            3088,
+            3145
+          ],
+          "ibm": [
+            4561,
+            4575
+          ],
+          "insurtech": [
+            5195,
+            5248
+          ],
+          "ey": [
+            5683,
+            5709
+          ],
+          "early_career": [
+            6314,
+            6379
+          ]
+        }
+      },
+      "threshold": "base resume employer/title/location/date headers in order",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_docx_base_role_headers_preserved",
+      "pass": true,
+      "observed_value": {
+        "role_headers": {
+          "unify": [
+            "Unify Consulting — SVP Engineering, Agentic AI Platforms",
+            "Boca Raton, FL | Feb 2023 – Present"
+          ],
+          "ibm": [
+            "IBM — Partner",
+            "Edgewater, NJ | Apr 2017 – Oct 2022"
+          ],
+          "insurtech": [
+            "InsurTech Cloud Solutions — Chief Technology Officer",
+            "New York, NY | Apr 2014 – Mar 2017"
+          ],
+          "ey": [
+            "Ernst & Young — Principal",
+            "New York, NY | Oct 2009 – Mar 2014"
+          ],
+          "early_career": [
+            "Early Career Roles — Actuarial Consultant and Quantitative Roles",
+            "Philadelphia, PA | Oct 2002 – Sep 2009"
+          ]
+        },
+        "positions": {
+          "unify": [
+            3083,
+            3140
+          ],
+          "ibm": [
+            4555,
+            4569
+          ],
+          "insurtech": [
+            5188,
+            5241
+          ],
+          "ey": [
+            5675,
+            5701
+          ],
+          "early_career": [
+            6305,
+            6370
+          ]
+        }
+      },
+      "threshold": "base resume employer/title/location/date headers in order",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_education_copied_from_base",
+      "pass": true,
+      "observed_value": {
+        "section_id": "education",
+        "expected_lines": [
+          "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+          "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+        ],
+        "positions": {
+          "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 6831,
+          "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 6916
+        }
+      },
+      "threshold": "base resume education lines",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_docx_education_copied_from_base",
+      "pass": true,
+      "observed_value": {
+        "section_id": "education",
+        "expected_lines": [
+          "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+          "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+        ],
+        "positions": {
+          "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 6821,
+          "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 6906
+        }
+      },
+      "threshold": "base resume education lines",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_certifications_copied_from_base",
+      "pass": true,
+      "observed_value": {
+        "section_id": "certifications",
+        "expected_lines": [
+          "Certified Machine Learning Engineer – Associate, AWS, 2025",
+          "Databricks Lakehouse Fundamentals Accreditation, 2023",
+          "Certified Solutions Architect – Professional, AWS, 2023",
+          "Fellow of the Society of Actuaries, 2010"
+        ],
+        "positions": {
+          "Certified Machine Learning Engineer – Associate, AWS, 2025": 7014,
+          "Databricks Lakehouse Fundamentals Accreditation, 2023": 7073,
+          "Certified Solutions Architect – Professional, AWS, 2023": 7127,
+          "Fellow of the Society of Actuaries, 2010": 7183
+        }
+      },
+      "threshold": "base resume certification lines",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_docx_certifications_copied_from_base",
+      "pass": true,
+      "observed_value": {
+        "section_id": "certifications",
+        "expected_lines": [
+          "Certified Machine Learning Engineer – Associate, AWS, 2025",
+          "Databricks Lakehouse Fundamentals Accreditation, 2023",
+          "Certified Solutions Architect – Professional, AWS, 2023",
+          "Fellow of the Society of Actuaries, 2010"
+        ],
+        "positions": {
+          "Certified Machine Learning Engineer – Associate, AWS, 2025": 7003,
+          "Databricks Lakehouse Fundamentals Accreditation, 2023": 7062,
+          "Certified Solutions Architect – Professional, AWS, 2023": 7116,
+          "Fellow of the Society of Actuaries, 2010": 7172
+        }
+      },
+      "threshold": "base resume certification lines",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "final_resume_no_gap_markers",
+      "pass": false,
+      "observed_value": {
+        "not_completed": false,
+        "not_generated_by_run": true
+      },
+      "threshold": false,
+      "failure_reason": "rendered resume contains generated-content gap markers"
+    }
+  ]
+}

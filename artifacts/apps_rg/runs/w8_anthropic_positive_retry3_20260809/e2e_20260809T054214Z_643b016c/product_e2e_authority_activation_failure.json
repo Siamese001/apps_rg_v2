@@ -1,0 +1,57 @@
+{
+  "failure": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry3_20260809\\e2e_20260809T054214Z_643b016c",
+    "attempt": {
+      "logical": 1,
+      "transport": null
+    },
+    "callsite": {
+      "file": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src\\apps_rg\\runtime\\e2e_stage_ledger.py",
+      "function": "_snapshot_authoritative_receipt",
+      "line": 181,
+      "source_line": "os.link(temporary, target)"
+    },
+    "errno": 2,
+    "exception_class": "FileNotFoundError",
+    "exception_message": "[WinError 3] The system cannot find the path specified: 'C:\\\\Git\\\\apps_rg_v2-worktrees\\\\codex-e2e-defect-remediation-w0\\\\artifacts\\\\apps_rg\\\\runs\\\\w8_anthropic_positive_retry3_20260809\\\\e2e_20260809T054214Z_643b016c\\\\e2e_ledger_receipts\\\\.f589cb6c6b6d.tmp' -> 'C:\\\\Git\\\\apps_rg_v2-worktrees\\\\codex-e2e-defect-remediation-w0\\\\artifacts\\\\apps_rg\\\\runs\\\\w8_anthropic_positive_retry3_20260809\\\\e2e_20260809T054214Z_643b016c\\\\e2e_ledger_receipts\\\\0000_fresh_preflight_7fae2e57f6d4a993f2cc667c524c70360636d3207108e1ce51874ea1ff4167ba.json'",
+    "exception_module": "builtins",
+    "integrated_artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry3_20260809\\e2e_20260809T054214Z_643b016c",
+    "lane_id": "",
+    "operation": "activate_product_stage_ledger",
+    "otel_span_id": "",
+    "otel_trace_id": "",
+    "provider_boundary": {
+      "attempt_evidence": "UNKNOWN_AT_LANE_EXCEPTION_BOUNDARY",
+      "canonical_dispatch_invoked": true,
+      "provider": "",
+      "provider_call_attempted": null,
+      "resolution_source": ""
+    },
+    "request_id": "req-e3c7a5ef94724cd59baf283294958427",
+    "run_id": "b21bda59-4032-47fb-b1af-f57c61566114",
+    "schema_version": "apps_rg.runtime_failure_envelope.v1",
+    "sections_root": "",
+    "source_component": "apps_rg.runtime.orchestration.r3r4_whole_run_orchestration",
+    "stage": "PRODUCT_E2E_AUTHORITY_ACTIVATION",
+    "tenant_id": "default",
+    "trace_root": "b0b52784-0384-4d2a-a61c-8b1eeebaf9f8",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src\\apps_rg\\runtime\\orchestration\\r3r4_whole_run_orchestration.py\", line 1775, in run_whole_run_with_route_governance\n    product_stage_ledger = _activate_product_stage_ledger(\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src\\apps_rg\\runtime\\orchestration\\r3r4_whole_run_orchestration.py\", line 730, in _activate_product_stage_ledger\n    ledger.record_from_receipt(\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src\\apps_rg\\runtime\\e2e_stage_ledger.py\", line 1049, in record_from_receipt\n    receipt_binding = _snapshot_authoritative_receipt(\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src\\apps_rg\\runtime\\e2e_stage_ledger.py\", line 181, in _snapshot_authoritative_receipt\n    os.link(temporary, target)\nFileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\\\Git\\\\apps_rg_v2-worktrees\\\\codex-e2e-defect-remediation-w0\\\\artifacts\\\\apps_rg\\\\runs\\\\w8_anthropic_positive_retry3_20260809\\\\e2e_20260809T054214Z_643b016c\\\\e2e_ledger_receipts\\\\.f589cb6c6b6d.tmp' -> 'C:\\\\Git\\\\apps_rg_v2-worktrees\\\\codex-e2e-defect-remediation-w0\\\\artifacts\\\\apps_rg\\\\runs\\\\w8_anthropic_positive_retry3_20260809\\\\e2e_20260809T054214Z_643b016c\\\\e2e_ledger_receipts\\\\0000_fresh_preflight_7fae2e57f6d4a993f2cc667c524c70360636d3207108e1ce51874ea1ff4167ba.json'\n",
+    "winerror": 3
+  },
+  "ledger_checkpoint": {
+    "entry_count": 0,
+    "last_stage_id": "",
+    "last_stage_status": "",
+    "ledger_present": true,
+    "ledger_read_error": "",
+    "ledger_ref": "e2e_stage_ledger.json",
+    "next_stage_id": "",
+    "preidentity_ledger_present": true
+  },
+  "otel_capture_status": "NO_MATCH",
+  "otel_snapshot_ref": "product_e2e_authority_activation_otel_trace_snapshot.json",
+  "pipeline_complete": false,
+  "product_authorized": false,
+  "schema_version": "apps_rg.product_e2e_authority_activation_failure.v1",
+  "status": "FAILED"
+}

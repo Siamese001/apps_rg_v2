@@ -213,6 +213,7 @@ _SVP_AGENTIC_MECHANISM_TOKENS: frozenset[str] = frozenset(
         "runtime",
         "sandboxed",
         "telemetry",
+        "validation",
         "workflow",
         "workflows",
     }

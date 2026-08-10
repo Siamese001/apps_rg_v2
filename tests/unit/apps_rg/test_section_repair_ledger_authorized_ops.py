@@ -101,6 +101,23 @@ def test_repair_exec_summary_thin_sentence_weave_is_authorized() -> None:
     )
 
 
+def test_repair_exec_summary_mechanism_inventory_sentence_is_authorized() -> None:
+    ledger = _make_ledger(
+        operations=[
+            (
+                KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_mechanism_inventory_sentence",
+                True,
+            ),
+        ]
+    )
+    blocked, reason = ledger_blocks_product_pass(ledger)
+    assert not blocked, (
+        "repair_exec_summary_mechanism_inventory_sentence is bounded lexical compaction "
+        f"followed by full X2. Got reason: {reason!r}"
+    )
+
+
 def test_repair_exec_summary_cross_fact_conflation_row_is_authorized() -> None:
     ledger = _make_ledger(
         operations=[
@@ -111,6 +128,28 @@ def test_repair_exec_summary_cross_fact_conflation_row_is_authorized() -> None:
     assert not blocked, (
         "repair_exec_summary_cross_fact_conflation_row only compacts source_fact_ids "
         f"for already-written sentences. Got reason: {reason!r}"
+    )
+
+
+def test_graph_allocation_repairs_are_authorized() -> None:
+    ledger = _make_ledger(
+        operations=[
+            (
+                KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_causal_multi_root_allocation_row",
+                True,
+            ),
+            (
+                KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_unallocated_metric_row",
+                True,
+            ),
+        ]
+    )
+    blocked, reason = ledger_blocks_product_pass(ledger)
+    assert not blocked, (
+        "Frozen graph-allocation repairs remove unsupported attribution or metrics and rerun X2. "
+        f"Got reason: {reason!r}"
     )
 
 
@@ -197,7 +236,22 @@ def test_all_authorized_ops_together_do_not_block() -> None:
             (KIND_DETERMINISTIC_REWRITE, "repair_unify_bullet_seniority_tense", True),
             (KIND_DETERMINISTIC_REWRITE, "repair_required_brushstroke_citation", True),
             (KIND_DETERMINISTIC_REWRITE, "repair_exec_summary_thin_sentence_weave", True),
+            (
+                KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_mechanism_inventory_sentence",
+                True,
+            ),
             (KIND_DETERMINISTIC_REWRITE, "repair_exec_summary_cross_fact_conflation_row", True),
+            (
+                KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_causal_multi_root_allocation_row",
+                True,
+            ),
+            (
+                KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_unallocated_metric_row",
+                True,
+            ),
         ]
     )
     blocked, reason = ledger_blocks_product_pass(ledger)

@@ -59,6 +59,7 @@ def test_managed_bridge_binds_approved_searxng_endpoint_and_receipt_path(
     sentinel = object()
 
     monkeypatch.delenv("SEARXNG_BASE_URL", raising=False)
+    monkeypatch.delenv("APPS_RESEARCH_RETRIEVAL_V2", raising=False)
     monkeypatch.setattr(
         "apps_research.integrations.searxng_readiness.runtime_base_url",
         lambda: "http://localhost:8080",
@@ -67,6 +68,7 @@ def test_managed_bridge_binds_approved_searxng_endpoint_and_receipt_path(
     def run_research(request, *, runner):
         captured["request"] = request
         captured["runner"] = runner
+        captured["retrieval_v2"] = os.environ.get("APPS_RESEARCH_RETRIEVAL_V2")
         return sentinel
 
     monkeypatch.setattr(
@@ -85,6 +87,8 @@ def test_managed_bridge_binds_approved_searxng_endpoint_and_receipt_path(
 
     request = captured["request"]
     assert result is sentinel
+    assert captured["retrieval_v2"] == "1"
+    assert "APPS_RESEARCH_RETRIEVAL_V2" not in os.environ
     assert os.environ["SEARXNG_BASE_URL"] == "http://localhost:8080"
     assert request.topic == "Unify Consulting"
     assert request.jd_context["_retrieval_receipt_path"] == str(
@@ -103,6 +107,38 @@ def test_managed_bridge_binds_approved_searxng_endpoint_and_receipt_path(
     assert request.jd_context["jd_text"] == ""
     assert request.jd_context["jd_ref"] == ""
     assert request.jd_context["jd_context"] == {"role": "SVP Technical Pre-Sales"}
+
+
+def test_managed_bridge_enforces_v2_during_call_and_restores_operator_value(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runs_root = tmp_path / "e2e" / "apps_research" / "runs"
+    runs_root.mkdir(parents=True)
+    observed: dict[str, str] = {}
+    monkeypatch.setenv("APPS_RESEARCH_RETRIEVAL_V2", "0")
+    monkeypatch.setenv("SEARXNG_BASE_URL", "http://localhost:8080")
+
+    def run_research(_request, *, runner):
+        observed["during"] = os.environ["APPS_RESEARCH_RETRIEVAL_V2"]
+        return runner
+
+    monkeypatch.setattr(
+        "apps_research.integrations.spine_handoff.run_research_via_spine",
+        run_research,
+    )
+
+    AppsResearchBridge(artifact_runs_root=runs_root)._invoke_apps_research(
+        company_name="Anthropic",
+        job_title="Manager of Applied AI Architecture, Partnerships",
+        capability_ref="apps_research.v1",
+        request_id="request-1",
+        run_id="run-1",
+        trace_id="trace-1",
+    )
+
+    assert observed["during"] == "1"
+    assert os.environ["APPS_RESEARCH_RETRIEVAL_V2"] == "0"
 
 
 def test_managed_bridge_preserves_nonblank_operator_endpoint(

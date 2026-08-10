@@ -1,0 +1,114 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_ibm_narrative",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_FAIL",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\ibm_narrative\\real\\patch_20260809_005856_193d10bf57d7\\x1d_gemini_provider_response_raw_20260809_005921_606.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "ibm_narrative_x1d_v3",
+      "input_hash": "3b80f44d8f332c49",
+      "output_hash": "6a8ee1b2015f6a53",
+      "score": 0.0,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.0,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": true,
+      "findings": [
+        "Candidate output is empty; no IBM narrative sentence was provided."
+      ],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [
+        "Generate a single-sentence IBM narrative thesis using supported IBM facts."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "3b80f44d8f332c49",
+      "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w1_live/e2e_20260808T214028Z_8eadd696/modular_r4/sections/ibm_narrative/real/patch_20260809_005856_193d10bf57d7/ibm_narrative_judge_packet.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/ibm_narrative_x1d.py#IBM_NARRATIVE_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "EMPTY_TEXT"
+          ]
+        },
+        "executive_signal": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "MISSING_THESIS"
+          ]
+        },
+        "resume_voice": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "MISSING_VOICE"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "MISSING_TEXT"
+          ]
+        },
+        "anti_overfit": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "MISSING_CONTENT"
+          ]
+        },
+        "synthesis_quality": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "MISSING_SYNTHESIS"
+          ]
+        },
+        "evidence_utilization": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "NO_EVIDENCE_USED"
+          ]
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "standard_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "ibm_narrative",
+      "pass": false,
+      "thinking_level": "high"
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+  "graph_claim_binding_contract_digest": "8e2c9c2bcb7ca065615ffabd279c359f77ccdf7c18e8e80463ba0831a63d81b6",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

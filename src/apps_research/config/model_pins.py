@@ -94,6 +94,10 @@ def company_brief_generation_pin() -> AppsResearchModelPin:
         row=primary,
         path=COMPANY_BRIEF_PROVIDER_PROFILE_PATH,
     )
+    if (pin.provider_key, pin.provider) != ("openai_chatgpt", "external_openai"):
+        raise AppsResearchModelPinError(
+            "apps_research company-brief generation is restricted to external_openai"
+        )
     if pin.reasoning_effort not in {"none", "low", "medium", "high", "xhigh", "max"}:
         raise AppsResearchModelPinError(
             "apps_research company-brief generation must pin an explicit reasoning_effort"
@@ -109,6 +113,10 @@ def apps_rg_handoff_judge_pin() -> AppsResearchModelPin:
         row=data.get("apps_rg_handoff_judge"),
         path=COMPANY_BRIEF_JUDGE_PROFILE_PATH,
     )
+    if (pin.provider_key, pin.provider) != ("gemini_pro", "google_gemini"):
+        raise AppsResearchModelPinError(
+            "apps_research handoff judge is restricted to google_gemini"
+        )
     if pin.reasoning_effort != "high":
         raise AppsResearchModelPinError(
             "apps_research apps_rg handoff judge must pin reasoning_effort=high"

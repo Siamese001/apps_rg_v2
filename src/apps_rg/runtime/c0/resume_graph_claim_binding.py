@@ -119,10 +119,37 @@ def _resolve_selected_plan(
     artifact_dir: Path,
     l2: Mapping[str, Any],
 ) -> dict[str, Any]:
+    def _carries_allocation_authority(value: Any) -> bool:
+        return isinstance(value, Mapping) and bool(
+            str(value.get("allocation_plan_digest") or "").strip()
+            or value.get("allocation_assignments")
+        )
+
     disk = _load_json(artifact_dir / "selected_fact_plan.json")
-    if isinstance(disk, Mapping):
+    if _carries_allocation_authority(disk):
         return dict(disk)
     embedded = l2.get("selected_fact_plan")
+    if _carries_allocation_authority(embedded):
+        return dict(embedded)
+
+    # Several provider-backed lanes persist a compact, lane-specific selection
+    # echo after C0.  That echo is useful generation evidence, but it must not
+    # erase the immutable whole-resume allocation slice already frozen in the
+    # runtime payload.  Recover only when both later surfaces contain no graph
+    # allocation authority at all.  If either surface carries a digest or
+    # assignments, it remains authoritative and any partial/mismatched state
+    # fails closed in ``_allocation_context`` below.
+    runtime_payload = _load_json(artifact_dir / "runtime_payload.json")
+    runtime_plan = (
+        runtime_payload.get("selected_fact_plan")
+        if isinstance(runtime_payload, Mapping)
+        else None
+    )
+    if _carries_allocation_authority(runtime_plan):
+        return dict(runtime_plan)
+
+    if isinstance(disk, Mapping):
+        return dict(disk)
     return dict(embedded) if isinstance(embedded, Mapping) else {}
 
 
@@ -200,10 +227,41 @@ def _assignment_aliases(
     claim_unit = str(assignment.get("claim_unit_id") or "")
     if ":" in claim_unit:
         aliases.add(claim_unit.rsplit(":", 1)[-1])
+    # Employment narratives cite their accepted companion bullet slots.  The
+    # frozen whole-resume allocation reserves narrative alternatives by the
+    # same ordinal (``ibm_narrative:derived:01`` <-> ``bul_ibm_001``).  Preserve
+    # that explicit structural lineage so narrative claims bind to the exact
+    # graph paths behind the cited companion bullets instead of becoming
+    # unallocated merely because the public citation uses the bullet id.
+    parts = claim_unit.split(":")
+    if len(parts) == 3 and parts[0].endswith("_narrative") and parts[1] == "derived":
+        employer = parts[0].removesuffix("_narrative")
+        try:
+            ordinal = int(parts[2])
+        except ValueError:
+            ordinal = 0
+        if employer and ordinal > 0:
+            aliases.add(f"bul_{employer}_{ordinal:03d}")
     return aliases
 
 
 def _visible_output_text(artifact_dir: Path, l2: Mapping[str, Any]) -> str:
+    # The durable L2 display is the final-materialization authority.  A lane's
+    # command_output.txt is a diagnostic transcript and can lag the in-memory
+    # repair by one finalize cycle; preferring it caused graph binding to test
+    # current claim rows against stale pre-repair prose.  Use sealed L2 first,
+    # then dedicated display files/transcripts only as legacy fallbacks.
+    for key in ("resume_display_text", "headline_line", "narrative_sentence"):
+        text = str(l2.get(key) or "").strip()
+        if text:
+            return text
+    bullets = [
+        str(row.get("bullet_text") or "").strip()
+        for row in l2.get("bullets") or []
+        if isinstance(row, Mapping) and str(row.get("bullet_text") or "").strip()
+    ]
+    if bullets:
+        return "\n".join(bullets)
     command = artifact_dir / "command_output.txt"
     if command.is_file():
         try:
@@ -219,16 +277,7 @@ def _visible_output_text(artifact_dir: Path, l2: Mapping[str, Any]) -> str:
             continue
         if text:
             return text
-    for key in ("resume_display_text", "headline_line", "narrative_sentence"):
-        text = str(l2.get(key) or "").strip()
-        if text:
-            return text
-    bullets = [
-        str(row.get("bullet_text") or "").strip()
-        for row in l2.get("bullets") or []
-        if isinstance(row, Mapping) and str(row.get("bullet_text") or "").strip()
-    ]
-    return "\n".join(bullets)
+    return ""
 
 
 def _explicit_claim_unit(
@@ -244,6 +293,12 @@ def _explicit_claim_unit(
         return f"{section_id}:{bullet_id}"
     for source_id in _strings(row.get("source_fact_ids")):
         if source_id.startswith("bul_"):
+            # Narrative rows may synthesize two companion bullets in one
+            # clause.  Do not force the first cited bullet into a fabricated
+            # ``<narrative>:bul_*`` unit; let the ordinal aliases above select
+            # every cited frozen narrative assignment.
+            if section_id.endswith("_narrative"):
+                return ""
             return f"{section_id}:{source_id}"
     return ""
 
@@ -295,7 +350,12 @@ def _select_assignments_for_claim(
     covered: set[str] = set()
     for assignment in selected:
         covered.update(aliases[str(assignment.get("claim_unit_id") or "")])
-    uncovered = sorted(source for source in sources if source not in covered)
+    uncovered = sorted(
+        source
+        for source in sources
+        if source not in covered
+        and source.split("_metric_", 1)[0] not in covered
+    )
     if uncovered:
         failures.append("orphan_source_ids:" + ",".join(uncovered))
     return selected, failures
@@ -418,6 +478,123 @@ def _binding_for_claim(
     return binding, []
 
 
+def validate_claim_rows_against_resume_graph_allocation(
+    *,
+    section_id: str,
+    claim_rows: Sequence[Mapping[str, Any]],
+    selected_fact_plan: Mapping[str, Any] | None,
+) -> list[str]:
+    """Return final graph-allocation failures without mutating lane artifacts.
+
+    Provider-backed lanes need the same root/metric checks *before* their last
+    bounded regeneration and X2 seal.  The durable binder below remains final
+    authority; this pure projection deliberately reuses its selection and
+    binding functions so the pre-X2 acceptance rule cannot drift from the
+    post-lane contract.
+    """
+
+    plan = dict(selected_fact_plan or {})
+    allocation_digest = str(plan.get("allocation_plan_digest") or "").strip()
+    assignments = [
+        dict(row)
+        for row in plan.get("allocation_assignments") or []
+        if isinstance(row, Mapping)
+        and str(row.get("section_id") or "") == str(section_id)
+    ]
+    if not allocation_digest and not assignments:
+        return []
+    if not allocation_digest or not assignments:
+        return ["resume_graph_allocation_authority_incomplete"]
+
+    aliases_by_root = _fact_aliases_by_root(plan)
+    aliases = {
+        str(row.get("claim_unit_id") or ""): _assignment_aliases(
+            row, aliases_by_root=aliases_by_root
+        )
+        for row in assignments
+    }
+    failures: list[str] = []
+    used_claim_units: set[str] = set()
+    rows = [dict(row) for row in claim_rows if isinstance(row, Mapping)]
+    if not rows:
+        return ["resume_graph_claim_rows_missing"]
+    for index, claim in enumerate(rows, start=1):
+        selected, select_failures = _select_assignments_for_claim(
+            claim,
+            section_id=section_id,
+            assignments=assignments,
+            aliases=aliases,
+        )
+        failures.extend(f"claim_{index}:{reason}" for reason in select_failures)
+        if not selected:
+            continue
+        binding, binding_failures = _binding_for_claim(
+            claim,
+            ordinal=index,
+            section_id=section_id,
+            allocation_digest=allocation_digest,
+            assignments=selected,
+        )
+        failures.extend(f"claim_{index}:{reason}" for reason in binding_failures)
+        if binding is not None:
+            used_claim_units.update(binding.get("allocation_claim_unit_ids") or [])
+
+    required_claim_units = {
+        str(row.get("claim_unit_id") or "")
+        for row in assignments
+        if row.get("claim_unit_id")
+        and row.get("counts_toward_global_uniqueness") is not False
+    }
+    orphan_claim_units = sorted(required_claim_units - used_claim_units)
+    if orphan_claim_units:
+        failures.append("orphan_allocation_claim_units:" + ",".join(orphan_claim_units))
+    return sorted(set(failures))
+
+
+def build_pre_x2_resume_graph_claim_binding_gate(
+    *,
+    section_id: str,
+    claim_rows: Sequence[Mapping[str, Any]],
+    selected_fact_plan: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Project the final allocation binder into a deterministic pre-X2 gate."""
+
+    plan = dict(selected_fact_plan or {})
+    digest = str(plan.get("allocation_plan_digest") or "").strip()
+    assignments = [
+        row
+        for row in plan.get("allocation_assignments") or []
+        if isinstance(row, Mapping)
+        and str(row.get("section_id") or "") == str(section_id)
+    ]
+    if not digest and not assignments:
+        return None
+    failures = validate_claim_rows_against_resume_graph_allocation(
+        section_id=section_id,
+        claim_rows=claim_rows,
+        selected_fact_plan=plan,
+    )
+    return {
+        "gate_id": GRAPH_CLAIM_BINDING_GATE_ID,
+        "gate_type": "deterministic_graph_authority_pre_x2",
+        "pass": not failures,
+        "observed_value": {
+            "allocation_plan_digest": digest,
+            "claim_count": len(
+                [row for row in claim_rows if isinstance(row, Mapping)]
+            ),
+            "allocation_assignment_count": len(assignments),
+            "failure_reasons": failures,
+        },
+        "threshold": {
+            "binding_failures": 0,
+            "orphan_allocations": 0,
+        },
+        "failure_reason": "" if not failures else "resume_graph_claim_binding_failed",
+        "evidence_ref": "selected_fact_plan.json#allocation_assignments",
+    }
+
+
 def _stamp_object(path: Path, fields: Mapping[str, Any]) -> None:
     raw = _load_json(path)
     if not isinstance(raw, Mapping):
@@ -488,17 +665,26 @@ def _persist_binding_contract(
     l2: Mapping[str, Any],
     plan: Mapping[str, Any],
     contract: Mapping[str, Any],
+    persist_l2_envelope: bool,
 ) -> None:
     _write_json(artifact_dir / GRAPH_CLAIM_BINDINGS_ARTIFACT, contract)
     fields = {
         "resume_graph_allocation_plan_digest": contract.get("allocation_plan_digest"),
         "graph_claim_binding_contract_digest": contract.get("contract_digest"),
         "graph_claim_bindings_ref": GRAPH_CLAIM_BINDINGS_ARTIFACT,
+        "resume_graph_claim_binding_active": contract.get("active") is True,
+        "resume_graph_claim_binding_pass": contract.get("pass") is True,
     }
-    l2_doc = dict(l2)
-    l2_doc.update(fields)
-    l2_doc["graph_claim_bindings"] = list(contract.get("bindings") or [])
-    _write_json(artifact_dir / "l2_output.json", l2_doc)
+    if persist_l2_envelope:
+        l2_doc = dict(l2)
+        l2_doc.update(fields)
+        # The binding rows remain authoritative in ``graph_claim_bindings.json``.
+        # Inlining them in L2 duplicates every visible claim plus graph paths and
+        # can more than double a compact lane document during its final seal.  L2
+        # carries the digest/ref/pass envelope; final-resume projection hydrates
+        # the rows from the digest-bound sidecar.
+        l2_doc.pop("graph_claim_bindings", None)
+        _write_json(artifact_dir / "l2_output.json", l2_doc)
 
     # ``selected_fact_plan.json`` is already sealed with the allocation digest.
     # Do not add downstream fields to it: that would invalidate its canonical
@@ -512,10 +698,44 @@ def _persist_binding_contract(
     _stamp_x2(artifact_dir / "x2_gate_outputs.json", contract=contract)
 
 
+def merge_resume_graph_claim_binding_fields(
+    l2_doc: Mapping[str, Any],
+    *,
+    artifact_dir: Path,
+) -> dict[str, Any]:
+    """Merge the already-sealed final binding into a lane's final L2 document.
+
+    Several lanes add proof-bundle metadata after X3 computes the graph binding.
+    Those additions must preserve the binding fields rather than replacing the
+    on-disk bound document with an older in-memory copy.  This helper does not
+    recompute, widen, or authorize a binding; it only carries the existing
+    contract envelope into the final document that L2 seals.  Exact binding
+    rows stay in the digest-bound sidecar to avoid write amplification.
+    """
+    merged = dict(l2_doc)
+    contract = _load_json(Path(artifact_dir) / GRAPH_CLAIM_BINDINGS_ARTIFACT)
+    if not isinstance(contract, Mapping) or contract.get("active") is not True:
+        return merged
+    merged.update(
+        {
+            "resume_graph_allocation_plan_digest": contract.get(
+                "allocation_plan_digest"
+            ),
+            "graph_claim_binding_contract_digest": contract.get("contract_digest"),
+            "graph_claim_bindings_ref": GRAPH_CLAIM_BINDINGS_ARTIFACT,
+            "resume_graph_claim_binding_active": True,
+            "resume_graph_claim_binding_pass": contract.get("pass") is True,
+        }
+    )
+    merged.pop("graph_claim_bindings", None)
+    return merged
+
+
 def bind_final_claims_to_resume_graph_allocation(
     artifact_dir: Path,
     *,
     section_id: str,
+    persist_l2_envelope: bool = True,
 ) -> dict[str, Any]:
     """Bind every final claim or emit a sealed deterministic failure contract.
 
@@ -710,6 +930,7 @@ def bind_final_claims_to_resume_graph_allocation(
         l2=l2,
         plan=plan,
         contract=contract,
+        persist_l2_envelope=persist_l2_envelope,
     )
     return contract
 
@@ -719,4 +940,7 @@ __all__ = [
     "GRAPH_CLAIM_BINDING_CONTRACT_SCHEMA",
     "GRAPH_CLAIM_BINDING_GATE_ID",
     "bind_final_claims_to_resume_graph_allocation",
+    "build_pre_x2_resume_graph_claim_binding_gate",
+    "merge_resume_graph_claim_binding_fields",
+    "validate_claim_rows_against_resume_graph_allocation",
 ]

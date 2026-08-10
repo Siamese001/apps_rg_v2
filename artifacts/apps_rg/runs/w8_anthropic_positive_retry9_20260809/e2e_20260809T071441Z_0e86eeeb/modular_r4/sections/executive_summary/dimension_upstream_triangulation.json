@@ -1,0 +1,34 @@
+{
+  "schema": "executive_summary_dimension_upstream_triangulation_v1",
+  "consensus_failed_dimensions": [],
+  "l2_upstream_failed_dimensions": [],
+  "dimension_remediation_lines": [],
+  "per_dimension": [],
+  "PROVIDER_MODEL_prompt_refs": {
+    "compiled_prompt": "compiled_prompt.txt",
+    "compiled_prompt_artifact": "compiled_prompt_artifact.json",
+    "provider_request": "provider_request.json",
+    "provider_response": "provider_response.json",
+    "raw_model_output": "raw_model_output.txt",
+    "composition_plan": "executive_summary_composition_plan.json",
+    "generation_grade_contract_manifest": "generation_grade_contract_manifest.json"
+  },
+  "retired_provider_prompt_refs": {
+    "compiled_prompt": "compiled_prompt.txt",
+    "compiled_prompt_artifact": "compiled_prompt_artifact.json",
+    "provider_request": "provider_request.json",
+    "provider_response": "provider_response.json",
+    "raw_model_output": "raw_model_output.txt",
+    "composition_plan": "executive_summary_composition_plan.json",
+    "generation_grade_contract_manifest": "generation_grade_contract_manifest.json"
+  },
+  "judge_cost_controls": {
+    "post_regen_judge_rescore_mode": "full_panel",
+    "judge_regen_max_cycles_configured": 0,
+    "judge_regen_cycles_consumed": 0,
+    "note": "Post-regen should rescore soft-failed judges only unless APPS_RG_EXEC_SUMMARY_POST_REGEN_JUDGE_MODE=full_panel."
+  },
+  "generation_manifest_digest": null,
+  "recommended_next_step": "X2 blocked judges — fix deterministic gates first (see x2_gate_outputs.json); review compiled_prompt.txt + composition_plan before any judge spend.",
+  "run_id": "exec_summary_20260809_072122"
+}

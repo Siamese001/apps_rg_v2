@@ -225,7 +225,7 @@ def build_headline_assembly_input(
         "headline_line MUST use exact prefix 'SVP Engineering | ', exactly three ' | ' separators (four non-empty segments), 10–13 words total, ",
         "no metrics, no employer or target company names, no candidate names, no inline source tags, no first person, no em dash.\n",
         "claim_ledger MUST be an array of OBJECT rows with claim_text (non-empty string) and ",
-        "source_fact_ids (non-empty string array of bul_* IDs from C0). ",
+        "source_fact_ids (non-empty string array drawn exactly from ALLOWED_SOURCE_FACT_IDS; graph-era reb_* and skill_* IDs are valid when explicitly allowed). ",
         "FORBIDDEN: flat arrays of strings such as [\"bul_unify_001\",\"bul_unify_005\"] — invalid for proof.\n",
         "jd_alignment must include jd_used_as_proof: false and briefing_used_as_proof: false (both booleans).\n",
     ]

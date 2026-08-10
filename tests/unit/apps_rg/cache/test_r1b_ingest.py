@@ -29,7 +29,7 @@ def _run_context(*, proof_eligible: bool = True, status: str = "REAL_LLM") -> di
     return {
         "record_id": "hir_wave1_run",
         "run_id": "run_wave1",
-        "x3_disposition": "X3_ALLOW",
+        "x3_disposition": "X3D_ALLOW_FINISH",
         "proof_eligible": proof_eligible,
         "runtime_generation_status": status,
         "generated_at_utc": "2026-05-20T00:00:00+00:00",

@@ -11,6 +11,7 @@ from tests.helpers import apps_rg_model_pins as pins
 
 import apps_rg.runtime.providers.external_provider as external_provider_module
 import apps_rg.runtime.providers.section_provider_call as section_provider_call_module
+import apps_rg.runtime.sections.section_generation as section_generation_module
 from apps_rg.runtime.section_model_limits import (
     DEFAULT_EXTERNAL_CLAUDE_MODEL,
     DEFAULT_EXTERNAL_OPENAI_MODEL,
@@ -80,10 +81,15 @@ def test_external_openai_narrative_pin_is_gpt_56_luna() -> None:
     assert DEFAULT_EXTERNAL_OPENAI_MODEL == "gpt-5.6-luna"
 
 
-def test_competencies_primary_and_backup_models() -> None:
+def test_competencies_primary_and_backup_models(monkeypatch) -> None:
     assert resolve_section_generation_model("competencies") == "claude-sonnet-5"
     with pytest.raises(SectionModelSSOTError):
         external_openai_generation_model(section_id="competencies")
+    monkeypatch.setenv(
+        "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT",
+        "credit balance too low",
+    )
+    assert external_openai_generation_model(section_id="competencies") == "gpt-5.6-luna"
 
 
 def test_section_request_uses_external_claude_section_pin() -> None:
@@ -97,6 +103,43 @@ def test_section_request_uses_external_claude_section_pin() -> None:
     assert request.provider_requested == "external_claude"
     assert request.model == DEFAULT_EXTERNAL_CLAUDE_MODEL
     assert payload["model"] == DEFAULT_EXTERNAL_CLAUDE_MODEL
+
+
+def test_repair_generation_preserves_original_provider_profile(monkeypatch) -> None:
+    _request, payload = build_section_request(
+        messages=[{"role": "user", "content": "Return narrative JSON."}],
+        prompt_hash="prompt-hash",
+        input_payload_hash="input-hash",
+        model=DEFAULT_EXTERNAL_OPENAI_MODEL,
+        provider_requested="external_openai",
+    )
+    captured: dict[str, object] = {}
+
+    def _call(profile, body, **kwargs):
+        captured.update(profile=profile, body=body, kwargs=kwargs)
+        return ProviderResult(
+            provider_requested=str(profile),
+            provider_attempted=True,
+            provider_available=True,
+            exact_provider_error=None,
+            runtime_generation_status="REAL_LLM",
+            model=str(body["model"]),
+            raw_model_output="{}",
+            provider_response={},
+        )
+
+    monkeypatch.setattr(section_generation_module, "call_section_model_provider", _call)
+    monkeypatch.setattr(
+        section_generation_module,
+        "resolve_provider_profile",
+        lambda: pytest.fail("bound repair must not re-resolve the global provider"),
+    )
+
+    section_generation_module.generate_section(payload, run_id="run-bound")
+
+    assert captured["profile"] == "external_openai"
+    assert captured["body"]["model"] == DEFAULT_EXTERNAL_OPENAI_MODEL
+    assert "_provider_profile" not in captured["body"]
 
 
 def test_provider_profile_resolution_defaults_to_external_claude(monkeypatch) -> None:

@@ -604,6 +604,12 @@ class CompletedEvalRecord:
     regression: RegressionSummary
     artifact_paths: dict[str, str]
     rubric_ids: list[str]
+    eval_execution_complete: bool = False
+    eval_verdict: str = ""
+    release_blocked: bool = True
+    admission_status: str = ""
+    preflight_verification_status: str = ""
+    admission_failures: list[str] = field(default_factory=list)
     record_seed: dict[str, Any] = field(default_factory=dict)
     run_metadata: EvalRunMetadata = field(default_factory=EvalRunMetadata)
     fixture_provenance: list[FixtureProvenance] = field(default_factory=list)

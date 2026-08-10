@@ -8,8 +8,10 @@ from pathlib import Path
 from apps_rg.runtime.assembly.final_resume_x2 import gate_x2_full_resume_llm_coherence_aggregation
 from apps_rg.runtime.assembly.full_resume_llm_coherence import (
     aggregate_full_resume_coherence,
+    build_full_resume_evidence_packet,
     emit_full_resume_llm_coherence_review,
     run_full_resume_coherence_judges,
+    _build_prompt,
 )
 from apps_rg.runtime.judges.executive_summary_x1d import (
     JudgeOutput,
@@ -181,6 +183,10 @@ def test_locked_experience_credential_is_not_competencies_duplication(tmp_path: 
     )
 
     assert not any("credential_name_in_competencies_block" in b for b in review["blockers"])
+    assert any(
+        "credential_section_ownership_duplicate:Fellow of the Society of Actuaries" in b
+        for b in review["blockers"]
+    )
 
 
 def test_provider_artifact_write_recreates_missing_parent(tmp_path: Path):
@@ -345,3 +351,55 @@ def test_gate_requires_artifact_when_enabled():
         required=True,
     )
     assert g2.pass_ is True
+
+
+def test_candidate_evidence_packet_preserves_unique_metric_authority_without_diagnostics():
+    final = {
+        "sections": [
+            {
+                "section_id": "executive_summary",
+                "l2_output_snapshot": {
+                    "claim_ledger": [
+                        {
+                            "claim_text": "Scaled an IP portfolio to $22M in revenue.",
+                            "source_fact_ids": ["fact_engineering_platform_006"],
+                        }
+                    ],
+                    "selected_fact_plan": {
+                        "allocation_plan_digest": "a" * 64,
+                        "graph_candidate_decision_ledger": ["must-not-leak"],
+                        "facts": [
+                            {
+                                "fact_id": "reb_unify_platform_commercialization_leadership",
+                                "claim_text": "Platform productization and IP-led revenue",
+                                "source_fact_ids": ["fact_engineering_platform_006"],
+                                "graph_skill_node_ids": ["skill_agentic_platform_productization"],
+                                "metric_outcome_ids": ["metric_unify_22m_ip_led_revenue"],
+                                "metric_values": ["$22M IP-led revenue"],
+                                "allocation_claim_unit_ids": ["executive_summary:claim:01"],
+                                "verification_status": "allocation_authority_pass",
+                            }
+                        ],
+                    },
+                },
+            }
+        ]
+    }
+
+    packet = build_full_resume_evidence_packet(final)
+    encoded = json.dumps(packet, sort_keys=True)
+    fact = packet["sections"][0]["selected_candidate_facts"][0]
+
+    assert fact["metric_outcome_ids"] == ["metric_unify_22m_ip_led_revenue"]
+    assert fact["metric_values"] == ["$22M IP-led revenue"]
+    assert "graph_candidate_decision_ledger" not in encoded
+    prompt = _build_prompt(
+        full_resume_text="EXECUTIVE SUMMARY\nScaled an IP portfolio to $22M in revenue.",
+        target_company="Anthropic",
+        target_role="Partnerships Lead",
+        jd_context="JD asks for partner growth.",
+        evidence_packet=packet,
+    )
+    assert "CANDIDATE_EVIDENCE_PACKET (candidate proof)" in prompt
+    assert "TARGETING_CONTEXT (not proof)" in prompt
+    assert "surface-text repetition is not required" in prompt

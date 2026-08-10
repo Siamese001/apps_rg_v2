@@ -15,6 +15,7 @@ from apps_rg.cache.r1b_constants import (
     R1B_STORAGE_SUBSYSTEM,
     R1B_UWG_TARGET_SURFACE,
 )
+from apps_rg.cache.r1b_integrity import attach_integrity
 
 
 @dataclass(frozen=True)
@@ -171,7 +172,8 @@ def project_r1b_filesystem_from_outbox(
 
     file_hashes: dict[str, str] = {}
     intent_path = intents / f"{candidate.record.record_id}.json"
-    file_hashes[str(intent_path)] = _atomic_write_json(intent_path, bundle)
+    signed_bundle = attach_integrity(bundle, artifact_kind="durable_bundle")
+    file_hashes[str(intent_path)] = _atomic_write_json(intent_path, signed_bundle)
     file_hashes[str(embeddings / "intent.json")] = _atomic_write_json(
         embeddings / "intent.json", intent_embedding
     )

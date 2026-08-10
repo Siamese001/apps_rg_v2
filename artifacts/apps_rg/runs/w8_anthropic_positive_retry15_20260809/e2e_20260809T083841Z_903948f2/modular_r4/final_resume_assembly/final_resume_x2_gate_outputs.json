@@ -1,0 +1,298 @@
+{
+  "gate_family": "final_resume_assembly_x2",
+  "evaluated_at_utc": "2026-08-09T08:49:23.297481+00:00",
+  "all_pass": false,
+  "failed_gate_ids": [
+    "x2_full_resume_llm_coherence_aggregation"
+  ],
+  "gates": [
+    {
+      "gate_id": "x2_all_required_sections_present",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "headline",
+        "executive_summary",
+        "competencies",
+        "unify_narrative",
+        "unify_bullets",
+        "ibm_narrative",
+        "ibm_bullets",
+        "insurtech_narrative",
+        "insurtech_bullets",
+        "ey_narrative",
+        "ey_bullets",
+        "early_career",
+        "education",
+        "certifications"
+      ],
+      "threshold": [
+        "certifications",
+        "competencies",
+        "early_career",
+        "education",
+        "executive_summary",
+        "ey_bullets",
+        "ey_narrative",
+        "headline",
+        "ibm_bullets",
+        "ibm_narrative",
+        "insurtech_bullets",
+        "insurtech_narrative",
+        "unify_bullets",
+        "unify_narrative"
+      ],
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_order_valid",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "headline",
+        "executive_summary",
+        "competencies",
+        "unify_narrative",
+        "unify_bullets",
+        "ibm_narrative",
+        "ibm_bullets",
+        "insurtech_narrative",
+        "insurtech_bullets",
+        "ey_narrative",
+        "ey_bullets",
+        "early_career",
+        "education",
+        "certifications"
+      ],
+      "threshold": [
+        "headline",
+        "executive_summary",
+        "competencies",
+        "unify_narrative",
+        "unify_bullets",
+        "ibm_narrative",
+        "ibm_bullets",
+        "insurtech_narrative",
+        "insurtech_bullets",
+        "ey_narrative",
+        "ey_bullets",
+        "early_career",
+        "education",
+        "certifications"
+      ],
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_generated_sections_from_latest_successful_real",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "rollup pointer contract",
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_generated_sections_final_materialized_contracts_pass",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "headline:ok",
+        "executive_summary:ok",
+        "unify_narrative:ok",
+        "unify_bullets:ok",
+        "ibm_narrative:ok",
+        "ibm_bullets:ok",
+        "insurtech_narrative:ok",
+        "insurtech_bullets:ok",
+        "ey_narrative:ok",
+        "ey_bullets:ok",
+        "competencies:ok"
+      ],
+      "threshold": "all generated lanes have pass=true final_materialized_acceptance_contract.json",
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_locked_sections_from_locked_copy_manifest",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": [
+        "early_career",
+        "education",
+        "certifications",
+        "company_names",
+        "titles",
+        "locations",
+        "dates"
+      ],
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_generated_section_rewritten",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "deterministic product projection equality plus full source L2 digest binding",
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_locked_copy_rewritten",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "manifest copied_text equality",
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_company_names_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "company_names",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_titles_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "titles",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_locations_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "locations",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_dates_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "dates",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_education_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "education",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_certifications_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "certifications",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_digest_present",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_hashes_present",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_final_resume_hash_present",
+      "gate_type": "deterministic",
+      "observed_value": "2f9634d8623caaa0d19661f8d57b25e8699265386d436416acc757c316a3218c",
+      "threshold": "2f9634d8623caaa0d19661f8d57b25e8699265386d436416acc757c316a3218c",
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_artifact_refs_present",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "artifact_refs_ok": true,
+        "invariant_refs_ok": true,
+        "section_disposition_refs_ok": true,
+        "invariant_disposition_refs_ok": true
+      },
+      "threshold": null,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_provider_calls",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_l2_generation_calls",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_docx_render",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_structural_assembly_no_inline_lane_judges",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_final_resume_aggregate_judge_executed",
+      "gate_type": "deterministic",
+      "observed_value": true,
+      "threshold": true,
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_final_resume_aggregate_judge_artifact_present",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "full_resume_llm_coherence_review.json": true,
+        "x1d_full_resume_judge_outputs.json": true
+      },
+      "threshold": "both aggregate judge artifacts required",
+      "failure_reason": null,
+      "pass": true
+    },
+    {
+      "gate_id": "x2_full_resume_llm_coherence_aggregation",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "full_resume_coherence_pass": false,
+        "decisive_reason": "quorum_not_met",
+        "blockers": [
+          "judge_fail:x1d_openai_chatgpt_full_resume_coherence"
+        ],
+        "model_backed_pass_count": 1,
+        "quorum_required": 2
+      },
+      "threshold": "full_resume_coherence_pass=true",
+      "failure_reason": "quorum_not_met",
+      "pass": false
+    }
+  ]
+}

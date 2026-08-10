@@ -1,0 +1,166 @@
+{
+  "attempt_count": 1,
+  "attempt_receipt_id": "attempt-09202499a4ff4f6aa9c117012718fe93",
+  "authority_scope": "apps_rg_l2_envelope_adapter_receipts",
+  "canonical_l2_artifact_authority": false,
+  "decisive_reason_code": "E3_SECTION_OUTPUT_OBSERVED",
+  "determinism": {
+    "attempt_seed": "1928cdd243af9cdd9b743f196c06b8221eb9d6015cddca94bae4e96a54d52042",
+    "blueprint_hash": "ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+    "input_hash": "a56a03ce4b547154f101c15aae26b75d8a8fd1dfa6f7c0abeca4e51edd033683",
+    "policy_hash": "bafee91ee86960cfdc581d692c349be017596d991829e2ec269383f6165b31ed",
+    "prompt_hash": "a3a577270063358b778be8968e78abc88b382f7cc2cd356c7d891ba6d4ed1054",
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:3ff1138c33b6e377::v1"
+  },
+  "error_summary": null,
+  "execution_lane": "MODEL",
+  "generated_artifacts": [
+    "provider_request.json",
+    "provider_response.json",
+    "l2_output.json"
+  ],
+  "latency_ms": 0.0,
+  "lineage": {
+    "ancestry_chain": [
+      "R3R4_MANAGED_WORKFLOW",
+      "wfm::apps_rg::resume_generation::v1"
+    ],
+    "parent_plan_id": "wfm::apps_rg::resume_generation::v1",
+    "parent_route_id": "R3R4_MANAGED_WORKFLOW",
+    "parent_step_id": "ibm_narrative",
+    "same_run_packet_family": "8b290cfa-e51d-4ce3-b4ee-5da19764365d"
+  },
+  "local_check_results": {
+    "artifact_bytes_match": true,
+    "grounded_output": true,
+    "l2_output_file_digest": "c99e71d62eac98760a0248a53d51135371403807e62bae11f5a39c986b46066f",
+    "l2_output_ref": "l2_output.json",
+    "model_or_tool_name": "claude-sonnet-5",
+    "provider_lane": "openai",
+    "provider_request_digest": "22433d8fce98deeaefa66f48ff349da666e42c674dc05a018a9efdf72cc8e7cd",
+    "provider_request_ref": "provider_request.json",
+    "provider_response_digest": "915379ea17b6d6057302dce5bdda7ddd04486610e1575688c62c3cfd9c2daab4",
+    "provider_response_ref": "provider_response.json",
+    "replay_key_matches": true,
+    "token_usage_observed": true,
+    "tokens_used": 13593
+  },
+  "output_digest": "2ccfd219b6d528495312db5dd800ff5fd59f45193a57af3a49e57af990324059",
+  "proposed_state_diff": {
+    "payload": {
+      "graph_claim_binding_contract_digest": "31c6aa863becf1f061d3c64c7db4c72094e860adc44ba14ddb8669c86bf511db",
+      "graph_claim_bindings": [
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:02",
+            "ibm_narrative:derived:05"
+          ],
+          "allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_002",
+            "fact_revenue_ops_001"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_002",
+            "bul_ibm_005"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_1_af3752cf",
+          "edge_ids": [
+            "edge:5644557d40383b876d6003cb",
+            "edge:c0749340728d10069ea80454",
+            "edge:58671d4eab74d24ad6a06da1",
+            "edge:ecaa73ab1a090d096f5636de"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_002",
+            "fact_revenue_ops_001"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_002",
+            "root:reb_ibm_presales_solution_engineering",
+            "root:reb_ibm_presales_solution_engineering/skill:skill_p2_gtm_executive_buyer_alignment",
+            "root:reb_ibm_presales_solution_engineering/fact:fact_revenue_ops_001"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 0.9,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": -0.4,
+          "skill_ids": [
+            "skill_partner_pnl_oversight",
+            "skill_p2_gtm_executive_buyer_alignment"
+          ],
+          "source_independence_score": 0.5,
+          "target_alignment_score": 0.3,
+          "visible_claim_hash": "33cf4e77688bea5e519fa2b593879f134eeb6a06dbce773d1a8b248e4e756362",
+          "visible_claim_text": "Championed enterprise solution governance at IBM through AWS partnership and BI-backed decision support"
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:02"
+          ],
+          "allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_002"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_002"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_2_f851f1b9",
+          "edge_ids": [
+            "edge:5644557d40383b876d6003cb",
+            "edge:c0749340728d10069ea80454"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_002"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_002"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.1,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": -0.2,
+          "skill_ids": [
+            "skill_partner_pnl_oversight"
+          ],
+          "source_independence_score": 0.5,
+          "target_alignment_score": 0.0,
+          "visible_claim_hash": "ca03118379ae975e838338965beaecc130dae560c4845feb6a7d231c654c4fe8",
+          "visible_claim_text": "establishing a pipeline-informed architecture discipline for executive pursuit choices and modernization delivery"
+        }
+      ],
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "resume_graph_allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015"
+    },
+    "section_id": "ibm_narrative",
+    "section_output_ref": "l2_output.json"
+  },
+  "quarantined_payload": null,
+  "result_class": "SUCCESS",
+  "return_code": 0,
+  "sealed_at": 692988.781,
+  "span_id": "section-l2-ibm_narrative",
+  "tokens_used": 13593,
+  "trace_id": "532a8718-cade-41e7-93f6-5bbfd93bf571",
+  "validation_packet_id": "section-val-a56a03ce4b547154"
+}

@@ -1,0 +1,86 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.6,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "S1 uses present-tense IBM-AWS leadership although the IBM role ended in 2022.",
+      "S2 redundantly repeats S1's alliance-modernization point.",
+      "S5 is vague and repeats “through,” weakening executive polish.",
+      "S6 is prospective and generic rather than evidence-led.",
+      "Competencies are clustered but over-dense and repeat co-sell, GraphRAG, telemetry, quota, and discovery content.",
+      "FSA appears in Early Career and Certifications, violating strict section ownership."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      5,
+      6
+    ],
+    "remediation_suggestions": [
+      "Align alliance claims with the documented role chronology.",
+      "Consolidate repetitive summary statements around current scope and proven outcomes.",
+      "Prune competencies that directly restate summary or experience language.",
+      "Resolve credential duplication through upstream section-governance review."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "TEMPORAL_ROLE_TENSE_CONFLICT"
+        ]
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "SUMMARY_REPETITION",
+          "AWKWARD_SYNTAX",
+          "GENERIC_PROSPECTIVE_CLOSE"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "COMPETENCY_DENSITY",
+          "CROSS_SECTION_REPETITION"
+        ]
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "REDUNDANT_SUMMARY_ARC",
+          "SECTION_OWNERSHIP_VIOLATION"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\final_resume_assembly\\coherence_judge_providers\\x1d_openai_provider_response_raw_20260809_095711_685.json",
+  "original_model": null,
+  "fallback_model": null
+}

@@ -1,0 +1,355 @@
+{
+  "payload": {
+    "contents": [
+      {
+        "parts": [
+          {
+            "text": "You are grading a generated resume section candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write replacement section content.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (when provided), and candidate_output.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).\n\nSECTION: headline\n\nRUBRIC_REF: apps_rg/runtime/judges/headline_x1d.py#HEADLINE_GRADE_ONLY_RUBRIC\n\nYou are evaluating a single resume headline formatted exactly as: SVP Engineering | X | Y | Z\n(space-pipe-space separators; exactly four segments; first segment exactly \"SVP Engineering\"; 10-13 total words).\nReturn JSON only with: score_scale, score, threshold, pass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n\nRubric dimensions:\n1. factual_support: every substantive phrase in X/Y/Z is supported by claim_ledger source_fact_ids present in allowed_fact_packet. Treat every ID explicitly present there as eligible, including graph-era reb_* role-episode roots and skill_* nodes as well as bul_*, fact_*, and metric-suffixed IDs. Never use an ID prefix as a reason to reject evidence that the packet explicitly allows; JD/briefing/target fields remain targeting-only and never proof.\n2. fixed_prefix_compliance: headline_line starts with \"SVP Engineering | \" and uses exactly three \" | \" separators.\n3. base_identity_fidelity: authentic to the base resume headline anchor; not rewritten to chase the JD.\n4. anti_keyword_stuffing: no ATS keyword bags, list-like segments, or semantically redundant variants of the same positioning theme across X/Y/Z.\n5. JD targeting discipline: JD relevance without copying JD phrasing or treating JD as authority; preserve senior platform, governance, and runtime signals; ask whether a Head of Talent Acquisition at the target company would forward it.\n6. executive_authenticity: reads as a senior platform/engineering leader, not generic leadership filler or juniorized IT labeling; no AI-authenticity dead giveaways such as em dashes, buzzword soup, template cadence, or machine-generated phrasing.\n7. no_title_inflation: first segment is not replaced or subverted; no \"SVP at TargetCo\" framing.\n8. natural human resume sound: concise, human, resume-native phrasing; each segment should add a distinct signal, not a synonym, and the whole line should survive a skeptical TA screen.\n\nAdversarial review lens:\n- Head of Talent Acquisition pass: would a recruiter at the target company forward it in one read?\n- AI authenticity pass: no em dashes, no buzzword soup, no template phrasing, no generic AI tells.\n\nDecisive failure triggers (if any, set decisive_failure true and pass false):\n- missing fixed prefix \"SVP Engineering\" as segment 1\n- not exactly four non-empty segments or not exactly three \" | \" separators\n- word count outside 10-13 (inclusive)\n- unsupported proof relative to claim_ledger / resume facts\n- employer names, target company names, or candidate personal name tokens\n- metrics or numeric proof in headline_line\n- first person\n- semantically redundant X/Y/Z segments that collapse to the same concept\n- generic IT labels or demoting terms that blunt SVP-level positioning\n- copied JD phrases or briefing-only / JD-only claims without fact support\n- would not pass a Head of Talent Acquisition screen\n- AI-authenticity dead giveaways such as em dashes, buzzword soup, or machine-generated cadence\n\nReturn ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[]}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.\n\nCANDIDATE_OUTPUT:\n{\n  \"headline_line\": \"\",\n  \"resume_display_text\": \"\",\n  \"companion_context\": \"### unify_narrative\\nOwned Unify Consulting’s mandate to industrialize agentic AI for regulated enterprise adoption, connecting control-plane architecture, lifecycle governance, and alliance distribution to a productized operating model that transformed delivery knowledge into repeatable IP and extensible platform offerings.\\n\\n### unify_bullets\\n- bul_unify_001: Architected a governed policy-gated agent execution surface for enterprise AI workflows, combining L0 route-policy dispatch, multi-agent orchestration contracts, and human override escalation paths to keep agentic decisions auditable at scale.\\n- bul_unify_002: Built CFO-aligned enterprise adoption motions tied to reusable AI platform commercialization, pairing partner-led deal support with usage-based subscription forecasting to sustain renewals.\\n- bul_unify_003: Delivered audit-grade runtime observability coverage for regulated AI workflows by pairing context engineering with telemetry and rollback controls across production agentic systems.\\n- bul_unify_004: Standardized the AI systems lifecycle from intake through production monitoring, compressing lab-to-production cycle time from six months to three weeks through managed workflow orchestration and replayable runtime design.\\n- bul_unify_005: Engineered high-availability distributed service patterns for enterprise AI platforms, integrating Databricks Lakehouse data pipelines with dense sparse exact retrieval design across cloud environments.\\n- bul_unify_006: Converted bespoke delivery into commercialized agentic platform capability while scaling the engineering team from 8 to 28 under an operating model for agentic AI.\\n\\n### ibm_bullets\\n- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\\n- bul_ibm_002: Built decision-support data models and BI views that connected modernization programs to executive operating decisions\\n- bul_ibm_003: Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.\\n- bul_ibm_004: Owned quota-aligned solution leadership and pipeline governance across enterprise pursuits and client portfolio expansion motions.\\n- bul_ibm_005: Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.\\n\\n### ibm_narrative\\nChampioned partner-led technical pursuits at IBM, connecting AWS alliance GTM with executive discovery and alignment, establishing a disciplined operating cadence for clearer executive decisions across complex financial-services engagements and enterprise stakeholders.\"\n}\n\nALLOWED_FACT_PACKET:\n[\n  {\n    \"fact_id\": \"reb_ibm_revenue_sales_target_execution\",\n    \"candidate_fact_id\": \"reb_ibm_revenue_sales_target_execution\",\n    \"claim_text\": \"Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions\",\n    \"role_episode_bundle_id\": \"reb_ibm_revenue_sales_target_execution\",\n    \"graph_evidence_type\": \"role_episode_bundle\",\n    \"employer_lane\": \"ibm\",\n    \"source_employment\": \"ibm\",\n    \"graph_skill_node_ids\": [\n      \"skill_partner_pnl_oversight\"\n    ],\n    \"metric_outcome_ids\": [],\n    \"selected_metric_ids\": [],\n    \"allowed_graph_evidence_ids\": [\n      \"reb_ibm_revenue_sales_target_execution\",\n      \"fact_revenue_ops_003\",\n      \"skill_partner_pnl_oversight\"\n    ],\n    \"linked_identity_fact_ids\": [\n      \"fact_revenue_ops_003\"\n    ],\n    \"linked_source_fact_ids\": [\n      \"fact_revenue_ops_003\"\n    ],\n    \"source_fact_ids\": [\n      \"reb_ibm_revenue_sales_target_execution\"\n    ],\n    \"confidence\": \"HIGH\",\n    \"support_level\": \"allocation_authority_pass\",\n    \"verification_status\": \"allocation_authority_pass\",\n    \"metric_values\": [],\n    \"technologies\": [\n      \"skill_partner_pnl_oversight\"\n    ],\n    \"domain\": \"IBM partner role with quota and revenue-target accountability for enterprise financial-services solution motions.\",\n    \"allocation_claim_unit_ids\": [\n      \"headline:skill:01\"\n    ],\n    \"allocation_plan_digest\": \"32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79\"\n  },\n  {\n    \"fact_id\": \"reb_unify_runtime_reliability_governance\",\n    \"candidate_fact_id\": \"reb_unify_runtime_reliability_governance\",\n    \"claim_text\": \"Runtime reliability, governance, telemetry, evaluation, rollback\",\n    \"role_episode_bundle_id\": \"reb_unify_runtime_reliability_governance\",\n    \"graph_evidence_type\": \"role_episode_bundle\",\n    \"employer_lane\": \"unify\",\n    \"source_employment\": \"unify\",\n    \"graph_skill_node_ids\": [\n      \"skill_context_engineering\"\n    ],\n    \"metric_outcome_ids\": [],\n    \"selected_metric_ids\": [],\n    \"allowed_graph_evidence_ids\": [\n      \"reb_unify_runtime_reliability_governance\",\n      \"fact_engineering_platform_003\",\n      \"skill_context_engineering\"\n    ],\n    \"linked_identity_fact_ids\": [\n      \"fact_engineering_platform_003\"\n    ],\n    \"linked_source_fact_ids\": [\n      \"fact_engineering_platform_003\"\n    ],\n    \"source_fact_ids\": [\n      \"reb_unify_runtime_reliability_governance\"\n    ],\n    \"confidence\": \"HIGH\",\n    \"support_level\": \"allocation_authority_pass\",\n    \"verification_status\": \"allocation_authority_pass\",\n    \"metric_values\": [],\n    \"technologies\": [\n      \"skill_context_engineering\"\n    ],\n    \"domain\": \"Runtime reliability and governance for production agentic systems; evaluation gates, telemetry, and rollback controls.\",\n    \"allocation_claim_unit_ids\": [\n      \"headline:skill:02\"\n    ],\n    \"allocation_plan_digest\": \"32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79\"\n  },\n  {\n    \"fact_id\": \"__proof_pool_anchor__\",\n    \"kind\": \"proof_pool_anchor\",\n    \"proof_pool_ref\": \"apps_rg/fact_inventory/master_skills_arsenal_ledger.json\",\n    \"proof_pool_digest\": \"2a11a60ea83266ec4c2501b421b4bdb4252954e7307585047d19fbad65b2b303\"\n  }\n]\n\nCLAIM_LEDGER:\n[]\n\nTARGETING_CONTEXT (not proof):\n{\n  \"target_title\": \"\",\n  \"target_company\": \"\",\n  \"jd_text\": \"\",\n  \"briefing\": \"\"\n}\n\nPROOF_BOUNDARY:\n{\n  \"jd_is_targeting_context_only\": true,\n  \"briefing_is_targeting_context_only\": true,\n  \"claims_must_be_supported_by_allowed_fact_packet\": true,\n  \"judges_must_not_rewrite\": true,\n  \"metadata_only_graph_context_is_insufficient\": true\n}\n\nGRAPH_BINDING_MATERIALITY_SUMMARY:\n{}\n\nDETERMINISTIC_GATE_SUMMARY:\n{\n  \"x2_judge_snapshot_pending\": {\n    \"pass\": true,\n    \"detail\": \"Pre-X2 GRADE_ONLY for headline: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys.\"\n  }\n}"
+          }
+        ]
+      }
+    ],
+    "systemInstruction": {
+      "parts": [
+        {
+          "text": "You are a strict executive resume judge. Output a single compact JSON object only. No markdown fences, no explanatory prose, no nested finding objects.\n\nGRADE_ONLY authority (all providers — Gemini, OpenAI, Anthropic):\n- Do NOT rewrite, replace, or edit candidate_output.resume_display_text.\n- deterministic_gate_summary is authoritative: if a gate shows \"pass\": true, do NOT fail or cite that axis.\n- Do NOT apply retired SRFS slot mandates as decisive failures: five-part S1–S5 arc, mandatory S5 credibility\n  sentence, S2 mechanism-only / S4 outcomes slot shapes, srfs_sentence_responsibility.\n- When x2_exec_summary_evidence_utilization.pass is true, unused_fact_ids are optional weave targets, not defects.\n\nReturn ONLY one compact JSON object. No markdown fences, no prose before or after, no nested objects.\nRequired shape (findings and remediation_suggestions must be arrays of short strings only):\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\"findings\":[\"...\"],\"cited_sentence_indexes\":[1],\"remediation_suggestions\":[],\"dimension_verdicts\":{...8 rubric keys...}}\nAt most 6 short strings in findings and 4 in remediation_suggestions.\ncited_sentence_indexes: 1-based indexes (S1=1 … S6=6) for every sentence your findings ask to change.\nInclude dimension_verdicts with all eight rubric dimension ids (pass/severity/codes per dimension).\n\nScore contract (mandatory - every judge response MUST comply):\n- Include score_scale as exactly one of: \"0_to_1\" or \"0_to_5\". Do not omit score_scale.\n- If score_scale is \"0_to_1\": score and threshold MUST each be a number from 0.0 through 1.0 inclusive.\n- If score_scale is \"0_to_5\": score and threshold MUST each be a number from 0.0 through 5.0 inclusive.\n- Forbidden: 0_to_10 scales, percentage scores (0–100), or values like score=9.2 with threshold=8.0.\n- Do not infer scale from magnitude; declare score_scale explicitly and keep score/threshold within that scale."
+        }
+      ]
+    },
+    "generationConfig": {
+      "thinkingConfig": {
+        "thinkingLevel": "high"
+      },
+      "maxOutputTokens": 4096,
+      "responseMimeType": "application/json",
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "score_scale": {
+            "type": "string",
+            "enum": [
+              "0_to_1",
+              "0_to_5"
+            ]
+          },
+          "score": {
+            "type": "number"
+          },
+          "threshold": {
+            "type": "number"
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "decisive_failure": {
+            "type": "boolean"
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cited_sentence_indexes": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "remediation_suggestions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dimension_verdicts": {
+            "type": "object",
+            "properties": {
+              "factual_support": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "executive_signal": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "resume_voice": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "ats_alignment_without_keyword_stuffing": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "anti_overfit": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "synthesis_quality": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "evidence_utilization": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "deterministic_alignment": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              }
+            },
+            "required": [
+              "factual_support",
+              "executive_signal",
+              "resume_voice",
+              "ats_alignment_without_keyword_stuffing",
+              "anti_overfit",
+              "synthesis_quality",
+              "evidence_utilization",
+              "deterministic_alignment"
+            ]
+          }
+        },
+        "required": [
+          "score_scale",
+          "score",
+          "threshold",
+          "pass",
+          "decisive_failure",
+          "findings",
+          "cited_sentence_indexes",
+          "remediation_suggestions",
+          "dimension_verdicts"
+        ]
+      }
+    }
+  },
+  "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+  "resolved_model": "gemini-3.6-flash",
+  "resolved_model_source": "yaml_judge_models",
+  "model_requested": "gemini-3.6-flash",
+  "model_actual": "gemini-3.6-flash",
+  "thinking_level": "high",
+  "provider_key": "gemini_pro",
+  "request_timeout_seconds": 60,
+  "gemini_max_retries_configured": 4,
+  "judge_max_attempts": 2,
+  "input_hash": "9549f916ea880c9e",
+  "timestamp": "2026-08-09T07:21:34.856231+00:00",
+  "judge_attempt": 1,
+  "gemini_thinking_config": {
+    "thinkingLevel": "high"
+  },
+  "gemini_thinking_optimization_enabled": true,
+  "provider_name": "gemini",
+  "model_env_source": "yaml_judge_models",
+  "canonical_contract_hash": "3aaaa0f7256691fb314a0cb6e68f25cbaa2e16dfaefac278ddea3f096573e30c",
+  "packet_hash": "9549f916ea880c9e",
+  "schema_hash": "2d3f3d956b325217",
+  "max_tokens": 4096,
+  "temperature": null,
+  "response_format": "responseSchema",
+  "judge_receipt": {
+    "judge_packet_hash": "9549f916ea880c9e",
+    "packet_hash": "9549f916ea880c9e",
+    "canonical_contract_hash": "3aaaa0f7256691fb314a0cb6e68f25cbaa2e16dfaefac278ddea3f096573e30c",
+    "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline/headline_judge_packet.json",
+    "candidate_output_ref": "candidate_output.resume_display_text",
+    "allowed_fact_packet_ref": "allowed_fact_packet",
+    "rubric_ref": "apps_rg/runtime/judges/headline_x1d.py#HEADLINE_GRADE_ONLY_RUBRIC",
+    "deterministic_gate_summary": {
+      "x2_judge_snapshot_pending": {
+        "pass": true,
+        "detail": "Pre-X2 GRADE_ONLY for headline: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys."
+      }
+    },
+    "gate_closure_map_version": "executive_summary_gate_closure_v2"
+  },
+  "redacted_query_param_names": [
+    "key"
+  ]
+}

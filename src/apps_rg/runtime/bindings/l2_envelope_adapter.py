@@ -1311,8 +1311,8 @@ def _seal_l2_artifact(
     attempt_receipt: Any | None,
     heal_receipt: Any | None = None,
 ) -> Any:
-    from agentic_core.runtime.contracts.origin import Origin
-    from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+    from apps_rg.runtime.spine_contracts import Origin
+    from apps_rg.runtime.spine_contracts import SealedL2Artifact
 
     if prep_output is None or validation_output is None:
         raise ValueError("E5_SEAL_REJECTED: missing prep_output or validation_output")
@@ -1441,8 +1441,8 @@ def _seal_l2_artifact(
 
 def _seal_e2_rejection(*, cpa: Any, prep_output: Any, validation_output: Any) -> Any:
     """E5-style seal when E2 fails (no E3 attempt, no provider receipts)."""
-    from agentic_core.runtime.contracts.origin import Origin
-    from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+    from apps_rg.runtime.spine_contracts import Origin
+    from apps_rg.runtime.spine_contracts import SealedL2Artifact
 
     srp = getattr(validation_output, "sealed_rejection_packet", None)
     rule = str(getattr(srp, "failed_validation_rule", "") if srp is not None else "E2_REJECTED")

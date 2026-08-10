@@ -56,13 +56,17 @@ def evaluate_apps_rg_full_success_eligibility(
     if fr is not True:
         reasons.append("full_resume_generated_not_true")
 
-    require_docx = docx_output_required() or manifest.get("docx_output_required") is True
+    require_docx = (
+        docx_output_required() or manifest.get("docx_output_required") is True
+    )
     if require_docx:
         dv = manifest.get("docx_verified")
         if dv is not True:
             reasons.append(f"docx_verified_not_true:{dv!r}")
 
-    json_rel = str(manifest.get("generated_resume_json_relpath") or "outputs/generated_resume.json")
+    json_rel = str(
+        manifest.get("generated_resume_json_relpath") or "outputs/generated_resume.json"
+    )
     jp = (run_root / json_rel).resolve()
 
     if not jp.is_file():
@@ -97,6 +101,82 @@ def evaluate_apps_rg_full_success_eligibility(
     return (len(reasons) == 0, reasons)
 
 
+def evaluate_apps_rg_product_authority_eligibility(
+    *,
+    manifest: Mapping[str, Any],
+    run_root: Path,
+) -> tuple[bool, list[str]]:
+    """Require output shape *and* the complete source-bound product authority chain.
+
+    ``evaluate_apps_rg_full_success_eligibility`` remains the package-shape
+    validator used by non-authorizing packaging code.  This function is the
+    mandatory admission check before PRODUCT_ELIGIBILITY or a new UWG commit.
+    """
+
+    from apps_rg.runtime.authority_reconciliation import (
+        derive_entry_authority,
+        derive_final_assembly_authority,
+    )
+    from apps_rg.runtime.whole_run_exit import (
+        WHOLE_RUN_EXIT_ARTIFACT,
+        verify_whole_run_exit_review_packet,
+    )
+
+    root = Path(run_root).resolve()
+    shape_eligible, shape_reasons = evaluate_apps_rg_full_success_eligibility(
+        manifest=manifest,
+        run_root=root,
+    )
+    reasons = list(shape_reasons)
+    packet_path = root / WHOLE_RUN_EXIT_ARTIFACT
+    try:
+        packet_raw = json.loads(packet_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError) as exc:
+        packet: dict[str, Any] = {}
+        reasons.append(f"whole_run_exit_unreadable:{type(exc).__name__}")
+    else:
+        packet = packet_raw if isinstance(packet_raw, dict) else {}
+        if not packet:
+            reasons.append("whole_run_exit_not_object")
+
+    valid, verification_errors = verify_whole_run_exit_review_packet(root)
+    if not valid:
+        reasons.extend(
+            f"whole_run_exit_verification:{error}" for error in verification_errors
+        )
+    if packet.get("status") != "PASS":
+        reasons.append(f"whole_run_exit_status_not_pass:{packet.get('status')!r}")
+    if packet.get("x3_disposition") != "X3D_ALLOW_FINISH":
+        reasons.append(f"whole_run_exit_not_exact_x3d:{packet.get('x3_disposition')!r}")
+    signals = packet.get("signals")
+    signals = dict(signals) if isinstance(signals, Mapping) else {}
+    if signals.get("authoritative_lane_contracts_pass") is not True:
+        reasons.append("authoritative_lane_contracts_not_pass")
+    if signals.get("final_assembly_product_release_eligible") is not True:
+        reasons.append("final_assembly_product_release_not_eligible")
+
+    entry = derive_entry_authority(root)
+    if entry.get("entry_authorized") is not True:
+        reasons.extend(
+            f"entry_authority:{value}" for value in entry.get("failed_checks", [])
+        )
+    packet_identity = packet.get("identity")
+    if not isinstance(packet_identity, Mapping) or dict(packet_identity) != entry.get(
+        "identity"
+    ):
+        reasons.append("whole_run_exit_entry_identity_mismatch")
+
+    final_assembly = derive_final_assembly_authority(root)
+    if final_assembly.get("product_release_eligible") is not True:
+        reasons.extend(
+            f"final_assembly:{value}"
+            for value in final_assembly.get("failed_checks", [])
+        )
+    unique_reasons = list(dict.fromkeys(reasons))
+    return bool(shape_eligible and not unique_reasons), unique_reasons
+
+
 __all__ = [
     "evaluate_apps_rg_full_success_eligibility",
+    "evaluate_apps_rg_product_authority_eligibility",
 ]

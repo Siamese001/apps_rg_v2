@@ -683,7 +683,43 @@ def reduce_competency_keyword_stuffing(parsed: dict[str, Any]) -> None:
         freq = _global_word_freq()
         if not freq or max(freq.values()) <= 3:
             break
-        worst = max(freq, key=lambda w: freq[w])
+        overloaded = [
+            token
+            for token, count in sorted(
+                freq.items(), key=lambda item: (-item[1], item[0])
+            )
+            if count > 3
+        ]
+        # Do not let an irreducible frozen-allocation token mask another
+        # overloaded token that still has a removable bundle anchor.
+        worst = next(
+            (
+                token
+                for token in overloaded
+                if any(
+                    isinstance(cat, dict)
+                    and isinstance(cat.get("terms"), list)
+                    and len(cat["terms"]) > 3
+                    and any(
+                        token
+                        in _competency_term_content_words(
+                            term_phrase(raw_t)
+                            if isinstance(raw_t, dict)
+                            else str(raw_t or "")
+                        )
+                        and not (
+                            isinstance(raw_t, dict)
+                            and str(
+                                raw_t.get("allocation_claim_unit_id") or ""
+                            ).strip()
+                        )
+                        for raw_t in cat["terms"]
+                    )
+                    for cat in comps
+                )
+            ),
+            overloaded[0],
+        )
         removed = False
         for cat in comps:
             if not isinstance(cat, dict):
@@ -1374,6 +1410,52 @@ def normalize_parsed_output(parsed: dict[str, Any] | None, runtime_payload: dict
     if not parsed:
         return parsed
     out = dict(parsed)
+    # Normalize the one bounded provider alias observed in live output before
+    # self-consistency selection. Without this, valid categories serialized as
+    # {"category": "..."} become anonymous pool entries and cannot be joined
+    # back to the selected path deterministically.
+    packet = (
+        (runtime_payload.get("proof_pool_metadata") or {}).get(
+            "competency_capability_section_packet"
+        )
+        or runtime_payload.get("competency_capability_section_packet")
+        or {}
+    )
+    allowed_bundle_ids = {
+        str(row.get("competency_bundle_id") or "").strip()
+        for row in packet.get("competency_bundles") or []
+        if isinstance(row, dict) and str(row.get("competency_bundle_id") or "").strip()
+    }
+    for surface_name in ("categories", "competencies"):
+        surface = out.get(surface_name)
+        if not isinstance(surface, list):
+            continue
+        normalized_surface: list[Any] = []
+        for raw_category in surface:
+            if not isinstance(raw_category, dict):
+                normalized_surface.append(raw_category)
+                continue
+            category = dict(raw_category)
+            if not str(category.get("category_label") or "").strip():
+                alias = str(
+                    category.get("display_label")
+                    or category.get("resume_display_label")
+                    or category.get("category")
+                    or ""
+                ).strip()
+                if alias:
+                    category["category_label"] = alias
+                    category.pop("category", None)
+                    category.pop("display_label", None)
+            # One observed provider schema variant puts the exact governed
+            # bundle ID in category_id.  Accept only IDs present in this run's
+            # capability packet; arbitrary model-authored IDs remain blocked.
+            if not str(category.get("competency_bundle_id") or "").strip():
+                category_id = str(category.get("category_id") or "").strip()
+                if category_id in allowed_bundle_ids:
+                    category["competency_bundle_id"] = category_id
+            normalized_surface.append(category)
+        out[surface_name] = normalized_surface
     if not isinstance(out.get("competencies"), list):
         out["competencies"] = []
     if not isinstance(out.get("selected_fact_plan"), dict):
@@ -1705,6 +1787,3 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exit 0 for inspection despite X3≠ALLOW — does not bypass mock-judge blocks.",
     )
     return parser
-
-
-

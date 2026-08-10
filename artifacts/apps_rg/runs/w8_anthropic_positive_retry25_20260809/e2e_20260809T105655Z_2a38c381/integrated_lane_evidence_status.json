@@ -1,0 +1,40 @@
+{
+  "schema_version": "integrated_lane_evidence_status_v1",
+  "generated_at_utc": "2026-08-09T11:06:25.102694+00:00",
+  "integrated_run_id": "e2e_20260809T105655Z_2a38c381",
+  "correlation_id": "6c59150c252241d7",
+  "lanes_finalized": [
+    "competencies",
+    "unify_bullets",
+    "ibm_bullets",
+    "insurtech_bullets",
+    "ey_bullets",
+    "ibm_narrative",
+    "insurtech_narrative",
+    "ey_narrative",
+    "executive_summary",
+    "headline"
+  ],
+  "lane_bundle_ref_count": 11,
+  "executed_lane_count": 10,
+  "not_run_lane_count": 1,
+  "missing_lanes": [
+    {
+      "lane_id": "unify_narrative",
+      "reason": "upstream_not_finalized",
+      "expected_run_dir_pattern": "artifacts/apps_rg/runs/w8_anthropic_positive_retry25_20260809/e2e_20260809T105655Z_2a38c381/modular_r4/sections/unify_narrative/real/<run_id>/"
+    }
+  ],
+  "shadow_artifacts_rejected": [
+    "executive_summary_demo",
+    "generated_lane_rollup.json",
+    "orchestrate_full_resume",
+    "resume_package_x3"
+  ],
+  "explicit_non_claims": [
+    "parent integrated evidence does not consume orchestrate_full_resume rollup",
+    "parent integrated evidence does not consume resume_package_x3",
+    "parent integrated evidence does not consume executive_summary_demo",
+    "product certification not upgraded by packaging alone"
+  ]
+}

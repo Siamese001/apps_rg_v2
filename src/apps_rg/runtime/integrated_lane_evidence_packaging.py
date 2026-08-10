@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
+from apps_rg.runtime.failure_evidence import atomic_write_json
 from apps_rg.runtime.run_bundle_index import RUN_BUNDLE_INDEX_FILENAME, repo_relative_posix
 from apps_rg.runtime.run_correlation_links import RUN_LINKS_FILENAME
 from apps_rg.runtime.section_evidence_package import (
@@ -120,13 +121,21 @@ def emit_integrated_lane_pre_run_failure(
     blocker: str,
     dispatch_result: Mapping[str, Any] | None = None,
     lane_exec_status: str = "",
+    downstream_consequences: list[Mapping[str, Any]] | None = None,
 ) -> Path:
     """Write explicit PRE_RUN_BLOCKED receipt when Phase1 cannot resolve a lane run dir."""
     lane_root = Path(sections_root) / lane_id
     lane_root.mkdir(parents=True, exist_ok=True)
     out_path = lane_root / INTEGRATED_LANE_PRE_RUN_FAILURE_ARTIFACT
+    dispatch_doc = dict(dispatch_result) if isinstance(dispatch_result, Mapping) else {}
+    primary_failure = (
+        dict(dispatch_doc)
+        if str(dispatch_doc.get("fault") or "").strip()
+        or str(dispatch_doc.get("exception_class") or "").strip()
+        else {}
+    )
     doc: dict[str, Any] = {
-        "schema_version": "integrated_lane_pre_run_failure_v1",
+        "schema_version": "integrated_lane_pre_run_failure_v2",
         "generated_at_utc": _utc_now(),
         "lane_id": lane_id,
         "status": "PRE_RUN_BLOCKED",
@@ -134,13 +143,17 @@ def emit_integrated_lane_pre_run_failure(
         "lane_exec_status": str(lane_exec_status or ""),
         "integrated_run_id": integrated_dir.name,
         "sections_root_rel": repo_relative_posix(repo_root, Path(sections_root).resolve()),
-        "dispatch_result": dict(dispatch_result) if isinstance(dispatch_result, Mapping) else {},
+        "dispatch_result": dispatch_doc,
+        "primary_failure": primary_failure,
+        "downstream_consequences": [
+            dict(row) for row in (downstream_consequences or []) if isinstance(row, Mapping)
+        ],
         "expected_run_dir_pattern": (
             f"{repo_relative_posix(repo_root, integrated_dir)}/modular_r4/sections/"
             f"{lane_id}/real/<run_id>/"
         ),
     }
-    out_path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    atomic_write_json(out_path, doc)
     return out_path
 
 

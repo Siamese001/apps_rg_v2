@@ -1,0 +1,77 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 4.2,
+    "threshold": 4.0,
+    "pass": true,
+    "decisive_failure": false,
+    "findings": [
+      "Strong governed-platform and commercialization evidence, including the $22M outcome.",
+      "S1 and S6 signal partner architecture, but concrete partner and team leadership remains light.",
+      "S2 and S3 are technically dense, reducing executive readability.",
+      "One packet-parity gate is false because display-override text is missing from the judge packet."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      3,
+      6
+    ],
+    "remediation_suggestions": [
+      "Clarify the partner-leadership signal using only authorized evidence.",
+      "Reduce technical density in S2 and S3 without removing supported substance.",
+      "Restore display-override visibility in the judge packet."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "PARTNER_LEADERSHIP_LIGHT"
+        ]
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "TECHNICAL_DENSITY"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DISPLAY_OVERRIDE_PACKET_PARITY_GATE_FALSE"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\executive_summary\\real\\p_882079\\x1d_openai_provider_response_raw_20260809_121623_061.json",
+  "original_model": null,
+  "fallback_model": null
+}

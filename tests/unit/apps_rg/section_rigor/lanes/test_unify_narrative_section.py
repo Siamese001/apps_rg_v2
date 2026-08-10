@@ -141,6 +141,84 @@ def test_unify_narrative_normalization_trims_metric_recap_before_x2() -> None:
     assert by_id["x2_no_companion_ngram_copy"].pass_ is True
 
 
+def test_unify_narrative_normalization_binds_single_ledger_row_to_visible_sentence() -> None:
+    narrative = (
+        "Owned Unify Consulting's governed platform mandate, connecting partner enablement "
+        "to repeatable enterprise adoption."
+    )
+    parsed = {
+        "narrative_sentence": narrative,
+        "claim_ledger": [
+            {
+                "claim_text": "Owned a scalable commercial platform operating model.",
+                "source_fact_ids": ["bul_unify_001"],
+            }
+        ],
+        "selected_fact_plan": {"facts": []},
+    }
+    normalized = normalize_unify_narrative_parsed(
+        parsed,
+        {
+            "selected_fact_plan": {"facts": []},
+            "allowed_fact_ids": ["bul_unify_001"],
+            "briefing": "",
+            "jd_text": "",
+        },
+    )
+
+    assert normalized is not None
+    assert normalized["claim_ledger"][0]["claim_text"] == narrative
+    assert normalized["claim_ledger"][0]["source_fact_ids"] == ["bul_unify_001"]
+    assert any(
+        row.get("operation") == "synchronize_single_sentence_claim_ledger_text"
+        for row in normalized["change_log"]
+    )
+
+
+def test_unify_narrative_normalization_collapses_multiple_rows_to_visible_sentence() -> None:
+    narrative = (
+        "Owned Unify Consulting's governed platform mandate, connecting partner enablement "
+        "to repeatable enterprise adoption."
+    )
+    parsed = {
+        "narrative_sentence": narrative,
+        "claim_ledger": [
+            {
+                "claim_text": "Owned a governed platform mandate.",
+                "source_fact_ids": ["bul_unify_001", "fact_unify_001"],
+            },
+            {
+                "claim_text": "Connected partner enablement to adoption.",
+                "source_fact_ids": ["fact_unify_001", "bul_unify_002"],
+            },
+        ],
+        "selected_fact_plan": {"facts": []},
+    }
+
+    normalized = normalize_unify_narrative_parsed(
+        parsed,
+        {
+            "selected_fact_plan": {"facts": []},
+            "allowed_fact_ids": ["bul_unify_001", "fact_unify_001", "bul_unify_002"],
+            "briefing": "",
+            "jd_text": "",
+        },
+    )
+
+    assert normalized is not None
+    assert normalized["claim_ledger"] == [
+        {
+            "claim_text": narrative,
+            "source_fact_ids": ["bul_unify_001", "fact_unify_001", "bul_unify_002"],
+        }
+    ]
+    assert any(
+        row.get("operation") == "collapse_single_sentence_claim_ledger_to_visible_claim"
+        and row.get("source_row_count") == 2
+        for row in normalized["change_log"]
+    )
+
+
 def test_unify_narrative_normalization_trims_exact_companion_overlap_phrase() -> None:
     narrative = (
         "Stewarded Unify Consulting's shift from bespoke agentic AI engagements into a productized platform "
@@ -218,6 +296,64 @@ def test_unify_narrative_normalization_trims_live_reusable_capability_fourgram()
     assert normalized is not None
     assert "into reusable enterprise capability" not in normalized["narrative_sentence"].lower()
     assert "into reusable platform services" in normalized["narrative_sentence"].lower()
+
+
+def test_retry32_unify_narrative_removes_repeatable_operating_model_copy_and_syncs_ledger() -> None:
+    narrative = (
+        "Owned Unify Consulting's mandate to transform governed agentic AI architecture into an "
+        "industrialized commercial engine, aligning platform direction, reusable IP, and disciplined "
+        "enterprise deployment so regulated clients could adopt scalable capabilities through a "
+        "repeatable operating model."
+    )
+    companion = (
+        "- bul_unify_006: Commercialized reusable IP through a repeatable operating model for "
+        "regulated enterprise adoption."
+    )
+    source_ids = [
+        "reb_unify_agentic_platform_architecture",
+        "reb_unify_platform_commercialization_leadership",
+        "reb_unify_enterprise_adoption_revenue",
+        "reb_unify_production_adoption_lifecycle",
+        "reb_unify_runtime_reliability_governance",
+    ]
+    parsed = {
+        "narrative_sentence": narrative,
+        "claim_ledger": [{"claim_text": narrative, "source_fact_ids": source_ids}],
+        "selected_fact_plan": {"facts": [{"fact_id": fid} for fid in source_ids]},
+        "change_log": [],
+    }
+    runtime_payload = {
+        "selected_fact_plan": parsed["selected_fact_plan"],
+        "allowed_fact_ids": source_ids,
+        "jd_text": "regulated platform commercialization",
+    }
+
+    normalized = normalize_unify_narrative_parsed(
+        parsed, runtime_payload, companion_text=companion
+    )
+
+    assert normalized is not None
+    repaired = normalized["narrative_sentence"]
+    assert "a repeatable operating model" not in repaired.lower()
+    assert "consistent operating discipline" in repaired.lower()
+    assert normalized["claim_ledger"][0]["claim_text"] == repaired
+    gates = run_unify_narrative_x2_gates(
+        narrative_sentence=repaired,
+        parsed_output=normalized,
+        claim_ledger=normalized["claim_ledger"],
+        jd_text=runtime_payload["jd_text"],
+        runtime_generation_status="REAL_LLM",
+        companion_bullet_texts=companion,
+        companion_bullets_status="ACCEPTED_FINALIZED",
+        companion_bullets_reason="ok",
+        provider_requested="external_claude",
+        provider_attempted="external_claude",
+        raw_output=json.dumps(normalized, ensure_ascii=False),
+        x1d_judges=[],
+        allowed_fact_ids=set(source_ids),
+    )
+    by_id = {gate.gate_id: gate for gate in gates}
+    assert by_id["x2_no_companion_ngram_copy"].pass_ is True
 
 
 def test_unify_narrative_normalization_collapses_live_comma_stack_before_x2() -> None:

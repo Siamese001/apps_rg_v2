@@ -1,0 +1,236 @@
+{
+  "attempt_count": 1,
+  "attempt_receipt_id": "attempt-6d723e7f375d4e2486ca771a2d1af31e",
+  "authority_scope": "apps_rg_l2_envelope_adapter_receipts",
+  "canonical_l2_artifact_authority": false,
+  "decisive_reason_code": "E3_SECTION_OUTPUT_OBSERVED",
+  "determinism": {
+    "attempt_seed": "4d731c2c5db4de22d553c5467b3042e79c02d8473978ca95feb94db7d748b4b4",
+    "blueprint_hash": "ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+    "input_hash": "8e9f1e7276c25a300be94fd83f3624d608b44aa4a7cf387f300a4cdc2d2e887c",
+    "policy_hash": "bafee91ee86960cfdc581d692c349be017596d991829e2ec269383f6165b31ed",
+    "prompt_hash": "90579e114571e94f6490ebae385e92334e04fa1597297aafb6984dec379d19ca",
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:eef1bf82cda1d462::v1"
+  },
+  "error_summary": null,
+  "execution_lane": "MODEL",
+  "generated_artifacts": [
+    "provider_request.json",
+    "provider_response.json",
+    "l2_output.json"
+  ],
+  "latency_ms": 0.0,
+  "lineage": {
+    "ancestry_chain": [
+      "R3R4_MANAGED_WORKFLOW",
+      "wfm::apps_rg::resume_generation::v1"
+    ],
+    "parent_plan_id": "wfm::apps_rg::resume_generation::v1",
+    "parent_route_id": "R3R4_MANAGED_WORKFLOW",
+    "parent_step_id": "headline",
+    "same_run_packet_family": "8de053f9-e693-4f62-be7d-aa013950b8a2"
+  },
+  "local_check_results": {
+    "artifact_bytes_match": true,
+    "grounded_output": true,
+    "l2_output_file_digest": "2f3d8c30b14289afa02ecaa3ef671cacc4e0e34fcb695e7afef009c27bc6ff6c",
+    "l2_output_ref": "l2_output.json",
+    "model_or_tool_name": "claude-sonnet-5",
+    "provider_lane": "anthropic",
+    "provider_request_digest": "ccb1ba589ec2803cb37b944c8e1c2708871ce36a432f9bdb5bd1b93dc6ef0c5f",
+    "provider_request_ref": "provider_request.json",
+    "provider_response_digest": "4a7dba6d8038486de2e98369228d9009b224ccaada155c5137e2ec8d6d75aae0",
+    "provider_response_ref": "provider_response.json",
+    "replay_key_matches": true,
+    "token_usage_observed": true,
+    "tokens_used": 1488
+  },
+  "output_digest": "276fd441ac87e608446ed31c269c16fae1fe506ef4a1765c4c6f3ac963dd9131",
+  "proposed_state_diff": {
+    "payload": {
+      "graph_claim_binding_contract_digest": "c6fe103a761b648a16a7f0b3d531d83ff6cf0fa5146f181d323029787e71ab27",
+      "graph_claim_bindings": [
+        {
+          "allocation_claim_unit_ids": [
+            "headline:skill:01",
+            "headline:skill:02"
+          ],
+          "allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_003",
+            "fact_engineering_platform_003"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "reb_ibm_revenue_sales_target_execution",
+            "reb_unify_runtime_reliability_governance",
+            "skill_context_engineering",
+            "skill_partner_pnl_oversight"
+          ],
+          "claim_unit_id": "headline_claim_1_fba2d1ab",
+          "edge_ids": [
+            "edge:5644557d40383b876d6003cb",
+            "edge:9c9a15b3cc03ef51d0403a49",
+            "edge:adf1b2dc8fe6e83e1d96fa47",
+            "edge:4a9a9888f465c1b1d980aa83"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_003",
+            "fact_engineering_platform_003"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_003",
+            "root:reb_unify_runtime_reliability_governance",
+            "root:reb_unify_runtime_reliability_governance/skill:skill_context_engineering",
+            "root:reb_unify_runtime_reliability_governance/fact:fact_engineering_platform_003"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.1,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "headline",
+          "selection_margin": -0.2,
+          "skill_ids": [
+            "skill_partner_pnl_oversight",
+            "skill_context_engineering"
+          ],
+          "source_independence_score": 0.5,
+          "target_alignment_score": 1.475,
+          "visible_claim_hash": "9cabdd737f85b6f96a0e5ae4f32f5a8d25f106caf0a6781fee90dd327ed59495",
+          "visible_claim_text": "Enterprise Portfolio Leadership"
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "headline:skill:01",
+            "headline:skill:02"
+          ],
+          "allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_003",
+            "fact_engineering_platform_003"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "reb_ibm_revenue_sales_target_execution",
+            "reb_unify_runtime_reliability_governance",
+            "skill_context_engineering",
+            "skill_partner_pnl_oversight"
+          ],
+          "claim_unit_id": "headline_claim_2_5837fac5",
+          "edge_ids": [
+            "edge:5644557d40383b876d6003cb",
+            "edge:9c9a15b3cc03ef51d0403a49",
+            "edge:adf1b2dc8fe6e83e1d96fa47",
+            "edge:4a9a9888f465c1b1d980aa83"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_003",
+            "fact_engineering_platform_003"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_003",
+            "root:reb_unify_runtime_reliability_governance",
+            "root:reb_unify_runtime_reliability_governance/skill:skill_context_engineering",
+            "root:reb_unify_runtime_reliability_governance/fact:fact_engineering_platform_003"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.1,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "headline",
+          "selection_margin": -0.2,
+          "skill_ids": [
+            "skill_partner_pnl_oversight",
+            "skill_context_engineering"
+          ],
+          "source_independence_score": 0.5,
+          "target_alignment_score": 1.475,
+          "visible_claim_hash": "4c436a9fac6ad4236d373e7df11399034d3a95105f5a871c497551b7c6422907",
+          "visible_claim_text": "Runtime Governance Controls"
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "headline:skill:01",
+            "headline:skill:02"
+          ],
+          "allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_003",
+            "fact_engineering_platform_003"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "reb_ibm_revenue_sales_target_execution",
+            "reb_unify_runtime_reliability_governance",
+            "skill_context_engineering",
+            "skill_partner_pnl_oversight"
+          ],
+          "claim_unit_id": "headline_claim_3_99223329",
+          "edge_ids": [
+            "edge:5644557d40383b876d6003cb",
+            "edge:9c9a15b3cc03ef51d0403a49",
+            "edge:adf1b2dc8fe6e83e1d96fa47",
+            "edge:4a9a9888f465c1b1d980aa83"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_003",
+            "fact_engineering_platform_003"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_003",
+            "root:reb_unify_runtime_reliability_governance",
+            "root:reb_unify_runtime_reliability_governance/skill:skill_context_engineering",
+            "root:reb_unify_runtime_reliability_governance/fact:fact_engineering_platform_003"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.1,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "headline",
+          "selection_margin": -0.2,
+          "skill_ids": [
+            "skill_partner_pnl_oversight",
+            "skill_context_engineering"
+          ],
+          "source_independence_score": 0.5,
+          "target_alignment_score": 1.475,
+          "visible_claim_hash": "f3d748b43ee62d48bd9347d7f4ba4089f2d287ae7611e00ff8f525a123a5f110",
+          "visible_claim_text": "Context Engineering Evaluation"
+        }
+      ],
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "resume_graph_allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2"
+    },
+    "section_id": "headline",
+    "section_output_ref": "l2_output.json"
+  },
+  "quarantined_payload": null,
+  "result_class": "SUCCESS",
+  "return_code": 0,
+  "sealed_at": 650336.203,
+  "span_id": "section-l2-headline",
+  "tokens_used": 1488,
+  "trace_id": "eab3922a-184c-4d98-84c8-b387835b24cc",
+  "validation_packet_id": "section-val-8e9f1e7276c25a30"
+}

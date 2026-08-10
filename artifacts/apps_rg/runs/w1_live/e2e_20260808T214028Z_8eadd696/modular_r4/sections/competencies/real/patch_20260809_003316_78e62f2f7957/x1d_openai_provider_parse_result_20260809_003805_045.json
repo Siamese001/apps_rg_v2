@@ -1,0 +1,97 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.7,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Alliance GTM repeats six near-synonymous co-sell and channel phrases.",
+      "Agentic platform and LLMOps terms substantially echo Unify bullet language.",
+      "Partner architecture and alliance GTM reuse the same capability family.",
+      "Several alliance phrases lack distinctive agentic mechanisms or operating context."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      5,
+      6
+    ],
+    "remediation_suggestions": [
+      "Consolidate alliance GTM into fewer differentiated commercial mechanisms.",
+      "Use adjacent graph-backed capabilities instead of repeated bullet phrases.",
+      "Separate partner architecture from alliance commercialization.",
+      "Add agentic mechanisms and executive operating context to generic terms."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "REPETITIVE_PARTNER_CLUSTER"
+        ]
+      },
+      "seniority_executive_relevance": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "complementarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "PROOF_SURFACE_REUSE",
+          "GENERATED_SECTION_OVERLAP"
+        ]
+      },
+      "no_bullet_restatement": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "SHORT_PHRASE_ECHOES"
+        ]
+      },
+      "anti_overfit": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "BUNDLE_FAMILY_DUPLICATION",
+          "GENERIC_ALLIANCE_PHRASING"
+        ]
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DUPLICATE_CAPABILITY_FAMILY"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "GENERIC_EXECUTIVE_TERMS",
+          "TABLE_STAKES_COSELL"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_003316_78e62f2f7957\\x1d_openai_provider_response_raw_20260809_003805_042.json",
+  "original_model": null,
+  "fallback_model": null
+}

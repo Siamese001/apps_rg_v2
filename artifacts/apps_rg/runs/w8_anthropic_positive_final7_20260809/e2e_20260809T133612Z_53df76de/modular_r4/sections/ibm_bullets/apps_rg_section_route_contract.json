@@ -1,0 +1,176 @@
+{
+  "contract_type": "RouteContract",
+  "contract_version": "apps_rg_spine_front_contracts_v1",
+  "producer_stage": "L0",
+  "consumer_stage": "section_lane_modular",
+  "request_id": "req-f641e070479745978654dcb75a6f8594",
+  "run_id": "062ef2e4-aa36-4d78-a1db-fbcd6a33ebd6",
+  "l1_plan_contract_ref": "l1_plan_contract.json",
+  "parent_contract_ref": "req-f641e070479745978654dcb75a6f8594",
+  "route_id": "R3R4_MANAGED_WORKFLOW",
+  "grounding_required": true,
+  "apps_research_call_required": false,
+  "execution_form": "MANAGED_WORKFLOW",
+  "payload": {
+    "request_id": "req-f641e070479745978654dcb75a6f8594",
+    "run_id": "062ef2e4-aa36-4d78-a1db-fbcd6a33ebd6",
+    "app_id": "apps_rg",
+    "trace_id": "d1869180-caaf-4032-af3c-a980b5460ee7",
+    "route_id": "R3R4_MANAGED_WORKFLOW",
+    "l3_required": true,
+    "grounding_required": true,
+    "model_generation_required": true,
+    "write_authority_present": false,
+    "tenant_id": "default",
+    "sandbox_required": false,
+    "egress_policy_ref": "",
+    "allowed_tools": [],
+    "allowed_models": [],
+    "allowed_networks": [],
+    "allowed_file_roots": [],
+    "route_family": "R3R4_MANAGED_WORKFLOW",
+    "execution_form": "MANAGED_WORKFLOW",
+    "cache_eligibility": {
+      "r1a_exact": false,
+      "r1b_semantic": false,
+      "r3_grounded": true,
+      "r4_action": false
+    },
+    "action_required": false,
+    "workflow_ref": "wfm::apps_rg::resume_generation::v1",
+    "workflow_manifest_ref": "wfm::apps_rg::resume_generation::v1",
+    "workflow_registry_ref": "apps_rg/config/route_registry.yaml",
+    "registry_resolution_receipt_ref": "",
+    "route_gate_refs": [
+      "G07_GROUNDING_READINESS:PASS:1.000",
+      "G08_PERSONALIZATION:PASS:1.000",
+      "G10_BUDGET:NOT_APPLICABLE:0.000",
+      "G20_ROUTE_BUDGET:NOT_APPLICABLE:0.000",
+      "G_L1_PLAN_READY:PASS:1.000"
+    ],
+    "route_gate_receipts": [
+      {
+        "gate_id": "G07_GROUNDING_READINESS",
+        "verdict": "PASS",
+        "score": 1.0,
+        "facts_present": true,
+        "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+        "reason": "jd_hash+resume_hash required for grounding PASS"
+      },
+      {
+        "gate_id": "G08_PERSONALIZATION",
+        "verdict": "PASS",
+        "score": 1.0,
+        "facts_present": true,
+        "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+        "reason": "support_expectation must be present for personalization policy"
+      },
+      {
+        "gate_id": "G10_BUDGET",
+        "verdict": "NOT_APPLICABLE",
+        "score": 0.0,
+        "facts_present": false,
+        "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+        "reason": "budget enforcement disabled in route profile"
+      },
+      {
+        "gate_id": "G20_ROUTE_BUDGET",
+        "verdict": "NOT_APPLICABLE",
+        "score": 0.0,
+        "facts_present": false,
+        "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+        "reason": "budget profile not enforced"
+      },
+      {
+        "gate_id": "G_L1_PLAN_READY",
+        "verdict": "PASS",
+        "score": 1.0,
+        "facts_present": true,
+        "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+        "reason": "verified L1 capsule is READY and bound to planning profile bytes"
+      }
+    ],
+    "allowed_next_stage": [
+      "L3"
+    ],
+    "provider_model_requirement_ref": "apps_rg::provider_model::resume_generation::v1",
+    "personalization_required": true,
+    "work_shape": "full_resume_generation",
+    "task_shape": "strategic_tailor",
+    "route_profile_ref": "arpf::apps_rg::resume_generation::full_resume_managed::v1",
+    "route_policy_ref": "apps_rg/config/domain_contract/route_profiles.yaml#arpf::apps_rg::resume_generation::full_resume_managed::v1",
+    "route_digest": "4536bfac6c2da43c8448e9170e4936948df9707c4bfaf6c5c7261e618393bc1d",
+    "hmac_sig": "e0331448d373d8727ea37d8bc34dab1de022db69cc7972fbb7adcee4f55c1745",
+    "cache_lookup_r1a_receipt": "",
+    "cache_lookup_r1b_receipt": "",
+    "cache_lookup_r5_receipt": "",
+    "r1a_lookup_receipt_ref": "",
+    "r1b_lookup_receipt_ref": "",
+    "r5_fallback_receipt_ref": "",
+    "reason_codes": [
+      "execution_form=MANAGED_WORKFLOW",
+      "canonical_route_id=R3R4_MANAGED_WORKFLOW",
+      "app_route_id=R4_MANAGED_DRAFT",
+      "route_gate_status=PASS",
+      "hitl_posture=low",
+      "route_signing_posture=signed",
+      "l1_plan_ready=PASS",
+      "l1_capsule_digest:sha256:25c535248a2b12373",
+      "l1_profile_digest:b19a1f53318e04904e2565ec",
+      "l1_route_features:6f9a3ae3abf18e92",
+      "l1_work_units:bd591127e4038dc9",
+      "l1_completion_criteria:554a72ba3dba4244",
+      "l1_evidence_plan_ref:db0fa6e66347bfc9",
+      "l1_planning_status:READY",
+      "l1_work_shape:full_resume_generation",
+      "l1_task_shape:strategic_tailor"
+    ],
+    "routing_timestamp": "2026-08-09T13:39:45.486067+00:00",
+    "schema_version": "W6.0",
+    "otel_span_refs": [
+      "span:l0:route_decision:d1869180-caaf-4032-af3c-a980b5460ee7:062ef2e4-aa36-4d78-a1db-fbcd6a33ebd6:f9829d166ad0f341"
+    ],
+    "audit_refs": [],
+    "signature": "e0331448d373d8727ea37d8bc34dab1de022db69cc7972fbb7adcee4f55c1745",
+    "posture": {
+      "read_only": true,
+      "external_call": false,
+      "write_intent": false,
+      "hitl_required": false,
+      "posture_class": "read_only"
+    },
+    "gate_verdict_refs": [],
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:686987e96381c87e::v1",
+    "snapshot_refs": [
+      "policy_hash:bafee91ee86960cfdc581d692c349be017596d991829e2ec269383f6165b31ed",
+      "blueprint_hash:ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+      "registry_digest_set:route_profiles=ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5|route_registry=dba312af3265412ec89f90df91b3f6a7d1351d5ec713d2b0c3d26c68d089c7dd",
+      "l1_capsule_digest:sha256:25c535248a2b12373a97334aa4210d7999e5cc33c5e47cca85f21f48c3fa837a",
+      "l1_planning_profile_digest:b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+      "l1_plan_binding_digest:b45825fe008fcaadd8aa1657f82d507c42987cf0e70e22d47b2fa9a7629ad4cb"
+    ],
+    "l5_certification_ref": "l5:apps_rg:u0:36a0f3e157b88cc51a8428bb",
+    "graph_traverse_policy": {
+      "graph_expansion_allowed": true,
+      "max_hops": 1,
+      "max_nodes": 32,
+      "max_edges": 64,
+      "allowed_relation_types": [
+        "DERIVED_FROM",
+        "IMPLEMENTS",
+        "CONTRADICTS",
+        "SOURCE_VERSION",
+        "EVIDENCE",
+        "SUPPORTS",
+        "REQUIRES",
+        "RELATED_TO"
+      ],
+      "contradiction_scan_enabled": true,
+      "supersession_scan_enabled": false,
+      "graph_adapter_ref": "apps_rg.integrations.c0_graph_adapter",
+      "live_wiring_deferred": false,
+      "wiring_gate": "LIVE"
+    },
+    "apps_research_call_required": false
+  }
+}

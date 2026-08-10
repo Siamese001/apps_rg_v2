@@ -1,0 +1,27 @@
+ERROR: refusing to re-dispatch authorized lane(s) unify_bullets — green lanes stay banked. Name them in --force-lanes to override.
+Traceback (most recent call last):
+  File "C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\src\apps_rg\runtime\orchestration\patch_run.py", line 1643, in run_patch_from_cli
+    plan = build_patch_plan(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\src\apps_rg\runtime\orchestration\patch_run.py", line 933, in build_patch_plan
+    target_lanes = select_patch_lanes(
+                   ^^^^^^^^^^^^^^^^^^^
+  File "C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\src\apps_rg\runtime\orchestration\patch_run.py", line 887, in select_patch_lanes
+    raise PatchRunInputError(
+apps_rg.runtime.orchestration.patch_run.PatchRunInputError: refusing to re-dispatch authorized lane(s) unify_bullets — green lanes stay banked. Name them in --force-lanes to override.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\src\apps_rg\__main__.py", line 1843, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\src\apps_rg\__main__.py", line 1023, in main
+    return run_patch_from_cli(args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\src\apps_rg\runtime\orchestration\patch_run.py", line 1650, in run_patch_from_cli
+    return PatchRunInputError.exit_code
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'PatchRunInputError' has no attribute 'exit_code'

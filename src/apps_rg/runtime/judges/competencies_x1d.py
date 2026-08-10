@@ -14,6 +14,7 @@ from apps_rg.runtime.judges.executive_summary_x1d import (
     JudgeOutput,
     _call_gemini,
     _call_openai,
+    build_judge_response_schema,
     _invoke_judge_with_bounded_retries,
     _make_blocked_output,
     _resolve_gemini_model,
@@ -34,6 +35,10 @@ COMPETENCIES_RUBRIC_DIMENSION_IDS: tuple[str, ...] = (
     "svp_agentic_specificity",
     "partner_architecture_specificity",
     "root_chronology_discipline",
+)
+
+COMPETENCIES_JUDGE_RESPONSE_SCHEMA = build_judge_response_schema(
+    COMPETENCIES_RUBRIC_DIMENSION_IDS
 )
 
 COMPETENCIES_JUDGE_OUTPUT_CONTRACT = (
@@ -285,6 +290,7 @@ def run_competencies_judges(
                         model_env_source=model_source,
                         attempt=attempt_no,
                         section_id="competencies",
+                        response_schema=COMPETENCIES_JUDGE_RESPONSE_SCHEMA,
                     )
                 return _call_gemini(
                     api_key,
@@ -298,6 +304,7 @@ def run_competencies_judges(
                     thinking_level=reasoning_effort,
                     attempt=attempt_no,
                     section_id="competencies",
+                    response_schema=COMPETENCIES_JUDGE_RESPONSE_SCHEMA,
                 )
 
             output = _invoke_judge_with_bounded_retries(

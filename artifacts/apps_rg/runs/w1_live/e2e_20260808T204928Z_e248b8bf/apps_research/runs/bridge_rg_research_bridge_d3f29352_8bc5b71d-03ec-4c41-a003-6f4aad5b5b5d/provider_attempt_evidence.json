@@ -1,0 +1,92 @@
+{
+  "attempts": [
+    {
+      "application_output_valid": true,
+      "attempt_id": "attempt-2191c7e3ff07441dbcc482306fa3aa9a",
+      "gateway_id": "apps_research.provider_gateway_v1",
+      "ledger_event_digest": "d6c8af99647cb318f4190d81dba94a5187dd4edc988a0867f66f5fed367c6d9e",
+      "lifecycle": {
+        "first_byte_received": false,
+        "local_dispatch_started": true,
+        "remote_outcome": "PROVIDER_RESPONDED",
+        "request_bytes_sent": false,
+        "response_headers_received": false,
+        "sdk_response_returned": true
+      },
+      "logical_attempt_id": "d49159a5-3df5-4250-9da0-4513a242ebe3:logical:1",
+      "model_pin_valid": true,
+      "observed_model": "gpt-5.6-terra",
+      "overall_success": true,
+      "provider": "external_openai",
+      "provider_response_id": "chatcmpl-EAiH5NnZQdqlEIHwBg8UM5N0EpQrA",
+      "reasoning_effort": "medium",
+      "request_digest": "f26b70915eb2d378eb27f9df82b18267662f1ad830ddd006699666137ab3f8bc",
+      "requested_model": "gpt-5.6-terra",
+      "response_schema_valid": true,
+      "role": "company_brief_generation",
+      "run_id": "d49159a5-3df5-4250-9da0-4513a242ebe3",
+      "schema_version": "apps_research.provider_attempt_validation.v1",
+      "terminal_status": "SUCCESS",
+      "trace_id": "8bc5b71d-03ec-4c41-a003-6f4aad5b5b5d",
+      "transport_attempt_id": "d49159a5-3df5-4250-9da0-4513a242ebe3:logical:1:transport:1",
+      "transport_response_received": true,
+      "usage": {
+        "cache_write_tokens": null,
+        "cached_tokens": 0,
+        "output_tokens": 1470,
+        "prompt_tokens": 4852,
+        "thought_tokens": 348,
+        "total_tokens": 6322
+      },
+      "validation_reason": "ALL_VALIDATIONS_PASSED"
+    },
+    {
+      "application_output_valid": true,
+      "attempt_id": "attempt-dd72ebf7197d40178f5829601bfd0dd4",
+      "gateway_id": "apps_research.provider_gateway_v1",
+      "ledger_event_digest": "74a951da2db763d7fc29273cb49eb21b37aeaa1d7b1caf09aa48ea878d52ff6e",
+      "lifecycle": {
+        "first_byte_received": true,
+        "local_dispatch_started": true,
+        "remote_outcome": "PROVIDER_RESPONDED",
+        "request_bytes_sent": false,
+        "response_headers_received": true,
+        "sdk_response_returned": false
+      },
+      "logical_attempt_id": "d49159a5-3df5-4250-9da0-4513a242ebe3:logical:2",
+      "model_pin_valid": true,
+      "observed_model": "gemini-3.6-flash",
+      "overall_success": true,
+      "provider": "google_gemini",
+      "provider_response_id": "dpZ3ao3bLo7pqtsP7MnAaA",
+      "reasoning_effort": "high",
+      "request_digest": "222f51bf8304f50ae6064b6e6aa33ac5a6e87999a165e1a445b0aa1e66bfd3ae",
+      "requested_model": "gemini-3.6-flash",
+      "response_schema_valid": true,
+      "role": "apps_rg_handoff_judge",
+      "run_id": "d49159a5-3df5-4250-9da0-4513a242ebe3",
+      "schema_version": "apps_research.provider_attempt_validation.v1",
+      "terminal_status": "SUCCESS",
+      "trace_id": "8bc5b71d-03ec-4c41-a003-6f4aad5b5b5d",
+      "transport_attempt_id": "d49159a5-3df5-4250-9da0-4513a242ebe3:logical:2:transport:1",
+      "transport_response_received": true,
+      "usage": {
+        "cache_write_tokens": null,
+        "cached_tokens": null,
+        "output_tokens": 17,
+        "prompt_tokens": 6116,
+        "thought_tokens": 582,
+        "total_tokens": 6715
+      },
+      "validation_reason": "ALL_VALIDATIONS_PASSED"
+    }
+  ],
+  "gateway_id": "apps_research.provider_gateway_v1",
+  "required_roles": [
+    "company_brief_generation",
+    "apps_rg_handoff_judge"
+  ],
+  "schema_version": "apps_research.provider_attempt_evidence.v1",
+  "status": "PASS",
+  "trace_root": "8bc5b71d-03ec-4c41-a003-6f4aad5b5b5d"
+}

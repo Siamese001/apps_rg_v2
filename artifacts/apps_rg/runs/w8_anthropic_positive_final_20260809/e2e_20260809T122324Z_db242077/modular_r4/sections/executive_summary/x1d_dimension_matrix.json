@@ -1,0 +1,195 @@
+{
+  "schema": "executive_summary_x1d_dimension_matrix_v1",
+  "dimension_ids": [
+    "factual_support",
+    "executive_signal",
+    "resume_voice",
+    "ats_alignment_without_keyword_stuffing",
+    "anti_overfit",
+    "synthesis_quality",
+    "evidence_utilization",
+    "deterministic_alignment"
+  ],
+  "providers": [
+    {
+      "provider_key": "gemini_pro",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "score": 5.0,
+      "pass": true,
+      "provider_status": "MODEL_BACKED_PASS",
+      "dimension_verdicts_inferred": false,
+      "dimensions": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      }
+    },
+    {
+      "provider_key": "openai_chatgpt",
+      "provider_name": "OpenAI ChatGPT",
+      "score": 4.3,
+      "pass": true,
+      "provider_status": "MODEL_BACKED_PASS",
+      "dimension_verdicts_inferred": false,
+      "dimensions": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "minor",
+          "codes": [
+            "DENSE_TECHNICAL_ABSTRACTION"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      }
+    }
+  ],
+  "by_dimension": {
+    "factual_support": {
+      "judges": {
+        "gemini_pro": true,
+        "openai_chatgpt": true
+      },
+      "fail_count": 0,
+      "pass_count": 2,
+      "consensus_fail": false
+    },
+    "executive_signal": {
+      "judges": {
+        "gemini_pro": true,
+        "openai_chatgpt": true
+      },
+      "fail_count": 0,
+      "pass_count": 2,
+      "consensus_fail": false
+    },
+    "resume_voice": {
+      "judges": {
+        "gemini_pro": true,
+        "openai_chatgpt": true
+      },
+      "fail_count": 0,
+      "pass_count": 2,
+      "consensus_fail": false
+    },
+    "ats_alignment_without_keyword_stuffing": {
+      "judges": {
+        "gemini_pro": true,
+        "openai_chatgpt": true
+      },
+      "fail_count": 0,
+      "pass_count": 2,
+      "consensus_fail": false
+    },
+    "anti_overfit": {
+      "judges": {
+        "gemini_pro": true,
+        "openai_chatgpt": true
+      },
+      "fail_count": 0,
+      "pass_count": 2,
+      "consensus_fail": false
+    },
+    "synthesis_quality": {
+      "judges": {
+        "gemini_pro": true,
+        "openai_chatgpt": true
+      },
+      "fail_count": 0,
+      "pass_count": 2,
+      "consensus_fail": false
+    },
+    "evidence_utilization": {
+      "judges": {
+        "gemini_pro": true,
+        "openai_chatgpt": true
+      },
+      "fail_count": 0,
+      "pass_count": 2,
+      "consensus_fail": false
+    },
+    "deterministic_alignment": {
+      "judges": {
+        "gemini_pro": false,
+        "openai_chatgpt": false
+      },
+      "fail_count": 2,
+      "pass_count": 0,
+      "consensus_fail": true
+    }
+  }
+}

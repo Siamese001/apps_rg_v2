@@ -1,0 +1,53 @@
+{
+  "judge_packet_version": "apps_rg_grade_only_judge_packet_v2",
+  "section": "ibm_narrative",
+  "judge_task": "GRADE_ONLY",
+  "candidate_output": {
+    "narrative_sentence": "Championed AWS alliance architecture at IBM, establishing decision-support discipline that connected modernization programs with executive operating decisions through a repeatable, executive-oriented operating model for complex enterprise pursuits.",
+    "resume_display_text": "Championed AWS alliance architecture at IBM, establishing decision-support discipline that connected modernization programs with executive operating decisions through a repeatable, executive-oriented operating model for complex enterprise pursuits.",
+    "companion_bullets_context": "- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\n- bul_ibm_002: Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\n- bul_ibm_003: Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.\n- bul_ibm_004: Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, and buyer readiness, connecting technical validation to executive deal support.\n- bul_ibm_005: Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support."
+  },
+  "claim_ledger": [
+    {
+      "claim_text": "Championed AWS alliance architecture at IBM",
+      "source_fact_ids": [
+        "bul_ibm_001"
+      ]
+    },
+    {
+      "claim_text": "establishing decision-support discipline that connected modernization programs with executive operating decisions through a repeatable, executive-oriented operating model for complex enterprise pursuits",
+      "source_fact_ids": [
+        "bul_ibm_002"
+      ]
+    }
+  ],
+  "source_fact_ids": [],
+  "allowed_fact_packet": null,
+  "targeting_context": {
+    "target_title": "",
+    "target_company": "",
+    "jd_text": "",
+    "briefing": ""
+  },
+  "proof_boundary": {
+    "jd_is_targeting_context_only": true,
+    "briefing_is_targeting_context_only": true,
+    "claims_must_be_supported_by_allowed_fact_packet": true,
+    "judges_must_not_rewrite": true,
+    "metadata_only_graph_context_is_insufficient": true
+  },
+  "graph_binding_materiality_summary": {},
+  "deterministic_gate_summary": {
+    "x2_judge_snapshot_pending": {
+      "pass": true,
+      "detail": "Pre-X2 GRADE_ONLY for ibm_narrative: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys."
+    }
+  },
+  "section_specific_rubric": "You are evaluating one IBM employment narrative sentence: the executive thesis above five IBM bullets.\nReturn JSON only with: score_scale, score, threshold, pass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n\nRubric dimensions:\n1. factual_support: claims align with claim_ledger and bul_ibm_* source facts only.\n2. enterprise_platform_signal: IBM reads as supporting enterprise/platform credibility, not current agentic runtime ownership.\n3. complementarity_vs_bullets: states a role thesis the bullets prove; does not mechanically recap all five bullets.\n4. resume_voice: third person or implied subject; clean board-readable executive tone; no hype or comma-packed mechanism list.\n5. ats_alignment_without_stuffing: relevant without JD dumping.\n6. anti_overfit: no JD-as-proof, no briefing-as-proof, no cross-employer facts (Unify, InsurTech, EY).\n7. no_unify_inflation: no Unify-era agentic runtime vocabulary in the sentence.\n8. role_fit_targeting: JD/briefing shape emphasis only — never proof.\n9. why_role_mattered: sentence explains IBM foundation mandate (cloud, data, lineage, observability, regulated context) — companion bullets carry KPI proof.\n10. no_meta_disclaimer: display text must not contain \"without claiming/asserting\" or similar editorial boundary language.\n11. executive_brevity: exactly one sentence; product shape max 58 words and 360 characters; JD/briefing targeting only (never proof).\n\nDecisive failure triggers:\n- first person or wrong-company proof framing\n- unsupported metrics or bul_unify_* / non-IBM fact leakage\n- multiple sentences or obvious five-bullet recap\n- spins a different role story not entailed by the finalized bullets or claim_ledger\n- meta-disclaimer phrasing in narrative_sentence (\"without claiming\", \"without asserting\", etc.)\n- career-bridge phrasing (\"supported later\", \"subsequent roles\") without explicit allowed career-bridge fact",
+  "grading_only_instructions": "You are grading a generated resume section candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write replacement section content.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (when provided), and candidate_output.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).",
+  "required_judge_output_schema": "Return ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[]}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.",
+  "rubric_ref": "apps_rg/runtime/judges/ibm_narrative_x1d.py#IBM_NARRATIVE_GRADE_ONLY_RUBRIC",
+  "judge_tier": "STANDARD_REASONING",
+  "judge_packet_required": true,
+  "judge_packet_hash": "bdda69134ac2df78"
+}

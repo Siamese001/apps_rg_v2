@@ -1,0 +1,396 @@
+{
+  "schema_version": "apps_rg.section_failure_forensics.v1",
+  "generated_at_utc": "2026-08-09T05:57:06Z",
+  "section_id": "whole_run",
+  "failure_type": "mandatory_output_authorization_block",
+  "failed_gate_ids": [],
+  "current_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "missing_lane_dir"
+  },
+  "last_successful_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "missing_lane_dir",
+    "baseline_run_dir": "",
+    "baseline_found": false,
+    "baseline_lane_dir": "",
+    "baseline_display_txt_path": ""
+  },
+  "input_hash_comparison": {
+    "current_scenario_hash": "dc0c73a8bba75f0e0358351b3522f61e74a1187aab6e6d5999f0b26e0a0b09eb",
+    "baseline_scenario_hash": "",
+    "match": false,
+    "current": {
+      "target_company": "",
+      "target_role": "",
+      "manual_brief": "",
+      "jd": "",
+      "generation_mode": "",
+      "scenario_hash": "dc0c73a8bba75f0e0358351b3522f61e74a1187aab6e6d5999f0b26e0a0b09eb"
+    },
+    "baseline": {}
+  },
+  "selected_fact_plan_comparison": {
+    "artifact": "selected_fact_plan.json",
+    "current_present": false,
+    "baseline_present": false,
+    "current_hash": "",
+    "baseline_hash": "",
+    "match": false
+  },
+  "provider_request_hash_comparison": {
+    "artifact": "provider_request.json",
+    "current_present": false,
+    "baseline_present": false,
+    "current_hash": "",
+    "baseline_hash": "",
+    "match": false
+  },
+  "revision_comparison": {
+    "baseline": {
+      "status": "NO_PRIOR_PASSING_RUN",
+      "git_commit": "",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_applicable"
+    },
+    "current": {
+      "status": "REVISION_NOT_OBSERVED",
+      "git_commit": "",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_derivable_from_local_history"
+    }
+  },
+  "difference_summary": {
+    "baseline_status": "NO_PRIOR_PASSING_RUN",
+    "inputs_match": false,
+    "selected_fact_plan_match": false,
+    "provider_request_match": false,
+    "materialized_output_match": false,
+    "baseline_x2": "NOT_OBSERVED",
+    "current_x2": "NOT_OBSERVED",
+    "baseline_x3": "NOT_OBSERVED",
+    "current_x3": "X3_BLOCK",
+    "baseline_judges": "NOT_OBSERVED",
+    "current_judges": "NOT_OBSERVED",
+    "failed_gate_ids": []
+  },
+  "comparison_complete": false,
+  "output_bisect": {
+    "schema_version": "apps_rg.output_bisect.v1",
+    "section_id": "whole_run",
+    "scope": "NO_PRIOR_BASELINE",
+    "first_observed_divergence": {
+      "order": 1,
+      "stage": "u0_ingress",
+      "prior_value": "NOT_OBSERVED",
+      "current_value": "NOT_OBSERVED",
+      "prior_detail": "NOT_OBSERVED",
+      "current_detail": "NOT_OBSERVED",
+      "match": false,
+      "classification": "EVIDENCE_GAP",
+      "reason": "Neither run recorded evidence for this stage.",
+      "prior_evidence_ref": "",
+      "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry5_20260809\\e2e_20260809T055651Z_9e1420f1\\ingress_raw.json"
+    },
+    "first_causally_relevant_divergence": {},
+    "ingestion_to_outcome_lineage": [
+      {
+        "order": 1,
+        "stage": "u0_ingress",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "NOT_OBSERVED",
+        "current_detail": "NOT_OBSERVED",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry5_20260809\\e2e_20260809T055651Z_9e1420f1\\ingress_raw.json"
+      },
+      {
+        "order": 2,
+        "stage": "u0_payload",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry5_20260809\\e2e_20260809T055651Z_9e1420f1\\u0_receipt.json"
+      },
+      {
+        "order": 3,
+        "stage": "jd_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 4,
+        "stage": "briefing_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 5,
+        "stage": "targeting_bundle",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 6,
+        "stage": "proof_pool",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 7,
+        "stage": "selected_fact_plan",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 8,
+        "stage": "provider_request",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 9,
+        "stage": "initial_candidate",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 10,
+        "stage": "retry_loop",
+        "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": true,
+        "classification": "RULED_OUT",
+        "reason": "The evidence is identical at this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 11,
+        "stage": "deterministic_finalization",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 12,
+        "stage": "final_x2",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 13,
+        "stage": "judges",
+        "prior_value": "NO_JUDGE_ROWS",
+        "current_value": "NO_JUDGE_ROWS",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": true,
+        "classification": "RULED_OUT",
+        "reason": "The evidence is identical at this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 14,
+        "stage": "x3",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      }
+    ],
+    "prior_attempt_timeline": [
+      {
+        "run": "prior_passing",
+        "sequence": 1,
+        "phase": "lane_resolution",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "no prior passing lane was found",
+        "repair_or_action": "none",
+        "gate_scope": "NONE",
+        "gate_result": "NOT_APPLICABLE",
+        "failed_gate_ids": [],
+        "judge_result": "NO_PRIOR_PASSING_RUN",
+        "disposition": "NO_BASELINE",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "",
+        "complete": true
+      }
+    ],
+    "current_attempt_timeline": [
+      {
+        "run": "current_failure",
+        "sequence": 1,
+        "phase": "lane_resolution",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "lane artifact directory not found",
+        "repair_or_action": "none",
+        "gate_scope": "NONE",
+        "gate_result": "EVIDENCE_NOT_RECORDED",
+        "failed_gate_ids": [],
+        "judge_result": "EVIDENCE_NOT_RECORDED",
+        "disposition": "EVIDENCE_GAP",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "",
+        "complete": false
+      }
+    ],
+    "gate_matrix": [],
+    "judge_matrix": [
+      {
+        "judge": "configured_panel",
+        "prior": "NOT_OBSERVED",
+        "current": "JUDGES_NOT_REACHED",
+        "reason": "No current judge rows were emitted because X2 failed first."
+      }
+    ],
+    "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+    "code_bindings": [
+      {
+        "role": "revision comparison",
+        "file": "",
+        "symbol": "",
+        "baseline_symbol_hash": "",
+        "current_symbol_hash": "",
+        "changed_between_revisions": false,
+        "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+      }
+    ],
+    "underlying_root_cause": {
+      "downstream_root_cause": {
+        "status": "ISOLATED_TO_UPSTREAM_SECTION",
+        "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+      }
+    },
+    "layperson_explanation": [
+      "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+      "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used NOT_OBSERVED; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+      "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (failed gates not recorded), so the judges were not reached and the resume remained blocked."
+    ]
+  },
+  "layperson_explanation": [
+    "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+    "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used NOT_OBSERVED; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+    "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (failed gates not recorded), so the judges were not reached and the resume remained blocked."
+  ],
+  "retry_attempts": [],
+  "retry_outputs": [],
+  "repair_ledger": {
+    "present": false,
+    "artifacts": []
+  },
+  "final_materialized_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "missing_lane_dir"
+  },
+  "exact_code_surface": {
+    "producer_files": [
+      "apps_rg/runtime/mandatory_run_outputs.py",
+      "apps_rg/runtime/section_failure_forensics.py"
+    ],
+    "artifact_refs": [],
+    "lane_dir": ""
+  },
+  "why_it_passed_before": "The pinned prior-pass baseline was unavailable, so this RCA cannot claim a clean passing comparison.",
+  "why_it_failed_now": "Mandatory output authorization failed before the run could be treated as explainable.",
+  "required_fix": [
+    "Generate missing mandatory BCG, run-ledger, and forensic RCA artifacts before exit.",
+    "Validate every required forensic RCA field before declaring the E2E failure explainable.",
+    "Fail with E2E_FAIL_WITHOUT_SECTION_FORENSICS when any required RCA artifact is missing or incomplete."
+  ],
+  "baseline_confidence": "pinned_contract_invalid",
+  "baseline_run_dir": ""
+}

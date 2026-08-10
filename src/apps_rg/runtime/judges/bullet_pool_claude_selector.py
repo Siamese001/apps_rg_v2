@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Literal, Mapping
@@ -31,7 +32,9 @@ from apps_rg.runtime.reasoning.competencies_graph_pool import (
     COMPETENCIES_FINAL_CATEGORY_COUNT,
     COMPETENCIES_SC_PATH_COUNT,
     COMPETENCIES_MIN_CATEGORY_COUNT,
+    REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY,
     build_competencies_rejected_neighbor_audit,
+    competencies_candidate_support_score,
     high_signal_competencies_selection_score,
     merge_competencies_graph_pool_top_eight,
     min_competencies_selection_score,
@@ -575,7 +578,13 @@ def _category_by_label(parsed: dict[str, Any], label: str) -> dict[str, Any] | N
         for row in parsed.get(key) or []:
             if not isinstance(row, dict):
                 continue
-            if str(row.get("category_label") or "").strip().lower() == norm:
+            if str(
+                row.get("category_label")
+                or row.get("display_label")
+                or row.get("resume_display_label")
+                or row.get("category")
+                or ""
+            ).strip().lower() == norm:
                 return row
     return None
 
@@ -609,17 +618,27 @@ def _competencies_graph_selection_prompt(
         "targeting emphasis only — never cite facts.skills or base-resume skill rows as proof).\n"
         "- Score each unique category_label variant on phrase_quality, evidence_alignment, distinctness, "
         "and anti_keyword_stuffing.\n"
+        "- category_label MUST be copied byte-for-byte from the candidate's square brackets; never "
+        "invent, paraphrase, or copy the terms string into category_label.\n"
+        "- Select at most one row per competency_bundle_id and at most one row per "
+        "taxonomy_category_id. The final set must contain distinct graph bundles and distinct "
+        "taxonomy wrappers; repeated variants from one bundle are alternatives, not separate categories.\n"
+        "- Select exactly one row for each of these eight governed competency_bundle_id values: "
+        f"{', '.join(REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY.values())}. Text associated with one bundle "
+        "cannot substitute for a missing bundle family. If a required bundle has no valid candidate, do not "
+        "claim complete coverage; the runtime will regenerate the pool.\n"
         f"- Minimum score floor: only select variants with score >= {min_score_threshold:.2f} AND passes=true.\n"
         f"- High-signal target: prefer categories with score >= {high_signal:.2f}; include lower-scoring passing "
         f"categories only if needed to reach {n_min}.\n"
-        f"- Output {n_min}-{n_max} selections when possible; each row must include category_label, "
+        f"- Output exactly {n_max} selections when all required bundles are available; each row must include category_label, "
         "path_index, score, passes, and rationale.\n"
         f"{regen_note}\n\n"
         f"JD (targeting only):\n{jd[:resolve_bullet_selector_jd_max_chars()]}\n\n"
         f"Briefing (targeting only):\n{briefing[:resolve_bullet_selector_briefing_max_chars()]}\n\n"
         f"Skills graph ref: {skills_ref}\n\n"
         "Return JSON only:\n"
-        f'{{"selections":[{{"category_label":"...","path_index":0,"score":0.85,"passes":true,"rationale":"..."}}],'
+        f'{{"selections":[{{"category_label":"...","competency_bundle_id":"ccb_...",'
+        f'"taxonomy_category_id":"...","path_index":0,"score":0.85,"passes":true,"rationale":"..."}}],'
         f'"pool_summary":{{"paths_scored":{n_paths},"min_category_count":{n_min},'
         f'"max_category_count":{n_max},'
         f'"candidate_category_count":{n_candidate},'
@@ -646,6 +665,10 @@ def _format_bullet_pool(paths: list[SelfConsistencyPath], required_ids: tuple[st
 
 
 def _format_competency_pool(paths: list[SelfConsistencyPath]) -> str:
+    from apps_rg.runtime.sections.competency_capability_evidence import (
+        visible_graph_surface_taxonomy_for_bundle,
+    )
+
     blocks: list[str] = []
     for path in paths:
         if path.parsed is None:
@@ -654,7 +677,19 @@ def _format_competency_pool(paths: list[SelfConsistencyPath]) -> str:
         for cat in (path.parsed.get("competencies") or path.parsed.get("categories") or []):
             if not isinstance(cat, dict):
                 continue
-            label = str(cat.get("category_label") or "").strip()
+            label = str(
+                cat.get("category_label")
+                or cat.get("display_label")
+                or cat.get("resume_display_label")
+                or cat.get("category")
+                or ""
+            ).strip()
+            if not label:
+                # Fail visibly in the selector input instead of emitting an
+                # ambiguous empty identity that a model may silently invent.
+                label = "INVALID_MISSING_CATEGORY_LABEL"
+            bundle_id = str(cat.get("competency_bundle_id") or "").strip()
+            taxonomy_category_id, _ = visible_graph_surface_taxonomy_for_bundle(bundle_id)
             terms = cat.get("terms") or []
             phrase_bits: list[str] = []
             if isinstance(terms, list):
@@ -663,7 +698,11 @@ def _format_competency_pool(paths: list[SelfConsistencyPath]) -> str:
                         phrase_bits.append(str(t.get("text") or ""))
                     else:
                         phrase_bits.append(str(t))
-            lines.append(f"[{label}] terms={', '.join(p for p in phrase_bits if p)}")
+            lines.append(
+                f"[{label}] competency_bundle_id={bundle_id or 'MISSING'} "
+                f"taxonomy_category_id={taxonomy_category_id or 'MISSING'} "
+                f"terms={', '.join(p for p in phrase_bits if p)}"
+            )
         blocks.append("\n".join(lines))
     return "\n\n".join(blocks)
 
@@ -833,17 +872,42 @@ def _parse_selections(text: str) -> dict[str, Any] | None:
     Genuinely unusable responses (no JSON, refusal prose) still return ``None`` and fail
     closed upstream — the synthetic decisive judge row remains the honest outcome.
     """
-    doc = _extract_json_from_text(text)
-    if isinstance(doc, dict) and isinstance(doc.get("selections"), list):
-        return doc
-    for span in _iter_top_level_json_object_spans(str(text or "")):
-        try:
-            candidate = json.loads(span)
-        except json.JSONDecodeError:  # guardian: allow-silent-swallow -- scan continues to next balanced span
-            continue
-        if isinstance(candidate, dict) and isinstance(candidate.get("selections"), list):
-            return candidate
-    return doc
+    original = str(text or "")
+    repaired, repair_count = re.subn(
+        r'"path_index\s*=\s*(\d+)"(?=\s*,)',
+        r'"path_index":\1',
+        original,
+    )
+    variants: list[tuple[str, list[str]]] = [(original, [])]
+    if repair_count:
+        variants.append(
+            (
+                repaired,
+                [f"path_index_assignment_key_to_integer_field:{repair_count}"],
+            )
+        )
+
+    legacy_doc: dict[str, Any] | None = None
+    for variant, repairs in variants:
+        doc = _extract_json_from_text(variant)
+        if legacy_doc is None and isinstance(doc, dict):
+            legacy_doc = doc
+        if isinstance(doc, dict) and isinstance(doc.get("selections"), list):
+            if repairs:
+                doc = dict(doc)
+                doc["selector_parse_repairs"] = repairs
+            return doc
+        for span in _iter_top_level_json_object_spans(variant):
+            try:
+                candidate = json.loads(span)
+            except json.JSONDecodeError:  # guardian: allow-silent-swallow -- scan continues to next balanced span
+                continue
+            if isinstance(candidate, dict) and isinstance(candidate.get("selections"), list):
+                if repairs:
+                    candidate = dict(candidate)
+                    candidate["selector_parse_repairs"] = repairs
+                return candidate
+    return legacy_doc
 
 
 def _load_selection_doc_from_judge_artifacts(
@@ -1799,6 +1863,147 @@ def merge_competency_selections(
     return merged, source_map
 
 
+def _complete_governed_required_bundle_selections(
+    paths: list[SelfConsistencyPath],
+    selections: list[dict[str, Any]],
+    *,
+    min_score_threshold: float,
+    targeting_context: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Complete selector output from the governed baseline, with support proof.
+
+    Claude remains the advisory ranker for provider-authored variants. If it
+    omits a required family, the exact governed bundle candidate may fill that
+    slot only when its deterministic graph/fact support score meets the same
+    threshold. Optional or duplicate bundle rows are removed because the final
+    contract is exactly one category per required governed bundle.
+    """
+    required_bundle_ids = tuple(REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY.values())
+    required_set = set(required_bundle_ids)
+    path_by_index = {path.path_index: path for path in paths}
+
+    baseline_by_bundle: dict[str, tuple[SelfConsistencyPath, dict[str, Any]]] = {}
+    for path in paths:
+        if not isinstance(path.parsed, dict):
+            continue
+        for category in path.parsed.get("competencies") or path.parsed.get("categories") or []:
+            if not isinstance(category, dict):
+                continue
+            if category.get("candidate_origin") != "governed_required_bundle_baseline":
+                continue
+            bundle_id = str(category.get("competency_bundle_id") or "").strip()
+            if bundle_id in required_set:
+                baseline_by_bundle[bundle_id] = (path, category)
+
+    kept: list[dict[str, Any]] = []
+    dropped: list[dict[str, Any]] = []
+    covered: set[str] = set()
+    for raw in selections:
+        if not isinstance(raw, dict):
+            continue
+        row = dict(raw)
+        label = str(row.get("category_label") or "").strip()
+        try:
+            path_index = int(row.get("path_index", 0))
+        except (TypeError, ValueError):
+            path_index = 0
+        path = path_by_index.get(path_index)
+        category = (
+            _category_by_label(path.parsed or {}, label)
+            if path is not None and isinstance(path.parsed, dict)
+            else None
+        )
+        bundle_id = str(
+            (category or {}).get("competency_bundle_id")
+            or row.get("competency_bundle_id")
+            or ""
+        ).strip()
+        try:
+            score = float(row.get("score", 0.0))
+        except (TypeError, ValueError):
+            score = 0.0
+        passes_value = row.get("passes", True)
+        passes = (
+            passes_value
+            if isinstance(passes_value, bool)
+            else str(passes_value).strip().lower() in {"true", "1", "yes"}
+        )
+        valid_required = (
+            bundle_id in required_set
+            and bundle_id not in covered
+            and passes
+            and score >= min_score_threshold
+            and category is not None
+        )
+        if not valid_required:
+            dropped.append(
+                {
+                    **row,
+                    "resolved_competency_bundle_id": bundle_id,
+                    "drop_reason": (
+                        "optional_or_unknown_bundle"
+                        if bundle_id not in required_set
+                        else "duplicate_or_below_threshold_required_bundle"
+                    ),
+                }
+            )
+            continue
+        row["competency_bundle_id"] = bundle_id
+        row["selection_origin"] = "provider_advisory_selector"
+        kept.append(row)
+        covered.add(bundle_id)
+
+    allowed_fact_ids = {
+        str(value).strip()
+        for value in targeting_context.get("allowed_fact_ids") or []
+        if str(value).strip()
+    }
+    allowed_skill_ids = {
+        str(value).strip()
+        for value in targeting_context.get("allowed_skill_ids") or []
+        if str(value).strip()
+    }
+    resume_support_blob_lower = str(
+        targeting_context.get("resume_support_blob_lower") or ""
+    )
+    additions: list[dict[str, Any]] = []
+    from apps_rg.runtime.sections.competency_capability_evidence import (
+        visible_graph_surface_taxonomy_for_bundle,
+    )
+
+    for bundle_id in required_bundle_ids:
+        if bundle_id in covered:
+            continue
+        baseline = baseline_by_bundle.get(bundle_id)
+        if baseline is None:
+            continue
+        path, category = baseline
+        support_score = competencies_candidate_support_score(
+            category,
+            allowed_fact_ids=allowed_fact_ids,
+            allowed_skill_ids=allowed_skill_ids,
+            resume_support_blob_lower=resume_support_blob_lower,
+        )
+        if support_score < min_score_threshold:
+            continue
+        taxonomy_id, _ = visible_graph_surface_taxonomy_for_bundle(bundle_id)
+        row = {
+            "category_label": str(category.get("category_label") or "").strip(),
+            "competency_bundle_id": bundle_id,
+            "taxonomy_category_id": taxonomy_id,
+            "path_index": path.path_index,
+            "score": round(float(support_score), 4),
+            "passes": True,
+            "rationale": "governed required bundle baseline with graph/fact support",
+            "selection_origin": "governed_required_bundle_completion",
+            "score_source": "deterministic_graph_fact_support_ratio",
+        }
+        additions.append(row)
+        kept.append(row)
+        covered.add(bundle_id)
+    return kept, additions, dropped
+
+
 def run_claude_bullet_pool_selection(
     *,
     section_id: str,
@@ -1992,9 +2197,17 @@ def run_claude_bullet_pool_selection(
             base_parsed=base,
             min_score_threshold=floor,
         )
-        selection_mode = "claude_employment_top_n_pass"
+        selection_mode = f"{provider_key}_employment_top_n_pass"
     elif _is_competencies_graph_pool(section_id, slot_kind):
         floor = min_score_threshold or min_competencies_selection_score()
+        selections, governed_additions, dropped_selections = (
+            _complete_governed_required_bundle_selections(
+                valid_paths,
+                selections,
+                min_score_threshold=floor,
+                targeting_context=tc,
+            )
+        )
         merged, source_map, rejected_neighbor_audit = _merge_competencies_graph_pool_with_audit(
             valid_paths,
             selections,
@@ -2002,10 +2215,14 @@ def run_claude_bullet_pool_selection(
             min_score_threshold=floor,
             targeting_context=tc,
         )
-        selection_mode = "competencies_advisory_selector_adaptive_6_8_pass"
+        selection_mode = (
+            "competencies_advisory_selector_plus_governed_required_bundle_completion"
+            if governed_additions or dropped_selections
+            else "competencies_advisory_selector_required_eight_pass"
+        )
     else:
         merged, source_map = merge_competency_selections(valid_paths, selections, base_parsed=base)
-        selection_mode = "claude_per_slot_selection"
+        selection_mode = f"{provider_key}_per_slot_selection"
 
     return PoolSelectionResult(
         merged_parsed=merged,

@@ -18,7 +18,7 @@ from importlib.metadata import version as package_version
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_eval import _write_gateway as _wg
 from apps_eval.adapters import run_apps_lic_live, run_apps_rg_live
 from apps_eval.adapters.apps_rg import (
     build_source_artifact_manifest,
@@ -629,10 +629,31 @@ def _record_evidence_bindings(
     }
 
 
-def _assert_source_snapshot_unchanged(snapshot: AppOutputSnapshot) -> None:
-    if not snapshot.run_root or not snapshot.source_artifact_manifest:
+def _assert_source_snapshot_unchanged(
+    snapshot: AppOutputSnapshot,
+    *,
+    require_manifest: bool = False,
+) -> None:
+    if not snapshot.run_root:
+        if require_manifest:
+            raise RuntimeError("apps_rg_source_manifest_unreadable:run_root_missing")
         return
-    current_manifest = build_source_artifact_manifest(Path(snapshot.run_root))
+    source_root = Path(snapshot.run_root)
+    if not source_root.is_dir() or not snapshot.source_artifact_manifest:
+        if require_manifest:
+            raise RuntimeError("apps_rg_source_manifest_unreadable")
+        return
+    sealed_manifest_digest = source_artifact_manifest_digest(
+        snapshot.source_artifact_manifest
+    )
+    if not snapshot.snapshot_digest or sealed_manifest_digest != snapshot.snapshot_digest:
+        raise RuntimeError(
+            "apps_rg_source_manifest_digest_invalid: "
+            f"sealed={sealed_manifest_digest} snapshot={snapshot.snapshot_digest}"
+        )
+    current_manifest = build_source_artifact_manifest(source_root)
+    if not current_manifest:
+        raise RuntimeError("apps_rg_source_manifest_unreadable")
     current_digest = source_artifact_manifest_digest(current_manifest)
     if current_digest != snapshot.snapshot_digest:
         raise RuntimeError(
@@ -656,6 +677,240 @@ def _default_current_run_expected(snapshot: AppOutputSnapshot) -> dict[str, Any]
     }
 
 
+def _apps_rg_admission_summary(snapshot: AppOutputSnapshot) -> dict[str, Any]:
+    provenance = snapshot.provenance
+    preflight_errors = sorted(
+        {
+            str(error)
+            for error in provenance.get("preflight_verification_errors", [])
+            if str(error)
+        }
+    )
+    preflight_status = str(
+        provenance.get("preflight_verification_status") or ""
+    ).strip()
+    if not preflight_status:
+        preflight_status = (
+            "VERIFIED"
+            if provenance.get("preflight_verified") is True and not preflight_errors
+            else "INVALID"
+        )
+    preflight_pass = (
+        preflight_status == "VERIFIED"
+        and provenance.get("preflight_verified") is True
+        and not preflight_errors
+    )
+
+    product_authority_errors = sorted(
+        {
+            str(error)
+            for error in provenance.get("source_seal_verification_errors", [])
+            if str(error)
+        }
+    )
+    product_authority_pass = (
+        provenance.get("source_seal_verified") is True
+        and provenance.get("product_authorized") is True
+        and not product_authority_errors
+    )
+    missing_identity = sorted(
+        field
+        for field in ("parent_run_id", "child_run_id")
+        if not str(getattr(snapshot, field, "") or "").strip()
+    )
+
+    failures: list[str] = []
+    if not preflight_pass:
+        failures.append(
+            "preflight_verification_unverifiable_key_material"
+            if preflight_status == "UNVERIFIABLE_KEY_MATERIAL"
+            else "preflight_verification_invalid"
+        )
+    if not product_authority_pass:
+        failures.append("product_authority_invalid")
+    if missing_identity:
+        failures.append("source_identity_missing:" + ",".join(missing_identity))
+    return {
+        "schema_version": "apps_eval.apps_rg_admission.v1",
+        "status": "PASS" if not failures else "FAIL",
+        "preflight": {
+            "passed": preflight_pass,
+            "verification_status": preflight_status,
+            "verification_errors": preflight_errors,
+            "verifier_key_id": str(
+                provenance.get("preflight_verifier_key_id") or ""
+            ),
+            "verifier_key_source": str(
+                provenance.get("preflight_verifier_key_source") or ""
+            ),
+        },
+        "product_authority": {
+            "passed": product_authority_pass,
+            "verification_errors": product_authority_errors,
+            "corrected_product_authorized": bool(
+                provenance.get("product_authorized") is True
+            ),
+            "correction_disposition": str(
+                provenance.get("product_authorization_correction_disposition")
+                or ""
+            ),
+        },
+        "source_identity": {
+            "passed": not missing_identity,
+            "missing_fields": missing_identity,
+        },
+        "failures": failures,
+    }
+
+
+def _apps_rg_admission_rows(
+    *,
+    suite_id: str,
+    scenario_id: str,
+    run_id: str,
+    created_at: str,
+    snapshot: AppOutputSnapshot,
+    registry_digest: str,
+    admission: dict[str, Any],
+) -> list[ScorecardRow]:
+    provenance = snapshot.provenance
+    row_specs = (
+        {
+            "name": "preflight_verification",
+            "stage_id": "U0",
+            "artifact_role": "preflight_product_entry",
+            "artifact_ref": str(provenance.get("preflight_ref") or ""),
+            "evidence_digest": str(provenance.get("preflight_digest") or ""),
+            "passed": bool(admission["preflight"]["passed"]),
+            "failure_mode": (
+                "admission.preflight_unverifiable_key_material"
+                if admission["preflight"]["verification_status"]
+                == "UNVERIFIABLE_KEY_MATERIAL"
+                else "admission.preflight_signature_invalid"
+            ),
+            "observed": admission["preflight"],
+            "threshold": "VERIFIED",
+            "schema": "apps_rg.e2e_preflight_product_entry.v1",
+        },
+        {
+            "name": "product_authority",
+            "stage_id": "Exit",
+            "artifact_role": "product_authorization",
+            "artifact_ref": str(
+                provenance.get("product_authorization_correction_ref")
+                or provenance.get("product_authorization_ref")
+                or ""
+            ),
+            "evidence_digest": str(
+                provenance.get("product_authorization_correction_digest")
+                or provenance.get("product_authorization_digest")
+                or ""
+            ),
+            "passed": bool(admission["product_authority"]["passed"]),
+            "failure_mode": "admission.product_authority_invalid",
+            "observed": admission["product_authority"],
+            "threshold": "verified current product authorization",
+            "schema": "apps_rg.authorization_correction.v1",
+        },
+        {
+            "name": "source_identity",
+            "stage_id": "U0",
+            "artifact_role": "source_identity",
+            "artifact_ref": snapshot.run_root,
+            "evidence_digest": snapshot.snapshot_digest,
+            "passed": bool(admission["source_identity"]["passed"]),
+            "failure_mode": "admission.source_identity_missing",
+            "observed": admission["source_identity"],
+            "threshold": "complete parent_run_id and child_run_id",
+            "schema": "apps_research_rg_run_identity.v1",
+        },
+    )
+    rows: list[ScorecardRow] = []
+    for spec in row_specs:
+        passed = bool(spec["passed"])
+        name = str(spec["name"])
+        rows.append(
+            ScorecardRow(
+                suite_id=suite_id,
+                scenario_id=scenario_id,
+                app_id=snapshot.app_id,
+                row_id="admission-"
+                + _canonical_digest(
+                    {
+                        "suite_id": suite_id,
+                        "scenario_id": scenario_id,
+                        "run_id": run_id,
+                        "name": name,
+                    }
+                )[:16],
+                microstep_id=f"admission.{name}",
+                stage_id=str(spec["stage_id"]),
+                component_id="apps_rg.eval_admission",
+                subcomponent_id=name,
+                verdict="PASS" if passed else "FAIL",
+                score=1.0 if passed else 0.0,
+                severity="BLOCK",
+                required=True,
+                run_id=run_id,
+                artifact_role=str(spec["artifact_role"]),
+                artifact_ref=str(spec["artifact_ref"]),
+                evidence_ref=str(spec["artifact_ref"]),
+                evidence_digest=str(spec["evidence_digest"]),
+                failure_mode="" if passed else str(spec["failure_mode"]),
+                failure_family="" if passed else "admission",
+                observed_value=spec["observed"],
+                threshold=spec["threshold"],
+                decisive_reason=(
+                    f"{name} admission passed"
+                    if passed
+                    else f"{name} blocks release"
+                ),
+                source_system="apps_eval",
+                source_artifact_schema=str(spec["schema"]),
+                parent_run_id=snapshot.parent_run_id,
+                child_run_id=snapshot.child_run_id,
+                section_attempt_id=snapshot.section_attempt_id,
+                eval_record_id=run_id,
+                runtime_exhaust_bundle_id=snapshot.runtime_exhaust_bundle_id,
+                microstep_contract_digest=registry_digest,
+                registry_digest=registry_digest,
+                snapshot_digest=snapshot.snapshot_digest,
+                created_at=created_at,
+            )
+        )
+    return rows
+
+
+def _apps_rg_admission_components(
+    rows: list[ScorecardRow],
+) -> list[dict[str, Any]]:
+    components: list[dict[str, Any]] = []
+    for row in rows:
+        passed = row.verdict == "PASS"
+        components.append(
+            {
+                "suite_id": row.suite_id,
+                "app_id": row.app_id,
+                "scenario_id": row.scenario_id,
+                "component_id": row.component_id,
+                "subcomponent_id": row.subcomponent_id,
+                "stage_id": row.stage_id,
+                "lane_id": "",
+                "row_count": 1,
+                "required_count": 1,
+                "pass_count": int(passed),
+                "fail_count": int(not passed),
+                "warn_count": 0,
+                "unknown_count": 0,
+                "not_run_count": 0,
+                "blocking_failure_count": int(not passed),
+                "score": row.score,
+                "verdict": "pass" if passed else "fail",
+            }
+        )
+    return components
+
+
 def run_current_snapshot_eval(
     snapshot: AppOutputSnapshot,
     *,
@@ -663,8 +918,11 @@ def run_current_snapshot_eval(
     out_dir: str = "artifacts/apps_eval/runs",
     deterministic_only: bool = True,
     emit_l6_handoff: bool = True,
+    emit_l6_shadow_bridge: bool = True,
     expected: dict[str, Any] | None = None,
     threshold_suite_id: str = "apps_rg.dev.resume_generation",
+    git_commit_override: str | None = None,
+    platform_override: str | None = None,
 ) -> CompletedEvalRecord:
     """Evaluate one already-produced app snapshot.
 
@@ -680,29 +938,7 @@ def run_current_snapshot_eval(
         raise ValueError(
             "apps_rg current-run eval requires a read-only, byte-manifested source snapshot"
         )
-    if snapshot.provenance.get("source_seal_verified") is not True:
-        raise ValueError(
-            "apps_rg current-run eval requires a verified product authorization seal"
-        )
-    if snapshot.provenance.get("preflight_verified") is not True:
-        raise ValueError(
-            "apps_rg current-run eval requires signed, digest-bound preflight evidence"
-        )
-    missing_identity = [
-        field
-        for field in (
-            "parent_run_id",
-            "child_run_id",
-            "section_attempt_id",
-            "runtime_exhaust_bundle_id",
-        )
-        if not str(getattr(snapshot, field, "") or "").strip()
-    ]
-    if missing_identity:
-        raise ValueError(
-            "apps_rg current-run eval requires complete sealed source identity: "
-            + ",".join(missing_identity)
-        )
+    _assert_source_snapshot_unchanged(snapshot, require_manifest=True)
 
     scenario_id = snapshot.scenario_id or "apps_rg_current_run"
     app_microstep_contract_digest = apps_rg_contract_digest()
@@ -715,7 +951,11 @@ def run_current_snapshot_eval(
     expected_payload["required_sections"] = ["executive_summary", "experience", "skills"]
     created_at = _run_started_at(deterministic_only)
     repo_root = Path(__file__).resolve().parents[2]
-    git_commit = _git_commit(repo_root)
+    git_commit = (
+        _git_commit(repo_root)
+        if git_commit_override is None
+        else str(git_commit_override)
+    )
     graders = build_default_graders()
     thresholds = load_thresholds_registry().get(
         threshold_suite_id,
@@ -778,6 +1018,7 @@ def run_current_snapshot_eval(
         "compare_baseline": False,
         "baseline_digest": "",
         "emit_l6_handoff": emit_l6_handoff,
+        "emit_l6_shadow_bridge": emit_l6_shadow_bridge,
         "git_commit": git_commit,
         "suite_digest": suite_digest,
         "threshold_digest": threshold_digest,
@@ -794,12 +1035,24 @@ def run_current_snapshot_eval(
         "runtime_exhaust_bundle_id": stable_snapshot.runtime_exhaust_bundle_id,
         "registry_digest": app_microstep_contract_digest,
     }
+    admission = _apps_rg_admission_summary(stable_snapshot)
+    record_seed["admission"] = admission
     if not deterministic_only:
         record_seed["created_at"] = created_at
 
     record_id = _stable_record_id(record_seed)
     run_dir = Path(out_dir) / suite_id.replace(".", "_") / record_id
     planned_eval_artifacts = _planned_eval_artifacts(run_dir)
+    admission_rows = _apps_rg_admission_rows(
+        suite_id=suite_id,
+        scenario_id=scenario_id,
+        run_id=record_id,
+        created_at=created_at,
+        snapshot=stable_snapshot,
+        registry_digest=app_microstep_contract_digest,
+        admission=admission,
+    )
+    admission_components = _apps_rg_admission_components(admission_rows)
 
     findings = [grader.grade(fixture, stable_snapshot) for grader in graders]
     microstep_eval = build_apps_rg_microstep_evaluation(
@@ -811,8 +1064,16 @@ def run_current_snapshot_eval(
         planned_eval_artifacts=planned_eval_artifacts,
         snapshot_digest=stable_snapshot.snapshot_digest,
     )
-    rows = _apps_rg_record_rows(list(microstep_eval["rows"]))
-    components = [component.to_dict() for component in microstep_eval["component_scorecards"]]
+    rows = _apps_rg_record_rows(
+        [*list(microstep_eval["rows"]), *admission_rows]
+    )
+    components = [
+        *[
+            component.to_dict()
+            for component in microstep_eval["component_scorecards"]
+        ],
+        *admission_components,
+    ]
     coverage = microstep_eval["coverage_summary"].to_dict()
     diagnostic_eval = build_apps_rg_diagnostics(
         suite_id=suite_id,
@@ -838,6 +1099,7 @@ def run_current_snapshot_eval(
         _canonical_digest(fixture.provenance.to_dict()),
     )
     scenario_result["apps_rg_coverage_summary"] = coverage
+    scenario_result["apps_rg_admission"] = admission
     suite_coverage = _apps_rg_suite_coverage(
         suite_id=suite_id,
         app_id=stable_snapshot.app_id,
@@ -867,12 +1129,24 @@ def run_current_snapshot_eval(
         regression=regression,
         artifact_paths={},
         rubric_ids=["apps_rg_resume_generation_v1"],
+        eval_execution_complete=True,
+        eval_verdict=scorecard.verdict,
+        release_blocked=bool(suite_coverage.get("release_blocked")),
+        admission_status=str(admission["status"]),
+        preflight_verification_status=str(
+            admission["preflight"]["verification_status"]
+        ),
+        admission_failures=list(admission["failures"]),
         record_seed=record_seed,
         run_metadata=EvalRunMetadata(
             project_version=_project_version(),
             git_commit=git_commit,
             python_version=sys.version.split()[0],
-            platform=platform.platform(),
+            platform=(
+                platform.platform()
+                if platform_override is None
+                else str(platform_override)
+            ),
             cwd=Path.cwd().resolve().as_posix(),
             scorer_version=CURRENT_SCORER_VERSION,
             record_seed_digest=_canonical_digest(record_seed),
@@ -917,9 +1191,15 @@ def run_current_snapshot_eval(
         planned_eval_artifacts=planned_eval_artifacts,
         snapshot_digest=stable_snapshot.snapshot_digest,
     )
-    rows = _apps_rg_record_rows(list(microstep_eval["rows"]))
+    rows = _apps_rg_record_rows(
+        [*list(microstep_eval["rows"]), *admission_rows]
+    )
     components = [
-        component.to_dict() for component in microstep_eval["component_scorecards"]
+        *[
+            component.to_dict()
+            for component in microstep_eval["component_scorecards"]
+        ],
+        *admission_components,
     ]
     coverage = microstep_eval["coverage_summary"].to_dict()
     diagnostic_eval = build_apps_rg_diagnostics(
@@ -946,6 +1226,7 @@ def run_current_snapshot_eval(
         _canonical_digest(fixture.provenance.to_dict()),
     )
     scenario_result["apps_rg_coverage_summary"] = coverage
+    scenario_result["apps_rg_admission"] = admission
     suite_coverage = _apps_rg_suite_coverage(
         suite_id=suite_id,
         app_id=stable_snapshot.app_id,
@@ -966,6 +1247,8 @@ def run_current_snapshot_eval(
         record,
         scenario_results=[scenario_result],
         scorecard=scorecard,
+        eval_verdict=scorecard.verdict,
+        release_blocked=bool(suite_coverage.get("release_blocked")),
     )
     record = replace(
         provisional,
@@ -987,7 +1270,7 @@ def run_current_snapshot_eval(
     record = replace(record, artifact_paths=paths)
     _wg.write_text(Path(paths["eval_record"]), json.dumps(record.to_dict(), indent=2, sort_keys=True), encoding="utf-8")
     _wg.write_text(Path(paths["report"]), render_report(record, findings), encoding="utf-8")
-    if emit_l6_handoff:
+    if emit_l6_handoff and emit_l6_shadow_bridge:
         from apps_eval.l6_shadow_bridge import emit_completed_eval_l6_shadow_bridge
 
         bridge_paths = emit_completed_eval_l6_shadow_bridge(
@@ -1005,7 +1288,7 @@ def run_current_snapshot_eval(
         record_id=record_id,
         planned_eval_artifacts=planned_eval_artifacts,
     )
-    _assert_source_snapshot_unchanged(stable_snapshot)
+    _assert_source_snapshot_unchanged(stable_snapshot, require_manifest=True)
     return record
 
 

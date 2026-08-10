@@ -1,0 +1,41 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_060616",
+  "gate_id": "x2_ibm_narrative_claim_theme_coverage",
+  "fired": true,
+  "trigger": {
+    "themes_detected_pre": [
+      "bul_ibm_001",
+      "bul_ibm_002",
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "count_pre": 3,
+    "missing_in_ledger_union_pre": [
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "narrative_pre": "Operationalized partner-led solution architecture for regulated financial-services modernization at IBM by aligning AWS alliance motions with technical discovery, establishing BI-backed executive decision discipline that made enterprise pursuits more repeatable across complex modernization programs."
+  },
+  "accepted": false,
+  "themes_post": [
+    "bul_ibm_001",
+    "bul_ibm_002",
+    "unsupported_companion_theme:regulated_financial"
+  ],
+  "rejected_reason": "provider_not_real",
+  "bounded": {
+    "max_attempts": 1,
+    "attempts_used": 1
+  },
+  "kill_switch": "unset",
+  "regen_max_tokens": 4000,
+  "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+  "regen_parse_error": null,
+  "regen_provider_result": {
+    "runtime_generation_status": "BLOCKED",
+    "provider_requested": "external_claude",
+    "provider_attempted": true,
+    "provider_available": false,
+    "model": "gpt-5.6-luna",
+    "exact_provider_error": "External provider HTTP 404: {\"type\":\"error\",\"error\":{\"type\":\"not_found_error\",\"message\":\"model: gpt-5.6-luna\"},\"request_id\":\"req_011CdrfxhBYMiezAvHRDsMZ5\"}"
+  }
+}

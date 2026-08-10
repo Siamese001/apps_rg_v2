@@ -1,0 +1,83 @@
+{
+  "created_at_utc": "2026-08-09T05:56:52.244681+00:00",
+  "e2e_run_id": "e2e_20260809T055651Z_9e1420f1",
+  "entries": [
+    {
+      "artifact_bindings": [],
+      "attempt": 1,
+      "authoritative_receipt_byte_length": 9996,
+      "authoritative_receipt_ref": "e2e_preflight_continuation_receipt.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_preflight.v1",
+      "authoritative_receipt_sha256": "sha256:acb68b4d81ff0b53aca6535b37a956f067ea35ba479e5759d2d0fe0d0a430d8d",
+      "child_run_id": "",
+      "e2e_run_id": "e2e_20260809T055651Z_9e1420f1",
+      "finished_at_utc": "2026-08-09T05:56:57.983839+00:00",
+      "input_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "input_refs": {},
+      "output_digest": "sha256:15b864a903c1c8dfe779f0f7701feb1dfae802762016760cbcceb74e45461e39",
+      "output_refs": {
+        "authoritative_receipt": "e2e_preflight_continuation_receipt.json",
+        "preflight_receipt": "e2e_preflight_continuation_receipt.json"
+      },
+      "previous_receipt_digest": "",
+      "reason_code": "ALL_NON_RETRIABLE_PREFLIGHT_CHECKS_PASSED",
+      "receipt_digest": "sha256:42629fbd62b9ac0c6dc62efe6205e5d7b1415fd090e870425140e476a4d9a713",
+      "stage_id": "PREFLIGHT",
+      "started_at_utc": "2026-08-09T05:56:57.983839+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "attempt": 1,
+      "authoritative_receipt_byte_length": 0,
+      "authoritative_receipt_ref": "",
+      "authoritative_receipt_schema_version": "",
+      "authoritative_receipt_sha256": "",
+      "child_run_id": "",
+      "e2e_run_id": "e2e_20260809T055651Z_9e1420f1",
+      "finished_at_utc": "2026-08-09T05:57:06.278201+00:00",
+      "input_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "input_refs": {},
+      "output_digest": "sha256:b8a8af1eba992e5af21d73baa0c20c3108e013cf1d2a70602fec69bceb80234f",
+      "output_refs": {
+        "research_bridge_response": "research_bridge_response.json"
+      },
+      "previous_receipt_digest": "sha256:42629fbd62b9ac0c6dc62efe6205e5d7b1415fd090e870425140e476a4d9a713",
+      "reason_code": "APPS_RESEARCH_BLOCKED",
+      "receipt_digest": "sha256:420df0b84dd7a2410d065c235d225a64643613f9fa5056c4b5aa1aa96812e522",
+      "stage_id": "RESEARCH",
+      "started_at_utc": "2026-08-09T05:57:06.278201+00:00",
+      "status": "FAIL",
+      "status_derivation": "CALLER_ASSERTED_NON_PRODUCT_COMPATIBILITY"
+    },
+    {
+      "artifact_bindings": [],
+      "attempt": 1,
+      "authoritative_receipt_byte_length": 0,
+      "authoritative_receipt_ref": "",
+      "authoritative_receipt_schema_version": "",
+      "authoritative_receipt_sha256": "",
+      "child_run_id": "",
+      "e2e_run_id": "e2e_20260809T055651Z_9e1420f1",
+      "finished_at_utc": "2026-08-09T05:57:06.344070+00:00",
+      "input_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "input_refs": {},
+      "output_digest": "sha256:92d19b86efcc9de3b927cffbfb97a27ccb4f0e4648a8e1498244051e96db10b4",
+      "output_refs": {
+        "spine_run_manifest": "spine_run_manifest.json"
+      },
+      "previous_receipt_digest": "sha256:420df0b84dd7a2410d065c235d225a64643613f9fa5056c4b5aa1aa96812e522",
+      "reason_code": "FAILED_RUN_REPORTED",
+      "receipt_digest": "sha256:9fc14cad1ca9d70b604b3c9a13c92fd8216d763d5df7f9cb3475ca2392dd18e1",
+      "stage_id": "CLOSEOUT",
+      "started_at_utc": "2026-08-09T05:57:06.344070+00:00",
+      "status": "PASS",
+      "status_derivation": "CALLER_ASSERTED_NON_PRODUCT_COMPATIBILITY"
+    }
+  ],
+  "ledger_digest": "sha256:4adc7cb4b2c23d502a201592d582010c4d734dac2b7e32a9aace9cb1d5ce6a0b",
+  "schema_version": "apps_rg.e2e_stage_ledger.v1",
+  "stage_graph_digest": "sha256:e09deb3da710f1dc007b73ee8d1786fe0e7a4c276ad3331061991cad3b810566",
+  "stage_graph_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src\\apps_rg\\config\\domain_contract\\e2e_stage_graph.resume_generation.v1.yaml"
+}

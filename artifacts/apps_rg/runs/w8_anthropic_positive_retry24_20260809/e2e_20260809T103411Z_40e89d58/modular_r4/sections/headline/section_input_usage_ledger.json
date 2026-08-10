@@ -1,0 +1,213 @@
+{
+  "schema": "section_input_usage_ledger_v1",
+  "section_id": "headline",
+  "run_id": "headline_20260809_104200",
+  "request_id": "headline_20260809_104200",
+  "trace_root": "artifacts/apps_rg/runs/w8_anthropic_positive_retry24_20260809/e2e_20260809T103411Z_40e89d58/modular_r4/sections/headline",
+  "input_authority": {
+    "base_resume": "DEPRECATED_NON_AUTHORITY",
+    "selected_fact_plan": "CLAIM_EVIDENCE_AFTER_SELECTION",
+    "jd_text": "TARGETING_INPUT",
+    "target_title": "POSITIONING_INPUT",
+    "target_company": "POSITIONING_INPUT",
+    "briefing_research": "CONTEXT_INPUT",
+    "augmented_skills_graph": "SKILLS_COMPETENCY_AUTHORITY",
+    "broad_skills_ledger": "DEPRECATED_REFERENCE_ONLY"
+  },
+  "input_refs": {
+    "base_resume_ref": "apps_rg\\resume\\base\\amit_ayer_base_resume_v1.json",
+    "base_resume_hash": "8e7622c9528310e95288e97ddcb58a566b22b6a14435e389f0096f9aa10611e7",
+    "selected_fact_plan_ref": "selected_fact_plan.json",
+    "selected_fact_plan_hash": "f8a62d3fd040939cd006e2758f28800fc74b458d2b99308872d5c97ce65e9852",
+    "jd_text_ref": "runtime_payload.json#jd_text",
+    "jd_text_hash": "8538b12272eb74d73be0dd36a74a2a81a8fbfd197a43d5b51c9e095e81f3f75b",
+    "target_title": "Manager of Applied AI Architecture, Partnerships",
+    "target_company": "Anthropic",
+    "briefing_ref": "runtime_payload.json#briefing",
+    "briefing_hash": "6a9de5f02b2c07a44d259399ac528d92ceb7387bb573b5e9ae93ed76069f2a32",
+    "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "proof_pool_digest": "b66de415eb5bd346fb31243e154439f09904519f29b4577a4c08d0e764f2068f",
+    "broad_skills_ledger_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json",
+    "broad_skills_ledger_digest": "8d51311d531d3adbeda76e89540372c40e084d1069e5aa708b012fb10a9a44c7",
+    "srfs_ref": null,
+    "base_resume_override_used": false,
+    "augmented_skills_graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "augmented_skills_graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+    "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+    "graph_version": "master_skills_arsenal_graph_v1",
+    "legacy_skills_ledger_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json"
+  },
+  "required_input_usage": {
+    "base_resume": {
+      "required": true,
+      "used": false,
+      "authority": "DEPRECATED_NON_AUTHORITY",
+      "allowed_fact_ids": [
+        "exp_unify_001",
+        "fact_engineering_platform_003",
+        "fact_engineering_platform_006",
+        "metric_unify_partner_cosell_solution_motion_count",
+        "metric_unify_partner_enablement_asset_set",
+        "reb_unify_partner_channel_cosell",
+        "reb_unify_platform_commercialization_leadership",
+        "reb_unify_runtime_reliability_governance",
+        "skill_ai_platform_commercialization",
+        "skill_context_engineering",
+        "skill_partner_cloud_vendor_joint_gtm",
+        "skill_partner_gtm_enablement",
+        "skill_partner_partner_led_ai_solutions",
+        "skill_partner_partner_motions",
+        "skill_partner_partner_revenue_3m"
+      ],
+      "selected_fact_ids_used": [
+        "reb_unify_partner_channel_cosell",
+        "reb_unify_platform_commercialization_leadership",
+        "reb_unify_runtime_reliability_governance"
+      ]
+    },
+    "jd_text": {
+      "required": true,
+      "used": true,
+      "authority": "TARGETING_INPUT",
+      "used_for": []
+    },
+    "target_title": {
+      "required": true,
+      "used": true,
+      "authority": "POSITIONING_INPUT",
+      "used_for": []
+    },
+    "target_company": {
+      "required": true,
+      "used": true,
+      "authority": "POSITIONING_INPUT",
+      "used_for": []
+    },
+    "briefing_research": {
+      "required": true,
+      "used": true,
+      "authority": "CONTEXT_INPUT",
+      "used_for": []
+    },
+    "augmented_skills_graph": {
+      "required": true,
+      "used": true,
+      "authority": "SKILLS_COMPETENCY_AUTHORITY",
+      "ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+    },
+    "legacy_skills_ledger": {
+      "required": false,
+      "used": false,
+      "authority": "DEPRECATED_REFERENCE",
+      "ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json"
+    },
+    "claim_evidence": {
+      "required": true,
+      "used": true,
+      "authority": "CLAIM_EVIDENCE",
+      "source_type": "augmented_skills_graph",
+      "ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json"
+    }
+  },
+  "evidence_boundary": {
+    "claim_evidence_sources": [
+      "augmented_skills_graph"
+    ],
+    "non_evidence_inputs": [
+      "jd_text",
+      "target_title",
+      "target_company",
+      "briefing_research"
+    ],
+    "non_evidence_inputs_used_as_claim_evidence": false,
+    "non_evidence_inputs_in_source_fact_ids": false,
+    "skills_competency_authority": "augmented_skills_graph"
+  },
+  "claim_support_summary": {
+    "displayed_claim_count": 3,
+    "claims_supported_by_selected_resume_facts": 3,
+    "claims_with_targeting_input_in_source_fact_ids": 0,
+    "claims_with_context_input_in_source_fact_ids": 0,
+    "unsupported_claim_count": 0,
+    "orphan_source_fact_id_count": 0
+  },
+  "refs": {
+    "compiled_prompt_artifact_ref": "compiled_prompt_artifact.json",
+    "canonical_claim_ledger_ref": "canonical_claim_ledger_v2.json",
+    "text_claim_coverage_ref": "text_claim_coverage.json",
+    "x2_gate_outputs_ref": "x2_gate_outputs.json",
+    "x3_disposition_ref": "x3_disposition.json"
+  },
+  "proof_source": "augmented_skills_graph",
+  "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "proof_pool_digest": "b66de415eb5bd346fb31243e154439f09904519f29b4577a4c08d0e764f2068f",
+  "product_evidence_authority_receipt": {
+    "evidence_authority": {
+      "type": "augmented_skills_graph",
+      "graph_ref": "present",
+      "ledger_ref": "present"
+    },
+    "selection_scope": {
+      "section_id": "headline",
+      "selection_method": "selected_graph_evidence_plan_headline",
+      "role_target_projection": "graph_ledger_substrate_with_optional_srfs_filter",
+      "jd_targeting_active": true,
+      "briefing_targeting_active": true,
+      "jd_ref": "targeting_only",
+      "briefing_ref": "targeting_only",
+      "section_slice": "headline",
+      "allowed_fact_ids_count": 15
+    },
+    "layout_context": {
+      "base_resume_ref": "present",
+      "allowed_fields": [
+        "titles",
+        "companies",
+        "dates",
+        "education",
+        "certifications",
+        "identity",
+        "company_names",
+        "locations"
+      ]
+    }
+  },
+  "jd_title_company_present": true,
+  "briefing_present": true,
+  "broad_skills_ledger_present": false,
+  "srfs_present": false,
+  "base_resume_fallback_used": false,
+  "allowed_source_fact_ids_count": 15,
+  "non_proof_inputs": [
+    "jd_title_company",
+    "briefing"
+  ],
+  "claim_support_inputs": [
+    "augmented_skills_graph"
+  ],
+  "source_authority": "augmented_skills_graph",
+  "skills_source_type": "augmented_skills_graph",
+  "skills_source_authority_status": "PASS",
+  "skills_authority_source_type": "augmented_skills_graph",
+  "skills_authority_graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "skills_authority_graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "skills_authority_graph_version": "master_skills_arsenal_graph_v1",
+  "skills_authority_status": "PASS",
+  "claim_evidence_source_type": "augmented_skills_graph",
+  "claim_evidence_source_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "claim_evidence_source_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "claim_evidence_substrate_type": "candidate_fact_ledger",
+  "claim_evidence_substrate_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json",
+  "augmented_skills_graph_present": true,
+  "augmented_skills_graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "augmented_skills_graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "graph_version": "master_skills_arsenal_graph_v1",
+  "legacy_skills_ledger_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json",
+  "legacy_skills_ledger_role": "deprecated_reference",
+  "legacy_broad_skills_ledger_skills_authority": false,
+  "deprecated_non_authority": true,
+  "skills_authority_x2_boundary": "PASS"
+}

@@ -1,0 +1,80 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.3,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "Fixed prefix, four-segment structure, and 13-word limit pass.",
+      "All substantive phrases are supported by eligible ledger evidence.",
+      "“Distributed Partner Solution Infrastructure” is opaque and unnatural.",
+      "Repeated noun-stack cadence makes the headline sound machine-generated.",
+      "The buzzword density weakens clarity in a skeptical TA screen."
+    ],
+    "cited_sentence_indexes": [
+      1
+    ],
+    "remediation_suggestions": [
+      "Use simpler, resume-native phrasing.",
+      "Clarify the relationship between partner work and infrastructure.",
+      "Reduce stacked platform terminology while preserving distinct signals."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "TA_SCREEN_FAIL",
+          "EXECUTIVE_CLARITY_WEAK"
+        ]
+      },
+      "resume_voice": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MACHINE_GENERATED_CADENCE",
+          "UNNATURAL_NOUN_STACKS"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "BUZZWORD_DENSITY"
+        ]
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "OPAQUE_SEGMENT",
+          "LOW_SEMANTIC_CLARITY"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry8_20260809\\e2e_20260809T065510Z_3f589fcd\\modular_r4\\sections\\headline\\x1d_openai_provider_response_raw_20260809_070616_955.json",
+  "original_model": null,
+  "fallback_model": null
+}

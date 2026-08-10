@@ -1,0 +1,69 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 4.1,
+    "threshold": 4.0,
+    "pass": true,
+    "decisive_failure": false,
+    "findings": [
+      "S4's phrase \"replay-key controls manifests\" is grammatically awkward and reduces executive polish.",
+      "The judge packet reports missing display-override parity for fact_engineering_platform_002, limiting independent verification of S3."
+    ],
+    "cited_sentence_indexes": [
+      4
+    ],
+    "remediation_suggestions": [
+      "Correct the S4 noun construction without changing its claim.",
+      "Restore display_override_text parity in the judge packet."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "AWKWARD_GRAMMAR"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DISPLAY_OVERRIDE_PARITY_PACKET_FAILURE"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry29_20260809\\e2e_20260809T112846Z_d90c57d9\\modular_r4\\sections\\executive_summary\\x1d_openai_provider_response_raw_20260809_113638_522.json",
+  "original_model": null,
+  "fallback_model": null
+}

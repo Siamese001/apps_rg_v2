@@ -27,9 +27,10 @@ import logging
 import os
 from typing import Any, Protocol, runtime_checkable
 
-from agentic_core.config.model_catalog import (
+from apps_research.runtime.core_dependencies import (
     BGE_M3_EMBEDDING_DIMENSION,
     BGE_M3_MODEL_ID,
+    resolve_embedding_device,
 )
 from apps_research.engines.research_retrieval_engine import RetrievedResearch
 
@@ -52,9 +53,7 @@ def _resolve_embedding_device() -> str:
     override = os.environ.get("APPS_RESEARCH_EMBEDDING_DEVICE", "").strip().lower()
     if override in {"cpu", "cuda", "mps"}:
         return override
-    from agentic_core.embeddings.bge_runtime import _resolve_device
-
-    return _resolve_device()
+    return resolve_embedding_device()
 
 
 # ---------------------------------------------------------------------------

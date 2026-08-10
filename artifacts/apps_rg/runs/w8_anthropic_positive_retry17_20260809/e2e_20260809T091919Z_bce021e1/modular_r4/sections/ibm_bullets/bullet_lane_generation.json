@@ -1,0 +1,55 @@
+{
+  "generation_mode": "model_employment_pool_claude_top_n_regen",
+  "section_lane": "ibm_bullets",
+  "initial_path_count": 2,
+  "total_paths_executed": 2,
+  "regen_rounds_executed": 0,
+  "adaptive_sc_enabled": true,
+  "max_path_count": 4,
+  "stop_reason": "selection_gate_passed",
+  "configured_max_regen_rounds": 1,
+  "max_regen_rounds_allowed": 1,
+  "expansion_events": [],
+  "min_selection_score": 0.72,
+  "selection_gate": {
+    "ok": true,
+    "section_lane": "ibm_bullets",
+    "final_bullet_count": 5,
+    "min_score_threshold": 0.72,
+    "slots_passing": [
+      "bul_ibm_001",
+      "bul_ibm_002",
+      "bul_ibm_003",
+      "bul_ibm_004",
+      "bul_ibm_005"
+    ],
+    "slots_below_threshold": [],
+    "slots_missing": [],
+    "bullets_in_merged": 5,
+    "unique_source_fact_ids": [],
+    "unique_source_fact_count": 0,
+    "duplicate_source_fact_ids": [],
+    "slots_missing_source_fact_ids": [],
+    "proof_unique_source_fact_gate_active": false
+  },
+  "selection_mode": "openai_chatgpt_employment_top_n_pass",
+  "source_path_by_slot": {
+    "bul_ibm_001": 0,
+    "bul_ibm_002": 0,
+    "bul_ibm_003": 0,
+    "bul_ibm_004": 0,
+    "bul_ibm_005": 1
+  },
+  "claude_selection_count": 5,
+  "selector_empty": false,
+  "selector_selection_mode": "openai_chatgpt_employment_top_n_pass",
+  "selector_bullets_in_merged": 5,
+  "selector_selection_count": 5,
+  "selector_subthreshold_scores": [
+    0.82,
+    0.78,
+    0.81,
+    0.83,
+    0.76
+  ]
+}

@@ -1,0 +1,229 @@
+{
+  "section_id": "headline",
+  "run_id": "headline_20260809_115517",
+  "gate_id": "x2_headline_xyz_literal_grounding",
+  "trigger_arm": "literal_grounding",
+  "trigger": {
+    "required_families": [
+      "runtime_governance",
+      "regulated_ai_systems"
+    ],
+    "specificity_floor": 2,
+    "families_matched_pre": {
+      "governance_signal": [
+        "runtime_governance"
+      ],
+      "specificity_floor": [
+        "runtime_governance",
+        "partner_applied_ai_architecture"
+      ],
+      "narrowing_labels": [],
+      "segments_missing_executive_abstraction": [],
+      "literal_grounding": {
+        "segments": [
+          {
+            "segment": "Runtime Reliability Leadership",
+            "ground_pass": false,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_unify_runtime_reliability_governance"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [],
+            "majority_grounded": false,
+            "semantic_support": {
+              "semantic_grounding_pass": false,
+              "supported_semantic_tokens": {
+                "runtime": [
+                  "reliability",
+                  "runtime"
+                ]
+              },
+              "raw_segment_tokens": [
+                "leadership",
+                "reliability",
+                "runtime"
+              ]
+            }
+          },
+          {
+            "segment": "Telemetry Governance Controls",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_unify_runtime_reliability_governance"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [
+                  "telemetry"
+                ],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "telemetry"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Alliance Co-Sell Leadership",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_unify_runtime_reliability_governance"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [
+                  "alliance",
+                  "co-sell"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "alliance",
+              "co-sell"
+            ],
+            "majority_grounded": true
+          }
+        ],
+        "checked": 3
+      },
+      "resume_native_clarity": {
+        "pass": true,
+        "shape_valid": true,
+        "opaque_segments": [],
+        "semantic_overlap_issues": [],
+        "segment_observations": [
+          {
+            "segment": "Runtime Reliability Leadership",
+            "word_count": 3,
+            "familiar_positioning_phrases": [],
+            "pass": true
+          },
+          {
+            "segment": "Telemetry Governance Controls",
+            "word_count": 3,
+            "familiar_positioning_phrases": [
+              "governance controls"
+            ],
+            "pass": true
+          },
+          {
+            "segment": "Alliance Co-Sell Leadership",
+            "word_count": 3,
+            "familiar_positioning_phrases": [],
+            "pass": true
+          }
+        ]
+      }
+    },
+    "headline_pre": "SVP Engineering | Runtime Reliability Leadership | Telemetry Governance Controls | Alliance Co-Sell Leadership"
+  },
+  "attempted": true,
+  "regen_call_made": true,
+  "accepted": false,
+  "headline_post": "SVP Engineering | Runtime Reliability Leadership | Telemetry Governance Controls | Alliance Co-Sell Leadership",
+  "families_matched_post": {
+    "governance_signal": [],
+    "specificity_floor": [],
+    "narrowing_labels": [],
+    "segments_missing_executive_abstraction": [],
+    "literal_grounding": {},
+    "resume_native_clarity": {}
+  },
+  "rejected_reason": "signal_still_missing",
+  "bounded": {
+    "max_attempts": 3,
+    "attempts_used": 3
+  },
+  "env_kill_switch_state": "unset",
+  "attempts": [
+    {
+      "attempt": 1,
+      "headline": "SVP Engineering | Runtime Telemetry Governance | Evaluation Rollback Reliability | Alliance Co-Sell Motions",
+      "trigger_arm": "literal_grounding",
+      "trigger_reason": "x2_headline_xyz_literal_grounding:failed",
+      "rejected_reason": "signal_still_missing",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_openai",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "gpt-5.6-luna",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_1.json"
+      }
+    },
+    {
+      "attempt": 2,
+      "headline": "SVP Engineering | Runtime Telemetry Governance | Runtime Evaluation Rollback | Alliance Co-Sell Motions",
+      "trigger_arm": "executive_abstraction",
+      "trigger_reason": "x2_headline_executive_abstraction_floor:Evaluation Rollback Reliability",
+      "rejected_reason": "resume_clarity_still_missing",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_openai",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "gpt-5.6-luna",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_2.json"
+      }
+    },
+    {
+      "attempt": 3,
+      "headline": "SVP Engineering | Runtime Governance Controls | Telemetry Evaluation Rollback | Alliance Co-Sell Motions",
+      "trigger_arm": "resume_native_clarity",
+      "trigger_reason": "headline_pre_x1d_resume_native_clarity:",
+      "rejected_reason": "signal_still_missing",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_openai",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "gpt-5.6-luna",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_3.json"
+      }
+    }
+  ],
+  "regen_provider_result": {
+    "runtime_generation_status": "REAL_LLM",
+    "provider_requested": "external_openai",
+    "provider_attempted": true,
+    "provider_available": true,
+    "model": "gpt-5.6-luna",
+    "exact_provider_error": "",
+    "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_3.json"
+  },
+  "regen_provider_response_ref": "headline_content_signal_repair_provider_response_attempt_3.json"
+}

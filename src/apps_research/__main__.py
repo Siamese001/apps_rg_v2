@@ -355,8 +355,23 @@ def _run_profile_spine(argv: list[str]) -> int:
     try:
         _ensure_searxng_runtime_ready()
         request = _research_request_from_args(args)
-        record = _run_research_record(request)
-        artifact_path = _write_research_artifacts(record, request)
+        from apps_model_telemetry.external_model_usage import (  # noqa: PLC0415
+            external_model_usage_scope,
+        )
+
+        # The standalone CLI must bind the same provider-attempt ledger that the
+        # apps_rg bridge binds.  Otherwise a genuine provider response can
+        # synthesize a brief but cannot produce independently auditable model
+        # evidence for the atomic handoff.
+        with external_model_usage_scope(
+            artifact_dir=_apps_research_runs_root(),
+            run_id=str(request.trace_id),
+            stage="L2.apps_research_company_brief",
+            trace_id=str(request.trace_id),
+            app_id="apps_research",
+        ):
+            record = _run_research_record(request)
+            artifact_path = _write_research_artifacts(record, request)
     except Exception as exc:  # guardian: allow-broad-exception -- product CLI must fail closed with a clear operator message for heterogeneous research/runtime failures
         _log.error("[apps_research] product run failed closed: %s", exc)
         return 1

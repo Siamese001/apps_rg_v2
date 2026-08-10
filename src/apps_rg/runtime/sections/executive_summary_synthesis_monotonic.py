@@ -122,6 +122,9 @@ def _prior_needs_prose_tighten(prior_reject_reason: str, gate_ids: frozenset[str
     return (
         "mechanism_inventory" in blob
         or "mechanism inventory" in blob
+        or "mechanism_comma_list" in blob
+        or "mechanism_list_through_connector" in blob
+        or "mechanism_chain_inventory" in blob
         or "meta or filler" in blob
         or "credential" in blob
         or "generic_exec_opener" in blob
@@ -137,6 +140,9 @@ def _prior_needs_density_reduction(prior_reject_reason: str, gate_ids: frozenset
     return (
         "too_many_source_fact_ids" in blob
         or "cross_fact_display_conflation" in blob
+        or "mechanism_comma_list" in blob
+        or "mechanism_list_through_connector" in blob
+        or "mechanism_chain_inventory" in blob
         or "word count" in blob
         and "exceeds maximum" in blob
         or "mechanism_inventory" in blob

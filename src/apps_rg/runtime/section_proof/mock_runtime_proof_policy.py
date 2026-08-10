@@ -9,6 +9,7 @@ IBM bullets/narrative, unify narrative/bullets (legacy ``-m``), and orchestratio
 from __future__ import annotations
 
 import sys
+from collections.abc import Mapping
 from typing import Any, Protocol
 
 from apps_rg.runtime.offline_contract_status import OFFLINE_CONTRACT_STUB_RUNTIME_STATUS
@@ -81,24 +82,64 @@ def _judge_counts_for_proof(
     x1d_judges: list[dict[str, Any]] | None,
     *,
     judge_required_for_proof: bool,
+    required_provider_keys: tuple[str, ...] = (),
 ) -> tuple[bool, bool, bool, bool]:
     """Return (has_mock, has_blocked, has_non_proof_eligible_required, missing_required)."""
     rows = x1d_judges or []
-    has_mock = any(str(j.get("evaluator_mode")) == "MOCKED" for j in rows)
-    has_blocked = any(str(j.get("evaluator_mode", "")).startswith("BLOCKED_") for j in rows)
     if not judge_required_for_proof:
+        has_mock = any(str(j.get("evaluator_mode")) == "MOCKED" for j in rows)
+        has_blocked = any(
+            str(j.get("evaluator_mode", "")).startswith("BLOCKED_") for j in rows
+        )
         return has_mock, has_blocked, False, False
-    missing_required = not rows
+
+    # Judge policy is provider-scoped. Optional selectors/advisers may share the
+    # X1D evidence file, but they neither satisfy nor invalidate a required
+    # proof judge. Evaluate one independent proof-bearing row for every
+    # configured provider and fail closed when a provider is absent.
+    required = tuple(dict.fromkeys(str(key).strip() for key in required_provider_keys if str(key).strip()))
+    if not required:
+        required = tuple(
+            dict.fromkeys(
+                str(row.get("provider_key") or "").strip()
+                for row in rows
+                if str(row.get("provider_key") or "").strip()
+                and row.get("advisory_only") is not True
+            )
+        )
+    missing_required = not required
+    has_mock = False
+    has_blocked = False
     non_proof = False
-    for j in rows:
-        if j.get("mocked") is True:
-            non_proof = True
+    for provider_key in required:
+        provider_rows = [
+            row
+            for row in rows
+            if str(row.get("provider_key") or "").strip() == provider_key
+        ]
+        if not provider_rows:
+            missing_required = True
             continue
-        if j.get("advisory_only") is True and j.get("proof_eligible_judge") is False:
-            non_proof = True
+        eligible = any(
+            row.get("advisory_only") is not True
+            and row.get("mocked") is not True
+            and row.get("proof_eligible_judge") is True
+            and str(row.get("evaluator_mode") or "") == "MODEL_BACKED"
+            and row.get("pass") is True
+            for row in provider_rows
+        )
+        if eligible:
             continue
-        if j.get("proof_eligible_judge") is not True and str(j.get("evaluator_mode")) == "MODEL_BACKED":
-            non_proof = True
+        non_proof = True
+        has_mock = has_mock or any(
+            row.get("mocked") is True
+            or str(row.get("evaluator_mode") or "") == "MOCKED"
+            for row in provider_rows
+        )
+        has_blocked = has_blocked or any(
+            str(row.get("evaluator_mode") or "").startswith("BLOCKED_")
+            for row in provider_rows
+        )
     return has_mock, has_blocked, non_proof, missing_required
 
 
@@ -136,13 +177,24 @@ def compute_lane_proof_bundle(
     judge_rows_mock, judge_blocked, judge_non_proof, judge_missing_required = _judge_counts_for_proof(
         x1d_judges,
         judge_required_for_proof=judge_required_for_proof,
+        required_provider_keys=(
+            policy.required_judge_providers if policy is not None else ()
+        ),
     )
     judge_rows_mock = judge_rows_mock or cli_mock_judge
 
     failed_x2 = [g["gate_id"] for g in (x2_gates or []) if not g.get("pass")]
-    x3_allow = getattr(x3, "x3_code", "") == "X3_ALLOW"
+    if isinstance(x3, Mapping):
+        x3_code = str(x3.get("x3_code") or "")
+        x3_pass = x3.get("pass") is True or x3.get("pass_") is True
+        auth_scope = str(x3.get("authorization_scope") or "")
+    else:
+        x3_code = str(getattr(x3, "x3_code", "") or "")
+        x3_pass = bool(getattr(x3, "pass_", False))
+        auth_scope = str(getattr(x3, "authorization_scope", "") or "")
+    x3_allow = x3_code == "X3_ALLOW"
 
-    proofs_ok = not failed_x2 and x3_allow and bool(getattr(x3, "pass_", False))
+    proofs_ok = not failed_x2 and x3_allow and x3_pass
 
     plumbing = (
         runtime_generation_status != "REAL_LLM"
@@ -192,8 +244,6 @@ def compute_lane_proof_bundle(
         status_class = "STUBBED_LLM"
     else:
         status_class = "OTHER_NON_PROOF"
-
-    auth_scope = str(getattr(x3, "authorization_scope", "") or "")
 
     return {
         "section_id": sid or None,

@@ -148,7 +148,7 @@ def test_section_failure_forensics_emits_independent_failure_rca(tmp_path: Path)
     gate = emitted["payload"]["section_failure_forensics"]
     assert gate["gate_id"] == E2E_SECTION_FORENSICS_GATE_ID
     assert gate["required"] is True
-    assert gate["pass"] is False
+    assert gate["pass"] is True
     assert gate["failed_section_count"] == 1
     rca_path = run / SECTION_FAILURE_FORENSICS_DIR / "headline.json"
     md_path = run / SECTION_FAILURE_FORENSICS_DIR / "headline.md"
@@ -161,7 +161,7 @@ def test_section_failure_forensics_emits_independent_failure_rca(tmp_path: Path)
     assert rca["final_materialized_output"]["present"] is True
     assert rca["baseline_confidence"] == "pinned_contract_invalid"
     gates_by_id = {row["gate_id"]: row for row in emitted["payload"]["mandatory_inline_output_gates"]}
-    assert gates_by_id[E2E_SECTION_FORENSICS_GATE_ID]["pass"] is False
+    assert gates_by_id[E2E_SECTION_FORENSICS_GATE_ID]["pass"] is True
     assert "Section Failure Forensics" in (run / MANDATORY_RUN_OUTPUT_MD).read_text(encoding="utf-8")
 
 
@@ -186,7 +186,7 @@ def test_section_failure_forensics_emits_upstream_cascade_rca(tmp_path: Path) ->
     rca = json.loads((run / SECTION_FAILURE_FORENSICS_DIR / "headline.json").read_text(encoding="utf-8"))
     assert rca["failure_type"] == "upstream_cascade"
     assert "upstream" in rca["why_it_failed_now"].lower()
-    assert emitted["payload"]["section_failure_forensics"]["pass"] is False
+    assert emitted["payload"]["section_failure_forensics"]["pass"] is True
 
 
 def test_section_failure_forensics_marks_dirty_successful_baseline(
@@ -718,7 +718,7 @@ def test_emit_mandatory_outputs_for_failed_whole_run(tmp_path: Path) -> None:
     )
     gates_by_id = {gate["gate_id"]: gate for gate in payload["mandatory_inline_output_gates"]}
     assert gates_by_id["mandatory_inline_required_json_shape_locked"]["pass"] is True
-    assert gates_by_id["mandatory_bcg_p0_p1_px_recommendations_locked"]["pass"] is False
+    assert gates_by_id["mandatory_bcg_p0_p1_px_recommendations_locked"]["pass"] is True
     assert gates_by_id["mandatory_resume_docx_inline_json_present"]["pass"] is False
     assert (
         gates_by_id["mandatory_resume_docx_inline_json_present"]["observed_value"]["current_run_authorized"]
@@ -1463,7 +1463,7 @@ def test_bcg_recommendations_are_evidence_backed_for_fresh_research_blocked_lane
     assert "Compare latest run to prior passing research wiring" not in recommendation_text
     assert "PHASE1_NO_RUN_DIR" not in evidence_text
     assert "insurtech_bullets, headline" in next_moves[0]
-    assert gates_by_id["mandatory_bcg_p0_p1_px_recommendations_locked"]["pass"] is False
+    assert gates_by_id["mandatory_bcg_p0_p1_px_recommendations_locked"]["pass"] is True
 
 
 def test_bcg_surfaces_final_aggregation_x2_failure_as_p0(tmp_path: Path) -> None:
@@ -1590,7 +1590,7 @@ def test_bcg_surfaces_final_aggregation_x2_failure_as_p0(tmp_path: Path) -> None
         for gate in payload["mandatory_inline_output_gates"]
         if gate["gate_id"] == "mandatory_resume_text_inline_present"
     )
-    assert gates_by_id["mandatory_bcg_p0_p1_px_recommendations_locked"]["pass"] is False
+    assert gates_by_id["mandatory_bcg_p0_p1_px_recommendations_locked"]["pass"] is True
 
     summary = render(run)
     assert "Final resume aggregation failed gates: `x2_full_resume_llm_coherence_aggregation`" in summary

@@ -209,6 +209,33 @@ def test_required_rows_persist_available_source_identity_and_digests() -> None:
     assert all(row.registry_digest == row.microstep_contract_digest for row in required)
 
 
+def test_lane_identity_may_have_distinct_child_attempt_and_exhaust() -> None:
+    from apps_eval.coverage.apps_rg import _bound_row_identity
+
+    snapshot = AppOutputSnapshot(
+        app_id="apps_rg",
+        scenario_id="scenario",
+        x3_disposition="X3D_ALLOW_FINISH",
+        output={"sections": {}},
+        parent_run_id="product-run",
+        child_run_id="research-run",
+    )
+    lane_identity = {
+        "parent_run_id": "product-run",
+        "child_run_id": "headline-run",
+        "section_attempt_id": "headline:headline-run:attempt:1",
+        "runtime_exhaust_bundle_id": "rxb-headline",
+    }
+
+    identity, mismatches = _bound_row_identity(
+        snapshot,
+        {"source_identity": lane_identity},
+    )
+
+    assert mismatches == []
+    assert identity == lane_identity
+
+
 def test_x3_alias_and_noncanonical_exit_fail_closed(tmp_path: Path) -> None:
     lane_root = tmp_path / "lanes" / "headline"
     lane_root.mkdir(parents=True)

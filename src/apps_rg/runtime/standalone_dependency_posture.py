@@ -15,6 +15,7 @@ import importlib
 import json
 import re
 import subprocess
+from fnmatch import fnmatchcase
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from importlib import metadata as importlib_metadata
@@ -43,6 +44,10 @@ _GIT_OBJECT = re.compile(r"^[0-9a-f]{40}$")
 
 class StandaloneRuntimeDependencyError(RuntimeError):
     """Raised when a caller requires an unavailable external core runtime."""
+
+    def __init__(self, message: str, *, evidence: Mapping[str, Any] | None = None) -> None:
+        super().__init__(message)
+        self.evidence = dict(evidence or {})
 
 
 def _canonical_json(value: Any) -> str:
@@ -159,13 +164,26 @@ def _validated_contract(
         "approved_package_tree": str(trust.get("approved_package_tree") or ""),
         "package_relative_path": str(trust.get("package_relative_path") or ""),
         "require_clean_tracked_worktree": trust.get("require_clean_tracked_worktree"),
+        "allowed_untracked_artifact_patterns": list(
+            trust.get("allowed_untracked_artifact_patterns") or []
+        ),
     }
+    artifact_patterns = normalized_trust["allowed_untracked_artifact_patterns"]
     if (
         normalized_trust["mode"] != "GIT_COMMIT_AND_PACKAGE_TREE_PIN"
         or not _GIT_OBJECT.fullmatch(normalized_trust["approved_repository_commit"])
         or not _GIT_OBJECT.fullmatch(normalized_trust["approved_package_tree"])
         or normalized_trust["package_relative_path"] != "agentic_core"
         or normalized_trust["require_clean_tracked_worktree"] is not True
+        or not artifact_patterns
+        or any(
+            not isinstance(pattern, str)
+            or not pattern
+            or "\\" in pattern
+            or pattern.startswith(("/", "../"))
+            or "/../" in pattern
+            for pattern in artifact_patterns
+        )
     ):
         raise StandaloneRuntimeDependencyError("standalone runtime trust pin is invalid")
     return normalized_dependency, modules, normalized_policy, normalized_trust
@@ -220,26 +238,62 @@ def _git_value(package_root: Path, *arguments: str) -> str:
     return completed.stdout.strip()
 
 
-def _verify_runtime_trust(package_root: Path, trust: Mapping[str, Any]) -> dict[str, str]:
+def _verify_runtime_trust(package_root: Path, trust: Mapping[str, Any]) -> dict[str, Any]:
     repository_root = Path(_git_value(package_root, "rev-parse", "--show-toplevel")).resolve()
     package_relative_path = package_root.relative_to(repository_root).as_posix()
-    head_commit = _git_value(package_root, "rev-parse", "HEAD")
-    package_tree = _git_value(package_root, "rev-parse", f"HEAD:{package_relative_path}")
-    tracked_changes = _git_value(package_root, "status", "--porcelain", "--untracked-files=no")
-    if package_relative_path != trust["package_relative_path"]:
-        raise StandaloneRuntimeDependencyError("external agentic_core package path does not match trust pin")
-    if head_commit != trust["approved_repository_commit"]:
-        raise StandaloneRuntimeDependencyError("external agentic_core commit does not match trust pin")
-    if package_tree != trust["approved_package_tree"]:
-        raise StandaloneRuntimeDependencyError("external agentic_core tree does not match trust pin")
-    if tracked_changes:
-        raise StandaloneRuntimeDependencyError("external agentic_core checkout has tracked changes")
-    return {
+    head_commit = _git_value(repository_root, "rev-parse", "HEAD")
+    package_tree = _git_value(repository_root, "rev-parse", f"HEAD:{package_relative_path}")
+    tracked_changes = _git_value(
+        repository_root, "status", "--porcelain", "--untracked-files=no"
+    )
+    untracked_paths = sorted(
+        path
+        for path in _git_value(
+            repository_root,
+            "ls-files",
+            "--others",
+            "--exclude-standard",
+        ).splitlines()
+        if path
+    )
+    allowed_patterns = list(trust["allowed_untracked_artifact_patterns"])
+    permitted_untracked = sorted(
+        path
+        for path in untracked_paths
+        if not path.startswith(f"{package_relative_path}/")
+        and any(fnmatchcase(path, pattern) for pattern in allowed_patterns)
+    )
+    rejected_untracked = sorted(set(untracked_paths) - set(permitted_untracked))
+    evidence = {
         "repository_root": str(repository_root),
         "head_commit": head_commit,
         "package_tree": package_tree,
         "package_relative_path": package_relative_path,
+        "allowed_untracked_artifact_patterns": allowed_patterns,
+        "permitted_untracked_paths": permitted_untracked,
+        "rejected_untracked_paths": rejected_untracked,
     }
+    if package_relative_path != trust["package_relative_path"]:
+        raise StandaloneRuntimeDependencyError(
+            "external agentic_core package path does not match trust pin", evidence=evidence
+        )
+    if head_commit != trust["approved_repository_commit"]:
+        raise StandaloneRuntimeDependencyError(
+            "external agentic_core commit does not match trust pin", evidence=evidence
+        )
+    if package_tree != trust["approved_package_tree"]:
+        raise StandaloneRuntimeDependencyError(
+            "external agentic_core tree does not match trust pin", evidence=evidence
+        )
+    if tracked_changes:
+        raise StandaloneRuntimeDependencyError(
+            "external agentic_core checkout has tracked changes", evidence=evidence
+        )
+    if rejected_untracked:
+        raise StandaloneRuntimeDependencyError(
+            "external agentic_core checkout has unapproved untracked paths", evidence=evidence
+        )
+    return evidence
 
 
 def _receipt_digest(receipt: Mapping[str, Any]) -> str:
@@ -373,6 +427,7 @@ def verify_external_agentic_core_runtime(
     try:
         receipt["resolved_runtime_trust"] = _verify_runtime_trust(package_root, trust)
     except StandaloneRuntimeDependencyError as exc:
+        receipt["resolved_runtime_trust"] = exc.evidence
         receipt.update(
             {
                 "status": "BLOCKED_AGENTIC_CORE_TRUST_PIN_MISMATCH",
@@ -466,6 +521,9 @@ def validate_standalone_runtime_dependency_receipt(receipt: Mapping[str, Any]) -
         if (
             resolved_trust.get("head_commit") != runtime_trust.get("approved_repository_commit")
             or resolved_trust.get("package_tree") != runtime_trust.get("approved_package_tree")
+            or resolved_trust.get("allowed_untracked_artifact_patterns")
+            != runtime_trust.get("allowed_untracked_artifact_patterns")
+            or resolved_trust.get("rejected_untracked_paths") != []
         ):
             raise StandaloneRuntimeDependencyError("external runtime trust pin does not match receipt")
 

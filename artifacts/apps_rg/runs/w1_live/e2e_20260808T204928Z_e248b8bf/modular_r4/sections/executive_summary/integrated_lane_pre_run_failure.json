@@ -1,0 +1,54 @@
+{
+  "blocker": "EXECUTED_X3A_DENY_REROUTE",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\executive_summary",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:ValueError:path C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\executive_summary\\RUN_BUNDLE_INDEX.json is not under repo_root C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-a7d4e9b6ff194a67adf4a7d8a25a19ca",
+    "run_id": "95c30a35-d467-4150-ab38-bde357aeb429",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "lane 'executive_summary' run_dir failed product bar (latest_successful_real_run.json): product_quality_not_PASS:FAIL",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/runs/w1_live/e2e_20260808T204928Z_e248b8bf/modular_r4/sections/executive_summary/real/<run_id>/",
+  "generated_at_utc": "2026-08-08T20:57:59.815042+00:00",
+  "integrated_run_id": "e2e_20260808T204928Z_e248b8bf",
+  "lane_exec_status": "dispatch_error:L2_EXECUTION_ERROR:ValueError:path C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\executive_summary\\RUN_BUNDLE_INDEX.json is not under repo_root C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src",
+  "lane_id": "executive_summary",
+  "primary_failure": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\executive_summary",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:ValueError:path C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\executive_summary\\RUN_BUNDLE_INDEX.json is not under repo_root C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-a7d4e9b6ff194a67adf4a7d8a25a19ca",
+    "run_id": "95c30a35-d467-4150-ab38-bde357aeb429",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/runs/w1_live/e2e_20260808T204928Z_e248b8bf/modular_r4/sections",
+  "status": "PRE_RUN_BLOCKED"
+}

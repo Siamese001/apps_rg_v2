@@ -1,0 +1,65 @@
+{
+  "schema_version": "canonical_evidence_digest_chain_v1",
+  "section_id": "headline",
+  "run_dir": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry11_20260809/e2e_20260809T074907Z_cd88cbbc/modular_r4/sections/headline",
+  "c05_canonical_evidence_digest": "de2d83f7b611a14a6338bdcf56586bc6e4aac263b144ebfee7d274649a628bb4",
+  "c06_final_evidence_contract_digest": "de2d83f7b611a14a6338bdcf56586bc6e4aac263b144ebfee7d274649a628bb4",
+  "c07_runtime_bound_evidence_digest": "e873bc7e150bc5fa7ddcfad3b70f7d82155099d231002cee747a1439df684631",
+  "pa_c0_slot_digest": "de2d83f7b611a14a6338bdcf56586bc6e4aac263b144ebfee7d274649a628bb4",
+  "provider_request_allowed_ids_digest": "de2d83f7b611a14a6338bdcf56586bc6e4aac263b144ebfee7d274649a628bb4",
+  "claim_ledger_source_fact_ids_digest": "e873bc7e150bc5fa7ddcfad3b70f7d82155099d231002cee747a1439df684631",
+  "x2_active_pool_digest": "c565f6d75bab49f64d8fccb5fff15f48ba526682fbf1fede563b5c66d40fb77e",
+  "section_receipt_digest": "",
+  "c05_canonical_evidence_ids": [
+    "exp_unify_001",
+    "fact_engineering_platform_003",
+    "metric_unify_partner_cosell_solution_motion_count",
+    "metric_unify_partner_enablement_asset_set",
+    "reb_unify_partner_channel_cosell",
+    "reb_unify_runtime_reliability_governance",
+    "skill_context_engineering",
+    "skill_partner_cloud_vendor_joint_gtm",
+    "skill_partner_gtm_enablement",
+    "skill_partner_partner_led_ai_solutions",
+    "skill_partner_partner_motions",
+    "skill_partner_partner_revenue_3m"
+  ],
+  "c06_fec_ids": [
+    "exp_unify_001",
+    "fact_engineering_platform_003",
+    "metric_unify_partner_cosell_solution_motion_count",
+    "metric_unify_partner_enablement_asset_set",
+    "reb_unify_partner_channel_cosell",
+    "reb_unify_runtime_reliability_governance",
+    "skill_context_engineering",
+    "skill_partner_cloud_vendor_joint_gtm",
+    "skill_partner_gtm_enablement",
+    "skill_partner_partner_led_ai_solutions",
+    "skill_partner_partner_motions",
+    "skill_partner_partner_revenue_3m"
+  ],
+  "c07_bound_ids": [
+    "reb_unify_partner_channel_cosell",
+    "reb_unify_runtime_reliability_governance"
+  ],
+  "invariants": {
+    "c06_fec_ids_subset_of_c05_canonical_evidence_ids": true,
+    "c07_bound_ids_subset_of_c06_fec_ids": true,
+    "pa_c0_subset_of_fec": true,
+    "provider_subset_of_fec": true,
+    "claim_ledger_subset_of_fec": true,
+    "digest_match_or_explicit_narrowing_receipt": true,
+    "no_namespace_split_without_alias": true,
+    "x2_namespace_gate_pass": true,
+    "violations": {
+      "fec_widening": [],
+      "c07_widening": [],
+      "pa_widening": [],
+      "provider_widening": [],
+      "ledger_widening": [],
+      "namespace_split_ids": []
+    },
+    "fec_narrowed_from_pool": true,
+    "all_pass": true
+  }
+}

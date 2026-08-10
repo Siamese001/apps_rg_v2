@@ -79,6 +79,19 @@ def _reservation_path(artifact_dir: Path | str | None) -> Path | None:
     return Path(raw) / RESERVATION_FILENAME if raw else None
 
 
+def _filesystem_path(path: Path) -> Path:
+    """Return a Windows extended-length path for governed append-only ledgers."""
+    resolved = path.resolve(strict=False)
+    if os.name != "nt":
+        return resolved
+    rendered = str(resolved)
+    if rendered.startswith("\\\\?\\"):
+        return resolved
+    if rendered.startswith("\\\\"):
+        return Path("\\\\?\\UNC\\" + rendered.lstrip("\\"))
+    return Path("\\\\?\\" + rendered)
+
+
 def _prior_reserved_total(path: Path) -> int:
     if not path.is_file():
         return 0
@@ -148,6 +161,7 @@ def reserve_token_budget(
             event=None,
         )
 
+    path = _filesystem_path(path)
     with _reservation_lock:
         path.parent.mkdir(parents=True, exist_ok=True)
         prior = _prior_reserved_total(path)

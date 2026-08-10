@@ -984,7 +984,11 @@ def _default_slot_specs(
                 "metric_required": index == 1,
             }
         )
-    for index in range(1, 3):
+    # The fixed headline product shape is ``SVP Engineering | X | Y | Z``.
+    # Allocate one independent graph authority per visible positioning pillar;
+    # two slots force one root to be reused across two pillars and routinely
+    # produce semantically duplicate, judge-rejected headlines.
+    for index in range(1, 4):
         slots.append(
             {
                 "slot_id": f"headline:skill:{index:02d}",

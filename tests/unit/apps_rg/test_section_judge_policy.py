@@ -111,7 +111,7 @@ def test_allow_non_allow_exit_zero_does_not_force_plumbing_when_product_passes()
             "allow_test_mock_provider": False,
         },
     )()
-    judge = {
+    openai_judge = {
         "evaluator_mode": "MODEL_BACKED",
         "provider_status": "MODEL_BACKED_PASS",
         "pass": True,
@@ -121,11 +121,12 @@ def test_allow_non_allow_exit_zero_does_not_force_plumbing_when_product_passes()
         "provider_key": "openai_chatgpt",
         "proof_eligible_judge": True,
     }
+    gemini_judge = {**openai_judge, "provider_key": "gemini_pro"}
     bundle = compute_lane_proof_bundle(
         args,
         section_id="executive_summary",
         runtime_generation_status="REAL_LLM",
-        x1d_judges=[judge, judge, judge],
+        x1d_judges=[gemini_judge, openai_judge],
         x2_gates=[{"gate_id": "x2_ok", "pass": True}],
         x3=_FakeX3(),
     )
@@ -149,7 +150,7 @@ def test_competencies_proof_bundle_blocks_when_required_judges_missing() -> None
     assert bundle["proof_eligible"] is False
 
 
-def test_competencies_proof_bundle_requires_proof_eligible_judge() -> None:
+def test_competencies_proof_bundle_requires_every_configured_provider() -> None:
     args = type("Args", (), {"mock_judges": False, "provider": "external_claude"})()
     openai_judge = {
         "evaluator_mode": "MODEL_BACKED",
@@ -171,9 +172,77 @@ def test_competencies_proof_bundle_requires_proof_eligible_judge() -> None:
         x3=_FakeX3(),
     )
     assert bundle["judge_required_for_proof"] is True
+    assert bundle["required_judge_rows_missing"] is True
+    assert bundle["judge_proof_eligible"] is False
+    assert bundle["proof_eligible"] is False
+
+
+def test_optional_advisory_selector_does_not_invalidate_required_bullet_judge() -> None:
+    args = type("Args", (), {"mock_judges": False, "provider": "external_claude"})()
+    gemini_judge = {
+        "evaluator_mode": "MODEL_BACKED",
+        "provider_status": "MODEL_BACKED_PASS",
+        "pass": True,
+        "provider_key": "gemini_pro",
+        "proof_eligible_judge": True,
+        "advisory_only": False,
+    }
+    advisory_selector = {
+        "evaluator_mode": "MODEL_BACKED",
+        "provider_status": "MODEL_BACKED_PASS",
+        "pass": True,
+        "provider_key": "openai_chatgpt",
+        "proof_eligible_judge": False,
+        "advisory_only": True,
+    }
+
+    bundle = compute_lane_proof_bundle(
+        args,
+        section_id="unify_bullets",
+        runtime_generation_status="REAL_LLM",
+        x1d_judges=[gemini_judge, advisory_selector],
+        x2_gates=[{"gate_id": "x2_ok", "pass": True}],
+        x3=_FakeX3(),
+    )
+
     assert bundle["required_judge_rows_missing"] is False
     assert bundle["judge_proof_eligible"] is True
     assert bundle["proof_eligible"] is True
+
+
+def test_executive_summary_mapping_x3_is_proof_eligible_without_recalling_judges() -> None:
+    """Regression for fresh E2E final7: executive X3 is a serialized mapping."""
+
+    args = type("Args", (), {"mock_judges": False, "provider": "external_openai"})()
+    judges = [
+        {
+            "evaluator_mode": "MODEL_BACKED",
+            "provider_status": "MODEL_BACKED_PASS",
+            "pass": True,
+            "provider_key": provider,
+            "proof_eligible_judge": True,
+            "advisory_only": False,
+        }
+        for provider in ("gemini_pro", "openai_chatgpt")
+    ]
+
+    bundle = compute_lane_proof_bundle(
+        args,
+        section_id="executive_summary",
+        runtime_generation_status="REAL_LLM",
+        x1d_judges=judges,
+        x2_gates=[{"gate_id": "x2_ok", "pass": True}],
+        x3={
+            "x3_code": "X3_ALLOW",
+            "pass": True,
+            "authorization_scope": "PRODUCT_QUALITY",
+        },
+    )
+
+    assert bundle["proof_eligible"] is True
+    assert bundle["judge_proof_eligible"] is True
+    assert bundle["provider_proof_eligible"] is True
+    assert bundle["authorization_scope"] == "PRODUCT_QUALITY"
 
 
 def test_forbidden_models_fail_proof_resolution() -> None:

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,6 +24,7 @@ AUTHORITY_CONTRACT_ID = "apps_research_rg_e2e_authority"
 AUTHORITY_CONTRACT_REF = (
     "config/certification/apps_research_rg_e2e_authority_contract.v1.json"
 )
+E2E_LEDGER_RECEIPT_SNAPSHOT_DIR = "e2e_ledger_receipts"
 # ``e2e_stage_ledger.py`` lives under ``<repo>/src/apps_rg/runtime`` in the
 # standalone source layout, while the authority contract remains a repository
 # resource under ``<repo>/config``.  Resolve from the repository root so the
@@ -39,6 +42,15 @@ _ALLOWED_STATUSES = frozenset(
 )
 _DEPENDENCY_SUCCESS_STATUSES = frozenset({"PASS", "SKIPPED"})
 _TERMINAL_FAILURE_STATUSES = frozenset({"FAIL", "BLOCKED"})
+_CANONICAL_X3_CODES = frozenset(
+    {
+        "X3A_DENY_REROUTE",
+        "X3B_ESCALATE_HITL",
+        "X3C_COMMIT_REQUEST_TO_UWG",
+        "X3D_ALLOW_FINISH",
+        "X3E_SAFE_ABSTAIN",
+    }
+)
 
 
 class StageTransitionError(RuntimeError):
@@ -138,6 +150,50 @@ def _artifact_binding(root: Path, artifact_ref: str | Path) -> dict[str, Any]:
     }
 
 
+def _snapshot_authoritative_receipt(
+    root: Path,
+    *,
+    stage_id: str,
+    sequence: int,
+    receipt_bytes: bytes,
+) -> dict[str, Any]:
+    """Publish exact receipt bytes to a ledger-owned immutable stage path.
+
+    The full SHA-256 remains authoritative in the ledger entry.  Keeping that
+    digest out of the Windows filename prevents otherwise valid run roots from
+    crossing the legacy 260-character boundary during ``os.link``.
+    """
+
+    base = Path(root).resolve()
+    digest = _sha256_bytes(receipt_bytes)
+    target = (
+        base
+        / E2E_LEDGER_RECEIPT_SNAPSHOT_DIR
+        / f"{sequence:04d}_{stage_id.lower()}.json"
+    )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        if target.read_bytes() != receipt_bytes:
+            raise StageTransitionError(
+                f"immutable receipt snapshot collision: {target.relative_to(base)}"
+            )
+        return _artifact_binding(base, target)
+
+    temporary = target.with_name(f".{uuid.uuid4().hex[:12]}.tmp")
+    temporary.write_bytes(receipt_bytes)
+    try:
+        try:
+            os.link(temporary, target)
+        except FileExistsError:
+            if target.read_bytes() != receipt_bytes:
+                raise StageTransitionError(
+                    f"immutable receipt snapshot collision: {target.relative_to(base)}"
+                )
+    finally:
+        temporary.unlink(missing_ok=True)
+    return _artifact_binding(base, target)
+
+
 def _receipt_schema_version(payload: Mapping[str, Any]) -> str:
     return str(payload.get("schema_version") or "").strip()
 
@@ -202,6 +258,20 @@ def _derive_product_receipt_status(
             and str(commit.get("commit_marker_sha256") or "").strip()
         )
         return "PASS" if passed else "BLOCKED"
+    if sid == "X3_DISPOSITION":
+        code = str(
+            payload.get("x3_disposition") or payload.get("x3_code") or ""
+        ).strip()
+        if code not in _CANONICAL_X3_CODES:
+            raise StageTransitionError(
+                f"legacy or unknown product X3 disposition rejected: {code!r}"
+            )
+        return (
+            "PASS"
+            if code == "X3D_ALLOW_FINISH"
+            and _derive_receipt_status(payload, status_field="status") == "PASS"
+            else "BLOCKED"
+        )
     if sid == "UWG_COMMIT":
         return "PASS" if payload.get("commit_status") == "COMMITTED" else "BLOCKED"
     if sid == "PRODUCT_AUTHORIZATION_CLOSE":
@@ -212,6 +282,17 @@ def _derive_product_receipt_status(
             and payload.get("status") == "AUTHORIZED"
             else "BLOCKED"
         )
+    if sid == "TERMINAL_NON_PRODUCT":
+        passed = bool(
+            _derive_receipt_status(payload, status_field="status") == "PASS"
+            and str(payload.get("failed_stage_id") or "").strip()
+            and str(payload.get("causal_receipt_ref") or "").strip()
+            and isinstance(payload.get("blocked_successor_stage_ids"), list)
+            and payload.get("blocked_successor_stage_ids")
+            and payload.get("product_authorized") is False
+            and payload.get("pipeline_complete") is False
+        )
+        return "PASS" if passed else "BLOCKED"
     return _derive_receipt_status(payload, status_field="status")
 
 
@@ -926,20 +1007,19 @@ class ReceiptDerivedE2EStageLedger:
             str(item).upper() for item in stage_contract.get("allowed_next") or ()
         )
         selected_next = str(next_stage_id).upper() if next_stage_id else None
-        if selected_next is None and len(allowed_next) == 1:
-            selected_next = allowed_next[0]
+        ordinary_next = tuple(
+            item for item in allowed_next if item != "TERMINAL_NON_PRODUCT"
+        )
+        if selected_next is None and len(ordinary_next) == 1:
+            selected_next = ordinary_next[0]
         if selected_next is not None and selected_next not in allowed_next:
             raise StageTransitionError(
                 f"stage {sid} cannot transition to {selected_next}; allowed={allowed_next}"
             )
-        if selected_next is None and allowed_next:
-            raise StageTransitionError(
-                f"stage {sid} has multiple continuations; next_stage_id is required"
-            )
-        receipt_binding = _artifact_binding(self.path.parent, receipt_ref)
-        receipt_path = self.path.parent / receipt_binding["artifact_ref"]
+        receipt_path = _resolve_contained_artifact(self.path.parent, receipt_ref)
+        receipt_bytes = receipt_path.read_bytes()
         try:
-            receipt = json.loads(receipt_path.read_bytes())
+            receipt = json.loads(receipt_bytes)
         except json.JSONDecodeError as exc:
             raise StageTransitionError("authoritative receipt is not valid JSON") from exc
         if not isinstance(receipt, dict):
@@ -959,7 +1039,25 @@ class ReceiptDerivedE2EStageLedger:
             )
         status = _derive_product_receipt_status(sid, receipt)
         if status in {"FAIL", "BLOCKED"}:
-            selected_next = None
+            if sid == "TERMINAL_NON_PRODUCT":
+                selected_next = None
+            elif "TERMINAL_NON_PRODUCT" in allowed_next:
+                selected_next = "TERMINAL_NON_PRODUCT"
+            else:
+                raise StageTransitionError(
+                    f"failed stage {sid} has no TERMINAL_NON_PRODUCT transition"
+                )
+        if selected_next is None and allowed_next and status not in {"FAIL", "BLOCKED"}:
+            raise StageTransitionError(
+                f"stage {sid} has multiple continuations; next_stage_id is required"
+            )
+        receipt_binding = _snapshot_authoritative_receipt(
+            self.path.parent,
+            stage_id=sid,
+            sequence=len(entries),
+            receipt_bytes=receipt_bytes,
+        )
+        receipt_binding["schema_version"] = schema_version
         bindings = [
             _artifact_binding(self.path.parent, artifact_ref)
             for artifact_ref in artifact_refs
@@ -1006,16 +1104,6 @@ class ReceiptDerivedE2EStageLedger:
         entries = entries if isinstance(entries, list) else []
         if not entries:
             raise StageTransitionError("cannot seal an empty receipt-derived ledger")
-        non_success = [
-            str(entry.get("stage_id") or "")
-            for entry in entries
-            if str(entry.get("status") or "") not in {"PASS", "SKIPPED_NON_PRODUCT"}
-        ]
-        if non_success:
-            raise StageTransitionError(
-                "cannot seal a ledger containing unsuccessful stages: "
-                + ", ".join(non_success)
-            )
         state = {
             "product_authorized": bool(terminal_state.get("product_authorized")),
             "pipeline_complete": bool(terminal_state.get("pipeline_complete")),
@@ -1041,6 +1129,35 @@ class ReceiptDerivedE2EStageLedger:
             raise StageTransitionError(
                 f"cannot seal product state at {terminal_stage}; expected {expected_terminal}"
             )
+        non_success = [
+            entry
+            for entry in entries
+            if str(entry.get("status") or "") not in {"PASS", "SKIPPED_NON_PRODUCT"}
+        ]
+        if state["product_authorized"]:
+            if non_success:
+                raise StageTransitionError(
+                    "cannot seal a product ledger containing unsuccessful stages: "
+                    + ", ".join(
+                        str(entry.get("stage_id") or "") for entry in non_success
+                    )
+                )
+        else:
+            decisive_failures = [
+                entry
+                for entry in entries[:-1]
+                if str(entry.get("status") or "") in {"FAIL", "BLOCKED"}
+            ]
+            terminal_status = str(entries[-1].get("status") or "")
+            if len(decisive_failures) != 1 or terminal_status != "PASS":
+                raise StageTransitionError(
+                    "non-product seal requires one decisive failure followed by "
+                    "a successful TERMINAL_NON_PRODUCT receipt"
+                )
+            if non_success != decisive_failures:
+                raise StageTransitionError(
+                    "non-product ledger contains unsupported unsuccessful stages"
+                )
         closed_at = sealed_at_utc or self._clock()
         payload["terminal_state"] = state
         payload["closed_at_utc"] = closed_at
@@ -1147,8 +1264,15 @@ def _verify_receipt_derived_v2(
             errors.append(f"authoritative_receipt_unreadable:{sid}:{type(exc).__name__}")
             receipt = {}
             receipt_bytes = b""
-        if raw.get("authoritative_receipt_sha256") != _sha256_bytes(receipt_bytes):
+        receipt_sha256 = _sha256_bytes(receipt_bytes)
+        if raw.get("authoritative_receipt_sha256") != receipt_sha256:
             errors.append(f"authoritative_receipt_digest_mismatch:{sid}")
+        expected_snapshot_ref = (
+            f"{E2E_LEDGER_RECEIPT_SNAPSHOT_DIR}/"
+            f"{sequence:04d}_{sid.lower()}.json"
+        )
+        if receipt_ref != expected_snapshot_ref:
+            errors.append(f"authoritative_receipt_not_immutable_snapshot:{sid}")
         if raw.get("authoritative_receipt_schema_version") != _receipt_schema_version(
             receipt
         ):
@@ -1191,8 +1315,11 @@ def _verify_receipt_derived_v2(
         )
         if selected_next is not None and selected_next not in allowed_next:
             errors.append(f"next_stage_invalid:{sid}:{selected_next}")
-        if status in {"FAIL", "BLOCKED"} and selected_next is not None:
-            errors.append(f"failed_stage_has_continuation:{sid}:{selected_next}")
+        if status in {"FAIL", "BLOCKED"} and sid != "TERMINAL_NON_PRODUCT":
+            if selected_next != "TERMINAL_NON_PRODUCT":
+                errors.append(
+                    f"failed_stage_missing_non_product_terminal:{sid}:{selected_next}"
+                )
         if selected_next is None and allowed_next and status not in {"FAIL", "BLOCKED"}:
             errors.append(f"next_stage_missing:{sid}")
         prior_next = selected_next
@@ -1209,15 +1336,37 @@ def _verify_receipt_derived_v2(
     terminal_state = payload.get("terminal_state")
     if not isinstance(terminal_state, dict):
         errors.append("terminal_state_missing")
+    successful_statuses = {"PASS", "SKIPPED_NON_PRODUCT"}
+    product_complete = terminal_stage == "MANDATORY_OUTPUTS" and all(
+        isinstance(entry, dict)
+        and str(entry.get("status") or "") in successful_statuses
+        for entry in entries
+    )
+    decisive_failures = [
+        entry
+        for entry in entries[:-1]
+        if isinstance(entry, dict)
+        and str(entry.get("status") or "") in {"FAIL", "BLOCKED"}
+    ]
+    non_product_complete = bool(
+        terminal_stage == "TERMINAL_NON_PRODUCT"
+        and entries
+        and isinstance(entries[-1], dict)
+        and str(entries[-1].get("status") or "") == "PASS"
+        and len(decisive_failures) == 1
+        and all(
+            isinstance(entry, dict)
+            and (
+                entry is decisive_failures[0]
+                or str(entry.get("status") or "") in successful_statuses
+            )
+            for entry in entries[:-1]
+        )
+    )
     complete = (
         not errors
         and sealed
-        and terminal_stage in {"MANDATORY_OUTPUTS", "TERMINAL_NON_PRODUCT"}
-        and all(
-            isinstance(entry, dict)
-            and str(entry.get("status") or "") in {"PASS", "SKIPPED_NON_PRODUCT"}
-            for entry in entries
-        )
+        and (product_complete or non_product_complete)
     )
     return LedgerVerificationReport(
         valid=not errors,

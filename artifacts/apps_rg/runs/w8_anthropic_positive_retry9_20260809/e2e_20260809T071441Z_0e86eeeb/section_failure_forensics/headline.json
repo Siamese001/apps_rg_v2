@@ -1,0 +1,1346 @@
+{
+  "schema_version": "apps_rg.section_failure_forensics.v1",
+  "generated_at_utc": "2026-08-09T07:22:01Z",
+  "section_id": "headline",
+  "failure_type": "upstream_cascade",
+  "failed_gate_ids": [
+    "x2_headline_exactly_one_line",
+    "x2_headline_pipe_four_segments",
+    "x2_headline_word_count_10_to_13",
+    "x2_headline_claim_ledger_rows_present",
+    "x2_headline_text_claim_coverage_integrity",
+    "x2_headline_source_supported",
+    "x2_headline_xyz_literal_grounding",
+    "x2_headline_selected_fact_plan_matches_ledger",
+    "x2_json_parse_valid",
+    "x2_headline_schema_valid",
+    "x2_headline_executive_length",
+    "x2_headline_jd_context_not_proof",
+    "x2_headline_briefing_context_not_proof",
+    "x2_headline_companion_context_not_proof",
+    "x2_input_usage_accounting_consistent",
+    "x2_headline_positioning_bundle_id_required",
+    "x2_headline_graph_skill_node_ids_required",
+    "x2_headline_source_fact_or_graph_lineage_required",
+    "x2_headline_svp_engineering_seniority_required",
+    "x2_headline_seniority_floor_met",
+    "x2_headline_platform_or_runtime_signal_required",
+    "x2_headline_governance_or_regulated_ai_signal_required",
+    "x2_headline_technical_specificity_floor_met",
+    "x2_resume_graph_claim_binding"
+  ],
+  "current_output": {
+    "present": true,
+    "ref": "command_output.txt",
+    "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\command_output.txt",
+    "text": "HEADLINE_OUTPUT:\nBLOCKED: External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmgZxxuNXxodKdHu87g\"}\n\nWORD_COUNT: 0\n\nX1D_LLM_JUDGE_OUTPUTS:\n| Provider | Mode | Status | Score | Pass | Decisive Failure |\n|---|---|---|---:|---|---|\n| Google Gemini 3.6 Flash | MODEL_BACKED | MODEL_BACKED_FAIL | 0.0 | False | True |\n| OpenAI ChatGPT | MODEL_BACKED | MODEL_BACKED_FAIL | 0.0 | False | True |\n\nX2_DETERMINISTIC_GATE_OUTPUTS:\n- x2_headline_exactly_one_line: FAIL\n- x2_headline_pipe_four_segments: FAIL\n- x2_headline_segments_quality: PASS\n- x2_headline_no_standalone_vendor_architecture: PASS\n- x2_headline_executive_abstraction_floor: PASS\n- x2_headline_vendor_terms_proof_only: PASS\n- x2_headline_no_digit_tokens: PASS\n- x2_headline_no_currency_percent_literals: PASS\n- x2_headline_no_hype_markers: PASS\n- x2_headline_no_keyword_stuffing_heuristic: PASS\n- x2_headline_word_count_10_to_13: FAIL\n- x2_headline_no_metrics: PASS\n- x2_headline_no_unsupported_employer_names: PASS\n- x2_headline_no_candidate_name_tokens: PASS\n- x2_no_first_person: PASS\n- x2_no_em_dash: PASS\n- x2_headline_no_inline_source_tags: PASS\n- x2_no_target_company_as_experience: PASS\n- x2_no_jd_only_claims: PASS\n- x2_headline_claim_ledger_rows_present: FAIL\n- x2_headline_claim_ledger_segment_decomposition: PASS\n- x2_headline_claim_ledger_no_silent_row_drop: PASS\n- x2_headline_text_claim_coverage_integrity: FAIL\n- x2_headline_source_supported: FAIL\n- x2_headline_xyz_literal_grounding: FAIL\n- x2_headline_selected_fact_plan_matches_ledger: FAIL\n- x2_json_parse_valid: FAIL\n- x2_headline_prompt_reasoning_receipt_clean: PASS\n- x2_headline_raw_model_schema_valid: PASS\n- x2_headline_self_check_consistent: PASS\n- x2_headline_schema_valid: FAIL\n- x2_provider_requested_attempted: PASS\n- x2_no_silent_mock_fallback: PASS\n- x2_x1d_required_judges_present: PASS\n- x2_x1d_schema_valid: PASS\n- x2_headline_executive_length: FAIL\n- x2_headline_no_title_inflation: PASS\n- x2_headline_jd_context_not_proof: FAIL\n- x2_headline_briefing_context_not_proof: FAIL\n- x2_headline_companion_context_not_proof: FAIL\n- x2_headline_active_proof_pool_source_fact_ids: PASS\n- x2_section_input_usage_ledger_present: PASS\n- x2_jd_used_as_required_targeting_input: PASS\n- x2_briefing_used_as_required_context_input: PASS\n- x2_title_company_used_as_required_positioning_input: PASS\n- x2_no_non_evidence_inputs_as_claim_evidence: PASS\n- x2_no_non_evidence_inputs_in_source_fact_ids: PASS\n- x2_selected_fact_ids_only: PASS\n- x2_section_claims_supported_by_base_resume: PASS\n- x2_input_usage_accounting_consistent: FAIL\n- x2_fec_subset_of_canonical_evidence_pool: PASS\n- x2_prompt_c0_ids_subset_of_fec: PASS\n- x2_claim_ledger_source_fact_ids_subset_of_fec: PASS\n- X2_BLOCK_ID_NAMESPACE_SPLIT: PASS\n- x2_active_pool_digest_matches_fec_digest: PASS\n- x2_headline_no_narrowing_it_labels: PASS\n- x2_headline_positioning_family_preserved: PASS\n- x2_headline_e0_ngram_overlap: PASS\n- x2_headline_base_ngram_overlap: PASS\n- x2_headline_positioning_bundles_in_proof_pool: PASS\n- x2_headline_positioning_bundle_id_required: FAIL\n- x2_headline_graph_skill_node_ids_required: FAIL\n- x2_headline_source_fact_or_graph_lineage_required: FAIL\n- x2_headline_svp_engineering_seniority_required: FAIL\n- x2_headline_seniority_floor_met: FAIL\n- x2_headline_platform_or_runtime_signal_required: FAIL\n- x2_headline_governance_or_regulated_ai_signal_required: FAIL\n- x2_headline_generic_it_strategy_demote_forbidden: PASS\n- x2_headline_jd_only_phrase_forbidden: PASS\n- x2_headline_technical_specificity_floor_met: FAIL\n- x2_headline_e0_ngram_overlap_forbidden: PASS\n- x2_headline_base_ngram_overlap_forbidden_or_warn: PASS\n\nX3_DISPOSITION:\n{\n  \"x3_code\": \"X3_BLOCK\",\n  \"decisive_reason\": \"X2 deterministic gate failure\",\n  \"review_reason\": \"\",\n  \"authorization_scope\": \"PLUMBING_ONLY\",\n  \"proceed_to_runtime\": false,\n  \"runtime_generation_status\": \"BLOCKED\",\n  \"x1d_evaluator_mode\": \"MODEL_BACKED\",\n  \"product_quality_status\": \"FAIL\",\n  \"x2_failed_gates\": [\n    \"x2_headline_exactly_one_line\",\n    \"x2_headline_pipe_four_segments\",\n    \"x2_headline_word_count_10_to_13\",\n    \"x2_headline_claim_ledger_rows_present\",\n    \"x2_headline_text_claim_coverage_integrity\",\n    \"x2_headline_source_supported\",\n    \"x2_headline_xyz_literal_grounding\",\n    \"x2_headline_selected_fact_plan_matches_ledger\",\n    \"x2_json_parse_valid\",\n    \"x2_headline_schema_valid\",\n    \"x2_headline_executive_length\",\n    \"x2_headline_jd_context_not_proof\",\n    \"x2_headline_briefing_context_not_proof\",\n    \"x2_headline_companion_context_not_proof\",\n    \"x2_input_usage_accounting_consistent\",\n    \"x2_headline_positioning_bundle_id_required\",\n    \"x2_headline_graph_skill_node_ids_required\",\n    \"x2_headline_source_fact_or_graph_lineage_required\",\n    \"x2_headline_svp_engineering_seniority_required\",\n    \"x2_headline_seniority_floor_met\",\n    \"x2_headline_platform_or_runtime_signal_required\",\n    \"x2_headline_governance_or_regulated_ai_signal_required\",\n    \"x2_headline_technical_specificity_floor_met\"\n  ],\n  \"blocked_judges\": [],\n  \"mocked_judges\": [],\n  \"soft_failed_judges\": [],\n  \"decisive_judge_failures\": [\n    \"gemini_pro\",\n    \"openai_chatgpt\"\n  ],\n  \"final_summary_hash\": \"e3b0c44298fc1c14\",\n  \"claim_ledger_hash\": \"4f53cda18c2baa0c\",\n  \"required_remediation\": [\n    \"Fix failed X2 gates: x2_headline_exactly_one_line, x2_headline_pipe_four_segments, x2_headline_word_count_10_to_13, x2_headline_claim_ledger_rows_present, x2_headline_text_claim_coverage_integrity, x2_headline_source_supported, x2_headline_xyz_literal_grounding, x2_headline_selected_fact_plan_matches_ledger, x2_json_parse_valid, x2_headline_schema_valid, x2_headline_executive_length, x2_headline_jd_context_not_proof, x2_headline_briefing_context_not_proof, x2_headline_companion_context_not_proof, x2_input_usage_accounting_consistent, x2_headline_positioning_bundle_id_required, x2_headline_graph_skill_node_ids_required, x2_headline_source_fact_or_graph_lineage_required, x2_headline_svp_engineering_seniority_required, x2_headline_seniority_floor_met, x2_headline_platform_or_runtime_signal_required, x2_headline_governance_or_regulated_ai_signal_required, x2_headline_technical_specificity_floor_met\",\n    \"Remediate decisive judge failures: gemini_pro, openai_chatgpt\",\n    \"Product quality must be PASS, currently FAIL.\"\n  ],\n  \"blocked_judge_detail_rows\": [],\n  \"model_backed_pass_provider_keys\": [],\n  \"proof_eligible_allow_requires\": \"every_configured_x1d_judge_model_backed_pass\",\n  \"pass\": false,\n  \"disposition_authority\": \"lane\",\n  \"section_x3_authoritative\": false,\n  \"section_x3_mirror_only\": true,\n  \"spine_x3_claimed\": false\n}\n\nL6_SHADOW_EVAL_PACKAGE:\nC:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\l6_shadow_eval_package.json\noffline_only=true",
+    "sha256": "e89a0b0ab6b509f3507358984fbe09277c7e7c1f012a90bc34895c85abca4da6",
+    "source": "display_text_file"
+  },
+  "last_successful_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "missing_lane_dir",
+    "baseline_run_dir": "",
+    "baseline_found": false,
+    "baseline_lane_dir": "",
+    "baseline_display_txt_path": ""
+  },
+  "input_hash_comparison": {
+    "current_scenario_hash": "da33a8e36e09f68d05be4eaa32b5a444185414ab107506ebad8b377629ebdc62",
+    "baseline_scenario_hash": "",
+    "match": false,
+    "current": {
+      "target_company": "Anthropic",
+      "target_role": "Manager of Applied AI Architecture, Partnerships",
+      "manual_brief": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\apps_research\\runs\\r-a1c74aeba61837293a70a277\\briefing.md",
+      "jd": "",
+      "generation_mode": "strategic_tailor",
+      "scenario_hash": "da33a8e36e09f68d05be4eaa32b5a444185414ab107506ebad8b377629ebdc62"
+    },
+    "baseline": {}
+  },
+  "selected_fact_plan_comparison": {
+    "artifact": "selected_fact_plan.json",
+    "current_present": true,
+    "baseline_present": false,
+    "current_hash": "0ffb1ea82c1072aa85466b3968f44cb645c4d334a158a8cf3f6bb504b49ed428",
+    "baseline_hash": "",
+    "match": false
+  },
+  "provider_request_hash_comparison": {
+    "artifact": "provider_request.json",
+    "current_present": true,
+    "baseline_present": false,
+    "current_hash": "5297c66dc74b64342989fee1c2cd2103d1729df9064247479740ba575946cbf1",
+    "baseline_hash": "",
+    "match": false
+  },
+  "revision_comparison": {
+    "baseline": {
+      "status": "NO_PRIOR_PASSING_RUN",
+      "git_commit": "",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_applicable"
+    },
+    "current": {
+      "status": "IDENTIFIED",
+      "git_commit": "cba1303f044f24af364b888122971cab7a972457",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_derivable_from_local_history"
+    }
+  },
+  "difference_summary": {
+    "baseline_status": "NO_PRIOR_PASSING_RUN",
+    "inputs_match": false,
+    "selected_fact_plan_match": false,
+    "provider_request_match": false,
+    "materialized_output_match": false,
+    "baseline_x2": "NOT_OBSERVED",
+    "current_x2": "FAIL",
+    "baseline_x3": "NOT_OBSERVED",
+    "current_x3": "X3_BLOCK",
+    "baseline_judges": "NOT_OBSERVED",
+    "current_judges": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 0/5 vs 4 FAIL; OpenAI ChatGPT `gpt-5.6-sol`: 0/5 vs 4 FAIL",
+    "failed_gate_ids": [
+      "x2_headline_exactly_one_line",
+      "x2_headline_pipe_four_segments",
+      "x2_headline_word_count_10_to_13",
+      "x2_headline_claim_ledger_rows_present",
+      "x2_headline_text_claim_coverage_integrity",
+      "x2_headline_source_supported",
+      "x2_headline_xyz_literal_grounding",
+      "x2_headline_selected_fact_plan_matches_ledger",
+      "x2_json_parse_valid",
+      "x2_headline_schema_valid",
+      "x2_headline_executive_length",
+      "x2_headline_jd_context_not_proof",
+      "x2_headline_briefing_context_not_proof",
+      "x2_headline_companion_context_not_proof",
+      "x2_input_usage_accounting_consistent",
+      "x2_headline_positioning_bundle_id_required",
+      "x2_headline_graph_skill_node_ids_required",
+      "x2_headline_source_fact_or_graph_lineage_required",
+      "x2_headline_svp_engineering_seniority_required",
+      "x2_headline_seniority_floor_met",
+      "x2_headline_platform_or_runtime_signal_required",
+      "x2_headline_governance_or_regulated_ai_signal_required",
+      "x2_headline_technical_specificity_floor_met",
+      "x2_resume_graph_claim_binding"
+    ]
+  },
+  "comparison_complete": false,
+  "output_bisect": {
+    "schema_version": "apps_rg.output_bisect.v1",
+    "section_id": "headline",
+    "scope": "NO_PRIOR_BASELINE",
+    "first_observed_divergence": {
+      "order": 1,
+      "stage": "u0_ingress",
+      "prior_value": "NOT_OBSERVED",
+      "current_value": "90559beb2706e95632500b4bec5d29f230fbac74c4cefd341bc1e495abc901ca",
+      "prior_detail": "NOT_OBSERVED",
+      "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\apps_research\\runs\\r-a1c74aeba61837293a70a277\\briefing.md",
+      "match": false,
+      "classification": "CORRELATED_ONLY",
+      "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+      "prior_evidence_ref": "",
+      "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\ingress_raw.json"
+    },
+    "first_causally_relevant_divergence": {},
+    "ingestion_to_outcome_lineage": [
+      {
+        "order": 1,
+        "stage": "u0_ingress",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "90559beb2706e95632500b4bec5d29f230fbac74c4cefd341bc1e495abc901ca",
+        "prior_detail": "NOT_OBSERVED",
+        "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\apps_research\\runs\\r-a1c74aeba61837293a70a277\\briefing.md",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\ingress_raw.json"
+      },
+      {
+        "order": 2,
+        "stage": "u0_payload",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "0a0093ffc31878b2d826c48c12a69258e12031d521221c3d29f7bd809747c098",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\u0_receipt.json"
+      },
+      {
+        "order": 3,
+        "stage": "jd_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "d75ff7ec9aced5b64507928e926f40b95611a39ff25c78332efbfe16a3de95e1",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 4,
+        "stage": "briefing_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "b622dabd89ba343732c8c77407c80b6b56bb1cd25fd658c014a766ad200413c3",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 5,
+        "stage": "targeting_bundle",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 6,
+        "stage": "proof_pool",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 7,
+        "stage": "selected_fact_plan",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "0ffb1ea82c1072aa85466b3968f44cb645c4d334a158a8cf3f6bb504b49ed428",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 8,
+        "stage": "provider_request",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "edb5a91902ed22e095df462f3fa7c8bc50cbd352c73878d4f350987ff17be5d5",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\provider_request.json"
+      },
+      {
+        "order": 9,
+        "stage": "initial_candidate",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\raw_model_output.txt"
+      },
+      {
+        "order": 10,
+        "stage": "retry_loop",
+        "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": true,
+        "classification": "RULED_OUT",
+        "reason": "The evidence is identical at this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\synthesis_regen_receipt.json"
+      },
+      {
+        "order": 11,
+        "stage": "deterministic_finalization",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\executive_summary_finalize_coherence.json"
+      },
+      {
+        "order": 12,
+        "stage": "final_x2",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "c717532a0c40d2ac06800235b032754d4af28185f453e20938c77f61e68391e2",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "order": 13,
+        "stage": "judges",
+        "prior_value": "NO_JUDGE_ROWS",
+        "current_value": "f7284209739f02fe79d079127707ea71355dcb24d25da5d9d5504483586619ae",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x1d_llm_judge_outputs.json"
+      },
+      {
+        "order": 14,
+        "stage": "x3",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "X3_BLOCK",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x3_disposition.json"
+      }
+    ],
+    "prior_attempt_timeline": [
+      {
+        "run": "prior_passing",
+        "sequence": 1,
+        "phase": "lane_resolution",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "no prior passing lane was found",
+        "repair_or_action": "none",
+        "gate_scope": "NONE",
+        "gate_result": "NOT_APPLICABLE",
+        "failed_gate_ids": [],
+        "judge_result": "NO_PRIOR_PASSING_RUN",
+        "disposition": "NO_BASELINE",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "",
+        "complete": true
+      }
+    ],
+    "current_attempt_timeline": [
+      {
+        "run": "current_failure",
+        "sequence": 1,
+        "phase": "initial_generation",
+        "attempt": 0,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "initial candidate",
+        "repair_or_action": "dispatch provider generation",
+        "gate_scope": "FULL_X2",
+        "gate_result": "PASS_OR_NOT_TRIGGERED",
+        "failed_gate_ids": [],
+        "judge_result": "PENDING",
+        "disposition": "ADVANCED_TO_X2",
+        "acceptance_scope": "INITIAL_CANDIDATE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\raw_model_output.txt",
+        "complete": false
+      },
+      {
+        "run": "current_failure",
+        "sequence": 2,
+        "phase": "final_x2",
+        "attempt": 1,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "all deterministic product gates",
+        "repair_or_action": "evaluate full X2 gate set",
+        "gate_scope": "FULL_X2",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [
+          "x2_headline_exactly_one_line",
+          "x2_headline_pipe_four_segments",
+          "x2_headline_word_count_10_to_13",
+          "x2_headline_claim_ledger_rows_present",
+          "x2_headline_text_claim_coverage_integrity",
+          "x2_headline_source_supported",
+          "x2_headline_xyz_literal_grounding",
+          "x2_headline_selected_fact_plan_matches_ledger",
+          "x2_json_parse_valid",
+          "x2_headline_schema_valid",
+          "x2_headline_executive_length",
+          "x2_headline_jd_context_not_proof",
+          "x2_headline_briefing_context_not_proof",
+          "x2_headline_companion_context_not_proof",
+          "x2_input_usage_accounting_consistent",
+          "x2_headline_positioning_bundle_id_required",
+          "x2_headline_graph_skill_node_ids_required",
+          "x2_headline_source_fact_or_graph_lineage_required",
+          "x2_headline_svp_engineering_seniority_required",
+          "x2_headline_seniority_floor_met",
+          "x2_headline_platform_or_runtime_signal_required",
+          "x2_headline_governance_or_regulated_ai_signal_required",
+          "x2_headline_technical_specificity_floor_met",
+          "x2_resume_graph_claim_binding"
+        ],
+        "judge_result": "NOT_REACHED_X2_FAILED",
+        "disposition": "BLOCKED",
+        "acceptance_scope": "PRODUCT_GATE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 3,
+        "phase": "judge_panel",
+        "attempt": "gemini_pro",
+        "candidate_digest": "9549f916ea880c9e",
+        "word_count": 0,
+        "trigger_or_input": "Headline line is empty, failing prefix, word count, and structure requirements.",
+        "repair_or_action": "grade candidate",
+        "gate_scope": "X1D_MODEL_BACKED_JUDGE",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [],
+        "judge_result": "0.0/4.0 MODEL_BACKED_FAIL",
+        "disposition": "JUDGE_FAIL",
+        "acceptance_scope": "MODEL_BACKED_GRADE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x1d_gemini_provider_response_raw_20260809_072141_638.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 4,
+        "phase": "judge_panel",
+        "attempt": "openai_chatgpt",
+        "candidate_digest": "9549f916ea880c9e",
+        "word_count": 0,
+        "trigger_or_input": "Headline is empty.; Required fixed prefix and four-segment structure are absent.; Word count is 0, outside the required 10–13 range.; No supported executive positioning signals are presented.",
+        "repair_or_action": "grade candidate",
+        "gate_scope": "X1D_MODEL_BACKED_JUDGE",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [],
+        "judge_result": "0.0/4.0 MODEL_BACKED_FAIL",
+        "disposition": "JUDGE_FAIL",
+        "acceptance_scope": "MODEL_BACKED_GRADE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x1d_openai_provider_response_raw_20260809_072157_191.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 5,
+        "phase": "x3_disposition",
+        "attempt": "-",
+        "candidate_digest": "e3b0c44298fc1c14",
+        "word_count": 0,
+        "trigger_or_input": "X2 deterministic gate failure",
+        "repair_or_action": "authorize or block product output",
+        "gate_scope": "X3",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [
+          "x2_headline_exactly_one_line",
+          "x2_headline_pipe_four_segments",
+          "x2_headline_word_count_10_to_13",
+          "x2_headline_claim_ledger_rows_present",
+          "x2_headline_text_claim_coverage_integrity",
+          "x2_headline_source_supported",
+          "x2_headline_xyz_literal_grounding",
+          "x2_headline_selected_fact_plan_matches_ledger",
+          "x2_json_parse_valid",
+          "x2_headline_schema_valid",
+          "x2_headline_executive_length",
+          "x2_headline_jd_context_not_proof",
+          "x2_headline_briefing_context_not_proof",
+          "x2_headline_companion_context_not_proof",
+          "x2_input_usage_accounting_consistent",
+          "x2_headline_positioning_bundle_id_required",
+          "x2_headline_graph_skill_node_ids_required",
+          "x2_headline_source_fact_or_graph_lineage_required",
+          "x2_headline_svp_engineering_seniority_required",
+          "x2_headline_seniority_floor_met",
+          "x2_headline_platform_or_runtime_signal_required",
+          "x2_headline_governance_or_regulated_ai_signal_required",
+          "x2_headline_technical_specificity_floor_met"
+        ],
+        "judge_result": "MODEL_BACKED",
+        "disposition": "X3_BLOCK",
+        "acceptance_scope": "PRODUCT_AUTHORIZATION",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x3_disposition.json",
+        "complete": true
+      }
+    ],
+    "gate_matrix": [
+      {
+        "gate_id": "X2_BLOCK_ID_NAMESPACE_SPLIT",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'disjoint_without_alias': [], 'alias_map_size': 0}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_active_pool_digest_matches_fec_digest",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'canonical_evidence_set_digest': '9de857fbb1d8ecbff9db9398bf9df2ff0bad4daf112ba1ca1336b125e9227b1e', 'fec_allowed_fact_ids_digest': '9de857fbb1d8ecbff9db9398bf9df2ff0bad4daf112ba1ca1336b125e9227b1e', 'fec_narrowed_from_pool': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_briefing_used_as_required_context_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'required': True, 'used': True, 'authority': 'CONTEXT_INPUT', 'used_for': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_c0_metrics_artifact_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'schema_version': 'c0_metrics.v1', 'required_keys_present': ['blocked_source_refs', 'briefing_source_type', 'citation_map', 'company_brief_provenance', 'evidence_counts', 'excluded_evidence_refs', 'final_evidence_digest', 'freshness_receipts', 'retrieval_mode', 'retrieval_sources', 'route_id', 'run_id', 'schema_version', 'source_class_coverage', 'support_score_profile', 'support_status', 'support_target_met']}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_c0_support_status_gate",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'support_status': 'PASS', 'support_target_met': True, 'c0_minimum_safe': True, 'canonical_enum': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_claim_ledger_source_fact_ids_subset_of_fec",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'ledger_id_count': 0, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_fec_subset_of_canonical_evidence_pool",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'fec_count': 6, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_active_proof_pool_source_fact_ids",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "no_source_fact_ids_collected",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_base_ngram_overlap",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_base_ngram_overlap_forbidden_or_warn",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_briefing_context_not_proof",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "briefing_used_as_proof must be present and exactly false",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_claim_ledger_no_silent_row_drop",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_claim_ledger_rows_present",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "claim_ledger must contain dict rows with non-empty source_fact_ids (no fabrication).",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_claim_ledger_segment_decomposition",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "n/a",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_companion_context_not_proof",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "companion_used_as_proof must be present and exactly false when companion exists",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_e0_ngram_overlap",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_e0_ngram_overlap_forbidden",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_exactly_one_line",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Headline must be a single line.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_executive_abstraction_floor",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'skipped': True, 'reason': 'skipped_not_four_segments', 'display_tier': 'executive_positioning'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_executive_length",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Headline too long for ATS headline slot.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_generic_it_strategy_demote_forbidden",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_governance_or_regulated_ai_signal_required",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Headline missing governance/regulated-AI positioning signal.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_graph_skill_node_ids_required",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "No graph_skill_node_ids bound in output/change_log.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_jd_context_not_proof",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "jd_used_as_proof must be present and exactly false",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_jd_only_phrase_forbidden",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_candidate_name_tokens",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_currency_percent_literals",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_digit_tokens",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_hype_markers",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_inline_source_tags",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "absent",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_keyword_stuffing_heuristic",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_metrics",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_narrowing_it_labels",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_standalone_vendor_architecture",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'skipped': True, 'reason': 'skipped_not_four_segments', 'display_tier': 'executive_positioning'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_title_inflation",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_no_unsupported_employer_names",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_pipe_four_segments",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "must have exactly three ' | ' separators (four segments)",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_platform_or_runtime_signal_required",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Headline missing platform/runtime positioning signal.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_positioning_bundle_id_required",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "No headline_positioning_bundle_id in output/change_log.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_positioning_bundles_in_proof_pool",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'bundles_present': True, 'mode': 'headline_positioning_bundle_required'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_positioning_family_preserved",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Only 0 positioning families detected (need 2): []. Headline must preserve SVP Engineering positioning families (Agentic AI Platforms, Distributed AI Infrastructure, Runtime Governance, etc.)",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_prompt_reasoning_receipt_clean",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "n/a_not_real_llm",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_raw_model_schema_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "n/a_not_real_llm",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_schema_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Missing headline schema keys: ['change_log', 'claim_ledger', 'gap_notes', 'headline_line', 'jd_alignment', 'selected_fact_plan', 'self_check']",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_segments_quality",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_selected_fact_plan_matches_ledger",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "claim_ledger union empty or selected_fact_plan.required_fact_ids empty.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_self_check_consistent",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "n/a_not_real_llm",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_seniority_floor_met",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "First segment '' is not 'SVP Engineering'. Headline must open with the senior engineering title to preserve seniority posture.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_source_fact_or_graph_lineage_required",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "No source_fact_ids or graph_lineage_refs bound in output.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_source_supported",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "claim_ledger must cite active allowed_fact_ids only.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_svp_engineering_seniority_required",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "First segment '' is not 'SVP Engineering'. Headline must open with the senior engineering title to preserve seniority posture.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_technical_specificity_floor_met",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Only 0 positioning families detected (need 2): []. Headline must preserve SVP Engineering positioning families (Agentic AI Platforms, Distributed AI Infrastructure, Runtime Governance, etc.)",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_text_claim_coverage_integrity",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Segment-level text_claim_coverage failed.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_vendor_terms_proof_only",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'skipped': True, 'reason': 'skipped_not_four_segments', 'display_tier': 'executive_positioning'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_word_count_10_to_13",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "Word count out of range (count words with pipes as spaces).",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_headline_xyz_literal_grounding",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "headline_line empty; cannot check grounding.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_input_usage_accounting_consistent",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "section_input_usage_ledger counts mismatch or text_claim_coverage failed",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_jd_used_as_required_targeting_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'required': True, 'used': True, 'authority': 'TARGETING_INPUT', 'used_for': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_json_parse_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "raw_output is missing",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_em_dash",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "absent",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_first_person",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "absent",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_jd_only_claims",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_non_evidence_inputs_as_claim_evidence",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_non_evidence_inputs_in_source_fact_ids",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'row_scan_found_reserved_non_resume_ids': False, 'ledger_non_evidence_inputs_in_source_fact_ids': False}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_silent_mock_fallback",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Silent mock fallback detected.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_target_company_as_experience",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_prompt_c0_ids_subset_of_fec",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'prompt_c0_count': 6, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_provider_requested_attempted",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Provider mismatch.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_resume_graph_claim_binding",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "resume_graph_claim_binding_failed",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_section_claims_supported_by_base_resume",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'displayed_claim_count': 0, 'claims_supported_by_selected_resume_facts': 0, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_section_input_usage_ledger_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "section_input_usage_ledger_v1",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_selected_fact_ids_only",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_title_company_used_as_required_positioning_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'target_title': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}, 'target_company': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_x1d_required_judges_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_x1d_schema_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Blocked judges invalid schema: []",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\x2_gate_outputs.json"
+      }
+    ],
+    "judge_matrix": [
+      {
+        "judge": "gemini_pro",
+        "prior": "NOT_OBSERVED",
+        "current": "0.0/4.0 FAIL",
+        "reason": ""
+      },
+      {
+        "judge": "openai_chatgpt",
+        "prior": "NOT_OBSERVED",
+        "current": "0.0/4.0 FAIL",
+        "reason": ""
+      }
+    ],
+    "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+    "code_bindings": [
+      {
+        "role": "revision comparison",
+        "file": "",
+        "symbol": "",
+        "baseline_symbol_hash": "",
+        "current_symbol_hash": "",
+        "changed_between_revisions": false,
+        "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+      }
+    ],
+    "underlying_root_cause": {
+      "downstream_root_cause": {
+        "status": "ISOLATED_TO_UPSTREAM_SECTION",
+        "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+      }
+    },
+    "layperson_explanation": [
+      "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+      "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\apps_research\\runs\\r-a1c74aeba61837293a70a277\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+      "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (x2_headline_exactly_one_line, x2_headline_pipe_four_segments, x2_headline_word_count_10_to_13, x2_headline_claim_ledger_rows_present, x2_headline_text_claim_coverage_integrity, x2_headline_source_supported, x2_headline_xyz_literal_grounding, x2_headline_selected_fact_plan_matches_ledger, x2_json_parse_valid, x2_headline_schema_valid, x2_headline_executive_length, x2_headline_jd_context_not_proof, x2_headline_briefing_context_not_proof, x2_headline_companion_context_not_proof, x2_input_usage_accounting_consistent, x2_headline_positioning_bundle_id_required, x2_headline_graph_skill_node_ids_required, x2_headline_source_fact_or_graph_lineage_required, x2_headline_svp_engineering_seniority_required, x2_headline_seniority_floor_met, x2_headline_platform_or_runtime_signal_required, x2_headline_governance_or_regulated_ai_signal_required, x2_headline_technical_specificity_floor_met, x2_resume_graph_claim_binding), so 0.0/4.0 MODEL_BACKED_FAIL and the resume remained blocked."
+    ]
+  },
+  "layperson_explanation": [
+    "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+    "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\apps_research\\runs\\r-a1c74aeba61837293a70a277\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+    "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (x2_headline_exactly_one_line, x2_headline_pipe_four_segments, x2_headline_word_count_10_to_13, x2_headline_claim_ledger_rows_present, x2_headline_text_claim_coverage_integrity, x2_headline_source_supported, x2_headline_xyz_literal_grounding, x2_headline_selected_fact_plan_matches_ledger, x2_json_parse_valid, x2_headline_schema_valid, x2_headline_executive_length, x2_headline_jd_context_not_proof, x2_headline_briefing_context_not_proof, x2_headline_companion_context_not_proof, x2_input_usage_accounting_consistent, x2_headline_positioning_bundle_id_required, x2_headline_graph_skill_node_ids_required, x2_headline_source_fact_or_graph_lineage_required, x2_headline_svp_engineering_seniority_required, x2_headline_seniority_floor_met, x2_headline_platform_or_runtime_signal_required, x2_headline_governance_or_regulated_ai_signal_required, x2_headline_technical_specificity_floor_met, x2_resume_graph_claim_binding), so 0.0/4.0 MODEL_BACKED_FAIL and the resume remained blocked."
+  ],
+  "retry_attempts": [],
+  "retry_outputs": [
+    {
+      "ref": "raw_model_output.txt",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\raw_model_output.txt",
+      "missing": true
+    },
+    {
+      "ref": "parsed_output.json",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\parsed_output.json",
+      "json": {
+        "parsed": null,
+        "parse_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmgZxxuNXxodKdHu87g\"}",
+        "parse_status": "TRUNCATED_JSON"
+      }
+    }
+  ],
+  "repair_ledger": {
+    "present": true,
+    "artifacts": [
+      {
+        "ref": "section_repair_ledger.json",
+        "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\section_repair_ledger.json",
+        "json": {
+          "schema_version": 1,
+          "section_id": "headline",
+          "run_id": "headline_20260809_072132",
+          "product_fail_closed": true,
+          "scored_attempt_number": 1,
+          "authoritative_attempt_number": 1,
+          "authoritative_l2_source": "initial_llm",
+          "attempt_1_x2_failed": true,
+          "attempt_1_x2_failed_gate_ids": [
+            "x2_headline_exactly_one_line",
+            "x2_headline_pipe_four_segments",
+            "x2_headline_word_count_10_to_13",
+            "x2_headline_claim_ledger_rows_present",
+            "x2_headline_text_claim_coverage_integrity",
+            "x2_headline_source_supported",
+            "x2_headline_xyz_literal_grounding",
+            "x2_headline_selected_fact_plan_matches_ledger",
+            "x2_json_parse_valid",
+            "x2_headline_schema_valid",
+            "x2_headline_executive_length",
+            "x2_headline_jd_context_not_proof",
+            "x2_headline_briefing_context_not_proof",
+            "x2_headline_companion_context_not_proof",
+            "x2_input_usage_accounting_consistent",
+            "x2_headline_positioning_bundle_id_required",
+            "x2_headline_graph_skill_node_ids_required",
+            "x2_headline_source_fact_or_graph_lineage_required",
+            "x2_headline_svp_engineering_seniority_required",
+            "x2_headline_seniority_floor_met",
+            "x2_headline_platform_or_runtime_signal_required",
+            "x2_headline_governance_or_regulated_ai_signal_required",
+            "x2_headline_technical_specificity_floor_met"
+          ],
+          "repairs": [],
+          "x2_runs": [
+            {
+              "run": 1,
+              "after_l2_source": "initial_llm",
+              "failed_gate_ids": [
+                "x2_headline_exactly_one_line",
+                "x2_headline_pipe_four_segments",
+                "x2_headline_word_count_10_to_13",
+                "x2_headline_claim_ledger_rows_present",
+                "x2_headline_text_claim_coverage_integrity",
+                "x2_headline_source_supported",
+                "x2_headline_xyz_literal_grounding",
+                "x2_headline_selected_fact_plan_matches_ledger",
+                "x2_json_parse_valid",
+                "x2_headline_schema_valid",
+                "x2_headline_executive_length",
+                "x2_headline_jd_context_not_proof",
+                "x2_headline_briefing_context_not_proof",
+                "x2_headline_companion_context_not_proof",
+                "x2_input_usage_accounting_consistent",
+                "x2_headline_positioning_bundle_id_required",
+                "x2_headline_graph_skill_node_ids_required",
+                "x2_headline_source_fact_or_graph_lineage_required",
+                "x2_headline_svp_engineering_seniority_required",
+                "x2_headline_seniority_floor_met",
+                "x2_headline_platform_or_runtime_signal_required",
+                "x2_headline_governance_or_regulated_ai_signal_required",
+                "x2_headline_technical_specificity_floor_met"
+              ],
+              "passed": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "final_materialized_output": {
+    "present": true,
+    "ref": "command_output.txt",
+    "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\command_output.txt",
+    "text": "HEADLINE_OUTPUT:\nBLOCKED: External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmgZxxuNXxodKdHu87g\"}\n\nWORD_COUNT: 0\n\nX1D_LLM_JUDGE_OUTPUTS:\n| Provider | Mode | Status | Score | Pass | Decisive Failure |\n|---|---|---|---:|---|---|\n| Google Gemini 3.6 Flash | MODEL_BACKED | MODEL_BACKED_FAIL | 0.0 | False | True |\n| OpenAI ChatGPT | MODEL_BACKED | MODEL_BACKED_FAIL | 0.0 | False | True |\n\nX2_DETERMINISTIC_GATE_OUTPUTS:\n- x2_headline_exactly_one_line: FAIL\n- x2_headline_pipe_four_segments: FAIL\n- x2_headline_segments_quality: PASS\n- x2_headline_no_standalone_vendor_architecture: PASS\n- x2_headline_executive_abstraction_floor: PASS\n- x2_headline_vendor_terms_proof_only: PASS\n- x2_headline_no_digit_tokens: PASS\n- x2_headline_no_currency_percent_literals: PASS\n- x2_headline_no_hype_markers: PASS\n- x2_headline_no_keyword_stuffing_heuristic: PASS\n- x2_headline_word_count_10_to_13: FAIL\n- x2_headline_no_metrics: PASS\n- x2_headline_no_unsupported_employer_names: PASS\n- x2_headline_no_candidate_name_tokens: PASS\n- x2_no_first_person: PASS\n- x2_no_em_dash: PASS\n- x2_headline_no_inline_source_tags: PASS\n- x2_no_target_company_as_experience: PASS\n- x2_no_jd_only_claims: PASS\n- x2_headline_claim_ledger_rows_present: FAIL\n- x2_headline_claim_ledger_segment_decomposition: PASS\n- x2_headline_claim_ledger_no_silent_row_drop: PASS\n- x2_headline_text_claim_coverage_integrity: FAIL\n- x2_headline_source_supported: FAIL\n- x2_headline_xyz_literal_grounding: FAIL\n- x2_headline_selected_fact_plan_matches_ledger: FAIL\n- x2_json_parse_valid: FAIL\n- x2_headline_prompt_reasoning_receipt_clean: PASS\n- x2_headline_raw_model_schema_valid: PASS\n- x2_headline_self_check_consistent: PASS\n- x2_headline_schema_valid: FAIL\n- x2_provider_requested_attempted: PASS\n- x2_no_silent_mock_fallback: PASS\n- x2_x1d_required_judges_present: PASS\n- x2_x1d_schema_valid: PASS\n- x2_headline_executive_length: FAIL\n- x2_headline_no_title_inflation: PASS\n- x2_headline_jd_context_not_proof: FAIL\n- x2_headline_briefing_context_not_proof: FAIL\n- x2_headline_companion_context_not_proof: FAIL\n- x2_headline_active_proof_pool_source_fact_ids: PASS\n- x2_section_input_usage_ledger_present: PASS\n- x2_jd_used_as_required_targeting_input: PASS\n- x2_briefing_used_as_required_context_input: PASS\n- x2_title_company_used_as_required_positioning_input: PASS\n- x2_no_non_evidence_inputs_as_claim_evidence: PASS\n- x2_no_non_evidence_inputs_in_source_fact_ids: PASS\n- x2_selected_fact_ids_only: PASS\n- x2_section_claims_supported_by_base_resume: PASS\n- x2_input_usage_accounting_consistent: FAIL\n- x2_fec_subset_of_canonical_evidence_pool: PASS\n- x2_prompt_c0_ids_subset_of_fec: PASS\n- x2_claim_ledger_source_fact_ids_subset_of_fec: PASS\n- X2_BLOCK_ID_NAMESPACE_SPLIT: PASS\n- x2_active_pool_digest_matches_fec_digest: PASS\n- x2_headline_no_narrowing_it_labels: PASS\n- x2_headline_positioning_family_preserved: PASS\n- x2_headline_e0_ngram_overlap: PASS\n- x2_headline_base_ngram_overlap: PASS\n- x2_headline_positioning_bundles_in_proof_pool: PASS\n- x2_headline_positioning_bundle_id_required: FAIL\n- x2_headline_graph_skill_node_ids_required: FAIL\n- x2_headline_source_fact_or_graph_lineage_required: FAIL\n- x2_headline_svp_engineering_seniority_required: FAIL\n- x2_headline_seniority_floor_met: FAIL\n- x2_headline_platform_or_runtime_signal_required: FAIL\n- x2_headline_governance_or_regulated_ai_signal_required: FAIL\n- x2_headline_generic_it_strategy_demote_forbidden: PASS\n- x2_headline_jd_only_phrase_forbidden: PASS\n- x2_headline_technical_specificity_floor_met: FAIL\n- x2_headline_e0_ngram_overlap_forbidden: PASS\n- x2_headline_base_ngram_overlap_forbidden_or_warn: PASS\n\nX3_DISPOSITION:\n{\n  \"x3_code\": \"X3_BLOCK\",\n  \"decisive_reason\": \"X2 deterministic gate failure\",\n  \"review_reason\": \"\",\n  \"authorization_scope\": \"PLUMBING_ONLY\",\n  \"proceed_to_runtime\": false,\n  \"runtime_generation_status\": \"BLOCKED\",\n  \"x1d_evaluator_mode\": \"MODEL_BACKED\",\n  \"product_quality_status\": \"FAIL\",\n  \"x2_failed_gates\": [\n    \"x2_headline_exactly_one_line\",\n    \"x2_headline_pipe_four_segments\",\n    \"x2_headline_word_count_10_to_13\",\n    \"x2_headline_claim_ledger_rows_present\",\n    \"x2_headline_text_claim_coverage_integrity\",\n    \"x2_headline_source_supported\",\n    \"x2_headline_xyz_literal_grounding\",\n    \"x2_headline_selected_fact_plan_matches_ledger\",\n    \"x2_json_parse_valid\",\n    \"x2_headline_schema_valid\",\n    \"x2_headline_executive_length\",\n    \"x2_headline_jd_context_not_proof\",\n    \"x2_headline_briefing_context_not_proof\",\n    \"x2_headline_companion_context_not_proof\",\n    \"x2_input_usage_accounting_consistent\",\n    \"x2_headline_positioning_bundle_id_required\",\n    \"x2_headline_graph_skill_node_ids_required\",\n    \"x2_headline_source_fact_or_graph_lineage_required\",\n    \"x2_headline_svp_engineering_seniority_required\",\n    \"x2_headline_seniority_floor_met\",\n    \"x2_headline_platform_or_runtime_signal_required\",\n    \"x2_headline_governance_or_regulated_ai_signal_required\",\n    \"x2_headline_technical_specificity_floor_met\"\n  ],\n  \"blocked_judges\": [],\n  \"mocked_judges\": [],\n  \"soft_failed_judges\": [],\n  \"decisive_judge_failures\": [\n    \"gemini_pro\",\n    \"openai_chatgpt\"\n  ],\n  \"final_summary_hash\": \"e3b0c44298fc1c14\",\n  \"claim_ledger_hash\": \"4f53cda18c2baa0c\",\n  \"required_remediation\": [\n    \"Fix failed X2 gates: x2_headline_exactly_one_line, x2_headline_pipe_four_segments, x2_headline_word_count_10_to_13, x2_headline_claim_ledger_rows_present, x2_headline_text_claim_coverage_integrity, x2_headline_source_supported, x2_headline_xyz_literal_grounding, x2_headline_selected_fact_plan_matches_ledger, x2_json_parse_valid, x2_headline_schema_valid, x2_headline_executive_length, x2_headline_jd_context_not_proof, x2_headline_briefing_context_not_proof, x2_headline_companion_context_not_proof, x2_input_usage_accounting_consistent, x2_headline_positioning_bundle_id_required, x2_headline_graph_skill_node_ids_required, x2_headline_source_fact_or_graph_lineage_required, x2_headline_svp_engineering_seniority_required, x2_headline_seniority_floor_met, x2_headline_platform_or_runtime_signal_required, x2_headline_governance_or_regulated_ai_signal_required, x2_headline_technical_specificity_floor_met\",\n    \"Remediate decisive judge failures: gemini_pro, openai_chatgpt\",\n    \"Product quality must be PASS, currently FAIL.\"\n  ],\n  \"blocked_judge_detail_rows\": [],\n  \"model_backed_pass_provider_keys\": [],\n  \"proof_eligible_allow_requires\": \"every_configured_x1d_judge_model_backed_pass\",\n  \"pass\": false,\n  \"disposition_authority\": \"lane\",\n  \"section_x3_authoritative\": false,\n  \"section_x3_mirror_only\": true,\n  \"spine_x3_claimed\": false\n}\n\nL6_SHADOW_EVAL_PACKAGE:\nC:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline\\l6_shadow_eval_package.json\noffline_only=true",
+    "sha256": "e89a0b0ab6b509f3507358984fbe09277c7e7c1f012a90bc34895c85abca4da6",
+    "source": "display_text_file"
+  },
+  "exact_code_surface": {
+    "producer_files": [
+      "apps_rg/runtime/section_failure_forensics.py",
+      "apps_rg/runtime/sections/headline_lane.py"
+    ],
+    "artifact_refs": [
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline/x2_gate_outputs.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline/x3_disposition.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline/l2_output.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline/selected_fact_plan.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline/provider_request.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline/integrated_lane_pre_run_failure.json"
+    ],
+    "lane_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\headline"
+  },
+  "why_it_passed_before": "The pinned prior-pass baseline was unavailable, so this RCA cannot claim a clean passing comparison.",
+  "why_it_failed_now": "This section did not independently certify because an upstream dependency or pre-run blocker prevented normal section authorization: Output contract failure: parsed content or claim ledger did not satisfy section schema..",
+  "required_fix": [
+    "Resolve the upstream blocker before dispatching `headline`.",
+    "Write the upstream dependency status into the section pre-run receipt.",
+    "Keep the section blocked until its own X1-X3 inputs are present."
+  ],
+  "baseline_confidence": "pinned_contract_invalid",
+  "baseline_run_dir": ""
+}

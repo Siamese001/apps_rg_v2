@@ -1,4 +1,5 @@
 """Integrated-R4 whole-run product proof gate — canonical ``python -m apps_rg`` only."""
+
 from __future__ import annotations
 
 import json
@@ -54,6 +55,10 @@ PRODUCT_CLAIM_MARKERS: tuple[tuple[str, tuple[str, ...]], ...] = (
 )
 
 _REQUIRED_ARTIFACTS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (
+        "apps_rg_core_runtime_authority.json",
+        ("apps_rg_core_runtime_authority.json",),
+    ),
     ("agentic_core_how_trace.json", ("agentic_core_how_trace.json",)),
     ("agentic_core_spine_proof.json", ("agentic_core_spine_proof.json",)),
     (
@@ -62,12 +67,17 @@ _REQUIRED_ARTIFACTS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
     (
         "integrated_run_manifest",
-        ("r4_run_manifest.json", "run_manifest.json", "integrated_runtime_artifact_manifest.json"),
+        (
+            "r4_run_manifest.json",
+            "run_manifest.json",
+            "integrated_runtime_artifact_manifest.json",
+        ),
     ),
     ("route_contract.json", ("route_contract.json",)),
     (
         "exit_disposition_receipt",
         (
+            "apps_rg_whole_run_exit_review_packet.json",
             "exit_disposition_receipt.json",
             "x3_disposition_receipt.json",
             "exit_disposition_receipt.json",
@@ -106,7 +116,11 @@ def _load_json(path: Path) -> dict[str, Any] | None:
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
         return raw if isinstance(raw, dict) else None
-    except (OSError, json.JSONDecodeError, TypeError):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
+    except (
+        OSError,
+        json.JSONDecodeError,
+        TypeError,
+    ):  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
         return None
 
 
@@ -201,7 +215,9 @@ def _invalid_binding_classification_claims(blobs: list[dict[str, Any]]) -> list[
             BINDING_CLASSIFICATION_SECTION_GRAPH_CONTEXT,
             BINDING_CLASSIFICATION_FEC_SHAPE_ONLY,
         ):
-            if blob.get("can_satisfy_integrated_product_proof") or blob.get("product_proof_eligible"):
+            if blob.get("can_satisfy_integrated_product_proof") or blob.get(
+                "product_proof_eligible"
+            ):
                 reasons.append(f"section_binding_product_claim:{bc}")
         if blob.get("fec_shape_only") and blob.get("canonical_c0_3_claimed"):
             reasons.append("fec_shape_claims_full_c03")
@@ -214,7 +230,9 @@ def _detect_section_mode(run_dir: Path, blobs: list[dict[str, Any]]) -> bool:
         run_dir / "spine_run_manifest.json",
         run_dir / "integrated_runtime_artifact_manifest.json",
     )
-    whole_run_layout = (run_dir / "lanes").is_dir() or (run_dir / "modular_r4" / "sections").is_dir()
+    whole_run_layout = (run_dir / "lanes").is_dir() or (
+        run_dir / "modular_r4" / "sections"
+    ).is_dir()
     if whole_run_layout and any(marker.is_file() for marker in whole_run_markers):
         return False
     if (run_dir / "section_l7_binding_manifest.json").is_file():
@@ -245,9 +263,9 @@ def _detect_canonical_entrypoint(blobs: list[dict[str, Any]]) -> bool:
             ep = str(inv.get("entry_point") or inv.get("canonical_entrypoint") or "")
             if "apps_rg" in ep and "dispatch_apps_rg" in ep:
                 return True
-            if inv.get("integrated_runtime_entrypoint_used") is True and "apps_rg" in str(
-                inv.get("namespace") or ""
-            ):
+            if inv.get(
+                "integrated_runtime_entrypoint_used"
+            ) is True and "apps_rg" in str(inv.get("namespace") or ""):
                 return True
     for blob in blobs:
         if blob.get("apps_rg_product_outcome_authorized") is not None:
@@ -257,7 +275,9 @@ def _detect_canonical_entrypoint(blobs: list[dict[str, Any]]) -> bool:
     return False
 
 
-def _detect_cache_preflight_evidence(run_dir: Path, blobs: list[dict[str, Any]]) -> bool:
+def _detect_cache_preflight_evidence(
+    run_dir: Path, blobs: list[dict[str, Any]]
+) -> bool:
     """Whole-run product proof requires R1A/R1B preflight receipts in the run dir."""
     for name in (CACHE_PREFLIGHT_MANIFEST_NAME, CACHE_MISS_RECEIPT_NAME):
         if (run_dir / name).is_file():
@@ -284,7 +304,9 @@ def _fact_vector_writeback_blockers(run_dir: Path) -> tuple[list[str], bool, str
             grounded_receipt_present = True
         status = str(doc.get("status") or "")
         if staged > 0 and status == "FAIL":
-            blockers.append(f"fact_vector_ingest_failed:{path.relative_to(run_dir).as_posix()}")
+            blockers.append(
+                f"fact_vector_ingest_failed:{path.relative_to(run_dir).as_posix()}"
+            )
 
     completion = _load_json(run_dir / "apps_rg_post_x3_completion_receipt.json") or {}
     fv_completion = (
@@ -303,7 +325,10 @@ def _fact_vector_writeback_blockers(run_dir: Path) -> tuple[list[str], bool, str
     passing_promotions = 0
     for path in run_dir.rglob("fact_vector_promotion_receipt.json"):
         doc = _load_json(path) or {}
-        if int(doc.get("promoted_count") or 0) <= 0 and str(doc.get("status") or "") != "PASS":
+        if (
+            int(doc.get("promoted_count") or 0) <= 0
+            and str(doc.get("status") or "") != "PASS"
+        ):
             continue
         status = str(doc.get("status") or "")
         uwg_status = str((doc.get("uwg") or {}).get("status") or "")
@@ -323,9 +348,15 @@ def _fact_vector_writeback_blockers(run_dir: Path) -> tuple[list[str], bool, str
     return blockers, True, completion_status or ("PASS" if not blockers else "FAIL")
 
 
-def _detect_integrated_r4(blobs: list[dict[str, Any]], paths: dict[str, Path | None]) -> bool:
+def _detect_integrated_r4(
+    blobs: list[dict[str, Any]], paths: dict[str, Path | None]
+) -> bool:
     if paths.get("integrated_run_manifest") is not None:
-        inv = _load_json(paths["integrated_run_manifest"]) if paths["integrated_run_manifest"] else None
+        inv = (
+            _load_json(paths["integrated_run_manifest"])
+            if paths["integrated_run_manifest"]
+            else None
+        )
         if inv and (
             "r4_run_manifest" in str(paths["integrated_run_manifest"])
             or inv.get("apps_rg_generation_status")
@@ -334,13 +365,18 @@ def _detect_integrated_r4(blobs: list[dict[str, Any]], paths: dict[str, Path | N
             return True
     for blob in blobs:
         pay = blob.get("payload") if isinstance(blob.get("payload"), dict) else {}
-        if isinstance(pay, dict) and pay.get("integrated_runtime_entrypoint_used") is True:
+        if (
+            isinstance(pay, dict)
+            and pay.get("integrated_runtime_entrypoint_used") is True
+        ):
             return True
         if blob.get("integrated_runtime_entrypoint_used") is True:
             return True
         if "integrated_runtime_artifact_manifest" in blob.get("artifact_filenames", []):
             return True
-    if paths.get("agentic_core_how_trace.json") and paths.get("agentic_core_spine_proof.json"):
+    if paths.get("agentic_core_how_trace.json") and paths.get(
+        "agentic_core_spine_proof.json"
+    ):
         return True
     return False
 
@@ -361,18 +397,25 @@ def _has_no_bypass_assertions(paths: dict[str, Path | None]) -> bool:
     for st in stages:
         if not isinstance(st, dict):
             continue
-        assertions = st.get("forbidden_action_assertions") or st.get("no_bypass_assertions")
+        assertions = st.get("forbidden_action_assertions") or st.get(
+            "no_bypass_assertions"
+        )
         if isinstance(assertions, list) and assertions:
             return True
     exhaust = paths.get("runtime_exhaust_bundle.json")
     if exhaust is not None:
         ex = _load_json(exhaust)
-        if ex and ("no_bypass" in json.dumps(ex).lower() or "forbidden_action" in json.dumps(ex).lower()):
+        if ex and (
+            "no_bypass" in json.dumps(ex).lower()
+            or "forbidden_action" in json.dumps(ex).lower()
+        ):
             return True
     return False
 
 
-def _live_product_outcome_blockers(run_dir: Path, paths: dict[str, Path | None]) -> list[str]:
+def _live_product_outcome_blockers(
+    run_dir: Path, paths: dict[str, Path | None]
+) -> list[str]:
     """Block live product proof when apps_rg integrated run artifacts deny product outcome."""
     blockers: list[str] = []
     r4_path = paths.get("integrated_run_manifest")
@@ -387,50 +430,118 @@ def _live_product_outcome_blockers(run_dir: Path, paths: dict[str, Path | None])
     )
     if not apps_rg_run:
         return blockers
-    if r4.get("apps_rg_product_outcome_authorized") is False:
-        blockers.append("apps_rg_product_outcome_authorized_false")
     fault = str(r4.get("l2_fault") or "").strip()
     if fault:
         blockers.append(f"l2_fault:{fault[:160]}")
-    x3 = str(r4.get("x3_disposition") or "").strip()
-    if x3 and x3 != "X3D_ALLOW_FINISH":
-        blockers.append(f"integrated_x3_disposition:{x3}")
-    for name in ("x3_disposition_receipt.json", "exit_disposition_receipt.json"):
-        x3_path = run_dir / name
-        if not x3_path.is_file():
-            continue
-        x3_doc = _load_json(x3_path) or {}
-        pay = x3_doc.get("payload") if isinstance(x3_doc.get("payload"), dict) else x3_doc
-        disp = pay.get("disposition") or pay.get("x3_disposition")
-        if isinstance(disp, dict):
-            code = str(disp.get("x3_code") or disp.get("disposition") or "")
+
+    # Core-owned artifacts are retained as source evidence, but they are not an
+    # apps_rg product-authority surface.  The app-owned receipt binds those
+    # sources and supplies the one normalized vocabulary consumed here.
+    authority_valid = False
+    authority_path = paths.get("apps_rg_core_runtime_authority.json")
+    if authority_path is None:
+        blockers.append("core_runtime_authority_missing")
+    else:
+        from apps_rg.runtime.orchestration.core_runtime_authority import (
+            verify_core_runtime_authority,
+        )
+
+        verification = verify_core_runtime_authority(run_dir)
+        if not verification.valid:
+            blockers.extend(
+                f"core_runtime_authority_invalid:{error}"
+                for error in verification.errors
+            )
         else:
-            code = str(disp or "")
-        if code and code != "X3D_ALLOW_FINISH":
-            blockers.append(f"integrated_exit_x3:{code}")
-        break
-    spine_path = run_dir / "agentic_core_spine_proof.json"
-    if spine_path.is_file():
-        spine = _load_json(spine_path) or {}
-        status = str(spine.get("agentic_core_spine_status") or "")
-        if "BLOCKED" in status or "MISSING" in status:
-            blockers.append(f"spine_status:{status}")
-        gaps = spine.get("blocking_gaps")
-        if isinstance(gaps, list) and gaps:
-            blockers.append("spine_proof_blocking_gaps")
+            authority_valid = True
+            normalized = verification.receipt.get("normalized_contract") or {}
+            proof = (
+                normalized.get("spine_proof") if isinstance(normalized, dict) else {}
+            )
+            if not isinstance(proof, dict) or proof.get("success") is not True:
+                blockers.append("core_runtime_authority_spine_not_successful")
+            gaps = proof.get("blocking_gaps") if isinstance(proof, dict) else []
+            if isinstance(gaps, list) and gaps:
+                blockers.append("core_runtime_authority_spine_blocking_gaps")
+            # The pinned core observes apps_rg as one L2 tool call.  Its X3 is
+            # transport-envelope evidence and cannot authorize or deny the
+            # app's later multi-lane product result.
+
+    whole_exit_path = run_dir / "apps_rg_whole_run_exit_review_packet.json"
+    if not whole_exit_path.is_file():
+        blockers.append("apps_rg_whole_run_exit_authority_missing")
+    else:
+        from apps_rg.runtime.whole_run_exit import (
+            verify_whole_run_exit_review_packet,
+        )
+
+        valid_exit, exit_errors = verify_whole_run_exit_review_packet(run_dir)
+        whole_exit = _load_json(whole_exit_path) or {}
+        if not valid_exit:
+            blockers.extend(
+                f"apps_rg_whole_run_exit_invalid:{error}" for error in exit_errors
+            )
+        if whole_exit.get("status") != "PASS":
+            blockers.append("apps_rg_whole_run_exit_not_pass")
+        if whole_exit.get("x3_disposition") != "X3D_ALLOW_FINISH":
+            blockers.append(
+                "apps_rg_whole_run_exit_x3:"
+                + str(whole_exit.get("x3_disposition") or "missing")
+            )
+
+    # Compatibility fallback for pre-authority or invalid bundles.  It may add
+    # blockers, but it can never authorize an outcome.
+    if not authority_valid:
+        for name in ("x3_disposition_receipt.json", "exit_disposition_receipt.json"):
+            x3_path = run_dir / name
+            if not x3_path.is_file():
+                continue
+            x3_doc = _load_json(x3_path) or {}
+            pay = (
+                x3_doc.get("payload")
+                if isinstance(x3_doc.get("payload"), dict)
+                else x3_doc
+            )
+            disp = pay.get("disposition") or pay.get("x3_disposition")
+            if isinstance(disp, dict):
+                code = str(disp.get("x3_code") or disp.get("disposition") or "")
+            else:
+                code = str(disp or "")
+            if code and code != "X3D_ALLOW_FINISH":
+                blockers.append(f"integrated_exit_x3:{code}")
+            break
+        spine_path = run_dir / "agentic_core_spine_proof.json"
+        if spine_path.is_file():
+            spine_doc = _load_json(spine_path) or {}
+            spine = (
+                spine_doc.get("payload")
+                if isinstance(spine_doc.get("payload"), dict)
+                else spine_doc
+            )
+            status = str(spine.get("agentic_core_spine_status") or "")
+            if "BLOCKED" in status or "MISSING" in status:
+                blockers.append(f"spine_status:{status}")
+            gaps = spine.get("blocking_gaps")
+            if isinstance(gaps, list) and gaps:
+                blockers.append("spine_proof_blocking_gaps")
     return blockers
 
 
-def _exit_x3_and_package_flags(paths: dict[str, Path | None], run_dir: Path) -> tuple[bool, bool]:
+def _exit_x3_and_package_flags(
+    paths: dict[str, Path | None], run_dir: Path
+) -> tuple[bool, bool]:
     exit_names = {
+        "apps_rg_whole_run_exit_review_packet.json",
         "exit_disposition_receipt.json",
         "x3_disposition_receipt.json",
     }
     exit_present = any(
-        (run_dir / n).is_file() or (paths.get("exit_disposition_receipt") is not None) for n in exit_names
+        (run_dir / n).is_file() or (paths.get("exit_disposition_receipt") is not None)
+        for n in exit_names
     )
     package_present = (run_dir / "resume_package_x3_disposition.json").is_file() or any(
-        p.name == "resume_package_x3_disposition.json" for p in run_dir.rglob("resume_package_x3_disposition.json")
+        p.name == "resume_package_x3_disposition.json"
+        for p in run_dir.rglob("resume_package_x3_disposition.json")
     )
     package_only = package_present and not exit_present
     return exit_present, package_only
@@ -479,10 +590,14 @@ def validate_integrated_product_proof(
     exit_x3, package_only = _exit_x3_and_package_flags(paths, run_dir)
     no_bypass = _has_no_bypass_assertions(paths)
     cache_preflight_ok = _detect_cache_preflight_evidence(run_dir, blobs)
-    fact_vector_blockers, fact_vector_present, fact_vector_status = _fact_vector_writeback_blockers(run_dir)
+    fact_vector_blockers, fact_vector_present, fact_vector_status = (
+        _fact_vector_writeback_blockers(run_dir)
+    )
 
     if section_mode:
-        explicit_non_claims.append("section_mode=true: --section cannot satisfy product proof")
+        explicit_non_claims.append(
+            "section_mode=true: --section cannot satisfy product proof"
+        )
     if package_only:
         explicit_non_claims.append("package_x3_only: package rollup is not Exit X3")
     if rejected:
@@ -494,7 +609,9 @@ def validate_integrated_product_proof(
     if section_mode:
         hard_fail_reasons.append("section_mode")
     if binding_violations:
-        hard_fail_reasons.append(f"binding_classification:{';'.join(binding_violations)}")
+        hard_fail_reasons.append(
+            f"binding_classification:{';'.join(binding_violations)}"
+        )
     if rejected:
         hard_fail_reasons.append("non_product_classification")
     if package_only:
@@ -510,7 +627,9 @@ def validate_integrated_product_proof(
     if not section_mode and not cache_preflight_ok:
         hard_fail_reasons.append("cache_preflight_evidence_missing")
     if not section_mode and fact_vector_blockers:
-        hard_fail_reasons.append(f"fact_vector_writeback:{';'.join(fact_vector_blockers)}")
+        hard_fail_reasons.append(
+            f"fact_vector_writeback:{';'.join(fact_vector_blockers)}"
+        )
 
     live_blockers = _live_product_outcome_blockers(run_dir, paths)
     if live_blockers:
@@ -621,8 +740,8 @@ def validate_integrated_product_proof(
 def _receipt_asserts_product_claim(receipt: Mapping[str, Any]) -> bool:
     if receipt.get("release_eligible") is True:
         return True
-    for field, allowed in PRODUCT_CLAIM_MARKERS:
-        val = receipt.get(field)
+    for marker_field, allowed in PRODUCT_CLAIM_MARKERS:
+        val = receipt.get(marker_field)
         if isinstance(val, str) and val.strip().upper() in {a.upper() for a in allowed}:
             return True
     return False
@@ -637,7 +756,11 @@ def reject_non_integrated_product_claim(
     """Raise ValueError when a receipt asserts product/L7/Fort Knox without integrated proof."""
     if not receipt or not isinstance(receipt, Mapping):
         return
-    pc = str(receipt.get("proof_classification") or receipt.get("package_disposition_classification") or "")
+    pc = str(
+        receipt.get("proof_classification")
+        or receipt.get("package_disposition_classification")
+        or ""
+    )
     if pc in REJECTED_NON_PRODUCT_CLASSIFICATIONS:
         raise ValueError(
             f"{context or 'product_claim'}: non-product proof {pc!r} cannot satisfy product/L7/Fort Knox certification"
@@ -649,7 +772,10 @@ def reject_non_integrated_product_claim(
             f"{context or 'product_claim'}: product/L7/Fort Knox claim requires run_dir for integrated validation"
         )
     result = validate_integrated_product_proof(Path(run_dir))
-    if result.status != "PASS" or result.proof_classification != INTEGRATED_R4_PRODUCT_CLASSIFICATION:
+    if (
+        result.status != "PASS"
+        or result.proof_classification != INTEGRATED_R4_PRODUCT_CLASSIFICATION
+    ):
         raise ValueError(
             f"{context or 'product_claim'}: {result.decisive_reason} "
             f"(status={result.status}, proof_classification={result.proof_classification})"
@@ -677,7 +803,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(result.to_dict(), indent=2))
     else:
-        print(json.dumps({"status": result.status, "decisive_reason": result.decisive_reason}, indent=2))
+        print(
+            json.dumps(
+                {"status": result.status, "decisive_reason": result.decisive_reason},
+                indent=2,
+            )
+        )
     if result.status == "PASS":
         return 0
     if result.status == "BLOCKED":

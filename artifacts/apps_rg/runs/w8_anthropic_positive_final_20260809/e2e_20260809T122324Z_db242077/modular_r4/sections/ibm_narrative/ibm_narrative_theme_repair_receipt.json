@@ -1,0 +1,116 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_122949",
+  "gate_id": "x2_ibm_narrative_claim_theme_coverage",
+  "fired": true,
+  "trigger": {
+    "themes_detected_pre": [
+      "bul_ibm_001",
+      "bul_ibm_002",
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "count_pre": 3,
+    "missing_in_ledger_union_pre": [
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "mechanism_support_pre": {
+      "mechanisms": [
+        "aws",
+        "bi"
+      ],
+      "cited_companion_ids": [
+        "bul_ibm_001",
+        "bul_ibm_002"
+      ],
+      "unsupported_mechanisms": [],
+      "support_by_mechanism": {
+        "aws": [
+          "bul_ibm_001"
+        ],
+        "bi": [
+          "bul_ibm_002"
+        ]
+      },
+      "checked": true
+    },
+    "unsupported_mechanisms_pre": [],
+    "narrative_pre": "Championed partner-led solution architecture at IBM, establishing a repeatable operating discipline that connected AWS alliance motions and BI-backed decision support with executive priorities across complex, regulated financial-services modernization pursuits."
+  },
+  "accepted": true,
+  "themes_post": [
+    "bul_ibm_001",
+    "bul_ibm_002"
+  ],
+  "rejected_reason": null,
+  "bounded": {
+    "max_attempts": 2,
+    "attempts_used": 1
+  },
+  "kill_switch": "unset",
+  "regen_max_tokens": 4000,
+  "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+  "regen_parse_error": null,
+  "regen_provider_result": {
+    "runtime_generation_status": "REAL_LLM",
+    "provider_requested": "external_openai",
+    "provider_attempted": true,
+    "provider_available": true,
+    "model": "gpt-5.6-luna",
+    "exact_provider_error": ""
+  },
+  "mechanism_support_post": {
+    "mechanisms": [
+      "aws",
+      "bi"
+    ],
+    "cited_companion_ids": [
+      "bul_ibm_001",
+      "bul_ibm_002"
+    ],
+    "unsupported_mechanisms": [],
+    "support_by_mechanism": {
+      "aws": [
+        "bul_ibm_001"
+      ],
+      "bi": [
+        "bul_ibm_002"
+      ]
+    },
+    "checked": true
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_openai",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "gpt-5.6-luna",
+        "exact_provider_error": ""
+      },
+      "rejected_reason": null,
+      "mechanism_support": {
+        "mechanisms": [
+          "aws",
+          "bi"
+        ],
+        "cited_companion_ids": [
+          "bul_ibm_001",
+          "bul_ibm_002"
+        ],
+        "unsupported_mechanisms": [],
+        "support_by_mechanism": {
+          "aws": [
+            "bul_ibm_001"
+          ],
+          "bi": [
+            "bul_ibm_002"
+          ]
+        },
+        "checked": true
+      }
+    }
+  ]
+}

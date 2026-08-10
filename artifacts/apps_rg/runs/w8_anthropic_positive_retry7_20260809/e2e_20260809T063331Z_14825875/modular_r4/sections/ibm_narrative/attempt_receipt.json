@@ -1,0 +1,158 @@
+{
+  "attempt_count": 1,
+  "attempt_receipt_id": "attempt-fd50c6c8544d49cb886dcb8e5baa8eaa",
+  "authority_scope": "apps_rg_l2_envelope_adapter_receipts",
+  "canonical_l2_artifact_authority": false,
+  "decisive_reason_code": "E3_SECTION_OUTPUT_OBSERVED",
+  "determinism": {
+    "attempt_seed": "91d47518286488417c3d3abd1ebce102e74fe9678ade39f0f3762ae5c3c6cff3",
+    "blueprint_hash": "ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+    "input_hash": "a8c5cc81dbd21eb1b137967235db9ba1218921d3063ebe7716fb9a228b351a59",
+    "policy_hash": "bafee91ee86960cfdc581d692c349be017596d991829e2ec269383f6165b31ed",
+    "prompt_hash": "b483993bcb27e1976e3f7d95adac47ddbd9825f23e7cee35cbd4483d4d5c297c",
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:33fbb7039ce653d7::v1"
+  },
+  "error_summary": null,
+  "execution_lane": "MODEL",
+  "generated_artifacts": [
+    "provider_request.json",
+    "provider_response.json",
+    "l2_output.json"
+  ],
+  "latency_ms": 0.0,
+  "lineage": {
+    "ancestry_chain": [
+      "R3R4_MANAGED_WORKFLOW",
+      "wfm::apps_rg::resume_generation::v1"
+    ],
+    "parent_plan_id": "wfm::apps_rg::resume_generation::v1",
+    "parent_route_id": "R3R4_MANAGED_WORKFLOW",
+    "parent_step_id": "ibm_narrative",
+    "same_run_packet_family": "862227e7-8bf8-4aa1-90ce-5439f758a1df"
+  },
+  "local_check_results": {
+    "artifact_bytes_match": true,
+    "grounded_output": true,
+    "l2_output_file_digest": "38f705317c49ac102032d35149661b6572c07a269b72cf28f78bfd77895aa2d5",
+    "l2_output_ref": "l2_output.json",
+    "model_or_tool_name": "claude-sonnet-5",
+    "provider_lane": "openai",
+    "provider_request_digest": "bbf34116376c9a152222314010d4d2e27202045f53b1571921bbb5c343cd06bf",
+    "provider_request_ref": "provider_request.json",
+    "provider_response_digest": "5dc6bcac98188e28d3fcc1e2cea441b78513ef1fe6c8fc7643f8cee24fe4d52e",
+    "provider_response_ref": "provider_response.json",
+    "replay_key_matches": true,
+    "token_usage_observed": true,
+    "tokens_used": 14740
+  },
+  "output_digest": "bb604cccde9c1f28cd841eec75ccc82975d6d8e9e7e0a19c4f8692c8f64d8b9b",
+  "proposed_state_diff": {
+    "payload": {
+      "graph_claim_binding_contract_digest": "a4c8f9f7824a37b3d8be6825ab90f20b3af5b32863e7bcfb9521119083beafb0",
+      "graph_claim_bindings": [
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:01"
+          ],
+          "allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_partnerships_gtm_002"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_001"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_1_3442597a",
+          "edge_ids": [
+            "edge:244605aec5577e547cc2aede",
+            "edge:ab44170417c11551ae68a66d",
+            "edge:08c93a4b511f512e46815def"
+          ],
+          "fact_ids": [
+            "fact_partnerships_gtm_002"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.2,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": 0.0,
+          "skill_ids": [
+            "skill_partner_alliance_gtm_execution"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 4.0,
+          "visible_claim_hash": "d4a46241883628dce8a0e9a162f61c0b1c5a20057fcface89e47e91667b0c5a1",
+          "visible_claim_text": "Drove AWS alliance and solution architecture across enterprise client pursuits at IBM"
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:02"
+          ],
+          "allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_005"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_002"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_2_af06c2e3",
+          "edge_ids": [
+            "edge:c2e8a8bcf8fd2c50727b2888",
+            "edge:9343406f47c7c3166c2f3bd4"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_005"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_data_modeling_bi_decision_support",
+            "root:reb_ibm_data_modeling_bi_decision_support/skill:skill_sr_cloud_data_platform_engineering",
+            "root:reb_ibm_data_modeling_bi_decision_support/fact:fact_revenue_ops_005"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 0.9,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": -0.4,
+          "skill_ids": [
+            "skill_sr_cloud_data_platform_engineering"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 1.7,
+          "visible_claim_hash": "8bc46e40fe44750fd31c5bc1d1e7b6d9e90ecfb5683ed8003202daa090cbd726",
+          "visible_claim_text": "establishing a BI and pipeline operating discipline that connected discovery to executive decisions and made partner-led growth more repeatable"
+        }
+      ],
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "resume_graph_allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79"
+    },
+    "section_id": "ibm_narrative",
+    "section_output_ref": "l2_output.json"
+  },
+  "quarantined_payload": null,
+  "result_class": "SUCCESS",
+  "return_code": 0,
+  "sealed_at": 683242.453,
+  "span_id": "section-l2-ibm_narrative",
+  "tokens_used": 14740,
+  "trace_id": "96e9b7d3-3855-4b2f-94eb-88dd00198ab7",
+  "validation_packet_id": "section-val-a8c5cc81dbd21eb1"
+}

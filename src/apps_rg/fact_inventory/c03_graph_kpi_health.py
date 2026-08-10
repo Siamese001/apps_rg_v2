@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from agentic_core.L4_state.adapters import sqlite3_adapter as sqlite3
+from apps_rg.runtime.core_sqlite import sqlite3_adapter as sqlite3
 from apps_rg.fact_inventory.augmented_skills_graph_sqlite import (
     canonical_node_type,
     open_graph_sqlite,

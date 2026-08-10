@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "section_id": "executive_summary",
+  "run_id": "exec_summary_20260809_092557",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 1,
+  "authoritative_l2_source": "initial_llm",
+  "attempt_1_x2_failed": false,
+  "attempt_1_x2_failed_gate_ids": [],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "deterministic_rewrite",
+      "operation": "repair_exec_summary_unallocated_metric_row",
+      "reason": "claim_3_metric_20_PERCENT_not_reserved_by:executive_summary:claim:03",
+      "replaced_l2": true
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "initial_llm",
+      "failed_gate_ids": [],
+      "passed": true
+    }
+  ]
+}

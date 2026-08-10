@@ -233,7 +233,7 @@ def test_w3_selector_timing_receipt_written(tmp_path):
     assert doc["outcome"] == "selector_timeout"
 
 
-def test_w3_competencies_selector_uses_extended_timeout_default(monkeypatch):
+def test_w3_competencies_selector_uses_extended_timeout_and_schema_safe_effort_default(monkeypatch):
     import apps_rg.runtime.judges.bullet_pool_claude_selector as sel
     from apps_rg.runtime.reasoning.bullet_lane_self_consistency import SelfConsistencyPath
     from apps_rg.runtime.reasoning.competencies_graph_pool import COMPETENCIES_FINAL_CATEGORY_COUNT
@@ -327,7 +327,9 @@ def test_w3_competencies_selector_uses_extended_timeout_default(monkeypatch):
     )
 
     assert captured["timeout_s"] == sel.DEFAULT_COMPETENCIES_POOL_SELECTOR_TIMEOUT_SECONDS
-    assert captured["reasoning_effort"] == "high"
+    # Live Sonnet 5 evidence showed medium/high adaptive thinking can consume
+    # the governed 4096-token room before the required JSON is emitted.
+    assert captured["reasoning_effort"] == "low"
 
 
 def test_w3_no_hardcoded_60s_selector_timeout():

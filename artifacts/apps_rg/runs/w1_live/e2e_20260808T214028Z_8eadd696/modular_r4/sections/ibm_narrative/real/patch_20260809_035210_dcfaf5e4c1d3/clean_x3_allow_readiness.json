@@ -1,0 +1,31 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_035217",
+  "clean_allow_possible_at_start": true,
+  "required_judges": [
+    "gemini_pro"
+  ],
+  "provider_preflight_status_by_judge": {
+    "gemini_pro": {
+      "provider_key": "gemini_pro",
+      "status": "credential_present",
+      "env_vars_consulted_in_order": [
+        "GOOGLE_API_KEY"
+      ],
+      "detail": "non-empty credential resolved via resolve_x1d_provider_credentials"
+    }
+  },
+  "mocked_judges_present": false,
+  "blocked_judges_present": false,
+  "mocked_judge_flags_active": false,
+  "x2_hard_gates_required": 60,
+  "x2_hard_gates_passed": 59,
+  "x3_code": "X3_BLOCK",
+  "proceed_to_runtime": false,
+  "product_authorized": false,
+  "proof_eligible": false,
+  "proof_scope": "plumbing_only",
+  "decisive_blockers": [],
+  "recommended_next_action": "review x3_disposition.json; ensure deterministic X2 gates pass and configured model-backed judges pass (clean X3 ALLOW requires every_active X1D judge MODEL_BACKED_PASS).",
+  "preflight_artifact_written": true
+}

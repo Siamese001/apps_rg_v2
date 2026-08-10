@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
+from apps_rg.runtime.spine_contracts import ValidatedRequest
 
 _BRIEFING_REF_KEYS = ("briefing_artifact_ref", "manual_brief_path")
 

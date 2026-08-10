@@ -3,6 +3,7 @@ from __future__ import annotations
 from tests.helpers import apps_rg_model_pins as pins
 
 from apps_rg.runtime.judges import competencies_x1d
+from apps_rg.runtime.judges.executive_summary_x1d import _gemini_generation_config
 
 
 def test_build_prompt_marks_companion_context_read_only_and_compacts_ledger() -> None:
@@ -20,6 +21,35 @@ def test_build_prompt_marks_companion_context_read_only_and_compacts_ledger() ->
     assert "Required competencies dimension_verdicts keys" in prompt
     assert "svp_agentic_specificity" in prompt
     assert "Do not substitute executive_summary dimension ids" in prompt
+
+
+def test_competencies_structured_output_schema_is_strict_and_section_specific() -> None:
+    schema = competencies_x1d.COMPETENCIES_JUDGE_RESPONSE_SCHEMA
+    assert schema["additionalProperties"] is False
+    assert set(schema["required"]) == set(schema["properties"])
+    dimensions = schema["properties"]["dimension_verdicts"]
+    assert dimensions["additionalProperties"] is False
+    assert tuple(dimensions["required"]) == competencies_x1d.COMPETENCIES_RUBRIC_DIMENSION_IDS
+    assert set(dimensions["properties"]) == set(
+        competencies_x1d.COMPETENCIES_RUBRIC_DIMENSION_IDS
+    )
+    for verdict in dimensions["properties"].values():
+        assert verdict["additionalProperties"] is False
+        assert set(verdict["required"]) == set(verdict["properties"])
+
+
+def test_gemini_schema_keeps_competencies_dimensions_without_openai_only_keyword() -> None:
+    config = _gemini_generation_config(
+        thinking_level="high",
+        section_id="competencies",
+        response_schema=competencies_x1d.COMPETENCIES_JUDGE_RESPONSE_SCHEMA,
+    )
+    schema = config["responseSchema"]
+    serialized = __import__("json").dumps(schema)
+    assert "additionalProperties" not in serialized
+    assert tuple(schema["properties"]["dimension_verdicts"]["required"]) == (
+        competencies_x1d.COMPETENCIES_RUBRIC_DIMENSION_IDS
+    )
 
 
 def test_competencies_rubric_mentions_ta_screen_and_ai_authenticity() -> None:

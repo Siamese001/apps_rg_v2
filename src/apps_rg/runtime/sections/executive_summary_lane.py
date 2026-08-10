@@ -33,7 +33,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
+from apps_rg.repository_layout import repository_root as resolve_repository_root
 
 # Load environment variables from .env file
 try:
@@ -283,6 +284,7 @@ def _find_repo_root() -> Path:
 
 
 REPO_ROOT = _find_repo_root()
+CHECKOUT_ROOT = resolve_repository_root(Path(__file__))
 BASE_POINTER = REPO_ROOT / "apps_rg" / "resume" / "base" / "active_base_resume_pointer.json"
 BASE_JSON_DEFAULT = REPO_ROOT / "apps_rg" / "resume" / "base" / "amit_ayer_base_resume_v1.json"
 LANE_KEY = "executive_summary"
@@ -363,7 +365,7 @@ def build_runtime_payload(
         run_id_prefix="exec_summary",
         section_id="executive_summary",
         prompt_id=PROMPT_ID,
-        repo_root=REPO_ROOT,
+        repo_root=CHECKOUT_ROOT,
         base_json_path=base_json_path,
         base_hash=base_hash,
         selected_graph_evidence_plan=selected_fact_plan,
@@ -377,6 +379,22 @@ def build_runtime_payload(
             "monolithic_prompt_invoked": False,
             "strategic_tailor_v1_invoked": False,
         },
+    )
+
+
+def _finalize_executive_summary_l7_binding(
+    artifact_dir: Path,
+    runtime_payload: dict[str, Any],
+) -> Path:
+    """Package lane evidence relative to the standalone checkout root."""
+    from apps_rg.runtime.section_l7_binding_lane_integration import finalize_section_l7_binding
+
+    return finalize_section_l7_binding(
+        artifact_dir,
+        section_id="executive_summary",
+        runtime_payload=runtime_payload,
+        repo_root=CHECKOUT_ROOT,
+        command_surface="python -m apps_rg --section executive_summary",
     )
 
 
@@ -619,6 +637,48 @@ def reconcile_claim_ledger_to_sentence_count(parsed: dict[str, Any]) -> None:
     ledger.append(new_row)
 
 
+def _repair_speculative_exec_summary_capstone(
+    resume: str,
+    claim_ledger: list[dict[str, Any]],
+    change_log: list[Any],
+) -> str:
+    """Convert the narrow unsupported S6 future modal to present impact.
+
+    The rewrite removes no mechanism, outcome, or provenance.  It changes only
+    ``can guide future`` to ``guides`` and synchronizes the one-to-one ledger
+    row before the complete X2 and model-judge chain runs.
+    """
+
+    from apps_rg.runtime.validators.executive_summary_sentence_utils import (
+        join_executive_summary_sentences,
+        split_sentences,
+    )
+
+    sentences = [str(value).strip() for value in split_sentences(resume)]
+    if len(sentences) != _EXEC_SUMMARY_TARGET_SENTENCES:
+        return resume
+    repaired = re.sub(
+        r"\bcan\s+guide\s+future\s+",
+        "guides ",
+        sentences[-1],
+        count=1,
+        flags=re.IGNORECASE,
+    )
+    if repaired == sentences[-1]:
+        return resume
+    sentences[-1] = repaired
+    if len(claim_ledger) == len(sentences) and isinstance(claim_ledger[-1], dict):
+        claim_ledger[-1]["claim"] = repaired
+        claim_ledger[-1]["claim_text"] = repaired
+    change_log.append(
+        {
+            "operation": "repair_exec_summary_speculative_capstone",
+            "reason": "replace_unsupported_future_modal_with_evidence_led_present_impact",
+        }
+    )
+    return join_executive_summary_sentences(sentences)
+
+
 def normalize_executive_summary_llm_output(
     parsed: dict[str, Any],
     runtime_selected_fact_plan: dict[str, Any],
@@ -642,6 +702,11 @@ def normalize_executive_summary_llm_output(
     gap = parsed.get("gap_notes") if isinstance(parsed.get("gap_notes"), list) else []
     changelog = parsed.get("change_log") if isinstance(parsed.get("change_log"), list) else []
     self_chk = parsed.get("self_check") if isinstance(parsed.get("self_check"), dict) else {}
+    resume = _repair_speculative_exec_summary_capstone(
+        resume,
+        claims,
+        changelog,
+    )
     out: dict[str, Any] = {
         "executive_strategy_thesis": thesis,
         "resume_display_text": resume,
@@ -805,6 +870,7 @@ def _synthesis_shape_reject_reason(
     parsed: dict[str, Any] | None,
     *,
     selected_facts: list[dict[str, Any]] | None = None,
+    selected_fact_plan: dict[str, Any] | None = None,
     jd_text: str = "",
 ) -> tuple[bool, str]:
     """Return (all_ok, semicolon-joined failure reasons) for pre-X2 synthesis shape."""
@@ -875,6 +941,19 @@ def _synthesis_shape_reject_reason(
         )
         if not conf_ok and conf_reason:
             failures.append(conf_reason)
+        from apps_rg.runtime.c0.resume_graph_claim_binding import (
+            validate_claim_rows_against_resume_graph_allocation,
+        )
+
+        graph_binding_failures = validate_claim_rows_against_resume_graph_allocation(
+            section_id="executive_summary",
+            claim_rows=list(parsed.get("claim_ledger") or []),
+            selected_fact_plan=selected_fact_plan,
+        )
+        failures.extend(
+            f"resume_graph_claim_binding:{reason}"
+            for reason in graph_binding_failures
+        )
     meta_ok, meta_reason = check_exec_summary_meta_filler_patterns(text)
     if not meta_ok and meta_reason:
         failures.append(meta_reason)
@@ -954,10 +1033,15 @@ def _shape_failure_count(
     parsed: dict[str, Any] | None,
     *,
     selected_facts: list[dict[str, Any]] | None = None,
+    selected_fact_plan: dict[str, Any] | None = None,
     jd_text: str = "",
 ) -> int:
     ok, reason = _synthesis_shape_reject_reason(
-        resume_display_text, parsed, selected_facts=selected_facts, jd_text=jd_text
+        resume_display_text,
+        parsed,
+        selected_facts=selected_facts,
+        selected_fact_plan=selected_fact_plan,
+        jd_text=jd_text,
     )
     if ok:
         return 0
@@ -1003,6 +1087,7 @@ def _build_synthesis_repair_user(
     prior_ledger_rows: int,
     last_monotonicity_rejected: bool = False,
     strategy_executive: bool = False,
+    selected_fact_plan: dict[str, Any] | None = None,
 ) -> str:
     blob = str(reject_reason or "").lower()
     attempt_note = ""
@@ -1042,10 +1127,18 @@ def _build_synthesis_repair_user(
             "Always produce exactly 6 sentences regardless of pool size — split multi-beat sentences to reach 6. "
         )
     mechanism_note = ""
-    if "mechanism_inventory" in blob or "mechanism inventory" in blob:
+    if (
+        "mechanism_inventory" in blob
+        or "mechanism inventory" in blob
+        or "mechanism_comma_list" in blob
+        or "mechanism_list_through_connector" in blob
+        or "mechanism_chain_inventory" in blob
+    ):
         mechanism_note = (
             "MECHANISM_CONTROL: sentence 1 = thesis + operating domain ONLY (no routing/orchestration/GraphRAG list). "
             "Max two mechanism terms in any later sentence, only when verbatim in facts. "
+            "A sentence with two mechanism terms MUST NOT also contain two or more commas; "
+            "rewrite it as one plain causal clause instead of a coordinated inventory. "
             "Do not repeat the same platform sentence twice. "
         )
     meta_note = ""
@@ -1093,6 +1186,41 @@ def _build_synthesis_repair_user(
             "Weave team 8-to-28 scale (fact_exec_002) into commercialization when selected. "
             "Vary sentence openers; no Led/Successfully/Also/Built chains. "
         )
+    graph_binding_note = ""
+    if "resume_graph_claim_binding" in blob:
+        plan = selected_fact_plan if isinstance(selected_fact_plan, dict) else {}
+        facts_by_root: dict[str, list[str]] = {}
+        for fact in plan.get("facts") or []:
+            if not isinstance(fact, dict):
+                continue
+            root_id = str(
+                fact.get("role_episode_bundle_id") or fact.get("fact_id") or ""
+            ).strip()
+            if not root_id:
+                continue
+            aliases = {
+                str(value).strip()
+                for value in (
+                    fact.get("fact_id"),
+                    *list(fact.get("allowed_graph_evidence_ids") or []),
+                    *list(fact.get("linked_identity_fact_ids") or []),
+                    *list(fact.get("linked_source_fact_ids") or []),
+                    *list(fact.get("graph_skill_node_ids") or []),
+                    *list(fact.get("metric_outcome_ids") or []),
+                )
+                if str(value or "").strip()
+            }
+            facts_by_root[root_id] = sorted(aliases)
+        root_groups = "; ".join(
+            f"{root}=[{','.join(ids)}]" for root, ids in sorted(facts_by_root.items())
+        )
+        graph_binding_note = (
+            "GRAPH ALLOCATION ROOT HARD FAIL: a causal sentence may not combine source_fact_ids "
+            "from different allocated graph roots. Rewrite each failed claim as one root-supported "
+            "thought; remove unrelated source ids from that row or move the material to a separate "
+            "sentence while preserving exactly six rows/sentences. Do not imply that one root caused "
+            f"another root's outcome. SAME-ROOT GROUPS: {root_groups}. "
+        )
     stock_bridge_note = ""
     if "stock_bridge_stack" in blob or "robotic_transition_stack" in blob:
         stock_bridge_note = (
@@ -1118,7 +1246,7 @@ def _build_synthesis_repair_user(
         svp_note = format_synthesis_repair_directive(strategy_executive=True)
     return (
         f"SYNTHESIS REJECTED: {reject_reason}. {attempt_note}{sentence_count_note}{length_note}{utilization_note}"
-        f"{mechanism_note}{meta_note}{jd_copy_note}{filler_note}{conflation_note}{stock_bridge_note}{s5_note}{svp_note}"
+        f"{mechanism_note}{meta_note}{jd_copy_note}{filler_note}{conflation_note}{graph_binding_note}{stock_bridge_note}{s5_note}{svp_note}"
         "Return a NEW complete JSON object (RAW JSON only; first char {, last char }). "
         f"Rewrite resume_display_text as exactly 6 period-delimited sentences (one executive paragraph, max {EXEC_SUMMARY_MAX_WORDS} words), "
         "fit_to_evidence integrated narrative — not 4 compressed sentences; do not pad with filler. "
@@ -1146,6 +1274,7 @@ def retry_provider_for_synthesis(
     parsed: dict[str, Any],
     *,
     selected_facts: list[dict[str, Any]] | None = None,
+    selected_fact_plan: dict[str, Any] | None = None,
     strategy_executive: bool = False,
     artifact_dir: Path | None = None,
     run_id: str | None = None,
@@ -1167,7 +1296,11 @@ def retry_provider_for_synthesis(
     first_parsed = parsed
     first_text = str(parsed.get("resume_display_text") or "")
     shape_ok, reject_reason = _synthesis_shape_reject_reason(
-        first_text, parsed, selected_facts=selected_facts, jd_text=jd_text
+        first_text,
+        parsed,
+        selected_facts=selected_facts,
+        selected_fact_plan=selected_fact_plan,
+        jd_text=jd_text,
     )
     if shape_ok:
         return raw_output, parsed, ""
@@ -1199,7 +1332,13 @@ def retry_provider_for_synthesis(
 
     best_raw = raw_output
     best_parsed = parsed
-    best_fail_count = _shape_failure_count(first_text, parsed, selected_facts=selected_facts, jd_text=jd_text)
+    best_fail_count = _shape_failure_count(
+        first_text,
+        parsed,
+        selected_facts=selected_facts,
+        selected_fact_plan=selected_fact_plan,
+        jd_text=jd_text,
+    )
     best_ledger_rows = len(list(parsed.get("claim_ledger") or []))
 
     for attempt in range(max_attempts):
@@ -1207,7 +1346,11 @@ def retry_provider_for_synthesis(
         prior_wc = len(re.findall(r"\S+", resume_text))
         prior_ledger_rows = len(list(current_parsed.get("claim_ledger") or []))
         shape_ok, reject_reason = _synthesis_shape_reject_reason(
-            resume_text, current_parsed, selected_facts=selected_facts, jd_text=jd_text
+            resume_text,
+            current_parsed,
+            selected_facts=selected_facts,
+            selected_fact_plan=selected_fact_plan,
+            jd_text=jd_text,
         )
         if shape_ok:
             regen_receipt["accepted"] = True
@@ -1224,6 +1367,7 @@ def retry_provider_for_synthesis(
             prior_ledger_rows=prior_ledger_rows,
             last_monotonicity_rejected=last_mono_rejected,
             strategy_executive=strategy_executive,
+            selected_fact_plan=selected_fact_plan,
         )
         repair_messages = [
             *baseline_messages,
@@ -1280,6 +1424,7 @@ def retry_provider_for_synthesis(
                 regen_text,
                 new_parsed,
                 selected_facts=selected_facts,
+                selected_fact_plan=selected_fact_plan,
                 jd_text=jd_text,
             )
             attempt_record["defects_after"] = [
@@ -1293,7 +1438,11 @@ def retry_provider_for_synthesis(
                 "failed_reasons": attempt_record["defects_after"],
             }
             new_fail_count = _shape_failure_count(
-                regen_text, new_parsed, selected_facts=selected_facts, jd_text=jd_text
+                regen_text,
+                new_parsed,
+                selected_facts=selected_facts,
+                selected_fact_plan=selected_fact_plan,
+                jd_text=jd_text,
             )
             attempt_record["shape_failure_count"] = new_fail_count
             mono_ok, mono_detail = evaluate_synthesis_regen_monotonicity(
@@ -1341,10 +1490,18 @@ def retry_provider_for_synthesis(
 
     final_text = str(current_parsed.get("resume_display_text") or "")
     final_ok, final_reason = _synthesis_shape_reject_reason(
-        final_text, current_parsed, selected_facts=selected_facts, jd_text=jd_text
+        final_text,
+        current_parsed,
+        selected_facts=selected_facts,
+        selected_fact_plan=selected_fact_plan,
+        jd_text=jd_text,
     )
     final_fail_count = _shape_failure_count(
-        final_text, current_parsed, selected_facts=selected_facts, jd_text=jd_text
+        final_text,
+        current_parsed,
+        selected_facts=selected_facts,
+        selected_fact_plan=selected_fact_plan,
+        jd_text=jd_text,
     )
     best_wc = len(re.findall(r"\S+", str(best_parsed.get("resume_display_text") or "")))
     best_text = str(best_parsed.get("resume_display_text") or "")
@@ -1352,6 +1509,7 @@ def retry_provider_for_synthesis(
         best_text,
         best_parsed,
         selected_facts=selected_facts,
+        selected_fact_plan=selected_fact_plan,
         jd_text=jd_text,
     )
     if (
@@ -1373,7 +1531,11 @@ def retry_provider_for_synthesis(
         regen_receipt["accepted_via"] = "best_candidate_fallback"
         final_text = str(current_parsed.get("resume_display_text") or "")
         final_ok, final_reason = _synthesis_shape_reject_reason(
-            final_text, current_parsed, selected_facts=selected_facts, jd_text=jd_text
+            final_text,
+            current_parsed,
+            selected_facts=selected_facts,
+            selected_fact_plan=selected_fact_plan,
+            jd_text=jd_text,
         )
         regen_receipt["best_candidate_shape_failure_count"] = best_fail_count
     elif final_ok:
@@ -2077,7 +2239,9 @@ def run_executive_summary_execution(
     section_model = (
         external_openai_generation_model(section_id=LANE_KEY)
         if str(args.provider) == "external_openai"
-        else resolve_section_generation_model(LANE_KEY)
+        else resolve_section_generation_model(
+            LANE_KEY, provider_profile=str(args.provider)
+        )
     )
     if not evidence_capsule_block_reason:
         try:
@@ -2345,6 +2509,7 @@ def run_executive_summary_execution(
                 raw_output,
                 parsed,
                 selected_facts=list(selected_fact_plan.get("facts") or []),
+                selected_fact_plan=selected_fact_plan,
                 strategy_executive=is_strategy_executive_target_title(_target_role_for_regen),
                 artifact_dir=artifact_dir,
                 run_id=str(runtime_payload.get("run_id") or "") or None,
@@ -2756,6 +2921,23 @@ def run_executive_summary_execution(
         proof_pool_digest=str(pool.proof_pool_digest or ""),
         )
     ]
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        GRAPH_CLAIM_BINDING_GATE_ID,
+        build_pre_x2_resume_graph_claim_binding_gate,
+    )
+
+    _graph_binding_gate = build_pre_x2_resume_graph_claim_binding_gate(
+        section_id="executive_summary",
+        claim_rows=claim_ledger,
+        selected_fact_plan=selected_fact_plan,
+    )
+    if _graph_binding_gate is not None:
+        x2 = [
+            gate
+            for gate in x2
+            if str(gate.get("gate_id") or "") != GRAPH_CLAIM_BINDING_GATE_ID
+        ]
+        x2.append(_graph_binding_gate)
     from apps_rg.runtime.validators.proof_pool_source_fact_validation import (
         write_x2_source_fact_pool_receipt,
     )
@@ -3278,6 +3460,7 @@ def run_executive_summary_execution(
                         compiled_prompt=compiled_prompt,
                         raw_output=raw_output,
                         selected_facts=selected_facts_for_x2,
+                        selected_fact_plan=selected_fact_plan,
                         x1d_judges=x1d,
                         proof_pool_metadata=pp_x2 if proof_pool_x2_active else None,
                         proof_pool_ref=str(pool.proof_pool_ref or ""),
@@ -3352,6 +3535,7 @@ def run_executive_summary_execution(
                                 compiled_prompt=compiled_prompt,
                                 raw_output=raw_output,
                                 selected_facts=selected_facts_for_x2,
+                                selected_fact_plan=selected_fact_plan,
                                 x1d_judges=x1d,
                                 proof_pool_metadata=pp_x2 if proof_pool_x2_active else None,
                                 proof_pool_ref=str(pool.proof_pool_ref or ""),
@@ -3902,6 +4086,7 @@ def run_executive_summary_execution(
         artifact_dir=artifact_dir,
         section_id="executive_summary",
         runtime_payload=runtime_payload,
+        defer_graph_binding_l2_persistence=True,
         aggregate_x3_fn=_aggregate_executive_summary_x3,
         resume_display_text=resume_display_text,
         claim_ledger=claim_ledger,
@@ -3929,17 +4114,15 @@ def run_executive_summary_execution(
             "product_quality_status": product_quality_status,
         },
     )
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        merge_resume_graph_claim_binding_fields,
+    )
     from apps_rg.runtime.section_l2_lane_integration import finalize_section_l2_after_output
     from apps_rg.runtime.section_runtime_exhaust_lane_integration import (
         finalize_section_runtime_exhaust_before_l6,
         gate_section_l6_shadow_after_exhaust,
     )
   # guardian: allow-default-fallback -- P2 burndown: fail-soft optional boundary
-    finalize_section_l2_after_output(artifact_dir, "executive_summary", runtime_payload)
-    finalize_section_runtime_exhaust_before_l6(
-        artifact_dir, "executive_summary", runtime_payload, repo_root=REPO_ROOT
-    )
-
     emit_executive_summary_post_x3_proof_artifacts(
         repo_root=REPO_ROOT,
         artifact_dir=artifact_dir,
@@ -3961,7 +4144,15 @@ def run_executive_summary_execution(
         runtime_generation_status=runtime_generation_status,
         bundle=proof_bundle,
     )
+    l2_output = merge_resume_graph_claim_binding_fields(
+        l2_output,
+        artifact_dir=artifact_dir,
+    )
     write_json(artifact_dir / "l2_output.json", l2_output)
+    finalize_section_l2_after_output(artifact_dir, "executive_summary", runtime_payload)
+    finalize_section_runtime_exhaust_before_l6(
+        artifact_dir, "executive_summary", runtime_payload, repo_root=REPO_ROOT
+    )
 
     l6_temp = float(args.temperature)
     gate_section_l6_shadow_after_exhaust(artifact_dir, runtime_payload)
@@ -4155,15 +4346,7 @@ def run_executive_summary_execution(
         test_only_mock_judges=proof_bundle["test_only_mock_judges"],
         proof_closeout_note=proof_bundle.get("proof_closeout_note") or None,
     )
-    from apps_rg.runtime.section_l7_binding_lane_integration import finalize_section_l7_binding
-
-    finalize_section_l7_binding(
-        artifact_dir,
-        section_id="executive_summary",
-        runtime_payload=runtime_payload,
-        repo_root=REPO_ROOT,
-        command_surface="python -m apps_rg --section executive_summary",
-    )
+    _finalize_executive_summary_l7_binding(artifact_dir, runtime_payload)
     return {
         "artifact_dir": artifact_dir,
         "repo_root": REPO_ROOT,

@@ -108,6 +108,7 @@ def test_cache_flag_off_preserves_section_payload_shape() -> None:
         "max_tokens": 700,
         "timeout_seconds": 90,
         "response_format": {"type": "json_object"},
+        "_provider_profile": "external_claude",
     }
     assert "cache_control" not in str(payload)
 

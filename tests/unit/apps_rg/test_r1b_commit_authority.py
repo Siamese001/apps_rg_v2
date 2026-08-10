@@ -69,9 +69,17 @@ def _request(**overrides):
     return SimpleNamespace(**values)
 
 
-def test_literal_x3c_is_the_only_commit_authority() -> None:
-    assert assess_r1b_commit_authority(x3_code="X3C").authorized is True
-    for finish_code in ("X3_ALLOW", "X3D", "EXIT_OK", "EXIT_PARTIAL"):
+def test_canonical_x3c_is_the_only_commit_authority() -> None:
+    assert assess_r1b_commit_authority(
+        x3_code="X3C_COMMIT_REQUEST_TO_UWG"
+    ).authorized is True
+    for finish_code in (
+        "X3C",
+        "X3_ALLOW",
+        "X3D",
+        "EXIT_OK",
+        "EXIT_PARTIAL",
+    ):
         result = assess_r1b_commit_authority(x3_code=finish_code)
         assert result.authorized is False
         assert result.reason_code == REASON_X3C_REQUIRED
@@ -82,7 +90,7 @@ def test_run_dir_authority_fails_closed_on_missing_or_malformed(tmp_path: Path) 
     (tmp_path / "x3_disposition.json").write_text("[]", encoding="utf-8")
     assert assess_r1b_commit_authority_from_run_dir(tmp_path).authorized is False
     (tmp_path / "x3_disposition.json").write_text(
-        json.dumps({"x3_code": "X3C"}), encoding="utf-8"
+        json.dumps({"x3_code": "X3C_COMMIT_REQUEST_TO_UWG"}), encoding="utf-8"
     )
     assert assess_r1b_commit_authority_from_run_dir(tmp_path).authorized is True
 

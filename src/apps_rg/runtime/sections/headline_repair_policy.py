@@ -7,7 +7,13 @@ import os
 # Bounded same-authority content-signal regen (retry_headline_content_signal).
 RELEASE_HEADLINE_CONTENT_SIGNAL_REPAIR_ENABLED = True
 # Hard cap — absolute ceiling, not operator-raisable (no env knob exists for attempts).
-CONTENT_SIGNAL_REPAIR_MAX_ATTEMPTS = 1
+# One initial content repair plus up to two evidence-preserving corrections when
+# the provider returns real, parseable candidates that miss only the measured
+# shape/signal/grounding/clarity contract.  The third attempt closes the live
+# sequence where attempt 1 missed shape and attempt 2 passed X2 but produced an
+# opaque noun stack rejected by the decisive X1D judge. Transport/parse failures
+# remain single-shot.
+CONTENT_SIGNAL_REPAIR_MAX_ATTEMPTS = 3
 
 
 def content_signal_repair_enabled() -> bool:

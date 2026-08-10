@@ -309,7 +309,7 @@ def test_real_graph_whole_resume_allocation_covers_all_lanes_and_is_order_invari
     ]
     assert plan["uniqueness_receipt"]["pass"] is True
     assert plan["global_uniqueness_claimed"] is True
-    assert len(plan["assignments"]) == 47
+    assert len(plan["assignments"]) == 48
     assert set(forward["section_final_evidence_contracts"]) == set(
         forward["section_plans"]
     )
@@ -328,6 +328,7 @@ def test_real_graph_whole_resume_allocation_covers_all_lanes_and_is_order_invari
         for row in plan["assignments"]
         if row["section_id"] == "headline"
     }
+    assert len(allocated_headline_skills) == 3
     assert set(headline_slice["selected_skill_ids"]) == allocated_headline_skills
     assert headline_slice["allocation_plan_digest"] == plan["allocation_plan_digest"]
 

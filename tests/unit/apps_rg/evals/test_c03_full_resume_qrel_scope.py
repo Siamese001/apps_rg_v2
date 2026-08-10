@@ -16,14 +16,19 @@ from apps_rg.fact_inventory.c03_graph_node_semantic_hardening import canonical_s
 ROOT = Path(__file__).resolve().parents[4]
 
 
-def test_w0_scope_has_all_full_resume_sections() -> None:
+def test_w0_scope_has_all_sections_but_is_invalidated_by_source_drift() -> None:
     scope = load_full_resume_scope(ROOT)
 
     assert [row["section_id"] for row in scope["resume_sections"]] == list(
         EXPECTED_SECTION_IDS
     )
     assert scope["planned_denominator"]["query_section_case_count"] == 66
-    assert validate_full_resume_scope(scope, ROOT) == []
+    assert validate_full_resume_scope(scope, ROOT) == [
+        "SECTION_PROFILE_DIGEST",
+        "SOURCE_COMMIT",
+        "TARGET_BRIEF_DIGEST",
+        "TARGET_JD_DIGEST",
+    ]
 
 
 def test_w0_scope_detects_a_missing_ibm_section() -> None:
@@ -48,9 +53,15 @@ def test_w0_scope_detects_a_changed_target_input() -> None:
     assert "TARGET_JD_DIGEST" in validate_full_resume_scope(scope, ROOT)
 
 
-def test_w0_status_is_ready_for_w1_but_not_human_or_release_ready() -> None:
+def test_w0_status_is_blocked_and_not_human_or_release_ready() -> None:
     result = scope_status(ROOT)
 
-    assert result["status"] == "W0_FROZEN_READY_FOR_W1"
+    assert result["status"] == "W0_BLOCKED"
+    assert result["issues"] == [
+        "SECTION_PROFILE_DIGEST",
+        "SOURCE_COMMIT",
+        "TARGET_BRIEF_DIGEST",
+        "TARGET_JD_DIGEST",
+    ]
     assert result["human_qrels_created"] is False
     assert result["release_authorizing"] is False

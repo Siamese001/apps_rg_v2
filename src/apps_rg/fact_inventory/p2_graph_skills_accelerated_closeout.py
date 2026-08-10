@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 from apps_rg.runtime.sections.graph_evidence_contract import SECTION_KEYS
 from apps_rg.fact_inventory.track_weighted_graph_expansion import (

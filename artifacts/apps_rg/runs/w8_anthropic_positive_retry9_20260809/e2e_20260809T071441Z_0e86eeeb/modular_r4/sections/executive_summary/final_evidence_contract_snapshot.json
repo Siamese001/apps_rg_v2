@@ -1,0 +1,174 @@
+{
+  "schema_version": "final_evidence_contract_snapshot_v1",
+  "app_id": "apps_rg",
+  "source_authority": "augmented_skills_graph",
+  "support_status": "SUPPORTED",
+  "support_target_met": true,
+  "support_target_derivation": "graph_lane_v1",
+  "not_applicable_reason": "",
+  "graph_expansion_allowed": true,
+  "graph_expansion_refs": [
+    "ref:graph:digest:1aec5bcc45e4c98c"
+  ],
+  "graph_lineage_refs": [
+    "ref:graph:version:master_skills_arsenal_graph_v1",
+    "ref:graph:node_count:375",
+    "ref:graph:edge_count:2315",
+    "ref:graph:fact_lineage:reb_ibm_aws_alliance_partner_cosell_gtm",
+    "ref:graph:fact_lineage:reb_ibm_aws_modernization_architecture",
+    "ref:graph:fact_lineage:reb_ibm_customer_success_value_realization",
+    "ref:graph:fact_lineage:reb_ibm_offering_accelerator_management",
+    "ref:graph:fact_lineage:reb_insurtech_aws_guidewire_core_modernization",
+    "ref:graph:fact_lineage:reb_insurtech_regulated_aws_control_implementation",
+    "ref:graph:fact_lineage:reb_unify_agentic_platform_architecture",
+    "ref:graph:fact_lineage:reb_unify_distributed_ecosystem_engineering",
+    "ref:graph:fact_lineage:reb_unify_enterprise_adoption_revenue",
+    "ref:graph:fact_lineage:reb_unify_partner_channel_cosell"
+  ],
+  "graph_sig": "d49d11ea1a5db2cdad8c84c0e29415a6",
+  "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "graph_version": "master_skills_arsenal_graph_v1",
+  "evidence_items": [
+    {
+      "evidence_id": "evidence:graph:reb_ibm_aws_alliance_partner_cosell_gtm",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ibm_aws_alliance_partner_cosell_gtm",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true,
+      "graph_hop_path": [
+        {
+          "edge_type": "career_track_contains_pillar",
+          "from": "track_data_tech_cloud_ml",
+          "to": "pillar_partner_gtm_alliances",
+          "note": "track-weighted pillar scope"
+        },
+        {
+          "edge_type": "skill_row_pillar_projection",
+          "from": "pillar_partner_gtm_alliances",
+          "to": "skill_partner_ibm_aws_alliance_joint_revenue",
+          "note": "ACTIVE skill_row pillar match (not causal)"
+        },
+        {
+          "edge_type": "skill_supported_by_fact",
+          "from": "skill_partner_ibm_aws_alliance_joint_revenue",
+          "to": "fact_partnerships_gtm_002",
+          "note": "graph edge skill_supported_by_fact"
+        },
+        {
+          "edge_type": "role_episode_bundle_linked_source_fact",
+          "from": "fact_partnerships_gtm_002",
+          "to": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "note": "selected role-episode linked_source_fact_ids binding"
+        }
+      ]
+    },
+    {
+      "evidence_id": "evidence:graph:reb_ibm_aws_modernization_architecture",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ibm_aws_modernization_architecture",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_ibm_customer_success_value_realization",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ibm_customer_success_value_realization",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_ibm_offering_accelerator_management",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ibm_offering_accelerator_management",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_insurtech_aws_guidewire_core_modernization",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_insurtech_aws_guidewire_core_modernization",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_insurtech_regulated_aws_control_implementation",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_insurtech_regulated_aws_control_implementation",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_unify_agentic_platform_architecture",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_unify_agentic_platform_architecture",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true,
+      "graph_hop_path": [
+        {
+          "edge_type": "career_track_contains_pillar",
+          "from": "track_genai_agentic",
+          "to": "pillar_agentic_ai_platforms",
+          "note": "track-weighted pillar scope"
+        },
+        {
+          "edge_type": "skill_row_pillar_projection",
+          "from": "pillar_agentic_ai_platforms",
+          "to": "skill_agentic_control_plane_design",
+          "note": "ACTIVE skill_row pillar match (not causal)"
+        },
+        {
+          "edge_type": "skill_supported_by_fact",
+          "from": "skill_agentic_control_plane_design",
+          "to": "fact_engineering_platform_001",
+          "note": "graph edge skill_supported_by_fact"
+        },
+        {
+          "edge_type": "role_episode_bundle_linked_source_fact",
+          "from": "fact_engineering_platform_001",
+          "to": "reb_unify_agentic_platform_architecture",
+          "note": "selected role-episode linked_source_fact_ids binding"
+        }
+      ]
+    },
+    {
+      "evidence_id": "evidence:graph:reb_unify_distributed_ecosystem_engineering",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_unify_distributed_ecosystem_engineering",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_unify_enterprise_adoption_revenue",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_unify_enterprise_adoption_revenue",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_unify_partner_channel_cosell",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_unify_partner_channel_cosell",
+      "authority": "augmented_skills_graph",
+      "claim_support_allowed": true
+    }
+  ],
+  "evidence_collection_timestamp": "2026-08-09T07:21:19.478252+00:00",
+  "fec_shape_only": true,
+  "canonical_final_evidence_contract_emitted": false,
+  "recommended_artifact_name": "section_graph_binding_fec_snapshot.json",
+  "evidence_items_count": 10,
+  "graph_expansion_mode": "TRACK_WEIGHTED_MULTI_HOP",
+  "graph_hop_paths_count": 2,
+  "graph_hop_paths_count_semantics": "count of materialized track→pillar→skill→fact hop paths for allowed facts; not incident-edge ref cardinality"
+}

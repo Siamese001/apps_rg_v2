@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 from apps_rg.runtime.section_binding_taxonomy import (
     APPS_RG_DOMAIN_ARTIFACTS,

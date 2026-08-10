@@ -1,0 +1,85 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.0,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "All substantive claims are supported by allowed facts.",
+      "Four-segment format and 11-word count comply.",
+      "The final two segments overlap around runtime governance and telemetry.",
+      "“Telemetry Evaluation Runtime” is an unnatural, machine-like noun stack.",
+      "Repeated “Runtime” weakens distinct positioning and the TA screen."
+    ],
+    "cited_sentence_indexes": [
+      1
+    ],
+    "remediation_suggestions": [
+      "Make the final two segments semantically distinct.",
+      "Use natural, resume-native phrasing without stacked nouns.",
+      "Remove repeated positioning language across segments."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": [
+          "SUPPORTED_CLAIMS"
+        ]
+      },
+      "executive_signal": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DISTINCT_SIGNAL_WEAKENED"
+        ]
+      },
+      "resume_voice": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MACHINE_LIKE_NOUN_STACK"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "REDUNDANT_RUNTIME_THEME"
+        ]
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": [
+          "NO_JD_COPYING"
+        ]
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "OVERLAPPING_SEGMENTS"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": [
+          "LEDGER_EVIDENCE_USED"
+        ]
+      },
+      "deterministic_alignment": {
+        "pass": true,
+        "severity": "none",
+        "codes": [
+          "FORMAT_AND_WORD_COUNT_PASS"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry14_20260809\\e2e_20260809T082331Z_9f9147d4\\modular_r4\\sections\\headline\\x1d_openai_provider_response_raw_20260809_083333_001.json",
+  "original_model": null,
+  "fallback_model": null
+}

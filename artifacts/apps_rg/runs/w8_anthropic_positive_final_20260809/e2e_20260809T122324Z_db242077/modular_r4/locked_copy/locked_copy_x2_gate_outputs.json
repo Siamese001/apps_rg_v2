@@ -1,0 +1,140 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_locked_copy_source_present",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "base_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src\\apps_rg\\resume\\base\\amit_ayer_base_resume_v1.json",
+        "section_count": 9
+      },
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final_20260809\\e2e_20260809T122324Z_db242077\\modular_r4\\locked_copy\\locked_copy_manifest.json",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_locked_copy_byte_for_byte_match",
+      "gate_type": "deterministic",
+      "observed_value": true,
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_locked_copy_hash_match",
+      "gate_type": "deterministic",
+      "observed_value": true,
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_locked_copy_no_llm_provider",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "provider_calls_made": false,
+        "forbidden_artifacts_present": []
+      },
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_locked_copy_rewrite_allowed_false",
+      "gate_type": "deterministic",
+      "observed_value": true,
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_company_names_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "[\"Unify Consulting\",\"IBM\",\"InsurTech Cloud Solutions\",\"Ernst & Young\",\"Early Car",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "company_names",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_titles_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "[\"SVP Engineering, Agentic AI Platforms\",\"Partner\",\"Chief Technology Officer\",\"P",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "titles",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_locations_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "[\"Boca Raton, FL\",\"Edgewater, NJ\",\"New York, NY\",\"New York, NY\",\"Philadelphia, P",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "locations",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_dates_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "[{\"end_date\":\"present\",\"fact_id\":\"exp_unify_001\",\"is_current\":true,\"start_date\":",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "dates",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_education_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "[{\"degree\":\"Master of Science in Biostatistics\",\"evidence_confidence\":1.0,\"fact_",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "education",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_certifications_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "[{\"evidence_confidence\":1.0,\"fact_id\":\"cert_aws_cml_001\",\"issuing_organization\":",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "certifications",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_insurtech_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "{\"bullets\":[{\"bullet_id\":\"bul_insurtech_001\",\"domain\":\"cloud infrastructure\",\"ha",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "insurtech",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ey_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "{\"bullets\":[{\"bullet_id\":\"bul_ey_001\",\"domain\":\"regulatory analytics\",\"has_metri",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "ey",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_early_career_preserved",
+      "gate_type": "deterministic",
+      "observed_value": "{\"bullets\":[{\"bullet_id\":\"bul_early_career_001\",\"domain\":\"actuarial & quantitati",
+      "threshold": true,
+      "failure_reason": null,
+      "evidence_ref": "early_career",
+      "pass": true
+    }
+  ],
+  "failed_gates": [],
+  "x2_passed": 14,
+  "x2_failed": 0,
+  "total_x2_gates": 14
+}

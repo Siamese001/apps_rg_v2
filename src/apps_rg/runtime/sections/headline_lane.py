@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 try:
     from dotenv import load_dotenv
@@ -92,6 +92,9 @@ from apps_rg.runtime.validators.headline_positioning_x2 import (
 )
 from apps_rg.runtime.validators.headline_quality_x2 import POSITIONING_FAMILIES
 from apps_rg.runtime.validators.headline_x2 import (
+    evaluate_headline_literal_grounding,
+    headline_executive_abstraction_report,
+    headline_segment_theme_overlap_issues,
     headline_runtime_self_check_truth,
     headline_word_count,
     polish_claim_text_when_headline_has_no_metrics,
@@ -106,6 +109,9 @@ from apps_rg.runtime.sections.graph_evidence_contract import (
     build_graph_evidence_runtime_payload,
     build_selected_graph_evidence_plan,
     merge_graph_evidence_reporting_into_dict,
+)
+from apps_rg.runtime.c0.resume_graph_claim_binding import (
+    build_pre_x2_resume_graph_claim_binding_gate,
 )
 
 PROMPT_ID = "headline_section_v1"
@@ -422,6 +428,65 @@ def _headline_positioning_segments(headline_line: str) -> tuple[str, str, str] |
     if len(parts) != 4 or not all(parts) or parts[0] != "SVP Engineering":
         return None
     return parts[1], parts[2], parts[3]
+
+
+def headline_resume_native_clarity_report(headline_line: str) -> dict[str, Any]:
+    """Deterministic pre-X1D guard against opaque compound-noun headline segments.
+
+    A compact two- or three-word segment is accepted directly.  A longer segment
+    must retain at least one contiguous, familiar positioning phrase from the
+    existing POSITIONING_FAMILIES SSOT.  This distinguishes an intelligible phrase
+    such as ``Governed Agentic AI Platforms`` from live retry-8 hybrids such as
+    ``Distributed Partner Solution Infrastructure`` and
+    ``Agentic Context Evaluation Platform``.  The guard is only a repair trigger
+    and acceptance predicate; the model-backed X1D judges remain authoritative.
+    """
+
+    segments = _headline_positioning_segments(headline_line)
+    if segments is None:
+        return {
+            "pass": False,
+            "shape_valid": False,
+            "opaque_segments": [],
+            "segment_observations": [],
+        }
+    familiar_phrases = sorted(
+        {
+            str(phrase).strip().lower()
+            for phrases in POSITIONING_FAMILIES.values()
+            for phrase in phrases
+            if len(str(phrase).strip().split()) >= 2
+        }
+    )
+    observations: list[dict[str, Any]] = []
+    opaque: list[str] = []
+    for segment in segments:
+        normalized = " ".join(segment.lower().split())
+        word_count = len(normalized.split())
+        matched = [
+            phrase
+            for phrase in familiar_phrases
+            if f" {phrase} " in f" {normalized} "
+        ]
+        segment_pass = word_count <= 3 or bool(matched)
+        if not segment_pass:
+            opaque.append(segment)
+        observations.append(
+            {
+                "segment": segment,
+                "word_count": word_count,
+                "familiar_positioning_phrases": matched,
+                "pass": segment_pass,
+            }
+        )
+    semantic_overlap_issues = headline_segment_theme_overlap_issues(list(segments))
+    return {
+        "pass": not opaque and not semantic_overlap_issues,
+        "shape_valid": True,
+        "opaque_segments": opaque,
+        "semantic_overlap_issues": semantic_overlap_issues,
+        "segment_observations": observations,
+    }
 
 
 def _segment_claim_rows_already_valid(
@@ -956,6 +1021,9 @@ def retry_provider_for_parse(
     provider_payload: dict[str, Any],
     raw_output: str,
     parse_error: str,
+    *,
+    artifact_dir: Path | None = None,
+    run_id: str = "",
 ) -> tuple[str, dict[str, Any] | None, str]:
     repair_messages = [
         *messages,
@@ -978,12 +1046,57 @@ def retry_provider_for_parse(
         "max_tokens": HEADLINE_MAX_OUTPUT_TOKENS,
         "anthropic_workload_kind": "REPAIR",
     }
-    result = generate_section(tag_reasoning_lane(repair_payload, LANE_KEY))
+    result = generate_section(
+        tag_reasoning_lane(repair_payload, LANE_KEY),
+        artifact_dir=artifact_dir,
+        run_id=run_id,
+    )
     if result.runtime_generation_status != "REAL_LLM":
         return raw_output, None, parse_error
     new_raw = result.raw_model_output
     new_parsed, new_err = parse_model_json(new_raw)
     return new_raw, new_parsed, new_err
+
+
+def _compact_headline_repair_anchor(
+    parsed: dict[str, Any],
+    *,
+    fallback_raw: str,
+) -> str:
+    """Project hydrated lane state back to the provider-facing JSON contract.
+
+    Normalization attaches the multi-megabyte graph selection plan to
+    ``selected_fact_plan``.  Replaying that hydrated object in a repair turn
+    duplicates evidence already present in the compiled prompt and can exceed
+    the provider token cap.  Retain only the model-owned contract fields and a
+    compact selected-plan identity/required-id echo.
+    """
+
+    if not isinstance(parsed, dict):
+        return str(fallback_raw or "")
+    plan = parsed.get("selected_fact_plan")
+    compact_plan: dict[str, Any] = {}
+    if isinstance(plan, dict):
+        for key in (
+            "section_id",
+            "selection_method",
+            "required_fact_ids",
+            "plan_id",
+            "plan_digest",
+            "allocation_plan_digest",
+        ):
+            if key in plan:
+                compact_plan[key] = plan.get(key)
+    anchor = {
+        "headline_line": parsed.get("headline_line"),
+        "selected_fact_plan": compact_plan,
+        "claim_ledger": parsed.get("claim_ledger") or [],
+        "jd_alignment": parsed.get("jd_alignment") or {},
+        "gap_notes": parsed.get("gap_notes") or [],
+        "change_log": parsed.get("change_log") or [],
+        "self_check": parsed.get("self_check") or {},
+    }
+    return json.dumps(anchor, sort_keys=True, separators=(",", ":"))
 
 
 def retry_headline_word_and_pipe(
@@ -997,10 +1110,17 @@ def retry_headline_word_and_pipe(
     *,
     companion_nonempty: bool,
     employer_names_lower: list[str],
+    artifact_dir: Path | None = None,
+    run_id: str = "",
 ) -> tuple[str, dict[str, Any], dict[str, Any] | None]:
     repair_messages = [
         *messages,
-        {"role": "assistant", "content": raw_output},
+        {
+            "role": "assistant",
+            "content": _compact_headline_repair_anchor(
+                parsed, fallback_raw=raw_output
+            ),
+        },
         {
             "role": "user",
             "content": (
@@ -1022,7 +1142,11 @@ def retry_headline_word_and_pipe(
         "max_tokens": HEADLINE_MAX_OUTPUT_TOKENS,
         "anthropic_workload_kind": "REPAIR",
     }
-    result = generate_section(tag_reasoning_lane(repair_payload, LANE_KEY))
+    result = generate_section(
+        tag_reasoning_lane(repair_payload, LANE_KEY),
+        artifact_dir=artifact_dir,
+        run_id=run_id,
+    )
     if result.runtime_generation_status != "REAL_LLM":
         return raw_output, parsed, None
     new_raw = result.raw_model_output
@@ -1056,6 +1180,7 @@ _SPECIFICITY_EMPHASIS_FAMILY_IDS: tuple[str, ...] = (
     "agentic_ai_platforms",
     "distributed_ai_infrastructure",
     "runtime_governance",
+    "partner_applied_ai_architecture",
 )
 
 
@@ -1079,6 +1204,10 @@ def _content_signal_emphasis(
     trigger_arm: str,
     families_matched_pre: list[str],
     narrowing_labels_pre: list[str] | None = None,
+    missing_abstraction_pre: list[str] | None = None,
+    grounding_failure_pre: str | None = None,
+    clarity_report_pre: dict[str, Any] | None = None,
+    graph_binding_context_pre: list[dict[str, Any]] | None = None,
 ) -> str:
     """Per-arm CONTENT_SIGNAL_REVISION emphasis naming exactly what is missing."""
     arms = _content_signal_arms(trigger_arm)
@@ -1111,13 +1240,135 @@ def _content_signal_emphasis(
             "distributed AI infrastructure, runtime governance, platform engineering) drawn from "
             "the positioning bundles."
         )
+    if "executive_abstraction" in arms:
+        emphasis_parts.append(
+            "CONTENT_SIGNAL_REVISION (x2_headline_executive_abstraction_floor): "
+            f"these segment(s) lack an executive operating abstraction: {list(missing_abstraction_pre or [])}. "
+            "Every X/Y/Z segment MUST include a senior operating pattern such as platform, "
+            "architecture, governance, ecosystem, commercialization, regulated systems, partner, "
+            "enterprise, runtime, infrastructure, productization, controls, or co-sell. Make the "
+            "smallest evidence-preserving lexical change: retain the segment's already grounded "
+            "content nouns and add only an abstraction that the cited fact text contains or that "
+            "leaves at least half of all non-generic segment nouns literally grounded. Do not "
+            "replace grounded segments with fashionable terms absent from selected_fact_plan."
+        )
+    if "literal_grounding" in arms:
+        emphasis_parts.append(
+            "CONTENT_SIGNAL_REVISION (x2_headline_xyz_literal_grounding): "
+            f"{str(grounding_failure_pre or 'one or more segments are not grounded')}. "
+            "For every X/Y/Z segment, keep at least one non-generic content noun that literally "
+            "appears in the claim_text of a cited ALLOWED_SOURCE_FACT_ID, and ground at least half "
+            "of that segment's non-generic nouns. Do not introduce agent or multi-agent language "
+            "unless the cited allowed evidence text contains it. source_fact_ids may use any prefix "
+            "explicitly present in ALLOWED_SOURCE_FACT_IDS, including reb_* and skill_*."
+        )
+    if "resume_native_clarity" in arms:
+        opaque_segments = list((clarity_report_pre or {}).get("opaque_segments") or [])
+        semantic_overlap_issues = list(
+            (clarity_report_pre or {}).get("semantic_overlap_issues") or []
+        )
+        emphasis_parts.append(
+            "CONTENT_SIGNAL_REVISION (headline_pre_x1d_resume_native_clarity): "
+            f"these segment(s) are opaque compound-noun stacks: {opaque_segments}; "
+            f"these cross-segment overlap defects are present: {semantic_overlap_issues}. Use plain, "
+            "resume-native executive language. Prefer 2-3 words per X/Y/Z segment. If a segment "
+            "needs 4 words, it MUST contain a contiguous familiar positioning phrase from the "
+            "allowed vocabulary (for example: runtime governance, partner solution architecture, "
+            "agentic AI platforms, distributed AI infrastructure, or regulated systems). Do not "
+            "repeat 'runtime' across pillars, and do not splice fragments from multiple families "
+            "into constructions such as 'Distributed "
+            "Partner Solution Infrastructure' or 'Agentic Context Evaluation Platform'."
+        )
+    if "graph_claim_binding" in arms:
+        binding_context = list(graph_binding_context_pre or [])
+        emphasis_parts.append(
+            "CONTENT_SIGNAL_REVISION (x2_resume_graph_claim_binding): one or more frozen "
+            "whole-resume allocation claim units are not represented by any visible X/Y/Z "
+            "segment. Every listed allocation MUST be expressed in exactly one evidence-grounded "
+            "segment and that segment's claim_ledger row MUST cite its root_id. Do not copy the "
+            "same source_fact_ids onto all three rows. Unbound allocation authority: "
+            + json.dumps(binding_context, ensure_ascii=False, sort_keys=True)
+            + "."
+        )
     emphasis_parts.append(
         "Keep every other constraint (exact prefix 'SVP Engineering | ', exactly three ' | ' "
         "separators, 10 to 13 total words, no metrics, no employer or target company names, "
-        "no first person), rebind claim_ledger rows per segment, recompute self_check, "
+        "no first person). Literal grounding remains mandatory even when it was not the trigger: "
+        "each X/Y/Z segment must retain at least one content noun and at least half of its "
+        "non-generic nouns from the claim_text of its cited selected fact. Rebind claim_ledger "
+        "rows per segment. WORD-COUNT ARITHMETIC: 'SVP Engineering' consumes exactly 2 words; "
+        "therefore X+Y+Z combined MUST contain 8 to 11 words. Target 8 to 9 combined words, "
+        "counting every visible token and not counting pipe separators. Recompute self_check, "
         "and return one compact JSON object only."
     )
     return " ".join(emphasis_parts)
+
+
+def _headline_graph_content_contract_active(
+    parsed: dict[str, Any] | None,
+    runtime_payload: dict[str, Any],
+    allowed_fact_ids: set[str],
+) -> bool:
+    """Limit graph-era grounding repair to a materialized graph fact packet."""
+
+    plan = parsed.get("selected_fact_plan") if isinstance(parsed, dict) else None
+    if not isinstance(plan, dict) or not list(plan.get("facts") or []):
+        candidate = runtime_payload.get("selected_fact_plan")
+        plan = candidate if isinstance(candidate, dict) else None
+    return bool(
+        isinstance(plan, dict)
+        and list(plan.get("facts") or [])
+        and any(
+            str(fact_id).startswith(("reb_", "skill_"))
+            for fact_id in allowed_fact_ids
+        )
+    )
+
+
+def _headline_graph_binding_repair_state(
+    parsed: dict[str, Any] | None,
+    runtime_payload: dict[str, Any],
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Return the pre-X2 graph gate and actionable context for orphan allocations."""
+
+    if not isinstance(parsed, dict):
+        return None, []
+    candidate = parsed.get("selected_fact_plan")
+    plan = candidate if isinstance(candidate, dict) else runtime_payload.get("selected_fact_plan")
+    if not isinstance(plan, dict):
+        return None, []
+    gate = build_pre_x2_resume_graph_claim_binding_gate(
+        section_id="headline",
+        claim_rows=list(parsed.get("claim_ledger") or []),
+        selected_fact_plan=plan,
+    )
+    if not isinstance(gate, dict) or gate.get("pass") is True:
+        return gate, []
+    observed = gate.get("observed_value")
+    failures = list(observed.get("failure_reasons") or []) if isinstance(observed, dict) else []
+    orphan_ids: set[str] = set()
+    for failure in failures:
+        prefix = "orphan_allocation_claim_units:"
+        value = str(failure or "")
+        if value.startswith(prefix):
+            orphan_ids.update(x for x in value[len(prefix):].split(",") if x)
+    context: list[dict[str, Any]] = []
+    for row in plan.get("allocation_assignments") or []:
+        if not isinstance(row, dict) or str(row.get("section_id") or "") != "headline":
+            continue
+        claim_unit_id = str(row.get("claim_unit_id") or "")
+        if orphan_ids and claim_unit_id not in orphan_ids:
+            continue
+        context.append(
+            {
+                "claim_unit_id": claim_unit_id,
+                "root_id": str(row.get("root_id") or ""),
+                "skill_id": str(row.get("skill_id") or ""),
+                "root_claim_text": str(row.get("root_claim_text") or ""),
+                "root_claim_outcome": str(row.get("root_claim_outcome") or ""),
+            }
+        )
+    return gate, context
 
 
 def retry_headline_content_signal(
@@ -1133,26 +1384,43 @@ def retry_headline_content_signal(
     trigger_arm: str = "governance_signal",
     families_matched_pre: list[str] | None = None,
     narrowing_labels_pre: list[str] | None = None,
+    missing_abstraction_pre: list[str] | None = None,
+    grounding_failure_pre: str | None = None,
+    clarity_report_pre: dict[str, Any] | None = None,
+    graph_binding_context_pre: list[dict[str, Any]] | None = None,
     trigger_reason: str = "x2_headline_governance_or_regulated_ai_signal_required:none",
-) -> tuple[str, dict[str, Any], dict[str, Any] | None, str | None]:
+    artifact_dir: Path | None = None,
+    run_id: str = "",
+    attempt_index: int = 1,
+) -> tuple[str, dict[str, Any], dict[str, Any] | None, str | None, dict[str, Any]]:
     """Bounded same-authority regen when the headline misses a positioning content signal.
 
     Arms: governance_signal (governance/regulated-AI families empty), specificity_floor
     (< POSITIONING_FAMILY_FLOOR positioning families), narrowing_labels (forbidden
     narrowing/demoting IT label present), or any '+'-joined combination. Acceptance is
-    fail-closed: the regen is adopted only when ALL THREE arms are satisfied post-normalize
-    (governance families non-empty AND >= floor positioning families AND zero narrowing
-    labels), regardless of which arm(s) triggered.
+    fail-closed: the regen is adopted only when every content predicate is satisfied post-normalize
+    (governance families non-empty, >= floor positioning families, zero narrowing labels,
+    executive abstraction on every segment, and literal evidence grounding), regardless of
+    which arm(s) triggered.
     """
     repair_messages = [
         *messages,
-        {"role": "assistant", "content": raw_output},
+        {
+            "role": "assistant",
+            "content": _compact_headline_repair_anchor(
+                parsed, fallback_raw=raw_output
+            ),
+        },
         {
             "role": "user",
             "content": _content_signal_emphasis(
                 trigger_arm,
                 list(families_matched_pre or []),
                 list(narrowing_labels_pre or []),
+                list(missing_abstraction_pre or []),
+                grounding_failure_pre,
+                clarity_report_pre,
+                graph_binding_context_pre,
             ),
         },
     ]
@@ -1162,13 +1430,33 @@ def retry_headline_content_signal(
         "max_tokens": HEADLINE_MAX_OUTPUT_TOKENS,
         "anthropic_workload_kind": "REPAIR",
     }
-    result = generate_section(tag_reasoning_lane(repair_payload, LANE_KEY))
+    result = generate_section(
+        tag_reasoning_lane(repair_payload, LANE_KEY),
+        artifact_dir=artifact_dir,
+        run_id=run_id,
+    )
+    provider_result = {
+        "runtime_generation_status": str(result.runtime_generation_status or ""),
+        "provider_requested": str(result.provider_requested or ""),
+        "provider_attempted": bool(result.provider_attempted),
+        "provider_available": bool(result.provider_available),
+        "model": str(result.model or ""),
+        "exact_provider_error": str(result.exact_provider_error or ""),
+        "provider_response_ref": (
+            f"headline_content_signal_repair_provider_response_attempt_{int(attempt_index)}.json"
+        ),
+    }
+    if artifact_dir is not None:
+        write_json(
+            Path(artifact_dir) / provider_result["provider_response_ref"],
+            result.to_dict(),
+        )
     if result.runtime_generation_status != "REAL_LLM":
-        return raw_output, parsed, None, "provider_not_real"
+        return raw_output, parsed, None, "provider_not_real", provider_result
     new_raw = result.raw_model_output
     new_parsed, _e = parse_model_json(new_raw)
     if new_parsed is None:
-        return raw_output, parsed, None, "parse_failed"
+        return raw_output, parsed, None, "parse_failed", provider_result
     raw_gate_snap = json.loads(json.dumps(new_parsed))
     hl = str(new_parsed.get("headline_line", "")).strip()
     snapshot_raw_jd_alignment(new_parsed)
@@ -1184,16 +1472,71 @@ def retry_headline_content_signal(
         or parsed
     )
     final_hl = str(new_parsed.get("headline_line") or "").strip()
-    # Fail-closed acceptance: ALL THREE arms must hold post-normalize regardless of trigger arm.
-    if (
+    final_wc = headline_word_count(final_hl)
+    if _headline_positioning_segments(final_hl) is None or not (HEADLINE_WORD_MIN <= final_wc <= HEADLINE_WORD_MAX):
+        return new_raw, new_parsed, raw_gate_snap, "shape_invalid", provider_result
+    graph_content_contract_active = _headline_graph_content_contract_active(
+        new_parsed, runtime_payload, allowed_fact_ids
+    )
+    repaired_ledger = list(new_parsed.get("claim_ledger") or [])
+    final_abstraction: dict[str, Any] = {
+        "segments_missing_executive_abstraction": []
+    }
+    final_grounding_ok = True
+    final_graph_binding_ok = True
+    if graph_content_contract_active:
+        repaired_ledger, _grounding_recitation = repair_headline_segment_citations_for_grounding(
+            headline_line=final_hl,
+            parsed_output=new_parsed,
+            claim_ledger=repaired_ledger,
+        )
+        new_parsed["claim_ledger"] = repaired_ledger
+        sync_selected_fact_plan_required_ids(new_parsed, runtime_payload, allowed_fact_ids)
+        final_abstraction = headline_executive_abstraction_report(final_hl)
+        final_grounding_ok, _final_grounding_obs, _final_grounding_failure = (
+            evaluate_headline_literal_grounding(
+                headline_line=final_hl,
+                parsed_output=new_parsed,
+                claim_ledger=repaired_ledger,
+                proof_pool_metadata=runtime_payload.get("proof_pool_metadata")
+                if isinstance(runtime_payload.get("proof_pool_metadata"), dict)
+                else None,
+                allowed_fact_ids=allowed_fact_ids,
+            )
+        )
+        final_graph_gate, _final_graph_context = _headline_graph_binding_repair_state(
+            new_parsed, runtime_payload
+        )
+        final_graph_binding_ok = bool(
+            final_graph_gate is None or final_graph_gate.get("pass") is True
+        )
+    # Fail-closed acceptance: every content predicate must hold post-normalize.
+    final_signal_missing = bool(
         not governance_signal_families_matched(final_hl)
         or len(positioning_families_matched(final_hl)) < POSITIONING_FAMILY_FLOOR
         or narrowing_labels_found(final_hl)
+        or final_abstraction.get("segments_missing_executive_abstraction")
+    )
+    final_clarity_ok = bool(headline_resume_native_clarity_report(final_hl).get("pass"))
+    if (
+        final_signal_missing
+        or not final_grounding_ok
+        or not final_clarity_ok
+        or not final_graph_binding_ok
     ):
-        return raw_output, parsed, None, "signal_still_missing"
-    final_wc = headline_word_count(final_hl)
-    if _headline_positioning_segments(final_hl) is None or not (HEADLINE_WORD_MIN <= final_wc <= HEADLINE_WORD_MAX):
-        return raw_output, parsed, None, "shape_invalid"
+        return new_raw, new_parsed, raw_gate_snap, (
+            "graph_claim_binding_still_missing"
+            if not final_graph_binding_ok
+            else (
+                "literal_grounding_still_missing"
+                if not final_grounding_ok
+                else (
+                    "signal_still_missing"
+                    if final_signal_missing
+                    else "resume_clarity_still_missing"
+                )
+            )
+        ), provider_result
     if not isinstance(new_parsed.get("change_log"), list):
         new_parsed["change_log"] = []
     new_parsed["change_log"] = list(parsed.get("change_log") or []) + list(new_parsed.get("change_log") or [])
@@ -1203,7 +1546,13 @@ def retry_headline_content_signal(
             "reason": trigger_reason,
         }
     )
-    return json.dumps(new_parsed, sort_keys=True, separators=(",", ":")), new_parsed, raw_gate_snap, None
+    return (
+        json.dumps(new_parsed, sort_keys=True, separators=(",", ":")),
+        new_parsed,
+        raw_gate_snap,
+        None,
+        provider_result,
+    )
 
 
 def apply_headline_content_signal_repair(
@@ -1228,7 +1577,8 @@ def apply_headline_content_signal_repair(
     x2_headline_technical_specificity_floor_met predicate via positioning_families_matched),
     and/or narrowing-labels arm (forbidden narrowing/demoting IT label detected — the exact
     x2_headline_no_narrowing_it_labels / x2_headline_generic_it_strategy_demote_forbidden
-    predicate via narrowing_labels_found). trigger_arm is the '+'-joined list of fired arms.
+    predicate via narrowing_labels_found), executive-abstraction arm, and literal-grounding arm.
+    trigger_arm is the '+'-joined list of fired arms.
     """
     if not isinstance(parsed, dict):
         return raw_output, parsed, None, False
@@ -1243,10 +1593,55 @@ def apply_headline_content_signal_repair(
     gov_pre = governance_signal_families_matched(hl_pre)
     spec_pre = positioning_families_matched(hl_pre)
     narrow_pre = narrowing_labels_found(hl_pre)
+    abstraction_pre = headline_executive_abstraction_report(hl_pre)
+    missing_abstraction_pre = list(
+        abstraction_pre.get("segments_missing_executive_abstraction") or []
+    )
+    graph_content_contract_active = _headline_graph_content_contract_active(
+        parsed, runtime_payload, allowed_fact_ids
+    )
+    grounding_pre_ok = True
+    grounding_pre_observation: dict[str, Any] = {}
+    grounding_pre_failure: str | None = None
+    if graph_content_contract_active:
+        grounding_pre_ok, grounding_pre_observation, grounding_pre_failure = (
+            evaluate_headline_literal_grounding(
+                headline_line=hl_pre,
+                parsed_output=parsed,
+                claim_ledger=list(parsed.get("claim_ledger") or []),
+                proof_pool_metadata=pp_meta if isinstance(pp_meta, dict) else None,
+                allowed_fact_ids=allowed_fact_ids,
+            )
+        )
+    graph_binding_pre_gate: dict[str, Any] | None = None
+    graph_binding_context_pre: list[dict[str, Any]] = []
+    if graph_content_contract_active:
+        graph_binding_pre_gate, graph_binding_context_pre = (
+            _headline_graph_binding_repair_state(parsed, runtime_payload)
+        )
     governance_arm = not gov_pre
     specificity_arm = len(spec_pre) < POSITIONING_FAMILY_FLOOR
     narrowing_arm = bool(narrow_pre)
-    if not governance_arm and not specificity_arm and not narrowing_arm:
+    executive_abstraction_arm = graph_content_contract_active and bool(missing_abstraction_pre)
+    literal_grounding_arm = graph_content_contract_active and not grounding_pre_ok
+    graph_claim_binding_arm = bool(
+        graph_content_contract_active
+        and graph_binding_pre_gate is not None
+        and graph_binding_pre_gate.get("pass") is not True
+    )
+    clarity_pre = headline_resume_native_clarity_report(hl_pre)
+    resume_native_clarity_arm = not bool(clarity_pre.get("pass"))
+    if not any(
+        (
+            governance_arm,
+            specificity_arm,
+            narrowing_arm,
+            executive_abstraction_arm,
+            literal_grounding_arm,
+            resume_native_clarity_arm,
+            graph_claim_binding_arm,
+        )
+    ):
         return raw_output, parsed, None, False
     arm_names: list[str] = []
     gate_ids: list[str] = []
@@ -1268,15 +1663,52 @@ def apply_headline_content_signal_repair(
         reason_parts.append(
             "x2_headline_no_narrowing_it_labels:" + "|".join(narrow_pre)
         )
+    if executive_abstraction_arm:
+        arm_names.append("executive_abstraction")
+        gate_ids.append("x2_headline_executive_abstraction_floor")
+        reason_parts.append(
+            "x2_headline_executive_abstraction_floor:"
+            + "|".join(missing_abstraction_pre)
+        )
+    if literal_grounding_arm:
+        arm_names.append("literal_grounding")
+        gate_ids.append("x2_headline_xyz_literal_grounding")
+        reason_parts.append("x2_headline_xyz_literal_grounding:failed")
+    if resume_native_clarity_arm:
+        arm_names.append("resume_native_clarity")
+        gate_ids.append("headline_pre_x1d_resume_native_clarity")
+        reason_parts.append(
+            "headline_pre_x1d_resume_native_clarity:"
+            + "|".join(clarity_pre.get("opaque_segments") or [])
+        )
+    if graph_claim_binding_arm:
+        arm_names.append("graph_claim_binding")
+        gate_ids.append("x2_resume_graph_claim_binding")
+        reason_parts.append("x2_resume_graph_claim_binding:orphan_allocation")
     trigger_arm = "+".join(arm_names)
     trigger_reason = "+".join(reason_parts)
     from apps_rg.runtime.section_repair_ledger import KIND_REGEN_LLM, load_ledger, record_repair
 
     ledger = load_ledger(artifact_dir) or {}
-    budget_consumed = prior_repair_provider_call_made or any(
-        r.get("kind") == KIND_REGEN_LLM and r.get("replaced_l2")
+    replaced_regens = [
+        r
         for r in (ledger.get("repairs") or [])
+        if r.get("kind") == KIND_REGEN_LLM and r.get("replaced_l2")
+    ]
+    # Proof-shape repair corrects raw JSON/self_check accounting; it does not
+    # repair stochastic headline content.  Treating it as consumption of the
+    # independently bounded content-signal rung made a common self_check typo
+    # permanently suppress the only repair capable of closing grounding and
+    # executive-abstraction gates.  Parse retries and substantive/format
+    # regens still consume the content budget.
+    only_proof_shape_regen = bool(replaced_regens) and all(
+        str(row.get("operation") or "") == "headline_proof_shape_retry"
+        for row in replaced_regens
     )
+    budget_consumed = any(
+        str(row.get("operation") or "") != "headline_proof_shape_retry"
+        for row in replaced_regens
+    ) or (prior_repair_provider_call_made and not only_proof_shape_regen)
     receipt: dict[str, Any] = {
         "section_id": "headline",
         "run_id": str(runtime_payload.get("run_id") or ""),
@@ -1289,6 +1721,11 @@ def apply_headline_content_signal_repair(
                 "governance_signal": gov_pre,
                 "specificity_floor": spec_pre,
                 "narrowing_labels": narrow_pre,
+                "segments_missing_executive_abstraction": missing_abstraction_pre,
+                "literal_grounding": grounding_pre_observation,
+                "resume_native_clarity": clarity_pre,
+                "resume_graph_claim_binding": graph_binding_pre_gate,
+                "unbound_graph_allocations": graph_binding_context_pre,
             },
             "headline_pre": hl_pre,
         },
@@ -1299,7 +1736,11 @@ def apply_headline_content_signal_repair(
         "families_matched_post": {
             "governance_signal": [],
             "specificity_floor": [],
-            "narrowing_labels": [],
+                "narrowing_labels": [],
+                "segments_missing_executive_abstraction": [],
+                "literal_grounding": {},
+                "resume_native_clarity": {},
+                "resume_graph_claim_binding": {},
         },
         "rejected_reason": None,
         "bounded": {"max_attempts": CONTENT_SIGNAL_REPAIR_MAX_ATTEMPTS, "attempts_used": 0},
@@ -1314,20 +1755,151 @@ def apply_headline_content_signal_repair(
     else:
         receipt["attempted"] = True
         receipt["regen_call_made"] = True
-        receipt["bounded"]["attempts_used"] = 1
-        new_raw, new_parsed, new_snap, rejected_reason = retry_headline_content_signal(
-            messages,
-            provider_payload,
-            raw_output,
-            parsed,
-            runtime_payload,
-            allowed_fact_ids,
-            companion_nonempty=companion_nonempty,
-            employer_names_lower=employer_names_lower,
-            trigger_arm=trigger_arm,
-            families_matched_pre=spec_pre,
-            narrowing_labels_pre=narrow_pre,
-            trigger_reason=trigger_reason,
+        current_raw = raw_output
+        current_parsed = parsed
+        current_gov = gov_pre
+        current_spec = spec_pre
+        current_narrow = narrow_pre
+        current_missing_abstraction = missing_abstraction_pre
+        current_grounding_failure = grounding_pre_failure
+        current_graph_binding_context = graph_binding_context_pre
+        current_trigger_arm = trigger_arm
+        current_trigger_reason = trigger_reason
+        new_raw = raw_output
+        new_parsed = parsed
+        new_snap: dict[str, Any] | None = None
+        rejected_reason: str | None = "not_attempted"
+        provider_result: dict[str, Any] = {}
+        attempt_rows: list[dict[str, Any]] = []
+        remediable_rejections = {
+            "shape_invalid",
+            "signal_still_missing",
+            "literal_grounding_still_missing",
+            "resume_clarity_still_missing",
+            "graph_claim_binding_still_missing",
+        }
+        for attempt_index in range(1, CONTENT_SIGNAL_REPAIR_MAX_ATTEMPTS + 1):
+            receipt["bounded"]["attempts_used"] = attempt_index
+            (
+                new_raw,
+                new_parsed,
+                new_snap,
+                rejected_reason,
+                provider_result,
+            ) = retry_headline_content_signal(
+                messages,
+                provider_payload,
+                current_raw,
+                current_parsed,
+                runtime_payload,
+                allowed_fact_ids,
+                companion_nonempty=companion_nonempty,
+                employer_names_lower=employer_names_lower,
+                trigger_arm=current_trigger_arm,
+                families_matched_pre=current_spec,
+                narrowing_labels_pre=current_narrow,
+                missing_abstraction_pre=current_missing_abstraction,
+                grounding_failure_pre=current_grounding_failure,
+                clarity_report_pre=clarity_pre,
+                graph_binding_context_pre=current_graph_binding_context,
+                trigger_reason=current_trigger_reason,
+                artifact_dir=artifact_dir,
+                run_id=str(runtime_payload.get("run_id") or ""),
+                attempt_index=attempt_index,
+            )
+            attempt_rows.append(
+                {
+                    "attempt": attempt_index,
+                    "headline": str((new_parsed or {}).get("headline_line") or ""),
+                    "trigger_arm": current_trigger_arm,
+                    "trigger_reason": current_trigger_reason,
+                    "rejected_reason": rejected_reason,
+                    "provider_result": provider_result,
+                }
+            )
+            if rejected_reason is None and new_snap is not None:
+                break
+            if rejected_reason not in remediable_rejections:
+                break
+            current_raw = new_raw
+            current_parsed = new_parsed
+            current_headline = str((current_parsed or {}).get("headline_line") or "")
+            current_gov = governance_signal_families_matched(current_headline)
+            current_spec = positioning_families_matched(current_headline)
+            current_narrow = narrowing_labels_found(current_headline)
+            current_missing_abstraction = list(
+                headline_executive_abstraction_report(current_headline).get(
+                    "segments_missing_executive_abstraction"
+                )
+                or []
+            )
+            clarity_pre = headline_resume_native_clarity_report(current_headline)
+            current_grounding_ok, _ground_obs, current_grounding_failure = (
+                evaluate_headline_literal_grounding(
+                    headline_line=current_headline,
+                    parsed_output=current_parsed,
+                    claim_ledger=list((current_parsed or {}).get("claim_ledger") or []),
+                    proof_pool_metadata=pp_meta if isinstance(pp_meta, dict) else None,
+                    allowed_fact_ids=allowed_fact_ids,
+                )
+            )
+            current_graph_gate, current_graph_binding_context = (
+                _headline_graph_binding_repair_state(current_parsed, runtime_payload)
+            )
+            # A candidate can close the original predicate while exposing a
+            # different one (for example, adding an executive abstraction can
+            # create an opaque four-word noun stack).  Recompute the retry
+            # instruction from the candidate instead of replaying the stale
+            # attempt-1 trigger for every bounded retry.
+            next_arms: list[str] = []
+            next_reasons: list[str] = []
+            if not current_gov:
+                next_arms.append("governance_signal")
+                next_reasons.append(
+                    "x2_headline_governance_or_regulated_ai_signal_required:none"
+                )
+            if len(current_spec) < POSITIONING_FAMILY_FLOOR:
+                next_arms.append("specificity_floor")
+                next_reasons.append(
+                    "x2_headline_technical_specificity_floor_met:"
+                    f"{len(current_spec)}_of_{POSITIONING_FAMILY_FLOOR}"
+                )
+            if current_narrow:
+                next_arms.append("narrowing_labels")
+                next_reasons.append(
+                    "x2_headline_no_narrowing_it_labels:"
+                    + "|".join(current_narrow)
+                )
+            if graph_content_contract_active and current_missing_abstraction:
+                next_arms.append("executive_abstraction")
+                next_reasons.append(
+                    "x2_headline_executive_abstraction_floor:"
+                    + "|".join(current_missing_abstraction)
+                )
+            if graph_content_contract_active and not current_grounding_ok:
+                next_arms.append("literal_grounding")
+                next_reasons.append("x2_headline_xyz_literal_grounding:failed")
+            if not bool(clarity_pre.get("pass")):
+                next_arms.append("resume_native_clarity")
+                next_reasons.append(
+                    "headline_pre_x1d_resume_native_clarity:"
+                    + "|".join(clarity_pre.get("opaque_segments") or [])
+                )
+            if (
+                graph_content_contract_active
+                and current_graph_gate is not None
+                and current_graph_gate.get("pass") is not True
+            ):
+                next_arms.append("graph_claim_binding")
+                next_reasons.append(
+                    "x2_resume_graph_claim_binding:orphan_allocation"
+                )
+            current_trigger_arm = "+".join(next_arms)
+            current_trigger_reason = "+".join(next_reasons)
+        receipt["attempts"] = attempt_rows
+        receipt["regen_provider_result"] = provider_result
+        receipt["regen_provider_response_ref"] = provider_result.get(
+            "provider_response_ref"
         )
         if rejected_reason is None and new_snap is not None:
             record_repair(
@@ -1345,6 +1917,23 @@ def apply_headline_content_signal_repair(
                 "governance_signal": governance_signal_families_matched(hl_post),
                 "specificity_floor": positioning_families_matched(hl_post),
                 "narrowing_labels": narrowing_labels_found(hl_post),
+                "segments_missing_executive_abstraction": list(
+                    headline_executive_abstraction_report(hl_post).get(
+                        "segments_missing_executive_abstraction"
+                    )
+                    or []
+                ),
+                "literal_grounding": evaluate_headline_literal_grounding(
+                    headline_line=hl_post,
+                    parsed_output=parsed,
+                    claim_ledger=list(parsed.get("claim_ledger") or []),
+                    proof_pool_metadata=pp_meta if isinstance(pp_meta, dict) else None,
+                    allowed_fact_ids=allowed_fact_ids,
+                )[1],
+                "resume_native_clarity": headline_resume_native_clarity_report(hl_post),
+                "resume_graph_claim_binding": _headline_graph_binding_repair_state(
+                    parsed, runtime_payload
+                )[0],
             }
         else:
             receipt["rejected_reason"] = rejected_reason or "parse_failed"
@@ -1400,6 +1989,8 @@ def retry_headline_proof_shape(
     *,
     companion_nonempty: bool,
     employer_names_lower: list[str],
+    artifact_dir: Path | None = None,
+    run_id: str = "",
 ) -> tuple[str, dict[str, Any], dict[str, Any] | None]:
     """Second same-authority repair attempt when raw ledger shape or self_check mismatches runtime."""
     hl_fail = str(failed_snapshot.get("headline_line") or "").strip()
@@ -1407,7 +1998,12 @@ def retry_headline_proof_shape(
     sc_fail = failed_snapshot.get("self_check") if isinstance(failed_snapshot.get("self_check"), dict) else {}
     repair_messages = [
         *messages,
-        {"role": "assistant", "content": raw_output},
+        {
+            "role": "assistant",
+            "content": _compact_headline_repair_anchor(
+                failed_snapshot, fallback_raw=raw_output
+            ),
+        },
         {
             "role": "user",
             "content": (
@@ -1443,7 +2039,11 @@ def retry_headline_proof_shape(
         "max_tokens": HEADLINE_MAX_OUTPUT_TOKENS,
         "anthropic_workload_kind": "REPAIR",
     }
-    result = generate_section(tag_reasoning_lane(repair_payload, LANE_KEY))
+    result = generate_section(
+        tag_reasoning_lane(repair_payload, LANE_KEY),
+        artifact_dir=artifact_dir,
+        run_id=run_id,
+    )
     if result.runtime_generation_status != "REAL_LLM":
         return raw_output, failed_snapshot, None
     new_raw = result.raw_model_output
@@ -1733,7 +2333,9 @@ def run_headline_execution(
 
     from apps_rg.runtime.section_model_limits import resolve_section_generation_model
 
-    section_model = resolve_section_generation_model(LANE_KEY)
+    section_model = resolve_section_generation_model(
+        LANE_KEY, provider_profile=str(args.provider)
+    )
     provider_req, provider_payload = build_section_request(
         messages=messages,
         prompt_hash=prompt_hash,
@@ -1773,7 +2375,12 @@ def run_headline_execution(
         if parsed is None and str(args.provider) == "external_claude":
             headline_repair_provider_call_made = True
             raw_model_output_original, parsed, parse_error = retry_provider_for_parse(
-                messages, provider_payload, raw_model_output_original, parse_error
+                messages,
+                provider_payload,
+                raw_model_output_original,
+                parse_error,
+                artifact_dir=artifact_dir,
+                run_id=str(runtime_payload.get("run_id") or ""),
             )
             if parsed is not None:
                 from apps_rg.runtime.section_repair_ledger import KIND_MECHANICAL, record_repair
@@ -1806,6 +2413,8 @@ def run_headline_execution(
                     proof_retry_reason,
                     companion_nonempty=companion_nonempty,
                     employer_names_lower=employer_names,
+                    artifact_dir=artifact_dir,
+                    run_id=str(runtime_payload.get("run_id") or ""),
                 )
                 if parsed_retry is not None and snap_retry is not None:
                     headline_proof_retry_attempted = True
@@ -2272,13 +2881,13 @@ def run_headline_execution(
         runtime_generation_status, x2, artifact_dir=artifact_dir
     )
 
-    from apps_rg.runtime.spine.section_x3_finalize import finalize_section_lane_x3
-
-    x3 = finalize_section_lane_x3(
-        artifact_dir=artifact_dir,
-        section_id="headline",
-        runtime_payload=runtime_payload,
-        aggregate_x3_fn=_aggregate_headline_x3,
+    # Aggregate the disposition before finalization, but do not run the X3
+    # final-materialization/binding seam until the proof-bearing L2 record is
+    # durable.  Running that seam while ``l2_output.json`` is absent causes the
+    # graph binder to create a small compatibility record which this lane then
+    # tries to replace with the full selected-fact plan.  The shared write
+    # gateway correctly rejects that replacement as write amplification.
+    x3 = _aggregate_headline_x3(
         resume_display_text=headline_line or raw_output,
         claim_ledger=claim_ledger,
         x2_gates=x2,
@@ -2287,10 +2896,6 @@ def run_headline_execution(
         product_quality_status=product_quality_status,
         canonical_claims_for_hash=canon_doc.get("claims"),
         section_input_usage_ledger=usage_doc,
-    )
-    finalize_section_l2_after_output(artifact_dir, "headline", runtime_payload)
-    finalize_section_runtime_exhaust_before_l6(
-        artifact_dir, "headline", runtime_payload, repo_root=REPO_ROOT
     )
 
     bundle = headline_proof_bundle_labels(
@@ -2335,6 +2940,19 @@ def run_headline_execution(
         bundle=bundle,
     )
     write_json(artifact_dir / "l2_output.json", l2_output)
+
+    from apps_rg.runtime.spine.section_x3_finalize import finalize_section_lane_x3
+
+    x3 = finalize_section_lane_x3(
+        artifact_dir=artifact_dir,
+        section_id="headline",
+        runtime_payload=runtime_payload,
+        x3_result=x3,
+    )
+    finalize_section_l2_after_output(artifact_dir, "headline", runtime_payload)
+    finalize_section_runtime_exhaust_before_l6(
+        artifact_dir, "headline", runtime_payload, repo_root=REPO_ROOT
+    )
 
     _smr_h = {
         "run_id": runtime_payload["run_id"],

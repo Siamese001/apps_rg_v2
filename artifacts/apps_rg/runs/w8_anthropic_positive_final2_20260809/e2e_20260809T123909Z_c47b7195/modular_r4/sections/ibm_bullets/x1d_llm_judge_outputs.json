@@ -1,0 +1,160 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_ibm_bullets",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\ibm_bullets\\x1d_gemini_provider_response_raw_20260809_124319_591.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "ibm_bullets_x1d_v4",
+      "input_hash": "845f6dbf76189018",
+      "output_hash": "95a3448e770467ad",
+      "score": 5.0,
+      "score_scale": "0_to_5",
+      "normalized_score": 1.0,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "845f6dbf76189018",
+      "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/ibm_bullets_judge_packet.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/employment_bullet_judge_rubric.py#ibm_bullets",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "bullet_rewrite_quality",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "ibm_bullets",
+      "pass": true,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_bullet_pool_selector",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\ibm_bullets\\x1d_openai_provider_response_raw_20260809_124309_658.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "employment_bullet_judge_v1",
+      "input_hash": "36a21a042b79a4a0",
+      "output_hash": "",
+      "score": 0.78,
+      "score_scale": "0_to_1",
+      "normalized_score": 0.78,
+      "threshold": 0.72,
+      "normalized_threshold": 0.72,
+      "decisive_failure": false,
+      "findings": [
+        "Employment pool selector: 5 slots, min_score=0.78, threshold=0.72, gate_ok=True"
+      ],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": "apps_rg/runtime/judges/employment_bullet_judge_rubric.py#ibm_bullets",
+      "rationale": "apps_rg/config/provider_profiles.yaml:selector_models.employment_bullet_pool_selector.anthropic_limit_backup.model",
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": null,
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": true,
+      "model_tier": null,
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": "ibm_bullets",
+      "pass": true,
+      "model_source": "apps_rg/config/provider_profiles.yaml:selector_models.employment_bullet_pool_selector.anthropic_limit_backup.model",
+      "pass_": true,
+      "judge_role": "employment_bullet_pool_selector",
+      "pool_selector_dimensions": [
+        "claim_ledger_grounding",
+        "bullet_line_discipline",
+        "jd_briefing_targeting_discipline",
+        "keyword_discipline_without_stuffing",
+        "cross_bullet_outcome_diversity",
+        "foundation_enterprise_credibility",
+        "no_unify_runtime_vocabulary"
+      ],
+      "selection_mode": "openai_chatgpt_employment_top_n_pass"
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "ad78cea95a8518f36c4487d8732c0577494c0d98f4d4360743ed36ae605cf766",
+  "graph_claim_binding_contract_digest": "d072cc817b29d108ba256d24163a897603579245fff31c177703da378661bfff",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json",
+  "resume_graph_claim_binding_active": true,
+  "resume_graph_claim_binding_pass": true
+}

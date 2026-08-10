@@ -1,0 +1,97 @@
+{
+  "generation_mode": "model_competencies_graph_pool_adaptive_6_8_regen",
+  "section_lane": "competencies",
+  "initial_path_count": 4,
+  "total_paths_executed": 8,
+  "regen_rounds_executed": 1,
+  "adaptive_sc_enabled": true,
+  "max_path_count": 8,
+  "stop_reason": "path_budget_exhausted",
+  "min_selection_score": 0.72,
+  "high_signal_selection_score": 0.84,
+  "selection_gate": {
+    "ok": false,
+    "section_lane": "competencies",
+    "final_category_count": 4,
+    "min_category_count": 6,
+    "max_category_count": 8,
+    "min_score_threshold": 0.72,
+    "categories_passing": [
+      "distributed agentic control-plane architecture",
+      "hyperscaler partner solution architecture",
+      "reusable distributed accelerator packaging",
+      "runtime resilience for distributed infra"
+    ],
+    "categories_below_threshold": [],
+    "categories_missing": [],
+    "categories_in_merged": 4
+  },
+  "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass",
+  "source_path_by_slot": {
+    "hyperscaler partner solution architecture": 4,
+    "reusable distributed accelerator packaging": 4,
+    "distributed agentic control-plane architecture": 4,
+    "runtime resilience for distributed infra": 4
+  },
+  "claude_selection_count": 8,
+  "candidate_category_count": 8,
+  "min_category_count": 6,
+  "max_category_count": 8,
+  "final_category_count": 4,
+  "phase_timings": [
+    {
+      "phase": "self_consistency_generation_round_0",
+      "started_at": "2026-08-09T00:33:27.277282+00:00",
+      "duration_s": 103.531,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 8
+    },
+    {
+      "phase": "selector_round_0",
+      "started_at": "2026-08-09T00:35:10.810484+00:00",
+      "duration_s": 11.781,
+      "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass"
+    },
+    {
+      "phase": "self_consistency_generation_round_1",
+      "started_at": "2026-08-09T00:35:22.585697+00:00",
+      "duration_s": 94.922,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 4
+    },
+    {
+      "phase": "selector_round_1",
+      "started_at": "2026-08-09T00:36:57.512734+00:00",
+      "duration_s": 10.438,
+      "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass"
+    }
+  ],
+  "e2e_closeout_mode": false,
+  "max_regen_rounds_allowed": 2,
+  "competencies_rejected_neighbor_audit": {
+    "schema_version": "competencies_rejected_neighbor_audit_v1",
+    "audit_status": "present",
+    "candidate_label_count": 7,
+    "candidate_variant_count": 7,
+    "selected_count": 4,
+    "rejected_neighbor_count": 3
+  },
+  "selector_empty": true,
+  "selector_selection_mode": "competencies_advisory_selector_adaptive_6_8_pass",
+  "selector_bullets_in_merged": 0,
+  "selector_selection_count": 8,
+  "selector_subthreshold_scores": [
+    0.88,
+    0.87,
+    0.83,
+    0.85,
+    0.82,
+    0.8,
+    0.81,
+    0.75
+  ],
+  "selector_block_reason": "selector_returned_no_candidates_above_threshold",
+  "competencies_rejected_neighbor_audit_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_003316_78e62f2f7957\\competencies_rejected_neighbor_audit.json"
+}

@@ -1,0 +1,108 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 2.6,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "S5 and S6 duplicate the same LLMOps category, leaving only five distinct groups.",
+      "S1 lacks a concrete partner architecture artifact and partner deployment outcome.",
+      "S2, S3, S5, and S6 recycle control-gate, assurance, and observability language.",
+      "S4 combines productization, pre-sales, customer success, and deal support into one diffuse group.",
+      "The taxonomy closely mirrors summary and Unify proof surfaces instead of adding breadth.",
+      "Several partner and commercial phrases read as operator capabilities rather than SVP agentic mechanisms."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "remediation_suggestions": [
+      "Remove the duplicate LLMOps group and add a distinct graph-backed capability family.",
+      "Name a joint AI reference architecture, solution pattern, accelerator, or deployment-enablement mechanism in S1.",
+      "Separate runtime governance from evaluation and reliability with nonoverlapping terms.",
+      "Narrow S4 to platform productization and move generic revenue operations terms elsewhere."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_CATEGORY",
+          "REPEATED_QUERY_CLUSTER"
+        ]
+      },
+      "seniority_executive_relevance": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "OPERATOR_LEVEL_TERMS",
+          "LIMITED_DISTINCT_BREADTH"
+        ]
+      },
+      "complementarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "SUMMARY_SURFACE_REUSE",
+          "UNIFY_SURFACE_REUSE"
+        ]
+      },
+      "no_bullet_restatement": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "LANGUAGE_LOOP",
+          "MACHINE_GENERATED_DUPLICATION"
+        ]
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_GROUP",
+          "DIFFUSE_CATEGORY",
+          "FIVE_DISTINCT_CATEGORIES"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "GENERIC_PARTNER_TERMS",
+          "MUNDANE_COMMERCIAL_TERMS"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MISSING_ARCHITECTURE_ARTIFACT",
+          "MISSING_PARTNER_DEPLOYMENT_OUTCOME"
+        ]
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_020928_432f3bde4612\\x1d_openai_provider_response_raw_20260809_021256_996.json",
+  "original_model": null,
+  "fallback_model": null
+}

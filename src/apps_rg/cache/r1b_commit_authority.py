@@ -1,4 +1,4 @@
-"""Exit/X3C and evidence authority checks for R1B durable promotion."""
+"""Canonical Exit/X3C authority checks for R1B durable promotion."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from typing import Any, Iterable
 
 from apps_rg.cache.r1b_constants import R1B_UWG_TARGET_SURFACE
 
-X3C_COMMIT_AUTHORITY = "X3C"
+X3C_COMMIT_AUTHORITY = "X3C_COMMIT_REQUEST_TO_UWG"
 X3_DISPOSITION_ARTIFACT = "x3_disposition.json"
 REASON_X3C_REQUIRED = "x3_commit_authority_required"
 REASON_X3_MISSING = "x3_disposition_missing"

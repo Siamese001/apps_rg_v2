@@ -1,0 +1,75 @@
+{
+  "schema": "executive_summary_synthesis_regen_v2",
+  "triggered": true,
+  "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; resume_graph_claim_binding:claim_5:causal_claim_merges_unrelated_graph_roots; Executive summary meta or filler scaffolding: ['this executive']; DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'; resume_display_text must have exactly 6 sentences; found 7 (legacy 4–5 and 5–6 bands retired); executive summary word count 161 exceeds maximum 150; sentence 1: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+  "initial_candidate_digest": "c60d60be5c710bda",
+  "initial_defects": [
+    "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence",
+    "resume_graph_claim_binding:claim_5:causal_claim_merges_unrelated_graph_roots",
+    "Executive summary meta or filler scaffolding: ['this executive']",
+    "DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'",
+    "resume_display_text must have exactly 6 sentences",
+    "found 7 (legacy 4–5 and 5–6 bands retired)",
+    "executive summary word count 161 exceeds maximum 150",
+    "sentence 1: mechanism_comma_list",
+    "dominant_source_fact=unknown",
+    "claim_support_graph_refs=[]",
+    "suppressed_skills=[]"
+  ],
+  "first_pass_resume_word_count": 161,
+  "first_pass_claim_ledger_rows": 6,
+  "max_attempts": 3,
+  "acceptance_semantics": {
+    "monotonicity_accepted": "candidate improved relative to the prior draft; full pre-X2 shape closure is not implied",
+    "receipt_accepted": "the selected candidate cleared every pre-X2 synthesis-shape check",
+    "transport_accepted": "the provider call completed and parsed; product acceptance is not implied"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; resume_graph_claim_binding:claim_5:causal_claim_merges_unrelated_graph_roots; Executive summary meta or filler scaffolding: ['this executive']; DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'; resume_display_text must have exactly 6 sentences; found 7 (legacy 4–5 and 5–6 bands retired); executive summary word count 161 exceeds maximum 150; sentence 1: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "call_id": "synthesis_regen-00-01-d7740f7f",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "08616c6f7f3c8cf4",
+      "regen_resume_word_count": 123,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": true,
+        "failed_reasons": []
+      },
+      "shape_failure_count": 0,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 161,
+        "post_resume_word_count": 123,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 19,
+        "post_unique_source_fact_ids": 13,
+        "prior_failed_sentence_count": true,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": true,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "FULL_PRE_X2_SHAPE_PASS",
+      "advanced_to_next_attempt": false,
+      "best_candidate": true
+    }
+  ],
+  "accepted": true,
+  "accepted_via": "shape_pass",
+  "final_resume_word_count": 123
+}

@@ -16,6 +16,9 @@ from apps_rg.runtime.c0.resume_graph_claim_binding import (
     _claim_rows,
     _explicit_claim_unit,
     bind_final_claims_to_resume_graph_allocation,
+    build_pre_x2_resume_graph_claim_binding_gate,
+    merge_resume_graph_claim_binding_fields,
+    validate_claim_rows_against_resume_graph_allocation,
 )
 
 
@@ -164,6 +167,27 @@ def test_graph_slot_source_precedes_duplicate_display_text_when_deriving_claim_u
     ]
 
 
+def test_graph_binding_prefers_current_l2_display_over_stale_command_transcript(
+    tmp_path: Path,
+) -> None:
+    current = "Current repaired executive summary claim."
+    _artifact_fixture(tmp_path, section_id="executive_summary", claim_text=current)
+    (tmp_path / "command_output.txt").write_text(
+        "Stale pre-repair executive summary claim.\n", encoding="utf-8"
+    )
+    l2 = json.loads((tmp_path / "l2_output.json").read_text(encoding="utf-8"))
+    l2["resume_display_text"] = current
+    _write_json(tmp_path / "l2_output.json", l2)
+
+    contract = bind_final_claims_to_resume_graph_allocation(
+        tmp_path,
+        section_id="executive_summary",
+    )
+
+    assert contract["pass"] is True
+    assert contract["rendered_claim_reconciliation_pass"] is True
+
+
 @pytest.mark.parametrize("section_id", ALL_CLAIM_BEARING_SECTIONS)
 def test_all_eleven_lanes_bind_visible_claims_to_exact_paths(
     tmp_path: Path,
@@ -199,10 +223,73 @@ def test_all_eleven_lanes_bind_visible_claims_to_exact_paths(
         doc = json.loads((tmp_path / name).read_text(encoding="utf-8"))
         assert doc["resume_graph_allocation_plan_digest"] == "a" * 64
         assert doc["graph_claim_binding_contract_digest"] == contract["contract_digest"]
+        if name == "l2_output.json":
+            assert doc["resume_graph_claim_binding_active"] is True
+            assert doc["resume_graph_claim_binding_pass"] is True
+            assert doc["graph_claim_bindings_ref"] == "graph_claim_bindings.json"
+            assert "graph_claim_bindings" not in doc
     for name in ("compiled_prompt_artifact.json", "final_evidence_contract.json"):
         doc = json.loads((tmp_path / name).read_text(encoding="utf-8"))
         assert doc["resume_graph_allocation_plan_digest"] == "a" * 64
         assert "graph_claim_binding_contract_digest" not in doc
+
+
+def test_post_x3_metadata_merge_preserves_exact_graph_binding(tmp_path: Path) -> None:
+    _artifact_fixture(tmp_path, section_id="executive_summary")
+    contract = bind_final_claims_to_resume_graph_allocation(
+        tmp_path,
+        section_id="executive_summary",
+    )
+    stale_in_memory_l2 = {
+        "section_id": "executive_summary",
+        "claim_ledger": [
+            {
+                "claim_text": "Governed platform delivery.",
+                "source_fact_ids": ["fact_1"],
+            }
+        ],
+        "proof_status": "PASS",
+    }
+
+    merged = merge_resume_graph_claim_binding_fields(
+        stale_in_memory_l2,
+        artifact_dir=tmp_path,
+    )
+
+    assert merged["proof_status"] == "PASS"
+    assert merged["resume_graph_claim_binding_active"] is True
+    assert merged["resume_graph_claim_binding_pass"] is True
+    assert merged["resume_graph_allocation_plan_digest"] == "a" * 64
+    assert merged["graph_claim_binding_contract_digest"] == contract["contract_digest"]
+    assert merged["graph_claim_bindings_ref"] == "graph_claim_bindings.json"
+    assert "graph_claim_bindings" not in merged
+
+
+def test_deferred_l2_binding_persistence_does_not_create_interim_write_baseline(
+    tmp_path: Path,
+) -> None:
+    _artifact_fixture(tmp_path, section_id="ibm_bullets")
+    l2_path = tmp_path / "l2_output.json"
+    before = l2_path.read_bytes()
+
+    contract = bind_final_claims_to_resume_graph_allocation(
+        tmp_path,
+        section_id="ibm_bullets",
+        persist_l2_envelope=False,
+    )
+
+    assert contract["pass"] is True
+    assert l2_path.read_bytes() == before
+    assert (tmp_path / "graph_claim_bindings.json").is_file()
+
+    final_l2 = json.loads(before)
+    final_l2["product_quality_status"] = "PASS"
+    merged = merge_resume_graph_claim_binding_fields(
+        final_l2,
+        artifact_dir=tmp_path,
+    )
+    assert merged["resume_graph_claim_binding_pass"] is True
+    assert merged["graph_claim_bindings_ref"] == "graph_claim_bindings.json"
 
 
 def test_rendered_metric_requires_exact_allocated_value_and_unit(tmp_path: Path) -> None:
@@ -346,6 +433,91 @@ def test_unallocated_legacy_lane_is_not_reclassified(tmp_path: Path) -> None:
     assert not (tmp_path / "graph_claim_bindings.json").exists()
 
 
+def test_runtime_frozen_plan_survives_lane_specific_selection_echo(
+    tmp_path: Path,
+) -> None:
+    _artifact_fixture(tmp_path, section_id="ibm_narrative")
+    frozen_plan = json.loads(
+        (tmp_path / "selected_fact_plan.json").read_text(encoding="utf-8")
+    )
+    lane_echo = {
+        "through_line": "Partner-led platform transformation",
+        "selected_theme_families": ["alliances"],
+    }
+    _write_json(tmp_path / "selected_fact_plan.json", lane_echo)
+    l2 = json.loads((tmp_path / "l2_output.json").read_text(encoding="utf-8"))
+    l2["selected_fact_plan"] = lane_echo
+    _write_json(tmp_path / "l2_output.json", l2)
+    _write_json(tmp_path / "runtime_payload.json", {"selected_fact_plan": frozen_plan})
+
+    contract = bind_final_claims_to_resume_graph_allocation(
+        tmp_path,
+        section_id="ibm_narrative",
+    )
+
+    assert contract["active"] is True
+    assert contract["pass"] is True
+    assert contract["allocation_plan_digest"] == "a" * 64
+    assert (tmp_path / "graph_claim_bindings.json").is_file()
+
+
+def test_narrative_companion_bullet_ids_bind_to_reserved_derived_ordinals(
+    tmp_path: Path,
+) -> None:
+    assignments = _artifact_fixture(
+        tmp_path,
+        section_id="ibm_narrative",
+        source_id="fact_1",
+    )
+    assignments.append(
+        {
+            **assignments[0],
+            "claim_unit_id": "ibm_narrative:derived:02",
+            "skill_id": "skill_2",
+            "fact_id": "fact_2",
+            "root_id": "root_2",
+            "citation_refs": ["fact_2"],
+            "graph_path_ids": ["root:root_2", "root:root_2/skill:skill_2"],
+            "edge_ids": ["edge_2"],
+        }
+    )
+    plan = json.loads(
+        (tmp_path / "selected_fact_plan.json").read_text(encoding="utf-8")
+    )
+    plan["allocation_assignments"] = assignments
+    plan["facts"].append(
+        {
+            "fact_id": "root_2",
+            "role_episode_bundle_id": "root_2",
+            "allowed_graph_evidence_ids": ["fact_2", "skill_2"],
+        }
+    )
+    _write_json(tmp_path / "selected_fact_plan.json", plan)
+    ledger = [
+        {
+            "claim_text": "Governed platform delivery.",
+            "source_fact_ids": ["bul_ibm_001", "bul_ibm_002"],
+        }
+    ]
+    _write_json(tmp_path / "claim_ledger.json", ledger)
+    l2 = json.loads((tmp_path / "l2_output.json").read_text(encoding="utf-8"))
+    l2["selected_fact_plan"] = plan
+    l2["claim_ledger"] = ledger
+    _write_json(tmp_path / "l2_output.json", l2)
+
+    contract = bind_final_claims_to_resume_graph_allocation(
+        tmp_path,
+        section_id="ibm_narrative",
+    )
+
+    assert contract["pass"] is True
+    assert contract["bound_claim_count"] == 1
+    assert contract["bindings"][0]["allocation_claim_unit_ids"] == [
+        "ibm_narrative:derived:01",
+        "ibm_narrative:derived:02",
+    ]
+
+
 def test_real_graph_allocation_slices_bind_for_all_eleven_lanes(tmp_path: Path) -> None:
     repo_root = Path(__file__).resolve().parents[5]
     bundle = build_whole_resume_graph_allocation(
@@ -423,3 +595,104 @@ def test_real_graph_allocation_slices_bind_for_all_eleven_lanes(tmp_path: Path) 
         assert contract["bound_claim_count"] == len(assignments)
         assert contract["orphan_allocation_claim_unit_ids"] == []
         assert contract["allocation_plan_digest"] == plan["allocation_plan_digest"]
+
+
+def test_pre_x2_projection_blocks_causal_merge_across_unrelated_roots() -> None:
+    assignments = [
+        {
+            "section_id": "executive_summary",
+            "claim_unit_id": "executive_summary:claim:01",
+            "root_id": "root_revenue",
+            "fact_id": "fact_revenue",
+            "citation_refs": ["fact_revenue"],
+            "counts_toward_global_uniqueness": True,
+        },
+        {
+            "section_id": "executive_summary",
+            "claim_unit_id": "executive_summary:claim:02",
+            "root_id": "root_team",
+            "fact_id": "fact_team",
+            "citation_refs": ["fact_team"],
+            "counts_toward_global_uniqueness": True,
+        },
+    ]
+    plan = {
+        "allocation_plan_digest": "b" * 64,
+        "allocation_assignments": assignments,
+        "facts": [
+            {
+                "fact_id": "root_revenue",
+                "role_episode_bundle_id": "root_revenue",
+                "allowed_graph_evidence_ids": ["fact_revenue"],
+            },
+            {
+                "fact_id": "root_team",
+                "role_episode_bundle_id": "root_team",
+                "allowed_graph_evidence_ids": ["fact_team"],
+            },
+        ],
+    }
+    claims = [
+        {
+            "claim_text": "Revenue growth generated team scale.",
+            "source_fact_ids": ["fact_revenue", "fact_team"],
+        }
+    ]
+
+    failures = validate_claim_rows_against_resume_graph_allocation(
+        section_id="executive_summary",
+        claim_rows=claims,
+        selected_fact_plan=plan,
+    )
+    gate = build_pre_x2_resume_graph_claim_binding_gate(
+        section_id="executive_summary",
+        claim_rows=claims,
+        selected_fact_plan=plan,
+    )
+
+    assert "claim_1:causal_claim_merges_unrelated_graph_roots" in failures
+    assert gate is not None
+    assert gate["gate_id"] == GRAPH_CLAIM_BINDING_GATE_ID
+    assert gate["pass"] is False
+
+
+def test_slot_rooted_metric_derivative_binds_to_exact_frozen_bullet_unit() -> None:
+    plan = {
+        "allocation_plan_digest": "unify-derivative-plan",
+        "facts": [
+            {
+                "fact_id": "reb_unify_agentic_platform_architecture",
+                "role_episode_bundle_id": "reb_unify_agentic_platform_architecture",
+                "linked_source_fact_ids": ["fact_engineering_platform_001"],
+            }
+        ],
+        "allocation_assignments": [
+            {
+                "section_id": "unify_bullets",
+                "claim_unit_id": "unify_bullets:bul_unify_001",
+                "root_id": "reb_unify_agentic_platform_architecture",
+                "skill_id": "skill_unify_agentic_l0_route_policy_dispatch",
+                "fact_id": "fact_engineering_platform_001",
+                "metric_outcome_id": "metric_unify_policy_gated_agent_execution_surface",
+                "metric_value": "",
+                "metric_unit": "",
+                "counts_toward_global_uniqueness": True,
+            }
+        ],
+    }
+    failures = validate_claim_rows_against_resume_graph_allocation(
+        section_id="unify_bullets",
+        claim_rows=[
+            {
+                "claim_text": "Established a policy-gated agent execution surface.",
+                "source_fact_ids": [
+                    "bul_unify_001",
+                    "fact_engineering_platform_001",
+                    "bul_unify_001_metric_a50f35f7",
+                ],
+            }
+        ],
+        selected_fact_plan=plan,
+    )
+
+    assert failures == []

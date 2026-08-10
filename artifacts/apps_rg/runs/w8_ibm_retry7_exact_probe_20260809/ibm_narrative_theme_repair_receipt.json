@@ -1,0 +1,66 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_064220",
+  "gate_id": "x2_ibm_narrative_claim_theme_coverage",
+  "fired": true,
+  "trigger": {
+    "themes_detected_pre": [
+      "bul_ibm_001",
+      "bul_ibm_002",
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "count_pre": 3,
+    "missing_in_ledger_union_pre": [
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "narrative_pre": "Drove partner-led solution architecture and AWS alliance work for regulated financial-services clients at IBM, establishing a disciplined BI and pipeline operating model that connected enterprise discovery, reusable modernization patterns, and executive decisions to more repeatable enterprise pursuits."
+  },
+  "accepted": false,
+  "themes_post": [
+    "bul_ibm_001",
+    "bul_ibm_002"
+  ],
+  "rejected_reason": "mechanism_support_unsatisfied",
+  "bounded": {
+    "max_attempts": 1,
+    "attempts_used": 1
+  },
+  "kill_switch": "unset",
+  "regen_max_tokens": 4000,
+  "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+  "regen_parse_error": null,
+  "regen_provider_result": {
+    "runtime_generation_status": "REAL_LLM",
+    "provider_requested": "external_openai",
+    "provider_attempted": true,
+    "provider_available": true,
+    "model": "gpt-5.6-luna",
+    "exact_provider_error": ""
+  },
+  "mechanism_support_post": {
+    "mechanisms": [
+      "aws",
+      "bi",
+      "pipeline"
+    ],
+    "cited_companion_ids": [
+      "bul_ibm_001",
+      "bul_ibm_002"
+    ],
+    "unsupported_mechanisms": [
+      "pipeline"
+    ],
+    "support_by_mechanism": {
+      "aws": [
+        "bul_ibm_001"
+      ],
+      "bi": [
+        "bul_ibm_002"
+      ],
+      "pipeline": [
+        "bul_ibm_004"
+      ]
+    },
+    "checked": true
+  }
+}

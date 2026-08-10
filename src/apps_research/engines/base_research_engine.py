@@ -6,28 +6,13 @@ Mirrors the shared base-engine pattern with research-specific contracts.
 
 from __future__ import annotations
 
-from agentic_core.runtime.contracts.runtime_telemetry_decorators import (
-    traces_execute,
-)
+from agentic_core.runtime.contracts.runtime_telemetry_decorators import traces_execute
 
 import logging
 from abc import ABC, abstractmethod
 from typing import Any
 
-try:
-    from agentic_core.mixins.semantic_cache_mixin import SemanticCacheMixin
-except ImportError:  # guardian: allow-silent-swallow -- optional dependency
-
-    class SemanticCacheMixin:  # type: ignore[no-redef]
-        pass
-
-
-try:
-    from agentic_core.mixins.embedding_mixin import EmbeddingMixin
-except ImportError:
-
-    class EmbeddingMixin:  # type: ignore[no-redef]
-        pass
+from apps_research.runtime.core_dependencies import EmbeddingMixin, SemanticCacheMixin
 
 
 _log = logging.getLogger(__name__)

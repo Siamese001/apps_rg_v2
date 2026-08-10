@@ -13,13 +13,13 @@ from agentic_core.L3_orchestration.doctrine.contracts_l3_7 import (
     L3StepContract,
     StepInputs,
 )
-from agentic_core.runtime.contracts.compiled_prompt_artifact import CompiledPromptArtifact
-from agentic_core.runtime.contracts.final_evidence_contract import FinalEvidenceContract
-from agentic_core.runtime.contracts.l3_runtime_orchestration_receipt import (
+from apps_rg.runtime.spine_contracts import CompiledPromptArtifact
+from apps_rg.runtime.spine_contracts import FinalEvidenceContract
+from apps_rg.runtime.spine_contracts import (
     L3RuntimeOrchestrationReceipt,
     L3StepContractRef,
 )
-from agentic_core.runtime.contracts.route_contract import RouteContract
+from apps_rg.runtime.spine_contracts import RouteContract
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -190,7 +190,7 @@ def l3_orchestrate_apps_rg(
         status="step_handed_to_l2",
         handed_to_l2_at_utc=now_utc,
     )
-    from agentic_core.runtime.contracts.l3_runtime_orchestration_receipt import (
+    from apps_rg.runtime.spine_contracts import (
         L3_RUNTIME_RECEIPT_SCHEMA_VERSION,
         compute_l3_runtime_digest,
     )

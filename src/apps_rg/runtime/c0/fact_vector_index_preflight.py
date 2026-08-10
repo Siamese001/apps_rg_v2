@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from agentic_core.config.model_catalog import BGE_M3_MODEL_ID
+from apps_rg.runtime.core_model_catalog import BGE_M3_MODEL_ID
 from apps_rg.runtime.c0.constants import REPO_ROOT
 from apps_rg.runtime.c0.section_authority_profile import (
     c0_authority_manifest,

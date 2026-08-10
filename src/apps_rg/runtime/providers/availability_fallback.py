@@ -184,7 +184,9 @@ def maybe_retry_claude_availability_same_provider(
     if reason_category not in _RETRY_ALLOWED_REASON_CATEGORIES:
         return initial_result
 
-    model = resolve_section_generation_model(sid)
+    model = resolve_section_generation_model(
+        sid, provider_profile=ProviderProfile.EXTERNAL_CLAUDE
+    )
     current = initial_result
     spans = [
         provider_result_attempt_span(

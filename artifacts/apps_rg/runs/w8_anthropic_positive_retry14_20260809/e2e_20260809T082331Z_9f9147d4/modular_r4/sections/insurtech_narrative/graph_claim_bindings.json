@@ -1,0 +1,74 @@
+{
+  "schema_version": "resume_graph_claim_binding_contract_v1",
+  "section_id": "insurtech_narrative",
+  "active": true,
+  "status": "PASS",
+  "allocation_scope": "WHOLE_RESUME",
+  "allocation_plan_digest": "84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df",
+  "claim_count": 1,
+  "bound_claim_count": 1,
+  "binding_coverage": 1.0,
+  "metric_exactness_pass": true,
+  "allocated_claim_unit_count": 3,
+  "required_allocated_claim_unit_count": 0,
+  "bound_allocation_claim_unit_count": 1,
+  "allocation_claim_unit_consumption_counts": {
+    "insurtech_narrative:derived:01": 0,
+    "insurtech_narrative:derived:02": 0,
+    "insurtech_narrative:derived:03": 0
+  },
+  "allocation_claim_unit_consumption_exactly_once_pass": true,
+  "orphan_allocation_claim_unit_ids": [],
+  "failure_reasons": [],
+  "bindings": [
+    {
+      "schema_version": "graph_claim_binding_v1",
+      "section_id": "insurtech_narrative",
+      "claim_unit_id": "insurtech_narrative_claim_1_bf42417c",
+      "visible_claim_text": "Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.",
+      "visible_claim_hash": "15c448ec113f5bec5b21dd77ba440f0c4c9f3d0ef0ab4cb44c84a36ad3b6cb4e",
+      "allocation_plan_digest": "84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df",
+      "skill_ids": [
+        "skill_regulated_cloud_adoption_guardrails"
+      ],
+      "fact_ids": [
+        "exp_insurtech_001"
+      ],
+      "metric_outcome_id": "",
+      "metric_value": "",
+      "metric_unit": "",
+      "normalized_metric_signature": "",
+      "graph_path_ids": [
+        "root:reb_insurtech_aws_shared_responsibility_operating_model",
+        "root:reb_insurtech_aws_shared_responsibility_operating_model/skill:skill_regulated_cloud_adoption_guardrails",
+        "root:reb_insurtech_aws_shared_responsibility_operating_model/fact:exp_insurtech_001"
+      ],
+      "edge_ids": [
+        "edge:fe89befe7d6b429da1b44a80",
+        "edge:45388558e19661d29fd53465"
+      ],
+      "citation_refs": [
+        "exp_insurtech_001"
+      ],
+      "proof_strength_raw": 1.2,
+      "target_alignment_score": 1.05,
+      "claim_entailment_score": 1.0,
+      "metric_binding_score": 0.0,
+      "path_confidence_raw": 1.0,
+      "source_independence_score": 0.75,
+      "selection_margin": -0.1,
+      "claim_source_fact_ids": [
+        "reb_insurtech_aws_shared_responsibility_operating_model"
+      ],
+      "allocation_claim_unit_ids": [
+        "insurtech_narrative:derived:03"
+      ],
+      "binding_status": "PASS"
+    }
+  ],
+  "rendered_claim_reconciliation_pass": true,
+  "durable_graph_state_mutated": false,
+  "pass": true,
+  "bindings_digest": "417f0b47fcfc0aa8951ac0ac7520729ff4b9c2d87c3c20d24b897da342497056",
+  "contract_digest": "67e5a3a9e9788749cb6e5bec8a89709a30e00016f4b41d3d8cb5f2e06203d9e5"
+}

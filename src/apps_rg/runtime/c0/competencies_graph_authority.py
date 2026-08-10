@@ -41,9 +41,29 @@ _ROLE_AXIS_SIGNALS: Mapping[str, tuple[str, ...]] = {
 # not a new graph fact or an inferred competency.
 _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
     (
+        "reb_unify_agentic_platform_architecture",
+        "skill_unify_agentic_l0_route_policy_dispatch",
+    ): "Agentic platform route-policy dispatch architecture",
+    (
+        "reb_unify_agentic_platform_architecture",
+        "skill_unify_agentic_graphrag_context_pack_grounding",
+    ): "GraphRAG context pack grounding for governed execution",
+    (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_partner_cloud_vendor_joint_gtm",
+    ): "Partner AI solution architecture and co-sell execution",
+    (
+        "reb_ibm_customer_success_value_realization",
+        "skill_partner_customer_deal_support",
+    ): "Partner value-realization operating cadence and deal support",
+    (
+        "reb_ibm_customer_success_value_realization",
+        "skill_p2_gtm_presales_delivery_handoff",
+    ): "Presales-to-delivery customer success operating handoff cadence",
+    (
         "reb_insurtech_regulated_aws_control_implementation",
         "skill_pii_encryption_for_insurance_data",
-    ): "PII encryption controls for insurance data",
+    ): "PII encryption controls for regulated data",
     (
         "reb_insurtech_regulated_aws_control_implementation",
         "skill_aws_iam_kms_cloudtrail_controls",
@@ -83,7 +103,7 @@ _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
     (
         "reb_insurtech_aws_migration_execution",
         "skill_migration_wave_cutover_planning",
-    ): "Migration wave cutover planning for platforms",
+    ): "Migration wave cutover execution planning",
     (
         "reb_ey_insurance_core_modernization",
         "skill_insurance_claims_automation",
@@ -131,27 +151,115 @@ _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
     (
         "reb_ibm_presales_solution_engineering",
         "skill_partner_pre_sales",
-    ): "Enterprise technical pre-sales architecture mapping",
+    ): "Buyer-specific solution mapping for enterprise pursuits",
     (
         "reb_ibm_revenue_sales_target_execution",
         "skill_partner_enterprise_negotiations",
-    ): "Enterprise solution negotiation and quota execution",
+    ): "Enterprise pursuit execution across portfolio expansion motions",
     (
         "reb_unify_partner_channel_cosell",
         "skill_partner_partner_led_ai_solutions",
-    ): "Partner-led AI solution framework for alliance",
+    ): "AI co-sell bundling with strategic partners",
     (
         "reb_unify_partner_channel_cosell",
         "skill_partner_cloud_vendor_joint_gtm",
     ): "Vendor joint AI solution roadmaps for partners",
     (
+        "reb_unify_partner_channel_cosell",
+        "skill_partner_partner_revenue_3m",
+    ): "Partner-derived AI revenue through alliance channels",
+    (
+        "reb_unify_partner_channel_cosell",
+        "skill_partner_gtm_enablement",
+    ): "AI GTM enablement for alliance channels",
+    (
+        "reb_unify_partner_channel_cosell",
+        "skill_partner_partner_motions",
+    ): "Global AI channel program inception motions",
+    (
+        "reb_unify_distributed_ecosystem_engineering",
+        "skill_sr_cloud_data_platform_engineering",
+    ): "Cloud-native architectures for financial-services clients",
+    (
+        "reb_unify_distributed_ecosystem_engineering",
+        "skill_dense_sparse_exact_retrieval_design",
+    ): "Dense-sparse retrieval execution for evidence grounding",
+    (
+        "reb_unify_distributed_ecosystem_engineering",
+        "skill_sr_w12_databricks_lakehouse_fundamentals",
+    ): "Databricks lakehouse architectures for AWS engineering",
+    (
+        "reb_unify_distributed_ecosystem_engineering",
+        "skill_runtime_resilience_controls",
+    ): "Fail-closed provider resilience control gate",
+    (
+        "reb_unify_distributed_ecosystem_engineering",
+        "skill_provider_and_egress_governance",
+    ): "Provider egress governance for generation paths",
+    (
         "reb_unify_agentic_platform_architecture",
         "skill_unify_agentic_human_override_escalation_paths",
-    ): "Human override escalation paths for governed workflows",
+    ): "Governed human override and escalation paths",
     (
         "reb_unify_agentic_platform_architecture",
         "skill_unify_agentic_runtime_proof_bundle_lineage",
-    ): "Runtime proof bundle lineage for agent platform",
+    ): "Runtime agent-output proof lineage for platforms",
+    (
+        "reb_unify_agentic_platform_architecture",
+        "skill_unify_agentic_multi_agent_orchestration_contracts",
+    ): "Multi-agent orchestration contracts for governed execution",
+    (
+        "reb_unify_agentic_platform_architecture",
+        "skill_unify_agentic_replay_key_audit_manifest_design",
+    ): "Agent replay audit architectures for reviewable runs",
+    (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_partner_hyperscaler_cosell",
+    ): "Financial-services hyperscaler alliance co-sell execution",
+    (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_partner_ibm_aws_alliance_joint_revenue",
+    ): "AI sales frameworks for AWS revenue motions",
+    (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_partner_alliance_gtm_execution",
+    ): "AWS alliance joint architecture leadership",
+    (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_sr_w12_hyperscaler_alliance_co_sell",
+    ): "Multi-year hyperscaler co-sell motions for AI growth",
+    (
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_partner_joint_solution_development",
+    ): "AI analytics framework co-development for partners",
+    (
+        "reb_ibm_offering_accelerator_management",
+        "skill_p2_tech_demoable_accelerator",
+    ): "Production-grade accelerator commercialization for client platforms",
+    (
+        "reb_ibm_offering_accelerator_management",
+        "skill_p2_tech_ibm_cloud_portfolio_anchor",
+    ): "Cloud transformation portfolio architecture ownership",
+    (
+        "reb_ibm_offering_accelerator_management",
+        "skill_sr_w12_industry_reference_architecture",
+    ): "Industry modernization reference architecture patterns",
+    (
+        "reb_ibm_aws_modernization_architecture",
+        "skill_p2_tech_aws_modernization_patterns",
+    ): "AWS migration and modernization for regulated workloads",
+    (
+        "reb_ibm_aws_modernization_architecture",
+        "skill_p2_tech_reference_architecture",
+    ): "Regulated financial-services cloud modernization patterns",
+    (
+        "reb_ibm_aws_modernization_architecture",
+        "skill_sr_microservices_integration_platform",
+    ): "Microservices integration for regulated systems",
+    (
+        "reb_ey_insurance_core_modernization",
+        "skill_insurance_core_to_bi_reporting_handoff",
+    ): "Insurance core reporting integration and BI workflows",
 }
 
 # A joint alliance/co-sell capability is commercial evidence, even when its
@@ -161,12 +269,70 @@ _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
 # selected graph path below; it does not create a new claim or alter graph
 # selection.
 _ALLOCATION_SURFACE_CATEGORY_OVERRIDES: Mapping[tuple[str, str], str] = {
+    **{
+        ("reb_unify_partner_channel_cosell", skill_id): "Cloud & Partner Ecosystems"
+        for skill_id in (
+            "skill_partner_cloud_vendor_joint_gtm",
+            "skill_partner_gtm_enablement",
+        )
+    },
+    **{
+        ("reb_unify_partner_channel_cosell", skill_id): "Commercial & Operating Impact"
+        for skill_id in (
+            "skill_partner_partner_revenue_3m",
+            "skill_partner_partner_motions",
+            "skill_partner_partner_led_ai_solutions",
+        )
+    },
+    **{
+        ("reb_ibm_aws_alliance_partner_cosell_gtm", skill_id): "Commercial & Operating Impact"
+        for skill_id in (
+            "skill_partner_hyperscaler_cosell",
+            "skill_partner_ibm_aws_alliance_joint_revenue",
+            "skill_sr_w12_hyperscaler_alliance_co_sell",
+        )
+    },
     (
         "reb_ibm_aws_alliance_partner_cosell_gtm",
-        "skill_partner_joint_solution_development",
-    ): "Platform Productization & Commercialization",
+        "skill_partner_alliance_gtm_execution",
+    ): "Cloud & Partner Ecosystems",
+    ("reb_ibm_aws_alliance_partner_cosell_gtm", "skill_partner_joint_solution_development"): "Cloud & Partner Ecosystems",
+    ("reb_ibm_revenue_sales_target_execution", "skill_partner_enterprise_negotiations"): "Commercial & Operating Impact",
+    (
+        "reb_ibm_presales_solution_engineering",
+        "skill_partner_pre_sales",
+    ): "Cloud & Partner Ecosystems",
+    (
+        "reb_ibm_customer_success_value_realization",
+        "skill_p2_gtm_presales_delivery_handoff",
+    ): "Engineering & Delivery Leadership",
+    (
+        "reb_ibm_customer_success_value_realization",
+        "skill_partner_customer_deal_support",
+    ): "Commercial & Operating Impact",
+    (
+        "reb_ibm_devsecops_release_resilience",
+        "skill_ibm_automated_release_pipelines",
+    ): "Governance, Risk & Compliance",
+    ("reb_unify_distributed_ecosystem_engineering", "skill_runtime_resilience_controls"): "LLMOps & Reliability",
+    ("reb_unify_distributed_ecosystem_engineering", "skill_provider_and_egress_governance"): "Governance, Risk & Compliance",
+    ("reb_unify_distributed_ecosystem_engineering", "skill_sr_w12_databricks_lakehouse_fundamentals"): "Data & Analytics Modernization",
+    ("reb_unify_agentic_platform_architecture", "skill_unify_agentic_human_override_escalation_paths"): "Engineering & Delivery Leadership",
+    ("reb_unify_agentic_platform_architecture", "skill_unify_agentic_runtime_proof_bundle_lineage"): "Engineering & Delivery Leadership",
+    ("reb_unify_agentic_platform_architecture", "skill_unify_agentic_l0_route_policy_dispatch"): "AI Platform Leadership",
+    ("reb_ibm_offering_accelerator_management", "skill_p2_tech_ibm_cloud_portfolio_anchor"): "Cloud & Partner Ecosystems",
+    ("reb_ibm_offering_accelerator_management", "skill_p2_tech_reusable_accelerators"): "AI Platform Leadership",
+    ("reb_ibm_offering_accelerator_management", "skill_sr_w12_industry_reference_architecture"): "Cloud & Partner Ecosystems",
+    ("reb_ibm_offering_accelerator_management", "skill_p2_tech_demoable_accelerator"): "AI Platform Leadership",
+    ("reb_ibm_aws_modernization_architecture", "skill_p2_tech_aws_modernization_patterns"): "Data & Analytics Modernization",
+    ("reb_ibm_aws_modernization_architecture", "skill_p2_tech_reference_architecture"): "Data & Analytics Modernization",
+    ("reb_insurtech_regulated_aws_control_implementation", "skill_aws_iam_kms_cloudtrail_controls"): "Governance, Risk & Compliance",
+    ("reb_insurtech_regulated_aws_control_implementation", "skill_soc2_zero_trust_security"): "Governance, Risk & Compliance",
+    ("reb_ey_insurance_core_modernization", "skill_insurance_core_to_bi_reporting_handoff"): "Data & Analytics Modernization",
 }
-_SURFACE_COMPOSITION_CONNECTIVES = frozenset({"and", "for", "of", "the", "to", "with"})
+_SURFACE_COMPOSITION_CONNECTIVES = frozenset(
+    {"and", "for", "of", "the", "to", "with", "through", "across", "via"}
+)
 
 # This is a target-specific *output layout*, not a retrieval or evidence
 # policy. Brown & Brown's insurance-IT section has a frozen 24-unit allocation
@@ -583,7 +749,7 @@ def _allocation_surface_category(
             if override_label in {
                 str(category.get("category_label") or "").strip(),
                 str(category.get("resume_display_label") or "").strip(),
-            }:
+            } and _category_can_accept_allocation(category):
                 return category
     phrase_tokens = _tokens(phrase) | _tokens(assignment.get("skill_id"))
     commercial_tokens = {"customer", "deal", "revenue", "sales", "target", "value"}
@@ -591,7 +757,7 @@ def _allocation_surface_category(
     for index, category in enumerate(categories):
         terms = category.get("terms") or []
         nonempty_terms = sum(1 for term in terms if _term_text(term))
-        if nonempty_terms >= 6:
+        if not _category_can_accept_allocation(category):
             continue
         category_text = " ".join(
             [
@@ -613,6 +779,166 @@ def _allocation_surface_category(
         if best is None or candidate[:3] > best[:3]:
             best = candidate
     return best[3] if best is not None else None
+
+
+def _category_can_accept_allocation(category: Mapping[str, Any]) -> bool:
+    """Whether a category has a free slot or a non-authoritative term to replace."""
+
+    terms = [term for term in category.get("terms") or [] if _term_text(term)]
+    if len(terms) < 6:
+        return True
+    return any(
+        not (
+            isinstance(term, Mapping)
+            and str(term.get("allocation_claim_unit_id") or "").strip()
+        )
+        for term in terms
+    )
+
+
+def _make_category_capacity(
+    category: dict[str, Any],
+    *,
+    ceiling: int = 6,
+) -> dict[str, Any] | None:
+    """Open one slot without deleting a frozen allocation identity.
+
+    Model-authored bundle anchors are optional once a more specific frozen
+    allocation is projected into the same capability family.  Removing the
+    last optional term is deterministic and preserves the 3-item category
+    floor. Most categories use the six-item schema ceiling. A category rebound
+    to the partnership-execution bundle uses a three-item display ceiling so
+    its three frozen allocation terms replace generic bundle anchors instead
+    of creating the 27-item keyword-dense Retry 15 surface.
+    """
+
+    terms = list(category.get("terms") or [])
+    nonempty = [index for index, term in enumerate(terms) if _term_text(term)]
+    if len(nonempty) < ceiling:
+        return None
+    for index in reversed(nonempty):
+        term = terms[index]
+        if isinstance(term, Mapping) and str(
+            term.get("allocation_claim_unit_id") or ""
+        ).strip():
+            continue
+        removed = terms.pop(index)
+        category["terms"] = terms
+        return {
+            "visible_term": _term_text(removed),
+            "reason": "category_ceiling_replaced_optional_bundle_anchor",
+        }
+    return None
+
+
+def _partner_gtm_allocation_display_ceiling(
+    category: Mapping[str, Any],
+    assignment: Mapping[str, Any],
+) -> int:
+    """Return the compact display ceiling for a partner-GTM rebound category."""
+
+    # The Anthropic partner allocation starts from an eight-by-three surface.
+    # Recovery terms from these roots replace optional anchors in their
+    # semantically routed categories instead of increasing resume density.
+    if str(category.get("category_label") or "").strip() in {
+        "Cloud & Partner Ecosystems",
+        "Governance, Risk & Compliance",
+        "Commercial & Operating Impact",
+        "Engineering & Delivery Leadership",
+    } and str(assignment.get("root_id") or "").strip() in {
+        "reb_unify_partner_channel_cosell",
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_revenue_sales_target_execution",
+        "reb_ibm_customer_success_value_realization",
+        "reb_ibm_devsecops_release_resilience",
+        "reb_ibm_presales_solution_engineering",
+    }:
+        return 3
+    return 6
+
+
+def _apply_allocation_category_authority(
+    category: dict[str, Any],
+    *,
+    assignment: Mapping[str, Any],
+) -> dict[str, str] | None:
+    """Preserve the governed category family while adding frozen evidence.
+
+    Rebinding the sole commercial category after the first co-sell allocation
+    erased the required platform-productization family. Category routing now
+    separates partner architecture, delivery leadership, and commercial
+    productization, so no authority mutation is required.
+    """
+
+    del category, assignment
+    return None
+
+
+def _recompute_category_authority_from_visible_terms(
+    categories: Iterable[dict[str, Any]],
+) -> None:
+    """Remove stale category provenance after optional-term replacement.
+
+    Category-level source and skill lists are a projection of the currently
+    visible terms.  Keeping facts from terms that recovery replaced creates a
+    false concentration signal and makes the durable category disagree with
+    its claim ledger.
+    """
+
+    for category in categories:
+        facts: list[str] = []
+        skills: list[str] = []
+        claim_units: list[str] = []
+        for term in category.get("terms") or []:
+            if not isinstance(term, Mapping) or not _term_text(term):
+                continue
+            facts.extend(_strings(term.get("source_fact_ids")))
+            if term.get("source_fact_id"):
+                facts.append(str(term.get("source_fact_id")))
+            skills.extend(_strings(term.get("source_skill_ids")))
+            skills.extend(_strings(term.get("graph_skill_node_ids")))
+            if term.get("allocation_claim_unit_id"):
+                claim_units.append(str(term.get("allocation_claim_unit_id")))
+        category["source_fact_ids"] = _strings(facts)
+        category["graph_skill_node_ids"] = _strings(skills)
+        category["allocation_claim_unit_ids"] = _strings(claim_units)
+
+
+def _align_partner_commercial_display_label(
+    categories: Iterable[dict[str, Any]],
+) -> list[dict[str, str]]:
+    """Keep a fully allocated commercial category honest about its contents.
+
+    When partner allocation replaces all three optional productization anchors,
+    retaining the narrower ``Platform Productization`` display label makes the
+    visible category disagree with its evidence.  The governed taxonomy and
+    bundle IDs remain unchanged; only the resume wrapper is made specific to
+    the three source-bound commercial terms.
+    """
+
+    changes: list[dict[str, str]] = []
+    for category in categories:
+        if str(category.get("competency_bundle_id") or "") != (
+            "ccb_platform_productization"
+        ):
+            continue
+        terms = [term for term in category.get("terms") or [] if _term_text(term)]
+        if len(terms) != 3 or not all(
+            isinstance(term, Mapping)
+            and bool(str(term.get("allocation_claim_unit_id") or "").strip())
+            for term in terms
+        ):
+            continue
+        before = str(
+            category.get("resume_display_label")
+            or category.get("category_label")
+            or ""
+        )
+        after = "Partner Commercialization & Value Realization"
+        category["resume_display_label"] = after
+        if before != after:
+            changes.append({"before": before, "after": after})
+    return changes
 
 
 def materialize_unmatched_competencies_allocation_terms(
@@ -637,6 +963,8 @@ def materialize_unmatched_competencies_allocation_terms(
         if str(row.get("claim_unit_id") or "") in requested
     }
     additions: list[dict[str, Any]] = []
+    replacements: list[dict[str, Any]] = []
+    category_authority_rebindings: list[dict[str, str]] = []
     unresolved: list[str] = []
     surfaces = [
         (name, parsed.get(name))
@@ -681,6 +1009,14 @@ def materialize_unmatched_competencies_allocation_terms(
             )
             if category is None:
                 continue
+            authority_rebinding = _apply_allocation_category_authority(
+                category,
+                assignment=assignment,
+            )
+            if authority_rebinding is not None:
+                category_authority_rebindings.append(
+                    {"surface": surface_name, **authority_rebinding}
+                )
             terms = list(category.get("terms") or [])
             same_phrase_terms = [
                 term
@@ -702,6 +1038,32 @@ def materialize_unmatched_competencies_allocation_terms(
                 ):
                     unit_added = True
                 continue
+            display_ceiling = _partner_gtm_allocation_display_ceiling(
+                category,
+                assignment,
+            )
+            replacement = _make_category_capacity(
+                category,
+                ceiling=display_ceiling,
+            )
+            if (
+                sum(1 for term in category.get("terms") or [] if _term_text(term))
+                >= display_ceiling
+            ):
+                continue
+            if replacement is not None:
+                replacements.append(
+                    {
+                        "surface": surface_name,
+                        "category_label": str(
+                            category.get("resume_display_label")
+                            or category.get("category_label")
+                            or ""
+                        ),
+                        **replacement,
+                    }
+                )
+            terms = list(category.get("terms") or [])
             terms.append(
                 {
                     "term": phrase,
@@ -745,6 +1107,18 @@ def materialize_unmatched_competencies_allocation_terms(
         if not unit_added:
             unresolved.append(claim_unit_id)
 
+    display_label_adjustments: list[dict[str, str]] = []
+    for surface_name, raw_categories in surfaces:
+        _recompute_category_authority_from_visible_terms(
+            row for row in raw_categories if isinstance(row, dict)
+        )
+        display_label_adjustments.extend(
+            {"surface": surface_name, **change}
+            for change in _align_partner_commercial_display_label(
+                row for row in raw_categories if isinstance(row, dict)
+            )
+        )
+
     receipt: dict[str, Any] = {
         "schema_version": "competencies_allocation_visible_surface_v1",
         "section_id": "competencies",
@@ -755,6 +1129,9 @@ def materialize_unmatched_competencies_allocation_terms(
         ),
         "unresolved_claim_unit_ids": sorted(set(unresolved)),
         "additions": additions,
+        "optional_term_replacements": replacements,
+        "category_authority_rebindings": category_authority_rebindings,
+        "display_label_adjustments": display_label_adjustments,
         "pass": not unresolved,
     }
     receipt["receipt_digest"] = stable_digest(receipt)
@@ -1094,12 +1471,28 @@ def reconcile_competencies_allocation_claim_units(
                 text = _term_text(term)
                 if not text:
                     continue
+                assignment_unit_id = str(assignment.get("claim_unit_id") or "")
+                explicit_unit_id = (
+                    str(term.get("allocation_claim_unit_id") or "").strip()
+                    if isinstance(term, Mapping)
+                    else ""
+                )
+                # A term carrying an explicit frozen identity may never be
+                # reassigned to a sibling unit by the semantic greedy pass.
+                # This was the source of exact-once regressions after recovery:
+                # a newly materialized term was correct, then a higher sibling
+                # similarity score silently stole it on the second reconcile.
+                if explicit_unit_id and explicit_unit_id != assignment_unit_id:
+                    continue
                 score, reasons = _match_score(
                     assignment,
                     category=category,
                     term=term,
                     root_authority=root_authority,
                 )
+                if explicit_unit_id == assignment_unit_id and score > 0:
+                    score += 1_000_000
+                    reasons = ["EXPLICIT_ALLOCATION_CLAIM_UNIT_ID", *reasons]
                 if score <= 0:
                     continue
                 candidates.append(

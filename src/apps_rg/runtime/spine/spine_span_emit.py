@@ -91,7 +91,9 @@ def emit_spine_span_event(
 
 
 def _otel_sdk_enabled() -> bool:
-    return os.environ.get("APPS_RG_SPINE_OTEL_SDK", "").strip().lower() in ("1", "true", "yes")
+    from apps_model_telemetry.otel_runtime import current_otel_runtime_status
+
+    return current_otel_runtime_status().active
 
 
 def _try_otel_span(
@@ -105,9 +107,11 @@ def _try_otel_span(
     if not _otel_sdk_enabled():
         return False
     try:
-        from opentelemetry import trace  # type: ignore[import-untyped]
+        from apps_model_telemetry.otel_runtime import get_verified_tracer
 
-        tracer = trace.get_tracer("apps_rg.spine")
+        tracer = get_verified_tracer("apps_rg.spine")
+        if tracer is None:
+            return False
         with tracer.start_as_current_span(f"apps_rg.spine.{layer_key}") as span:
             span.set_attribute("apps_rg.layer_key", layer_key)
             span.set_attribute("apps_rg.binding_seam", binding_seam)

@@ -28,9 +28,11 @@ _PASS_X2_RECEIPT = {
     "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
     "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
     "judge_name": "gemini_pro",
-    "judge_provider": "gemini_pro",
+    "judge_provider": "google_gemini",
+    "judge_model_requested": pins.GEMINI_PROOF_JUDGE_MODEL,
     "judge_model": pins.GEMINI_PROOF_JUDGE_MODEL,
     "thinking_level": pins.RESEARCH_JUDGE_REASONING_EFFORT,
+    "model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
     "threshold": 0.75,
     "model_backed": True,
     "status": "PASS",
@@ -192,7 +194,7 @@ def test_openai_synthesis_uses_pinned_model_and_output_tokens(monkeypatch: pytes
             )
 
     monkeypatch.setattr(
-        "apps_research.engines.company_brief_engine.create_openai_sync_client",
+        "apps_research.integrations.provider_gateway.create_openai_sync_client",
         lambda: _FakeClient(),
     )
 

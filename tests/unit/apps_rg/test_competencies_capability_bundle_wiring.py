@@ -16,6 +16,7 @@ from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 from apps_rg.runtime.sections import competency_capability_registry as reg
 from apps_rg.runtime.sections.competency_capability_evidence import (
     COMPETENCY_CAPABILITY_EVIDENCE_PACK_MARKER,
+    PARTNERSHIP_FIRST_COMPETENCIES_BUNDLE_ORDER,
     _plan_fact_ids_for_bundle,
     attach_competency_bundles_to_proof_pool_metadata,
     append_competencies_path_diversity_to_messages,
@@ -300,6 +301,9 @@ def test_c0_evidence_pack_has_marker_and_authority_lines():
     assert "archive_usage = provenance_inventory_only" in pack
     assert "jd_usage = targeting_only" in pack
     assert "competency_bundle_id" in pack
+    assert "all eight differentiated families" in pack
+    assert "every family must remain visibly represented" in pack
+    assert "Required capability families to cover (>=8)" not in pack
     assert payload.get("competency_bundle_ids")
 
 
@@ -342,6 +346,23 @@ def test_stamp_competency_bundle_bindings_attaches_ids():
     assert cats[0]["competency_bundle_id"]
     assert cats[0]["graph_skill_node_ids"]
     assert cats[1]["competency_bundle_id"]
+
+
+def test_stamp_preserves_selector_authorized_bundle_on_shared_taxonomy_category():
+    cats = [
+        {
+            "category_id": "engineering_delivery_leadership",
+            "category_label": "Engineering & Delivery Leadership",
+            "competency_bundle_id": "ccb_engineering_leadership",
+            "graph_skill_node_ids": ["skill_selector_authorized"],
+            "terms": [],
+        }
+    ]
+
+    stamp_competency_bundle_bindings(cats)
+
+    assert cats[0]["competency_bundle_id"] == "ccb_engineering_leadership"
+    assert "skill_selector_authorized" in cats[0]["graph_skill_node_ids"]
 
 
 # ---------------------------------------------------------------------------
@@ -421,6 +442,32 @@ def test_jd_only_skill_fails():
 def test_required_families_not_covered_fails():
     comps = _good_competencies()[:2]  # only 2 families' worth of tokens
     assert not q.check_required_capability_families_covered(comps, min_families=7).passed
+
+
+def test_required_family_coverage_honors_governed_bundle_identity():
+    bundle_ids = [
+        "ccb_agentic_platforms",
+        "ccb_runtime_governance",
+        "ccb_retrieval_context_engineering",
+        "ccb_llmops_reliability",
+        "ccb_distributed_systems_engineering",
+        "ccb_platform_productization",
+        "ccb_partner_applied_ai_architecture",
+        "ccb_engineering_leadership",
+    ]
+    comps = [
+        {
+            "category_label": f"Generic taxonomy wrapper {index}",
+            "competency_bundle_id": bundle_id,
+            "terms": [{"text": "governed capability surface"}],
+        }
+        for index, bundle_id in enumerate(bundle_ids)
+    ]
+
+    result = q.check_required_capability_families_covered(comps, min_families=8)
+
+    assert result.passed is True
+    assert result.observed_value == list(q.REQUIRED_CAPABILITY_FAMILIES)
 
 
 def test_rigor_and_density_floors_fail_on_thin_output():
@@ -614,6 +661,59 @@ def test_visible_graph_surface_uses_partnership_first_bundle_labels_and_terms():
     assert richness_ok, richness_reason
 
 
+def test_visible_graph_surface_preserves_selector_authorized_six_category_shape():
+    """Graph enrichment may reorder selected bundles but may not add omitted ones."""
+    packet = build_competency_capability_section_packet("competencies")
+    by_id = {row["competency_bundle_id"]: row for row in packet["competency_bundles"]}
+    selected_bundle_ids = [
+        "ccb_partner_applied_ai_architecture",
+        "ccb_partnerships_ecosystem_execution",
+        "ccb_platform_productization",
+        "ccb_agentic_platforms",
+        "ccb_runtime_governance",
+        "ccb_distributed_systems_engineering",
+    ]
+    parsed = {"competencies": []}
+    for index, bundle_id in enumerate(reversed(selected_bundle_ids)):
+        rec = by_id[bundle_id]
+        parsed["competencies"].append(
+            {
+                "category_id": str(
+                    (rec.get("target_taxonomy_category_ids") or [f"cat_{index}"])[0]
+                ),
+                "category_label": f"Selected category {index}",
+                "competency_bundle_id": bundle_id,
+                "graph_skill_node_ids": list(rec.get("graph_skill_node_ids") or []),
+                "source_fact_ids": ["fact_engineering_platform_001"],
+                "terms": [
+                    {
+                        "term": "Enterprise technology roadmap ownership",
+                        "text": "Enterprise technology roadmap ownership",
+                        "source_fact_ids": ["fact_engineering_platform_001"],
+                    }
+                ],
+            }
+        )
+
+    receipt = enrich_competencies_visible_graph_surface(
+        parsed,
+        packet=packet,
+        allowed_fact_ids={"fact_engineering_platform_001"},
+    )
+
+    assert len(parsed["competencies"]) == 6
+    assert [row["competency_bundle_id"] for row in parsed["competencies"]] == [
+        bundle_id
+        for bundle_id in PARTNERSHIP_FIRST_COMPETENCIES_BUNDLE_ORDER
+        if bundle_id in selected_bundle_ids
+    ]
+    assert receipt["enriched_category_count"] == 6
+    assert receipt["category_count_policy"] == (
+        "preserve_selector_authorized_adaptive_6_8"
+    )
+    assert receipt["category_count_preserved"] is True
+
+
 def test_visible_graph_surface_uses_overlapping_selected_root_when_direct_bundle_fact_is_absent():
     """A required visible bundle retains provenance from an already-selected root.
 
@@ -646,7 +746,7 @@ def test_visible_graph_surface_uses_overlapping_selected_root_when_direct_bundle
             "category_label": "Engineering & Delivery Leadership",
             "resume_display_label": "Engineering Leadership & Operating Model",
             "terms": [
-                {"text": "executive-aligned engineering operating cadences for adoption"}
+                {"text": "executive-aligned technical discovery operating cadences"}
             ],
         },
         selected_graph_evidence_plan=selected_plan,
@@ -856,6 +956,22 @@ def test_partner_architecture_terms_fail_when_bound_to_insurtech_root():
     ]
     assert not q.check_partner_architecture_terms_require_bundle(comps, meta).passed
     assert not q.check_partner_terms_source_roots(comps, meta).passed
+
+
+def test_partner_architecture_gate_does_not_join_unrelated_terms():
+    comps = [
+        {
+            "category_label": "Engineering & Delivery Leadership",
+            "competency_bundle_id": "ccb_engineering_leadership",
+            "capability_family": "engineering_leadership",
+            "terms": [
+                {"text": "Buyer-specific solution mapping for enterprise pursuits"},
+                {"text": "Partner customer deal support operating cadence"},
+            ],
+        }
+    ]
+
+    assert q.check_partner_architecture_terms_require_bundle(comps, {}).passed is True
 
 
 def test_per_category_confidence_nonconstant_requires_real_category_scores():

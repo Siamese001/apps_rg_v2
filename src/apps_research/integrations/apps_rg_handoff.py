@@ -12,10 +12,8 @@ import hashlib
 import json
 import os
 import re
-import socket
 import shutil
-import urllib.error
-import urllib.request
+import tempfile
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -48,9 +46,11 @@ from apps_research.config.model_pins import (
 from apps_research.types.apps_rg_targeting_brief_contract import (
     validate_targeting_brief_text,
 )
-from apps_model_telemetry.external_model_usage import (
-    append_external_model_usage,
-    usage_telemetry,
+from apps_research.integrations.provider_gateway import (
+    GATEWAY_ID,
+    PROVIDER_RECEIPT_SCHEMA,
+    AppsResearchProviderGatewayError,
+    invoke_gemini_handoff_judge,
 )
 from apps_model_telemetry.token_budget_governor import TokenBudgetPolicy, estimate_input_tokens
 
@@ -58,7 +58,7 @@ _GENERATION_PIN = company_brief_generation_pin()
 _JUDGE_PIN = apps_rg_handoff_judge_pin()
 APPS_RG_HANDOFF_GENERATION_PROVIDER = _GENERATION_PIN.provider
 APPS_RG_HANDOFF_JUDGE_NAME = _JUDGE_PIN.provider_key
-APPS_RG_HANDOFF_JUDGE_PROVIDER = _JUDGE_PIN.provider_key
+APPS_RG_HANDOFF_JUDGE_PROVIDER = _JUDGE_PIN.provider
 APPS_RG_HANDOFF_JUDGE_MODEL = _JUDGE_PIN.model
 APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL = _JUDGE_PIN.reasoning_effort
 APPS_RG_HANDOFF_X2_THRESHOLD = 0.75
@@ -121,16 +121,6 @@ _HANDOFF_REQUIRED_GATE_IDS = (
     "G24_REPLAY_ELIGIBLE",
     "G26_EXIT_ELIGIBILITY",
 )
-
-
-def _x2_usage_request_digest(request: Any) -> str:
-    """Hash the request body only; never include the API-key-bearing URL."""
-    body = getattr(request, "body", b"")
-    if isinstance(body, bytes):
-        rendered = body
-    else:
-        rendered = str(body or "").encode("utf-8")
-    return hashlib.sha256(rendered).hexdigest()
 
 
 def _x2_prompt_budget_receipt(
@@ -432,101 +422,51 @@ class _AppsRgTargetingBriefGoogleJudge(GoogleJudge):
         self._usage_artifact_dir = usage_artifact_dir
         self.model_usage_attempts: list[dict[str, Any]] = []
 
-    def _record_model_usage(
-        self,
-        *,
-        request: Any,
-        raw_response: Mapping[str, Any] | None,
-        outcome: str,
-        provider_status: str,
-    ) -> None:
-        response = raw_response if isinstance(raw_response, Mapping) else {}
-        usage = response.get("usageMetadata") if isinstance(response.get("usageMetadata"), Mapping) else None
-        telemetry = usage_telemetry(
-            provider=APPS_RG_HANDOFF_JUDGE_PROVIDER,
-            model=str(response.get("modelVersion") or self._model),
-            usage=usage,
-            response_id=str(response.get("responseId") or ""),
-        )
-        self.model_usage_attempts.append({
-            **telemetry,
-            "outcome": outcome,
-            "provider_status": provider_status,
-        })
-        try:
-            append_external_model_usage(
-                artifact_dir=self._usage_artifact_dir,
-                provider=telemetry["provider"],
-                model=telemetry["model"],
-                request_digest=_x2_usage_request_digest(request),
-                outcome=outcome,
-                provider_status=provider_status,
-                usage=usage,
-                response_id=telemetry["response_id"],
-                stage="L2.X2_research_semantic_gate",
-                logical_attempt=len(self.model_usage_attempts),
-                transport_attempt=1,
-            )
-        except OSError:
-            # Diagnostic storage must not change the X2 evidence decision.
-            pass
-
     def _call_http(self, request: Any) -> str:  # type: ignore[override]
-        """Preserve Gemini ``usageMetadata`` before extracting the judge text."""
-        native_request = urllib.request.Request(
-            url=request.url,
-            data=request.body,
-            method=request.method,
-            headers=request.headers,
-        )
-        try:
-            with urllib.request.urlopen(native_request, timeout=self._timeout) as response:
-                body = response.read()
-        except socket.timeout as exc:
-            self._record_model_usage(
-                request=request,
-                raw_response=None,
-                outcome="TIMEOUT",
-                provider_status="JUDGE_PROVIDER_ERROR",
-            )
-            raise TimeoutError(f"judge HTTP timeout after {self._timeout}s: {exc}") from exc
-        except urllib.error.HTTPError as exc:
-            self._record_model_usage(
-                request=request,
-                raw_response=None,
-                outcome=f"HTTP_{exc.code}",
-                provider_status="JUDGE_PROVIDER_ERROR",
-            )
-            detail = exc.read().decode("utf-8", errors="ignore")[:500]
-            raise GraderError(f"judge HTTP {exc.code} {exc.reason}: {detail}") from exc
-        except urllib.error.URLError as exc:
-            self._record_model_usage(
-                request=request,
-                raw_response=None,
-                outcome="URL_ERROR",
-                provider_status="JUDGE_PROVIDER_ERROR",
-            )
-            if isinstance(exc.reason, socket.timeout):
-                raise TimeoutError(f"judge HTTP timeout: {exc.reason}") from exc
-            raise GraderError(f"judge HTTP URLError: {exc.reason}") from exc
+        """Invoke Gemini through the declared Apps Research provider gateway."""
 
         try:
-            parsed = json.loads(body.decode("utf-8"))
-        except (ValueError, UnicodeDecodeError) as exc:
-            self._record_model_usage(
-                request=request,
-                raw_response=None,
-                outcome="RESPONSE_UNPARSEABLE",
-                provider_status="JUDGE_PROVIDER_ERROR",
+            result = invoke_gemini_handoff_judge(
+                url=request.url,
+                body=request.body,
+                method=request.method,
+                headers=request.headers,
+                timeout=self._timeout,
+                application_validator=self._extract_text,
+                artifact_dir=str(self._usage_artifact_dir or "") or None,
             )
-            raise GraderError(f"judge response was not JSON: {exc}") from exc
-        self._record_model_usage(
-            request=request,
-            raw_response=parsed if isinstance(parsed, Mapping) else None,
-            outcome="SUCCESS",
-            provider_status="RESPONSE_RECEIVED",
+        except AppsResearchProviderGatewayError as exc:
+            self.provider_evidence = dict(exc.receipt)
+            usage = dict(exc.receipt.get("usage") or {})
+            self.model_usage_attempts.append(
+                {
+                    "provider": str(exc.receipt.get("provider") or APPS_RG_HANDOFF_JUDGE_PROVIDER),
+                    "model": str(exc.receipt.get("observed_model") or self._model),
+                    "response_id": str(exc.receipt.get("provider_response_id") or ""),
+                    **usage,
+                    "outcome": "FAIL",
+                    "provider_status": str(
+                        exc.receipt.get("validation_reason") or "JUDGE_PROVIDER_ERROR"
+                    ),
+                }
+            )
+            if "timeout" in str(exc).lower():
+                raise TimeoutError(str(exc)) from exc
+            raise GraderError(str(exc)) from exc
+        self.provider_evidence = dict(result.receipt)
+        usage = dict(result.receipt.get("usage") or {})
+        self.model_usage_attempts.append(
+            {
+                "provider": str(result.receipt["provider"]),
+                "model": str(result.receipt["observed_model"]),
+                "response_id": str(result.receipt.get("provider_response_id") or ""),
+                **usage,
+                "outcome": "SUCCESS",
+                "provider_status": "VALIDATED_SUCCESS",
+            }
         )
-        return self._extract_text(parsed)
+        return str(result.output)
+
     def _build_request(self, system: str, user: str):  # type: ignore[override]
         request = super()._build_request(system, user)
         payload = json.loads(request.body.decode("utf-8"))
@@ -672,6 +612,9 @@ def run_apps_rg_handoff_x2_judge(
                 "model_usage_attempts": list(
                     getattr(resolved_judge, "model_usage_attempts", ())
                 ),
+                "provider_evidence": dict(
+                    getattr(resolved_judge, "provider_evidence", {}) or {}
+                ),
             }
 
     score = float(getattr(response, "score", 0.0) or 0.0)
@@ -689,6 +632,33 @@ def run_apps_rg_handoff_x2_judge(
             "retry_count": max(0, attempt - 1),
             "retryable_provider_error": False,
             "reason": "MODEL_NOT_OBSERVED",
+            "provider_evidence": dict(
+                getattr(resolved_judge, "provider_evidence", {}) or {}
+            ),
+        }
+    if observed_model != APPS_RG_HANDOFF_JUDGE_MODEL:
+        return {
+            **base,
+            "judge_model": observed_model,
+            "model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
+            "status": "FAIL",
+            "score": 0.0,
+            "verdict": "FAIL",
+            "provider_status": "JUDGE_MODEL_PIN_MISMATCH",
+            "model_backed": False,
+            "attempt_count": attempt,
+            "retry_count": max(0, attempt - 1),
+            "retryable_provider_error": False,
+            "reason": (
+                f"requested={APPS_RG_HANDOFF_JUDGE_MODEL}; "
+                f"observed={observed_model}"
+            ),
+            "model_usage_attempts": list(
+                getattr(resolved_judge, "model_usage_attempts", ())
+            ),
+            "provider_evidence": dict(
+                getattr(resolved_judge, "provider_evidence", {}) or {}
+            ),
         }
     status = "UNKNOWN" if abstain else "PASS" if score >= APPS_RG_HANDOFF_X2_THRESHOLD else "FAIL"
     return {
@@ -706,6 +676,9 @@ def run_apps_rg_handoff_x2_judge(
         "model_usage_attempts": list(
             getattr(resolved_judge, "model_usage_attempts", ())
         ),
+        "provider_evidence": dict(
+            getattr(resolved_judge, "provider_evidence", {}) or {}
+        ),
     }
 
 
@@ -716,9 +689,13 @@ def x2_judge_receipt_passes(receipt: Mapping[str, Any] | None) -> bool:
         return False
     if receipt.get("model_backed") is not True:
         return False
-    if not str(receipt.get("judge_model") or "").strip():
+    if receipt.get("judge_model_requested") != _JUDGE_PIN.model:
         return False
-    if not str(receipt.get("judge_provider") or receipt.get("judge_name") or "").strip():
+    if receipt.get("judge_model") != _JUDGE_PIN.model:
+        return False
+    if receipt.get("judge_provider") != _JUDGE_PIN.provider:
+        return False
+    if receipt.get("model_observation_status") != "OBSERVED_PROVIDER_RESPONSE":
         return False
     if receipt.get("thinking_level") != APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL:
         return False
@@ -728,6 +705,90 @@ def x2_judge_receipt_passes(receipt: Mapping[str, Any] | None) -> bool:
     except (TypeError, ValueError):
         return False
     return score >= threshold
+
+
+def _provider_validation_receipt_passes(
+    receipt: Mapping[str, Any] | None,
+    *,
+    role: str,
+    provider: str,
+    model: str,
+    reasoning_effort: str,
+) -> bool:
+    def raw_sha256(value: Any) -> bool:
+        rendered = str(value or "")
+        return len(rendered) == 64 and all(
+            character in "0123456789abcdef" for character in rendered
+        )
+
+    if not isinstance(receipt, Mapping):
+        return False
+    if receipt.get("schema_version") != PROVIDER_RECEIPT_SCHEMA:
+        return False
+    if receipt.get("gateway_id") != GATEWAY_ID:
+        return False
+    expected = {
+        "role": role,
+        "provider": provider,
+        "requested_model": model,
+        "observed_model": model,
+        "reasoning_effort": reasoning_effort,
+        "transport_response_received": True,
+        "response_schema_valid": True,
+        "model_pin_valid": True,
+        "application_output_valid": True,
+        "overall_success": True,
+        "terminal_status": "SUCCESS",
+    }
+    if any(receipt.get(key) != value for key, value in expected.items()):
+        return False
+    lifecycle = receipt.get("lifecycle")
+    if not isinstance(lifecycle, Mapping):
+        return False
+    if lifecycle.get("local_dispatch_started") is not True:
+        return False
+    if lifecycle.get("remote_outcome") != "PROVIDER_RESPONDED":
+        return False
+    for field in ("attempt_id", "logical_attempt_id", "transport_attempt_id"):
+        if not str(receipt.get(field) or "").strip():
+            return False
+    for field in ("request_digest", "ledger_event_digest"):
+        if not raw_sha256(receipt.get(field)):
+            return False
+    ledger_event = receipt.get("ledger_event")
+    if not isinstance(ledger_event, Mapping):
+        return False
+    event_body = {
+        key: value for key, value in ledger_event.items() if key != "event_digest"
+    }
+    event_digest = str(ledger_event.get("event_digest") or "")
+    if (
+        not raw_sha256(event_digest)
+        or event_digest != str(receipt.get("ledger_event_digest") or "")
+        or _sha256_json(event_body) != event_digest
+    ):
+        return False
+    event_expected = {
+        "gateway_id": GATEWAY_ID,
+        "provider_role": role,
+        "provider": provider,
+        "requested_model": model,
+        "observed_model": model,
+        "request_digest": receipt.get("request_digest"),
+        "outcome": "SUCCESS",
+        "transport_response_received": True,
+        "response_schema_valid": True,
+        "model_pin_valid": True,
+        "application_output_valid": True,
+        "overall_success": True,
+        "attempt_id": receipt.get("attempt_id"),
+        "logical_attempt_id": receipt.get("logical_attempt_id"),
+        "transport_attempt_id": receipt.get("transport_attempt_id"),
+        "trace_id": receipt.get("trace_id"),
+    }
+    if any(ledger_event.get(key) != value for key, value in event_expected.items()):
+        return False
+    return True
 
 
 def validate_apps_rg_handoff_sidecar(
@@ -742,10 +803,12 @@ def validate_apps_rg_handoff_sidecar(
         return False, "apps_rg_handoff_sidecar_digest_mismatch"
     if sidecar.get("generation_provider") != APPS_RG_HANDOFF_GENERATION_PROVIDER:
         return False, "generation_provider_not_external_openai"
+    if sidecar.get("generation_model_requested") != _GENERATION_PIN.model:
+        return False, "generation_requested_model_pin_mismatch"
     if sidecar.get("generation_reasoning_effort") != _GENERATION_PIN.reasoning_effort:
         return False, "generation_reasoning_effort_mismatch"
-    if not str(sidecar.get("generation_model") or "").strip():
-        return False, "missing_generation_model"
+    if sidecar.get("generation_model") != _GENERATION_PIN.model:
+        return False, "generation_observed_model_pin_mismatch"
     if sidecar.get("generation_model_observation_status") != "OBSERVED_PROVIDER_RESPONSE":
         return False, "generation_model_not_observed"
     if not bool(sidecar.get("handoff_eligible")):
@@ -757,6 +820,22 @@ def validate_apps_rg_handoff_sidecar(
         "OBSERVED_PROVIDER_RESPONSE"
     ):
         return False, "x2_judge_model_not_observed"
+    if not _provider_validation_receipt_passes(
+        sidecar.get("generation_provider_evidence"),
+        role=_GENERATION_PIN.role,
+        provider=_GENERATION_PIN.provider,
+        model=_GENERATION_PIN.model,
+        reasoning_effort=_GENERATION_PIN.reasoning_effort,
+    ):
+        return False, "generation_provider_evidence_invalid"
+    if not _provider_validation_receipt_passes(
+        x2.get("provider_evidence"),
+        role=_JUDGE_PIN.role,
+        provider=_JUDGE_PIN.provider,
+        model=_JUDGE_PIN.model,
+        reasoning_effort=_JUDGE_PIN.reasoning_effort,
+    ):
+        return False, "judge_provider_evidence_invalid"
     return True, "ok"
 
 
@@ -1340,38 +1419,6 @@ def persist_apps_rg_targeting_brief_artifacts(
         "briefing.md": briefing_bytes,
         "run_metadata.json": _canonical_json_bytes(metadata),
     }
-    media_types = {
-        "briefing.md": "text/markdown; charset=utf-8",
-        "job_description.raw.txt": "text/plain; charset=utf-8",
-        "job_description.normalized.txt": "text/plain; charset=utf-8",
-    }
-    artifact_rows = [
-        {
-            "artifact_id": name.replace(".", "_").replace("-", "_"),
-            "artifact_ref": str(run_dir / name),
-            "sha256": _sha256_bytes(content),
-            "byte_length": len(content),
-            "media_type": media_types.get(name, "application/json"),
-            "required": True,
-        }
-        for name, content in sorted(artifact_payloads.items())
-    ]
-    artifact_manifest_sha = _sha256_bytes(
-        _canonical_json_bytes(artifact_rows, pretty=False)
-    )
-    directory_fsync_status = _directory_fsync_status()
-    handoff_id = f"apps-research-rg:{run_id}"
-    marker = {
-        "schema_version": "apps_research.apps_rg_bundle_commit_manifest.v1",
-        "authority_contract_id": "apps_research_rg_e2e_authority",
-        "handoff_id": handoff_id,
-        "artifact_manifest_sha256": artifact_manifest_sha,
-        "artifact_count": len(artifact_rows),
-        "status": "COMMITTED",
-        "created_at_utc": emitted_at,
-    }
-    marker_bytes = _canonical_json_bytes(marker)
-
     repo_root = Path(__file__).resolve().parents[3]
     policy_path = repo_root / "config/certification/apps_research_rg_e2e_authority_contract.v1.json"
     blueprint_path = repo_root / "src/apps_research/config/domain_contract/runtime_customization_package.company_brief.v1.json"
@@ -1423,6 +1470,33 @@ def persist_apps_rg_targeting_brief_artifacts(
     x2_sidecar = sidecar.get("x2_judge_receipt")
     if not isinstance(x2_sidecar, Mapping):
         raise RuntimeError("apps_research targeting sidecar missing X2 judge receipt")
+    generation_provider_evidence = dict(
+        sidecar.get("generation_provider_evidence")
+        if isinstance(sidecar.get("generation_provider_evidence"), Mapping)
+        else {}
+    )
+    judge_provider_evidence = dict(
+        x2_sidecar.get("provider_evidence")
+        if isinstance(x2_sidecar.get("provider_evidence"), Mapping)
+        else {}
+    )
+    for label, evidence in (
+        ("generation", generation_provider_evidence),
+        ("judge", judge_provider_evidence),
+    ):
+        if str(evidence.get("trace_id") or "") != trace_root:
+            raise RuntimeError(
+                f"apps_research {label} provider evidence trace does not match handoff"
+            )
+    provider_attempt_evidence = {
+        "schema_version": "apps_research.provider_attempt_evidence.v1",
+        "gateway_id": GATEWAY_ID,
+        "trace_root": trace_root,
+        "status": "PASS",
+        "required_roles": [_GENERATION_PIN.role, _JUDGE_PIN.role],
+        "attempts": [generation_provider_evidence, judge_provider_evidence],
+    }
+    provider_attempt_evidence_bytes = _canonical_json_bytes(provider_attempt_evidence)
     model_observations = {
         "generation": {
             "role": "company_brief_generation",
@@ -1431,7 +1505,7 @@ def persist_apps_rg_targeting_brief_artifacts(
             "reasoning_effort": str(sidecar.get("generation_reasoning_effort") or ""),
             "observed_model": str(sidecar.get("generation_model") or ""),
             "status": str(sidecar.get("generation_model_observation_status") or ""),
-            "receipt_source": "apps_rg_targeting_brief_sidecar",
+            "receipt_source": "provider_attempt_evidence.json",
         },
         "judge": {
             "role": "apps_rg_handoff_judge",
@@ -1440,9 +1514,68 @@ def persist_apps_rg_targeting_brief_artifacts(
             "reasoning_effort": str(x2_sidecar.get("thinking_level") or ""),
             "observed_model": str(x2_sidecar.get("judge_model") or ""),
             "status": str(x2_sidecar.get("model_observation_status") or ""),
-            "receipt_source": "apps_rg_handoff_x2_judge_receipt",
+            "receipt_source": "provider_attempt_evidence.json",
         },
     }
+    with tempfile.TemporaryDirectory(
+        prefix=".apps-research-otel-",
+        dir=root,
+    ) as otel_temp:
+        try:
+            from apps_model_telemetry.otel_runtime import capture_collector_snapshot
+
+            otel_snapshot = capture_collector_snapshot(
+                artifact_dir=Path(otel_temp),
+                trace_id=trace_root,
+                timeout_seconds=0.5,
+                filename="apps_research_handoff_otel_trace_snapshot.json",
+                boundary="apps_research_handoff_precommit",
+            )
+        except (OSError, ValueError) as exc:
+            otel_snapshot = {
+                "schema_version": "apps.otel_trace_snapshot.v3",
+                "trace_id": trace_root,
+                "boundary": "apps_research_handoff_precommit",
+                "status": "CAPTURE_FAILED",
+                "reason": type(exc).__name__,
+                "spans": [],
+            }
+    otel_snapshot_bytes = _canonical_json_bytes(otel_snapshot)
+    artifact_payloads["provider_attempt_evidence.json"] = provider_attempt_evidence_bytes
+    artifact_payloads["apps_research_handoff_otel_trace_snapshot.json"] = (
+        otel_snapshot_bytes
+    )
+    media_types = {
+        "briefing.md": "text/markdown; charset=utf-8",
+        "job_description.raw.txt": "text/plain; charset=utf-8",
+        "job_description.normalized.txt": "text/plain; charset=utf-8",
+    }
+    artifact_rows = [
+        {
+            "artifact_id": name.replace(".", "_").replace("-", "_"),
+            "artifact_ref": str(run_dir / name),
+            "sha256": _sha256_bytes(content),
+            "byte_length": len(content),
+            "media_type": media_types.get(name, "application/json"),
+            "required": True,
+        }
+        for name, content in sorted(artifact_payloads.items())
+    ]
+    artifact_manifest_sha = _sha256_bytes(
+        _canonical_json_bytes(artifact_rows, pretty=False)
+    )
+    directory_fsync_status = _directory_fsync_status()
+    handoff_id = f"apps-research-rg:{run_id}"
+    marker = {
+        "schema_version": "apps_research.apps_rg_bundle_commit_manifest.v1",
+        "authority_contract_id": "apps_research_rg_e2e_authority",
+        "handoff_id": handoff_id,
+        "artifact_manifest_sha256": artifact_manifest_sha,
+        "artifact_count": len(artifact_rows),
+        "status": "COMMITTED",
+        "created_at_utc": emitted_at,
+    }
+    marker_bytes = _canonical_json_bytes(marker)
     attestation_seed = {
         "identity": identity,
         "u0_receipt_sha256": u0_receipt_sha,
@@ -1450,6 +1583,10 @@ def persist_apps_rg_targeting_brief_artifacts(
             artifact_payloads["exit_disposition_receipt.json"]
         ),
         "model_observations": model_observations,
+        "provider_attempt_evidence_sha256": _sha256_bytes(
+            provider_attempt_evidence_bytes
+        ),
+        "otel_correlation_sha256": _sha256_bytes(otel_snapshot_bytes),
     }
     handoff_v2 = {
         "schema_version": "apps_research.apps_rg_handoff.v2",

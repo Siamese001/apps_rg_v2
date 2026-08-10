@@ -1,0 +1,809 @@
+{
+  "schema_version": "1",
+  "correlation_id": "27d8a800-35c5-40f0-be6b-050f1d155faa",
+  "integrated_run_id": "27d8a800-35c5-40f0-be6b-050f1d155faa",
+  "created_at": "2026-08-09T12:33:16.656739+00:00",
+  "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1",
+  "artifact_namespace": "artifacts/apps_rg/runs",
+  "log_namespace": "apps_rg/pipeline_logs",
+  "log_discovery": {
+    "mode": "telemetry_only",
+    "log_namespace": "apps_rg/pipeline_logs",
+    "log_root_path": null,
+    "notes": "No on-disk directory at log_namespace `apps_rg/pipeline_logs` at index time; pipeline_defaults.yaml declares telemetry_prefix `apps_rg.r4_integrated` (OpenTelemetry spans/metrics)."
+  },
+  "integrated_bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/RUN_BUNDLE_INDEX.json",
+  "lane_bundle_refs": [
+    {
+      "lane": "competencies",
+      "lane_id": "competencies",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "competencies_20260809_121942",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/competencies",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/competencies/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "ac487ce6e4e8f2074ea9877fc127b4deec7c5a35b32cd28d2f8f5fac6aa5f50a",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "executive_summary",
+      "lane_id": "executive_summary",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "exec_summary_20260809_122758",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/executive_summary",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/executive_summary/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "8dcd0789fe97e981749fcbe54cd4b9d1c9b3027358247064e2f07f128c7bdd29",
+      "evidence_package_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/executive_summary/evidence_package_index.json",
+      "evidence_package_index_sha256": "3131e8936b5e8ceece21b6bfb99ad0bad7707ef613d9039fe46e89104a377800",
+      "section_l7_binding_manifest_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/executive_summary/section_l7_binding_manifest.json",
+      "section_l7_binding_manifest_sha256": "f2d18239822990571f66da9e236a255341fb7de64d00e3088cb4a045ac628d0d",
+      "spine_subphase_coverage_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/executive_summary/spine_subphase_coverage_index.json",
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": true,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ey_bullets",
+      "lane_id": "ey_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ey_bullets_5120360c45c8",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ey_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ey_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "fc9a9965a5232a7cf522cded85552d3e592c0adee9d98283170747243175693c",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ey_narrative",
+      "lane_id": "ey_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ey_narrative_6622cf2bce93",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ey_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ey_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "f8898b440079f6274f36e93e4be84a38ccfc9a8f411d3c97b4d56ce93702bafa",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "headline",
+      "lane_id": "headline",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "headline_20260809_123109",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/headline",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/headline/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "45e9529e74c491cd95b76e9676cbd799e81d12df31adff0f415110245313d8c7",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ibm_bullets",
+      "lane_id": "ibm_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ibm_bullets_20260809_122331",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ibm_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ibm_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "6717981e4b3f4fc328ee672ea043598ee958b39105af00b20724d20694c7bd43",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ibm_narrative",
+      "lane_id": "ibm_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ibm_narrative_20260809_122636",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ibm_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/ibm_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "a543dd4567a0a73c102afa2ff1e530dc553d7ce338f557db738e3c0d477655c1",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "insurtech_bullets",
+      "lane_id": "insurtech_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "insurtech_bullets_d5b78c2d4f19",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/insurtech_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/insurtech_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "cc5ee7284700c010eb639ecd26f8c9cbd130c70794f9ca9a47f3a4ef7c943bb4",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "insurtech_narrative",
+      "lane_id": "insurtech_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "insurtech_narrative_9f74bc6ed5d8",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/insurtech_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/insurtech_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "99226fcfd562c77a4691b8244f550e54ace39dfd97d1e5be283c9e46cd5bd25c",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "unify_bullets",
+      "lane_id": "unify_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "unify_bullets_20260809_122225",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/unify_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/unify_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "aedb55132d59e69b5fe60a229cfc67b87cc39d5a536c4468386ab4bce6799b76",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "unify_narrative",
+      "lane_id": "unify_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "unify_narrative_20260809_122521",
+      "root_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/unify_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/modular_r4/sections/unify_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "793cb1a5a7d0ca2b7da40cfe53855844f76f3a8f2176f0ff505d77dfa7f1c80e",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T121839Z_a5e1aaa1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_how_trace.json",
+          "sha256": "fa3e0cc5ad7969b04186572d2fe18ac373eb4f27e8554760c8c8c22202c2059a",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "9c0b00c0eafe5419b5c423b4938257a6b06c968ce910dc4ec0edcd3641ffccbb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/agentic_core_spine_proof.json",
+          "sha256": "5e3d70c98eb400fa828289042b0078f73346a81956b396ca17440a2930e63a88",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/runtime_trace_snapshot.json",
+          "sha256": "8171aa484f65a6e788eba163e8e769ba3833c0ed0dd42a2b847b7078d6ea696d",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_controlled_negative_missing_otel_20260809/e2e_20260809T121839Z_a5e1aaa1/integrated_runtime_artifact_manifest.json",
+          "sha256": "3118c56bde9bba21f7923f51e69f8c9d60b33c029f3335a52ad09caf0609bdb7",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    }
+  ],
+  "aggregate_refs": [],
+  "modular_sections_root": {
+    "mode": "default",
+    "source_env_var": "APPS_RG_MODULAR_R4_SECTIONS_ROOT",
+    "manifest_ref": null,
+    "root_path": null,
+    "exists": false,
+    "notes": "APPS_RG_MODULAR_R4_SECTIONS_ROOT is not set; lane runtime proofs default under artifacts/apps_rg/runtime_proofs."
+  },
+  "lane_bundle_refs_source": "modular_r4_sections_tree_auto"
+}

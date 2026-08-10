@@ -8,6 +8,7 @@ import pytest
 from apps_model_telemetry.token_budget_governor import (
     RESERVATION_FILENAME,
     TokenBudgetPolicy,
+    _filesystem_path,
     reserve_token_budget,
 )
 
@@ -100,3 +101,30 @@ def test_malformed_prior_ledger_fails_closed(tmp_path: Path) -> None:
             policy=POLICY,
             stage="L2.test",
         )
+
+
+def test_reservation_ledger_supports_long_windows_run_path(tmp_path: Path) -> None:
+    base = tmp_path
+    while len(str((base / RESERVATION_FILENAME).resolve(strict=False))) <= 260:
+        base = base / f"deep_segment_{len(base.parts):02d}"
+    policy = TokenBudgetPolicy(
+        chars_per_token_estimate=4,
+        safety_multiplier=1.0,
+        max_input_tokens_per_attempt=100,
+        max_reserved_tokens_per_run=200,
+    )
+
+    reservation = reserve_token_budget(
+        artifact_dir=base,
+        provider="gemini",
+        model="gemini-test",
+        request_digest="long-path",
+        prompt_text="short prompt",
+        max_output_tokens=10,
+        policy=policy,
+        stage="X1D",
+        run_id="run-long",
+    )
+
+    assert reservation.allowed is True
+    assert _filesystem_path(base / RESERVATION_FILENAME).is_file()

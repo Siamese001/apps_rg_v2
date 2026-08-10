@@ -1457,6 +1457,7 @@ def rerun_x2_after_judge_remediation(
     compiled_prompt: str | None,
     raw_output: str,
     selected_facts: list[dict[str, Any]],
+    selected_fact_plan: dict[str, Any],
     x1d_judges: list[dict[str, Any]],
     proof_pool_metadata: dict[str, Any] | None,
     proof_pool_ref: str,
@@ -1488,7 +1489,25 @@ def rerun_x2_after_judge_remediation(
         proof_pool_ref=proof_pool_ref,
         proof_pool_digest=proof_pool_digest,
     )
-    return [g.to_dict() for g in gates]
+    gate_dicts = [g.to_dict() for g in gates]
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        GRAPH_CLAIM_BINDING_GATE_ID,
+        build_pre_x2_resume_graph_claim_binding_gate,
+    )
+
+    graph_gate = build_pre_x2_resume_graph_claim_binding_gate(
+        section_id="executive_summary",
+        claim_rows=claim_ledger,
+        selected_fact_plan=selected_fact_plan,
+    )
+    if graph_gate is not None:
+        gate_dicts = [
+            gate
+            for gate in gate_dicts
+            if str(gate.get("gate_id") or "") != GRAPH_CLAIM_BINDING_GATE_ID
+        ]
+        gate_dicts.append(graph_gate)
+    return gate_dicts
 
 
 def rerun_soft_failed_judges(

@@ -15,7 +15,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 from apps_rg.fact_inventory.graph_evolution_author_gate import (
     GE_W2_COMPLETION_MARKER,

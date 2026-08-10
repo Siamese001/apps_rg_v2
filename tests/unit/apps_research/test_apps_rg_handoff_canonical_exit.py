@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import copy
 from dataclasses import dataclass
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from jsonschema import Draft202012Validator
@@ -72,7 +74,72 @@ class _Record:
     trace_id: str = ""
 
 
-def _sidecar(brief: str, *, x2_status: str = "PASS") -> dict:
+def _provider_evidence(pin, *, trace_id: str, suffix: str) -> dict:
+    receipt = {
+        "schema_version": "apps_research.provider_attempt_validation.v1",
+        "gateway_id": "apps_research.provider_gateway_v1",
+        "role": pin.role,
+        "provider": pin.provider,
+        "requested_model": pin.model,
+        "observed_model": pin.model,
+        "reasoning_effort": pin.reasoning_effort,
+        "attempt_id": f"attempt-{suffix}",
+        "logical_attempt_id": f"run:logical:{suffix}",
+        "transport_attempt_id": f"run:logical:{suffix}:transport:1",
+        "run_id": "run",
+        "trace_id": trace_id,
+        "request_digest": suffix * 64,
+        "provider_response_id": f"response-{suffix}",
+        "lifecycle": {
+            "local_dispatch_started": True,
+            "request_bytes_sent": False,
+            "response_headers_received": pin.provider == "google_gemini",
+            "first_byte_received": pin.provider == "google_gemini",
+            "sdk_response_returned": pin.provider == "external_openai",
+            "remote_outcome": "PROVIDER_RESPONDED",
+        },
+        "transport_response_received": True,
+        "response_schema_valid": True,
+        "model_pin_valid": True,
+        "application_output_valid": True,
+        "overall_success": True,
+        "terminal_status": "SUCCESS",
+        "validation_reason": "ALL_VALIDATIONS_PASSED",
+        "usage": {},
+    }
+    event = {
+        "schema_version": "apps.external_model_usage_event.v1",
+        "gateway_id": "apps_research.provider_gateway_v1",
+        "provider_role": pin.role,
+        "provider": pin.provider,
+        "requested_model": pin.model,
+        "observed_model": pin.model,
+        "request_digest": receipt["request_digest"],
+        "outcome": "SUCCESS",
+        "transport_response_received": True,
+        "response_schema_valid": True,
+        "model_pin_valid": True,
+        "application_output_valid": True,
+        "overall_success": True,
+        "attempt_id": receipt["attempt_id"],
+        "logical_attempt_id": receipt["logical_attempt_id"],
+        "transport_attempt_id": receipt["transport_attempt_id"],
+        "trace_id": trace_id,
+    }
+    event["event_digest"] = hashlib.sha256(
+        json.dumps(event, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    receipt["ledger_event_digest"] = event["event_digest"]
+    receipt["ledger_event"] = event
+    return receipt
+
+
+def _sidecar(
+    brief: str,
+    *,
+    x2_status: str = "PASS",
+    trace_id: str = "trace-fixture",
+) -> dict:
     score = 0.91 if x2_status == "PASS" else 0.0
     generation_pin = company_brief_generation_pin()
     judge_pin = apps_rg_handoff_judge_pin()
@@ -83,6 +150,11 @@ def _sidecar(brief: str, *, x2_status: str = "PASS") -> dict:
         "generation_model": generation_pin.model,
         "generation_reasoning_effort": generation_pin.reasoning_effort,
         "generation_model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
+        "generation_provider_evidence": _provider_evidence(
+            generation_pin,
+            trace_id=trace_id,
+            suffix="a",
+        ),
         "provider_call_attempted": True,
         "handoff_eligible": True,
         "reason": "ok",
@@ -90,7 +162,7 @@ def _sidecar(brief: str, *, x2_status: str = "PASS") -> dict:
             "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
             "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
             "judge_name": judge_pin.provider_key,
-            "judge_provider": judge_pin.provider_key,
+            "judge_provider": judge_pin.provider,
             "judge_model_requested": judge_pin.model,
             "judge_model": judge_pin.model,
             "thinking_level": judge_pin.reasoning_effort,
@@ -101,6 +173,11 @@ def _sidecar(brief: str, *, x2_status: str = "PASS") -> dict:
             "score": score,
             "verdict": x2_status,
             "provider_status": f"MODEL_BACKED_{x2_status}",
+            "provider_evidence": _provider_evidence(
+                judge_pin,
+                trace_id=trace_id,
+                suffix="b",
+            ),
         },
         "role_archetype": "partnerships",
         "required_sections_present": ["jd complement"],
@@ -127,9 +204,46 @@ def _record(run_id: str, *, x2_status: str = "PASS") -> _Record:
                 "apps_rg_targeting_brief_sidecar": _sidecar(
                     _VALID_BRIEF,
                     x2_status=x2_status,
+                    trace_id=f"trace-{run_id}",
                 )
             }
         },
+    )
+
+
+def _record_for_identity(
+    *,
+    run_id: str,
+    trace_id: str,
+    request_id: str,
+    tenant_id: str = "default",
+) -> SimpleNamespace:
+    """Return observed-evidence fixture data rebound to one test ingress identity."""
+    base = _record(run_id)
+    context = copy.deepcopy(base.fec_run_context)
+    sidecar = context["company_brief"]["apps_rg_targeting_brief_sidecar"]
+    evidence_rows = (
+        sidecar["generation_provider_evidence"],
+        sidecar["x2_judge_receipt"]["provider_evidence"],
+    )
+    for receipt in evidence_rows:
+        receipt["trace_id"] = trace_id
+        event = receipt["ledger_event"]
+        event["trace_id"] = trace_id
+        event.pop("event_digest", None)
+        event["event_digest"] = hashlib.sha256(
+            json.dumps(event, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        receipt["ledger_event_digest"] = event["event_digest"]
+    return SimpleNamespace(
+        **{
+            **base.__dict__,
+            "request_id": request_id,
+            "parent_run_id": run_id,
+            "trace_id": trace_id,
+            "tenant_id": tenant_id,
+            "fec_run_context": context,
+        }
     )
 
 
@@ -146,6 +260,37 @@ def test_handoff_rejects_generation_reasoning_effort_drift() -> None:
 
     assert eligible is False
     assert reason == "generation_reasoning_effort_mismatch"
+
+
+def test_handoff_rejects_malformed_provider_event_digest() -> None:
+    sidecar = _sidecar(_VALID_BRIEF)
+    sidecar["generation_provider_evidence"]["ledger_event_digest"] = "not-a-digest"
+
+    eligible, reason = validate_apps_rg_handoff_sidecar(
+        sidecar,
+        expected_brief_sha=hashlib.sha256(
+            _VALID_BRIEF.strip().encode("utf-8")
+        ).hexdigest(),
+    )
+
+    assert eligible is False
+    assert reason == "generation_provider_evidence_invalid"
+
+
+def test_handoff_rejects_provider_event_that_does_not_match_observed_model() -> None:
+    brief = _VALID_BRIEF
+    sidecar = _sidecar(brief, trace_id="trace-forged-event")
+    sidecar["generation_provider_evidence"]["ledger_event"][
+        "observed_model"
+    ] = "forged-model"
+
+    valid, reason = validate_apps_rg_handoff_sidecar(
+        sidecar,
+        expected_brief_sha=hashlib.sha256(brief.strip().encode("utf-8")).hexdigest(),
+    )
+
+    assert valid is False
+    assert reason == "generation_provider_evidence_invalid"
 
 
 def test_publisher_writes_brief_only_after_canonical_x3d(tmp_path: Path) -> None:
@@ -192,6 +337,22 @@ def test_publisher_writes_brief_only_after_canonical_x3d(tmp_path: Path) -> None
         apps_rg_handoff_judge_pin().model
     )
     assert handoff["model_observations"]["judge"]["reasoning_effort"] == "high"
+    provider_evidence_path = bundle.run_dir / "provider_attempt_evidence.json"
+    otel_snapshot_path = (
+        bundle.run_dir / "apps_research_handoff_otel_trace_snapshot.json"
+    )
+    assert provider_evidence_path.is_file()
+    assert otel_snapshot_path.is_file()
+    provider_evidence = json.loads(provider_evidence_path.read_text(encoding="utf-8"))
+    assert provider_evidence["status"] == "PASS"
+    assert {row["role"] for row in provider_evidence["attempts"]} == {
+        company_brief_generation_pin().role,
+        apps_rg_handoff_judge_pin().role,
+    }
+    assert all(row["overall_success"] is True for row in provider_evidence["attempts"])
+    assert json.loads(otel_snapshot_path.read_text(encoding="utf-8"))["trace_id"] == (
+        handoff["identity"]["trace_root"]
+    )
     assert set(handoff["mandatory_gate_receipts"]) == {
         "G5",
         "G6",
@@ -240,6 +401,44 @@ def test_consumer_treats_long_inline_json_jd_as_text(tmp_path: Path) -> None:
     )
 
     assert validation.valid, validation.reason
+
+
+def test_consumer_rejects_handoff_otel_capture_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from apps_model_telemetry import otel_runtime
+
+    monkeypatch.setattr(
+        otel_runtime,
+        "capture_collector_snapshot",
+        lambda **kwargs: {
+            "schema_version": "apps.otel_trace_snapshot.v3",
+            "trace_id": kwargs["trace_id"],
+            "boundary": kwargs["boundary"],
+            "status": "SOURCE_UNREADABLE",
+            "spans": [],
+        },
+    )
+    jd = "Lead partner solution architecture for Claude."
+    bundle = persist_apps_rg_targeting_brief_artifacts(
+        record=_record("otel-capture-failure"),
+        target_company="Anthropic",
+        target_role="Manager Applied AI Architecture Partnerships",
+        jd_text=jd,
+        runs_root=tmp_path / "runs",
+    )
+
+    validation = validate_apps_research_handoff(
+        brief_ref=str(bundle.briefing_path),
+        jd_ref=jd,
+        require_observed=True,
+        require_x1_x3_authorization=True,
+        require_canonical_exit=True,
+    )
+
+    assert validation.valid is False
+    assert "apps_research_handoff_otel_status_invalid" in validation.reason
 
 
 def test_unknown_x2_never_publishes_briefing(tmp_path: Path) -> None:

@@ -1,0 +1,65 @@
+{
+  "artifact_hash": "sha256:1de85395ce82a981d2cefc99732f238c662e3aaeb502bde13d30b02885aa3a68",
+  "emitted_at": "2026-08-08T20:57:59Z",
+  "payload": {
+    "chain_kind": "R4_SINGLE_ACTION",
+    "emitted_at_utc": "2026-08-08T20:57:59Z",
+    "execution_form": "R4_SINGLE_ACTION",
+    "l2_execution_status": "EXECUTED",
+    "l2_fault": "L2_EXECUTION_ERROR:ValueError:path C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\executive_summary\\RUN_BUNDLE_INDEX.json is not under repo_root C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src",
+    "l2_recipe_executed": true,
+    "l2_recipe_run_report_ref": "",
+    "l2_sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.004,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 103822.229,
+        "meta": {
+          "fault": "L2_EXECUTION_ERROR:ValueError:path C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\executive_summary\\RUN_BUNDLE_INDEX.json is not under repo_root C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\src"
+        },
+        "status": "FAIL",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.004,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "FAIL",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "no_l2_execution_assertion": false,
+    "request_id": "req-a7d4e9b6ff194a67adf4a7d8a25a19ca",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "95c30a35-d467-4150-ab38-bde357aeb429",
+    "trace_root": "trace-8bd749cfad8b428ba26d08434b9e0b81"
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:bef87729e51e779ff988f4134f9fa4807b6ad2cdea9d79bd355eecb2712cb028"
+}

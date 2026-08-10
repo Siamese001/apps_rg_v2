@@ -1,0 +1,186 @@
+{
+  "run_id": "ibm_narrative_20260809_122636",
+  "section_id": "ibm_narrative",
+  "runtime_generation_status": "REAL_LLM",
+  "product_quality_status": "PASS",
+  "ibm_header": {
+    "employer": "IBM",
+    "title": "Partner",
+    "location": "Edgewater, NJ",
+    "start_date": "2017-04",
+    "end_date": "2022-10",
+    "is_current": false,
+    "fact_id": "exp_ibm_001"
+  },
+  "narrative_sentence": "Drove AWS alliance and technical discovery at IBM for enterprise financial-services pursuits, establishing BI-backed reference architectures and repeatable modernization guidance that aligned complex technical choices with executive operating decisions across regulated client portfolios.",
+  "selected_fact_plan": {
+    "selected_theme_families": [
+      "alliance GTM",
+      "technical presales and solution architecture",
+      "decision-support BI",
+      "industry-specific reference architecture"
+    ],
+    "omitted_theme_family": "pursuit prioritization and revenue-target execution",
+    "selected_bullet_ids": [
+      "bul_ibm_001",
+      "bul_ibm_002",
+      "bul_ibm_003",
+      "bul_ibm_005"
+    ],
+    "selected_role_episode_bundles": [
+      "reb_ibm_aws_alliance_partner_cosell_gtm",
+      "reb_ibm_presales_solution_engineering",
+      "reb_ibm_data_modeling_bi_decision_support",
+      "reb_ibm_aws_modernization_architecture"
+    ]
+  },
+  "claim_ledger": [
+    {
+      "claim_text": "Drove AWS alliance and technical discovery at IBM for enterprise financial-services pursuits",
+      "source_fact_ids": [
+        "bul_ibm_001"
+      ]
+    },
+    {
+      "claim_text": "establishing BI-backed reference architectures and repeatable modernization guidance that aligned complex technical choices with executive operating decisions across regulated client portfolios",
+      "source_fact_ids": [
+        "bul_ibm_002"
+      ]
+    }
+  ],
+  "jd_alignment": {
+    "targeting_only": true,
+    "jd_used_as_proof": false,
+    "briefing_used_as_proof": false,
+    "selected_jd_themes": [
+      "partner-led pre-sales architecture",
+      "cloud-partner joint GTM",
+      "joint solution development and reference architectures"
+    ],
+    "selected_briefing_themes": [
+      "repeatable technical plays for partner-led enterprise deployments",
+      "consistent deployment patterns across partners",
+      "industry-specific solution patterns"
+    ],
+    "targeting_rationale": "The narrative emphasizes cloud alliance execution, technical discovery, BI-supported decisions, and reusable reference architectures because these themes align with the target role while remaining grounded in IBM evidence."
+  },
+  "gap_notes": [],
+  "change_log": [
+    "Synthesized the alliance and technical discovery thesis from reb_ibm_aws_alliance_partner_cosell_gtm and reb_ibm_presales_solution_engineering, corresponding to bul_ibm_001 and bul_ibm_003.",
+    "Synthesized the BI and reference-architecture discipline from reb_ibm_data_modeling_bi_decision_support and reb_ibm_aws_modernization_architecture, corresponding to bul_ibm_002 and bul_ibm_005.",
+    "Excluded pursuit-prioritization and revenue-target themes to preserve a focused executive through-line.",
+    {
+      "operation": "align_ibm_narrative_claim_ledger_to_bul_ibm",
+      "reason": "graph_skills_authority_bul_ibm_x2_binding"
+    },
+    {
+      "operation": "decompose_ibm_narrative_claim_ledger_by_clause",
+      "reason": "clause_level_bul_ibm_theme_binding"
+    },
+    "Synthesized the first clause from reb_ibm_aws_alliance_partner_cosell_gtm and reb_ibm_presales_solution_engineering, corresponding to bul_ibm_001 and bul_ibm_003.",
+    "Synthesized the establishing clause from reb_ibm_data_modeling_bi_decision_support and reb_ibm_aws_modernization_architecture, corresponding to bul_ibm_002 and bul_ibm_005.",
+    "Removed ecosystem language to keep each clause within the two-family theme limit.",
+    {
+      "operation": "decompose_ibm_narrative_claim_ledger_by_clause",
+      "reason": "clause_level_bul_ibm_theme_binding"
+    },
+    {
+      "operation": "align_ibm_narrative_claim_ledger_to_bul_ibm",
+      "reason": "graph_skills_authority_bul_ibm_x2_binding"
+    },
+    {
+      "operation": "decompose_ibm_narrative_claim_ledger_by_clause",
+      "reason": "clause_level_bul_ibm_theme_binding"
+    },
+    {
+      "operation": "ibm_narrative_theme_overpack_repair",
+      "reason": "x2_ibm_narrative_claim_theme_coverage:overpack"
+    }
+  ],
+  "self_check": {
+    "exactly_one_sentence": true,
+    "employer_anchor_count": 1,
+    "begins_with_past_tense_action_verb": true,
+    "word_count_within_limit": true,
+    "character_count_within_limit": true,
+    "mechanism_tokens_present": [
+      "AWS",
+      "BI"
+    ],
+    "metrics_repeated": false,
+    "candidate_name_absent": true,
+    "targeting_used_as_proof": false,
+    "all_claim_source_ids_allowed": true,
+    "clause_theme_limit_satisfied": true
+  },
+  "prompt_id": "ibm_position_narrative_dispatch_v1",
+  "prompt_hash": "d9368a2ecb106426",
+  "section_prompt_adapter": true,
+  "apps_rg_prompt_template_ref": "apps_rg/prompt_assembly/templates/ibm_position_narrative_v1.yaml",
+  "compiler_template_id": "strategic_tailor_v1",
+  "input_payload_hash": "1f593e965b8ead75",
+  "judge_preflight_blocked": false,
+  "text_claim_coverage": {
+    "sentences": [
+      {
+        "sentence_index": 1,
+        "sentence_text": "Drove AWS alliance and technical discovery at IBM for enterprise financial-services pursuits, establishing BI-backed reference architectures and repeatable modernization guidance that aligned complex technical choices with executive operating decisions across regulated client portfolios.",
+        "material_claims": [
+          {
+            "claim_text": "Drove AWS alliance and technical discovery at IBM for enterprise financial-services pursuits",
+            "source_fact_ids": [
+              "bul_ibm_001"
+            ],
+            "support_status": "SUPPORTED",
+            "reason": "Mapped from claim_ledger."
+          },
+          {
+            "claim_text": "establishing BI-backed reference architectures and repeatable modernization guidance that aligned complex technical choices with executive operating decisions across regulated client portfolios",
+            "source_fact_ids": [
+              "bul_ibm_002"
+            ],
+            "support_status": "SUPPORTED",
+            "reason": "Mapped from claim_ledger."
+          }
+        ],
+        "sentence_pass": true
+      }
+    ],
+    "overall_pass": true
+  },
+  "product_quality_reason": "REAL_LLM output passed all deterministic ibm_narrative gates.",
+  "section_repair_ledger": "section_repair_ledger.json",
+  "authoritative_attempt_number": 2,
+  "authoritative_l2_source": "regen_llm",
+  "judge_required_for_proof": true,
+  "judge_tier": "STANDARD_REASONING",
+  "proof_eligible": true,
+  "generation_runtime_status": "REAL_LLM",
+  "mocked_provider_selected": false,
+  "proof_scope": "product_quality",
+  "proof_status": "PROOF_ELIGIBLE",
+  "authorization_scope": "PRODUCT_QUALITY",
+  "test_only_mock_provider": false,
+  "runtime_certification": true,
+  "x1d_runtime_status": "MODEL_BACKED",
+  "judge_proof_eligible": true,
+  "required_judge_rows_missing": false,
+  "provider_proof_eligible": true,
+  "test_only_mock_judges": false,
+  "offline_contract_stub_used": false,
+  "artifact_namespace_class": "PRODUCT_PROOF_ELIGIBLE_RUN",
+  "runtime_generation_status_class": "REAL_LLM",
+  "allow_non_allow_exit_zero_cli": false,
+  "allow_test_mock_judges_hatch": false,
+  "proof_closeout_note": "",
+  "generation_class": "real_llm",
+  "judge_class": "model_backed",
+  "proof_class": "allow_class",
+  "certification_class": "runtime_slice_allow",
+  "decisive_accounting_label": "PASS_ALLOW_CLASS",
+  "resume_graph_allocation_plan_digest": "6bbf4ee015f2ae3eb082fca462e8556eaa913457825380e4a591ba8961166aa4",
+  "graph_claim_binding_contract_digest": "f3ad825f976a8a5a1c1011df2afb990749d21159ab4b4cb6c02009118422e6bf",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json",
+  "resume_graph_claim_binding_active": true,
+  "resume_graph_claim_binding_pass": true
+}

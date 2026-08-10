@@ -1,0 +1,395 @@
+{
+  "payload": {
+    "model": "gpt-5.6-sol",
+    "input": [
+      {
+        "role": "system",
+        "content": "You are a strict executive resume judge. Output a single compact JSON object only. No markdown fences, no explanatory prose, no nested finding objects.\n\nGRADE_ONLY authority (all providers — Gemini, OpenAI, Anthropic):\n- Do NOT rewrite, replace, or edit candidate_output.resume_display_text.\n- deterministic_gate_summary is authoritative: if a gate shows \"pass\": true, do NOT fail or cite that axis.\n- Do NOT apply retired SRFS slot mandates as decisive failures: five-part S1–S5 arc, mandatory S5 credibility\n  sentence, S2 mechanism-only / S4 outcomes slot shapes, srfs_sentence_responsibility.\n- When x2_exec_summary_evidence_utilization.pass is true, unused_fact_ids are optional weave targets, not defects.\n\nReturn ONLY one compact JSON object. No markdown fences, no prose before or after, no nested objects.\nRequired shape (findings and remediation_suggestions must be arrays of short strings only):\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\"findings\":[\"...\"],\"cited_sentence_indexes\":[1],\"remediation_suggestions\":[],\"dimension_verdicts\":{...8 rubric keys...}}\nAt most 6 short strings in findings and 4 in remediation_suggestions.\ncited_sentence_indexes: 1-based indexes (S1=1 … S6=6) for every sentence your findings ask to change.\nInclude dimension_verdicts with all eight rubric dimension ids (pass/severity/codes per dimension).\n\nScore contract (mandatory - every judge response MUST comply):\n- Include score_scale as exactly one of: \"0_to_1\" or \"0_to_5\". Do not omit score_scale.\n- If score_scale is \"0_to_1\": score and threshold MUST each be a number from 0.0 through 1.0 inclusive.\n- If score_scale is \"0_to_5\": score and threshold MUST each be a number from 0.0 through 5.0 inclusive.\n- Forbidden: 0_to_10 scales, percentage scores (0–100), or values like score=9.2 with threshold=8.0.\n- Do not infer scale from magnitude; declare score_scale explicitly and keep score/threshold within that scale."
+      },
+      {
+        "role": "user",
+        "content": "You are evaluating 6-8 executive resume competency categories (short labels plus compact capability phrases).\nThis is REQUIRED proof taxonomy grading. Deterministic X2 gates remain authoritative for source lineage,\nand this X1D judge must pass before competencies can be product proof eligible.\nReturn JSON only with: score_scale, score, threshold, pass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n\nRubric dimensions:\n1. factual_support: terms align with claim_ledger and allowed bul_* resume facts only; graph-skill support may inform phrasing, but JD/briefing never become proof.\n2. ats_alignment_without_stuffing: relevant clusters without keyword stuffing or JD-as-proof; favor semantic coverage and distinct ATS query clusters over repeating the same three metrics or one employer lane.\n3. seniority_executive_relevance: reads as executive-level capability groupings with breadth across the graph, not a single repeated theme or junior operator checklist.\n4. complementarity: augments executive summary, Unify, and IBM generated sections; not a mechanical restatement of bullets, the same proof surface, or career-phase narration.\n5. no_bullet_restatement: avoids copying long bullet fragments, outcome laundry lists, repeated metric language, or employer-specific verbatim lines.\n6. anti_overfit: no JD-only or briefing-only skills framed as proof; company-specific targeting may influence label choice, not evidence; do not collapse multiple categories onto one metric family; no AI-authenticity dead giveaways such as template phrasing or buzzword soup.\n7. category_clarity: labels are crisp; terms are compact keyword phrases (not sentence-style competency claims) and each category should be semantically distinct, graph-backed, and tied to a different skill family.\n8. svp_agentic_specificity: no generic or mundane competency terms; phrases should sound like believable work by an SVP-level engineering leader and deep agentic AI practitioner, with concrete mechanisms plus operating/commercial context. Penalize table-stakes phrases such as \"hyperscaler co-sell\", \"platform commercialization\", \"stakeholder alignment\", \"cloud architecture\", or \"runtime policy controls\" when they appear without richer mechanism/context.\n9. partner_architecture_specificity: for Anthropic/applied-AI partnership roles, competencies must include a partner-applied AI architecture category with mechanism plus partner-facing outcome: reference architecture, joint AI solution pattern, solution accelerator, partner deployment enablement, or reusable partner assurance pattern. Generic ecosystem/GTM wording alone is insufficient.\n10. root_chronology_discipline: partner architecture wording must bind only to valid Unify/IBM roots. Do not credit partner-scaling language sourced from InsurTech or EY; do not launder later partner expectations into 2014-2017 InsurTech cloud modernization.\n\nAdversarial review lens:\n- Head of Talent Acquisition pass: would the taxonomy feel recruiter-clean and senior enough for the target company?\n- AI authenticity pass: no generic generated labels, no buzzword soup, no phrase recycling across categories.\n\nAnti-AI filters:\n- no em dashes in labels or findings\n- no template phrasing like \"strategic leadership\" repeated across categories\n- no repeated metric families copied into multiple categories\n- no first-person voice, self-reference, or resume prose leakage\n- no unsupported tools, benchmarks, certifications, or employer claims\n- no sentence-style category labels or bullet-shaped terms\n- no \"transformational\", \"innovative\", or \"cutting-edge\" filler without concrete grounding\n\n- The deterministic product shape expects 6-8 categories; flag fewer than 6, more than 8, unjustified padding, or duplicate category groups as quality_flags.\n- Sentence-style competency claims are out of scope for this section format; flag them as quality_flags only.\n- Judge pass/fail gates product proof eligibility for competencies.\n- companion_context_used_as_proof must remain false; JD/briefing/targeting_only — never proof (aligns with PA contract).\n- Terms require source_fact_ids / claim_ledger binding — no JD-only skills as proof.\n- When the categories collapse onto the same few metrics, fact surfaces, or employer lane, lower the score even if the shape is technically valid.\n- For partner-applied roles, fail or lower sharply if ccb_partner_applied_ai_architecture is missing, if partner architecture wording appears outside the partner architecture bundle, or if partner terms bind to InsurTech/EY roots.\n- If the labels feel machine-generated or too generic to survive a TA skim, treat that as a quality flag.\n- If the terms could belong unchanged to any cloud/AI executive rather than this candidate's graph-backed SVP agentic work, fail or lower svp_agentic_specificity.\n\nDecisive failure triggers (advisory only):\n- JD or briefing used as primary evidence for unsupported clusters\n- obvious bullet paste or first-person resume voice leakage\n- format breaks (full sentences inside terms, bullet markers)\n- repeated metric/language loops across multiple categories\n- generic category labels with no graph-backed differentiation\n- mundane visible competency phrases that lack agentic mechanism, executive operating context, or believable SVP scope\n- company-specific targeting used as proof rather than label choice\n\nReturn ONLY one compact JSON object. No markdown fences, no prose before or after, no nested objects.\nRequired shape (findings and remediation_suggestions must be arrays of short strings only):\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\"findings\":[\"...\"],\"cited_sentence_indexes\":[1],\"remediation_suggestions\":[],\"dimension_verdicts\":{...8 rubric keys...}}\nAt most 6 short strings in findings and 4 in remediation_suggestions.\ncited_sentence_indexes: 1-based indexes (S1=1 … S6=6) for every sentence your findings ask to change.\nInclude dimension_verdicts with all eight rubric dimension ids (pass/severity/codes per dimension).\n\nRequired competencies dimension_verdicts keys: factual_support, ats_alignment_without_stuffing, seniority_executive_relevance, complementarity, no_bullet_restatement, anti_overfit, category_clarity, svp_agentic_specificity, partner_architecture_specificity, root_chronology_discipline. Do not substitute executive_summary dimension ids.\n\"dimension_verdicts\": {\"factual_support\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"ats_alignment_without_stuffing\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"seniority_executive_relevance\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"complementarity\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"no_bullet_restatement\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"anti_overfit\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"category_clarity\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"svp_agentic_specificity\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"partner_architecture_specificity\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"root_chronology_discipline\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}}\n\nCOMPETENCIES_JSON:\n[{\"category_id\":\"cloud_partner_ecosystems\",\"category_label\":\"Cloud & Partner Ecosystems\",\"resume_display_label\":\"Partner Applied AI Architecture\",\"competency_bundle_id\":\"ccb_partner_applied_ai_architecture\",\"capability_family\":\"partner_applied_ai_architecture\",\"graph_skill_node_ids\":[\"skill_partner_joint_solution_development\",\"skill_sr_w12_joint_ai_solution_development\",\"skill_sr_w12_industry_reference_architecture\",\"skill_partner_solution_architecture\",\"skill_partner_ai_architecture_advisory\"],\"source_fact_ids\":[\"reb_ibm_aws_alliance_partner_cosell_gtm\",\"reb_ibm_presales_solution_engineering\",\"reb_unify_partner_channel_cosell\"],\"terms\":[{\"term\":\"partner-ready applied AI reference architectures\",\"text\":\"partner-ready applied AI reference architectures\",\"source_skill_ids\":[\"skill_partner_joint_solution_development\",\"skill_sr_w12_joint_ai_solution_development\",\"skill_sr_w12_industry_reference_architecture\",\"skill_partner_solution_architecture\",\"skill_partner_ai_architecture_advisory\"],\"graph_skill_node_ids\":[\"skill_partner_joint_solution_development\",\"skill_sr_w12_joint_ai_solution_development\",\"skill_sr_w12_industry_reference_architecture\",\"skill_partner_solution_architecture\",\"skill_partner_ai_architecture_advisory\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_unify_partner_channel_cosell\",\"reb_ibm_aws_alliance_partner_cosell_gtm\",\"reb_ibm_presales_solution_engineering\"],\"source_fact_id\":\"reb_unify_partner_channel_cosell\"},{\"term\":\"co-developed AI solution patterns for partners\",\"text\":\"co-developed AI solution patterns for partners\",\"source_skill_ids\":[\"skill_partner_joint_solution_development\",\"skill_sr_w12_joint_ai_solution_development\",\"skill_sr_w12_industry_reference_architecture\",\"skill_partner_solution_architecture\",\"skill_partner_ai_architecture_advisory\"],\"graph_skill_node_ids\":[\"skill_partner_joint_solution_development\",\"skill_sr_w12_joint_ai_solution_development\",\"skill_sr_w12_industry_reference_architecture\",\"skill_partner_solution_architecture\",\"skill_partner_ai_architecture_advisory\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_unify_partner_channel_cosell\",\"reb_ibm_aws_alliance_partner_cosell_gtm\",\"reb_ibm_presales_solution_engineering\"],\"source_fact_id\":\"reb_unify_partner_channel_cosell\"},{\"term\":\"safe AI partner deployment assurance patterns\",\"text\":\"safe AI partner deployment assurance patterns\",\"source_skill_ids\":[\"skill_partner_joint_solution_development\",\"skill_sr_w12_joint_ai_solution_development\",\"skill_sr_w12_industry_reference_architecture\",\"skill_partner_solution_architecture\",\"skill_partner_ai_architecture_advisory\"],\"graph_skill_node_ids\":[\"skill_partner_joint_solution_development\",\"skill_sr_w12_joint_ai_solution_development\",\"skill_sr_w12_industry_reference_architecture\",\"skill_partner_solution_architecture\",\"skill_partner_ai_architecture_advisory\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_unify_partner_channel_cosell\",\"reb_ibm_aws_alliance_partner_cosell_gtm\",\"reb_ibm_presales_solution_engineering\"],\"source_fact_id\":\"reb_unify_partner_channel_cosell\"}],\"candidate_origin\":\"governed_required_bundle_baseline\",\"selection_score\":0.889,\"selector_confidence\":0.889,\"confidence\":0.889,\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[]},{\"category_id\":\"ai_platform_leadership\",\"category_label\":\"AI Platform Leadership\",\"resume_display_label\":\"Governed Agentic AI Platform Architecture\",\"competency_bundle_id\":\"ccb_agentic_platforms\",\"capability_family\":\"agentic_platforms\",\"graph_skill_node_ids\":[\"skill_governed_agentic_systems_architecture\",\"skill_reusable_agentic_platform_architecture\",\"skill_agentic_control_plane_design\"],\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"terms\":[{\"term\":\"governed multi-agent orchestration control planes\",\"text\":\"governed multi-agent orchestration control planes\",\"source_skill_ids\":[\"skill_governed_agentic_systems_architecture\",\"skill_reusable_agentic_platform_architecture\",\"skill_agentic_control_plane_design\"],\"graph_skill_node_ids\":[\"skill_governed_agentic_systems_architecture\",\"skill_reusable_agentic_platform_architecture\",\"skill_agentic_control_plane_design\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"source_fact_id\":\"fact_engineering_platform_001\"},{\"term\":\"agentic workflow routing across enterprise systems\",\"text\":\"agentic workflow routing across enterprise systems\",\"source_skill_ids\":[\"skill_governed_agentic_systems_architecture\",\"skill_reusable_agentic_platform_architecture\",\"skill_agentic_control_plane_design\"],\"graph_skill_node_ids\":[\"skill_governed_agentic_systems_architecture\",\"skill_reusable_agentic_platform_architecture\",\"skill_agentic_control_plane_design\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"source_fact_id\":\"fact_engineering_platform_001\",\"allocation_claim_unit_id\":\"competencies:skill:03\"},{\"term\":\"policy-bound execution architecture for AI agents\",\"text\":\"policy-bound execution architecture for AI agents\",\"source_skill_ids\":[\"skill_governed_agentic_systems_architecture\",\"skill_reusable_agentic_platform_architecture\",\"skill_agentic_control_plane_design\"],\"graph_skill_node_ids\":[\"skill_governed_agentic_systems_architecture\",\"skill_reusable_agentic_platform_architecture\",\"skill_agentic_control_plane_design\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"source_fact_id\":\"fact_engineering_platform_001\"}],\"candidate_origin\":\"governed_required_bundle_baseline\",\"selection_score\":0.841,\"selector_confidence\":0.841,\"confidence\":0.841,\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[\"competencies:skill:03\"]},{\"category_label\":\"Governance, Risk & Compliance\",\"competency_bundle_id\":\"ccb_runtime_governance\",\"graph_skill_node_ids\":[\"skill_runtime_gate_mesh_design\",\"skill_fail_closed_gate_semantics\",\"skill_policy_bound_runtime_design\",\"skill_x1_x2_x3_exit_control\",\"skill_ibm_automated_release_pipelines\"],\"source_fact_ids\":[\"fact_engineering_platform_001\",\"fact_engineering_platform_002\"],\"terms\":[{\"term\":\"fail-closed runtime control gate design\",\"text\":\"fail-closed runtime control gate design\",\"source_skill_ids\":[\"skill_runtime_gate_mesh_design\",\"skill_fail_closed_gate_semantics\",\"skill_policy_bound_runtime_design\",\"skill_x1_x2_x3_exit_control\"],\"graph_skill_node_ids\":[\"skill_runtime_gate_mesh_design\",\"skill_fail_closed_gate_semantics\",\"skill_policy_bound_runtime_design\",\"skill_x1_x2_x3_exit_control\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"source_fact_id\":\"fact_engineering_platform_001\"},{\"term\":\"sandboxed decision workflows with audit trails\",\"text\":\"sandboxed decision workflows with audit trails\",\"source_skill_ids\":[\"skill_runtime_gate_mesh_design\",\"skill_fail_closed_gate_semantics\",\"skill_policy_bound_runtime_design\",\"skill_x1_x2_x3_exit_control\"],\"graph_skill_node_ids\":[\"skill_runtime_gate_mesh_design\",\"skill_fail_closed_gate_semantics\",\"skill_policy_bound_runtime_design\",\"skill_x1_x2_x3_exit_control\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"source_fact_id\":\"fact_engineering_platform_001\"},{\"term\":\"Regulated DevSecOps release governance pipelines\",\"text\":\"Regulated DevSecOps release governance pipelines\",\"source_fact_id\":\"fact_engineering_platform_002\",\"source_fact_ids\":[\"fact_engineering_platform_002\"],\"source_skill_ids\":[\"skill_ibm_automated_release_pipelines\"],\"graph_skill_node_ids\":[\"skill_ibm_automated_release_pipelines\"],\"support_class\":\"FROZEN_RESUME_GRAPH_ALLOCATION\",\"proof_source\":\"allocation_visible_graph_surface\",\"allocation_claim_unit_id\":\"competencies:skill:04\",\"allocation_surface_source_field\":\"graph_authority_surface_composition\"}],\"selection_score\":0.841,\"category_id\":\"governance_risk_compliance\",\"capability_family\":\"runtime_governance\",\"selector_confidence\":0.841,\"confidence\":0.841,\"resume_display_label\":\"AI Runtime Governance & Control Gates\",\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[\"competencies:skill:04\"]},{\"category_id\":\"tech_strategy_innovation\",\"category_label\":\"Technology Strategy & Innovation\",\"resume_display_label\":\"Retrieval & Context Engineering\",\"competency_bundle_id\":\"ccb_retrieval_context_engineering\",\"capability_family\":\"retrieval_context_engineering\",\"graph_skill_node_ids\":[\"skill_context_engineering\",\"skill_dense_sparse_exact_retrieval_design\",\"skill_graph_aware_relationship_grounding\",\"skill_prompt_assembly_architecture\",\"skill_unify_agentic_graphrag_context_pack_grounding\"],\"source_fact_ids\":[\"fact_engineering_platform_001\",\"reb_unify_agentic_platform_architecture\"],\"terms\":[{\"term\":\"GraphRAG context grounding for enterprise workflows\",\"text\":\"GraphRAG context grounding for enterprise workflows\",\"source_skill_ids\":[\"skill_context_engineering\",\"skill_dense_sparse_exact_retrieval_design\",\"skill_graph_aware_relationship_grounding\",\"skill_prompt_assembly_architecture\",\"skill_unify_agentic_graphrag_context_pack_grounding\"],\"graph_skill_node_ids\":[\"skill_context_engineering\",\"skill_dense_sparse_exact_retrieval_design\",\"skill_graph_aware_relationship_grounding\",\"skill_prompt_assembly_architecture\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"source_fact_id\":\"fact_engineering_platform_001\",\"allocation_claim_unit_id\":\"competencies:skill:08\"},{\"term\":\"dense-sparse retrieval with relationship-aware ranking\",\"text\":\"dense-sparse retrieval with relationship-aware ranking\",\"source_skill_ids\":[\"skill_context_engineering\",\"skill_dense_sparse_exact_retrieval_design\",\"skill_graph_aware_relationship_grounding\",\"skill_prompt_assembly_architecture\"],\"graph_skill_node_ids\":[\"skill_context_engineering\",\"skill_dense_sparse_exact_retrieval_design\",\"skill_graph_aware_relationship_grounding\",\"skill_prompt_assembly_architecture\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\"],\"source_fact_id\":\"reb_unify_agentic_platform_architecture\"},{\"term\":\"authority-ordered prompt context assembly pipelines\",\"text\":\"authority-ordered prompt context assembly pipelines\",\"source_skill_ids\":[\"skill_context_engineering\",\"skill_dense_sparse_exact_retrieval_design\",\"skill_graph_aware_relationship_grounding\",\"skill_prompt_assembly_architecture\"],\"graph_skill_node_ids\":[\"skill_context_engineering\",\"skill_dense_sparse_exact_retrieval_design\",\"skill_graph_aware_relationship_grounding\",\"skill_prompt_assembly_architecture\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\"],\"source_fact_id\":\"reb_unify_agentic_platform_architecture\"}],\"candidate_origin\":\"governed_required_bundle_baseline\",\"selection_score\":0.837,\"selector_confidence\":0.837,\"confidence\":0.837,\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[\"competencies:skill:08\"]},{\"category_id\":\"commercial_operating_impact\",\"category_label\":\"Commercial & Operating Impact\",\"resume_display_label\":\"Alliance GTM & Co-Sell Execution\",\"competency_bundle_id\":\"ccb_partnerships_ecosystem_execution\",\"capability_family\":\"partnerships_ecosystem_execution\",\"graph_skill_node_ids\":[\"skill_agentic_platform_productization\",\"skill_reusable_agentic_platform_architecture\",\"skill_p2_tech_demoable_accelerator\",\"skill_partner_enterprise_negotiations\",\"skill_partner_alliance_gtm_execution\",\"skill_p2_gtm_presales_delivery_handoff\",\"skill_partner_partner_led_ai_solutions\"],\"source_fact_ids\":[\"exp_unify_001\",\"fact_partnerships_gtm_002\",\"fact_revenue_ops_001\",\"fact_revenue_ops_004\",\"reb_unify_agentic_platform_architecture\",\"reb_unify_partner_channel_cosell\"],\"terms\":[{\"term\":\"demoable AI accelerators for executive buyers\",\"text\":\"demoable AI accelerators for executive buyers\",\"source_skill_ids\":[\"skill_agentic_platform_productization\",\"skill_reusable_agentic_platform_architecture\",\"skill_p2_tech_demoable_accelerator\"],\"graph_skill_node_ids\":[\"skill_agentic_platform_productization\",\"skill_reusable_agentic_platform_architecture\",\"skill_p2_tech_demoable_accelerator\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\",\"reb_unify_partner_channel_cosell\"],\"source_fact_id\":\"reb_unify_agentic_platform_architecture\"},{\"term\":\"reusable AI platform commercialization for adoption\",\"text\":\"reusable AI platform commercialization for adoption\",\"source_skill_ids\":[\"skill_agentic_platform_productization\",\"skill_reusable_agentic_platform_architecture\",\"skill_p2_tech_demoable_accelerator\"],\"graph_skill_node_ids\":[\"skill_agentic_platform_productization\",\"skill_reusable_agentic_platform_architecture\",\"skill_p2_tech_demoable_accelerator\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\",\"reb_unify_partner_channel_cosell\"],\"source_fact_id\":\"reb_unify_agentic_platform_architecture\"},{\"term\":\"Quota-aligned enterprise solution execution for pursuits\",\"text\":\"Quota-aligned enterprise solution execution for pursuits\",\"source_fact_id\":\"fact_revenue_ops_001\",\"source_fact_ids\":[\"fact_revenue_ops_001\"],\"source_skill_ids\":[\"skill_partner_enterprise_negotiations\"],\"graph_skill_node_ids\":[\"skill_partner_enterprise_negotiations\"],\"support_class\":\"FROZEN_RESUME_GRAPH_ALLOCATION\",\"proof_source\":\"allocation_visible_graph_surface\",\"allocation_claim_unit_id\":\"competencies:skill:02\",\"allocation_surface_source_field\":\"graph_authority_surface_composition\"},{\"term\":\"AWS alliance joint GTM execution\",\"text\":\"AWS alliance joint GTM execution\",\"source_fact_id\":\"fact_partnerships_gtm_002\",\"source_fact_ids\":[\"fact_partnerships_gtm_002\"],\"source_skill_ids\":[\"skill_partner_alliance_gtm_execution\"],\"graph_skill_node_ids\":[\"skill_partner_alliance_gtm_execution\"],\"support_class\":\"FROZEN_RESUME_GRAPH_ALLOCATION\",\"proof_source\":\"allocation_visible_graph_surface\",\"allocation_claim_unit_id\":\"competencies:skill:05\",\"allocation_surface_source_field\":\"graph_authority_surface_composition\"},{\"term\":\"Customer success and value-realization operating cadence\",\"text\":\"Customer success and value-realization operating cadence\",\"source_fact_id\":\"fact_revenue_ops_004\",\"source_fact_ids\":[\"fact_revenue_ops_004\"],\"source_skill_ids\":[\"skill_p2_gtm_presales_delivery_handoff\"],\"graph_skill_node_ids\":[\"skill_p2_gtm_presales_delivery_handoff\"],\"support_class\":\"FROZEN_RESUME_GRAPH_ALLOCATION\",\"proof_source\":\"allocation_visible_graph_surface\",\"allocation_claim_unit_id\":\"competencies:skill:06\",\"allocation_surface_source_field\":\"root_bundle_theme\"},{\"term\":\"AI co-sell bundling with strategic partners\",\"text\":\"AI co-sell bundling with strategic partners\",\"source_fact_id\":\"exp_unify_001\",\"source_fact_ids\":[\"exp_unify_001\"],\"source_skill_ids\":[\"skill_partner_partner_led_ai_solutions\"],\"graph_skill_node_ids\":[\"skill_partner_partner_led_ai_solutions\"],\"support_class\":\"FROZEN_RESUME_GRAPH_ALLOCATION\",\"proof_source\":\"allocation_visible_graph_surface\",\"allocation_claim_unit_id\":\"competencies:skill:07\",\"allocation_surface_source_field\":\"graph_authority_surface_composition\"}],\"candidate_origin\":\"governed_required_bundle_baseline\",\"selection_score\":0.847,\"selector_confidence\":0.847,\"confidence\":0.847,\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[\"competencies:skill:02\",\"competencies:skill:05\",\"competencies:skill:06\",\"competencies:skill:07\"]},{\"category_id\":\"llmops_reliability\",\"category_label\":\"LLMOps & Reliability\",\"resume_display_label\":\"LLMOps, Evaluation & Reliability\",\"competency_bundle_id\":\"ccb_llmops_reliability\",\"capability_family\":\"llmops_reliability\",\"graph_skill_node_ids\":[\"skill_audit_grade_observability\",\"skill_output_quality_and_schema_gates\",\"skill_fail_closed_gate_semantics\",\"skill_runtime_resilience_controls\"],\"source_fact_ids\":[\"fact_revenue_ops_001\",\"reb_ibm_revenue_sales_target_execution\"],\"terms\":[{\"term\":\"audit-grade telemetry for agentic systems\",\"text\":\"audit-grade telemetry for agentic systems\",\"source_skill_ids\":[\"skill_audit_grade_observability\",\"skill_output_quality_and_schema_gates\",\"skill_fail_closed_gate_semantics\",\"skill_runtime_resilience_controls\"],\"graph_skill_node_ids\":[\"skill_audit_grade_observability\",\"skill_output_quality_and_schema_gates\",\"skill_fail_closed_gate_semantics\",\"skill_runtime_resilience_controls\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_revenue_ops_001\",\"reb_ibm_revenue_sales_target_execution\"],\"source_fact_id\":\"fact_revenue_ops_001\"},{\"term\":\"evaluation gauntlets for behavior assurance\",\"text\":\"evaluation gauntlets for behavior assurance\",\"source_skill_ids\":[\"skill_audit_grade_observability\",\"skill_output_quality_and_schema_gates\",\"skill_fail_closed_gate_semantics\",\"skill_runtime_resilience_controls\"],\"graph_skill_node_ids\":[\"skill_audit_grade_observability\",\"skill_output_quality_and_schema_gates\",\"skill_fail_closed_gate_semantics\",\"skill_runtime_resilience_controls\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_revenue_ops_001\",\"reb_ibm_revenue_sales_target_execution\"],\"source_fact_id\":\"fact_revenue_ops_001\"},{\"term\":\"production reliability lifecycle for agentic workflows\",\"text\":\"production reliability lifecycle for agentic workflows\",\"source_skill_ids\":[\"skill_audit_grade_observability\",\"skill_output_quality_and_schema_gates\",\"skill_fail_closed_gate_semantics\",\"skill_runtime_resilience_controls\"],\"graph_skill_node_ids\":[\"skill_audit_grade_observability\",\"skill_output_quality_and_schema_gates\",\"skill_fail_closed_gate_semantics\",\"skill_runtime_resilience_controls\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_revenue_ops_001\",\"reb_ibm_revenue_sales_target_execution\"],\"source_fact_id\":\"fact_revenue_ops_001\"}],\"candidate_origin\":\"governed_required_bundle_baseline\",\"selection_score\":0.847,\"confidence\":0.847,\"selector_confidence\":0.847,\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[]},{\"category_id\":\"data_analytics_modernization\",\"category_label\":\"Data & Analytics Modernization\",\"resume_display_label\":\"Distributed Systems & Cloud Data Engineering\",\"competency_bundle_id\":\"ccb_distributed_systems_engineering\",\"capability_family\":\"distributed_systems_engineering\",\"graph_skill_node_ids\":[\"skill_sr_cloud_data_platform_engineering\",\"skill_sr_microservices_integration_platform\",\"skill_p2_tech_reference_architecture\"],\"source_fact_ids\":[\"fact_engineering_platform_002\"],\"terms\":[{\"term\":\"cloud-native AI data reference architectures\",\"text\":\"cloud-native AI data reference architectures\",\"source_skill_ids\":[\"skill_sr_cloud_data_platform_engineering\",\"skill_sr_microservices_integration_platform\",\"skill_p2_tech_reference_architecture\"],\"graph_skill_node_ids\":[\"skill_sr_cloud_data_platform_engineering\",\"skill_sr_microservices_integration_platform\",\"skill_p2_tech_reference_architecture\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_002\"],\"source_fact_id\":\"fact_engineering_platform_002\"},{\"term\":\"microservices integration for regulated ecosystems\",\"text\":\"microservices integration for regulated ecosystems\",\"source_skill_ids\":[\"skill_sr_cloud_data_platform_engineering\",\"skill_sr_microservices_integration_platform\",\"skill_p2_tech_reference_architecture\"],\"graph_skill_node_ids\":[\"skill_sr_cloud_data_platform_engineering\",\"skill_sr_microservices_integration_platform\",\"skill_p2_tech_reference_architecture\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_002\"],\"source_fact_id\":\"fact_engineering_platform_002\"},{\"term\":\"lakehouse modernization for decision intelligence\",\"text\":\"lakehouse modernization for decision intelligence\",\"source_skill_ids\":[\"skill_sr_cloud_data_platform_engineering\",\"skill_sr_microservices_integration_platform\",\"skill_p2_tech_reference_architecture\"],\"graph_skill_node_ids\":[\"skill_sr_cloud_data_platform_engineering\",\"skill_sr_microservices_integration_platform\",\"skill_p2_tech_reference_architecture\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"fact_engineering_platform_002\"],\"source_fact_id\":\"fact_engineering_platform_002\"}],\"candidate_origin\":\"governed_required_bundle_baseline\",\"selection_score\":0.821,\"selector_confidence\":0.821,\"confidence\":0.821,\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[]},{\"category_id\":\"engineering_delivery_leadership\",\"category_label\":\"Engineering & Delivery Leadership\",\"resume_display_label\":\"Engineering Leadership & Operating Model\",\"competency_bundle_id\":\"ccb_engineering_leadership\",\"capability_family\":\"engineering_leadership\",\"graph_skill_node_ids\":[\"skill_svp_it_strategy_innovation\",\"skill_commercial_board_level_stakeholder_alignment\",\"skill_partner_pre_sales\"],\"source_fact_ids\":[\"fact_revenue_ops_004\",\"reb_ibm_presales_solution_engineering\"],\"terms\":[{\"term\":\"executive-aligned technical discovery operating cadences\",\"text\":\"executive-aligned technical discovery operating cadences\",\"source_skill_ids\":[\"skill_svp_it_strategy_innovation\",\"skill_commercial_board_level_stakeholder_alignment\"],\"graph_skill_node_ids\":[\"skill_svp_it_strategy_innovation\",\"skill_commercial_board_level_stakeholder_alignment\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_ibm_presales_solution_engineering\"],\"source_fact_id\":\"reb_ibm_presales_solution_engineering\"},{\"term\":\"enterprise pursuit operating model scale-out\",\"text\":\"enterprise pursuit operating model scale-out\",\"source_skill_ids\":[\"skill_svp_it_strategy_innovation\",\"skill_commercial_board_level_stakeholder_alignment\"],\"graph_skill_node_ids\":[\"skill_svp_it_strategy_innovation\",\"skill_commercial_board_level_stakeholder_alignment\"],\"support_class\":\"FACT_AND_SKILL_GRAPH\",\"proof_source\":\"competency_bundle_visible_surface\",\"source_fact_ids\":[\"reb_ibm_presales_solution_engineering\"],\"source_fact_id\":\"reb_ibm_presales_solution_engineering\"},{\"term\":\"Enterprise technical pre-sales solution engineering\",\"text\":\"Enterprise technical pre-sales solution engineering\",\"source_fact_id\":\"fact_revenue_ops_004\",\"source_fact_ids\":[\"fact_revenue_ops_004\"],\"source_skill_ids\":[\"skill_partner_pre_sales\"],\"graph_skill_node_ids\":[\"skill_partner_pre_sales\"],\"support_class\":\"FROZEN_RESUME_GRAPH_ALLOCATION\",\"proof_source\":\"allocation_visible_graph_surface\",\"allocation_claim_unit_id\":\"competencies:skill:01\",\"allocation_surface_source_field\":\"graph_authority_surface_composition\"}],\"candidate_origin\":\"governed_required_bundle_baseline\",\"selection_score\":0.813,\"selector_confidence\":0.813,\"confidence\":0.813,\"resume_display_order_reason\":\"anthropic_partnership_relevance_first\",\"visible_graph_surface\":true,\"graph_surface_term_source\":\"competency_bundle_vocabulary_anchors\",\"allocation_claim_unit_ids\":[\"competencies:skill:01\"]}]\n\n(No companion generated-section artifacts on disk.)\n\nCLAIM_LEDGER:\n[{\"claim_text\":\"partner-ready applied AI reference architectures\",\"source_fact_ids\":[\"reb_unify_partner_channel_cosell\"]},{\"claim_text\":\"co-developed AI solution patterns for partners\",\"source_fact_ids\":[\"reb_unify_partner_channel_cosell\"]},{\"claim_text\":\"safe AI partner deployment assurance patterns\",\"source_fact_ids\":[\"reb_unify_partner_channel_cosell\"]},{\"claim_text\":\"governed multi-agent orchestration control planes\",\"source_fact_ids\":[\"fact_engineering_platform_001\"]},{\"claim_text\":\"agentic workflow routing across enterprise systems\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"claim_unit_id\":\"competencies:skill:03\"},{\"claim_text\":\"policy-bound execution architecture for AI agents\",\"source_fact_ids\":[\"fact_engineering_platform_001\"]},{\"claim_text\":\"fail-closed runtime control gate design\",\"source_fact_ids\":[\"fact_engineering_platform_001\"]},{\"claim_text\":\"sandboxed decision workflows with audit trails\",\"source_fact_ids\":[\"fact_engineering_platform_001\"]},{\"claim_text\":\"Regulated DevSecOps release governance pipelines\",\"source_fact_ids\":[\"fact_engineering_platform_002\"],\"claim_unit_id\":\"competencies:skill:04\"},{\"claim_text\":\"GraphRAG context grounding for enterprise workflows\",\"source_fact_ids\":[\"fact_engineering_platform_001\"],\"claim_unit_id\":\"competencies:skill:08\"},{\"claim_text\":\"dense-sparse retrieval with relationship-aware ranking\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\"]},{\"claim_text\":\"authority-ordered prompt context assembly pipelines\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\"]},{\"claim_text\":\"demoable AI accelerators for executive buyers\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\"]},{\"claim_text\":\"reusable AI platform commercialization for adoption\",\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\"]},{\"claim_text\":\"Quota-aligned enterprise solution execution for pursuits\",\"source_fact_ids\":[\"fact_revenue_ops_001\"],\"claim_unit_id\":\"competencies:skill:02\"},{\"claim_text\":\"AWS alliance joint GTM execution\",\"source_fact_ids\":[\"fact_partnerships_gtm_002\"],\"claim_unit_id\":\"competencies:skill:05\"},{\"claim_text\":\"Customer success and value-realization operating cadence\",\"source_fact_ids\":[\"fact_revenue_ops_004\"],\"claim_unit_id\":\"competencies:skill:06\"},{\"claim_text\":\"AI co-sell bundling with strategic partners\",\"source_fact_ids\":[\"exp_unify_001\"],\"claim_unit_id\":\"competencies:skill:07\"},{\"claim_text\":\"audit-grade telemetry for agentic systems\",\"source_fact_ids\":[\"fact_revenue_ops_001\"]},{\"claim_text\":\"evaluation gauntlets for behavior assurance\",\"source_fact_ids\":[\"fact_revenue_ops_001\"]},{\"claim_text\":\"production reliability lifecycle for agentic workflows\",\"source_fact_ids\":[\"fact_revenue_ops_001\"]},{\"claim_text\":\"cloud-native AI data reference architectures\",\"source_fact_ids\":[\"fact_engineering_platform_002\"]},{\"claim_text\":\"microservices integration for regulated ecosystems\",\"source_fact_ids\":[\"fact_engineering_platform_002\"]},{\"claim_text\":\"lakehouse modernization for decision intelligence\",\"source_fact_ids\":[\"fact_engineering_platform_002\"]},{\"claim_text\":\"executive-aligned technical discovery operating cadences\",\"source_fact_ids\":[\"reb_ibm_presales_solution_engineering\"]},{\"claim_text\":\"enterprise pursuit operating model scale-out\",\"source_fact_ids\":[\"reb_ibm_presales_solution_engineering\"]},{\"claim_text\":\"Enterprise technical pre-sales solution engineering\",\"source_fact_ids\":[\"fact_revenue_ops_004\"],\"claim_unit_id\":\"competencies:skill:01\"}]"
+      }
+    ],
+    "max_output_tokens": 4096,
+    "reasoning": {
+      "effort": "high"
+    },
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "apps_rg_x1d_judge",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "score_scale": {
+              "type": "string",
+              "enum": [
+                "0_to_1",
+                "0_to_5"
+              ]
+            },
+            "score": {
+              "type": "number"
+            },
+            "threshold": {
+              "type": "number"
+            },
+            "pass": {
+              "type": "boolean"
+            },
+            "decisive_failure": {
+              "type": "boolean"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "cited_sentence_indexes": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "remediation_suggestions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dimension_verdicts": {
+              "type": "object",
+              "properties": {
+                "factual_support": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "ats_alignment_without_stuffing": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "seniority_executive_relevance": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "complementarity": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "no_bullet_restatement": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "anti_overfit": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "category_clarity": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "svp_agentic_specificity": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "partner_architecture_specificity": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "root_chronology_discipline": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "factual_support",
+                "ats_alignment_without_stuffing",
+                "seniority_executive_relevance",
+                "complementarity",
+                "no_bullet_restatement",
+                "anti_overfit",
+                "category_clarity",
+                "svp_agentic_specificity",
+                "partner_architecture_specificity",
+                "root_chronology_discipline"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "score_scale",
+            "score",
+            "threshold",
+            "pass",
+            "decisive_failure",
+            "findings",
+            "cited_sentence_indexes",
+            "remediation_suggestions",
+            "dimension_verdicts"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "input_hash": "e1cd28858dcdd68e",
+  "timestamp": "2026-08-09T08:25:37.281129+00:00",
+  "model_requested": "gpt-5.6-sol",
+  "model_actual": "gpt-5.6-sol",
+  "reasoning_effort": "high",
+  "judge_attempt": 1,
+  "judge_max_attempts": 2,
+  "compact_system_prompt": true,
+  "provider_name": "openai",
+  "model_env_source": "yaml_judge_models",
+  "canonical_contract_hash": null,
+  "packet_hash": "e1cd28858dcdd68e",
+  "schema_hash": "2d3f3d956b325217",
+  "max_tokens": 4096,
+  "temperature": null,
+  "thinking_level": null,
+  "response_format": "responses_json_schema"
+}

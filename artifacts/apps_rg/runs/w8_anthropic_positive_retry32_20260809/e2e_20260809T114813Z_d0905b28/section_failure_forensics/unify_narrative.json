@@ -1,0 +1,1310 @@
+{
+  "schema_version": "apps_rg.section_failure_forensics.v1",
+  "generated_at_utc": "2026-08-09T11:56:18Z",
+  "section_id": "unify_narrative",
+  "failure_type": "independent_failure",
+  "failed_gate_ids": [
+    "x2_no_companion_ngram_copy"
+  ],
+  "current_output": {
+    "present": true,
+    "ref": "unify_narrative_output.txt",
+    "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\unify_narrative_output.txt",
+    "text": "Owned Unify Consulting’s mandate to transform governed agentic AI architecture into an industrialized commercial engine, aligning platform direction, reusable IP, and disciplined enterprise deployment so regulated clients could adopt scalable capabilities through a repeatable operating model.",
+    "sha256": "78977e0b3e933f05982886d2530a3a01a3695c9f9dc1e91d72a4f625414f5631",
+    "source": "display_text_file"
+  },
+  "last_successful_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "missing_lane_dir",
+    "baseline_run_dir": "",
+    "baseline_found": false,
+    "baseline_lane_dir": "",
+    "baseline_display_txt_path": ""
+  },
+  "input_hash_comparison": {
+    "current_scenario_hash": "4d25d15b0781e0bcc0c4bd50120357125c8f12afb14e99906a471e6cbcc24b5a",
+    "baseline_scenario_hash": "",
+    "match": false,
+    "current": {
+      "target_company": "Anthropic",
+      "target_role": "Manager of Applied AI Architecture, Partnerships",
+      "manual_brief": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\apps_research\\runs\\r-f718894707d1d3360f734d3b\\briefing.md",
+      "jd": "",
+      "generation_mode": "strategic_tailor",
+      "scenario_hash": "4d25d15b0781e0bcc0c4bd50120357125c8f12afb14e99906a471e6cbcc24b5a"
+    },
+    "baseline": {}
+  },
+  "selected_fact_plan_comparison": {
+    "artifact": "selected_fact_plan.json",
+    "current_present": true,
+    "baseline_present": false,
+    "current_hash": "708297edaad30ee04eca8415bd7be1231629b90710c691e786f78e8d0a35d186",
+    "baseline_hash": "",
+    "match": false
+  },
+  "provider_request_hash_comparison": {
+    "artifact": "provider_request.json",
+    "current_present": true,
+    "baseline_present": false,
+    "current_hash": "99ff63946f20b38277accc4e76f86b9fa3311ef200daaa814ea3510a35602f07",
+    "baseline_hash": "",
+    "match": false
+  },
+  "revision_comparison": {
+    "baseline": {
+      "status": "NO_PRIOR_PASSING_RUN",
+      "git_commit": "",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_applicable"
+    },
+    "current": {
+      "status": "IDENTIFIED",
+      "git_commit": "cba1303f044f24af364b888122971cab7a972457",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_derivable_from_local_history"
+    }
+  },
+  "difference_summary": {
+    "baseline_status": "NO_PRIOR_PASSING_RUN",
+    "inputs_match": false,
+    "selected_fact_plan_match": false,
+    "provider_request_match": false,
+    "materialized_output_match": false,
+    "baseline_x2": "NOT_OBSERVED",
+    "current_x2": "FAIL",
+    "baseline_x3": "NOT_OBSERVED",
+    "current_x3": "X3_BLOCK",
+    "baseline_judges": "NOT_OBSERVED",
+    "current_judges": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+    "failed_gate_ids": [
+      "x2_no_companion_ngram_copy"
+    ]
+  },
+  "comparison_complete": false,
+  "output_bisect": {
+    "schema_version": "apps_rg.output_bisect.v1",
+    "section_id": "unify_narrative",
+    "scope": "NO_PRIOR_BASELINE",
+    "first_observed_divergence": {
+      "order": 1,
+      "stage": "u0_ingress",
+      "prior_value": "NOT_OBSERVED",
+      "current_value": "d6a6c3ec6834649e3021969a2b45886dcc1f849ee7330ff9f518bc23cd4ac744",
+      "prior_detail": "NOT_OBSERVED",
+      "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\apps_research\\runs\\r-f718894707d1d3360f734d3b\\briefing.md",
+      "match": false,
+      "classification": "CORRELATED_ONLY",
+      "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+      "prior_evidence_ref": "",
+      "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\ingress_raw.json"
+    },
+    "first_causally_relevant_divergence": {},
+    "ingestion_to_outcome_lineage": [
+      {
+        "order": 1,
+        "stage": "u0_ingress",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "d6a6c3ec6834649e3021969a2b45886dcc1f849ee7330ff9f518bc23cd4ac744",
+        "prior_detail": "NOT_OBSERVED",
+        "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\apps_research\\runs\\r-f718894707d1d3360f734d3b\\briefing.md",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\ingress_raw.json"
+      },
+      {
+        "order": 2,
+        "stage": "u0_payload",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "15fbcaf569749b556a6e201ecfb64c1afd2442348fab3063ecff2c842ea13843",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\u0_receipt.json"
+      },
+      {
+        "order": 3,
+        "stage": "jd_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "7007d1c94751961bbca210c216339aaffe8a993bbce758b9fc86f43a68bac238",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 4,
+        "stage": "briefing_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "f30ea9b511a426fe96c0b16d4b0f0b725dfbeb25ad800385938848df1371be12",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 5,
+        "stage": "targeting_bundle",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 6,
+        "stage": "proof_pool",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 7,
+        "stage": "selected_fact_plan",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "708297edaad30ee04eca8415bd7be1231629b90710c691e786f78e8d0a35d186",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 8,
+        "stage": "provider_request",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "35df276fcd43d5d045851a2a9267b6b4f9b1b8f38668c96ca4b541805360a5be",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CONTRIBUTING",
+        "reason": "This changed the material presented to generation or the generated candidate, but no counterfactual replay isolates it as the sole cause.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\provider_request.json"
+      },
+      {
+        "order": 9,
+        "stage": "initial_candidate",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\raw_model_output.txt"
+      },
+      {
+        "order": 10,
+        "stage": "retry_loop",
+        "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": true,
+        "classification": "RULED_OUT",
+        "reason": "The evidence is identical at this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\synthesis_regen_receipt.json"
+      },
+      {
+        "order": 11,
+        "stage": "deterministic_finalization",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\executive_summary_finalize_coherence.json"
+      },
+      {
+        "order": 12,
+        "stage": "final_x2",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "52be1da1581ddcf834bc0523035a5cd61a543b3ab9c1f486078ea37e5063f436",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "order": 13,
+        "stage": "judges",
+        "prior_value": "NO_JUDGE_ROWS",
+        "current_value": "45ad40457e16eea9091b4ba6433435f5f23bc8fbcd05ce05b4df2a71781ce41a",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x1d_llm_judge_outputs.json"
+      },
+      {
+        "order": 14,
+        "stage": "x3",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "X3_BLOCK",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "DOWNSTREAM_EFFECT",
+        "reason": "This is an observed consequence of the earlier candidate and recovery differences.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x3_disposition.json"
+      }
+    ],
+    "prior_attempt_timeline": [
+      {
+        "run": "prior_passing",
+        "sequence": 1,
+        "phase": "lane_resolution",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "no prior passing lane was found",
+        "repair_or_action": "none",
+        "gate_scope": "NONE",
+        "gate_result": "NOT_APPLICABLE",
+        "failed_gate_ids": [],
+        "judge_result": "NO_PRIOR_PASSING_RUN",
+        "disposition": "NO_BASELINE",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "",
+        "complete": true
+      }
+    ],
+    "current_attempt_timeline": [
+      {
+        "run": "current_failure",
+        "sequence": 1,
+        "phase": "initial_generation",
+        "attempt": 0,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "initial candidate",
+        "repair_or_action": "dispatch provider generation",
+        "gate_scope": "FULL_X2",
+        "gate_result": "PASS_OR_NOT_TRIGGERED",
+        "failed_gate_ids": [],
+        "judge_result": "PENDING",
+        "disposition": "ADVANCED_TO_X2",
+        "acceptance_scope": "INITIAL_CANDIDATE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\raw_model_output.txt",
+        "complete": false
+      },
+      {
+        "run": "current_failure",
+        "sequence": 2,
+        "phase": "final_x2",
+        "attempt": 1,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "all deterministic product gates",
+        "repair_or_action": "evaluate full X2 gate set",
+        "gate_scope": "FULL_X2",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [
+          "x2_no_companion_ngram_copy"
+        ],
+        "judge_result": "NOT_REACHED_X2_FAILED",
+        "disposition": "BLOCKED",
+        "acceptance_scope": "PRODUCT_GATE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 3,
+        "phase": "judge_panel",
+        "attempt": "gemini_pro",
+        "candidate_digest": "30bbc36fed20ee96",
+        "word_count": 0,
+        "trigger_or_input": "",
+        "repair_or_action": "grade candidate",
+        "gate_scope": "X1D_MODEL_BACKED_JUDGE",
+        "gate_result": "PASS",
+        "failed_gate_ids": [],
+        "judge_result": "5.0/4.0 MODEL_BACKED_PASS",
+        "disposition": "JUDGE_PASS",
+        "acceptance_scope": "MODEL_BACKED_GRADE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x1d_gemini_provider_response_raw_20260809_115332_477.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 4,
+        "phase": "judge_retry_status",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "all configured judges passed",
+        "repair_or_action": "no judge retry required",
+        "gate_scope": "JUDGE_REMEDIATION",
+        "gate_result": "NOT_NEEDED",
+        "failed_gate_ids": [],
+        "judge_result": "NOT_NEEDED_ALL_JUDGES_PASSED",
+        "disposition": "NO_RETRY",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\judge_remediation_cycles.json",
+        "complete": true
+      },
+      {
+        "run": "current_failure",
+        "sequence": 5,
+        "phase": "x3_disposition",
+        "attempt": "-",
+        "candidate_digest": "78977e0b3e933f05",
+        "word_count": 0,
+        "trigger_or_input": "X2 deterministic gate failure",
+        "repair_or_action": "authorize or block product output",
+        "gate_scope": "X3",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [
+          "x2_no_companion_ngram_copy"
+        ],
+        "judge_result": "MODEL_BACKED",
+        "disposition": "X3_BLOCK",
+        "acceptance_scope": "PRODUCT_AUTHORIZATION",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x3_disposition.json",
+        "complete": true
+      }
+    ],
+    "gate_matrix": [
+      {
+        "gate_id": "X2_BLOCK_ID_NAMESPACE_SPLIT",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'disjoint_without_alias': [], 'alias_map_size': 0}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_active_pool_digest_matches_fec_digest",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'canonical_evidence_set_digest': '558bad37513c1030fbaa769fa704cf72f2b38f7524d092f1de207b789e46ca52', 'fec_allowed_fact_ids_digest': '558bad37513c1030fbaa769fa704cf72f2b38f7524d092f1de207b789e46ca52', 'fec_narrowed_from_pool': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_briefing_used_as_required_context_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'required': True, 'used': True, 'authority': 'CONTEXT_INPUT', 'used_for': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_c0_metrics_artifact_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'schema_version': 'c0_metrics.v1', 'required_keys_present': ['blocked_source_refs', 'briefing_source_type', 'citation_map', 'company_brief_provenance', 'evidence_counts', 'excluded_evidence_refs', 'final_evidence_digest', 'freshness_receipts', 'retrieval_mode', 'retrieval_sources', 'route_id', 'run_id', 'schema_version', 'source_class_coverage', 'support_score_profile', 'support_status', 'support_target_met']}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_c0_support_status_gate",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'support_status': 'PASS', 'support_target_met': True, 'c0_minimum_safe': True, 'canonical_enum': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_claim_ledger_claim_text_non_empty",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "ok",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_claim_ledger_source_fact_ids_subset_of_fec",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'ledger_id_count': 5, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_fec_subset_of_canonical_evidence_pool",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'fec_count': 49, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_input_usage_accounting_consistent",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'ledger_summary': {'displayed_claim_count': 1, 'claims_supported_by_selected_resume_facts': 1, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'runtime_summary': {'displayed_claim_count': 1, 'claims_supported_by_selected_resume_facts': 1, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'coverage_overall_pass': True}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_jd_used_as_required_targeting_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'required': True, 'used': True, 'authority': 'TARGETING_INPUT', 'used_for': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_json_parse_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_narrative_base_prose_ngram_overlap",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_narrative_e0_ngram_overlap",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_narrative_no_consulting_language",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_narrative_not_bullet_recap",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'max_5gram_overlap': 0.0, 'est_shared_ngrams': 0}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_narrative_seniority_floor",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'strong_verbs': ['owned'], 'authority': ['model', 'enterprise', 'architecture', 'platform', 'operating', 'mandate', 'regulated'], 'issues': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_narrative_technical_specificity_floor",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "['agentic']",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_narrative_upstream_graph_proof_required",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Upstream gate 'x2_bullet_graph_skill_node_ids_required' did not pass. Narrative proof authority depends on bullet graph_skill_node_ids being validated. Resolve bullet X2 gates before promoting narrative to HARD FAIL.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_bullet_label_repetition",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Narrative repeats a finalized bullet label.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_bullet_sentence_structure_copy",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Narrative copies a bullet-leading phrase.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_companion_ngram_copy",
+        "prior": "NOT_OBSERVED",
+        "current": "FAIL",
+        "changed": true,
+        "current_reason": "High n-gram overlap with companion bullet text.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_em_dash",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Em dash found.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_ey_fact_leakage",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "EY leakage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_first_person",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "First person in narrative.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_generic_filler",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Generic filler.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_ibm_fact_leakage",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "IBM leakage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_inline_source_tags",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Inline source tags in narrative.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_insurtech_fact_leakage",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "InsurTech leakage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_jd_only_claims",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "JD phrase copied as proof.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_metric_repetition_unless_justified",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "no companion bullets artifact",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_non_evidence_inputs_as_claim_evidence",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_non_evidence_inputs_in_source_fact_ids",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'row_scan_found_reserved_non_resume_ids': False, 'ledger_non_evidence_inputs_in_source_fact_ids': False}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_silent_mock_fallback",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Silent mock fallback.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_no_six_bullet_summary",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Reads like stacked bullet summary.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_prompt_c0_ids_subset_of_fec",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'prompt_c0_count': 49, 'violations': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_provider_requested_attempted",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Provider mismatch.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_resume_graph_claim_binding",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'allocation_plan_digest': '910d22fab4d7d7d366f8362f2a6aaa5d9e929a3b20b6399feea848a33d76f365', 'claim_count': 1, 'bound_claim_count': 1, 'binding_coverage': 1.0, 'metric_exactness_pass': True, 'orphan_allocation_claim_unit_ids': [], 'failure_reasons': []}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_section_claims_supported_by_base_resume",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'displayed_claim_count': 1, 'claims_supported_by_selected_resume_facts': 1, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_section_input_usage_ledger_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "section_input_usage_ledger_v1",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_selected_fact_ids_only",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_title_company_used_as_required_positioning_input",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'target_title': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}, 'target_company': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_active_proof_pool_source_fact_ids",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'section': 'unify_narrative', 'proof_source': 'augmented_skills_graph', 'proof_pool_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'proof_pool_digest': '9abea0d2f20e7dfc272eadff2a54e33c987fbe9df92932dd1a2ab74e8078402e', 'canonical_evidence_set_digest': '9abea0d2f20e7dfc272eadff2a54e33c987fbe9df92932dd1a2ab74e8078402e', 'id_alias_map': {}, 'claim_evidence_source_type': 'augmented_skills_graph', 'claim_evidence_source_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'skills_authority_source_type': 'augmented_skills_graph', 'skills_authority_status': 'PASS', 'skills_authority_graph_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'legacy_broad_skills_ledger_skills_authority': False, 'broad_skills_ledger_claim_evidence_only': None, 'allowed_source_fact_ids_count': 49, 'source_fact_ids_checked': ['reb_unify_agentic_platform_architecture', 'reb_unify_platform_commercialization_leadership', 'reb_unify_enterprise_adoption_revenue', 'reb_unify_production_adoption_lifecycle', 'reb_unify_runtime_reliability_governance'], 'unsupported_source_fact_ids': [], 'rejected_non_proof_source_ids': [], 'jd_or_briefing_ids_rejected': [], 'x2_source_fact_pool_status': 'PASS', 'decisive_reason': None, 'validator_name': 'evaluate_proof_pool_source_fact_gate', 'skills_authority_x2_boundary': 'PASS', 'x2_srfs_gate_status': 'NOT_APPLICABLE', 'out_of_slice_fact_ids': [], 'srfs_allowed_fact_ids_count': 49, 'selected_role_fact_set_used': False, 'broad_skills_ledger_used': False, 'broad_skills_ledger_used_as_authority': False, 'base_resume_fallback_used': False, 'srfs_section_id': 'unify_narrative'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_base_archive_ngram_overlap_forbidden_or_warn",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_bullet_overlap_threshold",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_exactly_one_sentence",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Must be exactly one sentence.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_exactly_one_sentence_mechanical",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "single sentence required",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_flat_skill_only_forbidden",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'flat_skill_only': False}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_forbidden_opener",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_generic_consulting_language_forbidden",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_graph_skill_node_ids_required",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "['skill_agentic_platform_productization', 'skill_ai_platform_commercialization', 'skill_audit_grade_observability', 'skill_context_engineering', 'skill_dense_sparse_exact_retrieval_design', 'skill_deterministic_route_selection', 'skill_enterprise_workflow_adoption', 'skill_exit_disposition_governance', 'skill_governed_agentic_systems_architecture', 'skill_graph_aware_relationship_grounding', 'skill_managed_workflow_orchestration', 'skill_operating_model_for_agentic_ai', 'skill_partner_customer_deal_support', 'skill_partner_sales_revenue_targets', 'skill_provider_and_egress_governance', 'skill_replayable_runtime_design', 'skill_revops_usage_based_subscription_forecasting', 'skill_runtime_gate_mesh_design', 'skill_runtime_resilience_controls', 'skill_sandboxed_execution_design', 'skill_sr_cloud_data_platform_engineering', 'skill_sr_w12_databricks_lakehouse_fundamentals', 'skill_svp_it_strategy_innovation', 'skill_unify_agentic_graphrag_context_pack_grounding', 'skill_unify_agentic_human_override_escalation_paths', 'skill_unify_agentic_l0_route_policy_dispatch', 'skill_unify_agentic_multi_agent_orchestration_contracts', 'skill_unify_agentic_replay_key_audit_manifest_design', 'skill_unify_agentic_runtime_gate_verdict_contracts', 'skill_unify_agentic_runtime_proof_bundle_lineage', 'skill_unify_agentic_tool_sandbox_egress_controls']",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_metric_cap",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_no_candidate_name_tokens",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Candidate name must not appear in the role narrative sentence.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_requires_finalized_bullets",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Narrative must run only after finalized Unify bullets are accepted.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_role_episode_bundle_id_required",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "['reb_unify_agentic_platform_architecture', 'reb_unify_distributed_ecosystem_engineering', 'reb_unify_enterprise_adoption_revenue', 'reb_unify_platform_commercialization_leadership', 'reb_unify_production_adoption_lifecycle', 'reb_unify_runtime_reliability_governance']",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_role_episode_bundles_in_proof_pool",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'bundles_present': True, 'flat_skill_only': False}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_seniority_floor_met",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "1",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_source_fact_or_graph_lineage_required",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "['exp_unify_001', 'fact_engineering_platform_001', 'fact_engineering_platform_002', 'fact_engineering_platform_003', 'fact_engineering_platform_004', 'fact_engineering_platform_006']",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_source_supported",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "claim_ledger must map to allowed Unify narrative proof facts only.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_targeting_inputs_used_but_not_proof",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'reason': 'ok'}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_technical_specificity_floor_met",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "2",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_unify_only_fact_scope",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Non-Unify fact scope.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_unsupported_new_claim_forbidden",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "none",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_unify_narrative_word_budget",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "{'word_count': 36, 'char_len': 293}",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_x1d_required_judges_present",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "gate_id": "x2_x1d_schema_valid",
+        "prior": "NOT_OBSERVED",
+        "current": "PASS",
+        "changed": true,
+        "current_reason": "Blocked judges invalid schema: []",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      }
+    ],
+    "judge_matrix": [
+      {
+        "judge": "gemini_pro",
+        "prior": "NOT_OBSERVED",
+        "current": "5.0/4.0 PASS",
+        "reason": ""
+      }
+    ],
+    "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+    "code_bindings": [
+      {
+        "role": "revision comparison",
+        "file": "",
+        "symbol": "",
+        "baseline_symbol_hash": "",
+        "current_symbol_hash": "",
+        "changed_between_revisions": false,
+        "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+      }
+    ],
+    "underlying_root_cause": {
+      "downstream_root_cause": {
+        "status": "ISOLATED_TO_UPSTREAM_SECTION",
+        "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+      }
+    },
+    "layperson_explanation": [
+      "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+      "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\apps_research\\runs\\r-f718894707d1d3360f734d3b\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+      "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (x2_no_companion_ngram_copy), so 5.0/4.0 MODEL_BACKED_PASS and the resume remained blocked."
+    ]
+  },
+  "layperson_explanation": [
+    "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+    "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\apps_research\\runs\\r-f718894707d1d3360f734d3b\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+    "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (x2_no_companion_ngram_copy), so 5.0/4.0 MODEL_BACKED_PASS and the resume remained blocked."
+  ],
+  "retry_attempts": [],
+  "retry_outputs": [
+    {
+      "ref": "raw_model_output.txt",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\raw_model_output.txt",
+      "json": {
+        "narrative_sentence": "Owned Unify Consulting’s mandate to transform governed agentic AI architecture into an industrialized commercial engine, aligning platform direction, reusable IP, and disciplined enterprise deployment so regulated clients could adopt scalable capabilities through a repeatable operating model.",
+        "selected_fact_plan": {
+          "method": "selected_graph_evidence_plan_unify_narrative",
+          "selected_role_episode_bundles": [
+            "reb_unify_agentic_platform_architecture",
+            "reb_unify_distributed_ecosystem_engineering",
+            "reb_unify_enterprise_adoption_revenue",
+            "reb_unify_platform_commercialization_leadership",
+            "reb_unify_production_adoption_lifecycle",
+            "reb_unify_runtime_reliability_governance"
+          ],
+          "synthesis_focus": [
+            "platform architecture",
+            "commercialization and reusable IP",
+            "enterprise adoption",
+            "lifecycle standardization",
+            "runtime governance"
+          ]
+        },
+        "claim_ledger": [
+          {
+            "claim_text": "The role unified governed agentic AI architecture, platform commercialization, reusable IP, and disciplined enterprise deployment into a repeatable operating model.",
+            "source_fact_ids": [
+              "reb_unify_agentic_platform_architecture",
+              "reb_unify_platform_commercialization_leadership",
+              "reb_unify_enterprise_adoption_revenue",
+              "reb_unify_production_adoption_lifecycle",
+              "reb_unify_runtime_reliability_governance"
+            ]
+          }
+        ],
+        "jd_alignment": {
+          "selected_jd_themes": [
+            "partner-facing applied AI architecture",
+            "joint solution development",
+            "enterprise AI adoption",
+            "team and operating-model leadership"
+          ],
+          "selected_briefing_themes": [
+            "reusable enterprise solution patterns",
+            "disciplined ecosystem execution",
+            "responsible and supportable AI deployment",
+            "translating deployment learning into platform direction"
+          ],
+          "targeting_rationale": "The narrative emphasizes the accepted evidence themes most relevant to applied AI architecture partnerships: reusable platform capability, enterprise deployment discipline, commercialization, and operating-model leadership.",
+          "jd_used_as_proof": false,
+          "briefing_used_as_proof": false,
+          "companion_context_used_as_proof": false,
+          "targeting_only": true
+        },
+        "gap_notes": [],
+        "change_log": [
+          {
+            "role_episode_bundle_id": "reb_unify_agentic_platform_architecture",
+            "narrative_contribution": "governed agentic AI architecture and platform direction",
+            "metric_outcome_ids": []
+          },
+          {
+            "role_episode_bundle_id": "reb_unify_distributed_ecosystem_engineering",
+            "narrative_contribution": "scalable enterprise platform infrastructure",
+            "metric_outcome_ids": []
+          },
+          {
+            "role_episode_bundle_id": "reb_unify_enterprise_adoption_revenue",
+            "narrative_contribution": "regulated-enterprise adoption",
+            "metric_outcome_ids": []
+          },
+          {
+            "role_episode_bundle_id": "reb_unify_platform_commercialization_leadership",
+            "narrative_contribution": "commercial engine and reusable IP",
+            "metric_outcome_ids": []
+          },
+          {
+            "role_episode_bundle_id": "reb_unify_production_adoption_lifecycle",
+            "narrative_contribution": "disciplined enterprise deployment",
+            "metric_outcome_ids": []
+          },
+          {
+            "role_episode_bundle_id": "reb_unify_runtime_reliability_governance",
+            "narrative_contribution": "governed and repeatable operating model",
+            "metric_outcome_ids": []
+          }
+        ],
+        "self_check": {
+          "companion_unify_bullets_status": "ACCEPTED_FINALIZED",
+          "exactly_one_sentence": true,
+          "word_count": 36,
+          "character_count": 236,
+          "metric_count": 0,
+          "forbidden_opener_check": "passed",
+          "four_word_companion_overlap_check": "passed",
+          "proof_policy_check": "passed",
+          "jd_and_briefing_used_as_proof": false
+        }
+      }
+    },
+    {
+      "ref": "parsed_output.json",
+      "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\parsed_output.json",
+      "json": {
+        "parsed": {
+          "narrative_sentence": "Owned Unify Consulting’s mandate to transform governed agentic AI architecture into an industrialized commercial engine, aligning platform direction, reusable IP, and disciplined enterprise deployment so regulated clients could adopt scalable capabilities through a repeatable operating model.",
+          "selected_fact_plan": {
+            "method": "selected_graph_evidence_plan_unify_narrative",
+            "selected_role_episode_bundles": [
+              "reb_unify_agentic_platform_architecture",
+              "reb_unify_distributed_ecosystem_engineering",
+              "reb_unify_enterprise_adoption_revenue",
+              "reb_unify_platform_commercialization_leadership",
+              "reb_unify_production_adoption_lifecycle",
+              "reb_unify_runtime_reliability_governance"
+            ],
+            "synthesis_focus": [
+              "platform architecture",
+              "commercialization and reusable IP",
+              "enterprise adoption",
+              "lifecycle standardization",
+              "runtime governance"
+            ]
+          },
+          "claim_ledger": [
+            {
+              "claim_text": "Owned Unify Consulting’s mandate to transform governed agentic AI architecture into an industrialized commercial engine, aligning platform direction, reusable IP, and disciplined enterprise deployment so regulated clients could adopt scalable capabilities through a repeatable operating model.",
+              "source_fact_ids": [
+                "reb_unify_agentic_platform_architecture",
+                "reb_unify_platform_commercialization_leadership",
+                "reb_unify_enterprise_adoption_revenue",
+                "reb_unify_production_adoption_lifecycle",
+                "reb_unify_runtime_reliability_governance"
+              ]
+            }
+          ],
+          "jd_alignment": {
+            "targeting_only": true,
+            "jd_used_as_proof": false,
+            "briefing_used_as_proof": false,
+            "selected_jd_themes": [
+              "partner-facing applied AI architecture",
+              "joint solution development",
+              "enterprise AI adoption",
+              "team and operating-model leadership"
+            ],
+            "selected_briefing_themes": [
+              "reusable enterprise solution patterns",
+              "disciplined ecosystem execution",
+              "responsible and supportable AI deployment",
+              "translating deployment learning into platform direction"
+            ],
+            "targeting_rationale": "The narrative emphasizes the accepted evidence themes most relevant to applied AI architecture partnerships: reusable platform capability, enterprise deployment discipline, commercialization, and operating-model leadership.",
+            "companion_context_used_as_proof": false
+          },
+          "gap_notes": [],
+          "change_log": [
+            {
+              "role_episode_bundle_id": "reb_unify_agentic_platform_architecture",
+              "narrative_contribution": "governed agentic AI architecture and platform direction",
+              "metric_outcome_ids": []
+            },
+            {
+              "role_episode_bundle_id": "reb_unify_distributed_ecosystem_engineering",
+              "narrative_contribution": "scalable enterprise platform infrastructure",
+              "metric_outcome_ids": []
+            },
+            {
+              "role_episode_bundle_id": "reb_unify_enterprise_adoption_revenue",
+              "narrative_contribution": "regulated-enterprise adoption",
+              "metric_outcome_ids": []
+            },
+            {
+              "role_episode_bundle_id": "reb_unify_platform_commercialization_leadership",
+              "narrative_contribution": "commercial engine and reusable IP",
+              "metric_outcome_ids": []
+            },
+            {
+              "role_episode_bundle_id": "reb_unify_production_adoption_lifecycle",
+              "narrative_contribution": "disciplined enterprise deployment",
+              "metric_outcome_ids": []
+            },
+            {
+              "role_episode_bundle_id": "reb_unify_runtime_reliability_governance",
+              "narrative_contribution": "governed and repeatable operating model",
+              "metric_outcome_ids": []
+            },
+            {
+              "operation": "synchronize_single_sentence_claim_ledger_text",
+              "reason": "final_materialized_claim_text_must_equal_visible_narrative",
+              "source_row_count": 1
+            }
+          ],
+          "self_check": {
+            "companion_unify_bullets_status": "ACCEPTED_FINALIZED",
+            "exactly_one_sentence": true,
+            "word_count": 36,
+            "character_count": 236,
+            "metric_count": 0,
+            "forbidden_opener_check": "passed",
+            "four_word_companion_overlap_check": "passed",
+            "proof_policy_check": "passed",
+            "jd_and_briefing_used_as_proof": false
+          }
+        },
+        "parse_error": "",
+        "parse_status": "OK"
+      }
+    }
+  ],
+  "repair_ledger": {
+    "present": true,
+    "artifacts": [
+      {
+        "ref": "section_repair_ledger.json",
+        "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\section_repair_ledger.json",
+        "json": {
+          "schema_version": 1,
+          "section_id": "unify_narrative",
+          "run_id": "unify_narrative_20260809_115313",
+          "product_fail_closed": true,
+          "scored_attempt_number": 1,
+          "authoritative_attempt_number": 1,
+          "authoritative_l2_source": "initial_llm",
+          "attempt_1_x2_failed": true,
+          "attempt_1_x2_failed_gate_ids": [
+            "x2_no_companion_ngram_copy"
+          ],
+          "repairs": [],
+          "x2_runs": [
+            {
+              "run": 1,
+              "after_l2_source": "initial_llm",
+              "failed_gate_ids": [
+                "x2_no_companion_ngram_copy"
+              ],
+              "passed": false
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "final_materialized_output": {
+    "present": true,
+    "ref": "unify_narrative_output.txt",
+    "path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative\\unify_narrative_output.txt",
+    "text": "Owned Unify Consulting’s mandate to transform governed agentic AI architecture into an industrialized commercial engine, aligning platform direction, reusable IP, and disciplined enterprise deployment so regulated clients could adopt scalable capabilities through a repeatable operating model.",
+    "sha256": "78977e0b3e933f05982886d2530a3a01a3695c9f9dc1e91d72a4f625414f5631",
+    "source": "display_text_file"
+  },
+  "exact_code_surface": {
+    "producer_files": [
+      "apps_rg/runtime/section_failure_forensics.py",
+      "apps_rg/runtime/sections/role_episode_lane.py"
+    ],
+    "artifact_refs": [
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry32_20260809/e2e_20260809T114813Z_d0905b28/modular_r4/sections/unify_narrative/x2_gate_outputs.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry32_20260809/e2e_20260809T114813Z_d0905b28/modular_r4/sections/unify_narrative/x3_disposition.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry32_20260809/e2e_20260809T114813Z_d0905b28/modular_r4/sections/unify_narrative/l2_output.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry32_20260809/e2e_20260809T114813Z_d0905b28/modular_r4/sections/unify_narrative/selected_fact_plan.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry32_20260809/e2e_20260809T114813Z_d0905b28/modular_r4/sections/unify_narrative/provider_request.json",
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry32_20260809/e2e_20260809T114813Z_d0905b28/modular_r4/sections/unify_narrative/integrated_lane_pre_run_failure.json"
+    ],
+    "lane_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\unify_narrative"
+  },
+  "why_it_passed_before": "The pinned prior-pass baseline was unavailable, so this RCA cannot claim a clean passing comparison.",
+  "why_it_failed_now": "The section's final materialized artifact did not pass x2_no_companion_ngram_copy.",
+  "required_fix": [
+    "Make `unify_narrative` gate final displayed output, not intermediate provider output.",
+    "Bind the failed gate evidence (`x2_no_companion_ngram_copy`) to the producer/parser contract that emitted the artifact.",
+    "Record retry and repair outputs in the lane ledger so repeated LLM variance is explainable."
+  ],
+  "baseline_confidence": "pinned_contract_invalid",
+  "baseline_run_dir": ""
+}

@@ -7,19 +7,20 @@ if __name__ == "__main__":
     )
 
 
-import argparse
 import hashlib
 import json
-import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Literal, Mapping
 
 from apps_rg.runtime.disposition_authority import (
+    CORE_RUNTIME_AUTHORITY_ARTIFACT,
+    CORE_X3_DISPOSITION_RECEIPT_ARTIFACT,
     EXIT_DISPOSITION_RECEIPT_ARTIFACT,
     resolve_lane_x3_from_artifact_refs,
 )
+from apps_rg.runtime.internal.generated_lane_contract import GENERATED_LANES
 from apps_rg.runtime.runtime_proof_layout import (
     is_accepted_real_llm_provider_bundle,
     load_latest_pointer,
@@ -29,7 +30,9 @@ from apps_rg.runtime.runtime_proof_layout import (
 )
 from apps_rg.runtime.section_judge_policy import REQUIRED_JUDGE_PROVIDER_KEYS
 from apps_rg.runtime.section_cli_defaults import COMPETENCIES_DEFAULT_X1D_JUDGES
-from apps_rg.runtime.spine.section_x3_finalize import FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT
+from apps_rg.runtime.spine.section_x3_finalize import (
+    FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 RUNTIME_PROOFS = REPO_ROOT / "artifacts" / "apps_rg" / "runtime_proofs"
@@ -99,20 +102,6 @@ def _collect_freshness(lane: str, base: Path, l2: Mapping[str, Any]) -> dict[str
 # SECTION_ORDER in lane_batch.py. The rollup readers (build_rollup / build_modular_lane_rollup)
 # aggregate by set membership, so order only affects display, not status. The parallel wave DAG
 # lives in workflow_manifest.resume_sections.v1.yaml and mirrors this dependency order.
-GENERATED_LANES: tuple[str, ...] = (
-    "competencies",
-    "unify_bullets",
-    "ibm_bullets",
-    "insurtech_bullets",
-    "ey_bullets",
-    "unify_narrative",
-    "ibm_narrative",
-    "insurtech_narrative",
-    "ey_narrative",
-    "executive_summary",
-    "headline",
-)
-
 REQUIRED_RELATIVE = (
     "l2_output.json",
     "x2_gate_outputs.json",
@@ -147,11 +136,7 @@ def _normalize_x1d_judges(raw: Any) -> list[dict[str, Any]]:
 
 
 def _judge_provider_status(judge: Mapping[str, Any]) -> str:
-    return str(
-        judge.get("provider_status")
-        or judge.get("evaluator_mode")
-        or "UNKNOWN"
-    )
+    return str(judge.get("provider_status") or judge.get("evaluator_mode") or "UNKNOWN")
 
 
 def _normalize_blocked_soft(x3: Mapping[str, Any]) -> tuple[list[str], list[str]]:
@@ -184,7 +169,11 @@ def _normalize_x2(raw: Any) -> dict[str, Any]:
     """Return gates list + tallies + failed ids (from pass flags and artifact fields)."""
     if isinstance(raw, list):
         gates = list(raw)
-        failed_from_pass = [g["gate_id"] for g in gates if isinstance(g, dict) and not g.get("pass", True)]
+        failed_from_pass = [
+            g["gate_id"]
+            for g in gates
+            if isinstance(g, dict) and not g.get("pass", True)
+        ]
         total = len(gates)
         passed = sum(1 for g in gates if isinstance(g, dict) and g.get("pass", True))
         return {
@@ -197,14 +186,19 @@ def _normalize_x2(raw: Any) -> dict[str, Any]:
         }
     if isinstance(raw, dict):
         gates = list(raw.get("gates") or [])
-        failed_from_pass = [g["gate_id"] for g in gates if isinstance(g, dict) and not g.get("pass", True)]
+        failed_from_pass = [
+            g["gate_id"]
+            for g in gates
+            if isinstance(g, dict) and not g.get("pass", True)
+        ]
         explicit = list(raw.get("failed_gates") or [])
-        artifact_failed = explicit if explicit else failed_from_pass
         total = int(raw.get("total_x2_gates", len(gates)))
         x2_passed = raw.get("x2_passed")
         x2_failed = raw.get("x2_failed")
         if x2_passed is None:
-            x2_passed = sum(1 for g in gates if isinstance(g, dict) and g.get("pass", True))
+            x2_passed = sum(
+                1 for g in gates if isinstance(g, dict) and g.get("pass", True)
+            )
         if x2_failed is None:
             x2_failed = len(failed_from_pass)
         return {
@@ -241,7 +235,11 @@ def _output_summary(l2: Mapping[str, Any], lane: str) -> dict[str, Any]:
         return {"kind": "bullets", "bullet_count": n}
     if lane in {"unify_narrative", "ibm_narrative"}:
         sent = str(l2.get("narrative_sentence", ""))
-        return {"kind": "narrative_sentence", "preview": sent[:400], "char_len": len(sent)}
+        return {
+            "kind": "narrative_sentence",
+            "preview": sent[:400],
+            "char_len": len(sent),
+        }
     return {"kind": "unknown", "lane": lane}
 
 
@@ -275,9 +273,15 @@ def _lane_pointer_fields(repo: Path, lane: str) -> dict[str, Any]:
         "latest_real_artifact_path": real.get("run_dir") if real else None,
         "latest_real_attempt_run_id": rid,
         "latest_real_attempt_runtime_generation_status": rstat or None,
-        "latest_successful_real_run_id": successful.get("run_id") if successful else None,
-        "latest_successful_real_generated_at_utc": successful.get("generated_at_utc") if successful else None,
-        "latest_successful_real_artifact_path": successful.get("run_dir") if successful else None,
+        "latest_successful_real_run_id": successful.get("run_id")
+        if successful
+        else None,
+        "latest_successful_real_generated_at_utc": successful.get("generated_at_utc")
+        if successful
+        else None,
+        "latest_successful_real_artifact_path": successful.get("run_dir")
+        if successful
+        else None,
         "latest_successful_real_runtime_generation_status": (
             str(successful.get("runtime_generation_status", "")) if successful else None
         ),
@@ -299,9 +303,15 @@ def collect_lane(
         base = resolve_rollup_run_dir(root, lane, artifact_mode="mock")
         accepted_real_evidence_resolution = "latest_mock_run.json"
     else:
-        base, accepted_real_evidence_resolution = resolve_accepted_real_rollup_run_dir(root, lane)
+        base, accepted_real_evidence_resolution = resolve_accepted_real_rollup_run_dir(
+            root, lane
+        )
     if base is None:
-        real_attempt = load_latest_pointer(root, lane, "real") if rollup_artifact_mode == "real" else None
+        real_attempt = (
+            load_latest_pointer(root, lane, "real")
+            if rollup_artifact_mode == "real"
+            else None
+        )
         attempt_tail = ""
         if real_attempt:
             attempt_tail = (
@@ -316,14 +326,18 @@ def collect_lane(
         )
     missing = [n for n in REQUIRED_RELATIVE if not (base / n).is_file()]
     if missing:
-        raise FileNotFoundError(f"Lane {lane!r} missing artifacts under {_rel(base)}: {missing}")
+        raise FileNotFoundError(
+            f"Lane {lane!r} missing artifacts under {_rel(base)}: {missing}"
+        )
 
     lp = LanePaths(lane=lane, base=base)
     l2 = _load_json(lp.p("l2_output.json"))
     x2_raw = _load_json(lp.p("x2_gate_outputs.json"))
     x1d_raw = _load_json(lp.p("x1d_llm_judge_outputs.json"))
     x3 = _load_json(lp.p("x3_disposition.json"))
-    final_materialized_contract = _load_json(lp.p(FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT))
+    final_materialized_contract = _load_json(
+        lp.p(FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT)
+    )
     l6 = _load_json(lp.p("l6_shadow_eval_package.json"))
 
     x2n = _normalize_x2(x2_raw)
@@ -336,6 +350,12 @@ def collect_lane(
         artifact_refs[EXIT_DISPOSITION_RECEIPT_ARTIFACT] = _rel(
             base / EXIT_DISPOSITION_RECEIPT_ARTIFACT
         )
+    for core_name in (
+        CORE_X3_DISPOSITION_RECEIPT_ARTIFACT,
+        CORE_RUNTIME_AUTHORITY_ARTIFACT,
+    ):
+        if (base / core_name).is_file():
+            artifact_refs[core_name] = _rel(base / core_name)
     x3_auth = resolve_lane_x3_from_artifact_refs(
         artifact_refs=artifact_refs,
         repo_root=root,
@@ -344,9 +364,11 @@ def collect_lane(
 
     section_id = str(l2.get("section_id") or lane)
     runtime_gen = str(
-        l2.get("runtime_generation_status") or x3.get("runtime_generation_status") or "UNKNOWN"
+        l2.get("runtime_generation_status")
+        or x3.get("runtime_generation_status")
+        or "UNKNOWN"
     )
-    rollup_x3_code = str(x3_auth.get("x3_code") or x3.get("x3_code", ""))
+    rollup_x3_code = str(x3_auth.get("x3_code") or "")
 
     return {
         "lane_key": lane,
@@ -367,7 +389,9 @@ def collect_lane(
         "soft_failed_judges": soft,
         "blocked_judges": blocked,
         "x3_code": rollup_x3_code,
-        "final_materialized_acceptance_ok": final_materialized_contract.get("pass") is True,
+        "x3_mirror_code": str(x3_auth.get("mirror_x3_code") or ""),
+        "final_materialized_acceptance_ok": final_materialized_contract.get("pass")
+        is True,
         "final_materialized_acceptance_contract_ref": artifact_refs.get(
             FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT
         ),
@@ -411,14 +435,18 @@ def collect_lane_from_run_dir(lane: str, base: Path, *, repo: Path) -> dict[str,
     """Build one rollup lane row from an explicit run directory (R4 modular Phase 1+)."""
     missing = [n for n in REQUIRED_RELATIVE if not (base / n).is_file()]
     if missing:
-        raise FileNotFoundError(f"Lane {lane!r} missing artifacts under {_rel(base)}: {missing}")
+        raise FileNotFoundError(
+            f"Lane {lane!r} missing artifacts under {_rel(base)}: {missing}"
+        )
 
     lp = LanePaths(lane=lane, base=base)
     l2 = _load_json(lp.p("l2_output.json"))
     x2_raw = _load_json(lp.p("x2_gate_outputs.json"))
     x1d_raw = _load_json(lp.p("x1d_llm_judge_outputs.json"))
     x3 = _load_json(lp.p("x3_disposition.json"))
-    final_materialized_contract = _load_json(lp.p(FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT))
+    final_materialized_contract = _load_json(
+        lp.p(FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT)
+    )
     l6 = _load_json(lp.p("l6_shadow_eval_package.json"))
 
     x2n = _normalize_x2(x2_raw)
@@ -428,9 +456,17 @@ def collect_lane_from_run_dir(lane: str, base: Path, *, repo: Path) -> dict[str,
 
     artifact_refs = {n: _rel(lp.p(n)) for n in REQUIRED_RELATIVE}
     if (base / EXIT_DISPOSITION_RECEIPT_ARTIFACT).is_file():
-        artifact_refs[EXIT_DISPOSITION_RECEIPT_ARTIFACT] = _rel(  # guardian: allow-silent-swallow -- P2 burndown: fail-soft optional boundary
-            base / EXIT_DISPOSITION_RECEIPT_ARTIFACT
+        artifact_refs[EXIT_DISPOSITION_RECEIPT_ARTIFACT] = (
+            _rel(  # guardian: allow-silent-swallow -- P2 burndown: fail-soft optional boundary
+                base / EXIT_DISPOSITION_RECEIPT_ARTIFACT
+            )
         )
+    for core_name in (
+        CORE_X3_DISPOSITION_RECEIPT_ARTIFACT,
+        CORE_RUNTIME_AUTHORITY_ARTIFACT,
+    ):
+        if (base / core_name).is_file():
+            artifact_refs[core_name] = _rel(base / core_name)
     x3_auth = resolve_lane_x3_from_artifact_refs(
         artifact_refs=artifact_refs,
         repo_root=repo,
@@ -439,9 +475,11 @@ def collect_lane_from_run_dir(lane: str, base: Path, *, repo: Path) -> dict[str,
 
     section_id = str(l2.get("section_id") or lane)
     runtime_gen = str(
-        l2.get("runtime_generation_status") or x3.get("runtime_generation_status") or "UNKNOWN"
+        l2.get("runtime_generation_status")
+        or x3.get("runtime_generation_status")
+        or "UNKNOWN"
     )
-    rollup_x3_code = str(x3_auth.get("x3_code") or x3.get("x3_code", ""))
+    rollup_x3_code = str(x3_auth.get("x3_code") or "")
 
     accepted_real_evidence_resolution = "modular_r4_explicit_run_dir"
     pointer_roots = (base.parent.parent, base)
@@ -454,10 +492,20 @@ def collect_lane_from_run_dir(lane: str, base: Path, *, repo: Path) -> dict[str,
             rel = raw_ptr.get("run_dir") if isinstance(raw_ptr, dict) else None
             if isinstance(rel, str):
                 ptr_base = (repo / rel).resolve()
-                if ptr_base.resolve() == base.resolve() and is_accepted_real_llm_provider_bundle(base):
-                    accepted_real_evidence_resolution = "latest_successful_real_run.json"
+                if (
+                    ptr_base.resolve() == base.resolve()
+                    and is_accepted_real_llm_provider_bundle(base)
+                ):
+                    accepted_real_evidence_resolution = (
+                        "latest_successful_real_run.json"
+                    )
                     break
-        except (json.JSONDecodeError, OSError, ValueError, TypeError):  # guardian: allow-silent-swallow -- P2 burndown: fail-soft optional boundary
+        except (
+            json.JSONDecodeError,
+            OSError,
+            ValueError,
+            TypeError,
+        ):  # guardian: allow-silent-swallow -- P2 burndown: fail-soft optional boundary
             pass
 
     return {
@@ -479,7 +527,9 @@ def collect_lane_from_run_dir(lane: str, base: Path, *, repo: Path) -> dict[str,
         "soft_failed_judges": soft,
         "blocked_judges": blocked,
         "x3_code": rollup_x3_code,
-        "final_materialized_acceptance_ok": final_materialized_contract.get("pass") is True,
+        "x3_mirror_code": str(x3_auth.get("mirror_x3_code") or ""),
+        "final_materialized_acceptance_ok": final_materialized_contract.get("pass")
+        is True,
         "final_materialized_acceptance_contract_ref": artifact_refs.get(
             FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT
         ),
@@ -500,7 +550,9 @@ def collect_lane_from_run_dir(lane: str, base: Path, *, repo: Path) -> dict[str,
     }
 
 
-def build_modular_lane_rollup(repo: Path, lane_run_dirs: Mapping[str, Path]) -> dict[str, Any]:
+def build_modular_lane_rollup(
+    repo: Path, lane_run_dirs: Mapping[str, Path]
+) -> dict[str, Any]:
     """Deterministic rollup from explicit per-lane run directories under ``modular_r4/sections``."""
     lanes: dict[str, Any] = {}
     errors: list[str] = []
@@ -520,12 +572,19 @@ def build_modular_lane_rollup(repo: Path, lane_run_dirs: Mapping[str, Path]) -> 
     lanes_x3_review = [
         k
         for k, v in lanes.items()
-        if isinstance(v.get("x3_code"), str) and str(v["x3_code"]).startswith("X3_REVIEW")
+        if isinstance(v.get("x3_code"), str)
+        and str(v["x3_code"]).startswith("X3_REVIEW")
     ]
-    lanes_x2_failures = [k for k, v in lanes.items() if int(v.get("x2_failed") or 0) > 0]
+    lanes_x2_failures = [
+        k for k, v in lanes.items() if int(v.get("x2_failed") or 0) > 0
+    ]
     l6_offline_all = all(bool(v.get("l6_offline_only")) for v in lanes.values())
-    lanes_real_llm = [k for k, v in lanes.items() if v.get("runtime_generation_status") == "REAL_LLM"]
-    lanes_mocked = [k for k, v in lanes.items() if v.get("runtime_generation_status") == "MOCKED"]
+    lanes_real_llm = [
+        k for k, v in lanes.items() if v.get("runtime_generation_status") == "REAL_LLM"
+    ]
+    lanes_mocked = [
+        k for k, v in lanes.items() if v.get("runtime_generation_status") == "MOCKED"
+    ]
     lanes_blocked_gen = [
         k
         for k, v in lanes.items()
@@ -542,10 +601,16 @@ def build_modular_lane_rollup(repo: Path, lane_run_dirs: Mapping[str, Path]) -> 
         "artifact_isolation": {
             "layout": "modular_r4_sections",
             "run_dir_pattern": "<artifact_dir>/modular_r4/sections/<lane>/{real|mock}/<run_id>/",
-            "pointer_files": ["latest_real_run.json", "latest_successful_real_run.json", "latest_mock_run.json"],
+            "pointer_files": [
+                "latest_real_run.json",
+                "latest_successful_real_run.json",
+                "latest_mock_run.json",
+            ],
             "scoped_under_repo": True,
         },
-        "evidence_pack_commands": {lane: canonical_lane_command(lane) for lane in GENERATED_LANES},
+        "evidence_pack_commands": {
+            lane: canonical_lane_command(lane) for lane in GENERATED_LANES
+        },
         "lanes": lanes,
         "summary": {
             "lane_keys": list(GENERATED_LANES),
@@ -562,7 +627,9 @@ def build_modular_lane_rollup(repo: Path, lane_run_dirs: Mapping[str, Path]) -> 
     }
 
 
-def build_rollup(*, rollup_artifact_mode: Literal["real", "mock"] = "real") -> dict[str, Any]:
+def build_rollup(
+    *, rollup_artifact_mode: Literal["real", "mock"] = "real"
+) -> dict[str, Any]:
     lanes: dict[str, Any] = {}
     errors: list[str] = []
     for lane in GENERATED_LANES:
@@ -577,12 +644,19 @@ def build_rollup(*, rollup_artifact_mode: Literal["real", "mock"] = "real") -> d
     lanes_x3_review = [
         k
         for k, v in lanes.items()
-        if isinstance(v.get("x3_code"), str) and str(v["x3_code"]).startswith("X3_REVIEW")
+        if isinstance(v.get("x3_code"), str)
+        and str(v["x3_code"]).startswith("X3_REVIEW")
     ]
-    lanes_x2_failures = [k for k, v in lanes.items() if int(v.get("x2_failed") or 0) > 0]
+    lanes_x2_failures = [
+        k for k, v in lanes.items() if int(v.get("x2_failed") or 0) > 0
+    ]
     l6_offline_all = all(bool(v.get("l6_offline_only")) for v in lanes.values())
-    lanes_real_llm = [k for k, v in lanes.items() if v.get("runtime_generation_status") == "REAL_LLM"]
-    lanes_mocked = [k for k, v in lanes.items() if v.get("runtime_generation_status") == "MOCKED"]
+    lanes_real_llm = [
+        k for k, v in lanes.items() if v.get("runtime_generation_status") == "REAL_LLM"
+    ]
+    lanes_mocked = [
+        k for k, v in lanes.items() if v.get("runtime_generation_status") == "MOCKED"
+    ]
     lanes_blocked_gen = [
         k
         for k, v in lanes.items()
@@ -591,17 +665,22 @@ def build_rollup(*, rollup_artifact_mode: Literal["real", "mock"] = "real") -> d
     lanes_accepted_via_migration = [
         k
         for k, v in lanes.items()
-        if v.get("accepted_real_evidence_resolution") == "migration_real_llm_provider_scan"
+        if v.get("accepted_real_evidence_resolution")
+        == "migration_real_llm_provider_scan"
     ]
     attempt_blocked_but_rollup_real_llm = [
         k
         for k, v in lanes.items()
-        if str(v.get("latest_real_attempt_runtime_generation_status", "") or "").upper().find("BLOCKED")
+        if str(v.get("latest_real_attempt_runtime_generation_status", "") or "")
+        .upper()
+        .find("BLOCKED")
         >= 0
         and str(v.get("runtime_generation_status", "")) == "REAL_LLM"
     ]
 
-    evidence_pack_commands = {lane: canonical_lane_command(lane) for lane in GENERATED_LANES}
+    evidence_pack_commands = {
+        lane: canonical_lane_command(lane) for lane in GENERATED_LANES
+    }
 
     current_mode = "mock" if rollup_artifact_mode == "mock" else "real_only"
 
@@ -651,13 +730,19 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("")
     lines.append(f"- **rollup_id**: `{data.get('rollup_id', '')}`")
     lines.append(f"- **generated_at_utc**: {data.get('generated_at_utc', '')}")
-    lines.append(f"- **current_rollup_artifact_mode**: {data.get('current_rollup_artifact_mode', '')}")
-    lines.append(f"- **rollup_artifact_mode_arg**: {data.get('rollup_artifact_mode_arg', '')}")
+    lines.append(
+        f"- **current_rollup_artifact_mode**: {data.get('current_rollup_artifact_mode', '')}"
+    )
+    lines.append(
+        f"- **rollup_artifact_mode_arg**: {data.get('rollup_artifact_mode_arg', '')}"
+    )
     lines.append("")
     lines.append("## Evidence pack commands (canonical)")
     lines.append("")
     for lane in GENERATED_LANES:
-        lines.append(f"- **{lane}**: `{_md_escape_cell(str(data.get('evidence_pack_commands', {}).get(lane, '')))}`")
+        lines.append(
+            f"- **{lane}**: `{_md_escape_cell(str(data.get('evidence_pack_commands', {}).get(lane, '')))}`"
+        )
     lines.append("")
     lines.append("## Lane status")
     lines.append("")
@@ -689,15 +774,23 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("## Summary")
     lines.append("")
     s = data.get("summary", {})
-    lines.append(f"- **lanes_with_x3_allow**: {', '.join(s.get('lanes_with_x3_allow', [])) or '—'}")
+    lines.append(
+        f"- **lanes_with_x3_allow**: {', '.join(s.get('lanes_with_x3_allow', [])) or '—'}"
+    )
     lines.append(
         f"- **lanes_with_x3_review** (prefix X3_REVIEW): "
         f"{', '.join(s.get('lanes_with_x3_review_prefix', [])) or '—'}"
     )
-    lines.append(f"- **lanes_with_x2_failures**: {', '.join(s.get('lanes_with_x2_failures', [])) or '—'}")
+    lines.append(
+        f"- **lanes_with_x2_failures**: {', '.join(s.get('lanes_with_x2_failures', [])) or '—'}"
+    )
     lines.append(f"- **all_l6_offline_only**: {s.get('all_l6_offline_only', False)}")
-    lines.append(f"- **REAL_LLM lanes**: {', '.join(s.get('lanes_runtime_generation_REAL_LLM', [])) or '—'}")
-    lines.append(f"- **MOCKED lanes**: {', '.join(s.get('lanes_runtime_generation_MOCKED', [])) or '—'}")
+    lines.append(
+        f"- **REAL_LLM lanes**: {', '.join(s.get('lanes_runtime_generation_REAL_LLM', [])) or '—'}"
+    )
+    lines.append(
+        f"- **MOCKED lanes**: {', '.join(s.get('lanes_runtime_generation_MOCKED', [])) or '—'}"
+    )
     lines.append("")
     lines.append("## Per-lane freshness (L2 mtime + provider_request)")
     lines.append("")

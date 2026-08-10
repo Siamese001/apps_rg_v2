@@ -1,0 +1,45 @@
+{
+  "blocker": "EXECUTED_X3_BLOCK",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry16_20260809\\e2e_20260809T090140Z_6b8a9546\\modular_r4\\sections\\ibm_bullets",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "executive_summary_cli_output_text": "",
+    "exit_status": "error",
+    "fault": "",
+    "headline_cli_output_text": "",
+    "ibm_bullets_cli_output_text": "IBM_BULLETS_OUTPUT:\n- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\n- bul_ibm_002: Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.\n- bul_ibm_003: Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\n- bul_ibm_004: Prioritized enterprise pursuits using account context, buyer readiness, and solution feasibility, connecting technical validation to executive deal support.\n- bul_ibm_005: Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.\n\nX1D_LLM_JUDGE_OUTPUTS:\n| Provider | Mode | Status | Score | Pass | Decisive Failure |\n|---|---|---|---:|---|---|\n| Google Gemini 3.6 Flash | MODEL_BACKED | MODEL_BACKED_PASS | 5.0 | True | False |\n| OpenAI ChatGPT | MODEL_BACKED | MODEL_BACKED_PASS | 0.76 | True | False |\n\nX2_DETERMINISTIC_GATE_OUTPUTS:\n- x2_ibm_augmented_skills_graph_proof_pool_only: PASS\n- x2_ibm_graph_only_no_base_resume_bullets: PASS\n- x2_ibm_bullet_count_5: PASS\n- x2_ibm_cross_bullet_semantic_overlap_zero: PASS\n- x2_ibm_bullet_no_embedded_newline: PASS\n- x2_ibm_bullet_single_thought: PASS\n- x2_ibm_bullet_no_paragraph_block: PASS\n- x2_ibm_narrative_slot_reservation: PASS\n- x2_required_top_level_json_keys: PASS\n- x2_ibm_no_rewrite_intensity_model: PASS\n- x2_claim_ledger_claim_text_non_empty: PASS\n- x2_text_claim_coverage_integrity: PASS\n- x2_ibm_metric_anchor_bullet_ownership: PASS\n- x2_ibm_hold_metric_forbidden_in_output: PASS\n- x2_ibm_metrics_preserved: PASS\n- x2_ibm_bullet_graph_skill_node_ids_required: PASS\n- x2_ibm_role_episode_bundles_in_proof_pool: PASS\n- x2_ibm_bullet_role_episode_bundle_id_required: PASS\n- x2_ibm_metric_outcome_id_required_when_has_metric: PASS\n- x2_base_resume_ngram_overlap_ibm: PASS\n- x2_e0_example_ngram_overlap_ibm: PASS\n- x2_bullet_seniority_floor: PASS\n- x2_bullet_technical_specificity_floor: FAIL\n- x2_no_generic_consulting_substitution: PASS\n- x2_ibm_only_fact_scope: PASS\n- x2_no_unify_fact_leakage: PASS\n- x2_no_unify_runtime_terms: PASS\n- x2_no_agentic_inflation: PASS\n- x2_no_taxonomy_label_prefix_in_display_text: PASS\n- x2_no_jd_only_claims: PASS\n- x2_claim_ledger_coverage_100: PASS\n- x2_metric_fact_id_granularity: PASS\n- x2_no_inline_source_tags: PASS\n- x2_no_first_person: PASS\n- x2_no_em_dash: PASS\n- x2_no_generic_filler: PASS\n- x2_json_parse_valid: PASS\n- x2_provider_requested_attempted: PASS\n- x2_no_silent_mock_fallback: PASS\n- x2_x1d_required_judges_present: PASS\n- x2_x1d_schema_valid: PASS\n- x2_ibm_bullets_active_proof_pool_source_fact_ids: PASS\n- x2_section_input_usage_ledger_present: PASS\n- x2_jd_used_as_required_targeting_input: PASS\n- x2_briefing_used_as_required_context_input: PASS\n- x2_title_company_used_as_required_positioning_input: PASS\n- x2_no_non_evidence_inputs_as_claim_evidence: PASS\n- x2_no_non_evidence_inputs_in_source_fact_ids: PASS\n- x2_selected_fact_ids_only: PASS\n- x2_section_claims_supported_by_base_resume: PASS\n- x2_input_usage_accounting_consistent: PASS\n- x2_fec_subset_of_canonical_evidence_pool: PASS\n- x2_prompt_c0_ids_subset_of_fec: PASS\n- x2_claim_ledger_source_fact_ids_subset_of_fec: PASS\n- X2_BLOCK_ID_NAMESPACE_SPLIT: PASS\n- x2_active_pool_digest_matches_fec_digest: PASS\n\nX3_DISPOSITION:\n{\n  \"x3_code\": \"X3_BLOCK\",\n  \"decisive_reason\": \"X2 deterministic gate failure\",\n  \"review_reason\": \"\",\n  \"authorization_scope\": \"PLUMBING_ONLY\",\n  \"proceed_to_runtime\": false,\n  \"runtime_generation_status\": \"REAL_LLM\",\n  \"x1d_evaluator_mode\": \"MODEL_BACKED\",\n  \"product_quality_status\": \"FAIL\",\n  \"x2_failed_gates\": [\n    \"x2_bullet_technical_specificity_floor\"\n  ],\n  \"blocked_judges\": [],\n  \"mocked_judges\": [],\n  \"soft_failed_judges\": [],\n  \"decisive_judge_failures\": [],\n  \"final_summary_hash\": \"5a99d9c6983a06b1\",\n  \"claim_ledger_hash\": \"7fadef721e9ddb09\",\n  \"required_remediation\": [\n    \"Fix failed X2 gates: x2_bullet_technical_specificity_floor\",\n    \"Product quality must be PASS, currently FAIL.\"\n  ],\n  \"blocked_judge_detail_rows\": [],\n  \"model_backed_pass_provider_keys\": [\n    \"gemini_pro\",\n    \"openai_chatgpt\"\n  ],\n  \"proof_eligible_allow_requires\": \"every_configured_x1d_judge_model_backed_pass\",\n  \"pass\": false,\n  \"disposition_authority\": \"lane\",\n  \"section_x3_authoritative\": false,\n  \"section_x3_mirror_only\": true,\n  \"spine_x3_claimed\": false\n}\n\nL6_SHADOW_EVAL_PACKAGE:\nC:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry16_20260809\\e2e_20260809T090140Z_6b8a9546\\modular_r4\\sections\\ibm_bullets\\l6_shadow_eval_package.json\noffline_only=true",
+    "ibm_narrative_cli_output_text": "",
+    "l7_how_trace_emitted": true,
+    "lane_run_id": "ibm_bullets_20260809_090514",
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-5922380272e0485f8ec50d681938d2a1",
+    "run_id": "2dd05123-735e-4c15-9158-af0b2e6fd77a",
+    "section_result_blocked": true,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "unify_bullets_cli_output_text": "",
+    "unify_narrative_cli_output_text": "",
+    "x3_disposition": "X3_BLOCK"
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "lane 'ibm_bullets' run_dir failed product bar (latest_successful_real_run.json): product_quality_not_PASS:FAIL",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/runs/w8_anthropic_positive_retry16_20260809/e2e_20260809T090140Z_6b8a9546/modular_r4/sections/ibm_bullets/real/<run_id>/",
+  "generated_at_utc": "2026-08-09T09:11:19.942893+00:00",
+  "integrated_run_id": "e2e_20260809T090140Z_6b8a9546",
+  "lane_exec_status": "dispatch_error:lane_exit_error",
+  "lane_id": "ibm_bullets",
+  "primary_failure": {},
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/runs/w8_anthropic_positive_retry16_20260809/e2e_20260809T090140Z_6b8a9546/modular_r4/sections",
+  "status": "PRE_RUN_BLOCKED"
+}

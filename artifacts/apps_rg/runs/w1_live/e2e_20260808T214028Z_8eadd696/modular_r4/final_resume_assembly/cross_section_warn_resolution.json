@@ -1,0 +1,42 @@
+{
+  "schema": "apps_rg.cross_section_warn_resolution.v1",
+  "evaluated_at_utc": "2026-08-09T03:30:18.698837+00:00",
+  "resolution_method": "deterministic_overlap_ledger",
+  "provenance_retained": true,
+  "l2_snapshots_unchanged": true,
+  "product_warn_waiver_used": false,
+  "warn_resolution_matrix": [
+    {
+      "gate_id": "x2_cross_section_exact_duplicate",
+      "verdict": "PASS",
+      "overlap_class": "exact_duplicate",
+      "decisions_count": 19,
+      "removed_with_provenance_count": 19,
+      "fully_dispositioned": true,
+      "decisive_reason": "19 exact duplicate groups dispositioned in overlap ledger (provenance retained; L2 snapshots unchanged)",
+      "evidence_refs": [
+        "artifacts/apps_rg/runtime_proofs/final_resume_assembly/kept_removed_claims.json",
+        "artifacts/apps_rg/runtime_proofs/final_resume_assembly/overlap_decisions.json"
+      ]
+    },
+    {
+      "gate_id": "x2_cross_section_same_claim_different_wording",
+      "verdict": "PASS",
+      "overlap_class": "same_claim_different_wording",
+      "decisions_count": 20,
+      "removed_with_provenance_count": 20,
+      "fully_dispositioned": true,
+      "decisive_reason": "20 same-fact-id wording variants dispositioned in overlap ledger (provenance retained)",
+      "evidence_refs": [
+        "artifacts/apps_rg/runtime_proofs/final_resume_assembly/kept_removed_claims.json",
+        "artifacts/apps_rg/runtime_proofs/final_resume_assembly/overlap_decisions.json"
+      ]
+    }
+  ],
+  "summary": {
+    "kept": 38,
+    "removed": 39,
+    "rewritten": 0,
+    "overlap_decisions": 39
+  }
+}

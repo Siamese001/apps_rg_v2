@@ -1,0 +1,809 @@
+{
+  "schema_version": "1",
+  "correlation_id": "a000344a-543d-413e-9bb5-b08de4373444",
+  "integrated_run_id": "a000344a-543d-413e-9bb5-b08de4373444",
+  "created_at": "2026-08-09T09:57:13.468358+00:00",
+  "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1",
+  "artifact_namespace": "artifacts/apps_rg/runs",
+  "log_namespace": "apps_rg/pipeline_logs",
+  "log_discovery": {
+    "mode": "telemetry_only",
+    "log_namespace": "apps_rg/pipeline_logs",
+    "log_root_path": null,
+    "notes": "No on-disk directory at log_namespace `apps_rg/pipeline_logs` at index time; pipeline_defaults.yaml declares telemetry_prefix `apps_rg.r4_integrated` (OpenTelemetry spans/metrics)."
+  },
+  "integrated_bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/RUN_BUNDLE_INDEX.json",
+  "lane_bundle_refs": [
+    {
+      "lane": "competencies",
+      "lane_id": "competencies",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "competencies_20260809_094712",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/competencies",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/competencies/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "6ea134d014abb231d1e314ce00324ab7336137c2bf5ecfc29f78517af1b7e25c",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "executive_summary",
+      "lane_id": "executive_summary",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "exec_summary_20260809_095239",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/executive_summary",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/executive_summary/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "7ffe32bf99aacb59e41165eb06e3420da8c9a652003eaa2705e603d91ddf03eb",
+      "evidence_package_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/executive_summary/evidence_package_index.json",
+      "evidence_package_index_sha256": "7fa05fffd661f1fe9e10cf5d80cbe5bbcbb1134ce460b6bcfdd7f40727bec786",
+      "section_l7_binding_manifest_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/executive_summary/section_l7_binding_manifest.json",
+      "section_l7_binding_manifest_sha256": "c94e9c766db8648d224f392f5a402c774c31a48789fde1f8e5633194ef266674",
+      "spine_subphase_coverage_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/executive_summary/spine_subphase_coverage_index.json",
+      "lane_outcome": "X3_REVIEW_JUDGE_PROVIDER_BLOCKED",
+      "lane_x3": "X3_REVIEW_JUDGE_PROVIDER_BLOCKED",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": true,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ey_bullets",
+      "lane_id": "ey_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ey_bullets_f0813c890b24",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ey_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ey_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "4731180e414614194a9660f49a48f11f14e6ed1d334b63cafde000bb2801438c",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ey_narrative",
+      "lane_id": "ey_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ey_narrative_26dd7edf19f5",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ey_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ey_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "ed543e6fd03d05dcd7495a427dbf226c2721a31229dbc4877853a448be357f95",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "headline",
+      "lane_id": "headline",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "headline_20260809_095533",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/headline",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/headline/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "cbcdf1c7f3adb5366e39c385922c41d6409a1897160223604087aba7e0583d12",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ibm_bullets",
+      "lane_id": "ibm_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ibm_bullets_20260809_094933",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ibm_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ibm_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "45266d33ed3ed7500792a27bbab5039750a22ff1cea6879f14d1e24ed7e5bbea",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "ibm_narrative",
+      "lane_id": "ibm_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "ibm_narrative_20260809_095120",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ibm_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/ibm_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "38d51014f3eada0236cf12545bb791e0f2ebed1dcd3221cb695c1ec4b0c64e83",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "insurtech_bullets",
+      "lane_id": "insurtech_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "insurtech_bullets_86dca37c4169",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/insurtech_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/insurtech_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "1be5f9f3a35f9641706d3d4ef6fce198103ac604d579b4bc818881d9f3d37137",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "insurtech_narrative",
+      "lane_id": "insurtech_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "insurtech_narrative_580bbcaa2172",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/insurtech_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/insurtech_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "696fdec3cb770ff3db59f28282bfac41695a9f6404ca69224d280134b5a6c900",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "unify_bullets",
+      "lane_id": "unify_bullets",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "unify_bullets_20260809_094857",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/unify_bullets",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/unify_bullets/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "6c6da9176fa13710730845128e7a559778eaab7dea57ceb5be4c9d9229f5baac",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    },
+    {
+      "lane": "unify_narrative",
+      "lane_id": "unify_narrative",
+      "status": "EXECUTED",
+      "proof_mode": "real",
+      "run_id": "unify_narrative_20260809_095057",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/unify_narrative",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/modular_r4/sections/unify_narrative/RUN_BUNDLE_INDEX.json",
+      "bundle_index_sha256": "ab863993e3b57f35d9b4681adfc754e5e0e0ab793943dab1115ed4b4d4b1cfa0",
+      "evidence_package_index_ref": null,
+      "evidence_package_index_sha256": "",
+      "section_l7_binding_manifest_ref": null,
+      "section_l7_binding_manifest_sha256": "",
+      "spine_subphase_coverage_index_ref": null,
+      "lane_outcome": "X3_ALLOW",
+      "lane_x3": "X3_ALLOW",
+      "missing_reason": null,
+      "run_dir_resolution": "latest_successful_real_run.json",
+      "parent_integrated_run_id": "e2e_20260809T094612Z_b7b0c0e1",
+      "parent_l7_artifact_refs": [
+        {
+          "artifact_name": "agentic_core_how_trace.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_how_trace.json",
+          "sha256": "e8df4ff8f33b17d2ba9bba9147064a1515da9b968f12c296913f7b473057b809",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_l7_route_family_coverage.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_l7_route_family_coverage.json",
+          "sha256": "00b20253548ba9b6b10febf80b43f0ed771618e507ffd4d23191c0ee31c407ed",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "agentic_core_spine_proof.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/agentic_core_spine_proof.json",
+          "sha256": "3f07473fcb7cfbdb8101440e6f5886aae832a6bd1d7d57d86c79cdadef2fa87e",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "runtime_trace_snapshot.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/runtime_trace_snapshot.json",
+          "sha256": "52d4cf84741c987e4675cc92f37873cae0d647a92b85ecd105fd31e8d4487503",
+          "exists": true,
+          "trust_status": "verified_external"
+        },
+        {
+          "artifact_name": "integrated_runtime_artifact_manifest.json",
+          "source_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry19_20260809/e2e_20260809T094612Z_b7b0c0e1/integrated_runtime_artifact_manifest.json",
+          "sha256": "1ca9eda2c47fb4a40e7c4029af70d3c389c3712abe4bec8efff372bd406654bb",
+          "exists": true,
+          "trust_status": "verified_external"
+        }
+      ],
+      "exists": false,
+      "producer": "apps_rg.runtime.integrated_lane_evidence_packaging.build_executed_lane_bundle_ref",
+      "explicit_non_claims": [
+        "lane evidence package is narrative audit linkage only",
+        "parent L7 refs are verified external hashes only",
+        "orchestrate_full_resume and resume_package_x3 are not lane evidence"
+      ]
+    }
+  ],
+  "aggregate_refs": [],
+  "modular_sections_root": {
+    "mode": "default",
+    "source_env_var": "APPS_RG_MODULAR_R4_SECTIONS_ROOT",
+    "manifest_ref": null,
+    "root_path": null,
+    "exists": false,
+    "notes": "APPS_RG_MODULAR_R4_SECTIONS_ROOT is not set; lane runtime proofs default under artifacts/apps_rg/runtime_proofs."
+  },
+  "lane_bundle_refs_source": "modular_r4_sections_tree_auto"
+}

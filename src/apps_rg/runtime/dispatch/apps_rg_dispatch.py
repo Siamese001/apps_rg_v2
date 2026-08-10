@@ -13,7 +13,7 @@ import dataclasses
 from types import SimpleNamespace
 from typing import Any
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import AppsRgIngressPayload
+from apps_rg.runtime.spine_contracts import AppsRgIngressPayload
 
 from apps_rg.runtime.resume_resolution import (
     ResumeResolutionError,
@@ -74,7 +74,7 @@ def apps_rg_parse(payload: dict[str, Any]) -> Any:
     RequestEnvelope
         A validated `agentic_core` RequestEnvelope ready for U0 validation.
     """
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import RequestEnvelope
+    from apps_rg.runtime.spine_contracts import RequestEnvelope
 
     app_id = str(payload.get("app_id", "apps_rg"))
     task_class = str(payload.get("task_class", "resume_generation"))

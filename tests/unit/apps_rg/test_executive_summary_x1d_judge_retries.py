@@ -68,6 +68,15 @@ def test_sol_judge_uses_responses_api_with_high_effort(
     assert body["max_output_tokens"] >= 4096
     assert body["text"]["format"]["type"] == "json_schema"
     assert body["text"]["format"]["strict"] is True
+    schema = body["text"]["format"]["schema"]
+    assert schema["additionalProperties"] is False
+    assert set(schema["required"]) == set(schema["properties"])
+    dimensions = schema["properties"]["dimension_verdicts"]
+    assert dimensions["additionalProperties"] is False
+    assert set(dimensions["required"]) == set(dimensions["properties"])
+    for verdict in dimensions["properties"].values():
+        assert verdict["additionalProperties"] is False
+        assert set(verdict["required"]) == set(verdict["properties"])
     assert "messages" not in body
     assert out.evaluator_mode == "MODEL_BACKED"
 

@@ -1,0 +1,57 @@
+{
+  "section_id": "unify_bullets",
+  "trigger_decision": {
+    "should_escalate": true,
+    "triggers": [
+      "JUDGE_CONFIDENCE_LOW",
+      "X2_PASS_JUDGE_RISK"
+    ],
+    "detail": {
+      "section_id": "unify_bullets",
+      "model_backed_judge_count": 2,
+      "x2_all_pass": true,
+      "borderline": [
+        {
+          "normalized_score": 1.0,
+          "normalized_threshold": 0.8,
+          "window": 0.08000000000000002,
+          "band_low": 0.72,
+          "band_high": 0.8800000000000001,
+          "provider_key": "gemini_pro"
+        },
+        {
+          "normalized_score": 0.79,
+          "normalized_threshold": 0.72,
+          "window": 0.072,
+          "band_low": 0.648,
+          "band_high": 0.7919999999999999,
+          "provider_key": "anthropic_claude"
+        }
+      ],
+      "x2_pass_judge_risk": true
+    }
+  },
+  "aggregation": {
+    "decision": "ACCEPT",
+    "accepted": true,
+    "should_adjudicate": false,
+    "pass_threshold": 0.72,
+    "margin_threshold": 0.05,
+    "composite_score": 1.0,
+    "composite_threshold": 0.8,
+    "margin": 0.19999999999999996,
+    "x2_failed_gate_ids": [],
+    "reasons": [
+      "accept_confident"
+    ],
+    "detail": {
+      "section_id": "unify_bullets",
+      "composite_provider_key": "gemini_pro",
+      "composite_decisive_failure": false
+    }
+  },
+  "escalated": true,
+  "panel_provider_keys": [
+    "openai_chatgpt"
+  ]
+}

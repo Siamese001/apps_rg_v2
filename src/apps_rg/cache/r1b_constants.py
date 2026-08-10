@@ -54,11 +54,8 @@ ALL_CHUNK_TYPES: frozenset[str] = frozenset(
 # X3 codes that allow finishing a run whose output may be cached for reuse.
 X3_FINISH_ALLOWED: frozenset[str] = frozenset(
     {
-        "X3_ALLOW",
-        "X3C",
-        "X3D",
-        "EXIT_OK",
-        "EXIT_PARTIAL",
+        "X3C_COMMIT_REQUEST_TO_UWG",
+        "X3D_ALLOW_FINISH",
     }
 )
 

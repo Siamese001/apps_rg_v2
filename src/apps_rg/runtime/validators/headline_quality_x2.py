@@ -54,6 +54,14 @@ POSITIONING_FAMILIES: dict[str, frozenset[str]] = {
         "regulated financial", "regulated environments", "regulatory ai",
         "compliance systems", "regulated platform",
     }),
+    # This family is required by headline_positioning_registry and backed by
+    # hpb_partner_applied_ai_architecture.  Omitting it here made a graph-bound
+    # partnership headline invisible to the technical-specificity gate.
+    "partner_applied_ai_architecture": frozenset({
+        "partner ai", "partner architecture", "partner solution architecture",
+        "partner applied ai", "partner ecosystems", "partner co-sell",
+        "co-sell channel", "alliance gtm", "alliance partnerships",
+    }),
 }
 
 # A broader set of signal tokens used for fuzzy multi-token matching
@@ -64,6 +72,9 @@ _POSITIONING_SIGNAL_TOKENS: dict[str, frozenset[str]] = {
     "enterprise_ai_architecture": frozenset({"enterprise", "architecture"}),
     "platform_productization": frozenset({"productization", "commercialization", "saas"}),
     "regulated_ai_systems": frozenset({"regulated", "regulatory", "compliance", "ccar", "basel"}),
+    "partner_applied_ai_architecture": frozenset(
+        {"partner", "partners", "partnership", "partnerships", "alliance", "co-sell", "cosell"}
+    ),
 }
 
 # ---------------------------------------------------------------------------

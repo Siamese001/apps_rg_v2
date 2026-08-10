@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "section_id": "executive_summary",
+  "run_id": "exec_summary_20260809_055201",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 2,
+  "authoritative_l2_source": "regen_llm",
+  "attempt_1_x2_failed": false,
+  "attempt_1_x2_failed_gate_ids": [],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "regen_llm",
+      "operation": "synthesis_regen",
+      "reason": "sentence 1: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "replaced_l2": true
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "regen_llm",
+      "failed_gate_ids": [],
+      "passed": true
+    }
+  ],
+  "authoritative_attempt_reason": "synthesis_regen_shape_pass"
+}

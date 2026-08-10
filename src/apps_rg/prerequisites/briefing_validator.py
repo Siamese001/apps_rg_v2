@@ -319,6 +319,11 @@ def _valid_sha256(value: Any) -> bool:
     return all(char in "0123456789abcdef" for char in raw[7:])
 
 
+def _valid_raw_sha256(value: Any) -> bool:
+    raw = str(value or "")
+    return len(raw) == 64 and all(char in "0123456789abcdef" for char in raw)
+
+
 def _validate_v2_handoff(
     *,
     manifest_path: Path,
@@ -383,6 +388,10 @@ def _validate_v2_handoff(
             failures.append(f"model_observation_{model_role}_model_not_observed")
         if observation.get("reasoning_effort") not in _REASONING_EFFORTS:
             failures.append(f"model_observation_{model_role}_reasoning_effort_invalid")
+        if observation.get("requested_model") != observed_model:
+            failures.append(f"model_observation_{model_role}_pin_mismatch")
+        if observation.get("receipt_source") != "provider_attempt_evidence.json":
+            failures.append(f"model_observation_{model_role}_receipt_source_invalid")
 
     identity_raw = manifest.get("identity")
     identity = _as_mapping(identity_raw)
@@ -596,9 +605,157 @@ def _validate_v2_handoff(
         "runtime_exhaust_bundle.json",
         "company_brief.json",
         "run_metadata.json",
+        "provider_attempt_evidence.json",
+        "apps_research_handoff_otel_trace_snapshot.json",
     }
     if set(artifact_bytes_by_name) != required_names:
         failures.append("artifact_manifest_required_set_mismatch")
+
+    try:
+        provider_evidence = json.loads(
+            artifact_bytes_by_name.get("provider_attempt_evidence.json", b"{}")
+        )
+    except json.JSONDecodeError:
+        provider_evidence = {}
+        failures.append("provider_attempt_evidence_unreadable")
+    if not isinstance(provider_evidence, Mapping):
+        provider_evidence = {}
+        failures.append("provider_attempt_evidence_not_object")
+    if provider_evidence.get("schema_version") != (
+        "apps_research.provider_attempt_evidence.v1"
+    ):
+        failures.append("provider_attempt_evidence_schema_mismatch")
+    if provider_evidence.get("gateway_id") != "apps_research.provider_gateway_v1":
+        failures.append("provider_attempt_evidence_gateway_mismatch")
+    if provider_evidence.get("status") != "PASS":
+        failures.append("provider_attempt_evidence_not_pass")
+    if str(provider_evidence.get("trace_root") or "") != str(
+        _as_mapping(manifest.get("identity")).get("trace_root") or ""
+    ):
+        failures.append("provider_attempt_evidence_trace_mismatch")
+    from apps_research.config.model_pins import (
+        apps_rg_handoff_judge_pin,
+        company_brief_generation_pin,
+    )
+
+    expected_pins = {
+        pin.role: pin
+        for pin in (company_brief_generation_pin(), apps_rg_handoff_judge_pin())
+    }
+    if set(provider_evidence.get("required_roles") or []) != set(expected_pins):
+        failures.append("provider_attempt_evidence_required_roles_mismatch")
+    attempt_rows = provider_evidence.get("attempts")
+    attempts = list(attempt_rows) if isinstance(attempt_rows, list) else []
+    if len(attempts) != len(expected_pins):
+        failures.append("provider_attempt_evidence_attempt_count_mismatch")
+    attempts_by_role = {
+        str(row.get("role") or ""): row
+        for row in attempts
+        if isinstance(row, Mapping)
+    }
+    if set(attempts_by_role) != set(expected_pins):
+        failures.append("provider_attempt_evidence_roles_mismatch")
+    for role, pin in expected_pins.items():
+        row = _as_mapping(attempts_by_role.get(role))
+        expected_values = {
+            "schema_version": "apps_research.provider_attempt_validation.v1",
+            "gateway_id": "apps_research.provider_gateway_v1",
+            "provider": pin.provider,
+            "requested_model": pin.model,
+            "observed_model": pin.model,
+            "reasoning_effort": pin.reasoning_effort,
+            "transport_response_received": True,
+            "response_schema_valid": True,
+            "model_pin_valid": True,
+            "application_output_valid": True,
+            "overall_success": True,
+            "terminal_status": "SUCCESS",
+        }
+        for field, expected in expected_values.items():
+            if row.get(field) != expected:
+                failures.append(f"provider_attempt_{role}_{field}_mismatch")
+        if str(row.get("trace_id") or "") != str(
+            provider_evidence.get("trace_root") or ""
+        ):
+            failures.append(f"provider_attempt_{role}_trace_mismatch")
+        lifecycle = _as_mapping(row.get("lifecycle"))
+        if lifecycle.get("local_dispatch_started") is not True:
+            failures.append(f"provider_attempt_{role}_dispatch_not_started")
+        if lifecycle.get("remote_outcome") != "PROVIDER_RESPONDED":
+            failures.append(f"provider_attempt_{role}_remote_outcome_invalid")
+        for field in ("attempt_id", "logical_attempt_id", "transport_attempt_id"):
+            if not str(row.get(field) or "").strip():
+                failures.append(f"provider_attempt_{role}_{field}_missing")
+        for field in ("request_digest", "ledger_event_digest"):
+            if not _valid_raw_sha256(row.get(field)):
+                failures.append(f"provider_attempt_{role}_{field}_invalid")
+        ledger_event = _as_mapping(row.get("ledger_event"))
+        event_body = {
+            key: value for key, value in ledger_event.items() if key != "event_digest"
+        }
+        event_digest = str(ledger_event.get("event_digest") or "")
+        if (
+            not ledger_event
+            or not _valid_raw_sha256(event_digest)
+            or event_digest != str(row.get("ledger_event_digest") or "")
+            or _sha256_json(event_body) != event_digest
+        ):
+            failures.append(f"provider_attempt_{role}_ledger_event_digest_mismatch")
+        ledger_expected = {
+            "gateway_id": "apps_research.provider_gateway_v1",
+            "provider_role": role,
+            "provider": pin.provider,
+            "requested_model": pin.model,
+            "observed_model": pin.model,
+            "request_digest": row.get("request_digest"),
+            "outcome": "SUCCESS",
+            "transport_response_received": True,
+            "response_schema_valid": True,
+            "model_pin_valid": True,
+            "application_output_valid": True,
+            "overall_success": True,
+            "attempt_id": row.get("attempt_id"),
+            "logical_attempt_id": row.get("logical_attempt_id"),
+            "transport_attempt_id": row.get("transport_attempt_id"),
+            "trace_id": row.get("trace_id"),
+        }
+        for field, expected in ledger_expected.items():
+            if ledger_event.get(field) != expected:
+                failures.append(f"provider_attempt_{role}_ledger_event_{field}_mismatch")
+        observation_role = "generation" if role == "company_brief_generation" else "judge"
+        observation = _as_mapping(model_observations.get(observation_role))
+        for field in ("provider", "requested_model", "observed_model", "reasoning_effort"):
+            if observation.get(field) != row.get(field):
+                failures.append(
+                    f"provider_attempt_{role}_model_observation_{field}_mismatch"
+                )
+
+    try:
+        otel_correlation = json.loads(
+            artifact_bytes_by_name.get(
+                "apps_research_handoff_otel_trace_snapshot.json", b"{}"
+            )
+        )
+    except json.JSONDecodeError:
+        otel_correlation = {}
+        failures.append("apps_research_handoff_otel_unreadable")
+    if not isinstance(otel_correlation, Mapping):
+        otel_correlation = {}
+        failures.append("apps_research_handoff_otel_not_object")
+    if otel_correlation.get("schema_version") != "apps.otel_trace_snapshot.v3":
+        failures.append("apps_research_handoff_otel_schema_mismatch")
+    if otel_correlation.get("boundary") != "apps_research_handoff_precommit":
+        failures.append("apps_research_handoff_otel_boundary_mismatch")
+    if str(otel_correlation.get("trace_id") or "") != str(
+        provider_evidence.get("trace_root") or ""
+    ):
+        failures.append("apps_research_handoff_otel_trace_mismatch")
+    if otel_correlation.get("status") not in {
+        "CAPTURED",
+        "NO_MATCH",
+        "NOT_CONFIGURED",
+    }:
+        failures.append("apps_research_handoff_otel_status_invalid")
 
     try:
         supplied_brief_bytes = Path(brief_ref).read_bytes()
@@ -877,6 +1034,14 @@ def _validate_v2_handoff(
             artifact_bytes_by_name.get("exit_disposition_receipt.json", b"")
         ),
         "model_observations": model_observations,
+        "provider_attempt_evidence_sha256": _sha256_bytes(
+            artifact_bytes_by_name.get("provider_attempt_evidence.json", b"")
+        ),
+        "otel_correlation_sha256": _sha256_bytes(
+            artifact_bytes_by_name.get(
+                "apps_research_handoff_otel_trace_snapshot.json", b""
+            )
+        ),
     }
     expected_attestation = _sha256_bytes(_canonical_json_bytes(attestation_seed))
     if producer.get("producer_app_id") != "apps_research":

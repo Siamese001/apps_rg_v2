@@ -32,8 +32,8 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
-from agentic_core.L4_state.adapters import sqlite3_adapter as sqlite3
+from apps_rg.runtime.core_io import write_gateway as _wg
+from apps_rg.runtime.core_sqlite import sqlite3_adapter as sqlite3
 from apps_rg.repository_layout import repository_root
 from apps_rg.runtime.c0.constants import PROOF_ELIGIBLE, SOURCE_BASE_RESUME
 from apps_rg.runtime.cli_exit_codes import EXIT_GENERIC_FAILURE, EXIT_SUCCESS

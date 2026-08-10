@@ -455,7 +455,7 @@ def competencies_pool_x1d_judge_rows(
     row["rubric_version"] = JUDGE_RUBRIC_VERSION
     row["selection_mode"] = str(
         (gen_meta or {}).get("selection_mode")
-        or "competencies_advisory_selector_adaptive_6_8_pass"
+        or "competencies_advisory_selector_required_eight_pass"
     )
     row["min_category_count"] = n_min
     row["max_category_count"] = n_max
@@ -551,7 +551,9 @@ def employment_pool_x1d_judge_rows(
     row["rubric_ref"] = f"apps_rg/runtime/judges/employment_bullet_judge_rubric.py#{lane}"
     row["rubric_version"] = EMPLOYMENT_BULLET_RUBRIC_VERSION
     row["pool_selector_dimensions"] = list(pool_selector_dimension_ids(lane))
-    row["selection_mode"] = str((gen_meta or {}).get("selection_mode") or "claude_employment_top_n_pass")
+    row["selection_mode"] = str(
+        (gen_meta or {}).get("selection_mode") or "provider_employment_top_n_pass"
+    )
     row["findings"] = [
         (
             f"Employment pool selector: {len(selections)} slots, min_score={min_score:.2f}, "

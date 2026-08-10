@@ -169,6 +169,9 @@ class GenerateResumeStep(BaseRecipeStep):
             run_modular_resume_generation,
         )
         from apps_rg.runtime.locked_copy.locked_copy_manifest import find_repo_root
+        from apps_rg.runtime.orchestration.canonical_identity_context import (
+            canonical_identity_for_recipe_context,
+        )
 
         art_raw = context.get("artifact_dir")
         if art_raw is None or not str(art_raw).strip():
@@ -191,6 +194,7 @@ class GenerateResumeStep(BaseRecipeStep):
             repo_root=repo,
             target_company=str(context.get("target_company") or ""),
             target_role=str(context.get("target_role") or ""),
+            canonical_run_identity=canonical_identity_for_recipe_context(context),
         )
         prof = ModularResumeProfile(
             phase1_invoke_real_lanes=True,

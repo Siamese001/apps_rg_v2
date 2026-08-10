@@ -1,0 +1,141 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_084355",
+  "gate_id": "x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets",
+  "fired": true,
+  "trigger": {
+    "themes_detected_pre": [
+      "bul_ibm_001"
+    ],
+    "count_pre": 1,
+    "missing_in_ledger_union_pre": [],
+    "mechanism_support_pre": {
+      "mechanisms": [
+        "aws",
+        "bi"
+      ],
+      "cited_companion_ids": [
+        "bul_ibm_001"
+      ],
+      "unsupported_mechanisms": [
+        "bi"
+      ],
+      "support_by_mechanism": {
+        "aws": [
+          "bul_ibm_001"
+        ],
+        "bi": [
+          "bul_ibm_003"
+        ]
+      },
+      "checked": true
+    },
+    "unsupported_mechanisms_pre": [
+      "bi"
+    ],
+    "narrative_pre": "Championed partner-led AWS modernization at IBM, translating technical discovery into coherent solution paths for complex financial-services pursuits from design through executive review, and established BI-backed decision support that strengthened governance and alignment across regulated client portfolios."
+  },
+  "accepted": true,
+  "themes_post": [
+    "bul_ibm_001"
+  ],
+  "rejected_reason": null,
+  "bounded": {
+    "max_attempts": 2,
+    "attempts_used": 2
+  },
+  "kill_switch": "unset",
+  "regen_max_tokens": 4000,
+  "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw_attempt_2.txt",
+  "regen_parse_error": null,
+  "regen_provider_result": {
+    "runtime_generation_status": "REAL_LLM",
+    "provider_requested": "external_openai",
+    "provider_attempted": true,
+    "provider_available": true,
+    "model": "gpt-5.6-luna",
+    "exact_provider_error": ""
+  },
+  "mechanism_support_post": {
+    "mechanisms": [
+      "aws"
+    ],
+    "cited_companion_ids": [
+      "bul_ibm_001",
+      "bul_ibm_002"
+    ],
+    "unsupported_mechanisms": [],
+    "support_by_mechanism": {
+      "aws": [
+        "bul_ibm_001"
+      ]
+    },
+    "checked": true
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_openai",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "gpt-5.6-luna",
+        "exact_provider_error": ""
+      },
+      "rejected_reason": "mechanism_support_unsatisfied",
+      "mechanism_support": {
+        "mechanisms": [
+          "aws",
+          "bi"
+        ],
+        "cited_companion_ids": [
+          "bul_ibm_001",
+          "bul_ibm_002"
+        ],
+        "unsupported_mechanisms": [
+          "bi"
+        ],
+        "support_by_mechanism": {
+          "aws": [
+            "bul_ibm_001"
+          ],
+          "bi": [
+            "bul_ibm_003"
+          ]
+        },
+        "checked": true
+      }
+    },
+    {
+      "attempt": 2,
+      "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw_attempt_2.txt",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_openai",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "gpt-5.6-luna",
+        "exact_provider_error": ""
+      },
+      "rejected_reason": null,
+      "mechanism_support": {
+        "mechanisms": [
+          "aws"
+        ],
+        "cited_companion_ids": [
+          "bul_ibm_001",
+          "bul_ibm_002"
+        ],
+        "unsupported_mechanisms": [],
+        "support_by_mechanism": {
+          "aws": [
+            "bul_ibm_001"
+          ]
+        },
+        "checked": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,232 @@
+{
+  "schema_version": "c02_fact_vector_index_preflight_v1",
+  "generated_at_utc": "2026-08-09T09:07:35.086006+00:00",
+  "section_id": "insurtech_narrative",
+  "product_hybrid_required": false,
+  "authority_mode": "inherited_bullet_proof",
+  "direct_vector_proof": false,
+  "inherited_bullet_proof": true,
+  "aggregate_section_proof": false,
+  "positioning_only": false,
+  "upstream_sections": [
+    "insurtech_bullets"
+  ],
+  "direct_fact_vector_required": false,
+  "authority_manifest": {
+    "competencies": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "executive_summary": {
+      "authority_mode": "aggregate_section_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": true,
+      "positioning_only": false,
+      "upstream_sections": [
+        "competencies",
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets",
+        "unify_narrative",
+        "ibm_narrative",
+        "insurtech_narrative",
+        "ey_narrative"
+      ],
+      "product_hybrid_allowed": true
+    },
+    "ey_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "ey_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "ey_bullets"
+      ],
+      "product_hybrid_allowed": false
+    },
+    "headline": {
+      "authority_mode": "positioning_only",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": true,
+      "positioning_only": true,
+      "upstream_sections": [
+        "executive_summary",
+        "competencies",
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets"
+      ],
+      "product_hybrid_allowed": true
+    },
+    "ibm_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "ibm_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "ibm_bullets"
+      ],
+      "product_hybrid_allowed": false
+    },
+    "insurtech_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "insurtech_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "insurtech_bullets"
+      ],
+      "product_hybrid_allowed": false
+    },
+    "unify_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "unify_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "unify_bullets"
+      ],
+      "product_hybrid_allowed": false
+    }
+  },
+  "status": "PASS",
+  "reasons": [],
+  "manifest_ref": "artifacts/apps_rg/c0/fact_vectors_bootstrap_manifest.json",
+  "manifest_present": true,
+  "manifest_schema_version": "apps_rg.fact_vectors_bootstrap_manifest.v1",
+  "manifest_checksum": "f4ac2ab8e8c9c8d05a5547a7e47f88ec245058dbf1218f420d914d264284c98a",
+  "manifest_generated_at_utc": "2026-08-09T09:01:41.066228+00:00",
+  "manifest_source": "candidate_fact_ledger + base_resume_employment_bullets (tracked first-principles sources); generated output is never a live fact source",
+  "manifest_dry_run": false,
+  "manifest_upserted_count": 45,
+  "manifest_collection_count_after": 45,
+  "manifest_sparse_sidecar_built": true,
+  "manifest_section_target_count": 4,
+  "locked_deterministic_lane": false,
+  "chroma_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\data\\cache\\chromadb",
+  "expected_embedding_model": "BAAI/bge-m3",
+  "expected_embedding_dim": 1024,
+  "collection": {
+    "skipped": true,
+    "reason": "direct_fact_vector_not_required_for_section_authority"
+  },
+  "delayed_loop_policy": {
+    "pre_run_fact_vector_index_required": false,
+    "live_write_during_c0": false,
+    "generated_output_route": "stage_or_semantic_cache_after_generation",
+    "promotion_gate": "fact_vectors_staging_to_live_after_validation_or_hitl"
+  },
+  "section_sufficiency": {
+    "schema_version": "section_fact_vector_sufficiency_v1",
+    "section_id": "insurtech_narrative",
+    "status": "PASS",
+    "reasons": [],
+    "known_generated_lane": true,
+    "authority_mode": "inherited_bullet_proof",
+    "direct_vector_proof": false,
+    "inherited_bullet_proof": true,
+    "aggregate_section_proof": false,
+    "positioning_only": false,
+    "upstream_sections": [
+      "insurtech_bullets"
+    ],
+    "direct_fact_vector_required": false,
+    "product_hybrid_required": false,
+    "manifest_section_target_count": 4,
+    "manifest_coverage_present": true,
+    "live_section_target_count": 0,
+    "pre_run_hydration_present": false,
+    "collection_count": 0,
+    "model_dim_pass": true,
+    "section_source_class_counts": {},
+    "section_tier_counts": {},
+    "expected_source_slot_prefix": "",
+    "expected_source_slot_min_count": 0,
+    "source_slot_count": 0,
+    "source_slot_ids": [],
+    "delayed_loop_policy_pass": true
+  },
+  "insurtech_narrative_section_sufficiency": {
+    "schema_version": "section_fact_vector_sufficiency_v1",
+    "section_id": "insurtech_narrative",
+    "status": "PASS",
+    "reasons": [],
+    "known_generated_lane": true,
+    "authority_mode": "inherited_bullet_proof",
+    "direct_vector_proof": false,
+    "inherited_bullet_proof": true,
+    "aggregate_section_proof": false,
+    "positioning_only": false,
+    "upstream_sections": [
+      "insurtech_bullets"
+    ],
+    "direct_fact_vector_required": false,
+    "product_hybrid_required": false,
+    "manifest_section_target_count": 4,
+    "manifest_coverage_present": true,
+    "live_section_target_count": 0,
+    "pre_run_hydration_present": false,
+    "collection_count": 0,
+    "model_dim_pass": true,
+    "section_source_class_counts": {},
+    "section_tier_counts": {},
+    "expected_source_slot_prefix": "",
+    "expected_source_slot_min_count": 0,
+    "source_slot_count": 0,
+    "source_slot_ids": [],
+    "delayed_loop_policy_pass": true
+  },
+  "section_coverage_present": true,
+  "same_run_write_policy": "not_applicable_inherited_upstream_proof",
+  "write_authority": false,
+  "comparison_authority": true
+}

@@ -13,8 +13,10 @@ model_pin_ownership:
   receipt_identity_source: observed_provider_response
   role_paths:
     generation: profiles.*.model_by_section
+    generation_backup: profiles.external_openai_generator.anthropic_limit_backup_model_by_section
     proof_judge: judge_models
     selector: selector_models
+    selector_backup: selector_models.*.anthropic_limit_backup
 
 wave10a_policy:
   default_provider: external_claude
@@ -34,11 +36,29 @@ profiles:
       ibm_narrative: gpt-5.6-luna
       insurtech_narrative: gpt-5.6-luna
       ey_narrative: gpt-5.6-luna
+    # Governed backup pins used only when the explicit Anthropic-limit preflight
+    # is active. They do not change the default/primary provider for these lanes.
+    anthropic_limit_backup_model_by_section:
+      competencies: gpt-5.6-luna
+      unify_bullets: gpt-5.6-luna
+      ibm_bullets: gpt-5.6-luna
+      insurtech_bullets: gpt-5.6-luna
+      ey_bullets: gpt-5.6-luna
+      headline: gpt-5.6-luna
+      executive_summary: gpt-5.6-luna
     effort_by_section:
       unify_narrative: medium
       ibm_narrative: medium
       insurtech_narrative: low
       ey_narrative: low
+    anthropic_limit_backup_effort_by_section:
+      competencies: low
+      unify_bullets: low
+      ibm_bullets: low
+      insurtech_bullets: low
+      ey_bullets: low
+      headline: low
+      executive_summary: medium
     endpoint_env_var: APPS_RG_EXTERNAL_OPENAI_BASE_URL
     api_key_env_var: OPENAI_API_KEY
     capabilities:
@@ -64,13 +84,17 @@ profiles:
       headline: claude-sonnet-5
       executive_summary: claude-sonnet-5
     effort_by_section:
-      competencies: high
-      unify_bullets: medium
-      ibm_bullets: medium
+      # Sonnet 5 adaptive reasoning shares max_tokens with the emitted JSON.
+      # Live W1 evidence showed medium/high consuming the entire 4096-token
+      # governed output room as thinking, leaving no section payload. These
+      # compact schema-bound generation calls therefore use low effort.
+      competencies: low
+      unify_bullets: low
+      ibm_bullets: low
       insurtech_bullets: low
       ey_bullets: low
-      headline: medium
-      executive_summary: high
+      headline: low
+      executive_summary: low
     endpoint_env_var: APPS_RG_EXTERNAL_CLAUDE_BASE_URL
     api_key_env_var: ANTHROPIC_API_KEY
     capabilities:
@@ -141,7 +165,13 @@ selector_models:
   competencies_graph_pool_selector:
     provider_key: anthropic_claude
     model: claude-sonnet-5
-    reasoning_effort: high
+    # The selector has the same 4096-token governed output room and must leave
+    # capacity for its compact JSON selection payload.
+    reasoning_effort: low
+    anthropic_limit_backup:
+      provider_key: openai_chatgpt
+      model: gpt-5.6-sol
+      reasoning_effort: medium
     role: advisory_selector
     owner: apps_rg.competencies_graph_pool
     review_after: "2026-11-07"
@@ -149,6 +179,11 @@ selector_models:
   employment_bullet_pool_selector:
     provider_key: anthropic_claude
     model: claude-sonnet-5
+    reasoning_effort: low
+    anthropic_limit_backup:
+      provider_key: openai_chatgpt
+      model: gpt-5.6-sol
+      reasoning_effort: medium
     role: advisory_selector
     owner: apps_rg.employment_bullet_pool
     review_after: "2026-11-07"
@@ -163,7 +198,10 @@ runtime_limits:
     chars_per_token_estimate: 3
     safety_multiplier: 1.12
     max_input_tokens_per_attempt: 48000
-    max_reserved_tokens_per_run: 250000
+    # The required executive-summary path can reserve one generation attempt plus
+    # four two-provider judge rounds (~253k on the Anthropic partnership fixture).
+    # 300k admits that finite proof path while still stopping malformed loops.
+    max_reserved_tokens_per_run: 300000
   executive_summary:
     scratch_max_output_tokens: 4096
     regen_max_output_tokens: 4096

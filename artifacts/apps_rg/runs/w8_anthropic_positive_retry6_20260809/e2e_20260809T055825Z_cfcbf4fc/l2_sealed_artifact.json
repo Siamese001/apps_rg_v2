@@ -1,0 +1,63 @@
+{
+  "artifact_hash": "sha256:2964eeb77d7cc9188625a13ff8bf6cfab798933145d75118ebbc5b12ad3e0a1b",
+  "payload": {
+    "executed": true,
+    "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:ibm_narrative:EXECUTED_X3_BLOCK; executive_summary:EXECUTED_X3_BLOCK_FINAL_MATERIALIZED_ACCEPTANCE; headline:EXECUTED_X3_BLOCK' schema_ok=False lane_ok=False",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-5682d85904004204b6d794ddee7e304d",
+    "route_id": "R4_SINGLE_ACTION",
+    "run_id": "dbf306a7-f8a1-4a47-a9ff-f6c431cec84d",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:ef9d11502637bc44121736dfd8b443beab4743410ea309189fe8e76a747c1c0a",
+    "status": "FAIL",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.004,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 686608.62,
+        "meta": {
+          "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:ibm_narrative:EXECUTED_X3_BLOCK; executive_summary:EXECUTED_X3_BLOCK_FINAL_MATERIALIZED_ACCEPTANCE; headline:EXECUTED_X3_BLOCK' schema_ok=False lane_ok=False"
+        },
+        "status": "FAIL",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.005,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "FAIL",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "051023f4-0cd4-4741-9aae-553666ccfb78"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:ef9d11502637bc44121736dfd8b443beab4743410ea309189fe8e76a747c1c0a"
+}

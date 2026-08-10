@@ -71,3 +71,63 @@ def test_modular_pointer_used_when_finalized(
         expected_bullet_ids=UNIFY_BULLET_IDS,
     )
     assert ctx["status"] == ACCEPTED_FINALIZED_COMPANION_STATUS
+
+
+def test_valid_patch_pointer_wins_when_flat_direct_artifact_is_stale(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Patch-run keeps the original flat lane artifact beside newer attempts.
+
+    A rejected flat artifact must not mask the current accepted pointer.
+    """
+    monkeypatch.delenv("APPS_RG_TEST_HARNESS", raising=False)
+    parsed, _ = unify_bullets_parsed_from_mock()
+    sections_root = tmp_path / "sections"
+    lane_base = sections_root / "unify_bullets"
+    lane_base.mkdir(parents=True, exist_ok=True)
+    (lane_base / "l2_output.json").write_text(
+        json.dumps(
+            {
+                "section_id": "unify_bullets",
+                "product_quality_status": "FAIL",
+                "runtime_generation_status": "REAL_LLM",
+                "bullets": parsed["bullets"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (lane_base / "x3_disposition.json").write_text(
+        json.dumps({"x3_code": "X3_BLOCK"}), encoding="utf-8"
+    )
+
+    patch_dir = lane_base / "real" / "patch_success"
+    patch_dir.mkdir(parents=True, exist_ok=True)
+    (patch_dir / "l2_output.json").write_text(
+        json.dumps(
+            {
+                "section_id": "unify_bullets",
+                "product_quality_status": "PASS",
+                "runtime_generation_status": "REAL_LLM",
+                "bullets": parsed["bullets"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (patch_dir / "x3_disposition.json").write_text(
+        json.dumps({"x3_code": "X3_ALLOW"}), encoding="utf-8"
+    )
+    rel = os.path.relpath(patch_dir, tmp_path).replace("\\", "/")
+    (lane_base / "latest_successful_real_run.json").write_text(
+        json.dumps({"run_dir": rel}), encoding="utf-8"
+    )
+    monkeypatch.setenv("APPS_RG_MODULAR_R4_SECTIONS_ROOT", str(sections_root.resolve()))
+
+    ctx = build_companion_bullets_context(
+        tmp_path,
+        upstream_section_id="unify_bullets",
+        expected_bullet_ids=UNIFY_BULLET_IDS,
+    )
+
+    assert ctx["status"] == ACCEPTED_FINALIZED_COMPANION_STATUS
+    assert "patch_success" in str(ctx["l2_ref"])

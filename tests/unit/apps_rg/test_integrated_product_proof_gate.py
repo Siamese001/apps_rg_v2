@@ -1,4 +1,5 @@
 """Integrated-R4 product proof gate — reject non-product paths; validate artifacts."""
+
 from __future__ import annotations
 
 import json
@@ -10,6 +11,7 @@ import pytest
 from apps_rg.runtime.integrated_product_proof_gate import (
     CONTRACT_TEST_ONLY_CLASSIFICATION,
     INTEGRATED_R4_PRODUCT_CLASSIFICATION,
+    _live_product_outcome_blockers,
     reject_non_integrated_product_claim,
     validate_integrated_product_proof,
 )
@@ -25,7 +27,9 @@ from apps_rg.runtime.non_product_proof_stamp import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-R4_FIXTURE = REPO_ROOT / "artifacts" / "certification" / "integrated_runtime" / "r4_latest"
+R4_FIXTURE = (
+    REPO_ROOT / "artifacts" / "certification" / "integrated_runtime" / "r4_latest"
+)
 SECTION_RUN = (
     REPO_ROOT
     / "artifacts"
@@ -65,13 +69,19 @@ def test_section_only_run_dir_fails_product_proof():
     result = validate_integrated_product_proof(SECTION_RUN)
     assert result.status == "FAIL"
     assert result.section_mode is True
-    assert SECTION_L7_CORRELATION_CLASSIFICATION in result.rejected_non_product_classifications or result.section_mode
+    assert (
+        SECTION_L7_CORRELATION_CLASSIFICATION
+        in result.rejected_non_product_classifications
+        or result.section_mode
+    )
     assert "section_mode" in result.decisive_reason
 
 
 def test_whole_run_root_with_section_blobs_is_not_section_mode(tmp_path: Path):
     (tmp_path / "r4_run_manifest.json").write_text(
-        json.dumps({"chain_kind": "R4_SINGLE_ACTION", "route_family": "R4_SINGLE_ACTION"}),
+        json.dumps(
+            {"chain_kind": "R4_SINGLE_ACTION", "route_family": "R4_SINGLE_ACTION"}
+        ),
         encoding="utf-8",
     )
     lane = tmp_path / "modular_r4" / "sections" / "competencies"
@@ -88,29 +98,66 @@ def test_whole_run_root_with_section_blobs_is_not_section_mode(tmp_path: Path):
     assert "section_mode" not in result.decisive_reason
 
 
+def test_apps_rg_live_product_gate_requires_core_runtime_authority(tmp_path: Path):
+    manifest = tmp_path / "r4_run_manifest.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "route_id": "apps_rg.integrated_r4",
+                "apps_rg_product_outcome_authorized": True,
+                "x3_disposition": "X3D_ALLOW_FINISH",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    blockers = _live_product_outcome_blockers(
+        tmp_path,
+        {
+            "integrated_run_manifest": manifest,
+            "apps_rg_core_runtime_authority.json": None,
+        },
+    )
+
+    assert "core_runtime_authority_missing" in blockers
+
+
 def test_orchestrator_offline_rollup_fails(tmp_path: Path):
     receipt = orchestrator_non_product_stamp()
-    (tmp_path / "orchestrator_receipt.json").write_text(json.dumps(receipt), encoding="utf-8")
+    (tmp_path / "orchestrator_receipt.json").write_text(
+        json.dumps(receipt), encoding="utf-8"
+    )
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
-    assert ORCHESTRATOR_PROOF_CLASSIFICATION in result.rejected_non_product_classifications
+    assert (
+        ORCHESTRATOR_PROOF_CLASSIFICATION in result.rejected_non_product_classifications
+    )
 
 
 def test_resume_package_x3_offline_rollup_fails(tmp_path: Path):
     receipt = package_rollup_non_product_stamp(package_x3_allow=True)
-    (tmp_path / "resume_package_x3_disposition.json").write_text(json.dumps(receipt), encoding="utf-8")
+    (tmp_path / "resume_package_x3_disposition.json").write_text(
+        json.dumps(receipt), encoding="utf-8"
+    )
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
-    assert PACKAGE_DISPOSITION_CLASSIFICATION in result.rejected_non_product_classifications
+    assert (
+        PACKAGE_DISPOSITION_CLASSIFICATION
+        in result.rejected_non_product_classifications
+    )
     assert result.package_x3_only is True
 
 
 def test_demo_harness_fails(tmp_path: Path):
     stamp = demo_harness_non_product_stamp()
-    (tmp_path / "demo_harness_proof_stamp.json").write_text(json.dumps(stamp), encoding="utf-8")
+    (tmp_path / "demo_harness_proof_stamp.json").write_text(
+        json.dumps(stamp), encoding="utf-8"
+    )
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
-    assert DEMO_HARNESS_PROOF_CLASSIFICATION in result.rejected_non_product_classifications
+    assert (
+        DEMO_HARNESS_PROOF_CLASSIFICATION in result.rejected_non_product_classifications
+    )
 
 
 def test_ci_lane_dev_harness_fails(tmp_path: Path):
@@ -119,10 +166,15 @@ def test_ci_lane_dev_harness_fails(tmp_path: Path):
         "product_certification": "NOT_CLAIMED",
         "integrated_r4_invoked": False,
     }
-    (tmp_path / "apps_rg_e2e_runtime_proof.json").write_text(json.dumps(stamp), encoding="utf-8")
+    (tmp_path / "apps_rg_e2e_runtime_proof.json").write_text(
+        json.dumps(stamp), encoding="utf-8"
+    )
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
-    assert CI_LANE_DEV_HARNESS_CLASSIFICATION in result.rejected_non_product_classifications
+    assert (
+        CI_LANE_DEV_HARNESS_CLASSIFICATION
+        in result.rejected_non_product_classifications
+    )
 
 
 def test_missing_how_trace_fails(tmp_path: Path):
@@ -143,13 +195,17 @@ def test_missing_spine_proof_fails(tmp_path: Path):
 
 def test_package_x3_without_exit_x3_fails(tmp_path: Path):
     receipt = package_rollup_non_product_stamp(package_x3_allow=True)
-    (tmp_path / "resume_package_x3_disposition.json").write_text(json.dumps(receipt), encoding="utf-8")
+    (tmp_path / "resume_package_x3_disposition.json").write_text(
+        json.dumps(receipt), encoding="utf-8"
+    )
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
     assert result.package_x3_only or "package_x3_only" in result.decisive_reason
 
 
-def test_integrated_fixture_contract_test_only_without_canonical_command(tmp_path: Path):
+def test_integrated_fixture_contract_test_only_without_canonical_command(
+    tmp_path: Path,
+):
     _copy_r4_fixture(tmp_path)
     blocked = validate_integrated_product_proof(tmp_path)
     assert blocked.status == "BLOCKED"
@@ -174,12 +230,17 @@ def test_validator_reports_exact_missing_artifacts_and_decisive_reason(tmp_path:
 def test_reject_non_integrated_product_claim_raises_on_certified_without_run_dir():
     with pytest.raises(ValueError, match="run_dir"):
         reject_non_integrated_product_claim(
-            {"product_certification": "CERTIFIED", "proof_classification": "LIVE_RUNTIME_PROOF"},
+            {
+                "product_certification": "CERTIFIED",
+                "proof_classification": "LIVE_RUNTIME_PROOF",
+            },
             run_dir=None,
         )
 
 
-def test_reject_non_integrated_product_claim_raises_on_orchestrator_stamp(tmp_path: Path):
+def test_reject_non_integrated_product_claim_raises_on_orchestrator_stamp(
+    tmp_path: Path,
+):
     receipt = orchestrator_non_product_stamp()
     with pytest.raises(ValueError, match="non-product"):
         reject_non_integrated_product_claim(receipt, run_dir=tmp_path, context="test")

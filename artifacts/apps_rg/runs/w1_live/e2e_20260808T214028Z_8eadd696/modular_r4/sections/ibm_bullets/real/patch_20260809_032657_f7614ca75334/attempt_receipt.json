@@ -1,0 +1,60 @@
+{
+  "attempt_count": 1,
+  "attempt_receipt_id": "attempt-dc2a2e2bc4cb40e38f65a2ba239e2cd4",
+  "authority_scope": "apps_rg_l2_envelope_adapter_receipts",
+  "canonical_l2_artifact_authority": false,
+  "decisive_reason_code": "E3_SECTION_OUTPUT_MISSING",
+  "determinism": {
+    "attempt_seed": "6652742f27ac3d5c2644ce7fbd89a2af0b82ad491883f146bf4158b17d6a68ca",
+    "blueprint_hash": "ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+    "input_hash": "d6f5e5b75fb2926068f15af4d437fd8c894749ee9010b9e5eca55925506e3e7e",
+    "policy_hash": "d8a3e3ea46405ea0bda4210cd8b1b416f8131c4922594169c5ec852f10003679",
+    "prompt_hash": "13173e6392e168003d04537c47a6495bef431008f863142685da0ebbb0dd584d",
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:eef1bf82cda1d462::v1"
+  },
+  "error_summary": "section L2 output artifact missing",
+  "execution_lane": "MODEL",
+  "generated_artifacts": [
+    "provider_request.json",
+    "provider_response.json"
+  ],
+  "latency_ms": 0.0,
+  "lineage": {
+    "ancestry_chain": [
+      "R3_SIMPLE_GROUNDED_READ"
+    ],
+    "parent_plan_id": "8020359a-c1bb-43c9-a00a-d947f3a9230d",
+    "parent_route_id": "R3_SIMPLE_GROUNDED_READ",
+    "parent_step_id": "ibm_bullets",
+    "same_run_packet_family": "8020359a-c1bb-43c9-a00a-d947f3a9230d"
+  },
+  "local_check_results": {
+    "artifact_bytes_match": true,
+    "grounded_output": false,
+    "l2_output_file_digest": "",
+    "l2_output_ref": "",
+    "model_or_tool_name": "claude-sonnet-5",
+    "provider_lane": "anthropic",
+    "provider_request_digest": "b72c9d2cae67cac1fd33429b819d0bd03695c651cd1ca1c3aaa4dd9a29fac6b7",
+    "provider_request_ref": "provider_request.json",
+    "provider_response_digest": "5b941e43086b25b9c05b4a158ead9b2ae230384baac415d3b6a9b6c58eca5173",
+    "provider_response_ref": "provider_response.json",
+    "replay_key_matches": true,
+    "token_usage_observed": true,
+    "tokens_used": 2850
+  },
+  "output_digest": "edd04e8bcfed7cbf8af98e46fc9fa86a0a5d58cf47ee4b2e97feebee280c0590",
+  "proposed_state_diff": {
+    "payload": {},
+    "section_id": "ibm_bullets",
+    "section_output_ref": ""
+  },
+  "quarantined_payload": null,
+  "result_class": "FAIL_TERMINAL",
+  "return_code": 1,
+  "sealed_at": 671540.734,
+  "span_id": "section-l2-ibm_bullets",
+  "tokens_used": 2850,
+  "trace_id": "3da2370b-f1ae-4a16-955c-b48ffc256ab3",
+  "validation_packet_id": "section-val-d6f5e5b75fb29260"
+}

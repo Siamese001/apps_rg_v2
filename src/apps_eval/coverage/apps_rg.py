@@ -611,7 +611,13 @@ def _payload_identity_value(payload: Any, key: str) -> str:
     direct = str(payload.get(key) or "").strip()
     if direct:
         return direct
-    for wrapper in ("identity", "run_identity", "payload", "runtime_exhaust"):
+    for wrapper in (
+        "identity",
+        "run_identity",
+        "source_identity",
+        "payload",
+        "runtime_exhaust",
+    ):
         found = _payload_identity_value(payload.get(wrapper), key)
         if found:
             return found
@@ -621,6 +627,9 @@ def _payload_identity_value(payload: Any, key: str) -> str:
 def _bound_row_identity(snapshot: AppOutputSnapshot, payload: Any) -> tuple[dict[str, str], list[str]]:
     identity: dict[str, str] = {}
     mismatches: list[str] = []
+    payload_attempt = _payload_identity_value(payload, "section_attempt_id")
+    payload_exhaust = _payload_identity_value(payload, "runtime_exhaust_bundle_id")
+    lane_scoped = bool(payload_attempt and payload_exhaust)
     for key in (
         "parent_run_id",
         "child_run_id",
@@ -629,11 +638,16 @@ def _bound_row_identity(snapshot: AppOutputSnapshot, payload: Any) -> tuple[dict
     ):
         snapshot_value = str(getattr(snapshot, key, "") or "").strip()
         payload_value = _payload_identity_value(payload, key)
-        if snapshot_value and payload_value and snapshot_value != payload_value:
+        # A product snapshot has one research handoff child, while every lane
+        # has its own child/attempt/exhaust identity.  The lane parent must
+        # still equal the sealed product parent; lane-local fields come from
+        # the closure-bound package injected by the adapter.
+        compare_snapshot = key == "parent_run_id" or not lane_scoped
+        if compare_snapshot and snapshot_value and payload_value and snapshot_value != payload_value:
             mismatches.append(key)
             identity[key] = ""
         else:
-            identity[key] = payload_value or snapshot_value
+            identity[key] = payload_value or ("" if lane_scoped else snapshot_value)
     return identity, mismatches
 
 
@@ -750,7 +764,14 @@ def build_apps_rg_microstep_evaluation(
             required=bool(item.get("required", True)),
         )
         identity, identity_mismatches = _bound_row_identity(snapshot, payload)
-        missing_identity = sorted(key for key, value in identity.items() if not value)
+        required_identity_keys = (
+            ("parent_run_id", "child_run_id", "section_attempt_id", "runtime_exhaust_bundle_id")
+            if lane
+            else ("parent_run_id", "child_run_id")
+        )
+        missing_identity = sorted(
+            key for key in required_identity_keys if not identity.get(key)
+        )
         if not artifact_ref and resolved.failure_reason:
             reason = f"{reason}: {resolved.failure_reason}"
             observed = {"resolution_failure": resolved.failure_reason}

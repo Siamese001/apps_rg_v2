@@ -1,0 +1,697 @@
+{
+  "payload": {
+    "model": "gpt-5.6-sol",
+    "input": [
+      {
+        "role": "system",
+        "content": "You are a strict executive resume judge. Output a single compact JSON object only. No markdown fences, no explanatory prose, no nested finding objects.\n\nGRADE_ONLY authority (all providers — Gemini, OpenAI, Anthropic):\n- Do NOT rewrite, replace, or edit candidate_output.resume_display_text.\n- deterministic_gate_summary is authoritative: if a gate shows \"pass\": true, do NOT fail or cite that axis.\n- Do NOT apply retired SRFS slot mandates as decisive failures: five-part S1–S5 arc, mandatory S5 credibility\n  sentence, S2 mechanism-only / S4 outcomes slot shapes, srfs_sentence_responsibility.\n- When x2_exec_summary_evidence_utilization.pass is true, unused_fact_ids are optional weave targets, not defects.\n\nReturn ONLY one compact JSON object. No markdown fences, no prose before or after, no nested objects.\nRequired shape (findings and remediation_suggestions must be arrays of short strings only):\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\"findings\":[\"...\"],\"cited_sentence_indexes\":[1],\"remediation_suggestions\":[],\"dimension_verdicts\":{...8 rubric keys...}}\nAt most 6 short strings in findings and 4 in remediation_suggestions.\ncited_sentence_indexes: 1-based indexes (S1=1 … S6=6) for every sentence your findings ask to change.\nInclude dimension_verdicts with all eight rubric dimension ids (pass/severity/codes per dimension).\n\nScore contract (mandatory - every judge response MUST comply):\n- Include score_scale as exactly one of: \"0_to_1\" or \"0_to_5\". Do not omit score_scale.\n- If score_scale is \"0_to_1\": score and threshold MUST each be a number from 0.0 through 1.0 inclusive.\n- If score_scale is \"0_to_5\": score and threshold MUST each be a number from 0.0 through 5.0 inclusive.\n- Forbidden: 0_to_10 scales, percentage scores (0–100), or values like score=9.2 with threshold=8.0.\n- Do not infer scale from magnitude; declare score_scale explicitly and keep score/threshold within that scale."
+      },
+      {
+        "role": "user",
+        "content": "You are grading a generated executive summary candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write a new executive summary.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (graph proof pool), and candidate_output.\n- **deterministic_gate_summary is authoritative for X2 gates.** If a gate shows `\"pass\": true`, you MUST NOT\n  claim that gate failed or cite retired criteria (five-part S1–S5 arc, mandatory S5 credential sentence, etc.).\n- **DISPLAY_OVERRIDE PARITY (CRITICAL):** When an `allowed_fact_packet` row carries a non-empty\n  `display_override_text` field, treat the **UNION** of `claim_text` + `display_override_text` as the\n  authorized fact substrate for that fact_id. The generator (PROVIDER_MODEL) is contractually required by X2 gate\n  `x2_exec_summary_display_override_compliance` to emit the override text verbatim. Phrases drawn from\n  `display_override_text` are **NOT unsupported extensions** and MUST NOT be cited as \"extending beyond\n  fact scope\" or as inferential stretches. Grade fidelity to the union, not to `claim_text` alone.\n- **GRAPH_PROOF_REFS (CRITICAL):** When a row carries `graph_proof_refs.claim_support_graph_refs`, grade\n  `factual_support` against the UNION of `claim_text`, `display_override_text` (if any), and sentences that\n  demonstrate skills listed in `claim_support_graph_refs`. Treat `graph_proof_refs.source_resume_files` as\n  authoritative provenance for resume-backed skill claims — not as optional decoration.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).\n\nJUDGE_TASK: GRADE_ONLY\nSECTION: executive_summary\nJUDGE_CONTRACT_HASH: b32bbf390c84bc790d56bd4a13a766a3ec5bb22d9f9e32654621bd2ff2a03def\n\nPROOF_BOUNDARY:\n{\n  \"jd_is_targeting_context_only\": true,\n  \"briefing_is_targeting_context_only\": true,\n  \"claims_must_be_supported_by_allowed_fact_packet\": true,\n  \"judges_must_not_rewrite\": true,\n  \"judges_must_not_generate_replacement_summary\": true,\n  \"metadata_only_graph_context_is_insufficient\": true\n}\n\nGRAPH_BINDING_MATERIALITY_SUMMARY:\n{\n  \"schema\": \"apps_rg.graph_binding_materiality_summary.v1\",\n  \"section_id\": \"executive_summary\",\n  \"status\": \"GRAPH_CONTEXT_PRESENT\",\n  \"violation_count\": 0,\n  \"violations\": [],\n  \"native_c03_active\": false,\n  \"native_c03_selected_fact_count\": 0,\n  \"native_c03_cited_fact_count\": 0,\n  \"native_c03_cited_fact_ids\": [],\n  \"role_episode_active\": false,\n  \"role_episode_bundle_count\": 0,\n  \"role_episode_bundle_intersection_count\": 0,\n  \"role_episode_skill_intersection_count\": 0,\n  \"role_episode_fact_intersection_count\": 0,\n  \"judge_instruction\": \"graph context is available for PA/judge parity; candidate output still must cite source facts or graph bindings when making claims\",\n  \"authority\": \"C0.3 graph bindings and FinalEvidenceContract only\",\n  \"jd_and_briefing_policy\": \"targeting_context_only_not_claim_proof\",\n  \"graph_context_present\": true,\n  \"allowed_fact_ids\": [\n    \"fact_engineering_platform_001\",\n    \"fact_engineering_platform_002\",\n    \"fact_engineering_platform_006\",\n    \"metric_unify_22m_ip_led_revenue\",\n    \"metric_unify_agentic_l0_route_policy_dispatch_surface\",\n    \"metric_unify_agentic_tool_sandbox_egress_policy_surface\",\n    \"metric_unify_policy_gated_agent_execution_surface\",\n    \"reb_ibm_devsecops_release_resilience\"\n  ],\n  \"allowed_fact_count\": 17,\n  \"claim_support_graph_refs\": [\n    \"skill_ibm_devsecops_pipeline_security\",\n    \"skill_unify_agentic_human_override_escalation_paths\",\n    \"skill_agentic_platform_productization\"\n  ],\n  \"claim_support_graph_ref_count\": 3,\n  \"pillar_hint_ids\": [],\n  \"pillar_hint_count\": 0,\n  \"binding_fact_ids\": [\n    \"reb_ibm_devsecops_release_resilience\",\n    \"reb_unify_agentic_platform_architecture\",\n    \"reb_unify_platform_commercialization_leadership\"\n  ],\n  \"lineage_ref_count\": 0,\n  \"overloaded_fact_compression\": [],\n  \"final_evidence_digest\": \"\",\n  \"proof_pool_digest\": \"\"\n}\n\nDETERMINISTIC_GATE_SUMMARY (AUTHORITATIVE — do not contradict pass=true gates):\n{\n  \"x2_schema_valid\": {\n    \"pass\": true,\n    \"detail\": \"True\"\n  },\n  \"x2_claim_ledger_present\": {\n    \"pass\": true,\n    \"detail\": \"6\"\n  },\n  \"x2_sentence_coverage_present\": {\n    \"pass\": true,\n    \"detail\": \"6\"\n  },\n  \"x2_sentence_coverage_pass\": {\n    \"pass\": true,\n    \"detail\": \"True\"\n  },\n  \"x2_self_check_claim_ledger_consistent\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_claim_ledger_row_count_matches_sentence_count\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_claim_field_maps_to_display_sentence\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_source_fact_coverage_100\": {\n    \"pass\": true,\n    \"detail\": \"100%\"\n  },\n  \"x2_claim_ledger_orphan_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_claim_ledger_claim_text_non_empty\": {\n    \"pass\": true,\n    \"detail\": \"all_rows_non_empty\"\n  },\n  \"x2_unsupported_claim_zero\": {\n    \"pass\": true,\n    \"detail\": \"0\"\n  },\n  \"x2_mixed_claim_zero\": {\n    \"pass\": true,\n    \"detail\": \"0\"\n  },\n  \"x2_overbroad_claim_zero\": {\n    \"pass\": true,\n    \"detail\": \"0\"\n  },\n  \"x2_jd_phrase_copy_violation_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_jd_alignment_proof_flags\": {\n    \"pass\": true,\n    \"detail\": \"{'targeting_only': True, 'jd_used_as_proof': False, 'briefing_used_as_proof': False, 'companion_context_used_as_proof': False, 'companion_used_as_proof': False, 'graph_targeting': {'role_family_key': 'PARTNER_APPLIED_AI_ARCHITECTURE', 'projection_source': 'sqlite_role_family_projection', 'sqlite_projection_row_found': True, 'fallback_pillar_bridge_used': False, 'release_eligible_targeting_proof': True, 'targeting_degraded_explicit': False, 'pillar_hint_ids': ['pillar_applied_ai_partner_architecture', 'pillar_partner_gtm_alliances', 'pillar_presales_solutioning', 'pillar_technical_presales_accelerators'], 'briefing_targeting_supplement': []}}\"\n  },\n  \"x2_em_dash_count_zero\": {\n    \"pass\": true,\n    \"detail\": \"0\"\n  },\n  \"x2_inline_source_tags_absent\": {\n    \"pass\": true,\n    \"detail\": \"False\"\n  },\n  \"x2_exec_summary_paragraph_max_words\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_no_bloated_sentence\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_no_monolithic_prompt\": {\n    \"pass\": true,\n    \"detail\": \"False\"\n  },\n  \"x2_temperature_in_profile\": {\n    \"pass\": true,\n    \"detail\": \"0.45\"\n  },\n  \"x2_first_person_zero\": {\n    \"pass\": true,\n    \"detail\": \"False\"\n  },\n  \"x2_target_company_as_experience_zero\": {\n    \"pass\": true,\n    \"detail\": \"False\"\n  },\n  \"x2_generic_filler_zero\": {\n    \"pass\": true,\n    \"detail\": \"[]\"\n  },\n  \"x2_exec_summary_meta_filler_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_colon_stitch_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_sentence_count_6\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_display_roundtrip_integrity\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_cross_sentence_metric_dedup\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_c03_selected_fact_ids_claimable_subset_allowed_fact_ids\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_allowed_fact_utilization\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_evidence_utilization\": {\n    \"pass\": true,\n    \"detail\": \"ok_pool_below_utilization_threshold\"\n  },\n  \"x2_exec_summary_no_mechanism_inventory\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_no_credential_dump\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_no_sentence_fragment\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_display_override_compliance\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_strategy_no_commercialization_thread\": {\n    \"pass\": true,\n    \"detail\": \"skipped_not_strategy_lane\"\n  },\n  \"x2_exec_summary_no_competencies_duplication\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_no_certifications_section_duplication\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_prompt_template_authority\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_sentence_stacking_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_executive_summary_synthesis_quality\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_partner_narrative_continuity\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_speculative_capstone_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_mechanical_opener_stack_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_robotic_transition_stack_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_exec_summary_cross_fact_conflation_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_north_star_style_echo_unsupported_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_claim_coverage_accounting_consistent\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_claim_ledger_materialized_or_gap_excused\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_source_sensitive_phrases_supported\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_required_fields_complete\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_required_artifacts_written\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_json_parse_valid\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_no_selected_fact_plan_model_echo\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_no_extra_unrecognized_fields\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_material_clause_coverage_100\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_metric_fact_id_granularity\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_no_inferred_bridge_claims\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_jd_as_proof_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_briefing_as_proof_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_executive_summary_active_proof_pool_source_fact_ids\": {\n    \"pass\": true,\n    \"detail\": \"{'section': 'executive_summary', 'proof_source': 'augmented_skills_graph', 'proof_pool_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'proof_pool_digest': 'afe13a1362b94daa807f8e04c975da30bb9c82a462c6921d29f987f320b96b1e', 'canonical_evidence_set_digest': 'afe13a1362b94daa807f8e04c975da30bb9c82a462c6921d29f987f320b96b1e', 'id_alias_map': {}, 'claim_evidence_source_type': 'augmented_skills_graph', 'claim_evidence_source_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'skills_authority_source_type': 'augmented_skills_graph', 'skills_authority_status': 'PASS', 'skills_authority_graph_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'legacy_broad_skills_ledger_skills_authority': False, 'broad_skills_ledger_claim_evidence_only': None, 'allowed_source_fact_ids_count': 17, 'source_fact_ids_checked': ['reb_ibm_devsecops_release_resilience', 'reb_unify_agentic_platform_architecture', 'reb_unify_platform_commercialization_leadership', 'metric_unify_policy_gated_agent_execution_surface', 'skill_unify_agentic_runtime_proof_bundle_lineage', 'fact_engineering_platform_002', 'skill_ibm_devsecops_pipeline_security', 'metric_unify_22m_ip_led_revenue'], 'unsupported_source_fact_ids': [], 'rejected_non_proof_source_ids': [], 'jd_or_briefing_ids_rejected': [], 'x2_source_fact_pool_status': 'PASS', 'decisive_reason': None, 'validator_name': 'evaluate_proof_pool_source_fact_gate', 'skills_authority_x2_boundary': 'PASS', 'x2_srfs_gate_status': 'NOT_APPLICABLE', 'out_of_slice_fact_ids': [], 'srfs_allowed_fact_ids_count': 17, 'selected_role_fact_set_used': False, 'broad_skills_ledger_used': False, 'broad_skills_ledger_used_as_authority': False, 'base_resume_fallback_used': False, 'srfs_section_id': 'executive_summary'}\"\n  },\n  \"x2_target_title_inflation_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_unsupported_industry_claim_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_provider_requested_attempted\": {\n    \"pass\": true,\n    \"detail\": \"requested=external_openai, attempted=external_openai\"\n  },\n  \"x2_no_silent_mock_fallback\": {\n    \"pass\": true,\n    \"detail\": \"provider=external_openai, status=REAL_LLM\"\n  },\n  \"x2_PROVIDER_MODEL_provider_stub_transport_zero\": {\n    \"pass\": true,\n    \"detail\": \"ok\"\n  },\n  \"x2_model_name_allowed\": {\n    \"pass\": true,\n    \"detail\": \"skipped_provider_not_external_claude\"\n  },\n  \"x2_prompt_hash_known\": {\n    \"pass\": true,\n    \"detail\": \"bac9f0b1bec0aa13\"\n  },\n  \"x2_input_output_hashes_present\": {\n    \"pass\": true,\n    \"detail\": \"True\"\n  },\n  \"x2_section_input_usage_ledger_present\": {\n    \"pass\": true,\n    \"detail\": \"section_input_usage_ledger_v1\"\n  },\n  \"x2_jd_used_as_required_targeting_input\": {\n    \"pass\": true,\n    \"detail\": \"{'required': True, 'used': True, 'authority': 'TARGETING_INPUT', 'used_for': []}\"\n  },\n  \"x2_briefing_used_as_required_context_input\": {\n    \"pass\": true,\n    \"detail\": \"{'required': True, 'used': True, 'authority': 'CONTEXT_INPUT', 'used_for': [], 'material_delivered_to_l2': True, 'parity_match_generation_judge': True}\"\n  },\n  \"x2_title_company_used_as_required_positioning_input\": {\n    \"pass\": true,\n    \"detail\": \"{'target_title': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}, 'target_company': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}}\"\n  },\n  \"x2_no_non_evidence_inputs_as_claim_evidence\": {\n    \"pass\": true,\n    \"detail\": \"False\"\n  },\n  \"x2_no_non_evidence_inputs_in_source_fact_ids\": {\n    \"pass\": true,\n    \"detail\": \"{'row_scan_found_reserved_non_resume_ids': False, 'ledger_non_evidence_inputs_in_source_fact_ids': False}\"\n  },\n  \"x2_selected_fact_ids_only\": {\n    \"pass\": true,\n    \"detail\": \"[]\"\n  },\n  \"x2_section_claims_supported_by_base_resume\": {\n    \"pass\": true,\n    \"detail\": \"{'displayed_claim_count': 6, 'claims_supported_by_selected_resume_facts': 6, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}\"\n  },\n  \"x2_input_usage_accounting_consistent\": {\n    \"pass\": true,\n    \"detail\": \"{'ledger_summary': {'displayed_claim_count': 6, 'claims_supported_by_selected_resume_facts': 6, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'runtime_summary': {'displayed_claim_count': 6, 'claims_supported_by_selected_resume_facts': 6, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'coverage_overall_pass': True}\"\n  },\n  \"x2_fec_subset_of_canonical_evidence_pool\": {\n    \"pass\": true,\n    \"detail\": \"{'fec_count': 17, 'violations': []}\"\n  },\n  \"x2_prompt_c0_ids_subset_of_fec\": {\n    \"pass\": true,\n    \"detail\": \"{'prompt_c0_count': 17, 'violations': []}\"\n  },\n  \"x2_claim_ledger_source_fact_ids_subset_of_fec\": {\n    \"pass\": true,\n    \"detail\": \"{'ledger_id_count': 8, 'violations': []}\"\n  },\n  \"X2_BLOCK_ID_NAMESPACE_SPLIT\": {\n    \"pass\": true,\n    \"detail\": \"{'disjoint_without_alias': [], 'alias_map_size': 0}\"\n  },\n  \"x2_active_pool_digest_matches_fec_digest\": {\n    \"pass\": true,\n    \"detail\": \"{'canonical_evidence_set_digest': 'd28bce2e433480d559fb3e4d86df549d6e4469e2ddac27807cba05a55496fabd', 'fec_allowed_fact_ids_digest': 'd28bce2e433480d559fb3e4d86df549d6e4469e2ddac27807cba05a55496fabd', 'fec_narrowed_from_pool': True}\"\n  },\n  \"x2_resume_graph_claim_binding\": {\n    \"pass\": true,\n    \"detail\": \"\"\n  },\n  \"product_shape_note\": {\n    \"pass\": true,\n    \"detail\": \"judge_snapshot_content_gates=85\"\n  },\n  \"x2_executive_summary_judge_packet_display_override_parity\": {\n    \"pass\": false,\n    \"detail\": \"judge_packet_missing_display_override_text:fact_engineering_platform_002 (see Bug:ExecSummaryJudgeDisplayOverrideInvisible)\"\n  }\n}\n\nGENERATION_LAW_DIGEST (aligned with L2 I0 — judges do not receive full E0/I0):\nGENERATION_LAW_DIGEST:\n- Proof: ALLOWED_SOURCE_FACT_IDS + C0 lines only; JD/briefing targeting-only.\n- Required: executive_strategy_thesis (one sentence) then six-sentence display serving that leadership-first thesis.\n- Leadership first: regardless of JD or role family, open with leadership identity, scope, and operating model before domain-specific keywords.\n- Display metric weave: when claim_text for S3–S5 includes dollar/percent outcomes from allowed facts, the matching display sentence must include at least one outcome (executive_signal; not ledger-only metrics).\n- Anti-inventory: no comma-chain mechanism dumps; no sequential achievement bullet stack; no employer inventory line.\n- Credential policy: omit AWS/Databricks/vendor cert inventories; at most one FSA rigor mention (C0.3 phase-1) when woven into quantitative narrative — not equivalent to AWS Associate labels.\n- SVP ATS: translate JD themes into executive concepts via allowed facts; document gap_notes when proof IDs absent.\n- Exactly 6 sentences, one paragraph, max 150 words; S6 forward synthesis grounded in source_fact_ids, not thin recap.\n- S1 thesis-body promise: only name capability threads (e.g. 'commercialization', 'innovation delivery') that at least one of S2–S6 substantiates via source_fact_ids; a thesis thread with no body delivery is a thesis-body gap that Claude-class judges penalise severely — resolve the gap before writing S1.\n\n\nDIMENSION_GATE_MAP:\n{\n  \"factual_support\": \"x2_claim_ledger_orphan_zero\",\n  \"executive_signal\": \"x2_executive_summary_synthesis_quality\",\n  \"resume_voice\": \"x2_exec_summary_meta_filler_zero\",\n  \"ats_alignment_without_keyword_stuffing\": \"x2_jd_phrase_copy_violation_zero\",\n  \"anti_overfit\": \"x2_unsupported_claim_zero\",\n  \"synthesis_quality\": \"x2_executive_summary_synthesis_quality\",\n  \"evidence_utilization\": \"x2_exec_summary_evidence_utilization\",\n  \"deterministic_alignment\": \"x2_gate_snapshot_authoritative\"\n}\n\nRubric dimensions (graph-only C0.3 augmented skills graph authority, non-SRFS lane):\n1. factual_support: claims supported by allowed_fact_packet and candidate claim_ledger source_fact_ids only.\n   **For rows carrying `display_override_text`, the authorized substrate is the UNION of `claim_text` +\n   `display_override_text`. Phrases from `display_override_text` are deterministically authorized — do NOT\n   flag them as unsupported, inferential, or out-of-scope extensions; the generator was X2-required to emit\n   them verbatim. When `graph_proof_refs.claim_support_graph_refs` is non-empty, also authorize prose that\n   demonstrates those skill nodes; `graph_proof_refs.source_resume_files` is authoritative provenance.\n   Cite a `factual_support` failure only when prose deviates from the full authorized union (claim +\n   override + graph skill refs).**\n2. executive_signal: SVP-level platform/governance/partner-motion synthesis, not bullet stacks.\n3. resume_voice: credible executive prose; no recruiter filler, meta narration, or generic AI-company prose, and nothing that would fail a Head of Talent Acquisition screen.\n4. ats_alignment_without_keyword_stuffing: JD shapes emphasis only; no JD-as-proof. When allowed facts\n   lack EA/interop/federated proof IDs, penalize only if prose invents those themes or ignores documented\n   gap_notes — not for absence alone when generation_law_digest requires gap_notes. Reward company-DNA specificity when the\n   packet supports partner ecosystem, adoption motion, commercial fit, or a clean Head of Talent Acquisition screen.\n5. anti_overfit: no unsupported metrics/credentials; no target company as candidate experience; no repeated metric inventory\n   or company-name mirroring; no AI-authenticity dead giveaways such as em dashes, buzzword soup, or template phrasing.\n   **`display_override_text` content is NOT an unsupported credential/metric — it is X2-authorized\n   substrate. Do not cite override phrases (e.g. \"FSA-chartered\", \"informing data governance and AI\n   strategy at scale\") as anti_overfit violations.**\n6. synthesis_quality: **exactly six** integrated sentences (X2 band); reward connective SVP IT strategy emphasis when\n   ledger-backed; penalize thin recap S6, repeated metric surfaces, and bullet-stacked prose. **Do not** soft-penalize\n   credential/metric inventory, unused_fact_ids weave targets, or mechanism dumps when the mapped deterministic gate shows `\"pass\": true`.\n   Keep the cadence human enough to pass a Head of Talent Acquisition screen without machine-generated tells.\n7. evidence_utilization: when `x2_exec_summary_evidence_utilization` is `\"pass\": true`, unused_fact_ids are optional weave\n   targets — not proof gaps. Penalize under-use only when that gate is `\"pass\": false` or synthesis is decisively thin;\n   reward distinct evidence themes instead of the same metric repeated in multiple sentences.\n8. deterministic_alignment: **only** penalize gates that show `\"pass\": false` in deterministic_gate_summary. Never cite\n   retired five-part/S1–S5 arc mandates when gates passed.\n\nResidual quality (always in scope — not closed by X2 alone):\n- executive clarity, narrative coherence, commercial fit, usefulness, unsupported phrasing outside ledger scope.\n\nDecisive failure triggers (must align with deterministic_gate_summary failures when cited):\n- unsupported business metric or credential (when x2 gates failed or decisive unsupported claim)\n- JD or briefing used as proof\n- first-person narrative\n- obvious rewrite recommendation that invents new claims\n\nReturn ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[],\n \"dimension_verdicts\": {\"factual_support\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"executive_signal\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"resume_voice\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"ats_alignment_without_keyword_stuffing\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"anti_overfit\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"synthesis_quality\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"evidence_utilization\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}, \"deterministic_alignment\": {\"pass\": true, \"severity\": \"none\", \"codes\": []}}\nAll eight keys required: factual_support, executive_signal, resume_voice, ats_alignment_without_keyword_stuffing, anti_overfit, synthesis_quality, evidence_utilization, deterministic_alignment. deterministic_alignment.pass must be true when every gate in deterministic_gate_summary shows pass:true. Use severity major when that dimension drove score below threshold; minor for nit; none when pass.}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.\n\nTARGETING_CONTEXT (NOT PROOF):\n{\n  \"jd_text\": \"Manager of Applied AI Architecture, Partnerships\\nSan Francisco, CA | New York City, NY | Seattle, WA\\n\\nAbout Anthropic\\n\\nAnthropic's mission is to create reliable, interpretable, and steerable AI systems. We want AI to be safe and beneficial for our users and for society as a whole. Our team is a quickly growing group of committed researchers, engineers, policy experts, and business leaders working together to build beneficial AI systems.\\n\\nAbout the role\\n\\nAs the Manager of the Partnerships Applied AI Solutions Architect team, you will drive adoption of frontier AI by enabling deployment of Anthropic's products (Claude for Enterprise, Claude Code, API) through our Global and Regional System Integrators, cloud partners (AWS, GCP, Azure), and strategic technology partners.\\n\\nYou will build and lead a team of Partner Solutions Architects, establish processes and best practices for partner-led pre-sales engagements, and represent Anthropic as the technical lead on its most important partnerships. In collaboration with Sales, Partnerships, Product, and Engineering, you will help partners incorporate leading-edge AI into their practices, accelerate indirect revenue, and execute long-term GTM strategy while maintaining our best-in-class safety standards.\\n\\nResponsibilities\\n\\n    Team Leadership & Development: Hire, manage, and mentor a team of Partner Solutions Architects. Set goals, run reviews, and coach each team member toward high productivity and career growth.\\n    Strategic Technical Partnership: Act as the senior technical thought partner to Anthropic's GTM partnerships team. Co-build partner strategy with aligned GTM leadership, drive key programs, and align cross-functional stakeholders (Sales, Product, Engineering) behind partner outcomes.\\n    Partner Enablement & Ecosystem: Embed your team with GSI and cloud partner technical teams to enable their AI practices, troubleshoot, and evangelize Anthropic in their developer communities. Represent Anthropic at partner events (GSI workshops, AWS/GCP summits, hackathons) and contribute technical content and thought leadership.\\n    Joint Solution Development: Lead partners in identifying high-value, industry-specific GenAI applications. Develop joint solutions and codify reference architectures and best practices to accelerate time to deployment.\\n    Customer Deal Support: Own the technical portion of partner-led pre-sales engagements. Intervene directly on strategic deals where partners are the primary delivery vehicle, providing deep solution architecture guidance.\\n    Product Feedback: Gather and validate feedback on Anthropic's products from partner deployments and deliver it to Product and Engineering to inform roadmap and partner strategy.\\n\\nYou may be a good fit if you have\\n\\n    7+ years in technical customer-facing or partner-facing roles (Solutions Architect, Sales Engineer, Partner SE, TAM).\\n    3+ years managing pre-sales or partner-facing technical teams; comfortable building foundational teams in ambiguous, fast-moving environments.\\n    Track record building and scaling partnerships with GSIs (e.g., Accenture, Deloitte, TCS, Infosys) and/or cloud providers (AWS, GCP, Azure).\\n    Deep understanding of partner-led selling and delivery: indirect revenue models, enablement at scale, and joint GTM motions.\\n    Technical depth in enterprise AI deployments: LLM architecture, prompt engineering, evaluation, API integrations, and production use cases.\\n    Exceptional communication and executive presence; able to build trusted relationships with C-suite, partner leadership, and engineering teams alike.\\n    A love of teaching and mentoring, and a passion for advancing safe, beneficial AI.\\n\\nStrong candidates may also have\\n\\n    5+ years leading partner-facing SA teams through hypergrowth, including developing both senior and junior talent.\\n    Direct experience helping GSIs or consultancies build their AI/ML practice - enablement programs, certification paths, joint solution development.\\n\\nCompensation\\n\\nThe annual compensation range for this role is listed below.\\n\\nFor sales roles, the range provided is the role's On Target Earnings (\\\"OTE\\\") range, meaning that the range includes both the sales commissions/sales bonuses target and annual base salary for the role.\\n\\nAnnual Salary: $315,000 - $380,000 USD\\n[# APPS_RG_EXEC_SUMMARY_TARGETING_CAP targeting-only; not proof]\\n\",\n  \"briefing\": \"# Anthropic - Manager of Applied AI Architecture, Partnerships briefing packet\\n| Manager of Applied AI Architecture, Partnerships | $315,000-$380,000 USD | Reports to Partnerships (partner GTM and technical ecosystem context) |\\n\\n## JD Complement\\nAnthropic\\u2019s public-benefit structure and safety-first identity create a high bar for ecosystem execution. Growth through outside delivery organizations must preserve customer trust, technical rigor, security expectations, and\\nresponsible-use\\nstandards.\\n\\nThe core operating challenge is making advanced AI usable in enterprise environments without turning every deployment into a bespoke technical engagement. The winning model will pair reusable technical patterns with disciplined\\ngovernance, clear escalation, and rapid learning from field use.\\n\\n## Company DNA & Operating Model\\nAnthropic is an AI research and product company whose market identity is closely tied to dependable, understandable, and controllable AI. Its commercial offerings span Claude for business users, developer-facing capabilities, and\\nenterprise administration.\\n\\nEnterprise success depends on more than access to models. Customers need credible pathways from experimentation to governed workflows, including identity and access design, information-handling decisions, user adoption, and ongoing\\noperational ownership.\\n\\nThis creates an operating model in which research, product, commercial, customer, security, and ecosystem teams all influence deployment quality. Partners extend reach and delivery capacity, but their work must remain consistent with\\nAnthropic\\u2019s technical and safety posture.\\n\\nAnthropic\\u2019s enterprise approach combines:\\n- Direct engagement with organizations and developers adopting Claude products.\\n- Cloud, technology, and services ecosystems that expand distribution, integration, and implementation capacity.\\n- Adoption guidance that treats rollout as an organizational change effort as well as a technical implementation.\\n- Product learning informed by real-world customer and partner deployment patterns.\\n\\n## Company Strategy & Operating Pressure\\nAnthropic must convert a fast-growing enterprise opportunity into repeatable customer value while protecting the quality of its brand. The company\\u2019s stated emphasis on safety and reliability means implementation choices can become\\ncommercially consequential, not merely operational details.\\n\\nIts product surface serves distinct audiences: business teams seeking practical productivity gains, developers building AI-enabled experiences, and administrators accountable for enterprise controls. That breadth increases the\\nimportance of simple, partner-ready architectures that can work across varied customer environments.\\n\\nA central tension is distributed execution versus centralized standards. Services firms and cloud providers need enough latitude to move quickly in accounts, while Anthropic needs common design principles, validation methods, risk\\nboundaries, and feedback channels.\\n\\nThe relevant question is not whether partners can generate demand. It is whether the ecosystem can repeatedly move customers from interest to durable, trusted production use.\\n\\n## Leadership & Stakeholder Map\\nThe stakeholder environment is inherently cross-functional:\\n- Safety, security, legal, and policy functions shape acceptable deployment patterns and risk-management expectations.\\n\\n## AI, Data, Platform, Architecture Signals\\nAnthropic\\u2019s differentiation centers on AI that is dependable, interpretable, and steerable. In enterprise settings, that makes evaluation, observability, governance, and operating discipline part of the customer value proposition.\\n\\nClaude supports analytical, writing, coding, and knowledge-work use cases, broadening the architecture conversation beyond a standalone assistant. Customers and partners will need guidance on workflow design, application integration,\\ndata boundaries, user roles, quality assessment, and change-management practices.\\n\\nEnterprise adoption materials signal that administration and rollout deserve deliberate attention. Technical access alone is insufficient; successful use depends on a well-managed transition into team habits, business processes, and\\naccountability structures.\\n\\nThe architecture opportunity is to codify practical patterns that balance speed with control:\\n- Secure access, identity, and role design appropriate to enterprise environments.\\n- Evaluation approaches that make quality and risk visible before broader rollout.\\n- Workflow and integration patterns that connect AI capabilities to real operating processes.\\n- Adoption models that help customers move from pilots to durable usage.\\n- Support and escalation models that prevent recurring issues from becoming isolated account-specific work.\\n\\n## Partnership / Ecosystem Motion\\nAnthropic publicly positions a network of cloud, technology, and services partners as an important route to customer outcomes. This suggests an ecosystem model that is broader than referrals and depends on partner technical\\ncapability.\\n\\nDifferent partner types contribute different forms of leverage:\\n- Technology partners can incorporate Claude into broader platforms and customer workflows.\\n- Developer and practitioner communities can expand awareness, skills, and solution experimentation.\\n\\nReports of a major 2026 investment in the Claude Partner Network point to increased pressure for consistent onboarding, training, solution quality, and measurable partner readiness. As the ecosystem expands, technical enablement must\\nproduce independent delivery capacity rather than perpetual reliance on Anthropic specialists.\\n\\nThe commercial model is likely strongest where co-selling, joint solution design, and customer implementation reinforce one another. Technical credibility at the partner level may determine whether interest becomes production use,\\nrenewal, and expansion.\\n\\n## Recent Events & Urgency\\nAnthropic\\u2019s reported 2026 partner-network commitment indicates that ecosystem development is becoming a more formal growth mechanism. Scale can arrive quickly through large services and cloud organizations, but uneven delivery can\\nalso create inconsistent customer experiences and fragmented product signal.\\n\\nThe near-term urgency is operational. A mature applied architecture capability can establish the methods that make partner growth repeatable: qualification standards, reusable solution assets, technical readiness measures, escalation\\ndiscipline, and feedback loops.\\n\\nAnthropic\\u2019s enterprise materials also frame adoption as a lifecycle rather than a single transaction. That increases the value of clear handoffs among commercial teams, partners, customer stakeholders, and internal product groups.\\n\\n## apps_rg Positioning Themes (targeting only, not proof)\\n- Build ecosystem technical capacity while maintaining strong quality, governance, and customer-trust standards.\\n- Turn enterprise AI learnings into reusable solution patterns, operating guides, and validation methods.\\n- Translate AI platform capabilities into practical industry workflows with credible paths to production.\\n- Create scalable enablement for consulting, cloud, and technology ecosystems.\\n- Establish disciplined mechanisms for converting field insight into product and platform learning.\\n- Lead technical customer-facing teams through ambiguity, growth, and multi-party account dynamics.\\n- Balance commercial urgency with security, adoption, evaluation, and responsible-use requirements.\\n- Define clear models for joint account work, technical ownership, escalation, and delivery transition.\\n\\n## apps_lic Outreach Angles (targeting only, not proof)\\n- This role sits where commercial expansion, technical trust, customer adoption, and product learning intersect.\\n\\n## Do Not Use As Proof\\nThe JD and this briefing are targeting inputs only. Candidate claims must come from the governed resume/proof graph.\\n[# APPS_RG_EXEC_SUMMARY_TARGETING_CAP targeting-only; not proof]\\n\",\n  \"graph_targeting_capsule\": {\n    \"schema\": \"graph_targeting_capsule_v1\",\n    \"role_family_key\": \"PARTNER_APPLIED_AI_ARCHITECTURE\",\n    \"skill_entries\": [\n      {\n        \"skill_id\": \"skill_agentic_control_plane_design\",\n        \"label\": \"agentic control plane design (agentic ai platforms)\"\n      },\n      {\n        \"skill_id\": \"skill_app_overlay_runtime_binding\",\n        \"label\": \"app overlay runtime binding (agentic ai platforms)\"\n      },\n      {\n        \"skill_id\": \"skill_authority_ordered_prompt_packaging\",\n        \"label\": \"authority ordered prompt packaging (agentic ai platforms)\"\n      },\n      {\n        \"skill_id\": \"skill_bounded_agent_execution\",\n        \"label\": \"bounded agent execution (agentic ai platforms)\"\n      }\n    ],\n    \"skill_ids\": [\n      \"skill_agentic_control_plane_design\",\n      \"skill_app_overlay_runtime_binding\",\n      \"skill_authority_ordered_prompt_packaging\",\n      \"skill_bounded_agent_execution\"\n    ],\n    \"capsule_text\": \"agentic control plane design (agentic ai platforms); app overlay runtime binding (agentic ai platforms); authority ordered prompt packaging (agentic ai platforms); bounded agent execution (agentic ai platforms)\",\n    \"capsule_char_count\": 210,\n    \"max_skills\": 8,\n    \"max_label_chars\": 120,\n    \"max_total_chars\": 960,\n    \"non_proof_banner\": \"GRAPH_TARGETING_CAPSULE \\u2014 graph_context_routing_support_not_claim_proof \\u2014 theming/vocabulary only; NOT claim support; do not cite as evidence.\",\n    \"authority_class\": \"GRAPH_TARGETING_NON_PROOF\",\n    \"proof_classification\": \"graph_context_routing_support_not_claim_proof\",\n    \"claim_support_allowed\": false,\n    \"allowed_fact_ids_bound\": [\n      \"metric_ibm_20pct_joint_revenue_growth\",\n      \"metric_ibm_adoption_risk_to_expansion_readiness\",\n      \"metric_ibm_ai_driven_sales_frameworks\",\n      \"metric_ibm_alliance_cosell_operating_cadence\",\n      \"metric_ibm_client_facing_modernization_playbooks\",\n      \"metric_ibm_offering_accelerator_package_reuse\",\n      \"metric_ibm_onprem_to_aws_modernization_waves\",\n      \"metric_ibm_regulated_reference_architecture_reuse\",\n      \"metric_ibm_value_realization_account_reviews\",\n      \"metric_insurtech_core_data_entities_mapped_count\",\n      \"metric_insurtech_sensitive_data_controls_count\",\n      \"metric_unify_agentic_l0_route_policy_dispatch_surface\",\n      \"metric_unify_agentic_tool_sandbox_egress_policy_surface\",\n      \"metric_unify_cfo_aligned_adoption_motion_count\",\n      \"metric_unify_cloud_data_runtime_integration_patterns\",\n      \"metric_unify_consumption_renewal_signal_instrumentation\",\n      \"metric_unify_high_availability_distributed_service_patterns\",\n      \"metric_unify_partner_cosell_solution_motion_count\",\n      \"metric_unify_partner_enablement_asset_set\",\n      \"metric_unify_policy_gated_agent_execution_surface\",\n      \"reb_ibm_aws_alliance_partner_cosell_gtm\",\n      \"reb_ibm_aws_modernization_architecture\",\n      \"reb_ibm_customer_success_value_realization\",\n      \"reb_ibm_offering_accelerator_management\",\n      \"reb_insurtech_aws_guidewire_core_modernization\",\n      \"reb_insurtech_regulated_aws_control_implementation\",\n      \"reb_unify_agentic_platform_architecture\",\n      \"reb_unify_distributed_ecosystem_engineering\",\n      \"reb_unify_enterprise_adoption_revenue\",\n      \"reb_unify_partner_channel_cosell\",\n      \"skill_aws_iam_kms_cloudtrail_controls\",\n      \"skill_dense_sparse_exact_retrieval_design\",\n      \"skill_enterprise_workflow_adoption\",\n      \"skill_insurance_core_data_model_mapping\",\n      \"skill_p2_gtm_presales_delivery_handoff\",\n      \"skill_p2_tech_adoption_derisking\",\n      \"skill_p2_tech_aws_modernization_patterns\",\n      \"skill_p2_tech_demoable_accelerator\",\n      \"skill_p2_tech_ibm_cloud_portfolio_anchor\",\n      \"skill_p2_tech_reference_architecture\",\n      \"skill_p2_tech_reusable_accelerators\",\n      \"skill_partner_alliance_gtm_execution\",\n      \"skill_partner_cloud_vendor_joint_gtm\",\n      \"skill_partner_co_selling\",\n      \"skill_partner_customer_deal_support\",\n      \"skill_partner_gtm_enablement\",\n      \"skill_partner_hyperscaler_cosell\",\n      \"skill_partner_ibm_aws_alliance_joint_revenue\",\n      \"skill_partner_joint_solution_development\",\n      \"skill_partner_partner_led_ai_solutions\",\n      \"skill_partner_partner_revenue_3m\",\n      \"skill_partner_sales_revenue_targets\",\n      \"skill_provider_and_egress_governance\",\n      \"skill_revops_usage_based_subscription_forecasting\",\n      \"skill_runtime_resilience_controls\",\n      \"skill_soc2_zero_trust_security\",\n      \"skill_sr_cloud_data_platform_engineering\",\n      \"skill_sr_microservices_integration_platform\",\n      \"skill_sr_w12_databricks_lakehouse_fundamentals\",\n      \"skill_sr_w12_hyperscaler_alliance_co_sell\",\n      \"skill_sr_w12_industry_reference_architecture\",\n      \"skill_unify_agentic_human_override_escalation_paths\",\n      \"skill_unify_agentic_l0_route_policy_dispatch\",\n      \"skill_unify_agentic_multi_agent_orchestration_contracts\",\n      \"skill_unify_agentic_replay_key_audit_manifest_design\",\n      \"skill_unify_agentic_runtime_proof_bundle_lineage\"\n    ]\n  }\n}\nTARGET_TITLE: Manager of Applied AI Architecture, Partnerships\nTARGET_COMPANY: Anthropic\n\nALLOWED_FACT_PACKET (graph proof pool):\n[{\"fact_id\":\"reb_ibm_devsecops_release_resilience\",\"candidate_fact_id\":\"reb_ibm_devsecops_release_resilience\",\"claim_text\":\"Embedded release automation and security scanning into regulated modernization delivery paths\",\"role_episode_bundle_id\":\"reb_ibm_devsecops_release_resilience\",\"graph_evidence_type\":\"role_episode_bundle\",\"employer_lane\":\"ibm\",\"source_employment\":\"ibm\",\"graph_skill_node_ids\":[\"skill_ibm_devsecops_pipeline_security\"],\"metric_outcome_ids\":[],\"selected_metric_ids\":[],\"allowed_graph_evidence_ids\":[\"reb_ibm_devsecops_release_resilience\",\"fact_engineering_platform_002\",\"skill_ibm_devsecops_pipeline_security\"],\"linked_identity_fact_ids\":[\"fact_engineering_platform_002\"],\"linked_source_fact_ids\":[\"fact_engineering_platform_002\"],\"source_fact_ids\":[\"reb_ibm_devsecops_release_resilience\"],\"confidence\":\"HIGH\",\"support_level\":\"allocation_authority_pass\",\"verification_status\":\"allocation_authority_pass\",\"metric_values\":[],\"technologies\":[\"skill_ibm_devsecops_pipeline_security\"],\"domain\":\"IBM regulated delivery programs requiring release governance, security scanning, and deployment repeatability.\",\"allocation_claim_unit_ids\":[\"executive_summary:claim:03\"],\"allocation_plan_digest\":\"ad78cea95a8518f36c4487d8732c0577494c0d98f4d4360743ed36ae605cf766\",\"graph_proof_refs\":{\"claim_support_graph_refs\":[\"skill_ibm_devsecops_pipeline_security\"],\"source_resume_files\":[\"Amit Ayer Resume - AI Financial Services.docx\",\"Chief AI Officer - Amit Ayer.docx\",\"Field CTO - Amit Ayer.docx\",\"Chief Technology Officer - Amit Ayer.docx\"]},\"executive_capability_phrases\":[\"enterprise technology leadership with measurable business outcomes\"]},{\"fact_id\":\"reb_unify_agentic_platform_architecture\",\"candidate_fact_id\":\"reb_unify_agentic_platform_architecture\",\"claim_text\":\"SVP Engineering agentic AI platform control-plane architecture\",\"role_episode_bundle_id\":\"reb_unify_agentic_platform_architecture\",\"graph_evidence_type\":\"role_episode_bundle\",\"employer\":\"Unify\",\"employer_lane\":\"unify\",\"employer_node_id\":\"employment_exp_unify_001\",\"source_employment\":\"Unify\",\"graph_skill_node_ids\":[\"skill_unify_agentic_human_override_escalation_paths\"],\"metric_outcome_ids\":[],\"selected_metric_ids\":[],\"allowed_graph_evidence_ids\":[\"reb_unify_agentic_platform_architecture\",\"skill_unify_agentic_human_override_escalation_paths\",\"skill_unify_agentic_l0_route_policy_dispatch\",\"skill_unify_agentic_runtime_proof_bundle_lineage\",\"skill_unify_agentic_multi_agent_orchestration_contracts\",\"skill_unify_agentic_replay_key_audit_manifest_design\",\"metric_unify_policy_gated_agent_execution_surface\",\"metric_unify_agentic_tool_sandbox_egress_policy_surface\",\"metric_unify_agentic_l0_route_policy_dispatch_surface\",\"fact_engineering_platform_001\"],\"linked_identity_fact_ids\":[\"fact_engineering_platform_001\"],\"linked_source_fact_ids\":[\"fact_engineering_platform_001\"],\"source_fact_ids\":[\"reb_unify_agentic_platform_architecture\"],\"confidence\":\"approved_by_graph_presence\",\"support_level\":\"allocation_authority_pass\",\"verification_status\":\"allocation_authority_pass\",\"metric_values\":[],\"technologies\":[\"skill_unify_agentic_human_override_escalation_paths\"],\"domain\":\"SVP Engineering agentic AI platform control-plane architecture\",\"allocation_claim_unit_ids\":[\"executive_summary:claim:02\"],\"allocation_plan_digest\":\"ad78cea95a8518f36c4487d8732c0577494c0d98f4d4360743ed36ae605cf766\",\"graph_proof_refs\":{\"claim_support_graph_refs\":[\"skill_unify_agentic_human_override_escalation_paths\"],\"source_resume_files\":[]},\"executive_capability_phrases\":[\"enterprise technology leadership with measurable business outcomes\"]},{\"fact_id\":\"reb_unify_platform_commercialization_leadership\",\"candidate_fact_id\":\"reb_unify_platform_commercialization_leadership\",\"claim_text\":\"Platform productization, IP-led revenue, margin expansion, team scale\",\"role_episode_bundle_id\":\"reb_unify_platform_commercialization_leadership\",\"graph_evidence_type\":\"role_episode_bundle\",\"employer_lane\":\"unify\",\"source_employment\":\"unify\",\"graph_skill_node_ids\":[\"skill_agentic_platform_productization\"],\"metric_outcome_ids\":[\"metric_unify_22m_ip_led_revenue\"],\"selected_metric_ids\":[\"metric_unify_22m_ip_led_revenue\"],\"allowed_graph_evidence_ids\":[\"reb_unify_platform_commercialization_leadership\",\"fact_engineering_platform_006\",\"skill_agentic_platform_productization\",\"metric_unify_22m_ip_led_revenue\"],\"linked_identity_fact_ids\":[\"fact_engineering_platform_006\"],\"linked_source_fact_ids\":[\"fact_engineering_platform_006\"],\"source_fact_ids\":[\"reb_unify_platform_commercialization_leadership\"],\"confidence\":\"HIGH\",\"support_level\":\"allocation_authority_pass\",\"verification_status\":\"allocation_authority_pass\",\"metric_values\":[\"$22M IP-led revenue\"],\"technologies\":[\"skill_agentic_platform_productization\"],\"domain\":\"Platform productization and commercialization; reusable IP, margin expansion, engineering organization scale-out.\",\"allocation_claim_unit_ids\":[\"executive_summary:claim:01\"],\"allocation_plan_digest\":\"ad78cea95a8518f36c4487d8732c0577494c0d98f4d4360743ed36ae605cf766\",\"graph_proof_refs\":{\"claim_support_graph_refs\":[\"skill_agentic_platform_productization\"],\"source_resume_files\":[]},\"executive_capability_phrases\":[\"enterprise technology leadership with measurable business outcomes\"]}]\n\nEVIDENCE_UTILIZATION (X2 gate pass:true — unused_fact_ids are optional weave targets, not defects or proof gaps; do not penalize under-use):\n{\n  \"cited_fact_ids\": [\n    \"reb_ibm_devsecops_release_resilience\",\n    \"reb_unify_agentic_platform_architecture\",\n    \"reb_unify_platform_commercialization_leadership\",\n    \"metric_unify_policy_gated_agent_execution_surface\",\n    \"skill_unify_agentic_runtime_proof_bundle_lineage\",\n    \"fact_engineering_platform_002\",\n    \"skill_ibm_devsecops_pipeline_security\",\n    \"metric_unify_22m_ip_led_revenue\"\n  ],\n  \"unused_fact_ids\": [\n    \"fact_engineering_platform_001\",\n    \"fact_engineering_platform_006\",\n    \"metric_unify_agentic_l0_route_policy_dispatch_surface\",\n    \"metric_unify_agentic_tool_sandbox_egress_policy_surface\",\n    \"skill_agentic_platform_productization\",\n    \"skill_unify_agentic_human_override_escalation_paths\",\n    \"skill_unify_agentic_l0_route_policy_dispatch\",\n    \"skill_unify_agentic_multi_agent_orchestration_contracts\",\n    \"skill_unify_agentic_replay_key_audit_manifest_design\"\n  ],\n  \"unused_fact_count\": 9,\n  \"allowed_fact_count\": 17\n}\n\nCANDIDATE_OUTPUT:\n{\n  \"resume_display_text\": \"Engineering executive leading regulated modernization, governed agentic AI platform architecture, and IP-led growth through disciplined operating models. From that leadership mandate, designs control-plane architecture that gives agentic AI execution clear policy boundaries and traceable runtime evidence. Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity. In parallel, embeds release automation and security scanning into regulated modernization delivery paths, reinforcing dependable, secure movement from development through release. The same platform discipline pairs human override and escalation paths with runtime proof-bundle lineage, while platform productization generated $22M in IP-led revenue. It can carry this governed architecture and release resilience into broader platform IP growth, preserving control as operating scope expands.\",\n  \"claim_ledger\": [\n    {\n      \"claim\": \"Engineering executive leading regulated modernization, governed agentic AI platf\",\n      \"claim_text\": \"Engineering executive leading regulated modernization, governed agentic AI platform architecture, and IP-led growth through disciplined operating models.\",\n      \"source_fact_ids\": [\n        \"reb_ibm_devsecops_release_resilience\",\n        \"reb_unify_agentic_platform_architecture\",\n        \"reb_unify_platform_commercialization_leadership\"\n      ]\n    },\n    {\n      \"claim\": \"From that leadership mandate, designs control-plane architecture that gives agen\",\n      \"claim_text\": \"From that leadership mandate, designs control-plane architecture that gives agentic AI execution clear policy boundaries and traceable runtime evidence.\",\n      \"source_fact_ids\": [\n        \"reb_unify_agentic_platform_architecture\",\n        \"metric_unify_policy_gated_agent_execution_surface\",\n        \"skill_unify_agentic_runtime_proof_bundle_lineage\"\n      ]\n    },\n    {\n      \"claim\": \"Software dependency graph intelligence enables accelerated legacy-system analysi\",\n      \"claim_text\": \"Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity.\",\n      \"source_fact_ids\": [\n        \"fact_engineering_platform_002\"\n      ]\n    },\n    {\n      \"claim\": \"In parallel, embeds release automation and security scanning into regulated mode\",\n      \"claim_text\": \"In parallel, embeds release automation and security scanning into regulated modernization delivery paths, reinforcing dependable, secure movement from development through release.\",\n      \"source_fact_ids\": [\n        \"reb_ibm_devsecops_release_resilience\",\n        \"skill_ibm_devsecops_pipeline_security\"\n      ]\n    },\n    {\n      \"claim\": \"The same platform discipline pairs human override and escalation paths with runt\",\n      \"claim_text\": \"The same platform discipline pairs human override and escalation paths with runtime proof-bundle lineage, while platform productization generated $22M in IP-led revenue.\",\n      \"source_fact_ids\": [\n        \"metric_unify_22m_ip_led_revenue\"\n      ]\n    },\n    {\n      \"claim\": \"It can carry this governed architecture and release resilience into broader plat\",\n      \"claim_text\": \"It can carry this governed architecture and release resilience into broader platform IP growth, preserving control as operating scope expands.\",\n      \"source_fact_ids\": [\n        \"reb_unify_agentic_platform_architecture\",\n        \"reb_ibm_devsecops_release_resilience\",\n        \"reb_unify_platform_commercialization_leadership\"\n      ]\n    }\n  ],\n  \"source_fact_ids\": [\n    \"reb_ibm_devsecops_release_resilience\",\n    \"reb_unify_agentic_platform_architecture\",\n    \"reb_unify_platform_commercialization_leadership\",\n    \"metric_unify_policy_gated_agent_execution_surface\",\n    \"skill_unify_agentic_runtime_proof_bundle_lineage\",\n    \"fact_engineering_platform_002\",\n    \"skill_ibm_devsecops_pipeline_security\",\n    \"metric_unify_22m_ip_led_revenue\"\n  ]\n}"
+      }
+    ],
+    "max_output_tokens": 8192,
+    "reasoning": {
+      "effort": "high"
+    },
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "apps_rg_x1d_judge",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "score_scale": {
+              "type": "string",
+              "enum": [
+                "0_to_1",
+                "0_to_5"
+              ]
+            },
+            "score": {
+              "type": "number"
+            },
+            "threshold": {
+              "type": "number"
+            },
+            "pass": {
+              "type": "boolean"
+            },
+            "decisive_failure": {
+              "type": "boolean"
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "cited_sentence_indexes": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "remediation_suggestions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dimension_verdicts": {
+              "type": "object",
+              "properties": {
+                "factual_support": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "executive_signal": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "resume_voice": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "ats_alignment_without_keyword_stuffing": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "anti_overfit": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "synthesis_quality": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "evidence_utilization": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                },
+                "deterministic_alignment": {
+                  "type": "object",
+                  "properties": {
+                    "pass": {
+                      "type": "boolean"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    "codes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "pass",
+                    "severity",
+                    "codes"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "factual_support",
+                "executive_signal",
+                "resume_voice",
+                "ats_alignment_without_keyword_stuffing",
+                "anti_overfit",
+                "synthesis_quality",
+                "evidence_utilization",
+                "deterministic_alignment"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "score_scale",
+            "score",
+            "threshold",
+            "pass",
+            "decisive_failure",
+            "findings",
+            "cited_sentence_indexes",
+            "remediation_suggestions",
+            "dimension_verdicts"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "input_hash": "67e6c33de6a60525",
+  "timestamp": "2026-08-09T12:47:10.838060+00:00",
+  "model_requested": "gpt-5.6-sol",
+  "model_actual": "gpt-5.6-sol",
+  "reasoning_effort": "high",
+  "judge_attempt": 1,
+  "judge_max_attempts": 3,
+  "compact_system_prompt": true,
+  "provider_name": "openai",
+  "model_env_source": "yaml_judge_models",
+  "canonical_contract_hash": "b32bbf390c84bc790d56bd4a13a766a3ec5bb22d9f9e32654621bd2ff2a03def",
+  "packet_hash": "67e6c33de6a60525",
+  "schema_hash": "2d3f3d956b325217",
+  "max_tokens": 8192,
+  "temperature": null,
+  "thinking_level": null,
+  "response_format": "responses_json_schema",
+  "judge_receipt": {
+    "judge_packet_hash": "67e6c33de6a60525",
+    "packet_hash": "67e6c33de6a60525",
+    "canonical_contract_hash": "b32bbf390c84bc790d56bd4a13a766a3ec5bb22d9f9e32654621bd2ff2a03def",
+    "judge_packet_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+    "candidate_output_ref": "candidate_output.resume_display_text",
+    "allowed_fact_packet_ref": "allowed_fact_packet",
+    "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+    "deterministic_gate_summary": {
+      "x2_schema_valid": {
+        "pass": true,
+        "detail": "True"
+      },
+      "x2_claim_ledger_present": {
+        "pass": true,
+        "detail": "6"
+      },
+      "x2_sentence_coverage_present": {
+        "pass": true,
+        "detail": "6"
+      },
+      "x2_sentence_coverage_pass": {
+        "pass": true,
+        "detail": "True"
+      },
+      "x2_self_check_claim_ledger_consistent": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_claim_ledger_row_count_matches_sentence_count": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_claim_field_maps_to_display_sentence": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_source_fact_coverage_100": {
+        "pass": true,
+        "detail": "100%"
+      },
+      "x2_claim_ledger_orphan_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_claim_ledger_claim_text_non_empty": {
+        "pass": true,
+        "detail": "all_rows_non_empty"
+      },
+      "x2_unsupported_claim_zero": {
+        "pass": true,
+        "detail": "0"
+      },
+      "x2_mixed_claim_zero": {
+        "pass": true,
+        "detail": "0"
+      },
+      "x2_overbroad_claim_zero": {
+        "pass": true,
+        "detail": "0"
+      },
+      "x2_jd_phrase_copy_violation_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_jd_alignment_proof_flags": {
+        "pass": true,
+        "detail": "{'targeting_only': True, 'jd_used_as_proof': False, 'briefing_used_as_proof': False, 'companion_context_used_as_proof': False, 'companion_used_as_proof': False, 'graph_targeting': {'role_family_key': 'PARTNER_APPLIED_AI_ARCHITECTURE', 'projection_source': 'sqlite_role_family_projection', 'sqlite_projection_row_found': True, 'fallback_pillar_bridge_used': False, 'release_eligible_targeting_proof': True, 'targeting_degraded_explicit': False, 'pillar_hint_ids': ['pillar_applied_ai_partner_architecture', 'pillar_partner_gtm_alliances', 'pillar_presales_solutioning', 'pillar_technical_presales_accelerators'], 'briefing_targeting_supplement': []}}"
+      },
+      "x2_em_dash_count_zero": {
+        "pass": true,
+        "detail": "0"
+      },
+      "x2_inline_source_tags_absent": {
+        "pass": true,
+        "detail": "False"
+      },
+      "x2_exec_summary_paragraph_max_words": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_no_bloated_sentence": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_no_monolithic_prompt": {
+        "pass": true,
+        "detail": "False"
+      },
+      "x2_temperature_in_profile": {
+        "pass": true,
+        "detail": "0.45"
+      },
+      "x2_first_person_zero": {
+        "pass": true,
+        "detail": "False"
+      },
+      "x2_target_company_as_experience_zero": {
+        "pass": true,
+        "detail": "False"
+      },
+      "x2_generic_filler_zero": {
+        "pass": true,
+        "detail": "[]"
+      },
+      "x2_exec_summary_meta_filler_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_colon_stitch_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_sentence_count_6": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_display_roundtrip_integrity": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_cross_sentence_metric_dedup": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_c03_selected_fact_ids_claimable_subset_allowed_fact_ids": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_allowed_fact_utilization": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_evidence_utilization": {
+        "pass": true,
+        "detail": "ok_pool_below_utilization_threshold"
+      },
+      "x2_exec_summary_no_mechanism_inventory": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_no_credential_dump": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_no_sentence_fragment": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_display_override_compliance": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_strategy_no_commercialization_thread": {
+        "pass": true,
+        "detail": "skipped_not_strategy_lane"
+      },
+      "x2_exec_summary_no_competencies_duplication": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_no_certifications_section_duplication": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_prompt_template_authority": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_sentence_stacking_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_executive_summary_synthesis_quality": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_partner_narrative_continuity": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_speculative_capstone_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_mechanical_opener_stack_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_robotic_transition_stack_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_exec_summary_cross_fact_conflation_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_north_star_style_echo_unsupported_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_claim_coverage_accounting_consistent": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_claim_ledger_materialized_or_gap_excused": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_source_sensitive_phrases_supported": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_required_fields_complete": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_required_artifacts_written": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_json_parse_valid": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_no_selected_fact_plan_model_echo": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_no_extra_unrecognized_fields": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_material_clause_coverage_100": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_metric_fact_id_granularity": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_no_inferred_bridge_claims": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_jd_as_proof_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_briefing_as_proof_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_executive_summary_active_proof_pool_source_fact_ids": {
+        "pass": true,
+        "detail": "{'section': 'executive_summary', 'proof_source': 'augmented_skills_graph', 'proof_pool_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'proof_pool_digest': 'afe13a1362b94daa807f8e04c975da30bb9c82a462c6921d29f987f320b96b1e', 'canonical_evidence_set_digest': 'afe13a1362b94daa807f8e04c975da30bb9c82a462c6921d29f987f320b96b1e', 'id_alias_map': {}, 'claim_evidence_source_type': 'augmented_skills_graph', 'claim_evidence_source_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'skills_authority_source_type': 'augmented_skills_graph', 'skills_authority_status': 'PASS', 'skills_authority_graph_ref': 'apps_rg/fact_inventory/master_skills_arsenal_ledger.json', 'legacy_broad_skills_ledger_skills_authority': False, 'broad_skills_ledger_claim_evidence_only': None, 'allowed_source_fact_ids_count': 17, 'source_fact_ids_checked': ['reb_ibm_devsecops_release_resilience', 'reb_unify_agentic_platform_architecture', 'reb_unify_platform_commercialization_leadership', 'metric_unify_policy_gated_agent_execution_surface', 'skill_unify_agentic_runtime_proof_bundle_lineage', 'fact_engineering_platform_002', 'skill_ibm_devsecops_pipeline_security', 'metric_unify_22m_ip_led_revenue'], 'unsupported_source_fact_ids': [], 'rejected_non_proof_source_ids': [], 'jd_or_briefing_ids_rejected': [], 'x2_source_fact_pool_status': 'PASS', 'decisive_reason': None, 'validator_name': 'evaluate_proof_pool_source_fact_gate', 'skills_authority_x2_boundary': 'PASS', 'x2_srfs_gate_status': 'NOT_APPLICABLE', 'out_of_slice_fact_ids': [], 'srfs_allowed_fact_ids_count': 17, 'selected_role_fact_set_used': False, 'broad_skills_ledger_used': False, 'broad_skills_ledger_used_as_authority': False, 'base_resume_fallback_used': False, 'srfs_section_id': 'executive_summary'}"
+      },
+      "x2_target_title_inflation_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_unsupported_industry_claim_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_provider_requested_attempted": {
+        "pass": true,
+        "detail": "requested=external_openai, attempted=external_openai"
+      },
+      "x2_no_silent_mock_fallback": {
+        "pass": true,
+        "detail": "provider=external_openai, status=REAL_LLM"
+      },
+      "x2_PROVIDER_MODEL_provider_stub_transport_zero": {
+        "pass": true,
+        "detail": "ok"
+      },
+      "x2_model_name_allowed": {
+        "pass": true,
+        "detail": "skipped_provider_not_external_claude"
+      },
+      "x2_prompt_hash_known": {
+        "pass": true,
+        "detail": "bac9f0b1bec0aa13"
+      },
+      "x2_input_output_hashes_present": {
+        "pass": true,
+        "detail": "True"
+      },
+      "x2_section_input_usage_ledger_present": {
+        "pass": true,
+        "detail": "section_input_usage_ledger_v1"
+      },
+      "x2_jd_used_as_required_targeting_input": {
+        "pass": true,
+        "detail": "{'required': True, 'used': True, 'authority': 'TARGETING_INPUT', 'used_for': []}"
+      },
+      "x2_briefing_used_as_required_context_input": {
+        "pass": true,
+        "detail": "{'required': True, 'used': True, 'authority': 'CONTEXT_INPUT', 'used_for': [], 'material_delivered_to_l2': True, 'parity_match_generation_judge': True}"
+      },
+      "x2_title_company_used_as_required_positioning_input": {
+        "pass": true,
+        "detail": "{'target_title': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}, 'target_company': {'required': True, 'used': True, 'authority': 'POSITIONING_INPUT', 'used_for': []}}"
+      },
+      "x2_no_non_evidence_inputs_as_claim_evidence": {
+        "pass": true,
+        "detail": "False"
+      },
+      "x2_no_non_evidence_inputs_in_source_fact_ids": {
+        "pass": true,
+        "detail": "{'row_scan_found_reserved_non_resume_ids': False, 'ledger_non_evidence_inputs_in_source_fact_ids': False}"
+      },
+      "x2_selected_fact_ids_only": {
+        "pass": true,
+        "detail": "[]"
+      },
+      "x2_section_claims_supported_by_base_resume": {
+        "pass": true,
+        "detail": "{'displayed_claim_count': 6, 'claims_supported_by_selected_resume_facts': 6, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}"
+      },
+      "x2_input_usage_accounting_consistent": {
+        "pass": true,
+        "detail": "{'ledger_summary': {'displayed_claim_count': 6, 'claims_supported_by_selected_resume_facts': 6, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'runtime_summary': {'displayed_claim_count': 6, 'claims_supported_by_selected_resume_facts': 6, 'claims_with_targeting_input_in_source_fact_ids': 0, 'claims_with_context_input_in_source_fact_ids': 0, 'unsupported_claim_count': 0, 'orphan_source_fact_id_count': 0}, 'coverage_overall_pass': True}"
+      },
+      "x2_fec_subset_of_canonical_evidence_pool": {
+        "pass": true,
+        "detail": "{'fec_count': 17, 'violations': []}"
+      },
+      "x2_prompt_c0_ids_subset_of_fec": {
+        "pass": true,
+        "detail": "{'prompt_c0_count': 17, 'violations': []}"
+      },
+      "x2_claim_ledger_source_fact_ids_subset_of_fec": {
+        "pass": true,
+        "detail": "{'ledger_id_count': 8, 'violations': []}"
+      },
+      "X2_BLOCK_ID_NAMESPACE_SPLIT": {
+        "pass": true,
+        "detail": "{'disjoint_without_alias': [], 'alias_map_size': 0}"
+      },
+      "x2_active_pool_digest_matches_fec_digest": {
+        "pass": true,
+        "detail": "{'canonical_evidence_set_digest': 'd28bce2e433480d559fb3e4d86df549d6e4469e2ddac27807cba05a55496fabd', 'fec_allowed_fact_ids_digest': 'd28bce2e433480d559fb3e4d86df549d6e4469e2ddac27807cba05a55496fabd', 'fec_narrowed_from_pool': True}"
+      },
+      "x2_resume_graph_claim_binding": {
+        "pass": true,
+        "detail": ""
+      },
+      "product_shape_note": {
+        "pass": true,
+        "detail": "judge_snapshot_content_gates=85"
+      },
+      "x2_executive_summary_judge_packet_display_override_parity": {
+        "pass": false,
+        "detail": "judge_packet_missing_display_override_text:fact_engineering_platform_002 (see Bug:ExecSummaryJudgeDisplayOverrideInvisible)"
+      }
+    },
+    "gate_closure_map_version": "executive_summary_gate_closure_v2"
+  }
+}

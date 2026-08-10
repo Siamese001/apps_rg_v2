@@ -30,11 +30,11 @@ def test_generation_profiles_have_no_default_model() -> None:
 
 def test_explicit_section_effort_map() -> None:
     expected = {
-        "competencies": "high",
-        "unify_bullets": "medium",
-        "ibm_bullets": "medium",
-        "headline": "medium",
-        "executive_summary": "high",
+        "competencies": "low",
+        "unify_bullets": "low",
+        "ibm_bullets": "low",
+        "headline": "low",
+        "executive_summary": "low",
         "insurtech_bullets": "low",
         "ey_bullets": "low",
         "unify_narrative": "medium",
@@ -101,6 +101,28 @@ def test_openai_model_source_reports_only_configured_section() -> None:
         sml.external_openai_generation_model_source("headline")
 
 
+def test_anthropic_limit_backup_is_explicit_and_preflight_gated() -> None:
+    env = {"APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT": "credit balance too low"}
+    profiles = _yaml_data()["profiles"]
+    openai = profiles["external_openai_generator"]
+
+    for section_id in ("competencies", "headline", "executive_summary"):
+        assert sml.resolve_section_generation_model(
+            section_id,
+            env,
+            provider_profile="external_openai",
+        ) == openai["anthropic_limit_backup_model_by_section"][section_id]
+        assert sml.resolve_section_generation_effort(
+            section_id,
+            env,
+            provider_profile="external_openai",
+        ) == openai["anthropic_limit_backup_effort_by_section"][section_id]
+
+    assert sml.external_openai_generation_model_source("headline", env).endswith(
+        "anthropic_limit_backup_model_by_section.headline"
+    )
+
+
 def test_selector_models_are_explicit_and_advisory() -> None:
     assert sml.resolve_selector_provider_model("competencies_graph_pool_selector") == (
         "anthropic_claude",
@@ -109,14 +131,34 @@ def test_selector_models_are_explicit_and_advisory() -> None:
     )
     assert (
         sml.resolve_selector_reasoning_effort("competencies_graph_pool_selector")
-        == "high"
+        == "low"
     )
     assert sml.resolve_selector_provider_model("employment_bullet_pool_selector") == (
         "anthropic_claude",
         "claude-sonnet-5",
         "apps_rg/config/provider_profiles.yaml:selector_models.employment_bullet_pool_selector.model",
     )
-    assert sml.resolve_selector_reasoning_effort("employment_bullet_pool_selector") == ""
+    assert sml.resolve_selector_reasoning_effort("employment_bullet_pool_selector") == "low"
+
+
+def test_anthropic_limit_routes_selector_model_and_effort_as_one_identity() -> None:
+    env = {"APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT": "credit balance too low"}
+    selector = _yaml_data()["selector_models"]["employment_bullet_pool_selector"]
+    backup = selector["anthropic_limit_backup"]
+
+    provider, model, source = sml.resolve_selector_provider_model(
+        "employment_bullet_pool_selector", env
+    )
+
+    assert provider == backup["provider_key"]
+    assert model == backup["model"]
+    assert source.endswith("anthropic_limit_backup.model")
+    assert (
+        sml.resolve_selector_reasoning_effort(
+            "employment_bullet_pool_selector", env
+        )
+        == backup["reasoning_effort"]
+    )
 
 
 def test_missing_yaml_fails_closed(monkeypatch, tmp_path) -> None:

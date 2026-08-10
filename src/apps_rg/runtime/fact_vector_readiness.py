@@ -15,9 +15,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
-from agentic_core.L4_state.adapters import sqlite3_adapter as sqlite3
-from agentic_core.config.model_catalog import (
+from apps_rg.runtime.core_io import write_gateway as _wg
+from apps_rg.runtime.core_sqlite import sqlite3_adapter as sqlite3
+from apps_rg.runtime.core_model_catalog import (
     BGE_M3_EMBEDDING_DIMENSION,
     BGE_M3_MODEL_ID,
 )

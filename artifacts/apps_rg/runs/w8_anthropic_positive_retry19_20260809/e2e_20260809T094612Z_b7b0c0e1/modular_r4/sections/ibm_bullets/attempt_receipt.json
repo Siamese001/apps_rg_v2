@@ -1,0 +1,290 @@
+{
+  "attempt_count": 1,
+  "attempt_receipt_id": "attempt-f64bc291f9ee4caab703cd86783fa0f0",
+  "authority_scope": "apps_rg_l2_envelope_adapter_receipts",
+  "canonical_l2_artifact_authority": false,
+  "decisive_reason_code": "E3_SECTION_OUTPUT_OBSERVED",
+  "determinism": {
+    "attempt_seed": "ea844f979a3ce5cea41e5e056155a3fe6be11d0379b2e2a4bf077740e95202fd",
+    "blueprint_hash": "ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+    "input_hash": "c4807de09b3cb05657ae553b93c181c89c546e154775d7450a42b65b751667d2",
+    "policy_hash": "bafee91ee86960cfdc581d692c349be017596d991829e2ec269383f6165b31ed",
+    "prompt_hash": "8f85c90da506bbf1ac040078b73158ce2da3f318c4f962d18bdaa362fe32637d",
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:3ff1138c33b6e377::v1"
+  },
+  "error_summary": null,
+  "execution_lane": "MODEL",
+  "generated_artifacts": [
+    "provider_request.json",
+    "provider_response.json",
+    "l2_output.json"
+  ],
+  "latency_ms": 0.0,
+  "lineage": {
+    "ancestry_chain": [
+      "R3R4_MANAGED_WORKFLOW",
+      "wfm::apps_rg::resume_generation::v1"
+    ],
+    "parent_plan_id": "wfm::apps_rg::resume_generation::v1",
+    "parent_route_id": "R3R4_MANAGED_WORKFLOW",
+    "parent_step_id": "ibm_bullets",
+    "same_run_packet_family": "a000344a-543d-413e-9bb5-b08de4373444"
+  },
+  "local_check_results": {
+    "artifact_bytes_match": true,
+    "grounded_output": true,
+    "l2_output_file_digest": "9e310f2d088bba1561f476e76de16871f30563dd1f15d3147750e24cf1165abc",
+    "l2_output_ref": "l2_output.json",
+    "model_or_tool_name": "claude-sonnet-5",
+    "provider_lane": "openai",
+    "provider_request_digest": "d521ad6c316e440d2c5d82bd06acd85ef7b90179a61c130b8f480d6f22c2d91a",
+    "provider_request_ref": "provider_request.json",
+    "provider_response_digest": "6454ee342eb668266c630afaea665dff2bd6d3f57b27e09c2c00973fd610d579",
+    "provider_response_ref": "provider_response.json",
+    "replay_key_matches": true,
+    "token_usage_observed": true,
+    "tokens_used": 11652
+  },
+  "output_digest": "6a98aead473c411d9eabccd254b3b1e0f79e966a071b93a0f12e475cf600a81e",
+  "proposed_state_diff": {
+    "payload": {
+      "graph_claim_binding_contract_digest": "967c8d7a0f0a265e33b55326d93ab5f337e829a5984bb99c1ac3dca9ee183e98",
+      "graph_claim_bindings": [
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_bullets:bul_ibm_001"
+          ],
+          "allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_partnerships_gtm_002"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_001"
+          ],
+          "claim_unit_id": "ibm_bullets_claim_1_6dae0b41",
+          "edge_ids": [
+            "edge:a544fe64c0b84f10ec5c5c60",
+            "edge:ab44170417c11551ae68a66d",
+            "edge:08c93a4b511f512e46815def"
+          ],
+          "fact_ids": [
+            "fact_partnerships_gtm_002"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth"
+          ],
+          "metric_binding_score": 1.0,
+          "metric_outcome_id": "metric_ibm_20pct_joint_revenue_growth",
+          "metric_unit": "PERCENT",
+          "metric_value": "20",
+          "normalized_metric_signature": "20 pct joint revenue growth",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.2,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_bullets",
+          "selection_margin": 0.066667,
+          "skill_ids": [
+            "skill_partner_joint_solution_development"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 1.166667,
+          "visible_claim_hash": "7c4ce8d526c458f3e493bf75cff15e634bfabb249d6d10bc455c0769bce963f2",
+          "visible_claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth."
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_bullets:bul_ibm_002"
+          ],
+          "allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_002"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_002"
+          ],
+          "claim_unit_id": "ibm_bullets_claim_2_cef6d516",
+          "edge_ids": [
+            "edge:5644557d40383b876d6003cb",
+            "edge:c0749340728d10069ea80454"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_002"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_002"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.1,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_bullets",
+          "selection_margin": -0.2,
+          "skill_ids": [
+            "skill_partner_pnl_oversight"
+          ],
+          "source_independence_score": 0.5,
+          "target_alignment_score": 0.0,
+          "visible_claim_hash": "77c22eea9e9f51fdba57207ca7fdb911e04664231fcccd7c4cca4b5878520869",
+          "visible_claim_text": "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions."
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_bullets:bul_ibm_003"
+          ],
+          "allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_005"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_003"
+          ],
+          "claim_unit_id": "ibm_bullets_claim_3_a3187e62",
+          "edge_ids": [
+            "edge:c2e8a8bcf8fd2c50727b2888",
+            "edge:9343406f47c7c3166c2f3bd4"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_005"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_data_modeling_bi_decision_support",
+            "root:reb_ibm_data_modeling_bi_decision_support/skill:skill_sr_cloud_data_platform_engineering",
+            "root:reb_ibm_data_modeling_bi_decision_support/fact:fact_revenue_ops_005"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 0.9,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_bullets",
+          "selection_margin": -0.4,
+          "skill_ids": [
+            "skill_sr_cloud_data_platform_engineering"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 0.55,
+          "visible_claim_hash": "cfe3ec7466cc993bf08c1a175d50e9f84b0b8eefa6b4cbb0d877c006766cdb58",
+          "visible_claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions."
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_bullets:bul_ibm_004"
+          ],
+          "allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_003"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_004"
+          ],
+          "claim_unit_id": "ibm_bullets_claim_4_4c137134",
+          "edge_ids": [
+            "edge:5ce947f65af0ca1dda746957",
+            "edge:9c9a15b3cc03ef51d0403a49"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_003"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_p2_gtm_enterprise_deal_support",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_003"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 0.9,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_bullets",
+          "selection_margin": -0.4,
+          "skill_ids": [
+            "skill_p2_gtm_enterprise_deal_support"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 0.0,
+          "visible_claim_hash": "5a598e57670c32c6bae6a8cd4f391d03e7a4a3d1766cb84b75391cd81994715f",
+          "visible_claim_text": "Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, and buyer readiness, connecting technical validation to executive deal support."
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_bullets:bul_ibm_005"
+          ],
+          "allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_revenue_ops_001"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_005"
+          ],
+          "claim_unit_id": "ibm_bullets_claim_5_ac1d3cb0",
+          "edge_ids": [
+            "edge:58671d4eab74d24ad6a06da1",
+            "edge:ecaa73ab1a090d096f5636de"
+          ],
+          "fact_ids": [
+            "fact_revenue_ops_001"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_presales_solution_engineering",
+            "root:reb_ibm_presales_solution_engineering/skill:skill_p2_gtm_executive_buyer_alignment",
+            "root:reb_ibm_presales_solution_engineering/fact:fact_revenue_ops_001"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 0.9,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_bullets",
+          "selection_margin": -0.4,
+          "skill_ids": [
+            "skill_p2_gtm_executive_buyer_alignment"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 0.6,
+          "visible_claim_hash": "96832a9946ab8c1cd2e9d4f1856e6a31e4bed263fea38b68141451488e577ccd",
+          "visible_claim_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria."
+        }
+      ],
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "resume_graph_allocation_plan_digest": "1ee7cfd54c0485256c918010a03a534239f577adc3f483406349144a76b89015"
+    },
+    "section_id": "ibm_bullets",
+    "section_output_ref": "l2_output.json"
+  },
+  "quarantined_payload": null,
+  "result_class": "SUCCESS",
+  "return_code": 0,
+  "sealed_at": 694470.484,
+  "span_id": "section-l2-ibm_bullets",
+  "tokens_used": 11652,
+  "trace_id": "42c5b7e0-2fbc-47ec-8682-28046c9e0403",
+  "validation_packet_id": "section-val-c4807de09b3cb056"
+}
