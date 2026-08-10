@@ -24,6 +24,7 @@ from apps_model_telemetry.otel_runtime import (
     OTEL_CHECKPOINT_FILENAME,
     OTEL_ENDPOINT_ENV,
     OTEL_SNAPSHOT_FILE_ENV,
+    _trace_exporter_endpoint,
     capture_collector_snapshot,
     current_otel_runtime_status,
     initialize_collector_checkpoint,
@@ -52,6 +53,13 @@ def _clear_otel_environment(monkeypatch: pytest.MonkeyPatch) -> None:
         "OTEL_COLLECTOR_SPANS_FILE",
     ):
         monkeypatch.delenv(name, raising=False)
+
+
+def test_trace_exporter_endpoint_uses_the_otlp_trace_signal_path() -> None:
+    expected = "http://collector:4318/v1/traces"
+    assert _trace_exporter_endpoint("http://collector:4318") == expected
+    assert _trace_exporter_endpoint("http://collector:4318/") == expected
+    assert _trace_exporter_endpoint(expected) == expected
 
 
 def test_environment_translates_legacy_endpoint_and_rejects_conflict(
