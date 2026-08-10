@@ -1032,11 +1032,37 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
         )
         return 2
     if fresh_e2e:
+        if not is_test_harness():
+            from apps_model_telemetry.otel_runtime import configure_live_otel
+
+            otel_status = configure_live_otel(service_name="apps_rg")
+            if not otel_status.active:
+                print(
+                    "FRESH_E2E_PREFLIGHT status=BLOCKED "
+                    f"failure_code=OTEL_RUNTIME_UNAVAILABLE reason={otel_status.reason}",
+                    flush=True,
+                )
+                return 2
+            os.environ["APPS_RG_REQUIRE_OTEL_RECONCILIATION"] = "1"
         fresh_e2e_receipt = _prepare_fresh_e2e_run(
             _repo_root,
             str(getattr(args, "artifact_dir", "") or ""),
         )
         args.artifact_dir = str(fresh_e2e_receipt.get("artifact_dir") or "")
+        if not is_test_harness():
+            from apps_model_telemetry.otel_runtime import verify_live_collector_receipt
+
+            collector_receipt = verify_live_collector_receipt(
+                artifact_dir=Path(str(args.artifact_dir))
+            )
+            if collector_receipt.get("status") != "PASS":
+                print(
+                    "FRESH_E2E_PREFLIGHT status=BLOCKED "
+                    f"failure_code={collector_receipt.get('reason', 'COLLECTOR_UNAVAILABLE')} "
+                    f"run_dir={args.artifact_dir}",
+                    flush=True,
+                )
+                return 2
         print(
             "FRESH_E2E_ARTIFACT_DIR "
             f"root={fresh_e2e_receipt.get('artifact_root', '')} "

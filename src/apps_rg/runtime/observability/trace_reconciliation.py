@@ -1,8 +1,8 @@
 """Post-run reconciliation between local apps_rg receipts and OTel snapshots.
 
-The reconciliation artifact is consumed by apps_eval and L6. It never controls
-the current run: local receipts stay authoritative, and unavailable OTel becomes
-an observability gap instead of a product-path failure.
+The reconciliation artifact is consumed by apps_eval and L6. Legacy/replay
+callers may retain local-receipt-only behavior; a live product caller can make
+missing or mismatched collector evidence a hard failure.
 """
 
 from __future__ import annotations
@@ -200,12 +200,16 @@ def _load_otel_snapshot(
     otel_trace_snapshot: Mapping[str, Any] | None,
 ) -> tuple[dict[str, Any] | None, str | None]:
     if otel_trace_snapshot is not None:
-        return dict(otel_trace_snapshot), "provided"
+        provided = dict(otel_trace_snapshot)
+        return (provided, "provided") if str(provided.get("status") or "CAPTURED") == "CAPTURED" else (None, "provided_unavailable")
     for name in OTEL_SNAPSHOT_CANDIDATES:
         path = artifact_dir / name
         doc = _load_json(path)
         if isinstance(doc, Mapping):
-            return dict(doc), _repo_rel(repo_root, path)
+            snapshot = dict(doc)
+            if str(snapshot.get("status") or "CAPTURED") == "CAPTURED":
+                return snapshot, _repo_rel(repo_root, path)
+            return None, _repo_rel(repo_root, path)
     return None, None
 
 
@@ -432,6 +436,7 @@ def build_trace_reconciliation(
     section_id: str,
     run_id: str = "",
     otel_trace_snapshot: Mapping[str, Any] | None = None,
+    require_otel_for_live: bool = False,
 ) -> dict[str, Any]:
     """Build the reconciliation payload without writing files."""
     artifact_dir = Path(artifact_dir)
@@ -454,8 +459,8 @@ def build_trace_reconciliation(
             section_id=section_id,
             stage_id="L7",
             check_id="otel_snapshot.available",
-            verdict="PASS" if otel_available else "WARN",
-            severity="WARN",
+            verdict="PASS" if otel_available else "FAIL" if require_otel_for_live else "WARN",
+            severity="BLOCKER" if require_otel_for_live else "WARN",
             reason=(
                 "OTel snapshot available for post-run reconciliation"
                 if otel_available
@@ -508,8 +513,12 @@ def build_trace_reconciliation(
         provider_verdict = "NOT_APPLICABLE"
         provider_reason = "no local provider-attempt receipts to mirror"
     elif not otel_available:
-        provider_verdict = "WARN"
-        provider_reason = "OTel unavailable; provider-attempt mirror could not be checked"
+        provider_verdict = "FAIL" if require_otel_for_live else "WARN"
+        provider_reason = (
+            "live run requires OTel provider-attempt mirror"
+            if require_otel_for_live
+            else "OTel unavailable; provider-attempt mirror could not be checked"
+        )
     elif local_provider_keys == otel_provider_keys:
         provider_verdict = "PASS"
         provider_reason = "OTel provider-attempt spans match local receipt order"
@@ -523,7 +532,7 @@ def build_trace_reconciliation(
             stage_id="L7",
             check_id="l7_provider_attempts.otel_mirror",
             verdict=provider_verdict,
-            severity="MAJOR",
+        severity="BLOCKER" if require_otel_for_live else "MAJOR",
             reason=provider_reason,
             observed_value={
                 "local_provider_keys": local_provider_keys,
@@ -636,7 +645,7 @@ def build_trace_reconciliation(
     fail_count = sum(1 for row in rows if row["verdict"] == "FAIL")
     warn_count = sum(1 for row in rows if row["verdict"] == "WARN")
     if not otel_available:
-        trace_verdict = TRACE_UNAVAILABLE
+        trace_verdict = TRACE_MISMATCH if require_otel_for_live else TRACE_UNAVAILABLE
     elif fail_count:
         trace_verdict = TRACE_MISMATCH
     elif warn_count:
@@ -655,6 +664,7 @@ def build_trace_reconciliation(
         "otel_snapshot_available": otel_available,
         "otel_snapshot_ref": otel_snapshot_ref,
         "otel_span_count": len(otel_spans),
+        "require_otel_for_live": require_otel_for_live,
         "otel_provider_attempt_span_count": len(otel_provider_spans),
         "local_provider_attempt_span_count": len(local_provider_spans),
         "local_provider_attempt_span_source": local_provider_source,
@@ -666,9 +676,9 @@ def build_trace_reconciliation(
             "fail_count": fail_count,
             "warn_count": warn_count,
             "not_applicable_count": sum(1 for row in rows if row["verdict"] == "NOT_APPLICABLE"),
-            "proof_authority": "local_receipts",
+            "proof_authority": "collector_plus_local_receipts" if require_otel_for_live else "local_receipts",
             "current_run_mutation_assertion": False,
-            "future_run_only": True,
+            "future_run_only": not require_otel_for_live,
         },
         "rows_digest": _canonical_digest(rows),
         "rows": rows,
@@ -682,6 +692,7 @@ def emit_trace_reconciliation_artifacts(
     section_id: str,
     run_id: str = "",
     otel_trace_snapshot: Mapping[str, Any] | None = None,
+    require_otel_for_live: bool = False,
 ) -> dict[str, Path]:
     """Write reconciliation JSON + JSONL row artifacts and return their paths."""
     artifact_dir = Path(artifact_dir)
@@ -692,6 +703,7 @@ def emit_trace_reconciliation_artifacts(
         section_id=section_id,
         run_id=run_id,
         otel_trace_snapshot=otel_trace_snapshot,
+        require_otel_for_live=require_otel_for_live,
     )
     rows = [dict(row) for row in doc["rows"]]
     rows_path = _write_jsonl(artifact_dir / TRACE_RECONCILIATION_ROWS_ARTIFACT, rows)
