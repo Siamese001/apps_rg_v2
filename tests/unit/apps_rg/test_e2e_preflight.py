@@ -96,6 +96,31 @@ def _run_identity(run_id: str) -> dict[str, str]:
     }
 
 
+def test_pinned_baseline_accepts_only_checkout_line_ending_translation(tmp_path: Path) -> None:
+    from apps_rg.runtime.e2e_baseline import validate_pinned_baseline
+
+    contract = _write_passing_baseline(tmp_path)
+    payload = json.loads(contract.read_text(encoding="utf-8"))
+    mandatory = tmp_path / payload["baseline_run_dir"] / "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+    raw = mandatory.read_bytes()
+    lf = raw.replace(b"\r\n", b"\n")
+    crlf = lf.replace(b"\n", b"\r\n")
+    mandatory.write_bytes(lf)
+    payload["mandatory_output_sha256"] = hashlib.sha256(crlf).hexdigest()
+    contract.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = validate_pinned_baseline(tmp_path, contract)
+
+    assert result["mandatory_output_digest_match_mode"] == "line_ending_compatible"
+    mandatory.write_bytes(lf.replace(b'"success"', b'"failure"'))
+    try:
+        validate_pinned_baseline(tmp_path, contract)
+    except RuntimeError as exc:
+        assert "PINNED_BASELINE_DIGEST_MISMATCH" in str(exc)
+    else:
+        raise AssertionError("content alteration must not be accepted as an EOL translation")
+
+
 def test_missing_signing_config_emits_canonical_rca_without_running_dependencies(
     tmp_path: Path,
 ) -> None:

@@ -10,6 +10,7 @@ from apps_model_telemetry.external_model_usage import (
     external_model_usage_scope,
     normalize_usage,
 )
+from apps_model_telemetry.execution_evidence import REMOTE_OUTCOME_UNKNOWN, provider_attempt
 from apps_rg.runtime.providers.external_provider import ExternalProvider
 from apps_rg.runtime.providers.provider_gateway import ProviderProfile
 from apps_rg.runtime.judges.executive_summary_x1d import _call_gemini
@@ -65,6 +66,34 @@ def test_append_only_event_uses_digest_and_never_persists_prompt_text(tmp_path: 
     assert "a" * 64 in rendered
 
 
+def test_provider_attempt_records_unknown_remote_outcome_after_pre_response_timeout(
+    tmp_path: Path,
+) -> None:
+    with provider_attempt(
+        artifact_dir=str(tmp_path),
+        run_id="run-1",
+        trace_id="trace-1",
+        app_id="apps_rg",
+        stage="L2.section_generation",
+        section_id="competencies",
+        provider="external_claude",
+        requested_model="claude-test",
+        request_digest="b" * 64,
+    ) as attempt:
+        attempt.mark_request_written()
+        attempt.finish(failure_phase="WAIT_RESPONSE_HEADERS", error_class="TimeoutError")
+
+    events = _events(tmp_path)
+    assert [event["evidence_event"] for event in events] == [
+        "ATTEMPT_STARTED",
+        "REQUEST_WRITTEN",
+        "ATTEMPT_FINISHED",
+    ]
+    assert events[-1]["remote_outcome"] == REMOTE_OUTCOME_UNKNOWN
+    assert events[-1]["failure_phase"] == "WAIT_RESPONSE_HEADERS"
+    assert events[-1]["attempt_id"] == events[0]["attempt_id"]
+
+
 def test_external_provider_writes_usage_to_the_bound_run_ledger(tmp_path: Path) -> None:
     def transport(_request: dict) -> dict:
         return {
@@ -97,7 +126,7 @@ def test_external_provider_writes_usage_to_the_bound_run_ledger(tmp_path: Path) 
         result = provider.generate(_Prompt(), token_budget=77)
 
     assert result.runtime_generation_status == "REAL_LLM"
-    event = _events(tmp_path)[0]
+    event = next(event for event in _events(tmp_path) if event["outcome"] == "SUCCESS")
     assert event["provider"] == "external_openai"
     assert event["model"] == "gpt-test-actual"
     assert event["run_id"] == "run-token-test"

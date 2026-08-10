@@ -444,6 +444,8 @@ def call_section_model_provider(
         run_id=compiled.run_id,
         stage="L2.section_generation",
         section_id=sid or None,
+        trace_id=str(getattr(compiled, "trace_id", "") or ""),
+        app_id="apps_rg",
     ):
         result = build_section_provider_gateway(
             claude_model=claude_model,

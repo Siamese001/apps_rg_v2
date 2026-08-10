@@ -50,8 +50,10 @@ from apps_research.types.apps_rg_targeting_brief_contract import (
 )
 from apps_model_telemetry.external_model_usage import (
     append_external_model_usage,
+    current_external_model_usage_context,
     usage_telemetry,
 )
+from apps_model_telemetry.execution_evidence import provider_attempt
 from apps_model_telemetry.token_budget_governor import TokenBudgetPolicy, estimate_input_tokens
 
 _GENERATION_PIN = company_brief_generation_pin()
@@ -479,54 +481,69 @@ class _AppsRgTargetingBriefGoogleJudge(GoogleJudge):
             method=request.method,
             headers=request.headers,
         )
-        try:
-            with urllib.request.urlopen(native_request, timeout=self._timeout) as response:
-                body = response.read()
-        except socket.timeout as exc:
-            self._record_model_usage(
-                request=request,
-                raw_response=None,
-                outcome="TIMEOUT",
-                provider_status="JUDGE_PROVIDER_ERROR",
-            )
-            raise TimeoutError(f"judge HTTP timeout after {self._timeout}s: {exc}") from exc
-        except urllib.error.HTTPError as exc:
-            self._record_model_usage(
-                request=request,
-                raw_response=None,
-                outcome=f"HTTP_{exc.code}",
-                provider_status="JUDGE_PROVIDER_ERROR",
-            )
-            detail = exc.read().decode("utf-8", errors="ignore")[:500]
-            raise GraderError(f"judge HTTP {exc.code} {exc.reason}: {detail}") from exc
-        except urllib.error.URLError as exc:
-            self._record_model_usage(
-                request=request,
-                raw_response=None,
-                outcome="URL_ERROR",
-                provider_status="JUDGE_PROVIDER_ERROR",
-            )
-            if isinstance(exc.reason, socket.timeout):
-                raise TimeoutError(f"judge HTTP timeout: {exc.reason}") from exc
-            raise GraderError(f"judge HTTP URLError: {exc.reason}") from exc
+        context = current_external_model_usage_context()
+        with provider_attempt(
+            artifact_dir=context.get("artifact_dir") or self._usage_artifact_dir,
+            run_id=context.get("run_id", ""),
+            trace_id=context.get("trace_id", ""),
+            app_id=context.get("app_id") or "apps_research",
+            stage=context.get("stage") or "L2.X2_research_semantic_gate",
+            section_id=context.get("section_id") or "X2",
+            provider=APPS_RG_HANDOFF_JUDGE_PROVIDER,
+            requested_model=self._model,
+            request_digest=_x2_usage_request_digest(request),
+        ) as evidence:
+            evidence.mark_request_written()
+            try:
+                with urllib.request.urlopen(native_request, timeout=self._timeout) as response:
+                    headers = getattr(response, "headers", {})
+                    evidence.mark_response_headers(
+                        status_code=getattr(response, "status", None),
+                        provider_response_id=str(getattr(headers, "get", lambda *_: "")("x-request-id", "")),
+                    )
+                    body = response.read()
+                    evidence.mark_first_byte()
+            except socket.timeout as exc:
+                evidence.failure_phase = "WAIT_RESPONSE_HEADERS"
+                self._record_model_usage(
+                    request=request, raw_response=None, outcome="TIMEOUT", provider_status="JUDGE_PROVIDER_ERROR"
+                )
+                raise TimeoutError(f"judge HTTP timeout after {self._timeout}s: {exc}") from exc
+            except urllib.error.HTTPError as exc:
+                evidence.mark_response_headers(status_code=exc.code)
+                evidence.failure_phase = "HTTP_RESPONSE"
+                self._record_model_usage(
+                    request=request, raw_response=None, outcome=f"HTTP_{exc.code}", provider_status="JUDGE_PROVIDER_ERROR"
+                )
+                detail = exc.read().decode("utf-8", errors="ignore")[:500]
+                raise GraderError(f"judge HTTP {exc.code} {exc.reason}: {detail}") from exc
+            except urllib.error.URLError as exc:
+                evidence.failure_phase = "WAIT_RESPONSE_HEADERS"
+                self._record_model_usage(
+                    request=request, raw_response=None, outcome="URL_ERROR", provider_status="JUDGE_PROVIDER_ERROR"
+                )
+                if isinstance(exc.reason, socket.timeout):
+                    raise TimeoutError(f"judge HTTP timeout: {exc.reason}") from exc
+                raise GraderError(f"judge HTTP URLError: {exc.reason}") from exc
 
-        try:
-            parsed = json.loads(body.decode("utf-8"))
-        except (ValueError, UnicodeDecodeError) as exc:
+            try:
+                parsed = json.loads(body.decode("utf-8"))
+            except (ValueError, UnicodeDecodeError) as exc:
+                evidence.failure_phase = "PARSE_RESPONSE"
+                self._record_model_usage(
+                    request=request, raw_response=None, outcome="RESPONSE_UNPARSEABLE", provider_status="JUDGE_PROVIDER_ERROR"
+                )
+                raise GraderError(f"judge response was not JSON: {exc}") from exc
             self._record_model_usage(
                 request=request,
-                raw_response=None,
-                outcome="RESPONSE_UNPARSEABLE",
-                provider_status="JUDGE_PROVIDER_ERROR",
+                raw_response=parsed if isinstance(parsed, Mapping) else None,
+                outcome="SUCCESS",
+                provider_status="RESPONSE_RECEIVED",
             )
-            raise GraderError(f"judge response was not JSON: {exc}") from exc
-        self._record_model_usage(
-            request=request,
-            raw_response=parsed if isinstance(parsed, Mapping) else None,
-            outcome="SUCCESS",
-            provider_status="RESPONSE_RECEIVED",
-        )
-        return self._extract_text(parsed)
+            observed = str(parsed.get("modelVersion") or "") if isinstance(parsed, Mapping) else ""
+            response_id = str(parsed.get("responseId") or "") if isinstance(parsed, Mapping) else ""
+            evidence.finish(observed_model=observed, provider_response_id=response_id)
+            return self._extract_text(parsed)
     def _build_request(self, system: str, user: str):  # type: ignore[override]
         request = super()._build_request(system, user)
         payload = json.loads(request.body.decode("utf-8"))

@@ -40,7 +40,11 @@ from apps_research.engines.query_decomposer import (  # noqa: F401
     describe_jd_retrieval_contract,
 )
 from apps_research.integrations.llm_client import create_openai_sync_client
-from apps_model_telemetry.external_model_usage import append_external_model_usage
+from apps_model_telemetry.execution_evidence import provider_attempt
+from apps_model_telemetry.external_model_usage import (
+    append_external_model_usage,
+    current_external_model_usage_context,
+)
 from apps_model_telemetry.token_budget_governor import TokenBudgetPolicy, estimate_input_tokens
 from apps_research.reasoning.adaptive_research_loop import (
     build_adaptive_research_revision,
@@ -1147,7 +1151,23 @@ class CompanyBriefEngine(BaseResearchEngine):
 
         model_name = APPS_RESEARCH_BRIEF_MODEL
         started = time.time()
+        evidence_context = current_external_model_usage_context()
+        evidence_cm = provider_attempt(
+            artifact_dir=evidence_context.get("artifact_dir") or None,
+            run_id=evidence_context.get("run_id") or "",
+            trace_id=evidence_context.get("trace_id") or "",
+            app_id=evidence_context.get("app_id") or "apps_research",
+            stage=evidence_context.get("stage") or "L2.apps_research_company_brief",
+            section_id=evidence_context.get("section_id") or "",
+            provider="external_openai",
+            requested_model=model_name,
+            request_digest=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        )
+        evidence = evidence_cm.__enter__()
         try:
+            # The SDK does not expose a write hook. This is intentionally
+            # local dispatch only; a response is marked separately below.
+            evidence.mark_local_dispatch_started()
             resp = client.chat.completions.create(
                 model=model_name,
                 messages=[
@@ -1164,6 +1184,8 @@ class CompanyBriefEngine(BaseResearchEngine):
                 max_completion_tokens=_resolved_gemini_max_output_tokens(),
             )
         except Exception as exc:  # guardian: allow-broad-exception -- OpenAI SDK raises heterogeneous transport/API errors; fail closed
+            evidence.finish(failure_phase="SDK_CALL", error_class=type(exc).__name__)
+            evidence_cm.__exit__(None, None, None)
             self.logger.info("[CompanyBriefEngine] openai model=%s failed: %s", model_name, exc)
             _record_company_brief_model_usage(
                 model=model_name,
@@ -1187,6 +1209,15 @@ class CompanyBriefEngine(BaseResearchEngine):
             usage=_openai_usage_mapping(resp),
             response_id=str(getattr(resp, "id", "") or ""),
         )
+        evidence.mark_response_headers(
+            provider_response_id=str(getattr(resp, "id", "") or ""),
+        )
+        evidence.mark_first_byte()
+        evidence.finish(
+            observed_model=str(getattr(resp, "model", "") or model_name),
+            provider_response_id=str(getattr(resp, "id", "") or ""),
+        )
+        evidence_cm.__exit__(None, None, None)
         text = ""
         observed_model = str(getattr(resp, "model", "") or "").strip()
         if not observed_model:
@@ -1762,7 +1793,21 @@ class CompanyBriefEngine(BaseResearchEngine):
             ) from exc
 
         model_name = APPS_RESEARCH_BRIEF_MODEL
+        evidence_context = current_external_model_usage_context()
+        evidence_cm = provider_attempt(
+            artifact_dir=evidence_context.get("artifact_dir") or None,
+            run_id=evidence_context.get("run_id") or "",
+            trace_id=evidence_context.get("trace_id") or "",
+            app_id=evidence_context.get("app_id") or "apps_research",
+            stage=evidence_context.get("stage") or "L2.apps_research_company_brief",
+            section_id=evidence_context.get("section_id") or "",
+            provider="external_openai",
+            requested_model=model_name,
+            request_digest=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        )
+        evidence = evidence_cm.__enter__()
         try:
+            evidence.mark_local_dispatch_started()
             resp = client.chat.completions.create(
                 model=model_name,
                 messages=[
@@ -1779,6 +1824,8 @@ class CompanyBriefEngine(BaseResearchEngine):
                 max_completion_tokens=_resolved_gemini_max_output_tokens(),
             )
         except Exception as exc:  # guardian: allow-broad-exception -- OpenAI SDK raises heterogeneous transport/API errors; fail closed
+            evidence.finish(failure_phase="SDK_CALL", error_class=type(exc).__name__)
+            evidence_cm.__exit__(None, None, None)
             self.logger.info(
                 "[CompanyBriefEngine] targeting brief openai model=%s failed: %s",
                 model_name,
@@ -1799,6 +1846,15 @@ class CompanyBriefEngine(BaseResearchEngine):
             usage=_openai_usage_mapping(resp),
             response_id=str(getattr(resp, "id", "") or ""),
         )
+        evidence.mark_response_headers(
+            provider_response_id=str(getattr(resp, "id", "") or ""),
+        )
+        evidence.mark_first_byte()
+        evidence.finish(
+            observed_model=str(getattr(resp, "model", "") or model_name),
+            provider_response_id=str(getattr(resp, "id", "") or ""),
+        )
+        evidence_cm.__exit__(None, None, None)
         observed_model = str(getattr(resp, "model", "") or "").strip()
         if not observed_model:
             raise CompanyBriefUnavailableError(

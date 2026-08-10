@@ -14,6 +14,27 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _baseline_digest_match(data: bytes, expected_digest: str) -> tuple[bool, str, str]:
+    """Match the pinned bytes, allowing only checkout-level EOL translation.
+
+    The historic Anthropic baseline was pinned from a CRLF checkout while the
+    tracked artifact is checked out as LF in this worktree.  JSON content is
+    unchanged, but raw-byte hashing made that baseline unusable in a clean
+    worktree.  Keep the strict raw match first; only CRLF/LF re-encodings of
+    exactly the same byte sequence are accepted as a portability exception.
+    """
+
+    observed = hashlib.sha256(data).hexdigest()
+    if observed == expected_digest:
+        return True, observed, "exact_bytes"
+    canonical_lf = data.replace(b"\r\n", b"\n")
+    crlf = canonical_lf.replace(b"\n", b"\r\n")
+    for candidate in (canonical_lf, crlf):
+        if hashlib.sha256(candidate).hexdigest() == expected_digest:
+            return True, observed, "line_ending_compatible"
+    return False, observed, "mismatch"
+
+
 def validate_pinned_baseline(repo_root: Path, baseline_ref: Path) -> dict[str, str]:
     ref = baseline_ref if baseline_ref.is_absolute() else repo_root / baseline_ref
     try:
@@ -47,8 +68,10 @@ def validate_pinned_baseline(repo_root: Path, baseline_ref: Path) -> dict[str, s
     mandatory = run_dir / "APPS_RG_MANDATORY_RUN_OUTPUT.json"
     if not mandatory.is_file():
         raise RuntimeError(f"PINNED_BASELINE_ARTIFACT_MISSING:{mandatory}")
-    observed_digest = _sha256(mandatory)
-    if observed_digest != expected_digest:
+    matched, observed_digest, digest_match_mode = _baseline_digest_match(
+        mandatory.read_bytes(), expected_digest
+    )
+    if not matched:
         raise RuntimeError(
             f"PINNED_BASELINE_DIGEST_MISMATCH:expected={expected_digest}:observed={observed_digest}"
         )
@@ -77,7 +100,9 @@ def validate_pinned_baseline(repo_root: Path, baseline_ref: Path) -> dict[str, s
         "baseline_id": baseline_id,
         "baseline_ref": str(ref.resolve()),
         "baseline_run_dir": str(run_dir),
-        "mandatory_output_sha256": observed_digest,
+        "mandatory_output_sha256": expected_digest,
+        "mandatory_output_observed_sha256": observed_digest,
+        "mandatory_output_digest_match_mode": digest_match_mode,
         "git_commit": git_commit,
         "target_company": target_company,
         "target_role": target_role,

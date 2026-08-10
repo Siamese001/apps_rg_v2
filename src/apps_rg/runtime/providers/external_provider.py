@@ -27,7 +27,11 @@ from apps_rg.runtime.providers.provider_attempt_spans import (
     summarize_provider_attempt_spans,
 )
 from apps_rg.runtime.providers.provider_contract import ProviderResult
-from apps_model_telemetry.external_model_usage import append_external_model_usage
+from apps_model_telemetry.execution_evidence import provider_attempt
+from apps_model_telemetry.external_model_usage import (
+    append_external_model_usage,
+    current_external_model_usage_context,
+)
 ExternalTransport = Callable[[dict[str, Any]], dict[str, Any]]
 
 DEFAULT_ANTHROPIC_MESSAGES_URL = "https://api.anthropic.com/v1/messages"
@@ -336,6 +340,7 @@ class ExternalProvider:
         # stream got (last_progress_at / chars received). All times: monotonic deltas from t0.
         progress = request.get("progress_sink")
         progress = progress if isinstance(progress, dict) else None
+        evidence = request.get("_execution_evidence")
         started_wall = datetime.now(timezone.utc).isoformat()
         t0 = time.monotonic()
         if progress is not None:
@@ -367,7 +372,22 @@ class ExternalProvider:
             first_byte_after_s = None
             try:
                 http_req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+                if evidence is not None:
+                    evidence.mark_request_written()
                 with urllib.request.urlopen(http_req, timeout=per_read) as resp:
+                    if evidence is not None:
+                        response_headers = getattr(resp, "headers", None)
+                        response_id = ""
+                        if response_headers is not None:
+                            response_id = str(
+                                response_headers.get("request-id")
+                                or response_headers.get("x-request-id")
+                                or ""
+                            )
+                        evidence.mark_response_headers(
+                            status_code=getattr(resp, "status", None),
+                            provider_response_id=response_id,
+                        )
                     for raw_line in resp:
                         line = raw_line.decode("utf-8", errors="replace").strip()
                         if not line.startswith("data:"):
@@ -382,6 +402,8 @@ class ExternalProvider:
                         now_after = time.monotonic() - t0
                         if first_byte_after_s is None:
                             first_byte_after_s = now_after
+                            if evidence is not None:
+                                evidence.mark_first_byte()
                             if progress is not None:
                                 progress["first_byte_after_s"] = round(now_after, 4)
                         chunk_count += 1
@@ -498,7 +520,21 @@ class ExternalProvider:
             },
             method="POST",
         )
+        evidence = request.get("_execution_evidence")
+        if evidence is not None:
+            evidence.mark_request_written()
         with urllib.request.urlopen(http_req, timeout=timeout_seconds) as resp:
+            if evidence is not None:
+                headers = getattr(resp, "headers", None)
+                evidence.mark_response_headers(
+                    status_code=getattr(resp, "status", None),
+                    provider_response_id=str(
+                        (headers.get("x-request-id") or headers.get("request-id") or "")
+                        if headers is not None
+                        else ""
+                    ),
+                )
+                evidence.mark_first_byte()
             data = json.loads(resp.read().decode("utf-8"))
         text = str(data.get("output_text") or "")
         if not text:
@@ -711,6 +747,23 @@ class ExternalProvider:
                 ),
             )
         transport = self.transport or self._default_transport
+        evidence_context = current_external_model_usage_context()
+        evidence_cm = provider_attempt(
+            artifact_dir=evidence_context.get("artifact_dir") or None,
+            run_id=evidence_context.get("run_id") or "",
+            trace_id=evidence_context.get("trace_id") or "",
+            app_id=evidence_context.get("app_id") or "apps_rg",
+            stage=evidence_context.get("stage") or "L2.section_generation",
+            section_id=evidence_context.get("section_id") or "",
+            provider=self.provider_profile.value,
+            requested_model=self.model,
+            request_digest=request_digest,
+        )
+        evidence = evidence_cm.__enter__()
+        # Injected transports are intentionally supported in tests.  Production
+        # transports receive the witness and mark HTTP/stream boundaries below.
+        if self.transport is None:
+            request["_execution_evidence"] = evidence
         try:
             response = self._transport_with_wall_clock_timeout(
                 transport,
@@ -721,6 +774,13 @@ class ExternalProvider:
             detail = exc.read().decode("utf-8", errors="replace")[:1000]
             error = f"External provider HTTP {exc.code}: {detail or exc.reason}"
             _record_usage(outcome=f"HTTP_{exc.code}", provider_status="BLOCKED")
+            evidence.mark_response_headers(status_code=int(exc.code))
+            evidence.finish(
+                http_status_code=int(exc.code),
+                failure_phase="HTTP_RESPONSE",
+                error_class=type(exc).__name__,
+            )
+            evidence_cm.__exit__(None, None, None)
             return ProviderResult(
                 provider_requested=self.provider_profile.value,
                 provider_attempted=True,
@@ -750,6 +810,15 @@ class ExternalProvider:
                 )
             error = f"External provider call failed: {type(exc).__name__}: {exc}{progress_note}"
             _record_usage(outcome=type(exc).__name__.upper(), provider_status="BLOCKED")
+            if prog.get("first_byte_after_s") is not None:
+                evidence.mark_first_byte()
+            evidence.finish(
+                failure_phase=(
+                    "READ_STREAM" if evidence.first_byte_received else "WAIT_RESPONSE_HEADERS"
+                ),
+                error_class=type(exc).__name__,
+            )
+            evidence_cm.__exit__(None, None, None)
             return ProviderResult(
                 provider_requested=self.provider_profile.value,
                 provider_attempted=True,
@@ -790,6 +859,12 @@ class ExternalProvider:
                 )
             detail = f" ({'; '.join(detail_parts)})" if detail_parts else ""
             error = f"External provider returned empty text{detail}"
+            evidence.finish(
+                observed_model=resolved_model,
+                provider_response_id=str(raw_response.get("id") or raw_response.get("response_id") or ""),
+                failure_phase="EMPTY_RESPONSE",
+            )
+            evidence_cm.__exit__(None, None, None)
             return ProviderResult(
                 provider_requested=self.provider_profile.value,
                 provider_attempted=True,
@@ -824,6 +899,11 @@ class ExternalProvider:
             response_id=str(raw_response.get("id") or raw_response.get("response_id") or ""),
             model_name=resolved_model,
         )
+        evidence.finish(
+            observed_model=resolved_model,
+            provider_response_id=str(raw_response.get("id") or raw_response.get("response_id") or ""),
+        )
+        evidence_cm.__exit__(None, None, None)
         return ProviderResult(
             provider_requested=self.provider_profile.value,
             provider_attempted=True,

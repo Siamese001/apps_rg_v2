@@ -28,6 +28,7 @@ from agentic_core.L6_observability.shadow_eval.pipeline import (
 from agentic_core.L6_observability.shadow_eval.span_export import write_span_artifacts
 from apps_rg.runtime.observability.trace_reconciliation import (
     L6_TRACE_OBSERVABILITY_SUMMARY_ARTIFACT,
+    TRACE_RECONCILED,
     TRACE_RECONCILIATION_ARTIFACT,
     emit_trace_reconciliation_artifacts,
 )
@@ -281,6 +282,11 @@ def _emit_l6_observability_closure_receipt(
             _normal_sha256(package.get("runtime_exhaust_bundle_digest"))
         ),
     }
+    if _truthy(os.environ.get("APPS_RG_REQUIRE_OTEL_RECONCILIATION")):
+        trace_doc = _load_json(artifacts["trace_reconciliation"])
+        checks["live_trace_reconciliation_pass"] = (
+            str(trace_doc.get("trace_verdict") or "") == TRACE_RECONCILED
+        )
     failed_checks = sorted(name for name, passed in checks.items() if not passed)
     digest_map = {
         name: _sha256_file(path)
@@ -402,11 +408,28 @@ def run_l6_v40_shadow_eval_for_section(
         tenant_id=tenant_id,
         l5_certification_ref=l5_ref,
     )
+    require_otel_for_live = _truthy(os.environ.get("APPS_RG_REQUIRE_OTEL_RECONCILIATION"))
+    if require_otel_for_live:
+        from apps_model_telemetry.otel_runtime import (
+            capture_collector_snapshot,
+            flush_live_otel,
+        )
+
+        flush_live_otel()
+        capture_collector_snapshot(
+            artifact_dir=artifact_dir,
+            trace_id=str(
+                preliminary_exhaust.get("trace_root")
+                or preliminary_exhaust.get("trace_id")
+                or ""
+            ),
+        )
     trace_reconciliation_paths = emit_trace_reconciliation_artifacts(
         artifact_dir=artifact_dir,
         repo_root=repo_root,
         section_id=section_id,
         run_id=str(preliminary_exhaust.get("run_id") or section_id),
+        require_otel_for_live=require_otel_for_live,
     )
     raw_exhaust = from_section_artifacts(
         artifact_dir,

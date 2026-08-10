@@ -134,6 +134,8 @@ def external_model_usage_scope(
     run_id: str | None = None,
     stage: str | None = None,
     section_id: str | None = None,
+    trace_id: str | None = None,
+    app_id: str | None = None,
 ) -> Iterator[None]:
     """Bind nested provider transports to one known run artifact directory."""
     fields = {
@@ -141,12 +143,20 @@ def external_model_usage_scope(
         "run_id": str(run_id or ""),
         "stage": str(stage or ""),
         "section_id": str(section_id or ""),
+        "trace_id": str(trace_id or ""),
+        "app_id": str(app_id or ""),
     }
     token = _usage_context.set(fields)
     try:
         yield
     finally:
         _usage_context.reset(token)
+
+
+def current_external_model_usage_context() -> dict[str, str]:
+    """Return the current explicit run binding without inventing one."""
+
+    return dict(_usage_context.get() or {})
 
 
 def append_external_model_usage(
@@ -166,6 +176,20 @@ def append_external_model_usage(
     provider_status: str | None = None,
     response_id: str | None = None,
     raw_response_ref: str | None = None,
+    evidence_event: str | None = None,
+    attempt_id: str | None = None,
+    trace_id: str | None = None,
+    app_id: str | None = None,
+    requested_model: str | None = None,
+    observed_model: str | None = None,
+    request_written: bool | None = None,
+    response_headers_received: bool | None = None,
+    first_byte_received: bool | None = None,
+    http_status_code: int | None = None,
+    failure_phase: str | None = None,
+    remote_outcome: str | None = None,
+    error_class: str | None = None,
+    evidence_digest: str | None = None,
 ) -> dict[str, Any] | None:
     """Append one immutable provider-attempt event, returning the event.
 
@@ -197,6 +221,23 @@ def append_external_model_usage(
         "raw_response_ref": str(raw_response_ref or ""),
         **normalized,
     }
+    optional_evidence = {
+        "evidence_event": evidence_event,
+        "attempt_id": attempt_id,
+        "trace_id": trace_id,
+        "app_id": app_id,
+        "requested_model": requested_model,
+        "observed_model": observed_model,
+        "request_written": request_written,
+        "response_headers_received": response_headers_received,
+        "first_byte_received": first_byte_received,
+        "http_status_code": http_status_code,
+        "failure_phase": failure_phase,
+        "remote_outcome": remote_outcome,
+        "error_class": error_class,
+        "evidence_digest": evidence_digest,
+    }
+    event.update({key: value for key, value in optional_evidence.items() if value is not None})
     event["event_digest"] = _digest(event)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8", newline="\n") as handle:
@@ -226,6 +267,7 @@ __all__ = [
     "EVENT_SCHEMA_VERSION",
     "LEDGER_FILENAME",
     "append_external_model_usage",
+    "current_external_model_usage_context",
     "external_model_usage_scope",
     "ledger_path",
     "normalize_usage",

@@ -13,6 +13,7 @@ from apps_research.integrations.apps_rg_handoff import (
 
 
 class _UsageReportingJudge:
+    observed_model = "gemini-3.1-pro-preview"
     model_usage_attempts = [
         {
             "provider": "gemini_pro",
@@ -119,7 +120,12 @@ def test_google_x2_usage_is_appended_to_a_bound_run_ledger(
     )
 
     assert response.score == 0.91
-    event = json.loads((tmp_path / LEDGER_FILENAME).read_text(encoding="utf-8").strip())
+    events = [
+        json.loads(line)
+        for line in (tmp_path / LEDGER_FILENAME).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    event = next(event for event in events if event["outcome"] == "SUCCESS")
     assert event["provider"] == "gemini_pro"
     assert event["prompt_tokens"] == 101
     assert event["thought_tokens"] == 13

@@ -165,6 +165,7 @@ class AppsResearchBridge:
         from apps_research.integrations.searxng_readiness import runtime_base_url
         from apps_research.integrations.spine_handoff import run_research_via_spine
         from apps_research.types.research_types import ResearchRequest
+        from apps_model_telemetry.external_model_usage import external_model_usage_scope
 
         if not os.environ.get("SEARXNG_BASE_URL", "").strip():
             os.environ["SEARXNG_BASE_URL"] = runtime_base_url()
@@ -212,7 +213,17 @@ class AppsResearchBridge:
             },
         )
         runner = GovernedResearchRun()
-        return run_research_via_spine(research_request, runner=runner)
+        # The producer-owned child run is committed later.  Bind its known
+        # parent run root now so every live model attempt has a durable local
+        # witness and the same cross-app trace identity.
+        with external_model_usage_scope(
+            artifact_dir=self._artifact_runs_root,
+            run_id=run_id,
+            stage="L2.apps_research_company_brief",
+            trace_id=trace_root or trace_id,
+            app_id="apps_research",
+        ):
+            return run_research_via_spine(research_request, runner=runner)
 
     def _translate(
         self,
