@@ -425,6 +425,7 @@ def _unit_observations(
                 },
                 "actual_attempt_refs": actual_attempt_refs,
                 "artifact_refs": list(artifact_refs),
+                "l2_fault": l2_fault if l2_executed else "",
                 "disposition": disposition,
                 "attempted": attempted,
             }
@@ -608,6 +609,8 @@ def validate_plan_execution_reconciliation(receipt: Mapping[str, Any]) -> None:
             value = observation.get(field)
             if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
                 raise PlanExecutionReconciliationError(f"W1 {field} must be a sequence")
+        if not isinstance(observation.get("l2_fault"), str):
+            raise PlanExecutionReconciliationError("W1 l2_fault must be a string")
         expected = outcomes[unit_id]
         if (
             observation.get("disposition") != expected.get("disposition")
