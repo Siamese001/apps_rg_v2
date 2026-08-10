@@ -1,6 +1,6 @@
 # L1 Cognition and Reasoning Roadmap
 
-Status: proposed implementation plan
+Status: Wave 0 implemented and verified; Waves 1-6 remain proposed.
 
 Branch baseline: local `main` at `377bbbc3fa5faec8bfb18659b5c078f814ddb635`
 
@@ -139,6 +139,11 @@ fact.
 ### Wave 0 — Freeze an apps_rg_v2-only proof baseline
 
 Owner: apps_rg_v2 maintainer.
+
+Implementation: `l1_reasoning_baseline.py` now emits a privacy-safe,
+digest-bound `l1_reasoning_baseline.json` from a verified v1 capsule and any
+already-produced L0/C0/PA/L2/W1/W2 artifacts. The capture is observation-only;
+it does not invoke those stages or authorize an outcome.
 
 1. Capture current v1 capsules for representative full-resume and section-regen
    fixtures, including the ambiguity register, requirement plan, evidence plan,
