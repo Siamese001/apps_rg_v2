@@ -1,8 +1,8 @@
 # L1 Cognition and Reasoning Roadmap
 
-Status: Wave 0 implemented and verified; Waves 1-6 remain proposed.
+Status: Waves 0-1 implemented and verified; Waves 2-6 remain proposed.
 
-Branch baseline: local `main` at `377bbbc3fa5faec8bfb18659b5c078f814ddb635`
+Branch baseline: local `main` at `4d27ad271bab47e69914c36e86ed7134f03aa5fb`
 
 ## Decision
 
@@ -162,11 +162,21 @@ production-authorization claim.
 
 Owner: apps_rg.
 
+Implementation: `l1_planning_capsule_v2.py` now emits a separate immutable
+`apps_rg_l1_planning_capsule.v2`, bound to the exact v1 planning profile bytes
+and the app-owned `rg_l1_requirement_taxonomy.v1.json`. It contains source-span
+and digest-bound U0-JD requirements, an open typed decision ledger, advisory C0
+evidence obligations, and an acyclic work DAG. `l1_binding.py` carries it beside
+the unchanged v1 projection; L0 signs its identifiers as advisory lineage only,
+without treating v2 status as route authority or a new gate.
+
 Primary files:
 
 - `src/apps_rg/runtime/bindings/l1_planning_capsule.py`
+- `src/apps_rg/runtime/bindings/l1_planning_capsule_v2.py`
 - `src/apps_rg/runtime/bindings/l1_binding.py`
 - `src/apps_rg/profiles/rg_planning_profile.yaml`
+- `src/apps_rg/profiles/rg_l1_requirement_taxonomy.v1.json`
 - New app-owned requirement/uncertainty taxonomy profile under
   `src/apps_rg/profiles/`.
 - `tests/unit/apps_rg/runtime/bindings/test_l1_jd_obligation_plan.py` and new

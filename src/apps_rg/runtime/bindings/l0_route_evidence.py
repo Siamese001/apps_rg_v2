@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import json
 import os
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
 from apps_rg.runtime.spine_contracts import L1PlanContract
 from apps_rg.runtime.spine_contracts import RouteContract
@@ -60,7 +60,9 @@ def _verified_l1_binding(plan: L1PlanContract) -> dict[str, Any]:
     if not capsule:
         return {}
     profile_refs = capsule.get("planning_prior_refs") or ()
-    profile = profile_refs[0] if profile_refs and isinstance(profile_refs[0], Mapping) else {}
+    profile = (
+        profile_refs[0] if profile_refs and isinstance(profile_refs[0], Mapping) else {}
+    )
     return {
         "capsule_digest": str(capsule.get("capsule_digest") or ""),
         "planning_profile_ref": str(profile.get("ref") or ""),
@@ -73,6 +75,30 @@ def _verified_l1_binding(plan: L1PlanContract) -> dict[str, Any]:
             capsule.get("completion_criteria") or []
         ),
         "evidence_plan_digest": _sha256_json(capsule.get("evidence_plan") or []),
+        "verification_digest": _sha256_json(verification),
+    }
+
+
+def _verified_l1_v2_binding(plan: L1PlanContract) -> dict[str, Any]:
+    """Return only verified advisory v2 identifiers; L0 retains route authority."""
+
+    from apps_rg.runtime.bindings.l1_planning_capsule_v2 import (
+        extract_verified_planning_capsule_v2,
+    )
+
+    capsule, verification = extract_verified_planning_capsule_v2(plan, required=False)
+    if not capsule:
+        return {}
+    return {
+        "capsule_digest": str(capsule.get("capsule_digest") or ""),
+        "planning_status": str(capsule.get("planning_status") or ""),
+        "decision_ledger_digest": str(
+            capsule.get("decision_ledger", {}).get("ledger_digest") or ""
+        ),
+        "evidence_obligation_ledger_digest": str(
+            capsule.get("evidence_obligation_ledger", {}).get("ledger_digest") or ""
+        ),
+        "work_dag_digest": str(capsule.get("work_dag", {}).get("dag_digest") or ""),
         "verification_digest": _sha256_json(verification),
     }
 
@@ -144,6 +170,7 @@ def compute_route_digest(
         "replay_key": replay_key or plan.replay_key,
         "validation_receipt_id": getattr(plan, "validation_receipt_id", ""),
         "l1_plan_binding": _verified_l1_binding(plan),
+        "l1_v2_advisory_binding": _verified_l1_v2_binding(plan),
     }
     canonical = json.dumps(
         data,
@@ -163,20 +190,37 @@ def sign_route_digest(digest: str, *, secret: bytes) -> str:
 
 def _l1_capsule_consumption_refs(plan: L1PlanContract) -> tuple[str, ...]:
     binding = _verified_l1_binding(plan)
-    if not binding:
+    v2_binding = _verified_l1_v2_binding(plan)
+    if not binding and not v2_binding:
         return ()
-    capsule_digest = binding["capsule_digest"]
-    return (
-        f"l1_capsule_digest:{capsule_digest[:24]}",
-        f"l1_profile_digest:{binding['planning_profile_digest'][:24]}",
-        f"l1_route_features:{binding['route_feature_digest'][:16]}",
-        f"l1_work_units:{binding['work_units_digest'][:16]}",
-        f"l1_completion_criteria:{binding['completion_criteria_digest'][:16]}",
-        f"l1_evidence_plan_ref:{binding['evidence_plan_digest'][:16]}",
-        f"l1_planning_status:{binding['planning_status']}",
-        f"l1_work_shape:{plan.work_shape or 'unknown'}",
-        f"l1_task_shape:{plan.task_shape or 'unknown'}",
-    )
+    refs: list[str] = []
+    if binding:
+        capsule_digest = binding["capsule_digest"]
+        refs.extend(
+            (
+                f"l1_capsule_digest:{capsule_digest[:24]}",
+                f"l1_profile_digest:{binding['planning_profile_digest'][:24]}",
+                f"l1_route_features:{binding['route_feature_digest'][:16]}",
+                f"l1_work_units:{binding['work_units_digest'][:16]}",
+                f"l1_completion_criteria:{binding['completion_criteria_digest'][:16]}",
+                f"l1_evidence_plan_ref:{binding['evidence_plan_digest'][:16]}",
+                f"l1_planning_status:{binding['planning_status']}",
+                f"l1_work_shape:{plan.work_shape or 'unknown'}",
+                f"l1_task_shape:{plan.task_shape or 'unknown'}",
+            )
+        )
+    if v2_binding:
+        refs.extend(
+            (
+                f"l1_v2_capsule_digest:{v2_binding['capsule_digest'][:24]}",
+                f"l1_v2_decision_ledger:{v2_binding['decision_ledger_digest'][:16]}",
+                "l1_v2_evidence_obligation_ledger:"
+                f"{v2_binding['evidence_obligation_ledger_digest'][:16]}",
+                f"l1_v2_work_dag:{v2_binding['work_dag_digest'][:16]}",
+                f"l1_v2_planning_status:{v2_binding['planning_status']}",
+            )
+        )
+    return tuple(refs)
 
 
 def _explicit_unsigned_test_posture() -> bool:
@@ -316,6 +360,7 @@ def stamp_route_evidence(
         )
 
     binding = _verified_l1_binding(plan)
+    v2_binding = _verified_l1_v2_binding(plan)
     existing_receipts = tuple(
         receipt
         for receipt in route.route_gate_receipts
@@ -323,7 +368,9 @@ def stamp_route_evidence(
     )
     readiness_ref = readiness.to_runtime_gate_ref()
     existing_refs = tuple(
-        ref for ref in route.route_gate_refs if not str(ref).startswith("G_L1_PLAN_READY")
+        ref
+        for ref in route.route_gate_refs
+        if not str(ref).startswith("G_L1_PLAN_READY")
     )
     snapshot_refs = tuple(route.snapshot_refs or ())
     if binding:
@@ -331,6 +378,14 @@ def stamp_route_evidence(
             f"l1_capsule_digest:{binding['capsule_digest']}",
             f"l1_planning_profile_digest:{binding['planning_profile_digest']}",
             f"l1_plan_binding_digest:{_sha256_json(binding)}",
+        )
+    if v2_binding:
+        snapshot_refs += (
+            f"l1_v2_capsule_digest:{v2_binding['capsule_digest']}",
+            "l1_v2_evidence_obligation_ledger:"
+            f"{v2_binding['evidence_obligation_ledger_digest']}",
+            f"l1_v2_work_dag:{v2_binding['work_dag_digest']}",
+            f"l1_v2_plan_binding_digest:{_sha256_json(v2_binding)}",
         )
 
     from dataclasses import replace
