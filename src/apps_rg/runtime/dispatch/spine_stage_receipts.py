@@ -1,4 +1,5 @@
 """Stage receipt filenames for apps_rg whole-run spine (R3R4 + draft leg)."""
+
 from __future__ import annotations
 
 import hashlib
@@ -12,6 +13,7 @@ FILENAME_INGRESS_RAW = "ingress_raw.json"
 FILENAME_U0_RECEIPT = "u0_receipt.json"
 FILENAME_L1_PLAN = "l1_plan_contract.json"
 FILENAME_L1_PLANNING_CAPSULE = "l1_planning_capsule.json"
+FILENAME_L1_REASONING_BASELINE = "l1_reasoning_baseline.json"
 FILENAME_PLAN_EXECUTION_RECEIPT = "plan_execution_receipt.json"
 FILENAME_PLAN_REPLAN_DECISION = "plan_replan_decision.json"
 FILENAME_ROUTE_CONTRACT = "route_contract.json"
@@ -30,12 +32,17 @@ def _canonical_json(payload: Any) -> str:
 
 
 def sha256_digest(payload: Any) -> str:
-    return "sha256:" + hashlib.sha256(_canonical_json(payload).encode("utf-8")).hexdigest()
+    return (
+        "sha256:" + hashlib.sha256(_canonical_json(payload).encode("utf-8")).hexdigest()
+    )
 
 
 def write_stage_receipt(path: Path, payload: Mapping[str, Any]) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(dict(payload), indent=2, sort_keys=True, default=str), encoding="utf-8")
+    path.write_text(
+        json.dumps(dict(payload), indent=2, sort_keys=True, default=str),
+        encoding="utf-8",
+    )
     return str(path)
 
 
@@ -45,6 +52,7 @@ __all__ = [
     "FILENAME_INGRESS_RAW",
     "FILENAME_L1_PLAN",
     "FILENAME_L1_PLANNING_CAPSULE",
+    "FILENAME_L1_REASONING_BASELINE",
     "FILENAME_PLAN_EXECUTION_RECEIPT",
     "FILENAME_PLAN_REPLAN_DECISION",
     "FILENAME_MOCK_ELIMINATION_PROOF",
