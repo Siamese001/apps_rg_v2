@@ -142,6 +142,16 @@ def test_v2_is_byte_stable_span_bound_and_keeps_raw_jd_out_of_the_capsule() -> N
     serialized = json.dumps(first, sort_keys=True)
     assert "Bachelor's degree in Computer Science" not in serialized
     verify_apps_rg_l1_planning_capsule_v2(first)
+    merge_edges = [
+        edge
+        for edge in first["work_dag"]["edges"]
+        if edge["relation"] == "MERGE_AFTER"
+    ]
+    assert {"node_id": "merge:final_resume", "node_type": "MERGE"} in first[
+        "work_dag"
+    ]["nodes"]
+    assert len(merge_edges) == len(first["work_unit_ids"])
+    assert {edge["to"] for edge in merge_edges} == {"merge:final_resume"}
 
 
 def test_v2_escalates_critical_compound_and_unknown_requirements() -> None:
@@ -190,7 +200,7 @@ def test_v2_detects_duplicate_requirements_without_silently_deduplicating() -> N
     verify_apps_rg_l1_planning_capsule_v2(capsule)
 
 
-def test_v2_validator_rejects_cyclic_and_orphaned_work_graphs() -> None:
+def test_v2_validator_rejects_invalid_and_orphaned_work_graphs() -> None:
     cyclic = _thaw(_v2())
     mapped_target = next(
         requirement["target_unit_ids"][0]
@@ -205,7 +215,7 @@ def test_v2_validator_rejects_cyclic_and_orphaned_work_graphs() -> None:
         }
     )
     _refresh_capsule(cyclic)
-    with pytest.raises(L1PlanningV2IntegrityError, match="acyclic"):
+    with pytest.raises(L1PlanningV2IntegrityError, match="edge is invalid"):
         verify_apps_rg_l1_planning_capsule_v2(cyclic)
 
     orphaned = _thaw(_v2())
@@ -215,6 +225,20 @@ def test_v2_validator_rejects_cyclic_and_orphaned_work_graphs() -> None:
     _refresh_capsule(orphaned)
     with pytest.raises(L1PlanningV2IntegrityError, match="orphaned"):
         verify_apps_rg_l1_planning_capsule_v2(orphaned)
+
+
+def test_v2_validator_rejects_rewired_merge_after_edge() -> None:
+    rewired = _thaw(_v2())
+    merge_edge = next(
+        edge
+        for edge in rewired["work_dag"]["edges"]
+        if edge["relation"] == "MERGE_AFTER"
+    )
+    merge_edge["from"] = "u0:validated_resume"
+    _refresh_capsule(rewired)
+
+    with pytest.raises(L1PlanningV2IntegrityError, match="edge is invalid"):
+        verify_apps_rg_l1_planning_capsule_v2(rewired)
 
 
 def test_v2_is_parallel_to_v1_and_l0_signs_only_advisory_identifiers(

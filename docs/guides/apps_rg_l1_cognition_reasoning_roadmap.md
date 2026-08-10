@@ -1,8 +1,8 @@
 # L1 Cognition and Reasoning Roadmap
 
-Status: Waves 0-3 implemented and verified; Waves 4-6 remain proposed.
+Status: Waves 0-4 implemented and verified; Waves 5-6 remain proposed.
 
-Branch baseline: local `main` at `42f5c3d11519a23a9e4c1717d8be79d1ce1576e8`
+Branch baseline: local `main` at `1687a1deb956561cf049f8bc1f620c09dc3add15`
 
 ## Decision
 
@@ -290,17 +290,37 @@ Exit criteria:
 
 Owner: apps_rg orchestration owner.
 
-1. Pass the verified advisory v2 DAG to L3 as a scheduling input. L3 validates
-   graph acyclicity and current receipts, chooses execution order under its own
-   policy, and emits the actual order/parallelism receipt.
-2. Require `REQUIRES_EVIDENCE` and `REQUIRES_VALIDATION` predecessors before a
-   dependent unit is eligible. Keep L1 unable to start work or select routes.
-3. Enforce `MERGE_AFTER` checks before cross-section merge and require relevant
-   obligation/control receipts at the merge seam.
+Implementation: the v2 DAG now adds `merge:final_resume` and one
+`MERGE_AFTER` edge from every unit validation node for multi-unit work. The
+app-local `governed_l3_schedule.py` validates the v2 graph, the C0
+evidence-obligation sidecar, and (when present) the W1 reconciliation with its
+W3 control receipts. `l3_schedule_apps_rg()` exposes that L3-owned scheduling
+seam without modifying the generic runtime contract.
 
-Exit criteria: the L3 receipt can explain each attempted/skipped unit from the
-verified L1 graph plus current downstream state; no scheduling authority has
-moved into L1.
+Primary files:
+
+- `src/apps_rg/runtime/bindings/l1_planning_capsule_v2.py`
+- `src/apps_rg/runtime/bindings/l3_binding.py`
+- `src/apps_rg/runtime/contracts/governed_l3_schedule.py`
+- `tests/unit/apps_rg/runtime/contracts/test_governed_l3_schedule.py`
+
+1. L3 uses its fixed `TOPOLOGICAL_LEXICAL_SERIAL` policy and records every
+   selected node in its own one-item parallel batch. L1 contributes the DAG and
+   no order, parallelism setting, retry, route, or execution decision.
+2. A valid C0 obligation receipt is required before a work unit is selected.
+   Before W1 exists, validation and merge nodes remain deferred. W1-completed
+   units require a W3 quality-eligible control receipt before their validation
+   predecessor is satisfied.
+3. The merge node is selected only after every `MERGE_AFTER` validation node is
+   satisfied. A skipped or blocked predecessor blocks the merge; no output file
+   or L1 declaration can bypass the C0/W3 receipt checks.
+4. The receipt is digest-bound, run/request/trace-bound, uses relative receipt
+   references, and asserts that it neither dispatches work nor changes evidence,
+   prompt, route, Exit, human-review, or release authority.
+
+Exit criteria: the L3 receipt explains every selected, deferred, blocked, or
+skipped node from the verified L1 graph and current C0/W1/W3 receipts; no
+scheduling authority has moved into L1.
 
 ### Wave 5 — Make replan feedback diagnostic and bounded
 

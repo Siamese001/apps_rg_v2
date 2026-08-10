@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+from collections.abc import Mapping
 from datetime import datetime, timezone
 from typing import Any, Optional
 
@@ -20,6 +21,9 @@ from apps_rg.runtime.spine_contracts import (
     L3StepContractRef,
 )
 from apps_rg.runtime.spine_contracts import RouteContract
+from apps_rg.runtime.contracts.governed_l3_schedule import (
+    build_governed_l3_schedule_receipt,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -162,6 +166,29 @@ def _build_step_contract(
     )
 
 
+def l3_schedule_apps_rg(
+    *,
+    l1_v2_capsule: Mapping[str, Any],
+    c0_obligation_receipt: Mapping[str, Any],
+    c0_obligation_receipt_ref: str,
+    plan_execution_reconciliation: Mapping[str, Any] | None = None,
+    plan_execution_reconciliation_ref: str = "",
+) -> dict[str, Any]:
+    """Select app work only from a verified v2 DAG and current receipts.
+
+    The returned receipt is the app-owned L3 scheduling input/output seam. It
+    does not execute the selected node and does not amend the core L3 contract.
+    """
+
+    return build_governed_l3_schedule_receipt(
+        l1_v2_capsule=l1_v2_capsule,
+        c0_obligation_receipt=c0_obligation_receipt,
+        c0_obligation_receipt_ref=c0_obligation_receipt_ref,
+        plan_execution_reconciliation=plan_execution_reconciliation,
+        plan_execution_reconciliation_ref=plan_execution_reconciliation_ref,
+    )
+
+
 def l3_orchestrate_apps_rg(
     route: RouteContract,
     fec: FinalEvidenceContract,
@@ -257,4 +284,5 @@ __all__ = [
     "APPS_RG_DAG_ID",
     "APPS_RG_NODE_ID",
     "l3_orchestrate_apps_rg",
+    "l3_schedule_apps_rg",
 ]
