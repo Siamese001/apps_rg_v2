@@ -314,6 +314,16 @@ def flush_otel_runtime(timeout_millis: int = 10_000) -> bool:
     return bool(_provider.force_flush(timeout_millis=timeout_millis))
 
 
+# Compatibility names retained for existing integrations.  Both delegate to the
+# verified runtime path; neither recreates the historical implicit/no-op state.
+def configure_live_otel(*, service_name: str) -> OTelRuntimeStatus:
+    return configure_otel_runtime(service_name=service_name)
+
+
+def flush_live_otel() -> bool:
+    return flush_otel_runtime()
+
+
 def _walk(value: Any) -> list[Mapping[str, Any]]:
     if isinstance(value, Mapping):
         rows = [value]
@@ -628,9 +638,11 @@ __all__ = [
     "OTelEnvironment",
     "OTelRuntimeStatus",
     "capture_collector_snapshot",
+    "configure_live_otel",
     "configure_otel_runtime",
     "current_otel_runtime_status",
     "flush_otel_runtime",
+    "flush_live_otel",
     "get_verified_tracer",
     "initialize_collector_checkpoint",
     "resolve_otel_environment",

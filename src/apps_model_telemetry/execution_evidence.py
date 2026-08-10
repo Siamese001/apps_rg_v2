@@ -133,6 +133,16 @@ class ProviderAttempt:
             self.local_dispatch_started = True
             self._event(LOCAL_DISPATCH_STARTED)
 
+    def mark_request_written(self) -> None:
+        """Compatibility witness for older SDK integrations.
+
+        This records only local dispatch, not socket-byte proof.  New transports
+        must call :meth:`mark_request_bytes_sent` after a successful write.
+        """
+
+        self.local_dispatch_started = True
+        self._event("REQUEST_WRITTEN")
+
     def mark_request_bytes_sent(self, *, byte_count: int, proof_source: str) -> None:
         """Record bytes only when a transport hook supplies explicit proof."""
 
@@ -342,8 +352,8 @@ def provider_attempt(
     provider: str,
     requested_model: str,
     request_digest: str,
-    logical_attempt: int,
-    transport_attempt: int,
+    logical_attempt: int = 1,
+    transport_attempt: int = 1,
 ) -> Iterator[ProviderAttempt]:
     attempt = ProviderAttempt(
         artifact_dir=artifact_dir,
