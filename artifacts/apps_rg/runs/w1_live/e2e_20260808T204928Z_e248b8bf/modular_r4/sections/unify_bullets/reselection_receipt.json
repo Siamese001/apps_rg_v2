@@ -1,0 +1,46 @@
+{
+  "receipt_version": 1,
+  "section_id": "unify_bullets",
+  "run_id": "unify_bullets_20260808_205302",
+  "fired": false,
+  "outcome": "no_compliant_alternate",
+  "kill_switch": {
+    "env": "APPS_RG_BULLET_RESELECTION_DISABLE",
+    "disabled": false
+  },
+  "trigger": {
+    "x2_all_pass_pre": true,
+    "trigger_arm": "decisive",
+    "rows": [
+      {
+        "judge_id": "x1d_gemini_pro_unify_bullets",
+        "provider_key": "gemini_pro",
+        "judge_role": null,
+        "score": 3.0,
+        "threshold": 4.0,
+        "normalized_score": 0.6,
+        "normalized_threshold": 0.8,
+        "decisive_failure": true
+      }
+    ]
+  },
+  "slot_resolution_method": "bullet_id_regex",
+  "slots": [],
+  "x2": {
+    "failed_before": [],
+    "failed_after": null
+  },
+  "rejudge": {
+    "provider_keys": [],
+    "dropped_non_required_keys": [],
+    "scores_before": {},
+    "scores_after": {},
+    "decisive_after": null,
+    "pass_after": null
+  },
+  "attempt": 1,
+  "max_attempts": 1,
+  "slots_without_alternate": [
+    "bul_unify_006"
+  ]
+}

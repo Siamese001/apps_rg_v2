@@ -6,7 +6,7 @@ import hashlib
 import os
 from typing import Any
 
-from agentic_core.runtime.contracts.final_evidence_contract import EvidenceItem
+from apps_rg.runtime.spine_contracts import EvidenceItem
 
 from apps_rg.runtime.c0.c02_hybrid_receipt_truth import (
     build_product_hybrid_truth_receipt,

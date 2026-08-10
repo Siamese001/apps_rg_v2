@@ -1,0 +1,469 @@
+{
+  "payload": {
+    "contents": [
+      {
+        "parts": [
+          {
+            "text": "You are grading a generated resume section candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write replacement section content.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (when provided), and candidate_output.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).\n\nSECTION: insurtech_bullets\n\nRUBRIC_REF: apps_rg/runtime/judges/role_episode_x1d.py#ROLE_EPISODE_RUBRIC\n\nYou are evaluating a proof-bound InsurTech or EY role episode lane: either exactly 3 bullets\nor exactly one narrative sentence. Return JSON only with: score_scale, score, threshold,\npass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n- threshold is 0.80 unless policy overrides it.\n\nRubric dimensions:\n1. factual_support: every material claim maps to claim_ledger and source_fact_ids from the allowed proof pool.\n2. claim_ledger_grounding: claim_ledger rows have non-empty claim_text and cite only role_episode_bundle_id graph evidence.\n3. jd_briefing_targeting_discipline: JD and briefing are targeting only; never JD-as-proof or briefing-as-proof.\n4. role_fit_targeting: targeting may shape emphasis without becoming proof of experience.\n\nRole-lane product shape:\n- Bullet lanes: exactly 3 bullets, one high-impact thought per bullet, no embedded newline.\n- Narrative lanes: exactly one sentence, no more than 58 words and 360 characters.\n- Source namespaces: InsurTech uses bul_insurtech_* source_fact_ids with reb_insurtech_* graph bundle ids;\n  EY uses bul_ey_* source_fact_ids with reb_ey_* graph bundle ids.\n- No first-person voice and no em dash in display text.\n\nDecisive failure triggers:\n- unsupported claim, missing source_fact_ids, or claim_ledger omission\n- JD, briefing, or target company used as proof of experience\n- wrong source namespace, cross-employer leakage, mixed InsurTech/EY graph evidence, or missing bul_insurtech_*/bul_ey_* source_fact_ids\n- keyword stuffing, copied JD phrases, or ATS laundry-list phrasing\n- wrong output shape: not 3 bullets for bullet lanes or not exactly one sentence for narrative lanes\n\nReturn ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[]}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.\n\nCANDIDATE_OUTPUT:\n{\n  \"run_id\": \"insurtech_bullets_1c89b120bf6b\",\n  \"section_id\": \"insurtech_bullets\",\n  \"runtime_generation_status\": \"REAL_LLM\",\n  \"product_quality_status\": \"PASS\",\n  \"insurtech_header\": {\n    \"employer\": \"InsurTech Cloud Solutions\",\n    \"title\": \"Chief Technology Officer\",\n    \"location\": \"New York, NY\",\n    \"start_date\": \"2014-04\",\n    \"end_date\": \"2017-03\",\n    \"is_current\": false,\n    \"fact_id\": \"exp_insurtech_001\"\n  },\n  \"bullets\": [\n    {\n      \"bullet_id\": \"bul_insurtech_001\",\n      \"bullet_text\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n      \"source_fact_ids\": [\n        \"bul_insurtech_001\"\n      ]\n    },\n    {\n      \"bullet_id\": \"bul_insurtech_002\",\n      \"bullet_text\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n      \"source_fact_ids\": [\n        \"bul_insurtech_002\"\n      ]\n    },\n    {\n      \"bullet_id\": \"bul_insurtech_003\",\n      \"bullet_text\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n      \"source_fact_ids\": [\n        \"bul_insurtech_003\"\n      ]\n    }\n  ],\n  \"selected_fact_plan\": {\n    \"section_id\": \"insurtech_bullets\",\n    \"selection_method\": \"selected_graph_evidence_plan_insurtech_bullets\",\n    \"source_authority_contract\": {\n      \"schema_version\": \"c03_source_authority_contract_v1\",\n      \"authority_source\": \"augmented_skills_graph\",\n      \"graph_ref\": \"apps_rg/fact_inventory/master_skills_arsenal_ledger.json\",\n      \"graph_digest\": \"47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500\",\n      \"graph_version\": \"master_skills_arsenal_graph_v1\",\n      \"authority_evaluated_before_targeting\": true,\n      \"targeting_inputs_are_non_authority\": true,\n      \"missing_authority_fails_closed\": true\n    },\n    \"pretarget_authority_receipt\": {\n      \"schema_version\": \"c03_pretarget_authority_receipt_v1\",\n      \"section_id\": \"insurtech_bullets\",\n      \"candidate_count\": 337,\n      \"authority_pass_count\": 85,\n      \"authority_block_count\": 252,\n      \"targeting_consulted_count\": 0,\n      \"authority_before_targeting_pass\": true,\n      \"authority_decisions_digest\": \"1556b420fcd4a9999787b5914dd0191c53c7ec9efcaac74622cdac6a3c45cb62\"\n    },\n    \"target_role_profile\": \"ai_partnerships_gtm\",\n    \"role_family_key\": \"ai_partnerships_gtm\",\n    \"selected_employer_roots\": {\n      \"insurtech\": [\n        \"reb_insurtech_aws_guidewire_core_modernization\",\n        \"reb_insurtech_aws_shared_responsibility_operating_model\",\n        \"reb_insurtech_public_vs_private_cloud_strategy\",\n        \"reb_insurtech_resilient_core_operations\",\n        \"reb_insurtech_regulated_aws_control_implementation\",\n        \"reb_insurtech_aws_cloud_economics\",\n        \"reb_insurtech_founder_led_market_creation\",\n        \"reb_insurtech_aws_migration_execution\",\n        \"reb_insurtech_lean_delivery_operating_model\",\n        \"reb_insurtech_insurance_data_bi_decisioning\"\n      ]\n    },\n    \"selected_nodes\": [\n      \"reb_insurtech_aws_migration_execution\",\n      \"reb_insurtech_aws_shared_responsibility_operating_model\",\n      \"reb_insurtech_regulated_aws_control_implementation\"\n    ],\n    \"selected_edges\": [\n      {\n        \"edge_id\": \"edge:a55a960b62eeb651f1ce28d0\",\n        \"source\": \"reb_insurtech_aws_migration_execution\",\n        \"target\": \"\",\n        \"edge_type\": \"allocation_bound_graph_edge\"\n      },\n      {\n        \"edge_id\": \"edge:e2f49cbe9e8a87c6d0f11e49\",\n        \"source\": \"reb_insurtech_aws_migration_execution\",\n        \"target\": \"\",\n        \"edge_type\": \"allocation_bound_graph_edge\"\n      },\n      {\n        \"edge_id\": \"edge:fe89befe7d6b429da1b44a80\",\n        \"source\": \"reb_insurtech_aws_shared_responsibility_operating_model\",\n        \"target\": \"\",\n        \"edge_type\": \"allocation_bound_graph_edge\"\n      },\n      {\n        \"edge_id\": \"edge:45388558e19661d29fd53465\",\n        \"source\": \"reb_insurtech_aws_shared_responsibility_operating_model\",\n        \"target\": \"\",\n        \"edge_type\": \"allocation_bound_graph_edge\"\n      },\n      {\n        \"edge_id\": \"edge:94dbe456bbe63921ae8cb2de\",\n        \"source\": \"reb_insurtech_regulated_aws_control_implementation\",\n        \"target\": \"\",\n        \"edge_type\": \"allocation_bound_graph_edge\"\n      },\n      {\n        \"edge_id\": \"edge:90e53a9a7e0d74b5a001534a\",\n        \"source\": \"reb_insurtech_regulated_aws_control_implementation\",\n        \"target\": \"\",\n        \"edge_type\": \"allocation_bound_graph_edge\"\n      }\n    ],\n    \"selected_skills\": [\n      {\n        \"skill_id\": \"skill_soc2_zero_trust_security\",\n        \"skill_label\": \"\",\n        \"source_refs\": [\n          \"fact_governance_005\",\n          \"Embedded zero-trust security and compliance (SOC2, GDPR, CCPA), enabling sales to Fortune 100 clients\",\n          \"Accelerated Regulatory Filings through LLM-based document parsing tailored for SaaS compliance (SOC 2, GDPR)\"\n        ],\n        \"role_episode_bundle_id\": \"reb_insurtech_regulated_aws_control_implementation\",\n        \"employer_lane\": \"insurtech\",\n        \"root_weight\": 0.35,\n        \"root_weight_band\": \"tertiary\",\n        \"proof_strength_raw\": 1.3,\n        \"target_alignment_score\": 1.3,\n        \"ranking_score\": 2.6,\n        \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_001\"\n      },\n      {\n        \"skill_id\": \"skill_regulated_cloud_adoption_guardrails\",\n        \"skill_label\": \"\",\n        \"source_refs\": [\n          \"bul_insurtech_002\",\n          \"InsurTech CTO 2014-2017 role episode skill: Regulated Cloud Adoption Guardrails.\"\n        ],\n        \"role_episode_bundle_id\": \"reb_insurtech_aws_shared_responsibility_operating_model\",\n        \"employer_lane\": \"insurtech\",\n        \"root_weight\": 0.35,\n        \"root_weight_band\": \"tertiary\",\n        \"proof_strength_raw\": 1.2,\n        \"target_alignment_score\": 2.2,\n        \"ranking_score\": 3.4,\n        \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_002\"\n      },\n      {\n        \"skill_id\": \"skill_p2_tech_aws_modernization_patterns\",\n        \"skill_label\": \"\",\n        \"source_refs\": [\n          \"fact_partnerships_gtm_002\",\n          \"AWS Partner: Advanced Migration and Modernization Sales Training\"\n        ],\n        \"role_episode_bundle_id\": \"reb_insurtech_aws_migration_execution\",\n        \"employer_lane\": \"insurtech\",\n        \"root_weight\": 0.35,\n        \"root_weight_band\": \"tertiary\",\n        \"proof_strength_raw\": 1.2,\n        \"target_alignment_score\": 2.5,\n        \"ranking_score\": 3.7,\n        \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_003\"\n      }\n    ],\n    \"selected_skill_ids\": [\n      \"skill_soc2_zero_trust_security\",\n      \"skill_regulated_cloud_adoption_guardrails\",\n      \"skill_p2_tech_aws_modernization_patterns\"\n    ],\n    \"selected_metrics\": [],\n    \"selected_metrics_detail\": [],\n    \"selected_employer_lanes\": [\n      \"InsurTech Cloud Solutions\"\n    ],\n    \"selected_employer_lane_ids\": [\n      \"insurtech\"\n    ],\n    \"selected_headline_positioning_families\": [\n      \"svp_engineering_leadership\",\n      \"partner_applied_ai_architecture\",\n      \"platform_productization\",\n      \"enterprise_ai_architecture\"\n    ],\n    \"selected_competency_families\": [\n      \"partner_applied_ai_architecture\",\n      \"platform_productization\",\n      \"distributed_systems_engineering\",\n      \"engineering_leadership\",\n      \"cloud_hpc_modernization\",\n      \"data_governance_security\",\n      \"agentic_platforms\",\n      \"runtime_governance\"\n    ],\n    \"briefing_signal_packet\": {\n      \"schema\": \"briefing_signal_packet_v1\",\n      \"role_family_key\": \"ai_partnerships_gtm\",\n      \"section_count\": 1,\n      \"section_ids\": [\n        \"preamble\"\n      ],\n      \"theme_counts\": {\n        \"strategy\": 0,\n        \"operating_model\": 0,\n        \"commercial_motion\": 0,\n        \"partner_ecosystem\": 0,\n        \"adoption_motion\": 0,\n        \"leadership\": 0,\n        \"platform\": 0,\n        \"forward_looking\": 0,\n        \"urgency\": 0\n      },\n      \"dominant_themes\": [],\n      \"section_signals\": [\n        {\n          \"section_id\": \"preamble\",\n          \"themes\": [],\n          \"char_count\": 207\n        }\n      ],\n      \"signal_summary\": \"\"\n    },\n    \"allowed_graph_evidence_ids\": [\n      \"reb_insurtech_regulated_aws_control_implementation\",\n      \"skill_aws_iam_kms_cloudtrail_controls\",\n      \"skill_soc2_zero_trust_security\",\n      \"metric_insurtech_sensitive_data_controls_count\",\n      \"bul_insurtech_001\",\n      \"exp_insurtech_001\",\n      \"reb_insurtech_aws_shared_responsibility_operating_model\",\n      \"skill_regulated_cloud_adoption_guardrails\",\n      \"skill_cloud_control_ownership_mapping\",\n      \"metric_insurtech_safety_operating_model_artifacts_count\",\n      \"bul_insurtech_002\",\n      \"reb_insurtech_aws_migration_execution\",\n      \"skill_p2_tech_aws_modernization_patterns\",\n      \"skill_sr_insurtech_legacy_cloud_modernization\",\n      \"metric_insurtech_core_workloads_migrated_count\",\n      \"bul_insurtech_003\"\n    ],\n    \"selection_rationale\": \"Authority and source lineage were evaluated before any target-role, JD, or briefing score. Every bounded root, skill, metric, and source-fact path received a terminal decision after full sibling ranking; targeting only ordered authority-passing candidates.\",\n    \"facts\": [\n      {\n        \"fact_id\": \"bul_insurtech_001\",\n        \"candidate_fact_id\": \"exp_insurtech_001\",\n        \"claim_text\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n        \"role_episode_bundle_id\": \"reb_insurtech_regulated_aws_control_implementation\",\n        \"graph_evidence_type\": \"role_episode_bundle\",\n        \"employer\": \"InsurTech Cloud Solutions\",\n        \"employer_lane\": \"insurtech\",\n        \"employer_node_id\": \"employment_exp_insurtech_001\",\n        \"source_employment\": \"InsurTech Cloud Solutions\",\n        \"graph_skill_node_ids\": [\n          \"skill_soc2_zero_trust_security\"\n        ],\n        \"metric_outcome_ids\": [],\n        \"selected_metric_ids\": [],\n        \"allowed_graph_evidence_ids\": [\n          \"reb_insurtech_regulated_aws_control_implementation\",\n          \"skill_aws_iam_kms_cloudtrail_controls\",\n          \"skill_soc2_zero_trust_security\",\n          \"metric_insurtech_sensitive_data_controls_count\",\n          \"bul_insurtech_001\",\n          \"exp_insurtech_001\"\n        ],\n        \"linked_identity_fact_ids\": [\n          \"exp_insurtech_001\"\n        ],\n        \"linked_source_fact_ids\": [\n          \"exp_insurtech_001\"\n        ],\n        \"source_fact_ids\": [\n          \"bul_insurtech_001\"\n        ],\n        \"confidence\": \"DIRECT_FROM_RESUME_ARCHIVE\",\n        \"support_level\": \"allocation_authority_pass\",\n        \"verification_status\": \"allocation_authority_pass\",\n        \"metric_values\": [],\n        \"technologies\": [\n          \"skill_soc2_zero_trust_security\"\n        ],\n        \"domain\": \"Regulated AWS Control Implementation\",\n        \"has_metric\": false,\n        \"metric_raw\": \"\",\n        \"allocation_claim_unit_ids\": [\n          \"insurtech_bullets:bul_insurtech_001\"\n        ],\n        \"allocation_plan_digest\": \"e146b193b9c3dde4eea8b90964ac58f2258f8a3fde83c934f9dfba192a9d3dd1\"\n      },\n      {\n        \"fact_id\": \"bul_insurtech_002\",\n        \"candidate_fact_id\": \"exp_insurtech_001\",\n        \"claim_text\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n        \"role_episode_bundle_id\": \"reb_insurtech_aws_shared_responsibility_operating_model\",\n        \"graph_evidence_type\": \"role_episode_bundle\",\n        \"employer\": \"InsurTech Cloud Solutions\",\n        \"employer_lane\": \"insurtech\",\n        \"employer_node_id\": \"employment_exp_insurtech_001\",\n        \"source_employment\": \"InsurTech Cloud Solutions\",\n        \"graph_skill_node_ids\": [\n          \"skill_regulated_cloud_adoption_guardrails\"\n        ],\n        \"metric_outcome_ids\": [],\n        \"selected_metric_ids\": [],\n        \"allowed_graph_evidence_ids\": [\n          \"reb_insurtech_aws_shared_responsibility_operating_model\",\n          \"skill_regulated_cloud_adoption_guardrails\",\n          \"skill_cloud_control_ownership_mapping\",\n          \"metric_insurtech_safety_operating_model_artifacts_count\",\n          \"bul_insurtech_002\",\n          \"exp_insurtech_001\"\n        ],\n        \"linked_identity_fact_ids\": [\n          \"exp_insurtech_001\"\n        ],\n        \"linked_source_fact_ids\": [\n          \"exp_insurtech_001\"\n        ],\n        \"source_fact_ids\": [\n          \"bul_insurtech_002\"\n        ],\n        \"confidence\": \"DERIVED_SUPPORTED\",\n        \"support_level\": \"allocation_authority_pass\",\n        \"verification_status\": \"allocation_authority_pass\",\n        \"metric_values\": [],\n        \"technologies\": [\n          \"skill_regulated_cloud_adoption_guardrails\"\n        ],\n        \"domain\": \"AWS Shared-Responsibility Safety Operating Model\",\n        \"has_metric\": false,\n        \"metric_raw\": \"\",\n        \"allocation_claim_unit_ids\": [\n          \"insurtech_bullets:bul_insurtech_002\"\n        ],\n        \"allocation_plan_digest\": \"e146b193b9c3dde4eea8b90964ac58f2258f8a3fde83c934f9dfba192a9d3dd1\"\n      },\n      {\n        \"fact_id\": \"bul_insurtech_003\",\n        \"candidate_fact_id\": \"exp_insurtech_001\",\n        \"claim_text\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n        \"role_episode_bundle_id\": \"reb_insurtech_aws_migration_execution\",\n        \"graph_evidence_type\": \"role_episode_bundle\",\n        \"employer\": \"InsurTech Cloud Solutions\",\n        \"employer_lane\": \"insurtech\",\n        \"employer_node_id\": \"employment_exp_insurtech_001\",\n        \"source_employment\": \"InsurTech Cloud Solutions\",\n        \"graph_skill_node_ids\": [\n          \"skill_p2_tech_aws_modernization_patterns\"\n        ],\n        \"metric_outcome_ids\": [],\n        \"selected_metric_ids\": [],\n        \"allowed_graph_evidence_ids\": [\n          \"reb_insurtech_aws_migration_execution\",\n          \"skill_p2_tech_aws_modernization_patterns\",\n          \"skill_sr_insurtech_legacy_cloud_modernization\",\n          \"metric_insurtech_core_workloads_migrated_count\",\n          \"bul_insurtech_003\",\n          \"exp_insurtech_001\"\n        ],\n        \"linked_identity_fact_ids\": [\n          \"exp_insurtech_001\"\n        ],\n        \"linked_source_fact_ids\": [\n          \"exp_insurtech_001\"\n        ],\n        \"source_fact_ids\": [\n          \"bul_insurtech_003\"\n        ],\n        \"confidence\": \"DIRECT_FROM_RESUME_ARCHIVE\",\n        \"support_level\": \"allocation_authority_pass\",\n        \"verification_status\": \"allocation_authority_pass\",\n        \"metric_values\": [],\n        \"technologies\": [\n          \"skill_p2_tech_aws_modernization_patterns\"\n        ],\n        \"domain\": \"AWS Migration Execution for Legacy Insurance Platforms\",\n        \"has_metric\": false,\n        \"metric_raw\": \"\",\n        \"allocation_claim_unit_ids\": [\n          \"insurtech_bullets:bul_insurtech_003\"\n        ],\n        \"allocation_plan_digest\": \"e146b193b9c3dde4eea8b90964ac58f2258f8a3fde83c934f9dfba192a9d3dd1\"\n      }\n    ],\n    \"required_fact_ids\": [\n      \"bul_insurtech_001\",\n      \"reb_insurtech_regulated_aws_control_implementation\",\n      \"skill_aws_iam_kms_cloudtrail_controls\",\n      \"skill_soc2_zero_trust_security\",\n      \"metric_insurtech_sensitive_data_controls_count\",\n      \"exp_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"reb_insurtech_aws_shared_responsibility_operating_model\",\n      \"skill_regulated_cloud_adoption_guardrails\",\n      \"skill_cloud_control_ownership_mapping\",\n      \"metric_insurtech_safety_operating_model_artifacts_count\",\n      \"bul_insurtech_003\",\n      \"reb_insurtech_aws_migration_execution\",\n      \"skill_p2_tech_aws_modernization_patterns\",\n      \"skill_sr_insurtech_legacy_cloud_modernization\",\n      \"metric_insurtech_core_workloads_migrated_count\"\n    ],\n    \"graph_candidate_receipt\": {\n      \"schema_version\": \"graph_candidate_receipt_v1\",\n      \"section_id\": \"insurtech_bullets\",\n      \"candidate_decision_count\": 337,\n      \"selected_candidate_count\": 48,\n      \"rejected_candidate_count\": 289,\n      \"unexplained_candidate_count\": 0,\n      \"duplicate_candidate_path_ids\": [],\n      \"candidate_conservation_pass\": true,\n      \"decision_ledger_digest\": \"4708c8d2a49d17cff41a4742001a82d72d5cb8e27e3b36d8b1cfac833cd87e3b\",\n      \"plan_id\": \"insurtech_bullets:126d881a5952830f\",\n      \"plan_digest\": \"126d881a5952830f2f8ab5b37a24ad6be0e2d99bcd7c7b1895b87ad68044d2de\"\n    },\n    \"graph_evidence_depth_status\": \"judge_grade\",\n    \"graph_evidence_semantic_coverage_pct\": 1.0,\n    \"schema_version\": \"c03_canonical_section_graph_plan_v1\",\n    \"allocation_scope\": \"WHOLE_RESUME\",\n    \"allocation_plan_id\": \"resume_graph_allocation:e146b193b9c3dde4eea8\",\n    \"allocation_plan_digest\": \"e146b193b9c3dde4eea8b90964ac58f2258f8a3fde83c934f9dfba192a9d3dd1\",\n    \"allocation_assignments\": [\n      {\n        \"candidate_id\": \"alloc-cand:7116b634514c1209b88e217e\",\n        \"section_id\": \"insurtech_bullets\",\n        \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_001\",\n        \"skill_id\": \"skill_soc2_zero_trust_security\",\n        \"skill_label\": \"\",\n        \"fact_id\": \"exp_insurtech_001\",\n        \"metric_outcome_id\": \"\",\n        \"metric_text\": \"\",\n        \"metric_value\": \"\",\n        \"metric_unit\": \"\",\n        \"normalized_metric_signature\": \"\",\n        \"root_id\": \"reb_insurtech_regulated_aws_control_implementation\",\n        \"employer_lane\": \"insurtech\",\n        \"source_family\": \"insurtech\",\n        \"proof_strength_raw\": 1.3,\n        \"target_alignment_score\": 2.5,\n        \"claim_entailment_score\": 1.0,\n        \"metric_binding_score\": 0.0,\n        \"path_confidence_raw\": 1.0,\n        \"source_independence_score\": 1.0,\n        \"selection_margin\": 0.1,\n        \"selection_margin_available\": true,\n        \"selection_margin_basis\": \"proof_strength_raw\",\n        \"best_eligible_rejected_candidate_id\": \"alloc-cand:b161ed1c427ab17815dfa0b0\",\n        \"graph_path_ids\": [\n          \"root:reb_insurtech_regulated_aws_control_implementation\",\n          \"root:reb_insurtech_regulated_aws_control_implementation/skill:skill_soc2_zero_trust_security\",\n          \"root:reb_insurtech_regulated_aws_control_implementation/fact:exp_insurtech_001\"\n        ],\n        \"edge_ids\": [\n          \"edge:94dbe456bbe63921ae8cb2de\",\n          \"edge:90e53a9a7e0d74b5a001534a\"\n        ],\n        \"citation_refs\": [\n          \"exp_insurtech_001\"\n        ],\n        \"root_bundle_theme\": \"Regulated AWS Control Implementation\",\n        \"root_claim_text\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n        \"root_claim_action\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n        \"root_claim_scope\": \"2014-2017 InsurTech CTO role episode for AWS modernization of regulated insurance workloads.\",\n        \"root_claim_outcome\": \"Use only role_episode_bundle_id-bound evidence; metric_outcome_nodes are the approved metric surface.\",\n        \"metric_required\": false,\n        \"metric_outcome_required\": false,\n        \"counts_toward_global_uniqueness\": true\n      },\n      {\n        \"candidate_id\": \"alloc-cand:a293255d83994e261ce13b0d\",\n        \"section_id\": \"insurtech_bullets\",\n        \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_002\",\n        \"skill_id\": \"skill_regulated_cloud_adoption_guardrails\",\n        \"skill_label\": \"\",\n        \"fact_id\": \"exp_insurtech_001\",\n        \"metric_outcome_id\": \"\",\n        \"metric_text\": \"\",\n        \"metric_value\": \"\",\n        \"metric_unit\": \"\",\n        \"normalized_metric_signature\": \"\",\n        \"root_id\": \"reb_insurtech_aws_shared_responsibility_operating_model\",\n        \"employer_lane\": \"insurtech\",\n        \"source_family\": \"insurtech\",\n        \"proof_strength_raw\": 1.2,\n        \"target_alignment_score\": 3.0,\n        \"claim_entailment_score\": 1.0,\n        \"metric_binding_score\": 0.0,\n        \"path_confidence_raw\": 1.0,\n        \"source_independence_score\": 0.75,\n        \"selection_margin\": -0.1,\n        \"selection_margin_available\": true,\n        \"selection_margin_basis\": \"proof_strength_raw\",\n        \"best_eligible_rejected_candidate_id\": \"alloc-cand:0a18cd07773a966481c221bd\",\n        \"graph_path_ids\": [\n          \"root:reb_insurtech_aws_shared_responsibility_operating_model\",\n          \"root:reb_insurtech_aws_shared_responsibility_operating_model/skill:skill_regulated_cloud_adoption_guardrails\",\n          \"root:reb_insurtech_aws_shared_responsibility_operating_model/fact:exp_insurtech_001\"\n        ],\n        \"edge_ids\": [\n          \"edge:fe89befe7d6b429da1b44a80\",\n          \"edge:45388558e19661d29fd53465\"\n        ],\n        \"citation_refs\": [\n          \"exp_insurtech_001\"\n        ],\n        \"root_bundle_theme\": \"AWS Shared-Responsibility Safety Operating Model\",\n        \"root_claim_text\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n        \"root_claim_action\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n        \"root_claim_scope\": \"2014-2017 InsurTech CTO role episode for AWS modernization of regulated insurance workloads.\",\n        \"root_claim_outcome\": \"Use only role_episode_bundle_id-bound evidence; metric_outcome_nodes are the approved metric surface.\",\n        \"metric_required\": false,\n        \"metric_outcome_required\": false,\n        \"counts_toward_global_uniqueness\": true\n      },\n      {\n        \"candidate_id\": \"alloc-cand:3cc17475f57fcd5a6c3cf9bd\",\n        \"section_id\": \"insurtech_bullets\",\n        \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_003\",\n        \"skill_id\": \"skill_p2_tech_aws_modernization_patterns\",\n        \"skill_label\": \"\",\n        \"fact_id\": \"exp_insurtech_001\",\n        \"metric_outcome_id\": \"\",\n        \"metric_text\": \"\",\n        \"metric_value\": \"\",\n        \"metric_unit\": \"\",\n        \"normalized_metric_signature\": \"\",\n        \"root_id\": \"reb_insurtech_aws_migration_execution\",\n        \"employer_lane\": \"insurtech\",\n        \"source_family\": \"insurtech\",\n        \"proof_strength_raw\": 1.2,\n        \"target_alignment_score\": 2.6,\n        \"claim_entailment_score\": 1.0,\n        \"metric_binding_score\": 0.0,\n        \"path_confidence_raw\": 1.0,\n        \"source_independence_score\": 0.75,\n        \"selection_margin\": -0.1,\n        \"selection_margin_available\": true,\n        \"selection_margin_basis\": \"proof_strength_raw\",\n        \"best_eligible_rejected_candidate_id\": \"alloc-cand:5f034dd28d508cd734da3038\",\n        \"graph_path_ids\": [\n          \"root:reb_insurtech_aws_migration_execution\",\n          \"root:reb_insurtech_aws_migration_execution/skill:skill_p2_tech_aws_modernization_patterns\",\n          \"root:reb_insurtech_aws_migration_execution/fact:exp_insurtech_001\"\n        ],\n        \"edge_ids\": [\n          \"edge:a55a960b62eeb651f1ce28d0\",\n          \"edge:e2f49cbe9e8a87c6d0f11e49\"\n        ],\n        \"citation_refs\": [\n          \"exp_insurtech_001\"\n        ],\n        \"root_bundle_theme\": \"AWS Migration Execution for Legacy Insurance Platforms\",\n        \"root_claim_text\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n        \"root_claim_action\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n        \"root_claim_scope\": \"2014-2017 InsurTech CTO role episode for AWS modernization of regulated insurance workloads.\",\n        \"root_claim_outcome\": \"Use only role_episode_bundle_id-bound evidence; metric_outcome_nodes are the approved metric surface.\",\n        \"metric_required\": false,\n        \"metric_outcome_required\": false,\n        \"counts_toward_global_uniqueness\": true\n      }\n    ],\n    \"final_graph_evidence_contract\": {\n      \"schema_version\": \"section_final_graph_evidence_contract_v1\",\n      \"section_id\": \"insurtech_bullets\",\n      \"allocation_scope\": \"WHOLE_RESUME\",\n      \"allocation_plan_digest\": \"e146b193b9c3dde4eea8b90964ac58f2258f8a3fde83c934f9dfba192a9d3dd1\",\n      \"source_section_plan_id\": \"insurtech_bullets:e4fea78478b5f60d\",\n      \"source_section_plan_digest\": \"e4fea78478b5f60d63b8b3564f10acd036471dbdffd87b0fc84516bb322b4c27\",\n      \"graph_digest\": \"47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500\",\n      \"assignments\": [\n        {\n          \"candidate_id\": \"alloc-cand:7116b634514c1209b88e217e\",\n          \"section_id\": \"insurtech_bullets\",\n          \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_001\",\n          \"skill_id\": \"skill_soc2_zero_trust_security\",\n          \"skill_label\": \"\",\n          \"fact_id\": \"exp_insurtech_001\",\n          \"metric_outcome_id\": \"\",\n          \"metric_text\": \"\",\n          \"metric_value\": \"\",\n          \"metric_unit\": \"\",\n          \"normalized_metric_signature\": \"\",\n          \"root_id\": \"reb_insurtech_regulated_aws_control_implementation\",\n          \"employer_lane\": \"insurtech\",\n          \"source_family\": \"insurtech\",\n          \"proof_strength_raw\": 1.3,\n          \"target_alignment_score\": 2.5,\n          \"claim_entailment_score\": 1.0,\n          \"metric_binding_score\": 0.0,\n          \"path_confidence_raw\": 1.0,\n          \"source_independence_score\": 1.0,\n          \"selection_margin\": 0.1,\n          \"selection_margin_available\": true,\n          \"selection_margin_basis\": \"proof_strength_raw\",\n          \"best_eligible_rejected_candidate_id\": \"alloc-cand:b161ed1c427ab17815dfa0b0\",\n          \"graph_path_ids\": [\n            \"root:reb_insurtech_regulated_aws_control_implementation\",\n            \"root:reb_insurtech_regulated_aws_control_implementation/skill:skill_soc2_zero_trust_security\",\n            \"root:reb_insurtech_regulated_aws_control_implementation/fact:exp_insurtech_001\"\n          ],\n          \"edge_ids\": [\n            \"edge:94dbe456bbe63921ae8cb2de\",\n            \"edge:90e53a9a7e0d74b5a001534a\"\n          ],\n          \"citation_refs\": [\n            \"exp_insurtech_001\"\n          ],\n          \"root_bundle_theme\": \"Regulated AWS Control Implementation\",\n          \"root_claim_text\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n          \"root_claim_action\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n          \"root_claim_scope\": \"2014-2017 InsurTech CTO role episode for AWS modernization of regulated insurance workloads.\",\n          \"root_claim_outcome\": \"Use only role_episode_bundle_id-bound evidence; metric_outcome_nodes are the approved metric surface.\",\n          \"metric_required\": false,\n          \"metric_outcome_required\": false,\n          \"counts_toward_global_uniqueness\": true\n        },\n        {\n          \"candidate_id\": \"alloc-cand:a293255d83994e261ce13b0d\",\n          \"section_id\": \"insurtech_bullets\",\n          \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_002\",\n          \"skill_id\": \"skill_regulated_cloud_adoption_guardrails\",\n          \"skill_label\": \"\",\n          \"fact_id\": \"exp_insurtech_001\",\n          \"metric_outcome_id\": \"\",\n          \"metric_text\": \"\",\n          \"metric_value\": \"\",\n          \"metric_unit\": \"\",\n          \"normalized_metric_signature\": \"\",\n          \"root_id\": \"reb_insurtech_aws_shared_responsibility_operating_model\",\n          \"employer_lane\": \"insurtech\",\n          \"source_family\": \"insurtech\",\n          \"proof_strength_raw\": 1.2,\n          \"target_alignment_score\": 3.0,\n          \"claim_entailment_score\": 1.0,\n          \"metric_binding_score\": 0.0,\n          \"path_confidence_raw\": 1.0,\n          \"source_independence_score\": 0.75,\n          \"selection_margin\": -0.1,\n          \"selection_margin_available\": true,\n          \"selection_margin_basis\": \"proof_strength_raw\",\n          \"best_eligible_rejected_candidate_id\": \"alloc-cand:0a18cd07773a966481c221bd\",\n          \"graph_path_ids\": [\n            \"root:reb_insurtech_aws_shared_responsibility_operating_model\",\n            \"root:reb_insurtech_aws_shared_responsibility_operating_model/skill:skill_regulated_cloud_adoption_guardrails\",\n            \"root:reb_insurtech_aws_shared_responsibility_operating_model/fact:exp_insurtech_001\"\n          ],\n          \"edge_ids\": [\n            \"edge:fe89befe7d6b429da1b44a80\",\n            \"edge:45388558e19661d29fd53465\"\n          ],\n          \"citation_refs\": [\n            \"exp_insurtech_001\"\n          ],\n          \"root_bundle_theme\": \"AWS Shared-Responsibility Safety Operating Model\",\n          \"root_claim_text\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n          \"root_claim_action\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n          \"root_claim_scope\": \"2014-2017 InsurTech CTO role episode for AWS modernization of regulated insurance workloads.\",\n          \"root_claim_outcome\": \"Use only role_episode_bundle_id-bound evidence; metric_outcome_nodes are the approved metric surface.\",\n          \"metric_required\": false,\n          \"metric_outcome_required\": false,\n          \"counts_toward_global_uniqueness\": true\n        },\n        {\n          \"candidate_id\": \"alloc-cand:3cc17475f57fcd5a6c3cf9bd\",\n          \"section_id\": \"insurtech_bullets\",\n          \"claim_unit_id\": \"insurtech_bullets:bul_insurtech_003\",\n          \"skill_id\": \"skill_p2_tech_aws_modernization_patterns\",\n          \"skill_label\": \"\",\n          \"fact_id\": \"exp_insurtech_001\",\n          \"metric_outcome_id\": \"\",\n          \"metric_text\": \"\",\n          \"metric_value\": \"\",\n          \"metric_unit\": \"\",\n          \"normalized_metric_signature\": \"\",\n          \"root_id\": \"reb_insurtech_aws_migration_execution\",\n          \"employer_lane\": \"insurtech\",\n          \"source_family\": \"insurtech\",\n          \"proof_strength_raw\": 1.2,\n          \"target_alignment_score\": 2.6,\n          \"claim_entailment_score\": 1.0,\n          \"metric_binding_score\": 0.0,\n          \"path_confidence_raw\": 1.0,\n          \"source_independence_score\": 0.75,\n          \"selection_margin\": -0.1,\n          \"selection_margin_available\": true,\n          \"selection_margin_basis\": \"proof_strength_raw\",\n          \"best_eligible_rejected_candidate_id\": \"alloc-cand:5f034dd28d508cd734da3038\",\n          \"graph_path_ids\": [\n            \"root:reb_insurtech_aws_migration_execution\",\n            \"root:reb_insurtech_aws_migration_execution/skill:skill_p2_tech_aws_modernization_patterns\",\n            \"root:reb_insurtech_aws_migration_execution/fact:exp_insurtech_001\"\n          ],\n          \"edge_ids\": [\n            \"edge:a55a960b62eeb651f1ce28d0\",\n            \"edge:e2f49cbe9e8a87c6d0f11e49\"\n          ],\n          \"citation_refs\": [\n            \"exp_insurtech_001\"\n          ],\n          \"root_bundle_theme\": \"AWS Migration Execution for Legacy Insurance Platforms\",\n          \"root_claim_text\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n          \"root_claim_action\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n          \"root_claim_scope\": \"2014-2017 InsurTech CTO role episode for AWS modernization of regulated insurance workloads.\",\n          \"root_claim_outcome\": \"Use only role_episode_bundle_id-bound evidence; metric_outcome_nodes are the approved metric surface.\",\n          \"metric_required\": false,\n          \"metric_outcome_required\": false,\n          \"counts_toward_global_uniqueness\": true\n        }\n      ],\n      \"assignment_count\": 3,\n      \"representation_mode\": \"CANONICAL_VISIBLE\",\n      \"derived_from_section_id\": \"\",\n      \"counts_toward_global_uniqueness\": true,\n      \"traversal_receipt_digest\": \"064190d533f440e5d00615fd76f29a86db659d49916bba316dff9f21ef430338\",\n      \"traversal_conservation_pass\": true,\n      \"pass\": true,\n      \"contract_digest\": \"b1931d8d0c974a3927a44d72472d392b0038ad8134c13c991ce5d89bffe14237\"\n    },\n    \"global_uniqueness_claimed\": true,\n    \"durable_graph_state_mutated\": false,\n    \"plan_digest\": \"126d881a5952830f2f8ab5b37a24ad6be0e2d99bcd7c7b1895b87ad68044d2de\",\n    \"plan_id\": \"insurtech_bullets:126d881a5952830f\",\n    \"judge_projection\": {\n      \"projection_version\": \"selected_fact_plan_judge_projection_v1\",\n      \"source_sha256\": \"8e2f2c70c7dbd273bde42cb9dfb3ada629800d0cd245fe16a166612def68f05d\",\n      \"omitted_non_authoritative_fields\": [\n        \"allocation_source_traversal_evidence\",\n        \"concentration_policy\",\n        \"employer_root_weights\",\n        \"excluded_due_to_metric_cap\",\n        \"excluded_due_to_root_cap\",\n        \"graph_candidate_decision_ledger\",\n        \"graph_evidence_depth_comparison_report\",\n        \"graph_evidence_depth_post_report\",\n        \"graph_evidence_depth_pre_report\",\n        \"graph_evidence_depth_report\",\n        \"graph_traversal_receipt\",\n        \"graph_weight_profile\",\n        \"metric_caps_by_root\",\n        \"root_weight_bands\",\n        \"skew_diagnostics\",\n        \"skill_caps_by_root\",\n        \"unify_bullet_slot_bundle_map_resolved\"\n      ]\n    }\n  },\n  \"claim_ledger\": [\n    {\n      \"claim_text\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n      \"source_fact_ids\": [\n        \"bul_insurtech_001\"\n      ]\n    },\n    {\n      \"claim_text\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n      \"source_fact_ids\": [\n        \"bul_insurtech_002\"\n      ]\n    },\n    {\n      \"claim_text\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n      \"source_fact_ids\": [\n        \"bul_insurtech_003\"\n      ]\n    }\n  ],\n  \"jd_alignment\": {\n    \"targeting_only\": true,\n    \"jd_used_as_proof\": false\n  },\n  \"prompt_hash\": \"a8b95dbcb48a98ed\",\n  \"generation_method\": \"llm_selected_proof_render\",\n  \"llm_generation_status\": \"usable_output\",\n  \"llm_output_used\": false,\n  \"llm_selection_used\": true,\n  \"model_display_text_discarded\": true,\n  \"display_text_authority\": \"selected_fact_plan_claim_text\",\n  \"evidence_authority\": \"augmented_skills_graph\",\n  \"source_fact_ids\": [\n    \"bul_insurtech_001\",\n    \"bul_insurtech_002\",\n    \"bul_insurtech_003\"\n  ],\n  \"graph_packet_digest\": \"126d881a5952830f2f8ab5b37a24ad6be0e2d99bcd7c7b1895b87ad68044d2de\",\n  \"renderer_version\": \"proof_authorized_fact_claim_render.v2\",\n  \"lane_contract_allows_deterministic_graph_render\": true,\n  \"allowed_graph_packet_fact_count\": 16,\n  \"rendered_source_fact_ids_within_allowed_packet\": true,\n  \"final_materialized_selection_contract\": {\n    \"schema_version\": \"role_episode_final_materialized_selection_contract.v1\",\n    \"expected_bullet_count\": 3,\n    \"model_bullet_count\": 3,\n    \"selected_source_fact_ids\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"selected_unique_source_fact_count\": 3,\n    \"duplicate_source_fact_ids_ignored\": [],\n    \"rejected_source_fact_ids\": [],\n    \"deterministic_reselect_source_fact_ids\": [],\n    \"deterministic_reselect_applied\": false,\n    \"rendered_bullet_count\": 3,\n    \"rendered_source_fact_ids\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"slot_bound_ordering_applied\": true,\n    \"final_materialized_acceptance_ok\": true\n  },\n  \"final_materialized_acceptance_ok\": true,\n  \"generation_mode\": \"model_employment_pool_claude_top_n_regen\",\n  \"initial_path_count\": 2,\n  \"total_paths_executed\": 2,\n  \"regen_rounds_executed\": 0,\n  \"selection_gate\": {\n    \"ok\": true,\n    \"section_lane\": \"insurtech_bullets\",\n    \"final_bullet_count\": 3,\n    \"min_score_threshold\": 0.72,\n    \"slots_passing\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"slots_below_threshold\": [],\n    \"slots_missing\": [],\n    \"bullets_in_merged\": 3,\n    \"unique_source_fact_ids\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"unique_source_fact_count\": 3,\n    \"duplicate_source_fact_ids\": [],\n    \"slots_missing_source_fact_ids\": [],\n    \"proof_unique_source_fact_gate_active\": true\n  },\n  \"producer_selection_gate\": {\n    \"ok\": true,\n    \"section_lane\": \"insurtech_bullets\",\n    \"final_bullet_count\": 3,\n    \"min_score_threshold\": 0.72,\n    \"slots_passing\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"slots_below_threshold\": [],\n    \"slots_missing\": [],\n    \"bullets_in_merged\": 3,\n    \"unique_source_fact_ids\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"unique_source_fact_count\": 3,\n    \"duplicate_source_fact_ids\": [],\n    \"slots_missing_source_fact_ids\": [],\n    \"proof_unique_source_fact_gate_active\": true\n  },\n  \"final_materialized_selection_gate\": {\n    \"ok\": true,\n    \"section_lane\": \"insurtech_bullets\",\n    \"final_bullet_count\": 3,\n    \"min_score_threshold\": 0.72,\n    \"slots_passing\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"slots_below_threshold\": [],\n    \"slots_missing\": [],\n    \"bullets_in_merged\": 3,\n    \"unique_source_fact_ids\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"unique_source_fact_count\": 3,\n    \"duplicate_source_fact_ids\": [],\n    \"slots_missing_source_fact_ids\": [],\n    \"proof_unique_source_fact_gate_active\": true\n  },\n  \"selection_mode\": \"openai_chatgpt_employment_top_n_pass\",\n  \"source_path_by_slot\": {\n    \"bul_insurtech_001\": 0,\n    \"bul_insurtech_002\": 0,\n    \"bul_insurtech_003\": 0\n  },\n  \"generation_meta\": {\n    \"generation_mode\": \"model_employment_pool_claude_top_n_regen\",\n    \"section_lane\": \"insurtech_bullets\",\n    \"initial_path_count\": 2,\n    \"total_paths_executed\": 2,\n    \"regen_rounds_executed\": 0,\n    \"adaptive_sc_enabled\": false,\n    \"max_path_count\": 2,\n    \"stop_reason\": \"selection_gate_passed\",\n    \"configured_max_regen_rounds\": 1,\n    \"max_regen_rounds_allowed\": 1,\n    \"expansion_events\": [],\n    \"min_selection_score\": 0.72,\n    \"selection_gate\": {\n      \"ok\": true,\n      \"section_lane\": \"insurtech_bullets\",\n      \"final_bullet_count\": 3,\n      \"min_score_threshold\": 0.72,\n      \"slots_passing\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"slots_below_threshold\": [],\n      \"slots_missing\": [],\n      \"bullets_in_merged\": 3,\n      \"unique_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"unique_source_fact_count\": 3,\n      \"duplicate_source_fact_ids\": [],\n      \"slots_missing_source_fact_ids\": [],\n      \"proof_unique_source_fact_gate_active\": true\n    },\n    \"selection_mode\": \"openai_chatgpt_employment_top_n_pass\",\n    \"source_path_by_slot\": {\n      \"bul_insurtech_001\": 0,\n      \"bul_insurtech_002\": 0,\n      \"bul_insurtech_003\": 0\n    },\n    \"claude_selection_count\": 3,\n    \"selector_empty\": false,\n    \"selector_selection_mode\": \"openai_chatgpt_employment_top_n_pass\",\n    \"selector_bullets_in_merged\": 3,\n    \"selector_selection_count\": 3,\n    \"selector_subthreshold_scores\": [\n      0.78,\n      0.72,\n      0.76\n    ],\n    \"producer_selection_gate\": {\n      \"ok\": true,\n      \"section_lane\": \"insurtech_bullets\",\n      \"final_bullet_count\": 3,\n      \"min_score_threshold\": 0.72,\n      \"slots_passing\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"slots_below_threshold\": [],\n      \"slots_missing\": [],\n      \"bullets_in_merged\": 3,\n      \"unique_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"unique_source_fact_count\": 3,\n      \"duplicate_source_fact_ids\": [],\n      \"slots_missing_source_fact_ids\": [],\n      \"proof_unique_source_fact_gate_active\": true\n    },\n    \"final_materialized_selection_gate\": {\n      \"ok\": true,\n      \"section_lane\": \"insurtech_bullets\",\n      \"final_bullet_count\": 3,\n      \"min_score_threshold\": 0.72,\n      \"slots_passing\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"slots_below_threshold\": [],\n      \"slots_missing\": [],\n      \"bullets_in_merged\": 3,\n      \"unique_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"unique_source_fact_count\": 3,\n      \"duplicate_source_fact_ids\": [],\n      \"slots_missing_source_fact_ids\": [],\n      \"proof_unique_source_fact_gate_active\": true\n    }\n  },\n  \"generation_receipt\": {\n    \"generation_method\": \"llm_selected_proof_render\",\n    \"llm_generation_status\": \"usable_output\",\n    \"llm_output_used\": false,\n    \"llm_selection_used\": true,\n    \"model_display_text_discarded\": true,\n    \"display_text_authority\": \"selected_fact_plan_claim_text\",\n    \"evidence_authority\": \"augmented_skills_graph\",\n    \"source_fact_ids\": [\n      \"bul_insurtech_001\",\n      \"bul_insurtech_002\",\n      \"bul_insurtech_003\"\n    ],\n    \"graph_packet_digest\": \"126d881a5952830f2f8ab5b37a24ad6be0e2d99bcd7c7b1895b87ad68044d2de\",\n    \"renderer_version\": \"proof_authorized_fact_claim_render.v2\",\n    \"lane_contract_allows_deterministic_graph_render\": true,\n    \"allowed_graph_packet_fact_count\": 16,\n    \"rendered_source_fact_ids_within_allowed_packet\": true,\n    \"final_materialized_selection_contract\": {\n      \"schema_version\": \"role_episode_final_materialized_selection_contract.v1\",\n      \"expected_bullet_count\": 3,\n      \"model_bullet_count\": 3,\n      \"selected_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"selected_unique_source_fact_count\": 3,\n      \"duplicate_source_fact_ids_ignored\": [],\n      \"rejected_source_fact_ids\": [],\n      \"deterministic_reselect_source_fact_ids\": [],\n      \"deterministic_reselect_applied\": false,\n      \"rendered_bullet_count\": 3,\n      \"rendered_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"slot_bound_ordering_applied\": true,\n      \"final_materialized_acceptance_ok\": true\n    },\n    \"final_materialized_acceptance_ok\": true,\n    \"generation_mode\": \"model_employment_pool_claude_top_n_regen\",\n    \"initial_path_count\": 2,\n    \"total_paths_executed\": 2,\n    \"regen_rounds_executed\": 0,\n    \"selection_gate\": {\n      \"ok\": true,\n      \"section_lane\": \"insurtech_bullets\",\n      \"final_bullet_count\": 3,\n      \"min_score_threshold\": 0.72,\n      \"slots_passing\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"slots_below_threshold\": [],\n      \"slots_missing\": [],\n      \"bullets_in_merged\": 3,\n      \"unique_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"unique_source_fact_count\": 3,\n      \"duplicate_source_fact_ids\": [],\n      \"slots_missing_source_fact_ids\": [],\n      \"proof_unique_source_fact_gate_active\": true\n    },\n    \"producer_selection_gate\": {\n      \"ok\": true,\n      \"section_lane\": \"insurtech_bullets\",\n      \"final_bullet_count\": 3,\n      \"min_score_threshold\": 0.72,\n      \"slots_passing\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"slots_below_threshold\": [],\n      \"slots_missing\": [],\n      \"bullets_in_merged\": 3,\n      \"unique_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"unique_source_fact_count\": 3,\n      \"duplicate_source_fact_ids\": [],\n      \"slots_missing_source_fact_ids\": [],\n      \"proof_unique_source_fact_gate_active\": true\n    },\n    \"final_materialized_selection_gate\": {\n      \"ok\": true,\n      \"section_lane\": \"insurtech_bullets\",\n      \"final_bullet_count\": 3,\n      \"min_score_threshold\": 0.72,\n      \"slots_passing\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"slots_below_threshold\": [],\n      \"slots_missing\": [],\n      \"bullets_in_merged\": 3,\n      \"unique_source_fact_ids\": [\n        \"bul_insurtech_001\",\n        \"bul_insurtech_002\",\n        \"bul_insurtech_003\"\n      ],\n      \"unique_source_fact_count\": 3,\n      \"duplicate_source_fact_ids\": [],\n      \"slots_missing_source_fact_ids\": [],\n      \"proof_unique_source_fact_gate_active\": true\n    },\n    \"selection_mode\": \"openai_chatgpt_employment_top_n_pass\",\n    \"source_path_by_slot\": {\n      \"bul_insurtech_001\": 0,\n      \"bul_insurtech_002\": 0,\n      \"bul_insurtech_003\": 0\n    },\n    \"lane_status\": \"PASS\"\n  },\n  \"role_episode_bundle_consumed\": true,\n  \"product_quality_reason\": \"x2_pass\",\n  \"lane_status\": \"PASS\"\n}\n\nALLOWED_FACT_PACKET:\n{\n  \"allowed_fact_ids\": [\n    \"bul_insurtech_001\",\n    \"reb_insurtech_regulated_aws_control_implementation\",\n    \"skill_aws_iam_kms_cloudtrail_controls\",\n    \"skill_soc2_zero_trust_security\",\n    \"metric_insurtech_sensitive_data_controls_count\",\n    \"exp_insurtech_001\",\n    \"bul_insurtech_002\",\n    \"reb_insurtech_aws_shared_responsibility_operating_model\",\n    \"skill_regulated_cloud_adoption_guardrails\",\n    \"skill_cloud_control_ownership_mapping\",\n    \"metric_insurtech_safety_operating_model_artifacts_count\",\n    \"bul_insurtech_003\",\n    \"reb_insurtech_aws_migration_execution\",\n    \"skill_p2_tech_aws_modernization_patterns\",\n    \"skill_sr_insurtech_legacy_cloud_modernization\",\n    \"metric_insurtech_core_workloads_migrated_count\"\n  ]\n}\n\nCLAIM_LEDGER:\n[{\"claim_text\":\"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\"source_fact_ids\":[\"bul_insurtech_001\"]},{\"claim_text\":\"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\"source_fact_ids\":[\"bul_insurtech_002\"]},{\"claim_text\":\"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\"source_fact_ids\":[\"bul_insurtech_003\"]}]\n\nTARGETING_CONTEXT (not proof):\n{\n  \"target_title\": \"\",\n  \"target_company\": \"\",\n  \"jd_text\": \"\",\n  \"briefing\": \"\"\n}\n\nPROOF_BOUNDARY:\n{\n  \"jd_is_targeting_context_only\": true,\n  \"briefing_is_targeting_context_only\": true,\n  \"claims_must_be_supported_by_allowed_fact_packet\": true,\n  \"judges_must_not_rewrite\": true,\n  \"metadata_only_graph_context_is_insufficient\": true\n}\n\nGRAPH_BINDING_MATERIALITY_SUMMARY:\n{}\n\nDETERMINISTIC_GATE_SUMMARY:\n{\n  \"x2_gates\": [\n    {\n      \"gate_id\": \"x2_insurtech_bullets_allowed_fact_ids_non_empty\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": 16\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_source_fact_ids_supported\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": {\n        \"bad\": [],\n        \"cited_count\": 3\n      }\n    },\n    {\n      \"gate_id\": \"x2_claim_ledger_claim_text_non_empty\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": 3\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_display_text_proof_authorized\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": {\n        \"status\": \"PASS\",\n        \"display_text_authority\": \"selected_fact_plan_claim_text\",\n        \"rows\": [\n          {\n            \"row_id\": \"bul_insurtech_001\",\n            \"source_fact_ids\": [\n              \"bul_insurtech_001\"\n            ],\n            \"source_fact_ids_allowed\": true,\n            \"text_matches_selected_fact_claim_text\": true\n          },\n          {\n            \"row_id\": \"bul_insurtech_002\",\n            \"source_fact_ids\": [\n              \"bul_insurtech_002\"\n            ],\n            \"source_fact_ids_allowed\": true,\n            \"text_matches_selected_fact_claim_text\": true\n          },\n          {\n            \"row_id\": \"bul_insurtech_003\",\n            \"source_fact_ids\": [\n              \"bul_insurtech_003\"\n            ],\n            \"source_fact_ids_allowed\": true,\n            \"text_matches_selected_fact_claim_text\": true\n          }\n        ]\n      }\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_runtime_real_llm\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": \"REAL_LLM\"\n    },\n    {\n      \"gate_id\": \"x2_no_first_person\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": null\n    },\n    {\n      \"gate_id\": \"x2_no_em_dash\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": null\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_targeting_only_not_experience_claim\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": []\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_graph_role_episode_bundle_consumed\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": true\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_bullet_count_3\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": 3\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_bullet_single_thought\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": null\n    },\n    {\n      \"gate_id\": \"x2_insurtech_bullets_bullet_no_embedded_newline\",\n      \"gate_type\": \"deterministic\",\n      \"pass\": true,\n      \"failure_reason\": null,\n      \"observed_value\": null\n    }\n  ]\n}"
+          }
+        ]
+      }
+    ],
+    "systemInstruction": {
+      "parts": [
+        {
+          "text": "You are a strict executive resume judge. Output a single compact JSON object only. No markdown fences, no explanatory prose, no nested finding objects.\n\nGRADE_ONLY authority (all providers — Gemini, OpenAI, Anthropic):\n- Do NOT rewrite, replace, or edit candidate_output.resume_display_text.\n- deterministic_gate_summary is authoritative: if a gate shows \"pass\": true, do NOT fail or cite that axis.\n- Do NOT apply retired SRFS slot mandates as decisive failures: five-part S1–S5 arc, mandatory S5 credibility\n  sentence, S2 mechanism-only / S4 outcomes slot shapes, srfs_sentence_responsibility.\n- When x2_exec_summary_evidence_utilization.pass is true, unused_fact_ids are optional weave targets, not defects.\n\nReturn ONLY one compact JSON object. No markdown fences, no prose before or after, no nested objects.\nRequired shape (findings and remediation_suggestions must be arrays of short strings only):\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\"findings\":[\"...\"],\"cited_sentence_indexes\":[1],\"remediation_suggestions\":[],\"dimension_verdicts\":{...8 rubric keys...}}\nAt most 6 short strings in findings and 4 in remediation_suggestions.\ncited_sentence_indexes: 1-based indexes (S1=1 … S6=6) for every sentence your findings ask to change.\nInclude dimension_verdicts with all eight rubric dimension ids (pass/severity/codes per dimension).\n\nScore contract (mandatory - every judge response MUST comply):\n- Include score_scale as exactly one of: \"0_to_1\" or \"0_to_5\". Do not omit score_scale.\n- If score_scale is \"0_to_1\": score and threshold MUST each be a number from 0.0 through 1.0 inclusive.\n- If score_scale is \"0_to_5\": score and threshold MUST each be a number from 0.0 through 5.0 inclusive.\n- Forbidden: 0_to_10 scales, percentage scores (0–100), or values like score=9.2 with threshold=8.0.\n- Do not infer scale from magnitude; declare score_scale explicitly and keep score/threshold within that scale."
+        }
+      ]
+    },
+    "generationConfig": {
+      "thinkingConfig": {
+        "thinkingLevel": "high"
+      },
+      "maxOutputTokens": 4096,
+      "responseMimeType": "application/json",
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "score_scale": {
+            "type": "string",
+            "enum": [
+              "0_to_1",
+              "0_to_5"
+            ]
+          },
+          "score": {
+            "type": "number"
+          },
+          "threshold": {
+            "type": "number"
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "decisive_failure": {
+            "type": "boolean"
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cited_sentence_indexes": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "remediation_suggestions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dimension_verdicts": {
+            "type": "object",
+            "properties": {
+              "factual_support": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "executive_signal": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "resume_voice": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "ats_alignment_without_keyword_stuffing": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "anti_overfit": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "synthesis_quality": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "evidence_utilization": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "deterministic_alignment": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              }
+            },
+            "required": [
+              "factual_support",
+              "executive_signal",
+              "resume_voice",
+              "ats_alignment_without_keyword_stuffing",
+              "anti_overfit",
+              "synthesis_quality",
+              "evidence_utilization",
+              "deterministic_alignment"
+            ]
+          }
+        },
+        "required": [
+          "score_scale",
+          "score",
+          "threshold",
+          "pass",
+          "decisive_failure",
+          "findings",
+          "cited_sentence_indexes",
+          "remediation_suggestions",
+          "dimension_verdicts"
+        ]
+      }
+    }
+  },
+  "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+  "resolved_model": "gemini-3.6-flash",
+  "resolved_model_source": "yaml_judge_models",
+  "model_requested": "gemini-3.6-flash",
+  "model_actual": "gemini-3.6-flash",
+  "thinking_level": "high",
+  "provider_key": "gemini_pro",
+  "request_timeout_seconds": 60,
+  "gemini_max_retries_configured": 4,
+  "judge_max_attempts": 2,
+  "input_hash": "5a4d6a53dd1352cb",
+  "timestamp": "2026-08-09T12:28:44.818788+00:00",
+  "judge_attempt": 1,
+  "gemini_thinking_config": {
+    "thinkingLevel": "high"
+  },
+  "gemini_thinking_optimization_enabled": true,
+  "provider_name": "gemini",
+  "model_env_source": "yaml_judge_models",
+  "canonical_contract_hash": "a4fa310ad4ec61dcbd2737352c910f8eeba269007a040ae6bf6b83044f3bf344",
+  "packet_hash": "5a4d6a53dd1352cb",
+  "schema_hash": "2d3f3d956b325217",
+  "max_tokens": 4096,
+  "temperature": null,
+  "response_format": "responseSchema",
+  "judge_receipt": {
+    "judge_packet_hash": "5a4d6a53dd1352cb",
+    "packet_hash": "5a4d6a53dd1352cb",
+    "canonical_contract_hash": "a4fa310ad4ec61dcbd2737352c910f8eeba269007a040ae6bf6b83044f3bf344",
+    "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final_20260809/e2e_20260809T122324Z_db242077/modular_r4/sections/insurtech_bullets/insurtech_bullets_judge_packet.json",
+    "candidate_output_ref": "candidate_output.resume_display_text",
+    "allowed_fact_packet_ref": "allowed_fact_packet",
+    "rubric_ref": "apps_rg/runtime/judges/role_episode_x1d.py#ROLE_EPISODE_RUBRIC",
+    "deterministic_gate_summary": {
+      "x2_gates": [
+        {
+          "gate_id": "x2_insurtech_bullets_allowed_fact_ids_non_empty",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": 16
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_source_fact_ids_supported",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": {
+            "bad": [],
+            "cited_count": 3
+          }
+        },
+        {
+          "gate_id": "x2_claim_ledger_claim_text_non_empty",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": 3
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_display_text_proof_authorized",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": {
+            "status": "PASS",
+            "display_text_authority": "selected_fact_plan_claim_text",
+            "rows": [
+              {
+                "row_id": "bul_insurtech_001",
+                "source_fact_ids": [
+                  "bul_insurtech_001"
+                ],
+                "source_fact_ids_allowed": true,
+                "text_matches_selected_fact_claim_text": true
+              },
+              {
+                "row_id": "bul_insurtech_002",
+                "source_fact_ids": [
+                  "bul_insurtech_002"
+                ],
+                "source_fact_ids_allowed": true,
+                "text_matches_selected_fact_claim_text": true
+              },
+              {
+                "row_id": "bul_insurtech_003",
+                "source_fact_ids": [
+                  "bul_insurtech_003"
+                ],
+                "source_fact_ids_allowed": true,
+                "text_matches_selected_fact_claim_text": true
+              }
+            ]
+          }
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_runtime_real_llm",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": "REAL_LLM"
+        },
+        {
+          "gate_id": "x2_no_first_person",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": null
+        },
+        {
+          "gate_id": "x2_no_em_dash",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": null
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_targeting_only_not_experience_claim",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": []
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_graph_role_episode_bundle_consumed",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": true
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_bullet_count_3",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": 3
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_bullet_single_thought",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": null
+        },
+        {
+          "gate_id": "x2_insurtech_bullets_bullet_no_embedded_newline",
+          "gate_type": "deterministic",
+          "pass": true,
+          "failure_reason": null,
+          "observed_value": null
+        }
+      ]
+    },
+    "gate_closure_map_version": "executive_summary_gate_closure_v2"
+  },
+  "redacted_query_param_names": [
+    "key"
+  ]
+}

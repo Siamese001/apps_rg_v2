@@ -133,6 +133,13 @@ def build_section_request(
         "max_tokens": max_tokens,
         "timeout_seconds": timeout_seconds,
         "response_format": {"type": "json_object"},
+        # Transport-internal authority binding.  Bounded repair helpers clone
+        # this payload; retaining the originally selected provider prevents a
+        # repair from re-resolving a different global profile while carrying
+        # the original model id (for example external_openai/gpt-* becoming
+        # external_claude/gpt-*).  ``generate_section`` strips this key before
+        # transport.
+        "_provider_profile": str(provider_requested).strip(),
     }
     if compiled_prompt_artifact is not None:
         payload["compiled_prompt_artifact"] = compiled_prompt_artifact
@@ -160,6 +167,7 @@ def generate_section(
     artifact_dir: Path | str | None = None,
     run_id: str | None = None,
     temperature_override: float | None = None,
+    provider_profile: str | None = None,
 ) -> ProviderResult:
     """Execute a section generation payload through the apps_rg provider gateway.
 
@@ -167,14 +175,17 @@ def generate_section(
     ``call_section_model_provider``. Internal ``_reasoning_section_lane`` tags are stripped
     before transport.
     """
-    selection = resolve_provider_profile()
+    bound_profile = str(
+        provider_profile or payload.get("_provider_profile") or ""
+    ).strip()
+    selection = None if bound_profile else resolve_provider_profile()
     # Capture the section lane BEFORE stripping internal ``_``-tags, then pass it through as an
     # explicit ``section_id`` so the per-section model pin still applies on this path (the tag
     # itself is stripped from the transport ``body``).
     section_lane = str(payload.get("_reasoning_section_lane") or "").strip() or None
     body = {k: v for k, v in dict(payload).items() if not str(k).startswith("_")}
     return call_section_model_provider(
-        selection.profile,
+        bound_profile or selection.profile,
         body,
         artifact_dir=Path(artifact_dir) if artifact_dir is not None else None,
         run_id=run_id,

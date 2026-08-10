@@ -14,15 +14,40 @@ from apps_rg.runtime import spine_contracts
 
 def test_spine_contracts_exports_only_verified_contract_symbols() -> None:
     assert set(spine_contracts.__all__) == {
+        "ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY",
+        "AppsRgIngressPayload",
         "CompiledPromptArtifact",
+        "EvidenceItem",
         "FinalEvidenceContract",
         "GraphTraversePolicy",
         "L1PlanContract",
+        "L3_RUNTIME_RECEIPT_SCHEMA_VERSION",
+        "L3RuntimeOrchestrationReceipt",
+        "L3StepContractRef",
         "L3ToL2StepContract",
+        "Origin",
+        "PackageValidationReceipt",
+        "PromptBlock",
+        "RequestEnvelope",
         "RouteContract",
+        "RouteGateReceipt",
+        "RuntimeCustomizationPackage",
+        "RuntimePosture",
+        "STATUS_NOT_APPLICABLE",
+        "STATUS_UNKNOWN",
+        "SUPPORT_STATUS_BLOCKED",
+        "SUPPORT_STATUS_CONFLICTED",
+        "SUPPORT_STATUS_EMPTY",
+        "SUPPORT_STATUS_PARTIAL",
+        "SUPPORT_STATUS_PASS",
+        "SUPPORT_STATUS_PASSING_VALUES",
+        "SUPPORT_STATUS_WEAK",
+        "SUPPORT_STATUS_WEAK_WITH_CAVEATS",
         "SealedL2Artifact",
         "ValidatedRequest",
         "X3Disposition",
+        "compute_l3_runtime_digest",
+        "lifecycle_trace_contract",
     }
 
 
@@ -36,4 +61,3 @@ def test_spine_contracts_reexport_canonical_core_contracts() -> None:
     assert spine_contracts.SealedL2Artifact is SealedL2Artifact
     assert spine_contracts.ValidatedRequest is ValidatedRequest
     assert spine_contracts.X3Disposition is X3Disposition
-

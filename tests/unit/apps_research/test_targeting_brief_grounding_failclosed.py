@@ -43,7 +43,7 @@ _PASS_X2_RECEIPT = {
     "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
     "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
     "judge_name": _JUDGE_PIN.provider_key,
-    "judge_provider": _JUDGE_PIN.provider_key,
+    "judge_provider": _JUDGE_PIN.provider,
     "judge_model_requested": _JUDGE_PIN.model,
     "judge_model": _JUDGE_PIN.model,
     "thinking_level": _JUDGE_PIN.reasoning_effort,

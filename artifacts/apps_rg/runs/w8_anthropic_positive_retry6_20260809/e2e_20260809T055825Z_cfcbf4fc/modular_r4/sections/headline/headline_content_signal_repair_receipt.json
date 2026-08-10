@@ -1,0 +1,173 @@
+{
+  "section_id": "headline",
+  "run_id": "headline_20260809_060918",
+  "gate_id": "x2_headline_technical_specificity_floor_met+x2_headline_executive_abstraction_floor",
+  "trigger_arm": "specificity_floor+executive_abstraction",
+  "trigger": {
+    "required_families": [
+      "runtime_governance",
+      "regulated_ai_systems"
+    ],
+    "specificity_floor": 2,
+    "families_matched_pre": {
+      "governance_signal": [
+        "runtime_governance"
+      ],
+      "specificity_floor": [
+        "runtime_governance"
+      ],
+      "narrowing_labels": [],
+      "segments_missing_executive_abstraction": [
+        "Client Portfolio Expansion",
+        "Context Engineering Evaluation"
+      ],
+      "literal_grounding": {
+        "segments": [
+          {
+            "segment": "Runtime Governance Telemetry",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_context_engineering",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [
+                  "telemetry"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_context_engineering",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "telemetry"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Client Portfolio Expansion",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_context_engineering",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [
+                  "client",
+                  "expansion",
+                  "portfolio"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_context_engineering",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "client",
+              "expansion",
+              "portfolio"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Context Engineering Evaluation",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_context_engineering",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [
+                  "evaluation"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_context_engineering",
+                "shared_tokens": [
+                  "context"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "context",
+              "evaluation"
+            ],
+            "majority_grounded": true
+          }
+        ],
+        "checked": 3
+      }
+    },
+    "headline_pre": "SVP Engineering | Runtime Governance Telemetry | Client Portfolio Expansion | Context Engineering Evaluation"
+  },
+  "attempted": true,
+  "regen_call_made": true,
+  "accepted": false,
+  "headline_post": "SVP Engineering | Runtime Governance Telemetry | Client Portfolio Expansion | Context Engineering Evaluation",
+  "families_matched_post": {
+    "governance_signal": [],
+    "specificity_floor": [],
+    "narrowing_labels": [],
+    "segments_missing_executive_abstraction": [],
+    "literal_grounding": {}
+  },
+  "rejected_reason": "literal_grounding_still_missing",
+  "bounded": {
+    "max_attempts": 1,
+    "attempts_used": 1
+  },
+  "env_kill_switch_state": "unset"
+}

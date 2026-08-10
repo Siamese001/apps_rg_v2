@@ -10,6 +10,7 @@ from apps_rg.runtime.aggregation.cross_section_x2 import (
     VERDICT_WARN,
     build_cross_section_graph_coherence_receipt,
     check_cross_section_graph_coherence,
+    cross_section_gates_all_pass,
     run_cross_section_x2_gates,
 )
 
@@ -200,3 +201,56 @@ def test_run_cross_section_x2_gates_includes_graph_coherence_gate(tmp_path: Path
     assert "x2_cross_section_graph_coherence" in by_id
     assert by_id["x2_cross_section_graph_coherence"].verdict == VERDICT_WARN
     assert by_id["x2_cross_section_graph_coherence"].observed["active_section_count"] == 1
+
+
+def test_unknown_human_release_does_not_reclassify_engineering_completion(
+    tmp_path: Path,
+) -> None:
+    pointers = [
+        _write_runtime_payload(tmp_path, "executive_summary", _native_meta("fact_exec"))
+    ]
+    final_resume = {
+        "sections": [
+            _section(
+                "executive_summary",
+                {
+                    "resume_display_text": "Executive platform summary.",
+                    "claim_ledger": [
+                        {"claim_text": "platform", "source_fact_ids": ["fact_exec"]}
+                    ],
+                },
+            )
+        ],
+        "whole_resume_graph_evidence_contract": {
+            "active": True,
+            "engineering_pass": True,
+            "official_w6_status": "UNKNOWN",
+            "release_pass": False,
+            "promotion_eligible": False,
+            "contract_digest": "contract",
+        },
+    }
+
+    gates, *_ = run_cross_section_x2_gates(
+        repo=tmp_path,
+        final_resume_blob=final_resume,
+        fingerprint={"review_lanes": []},
+        sealed_index={"pointers": pointers},
+    )
+    by_id = {gate.gate_id: gate for gate in gates}
+
+    assert by_id["x2_whole_resume_graph_evidence_engineering"].verdict == VERDICT_PASS
+    assert (
+        by_id["x2_whole_resume_graph_release_authority_observed"].verdict
+        == VERDICT_PASS
+    )
+    assert by_id["x2_whole_resume_graph_release_authority_observed"].observed[
+        "promotion_eligible"
+    ] is False
+    # The observation gate preserves technical completion while the sealed
+    # contract's promotion_eligible=false remains the release-authority truth.
+    graph_gates = [
+        by_id["x2_whole_resume_graph_evidence_engineering"],
+        by_id["x2_whole_resume_graph_release_authority_observed"],
+    ]
+    assert cross_section_gates_all_pass(graph_gates) is True

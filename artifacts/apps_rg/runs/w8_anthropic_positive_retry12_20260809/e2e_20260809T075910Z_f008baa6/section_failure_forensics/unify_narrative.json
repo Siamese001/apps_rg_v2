@@ -1,0 +1,452 @@
+{
+  "schema_version": "apps_rg.section_failure_forensics.v1",
+  "generated_at_utc": "2026-08-09T08:09:30Z",
+  "section_id": "unify_narrative",
+  "failure_type": "upstream_cascade",
+  "failed_gate_ids": [],
+  "current_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "not_found"
+  },
+  "last_successful_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "missing_lane_dir",
+    "baseline_run_dir": "",
+    "baseline_found": false,
+    "baseline_lane_dir": "",
+    "baseline_display_txt_path": ""
+  },
+  "input_hash_comparison": {
+    "current_scenario_hash": "f24b5e87cba765662a9b33ddab54e2b7f48934467b0c6fc8b89e02a2446d141b",
+    "baseline_scenario_hash": "",
+    "match": false,
+    "current": {
+      "target_company": "Anthropic",
+      "target_role": "Manager of Applied AI Architecture, Partnerships",
+      "manual_brief": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\apps_research\\runs\\r-d0838e0df8682e94b58fb932\\briefing.md",
+      "jd": "",
+      "generation_mode": "strategic_tailor",
+      "scenario_hash": "f24b5e87cba765662a9b33ddab54e2b7f48934467b0c6fc8b89e02a2446d141b"
+    },
+    "baseline": {}
+  },
+  "selected_fact_plan_comparison": {
+    "artifact": "selected_fact_plan.json",
+    "current_present": false,
+    "baseline_present": false,
+    "current_hash": "",
+    "baseline_hash": "",
+    "match": false
+  },
+  "provider_request_hash_comparison": {
+    "artifact": "provider_request.json",
+    "current_present": false,
+    "baseline_present": false,
+    "current_hash": "",
+    "baseline_hash": "",
+    "match": false
+  },
+  "revision_comparison": {
+    "baseline": {
+      "status": "NO_PRIOR_PASSING_RUN",
+      "git_commit": "",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_applicable"
+    },
+    "current": {
+      "status": "IDENTIFIED",
+      "git_commit": "cba1303f044f24af364b888122971cab7a972457",
+      "git_commit_subject": "",
+      "pr_number": null,
+      "pr_resolution": "not_derivable_from_local_history"
+    }
+  },
+  "difference_summary": {
+    "baseline_status": "NO_PRIOR_PASSING_RUN",
+    "inputs_match": false,
+    "selected_fact_plan_match": false,
+    "provider_request_match": false,
+    "materialized_output_match": false,
+    "baseline_x2": "NOT_OBSERVED",
+    "current_x2": "UNKNOWN",
+    "baseline_x3": "NOT_OBSERVED",
+    "current_x3": "PRE_RUN:upstream_not_finalized",
+    "baseline_judges": "NOT_OBSERVED",
+    "current_judges": "NOT_OBSERVED",
+    "failed_gate_ids": []
+  },
+  "comparison_complete": false,
+  "output_bisect": {
+    "schema_version": "apps_rg.output_bisect.v1",
+    "section_id": "unify_narrative",
+    "scope": "NO_PRIOR_BASELINE",
+    "first_observed_divergence": {
+      "order": 1,
+      "stage": "u0_ingress",
+      "prior_value": "NOT_OBSERVED",
+      "current_value": "32ccc9d9d51aea8d167bfe1523aa1c25a19aa0f15d0c3deb21c779e7997a0730",
+      "prior_detail": "NOT_OBSERVED",
+      "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\apps_research\\runs\\r-d0838e0df8682e94b58fb932\\briefing.md",
+      "match": false,
+      "classification": "CORRELATED_ONLY",
+      "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+      "prior_evidence_ref": "",
+      "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\ingress_raw.json"
+    },
+    "first_causally_relevant_divergence": {},
+    "ingestion_to_outcome_lineage": [
+      {
+        "order": 1,
+        "stage": "u0_ingress",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "32ccc9d9d51aea8d167bfe1523aa1c25a19aa0f15d0c3deb21c779e7997a0730",
+        "prior_detail": "NOT_OBSERVED",
+        "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\apps_research\\runs\\r-d0838e0df8682e94b58fb932\\briefing.md",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\ingress_raw.json"
+      },
+      {
+        "order": 2,
+        "stage": "u0_payload",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "2758f9645d7222ad9b8ff735a0c0863ec89179e7245d83dc6bb6776b774d0b99",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "CORRELATED_ONLY",
+        "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\u0_receipt.json"
+      },
+      {
+        "order": 3,
+        "stage": "jd_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 4,
+        "stage": "briefing_material",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 5,
+        "stage": "targeting_bundle",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 6,
+        "stage": "proof_pool",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 7,
+        "stage": "selected_fact_plan",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\section_input_usage_ledger.json"
+      },
+      {
+        "order": 8,
+        "stage": "provider_request",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\provider_request.json"
+      },
+      {
+        "order": 9,
+        "stage": "initial_candidate",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": ""
+      },
+      {
+        "order": 10,
+        "stage": "retry_loop",
+        "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": true,
+        "classification": "RULED_OUT",
+        "reason": "The evidence is identical at this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\synthesis_regen_receipt.json"
+      },
+      {
+        "order": 11,
+        "stage": "deterministic_finalization",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\executive_summary_finalize_coherence.json"
+      },
+      {
+        "order": 12,
+        "stage": "final_x2",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json"
+      },
+      {
+        "order": 13,
+        "stage": "judges",
+        "prior_value": "NO_JUDGE_ROWS",
+        "current_value": "NO_JUDGE_ROWS",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": true,
+        "classification": "RULED_OUT",
+        "reason": "The evidence is identical at this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\x1d_llm_judge_outputs.json"
+      },
+      {
+        "order": 14,
+        "stage": "x3",
+        "prior_value": "NOT_OBSERVED",
+        "current_value": "NOT_OBSERVED",
+        "prior_detail": "",
+        "current_detail": "",
+        "match": false,
+        "classification": "EVIDENCE_GAP",
+        "reason": "Neither run recorded evidence for this stage.",
+        "prior_evidence_ref": "",
+        "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\x3_disposition.json"
+      }
+    ],
+    "prior_attempt_timeline": [
+      {
+        "run": "prior_passing",
+        "sequence": 1,
+        "phase": "lane_resolution",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "no prior passing lane was found",
+        "repair_or_action": "none",
+        "gate_scope": "NONE",
+        "gate_result": "NOT_APPLICABLE",
+        "failed_gate_ids": [],
+        "judge_result": "NO_PRIOR_PASSING_RUN",
+        "disposition": "NO_BASELINE",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "",
+        "complete": true
+      }
+    ],
+    "current_attempt_timeline": [
+      {
+        "run": "current_failure",
+        "sequence": 1,
+        "phase": "initial_generation",
+        "attempt": 0,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "initial candidate",
+        "repair_or_action": "dispatch provider generation",
+        "gate_scope": "FULL_X2",
+        "gate_result": "PASS_OR_NOT_TRIGGERED",
+        "failed_gate_ids": [],
+        "judge_result": "PENDING",
+        "disposition": "ADVANCED_TO_X2",
+        "acceptance_scope": "INITIAL_CANDIDATE",
+        "evidence_ref": "",
+        "complete": false
+      },
+      {
+        "run": "current_failure",
+        "sequence": 2,
+        "phase": "final_x2",
+        "attempt": 1,
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "all deterministic product gates",
+        "repair_or_action": "evaluate full X2 gate set",
+        "gate_scope": "FULL_X2",
+        "gate_result": "PASS",
+        "failed_gate_ids": [],
+        "judge_result": "ADVANCED_TO_JUDGES",
+        "disposition": "ADVANCED",
+        "acceptance_scope": "PRODUCT_GATE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\x2_gate_outputs.json",
+        "complete": false
+      },
+      {
+        "run": "current_failure",
+        "sequence": 3,
+        "phase": "judge_panel",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "judge evidence absent",
+        "repair_or_action": "none",
+        "gate_scope": "X1D_MODEL_BACKED_JUDGE",
+        "gate_result": "EVIDENCE_NOT_RECORDED",
+        "failed_gate_ids": [],
+        "judge_result": "EVIDENCE_NOT_RECORDED",
+        "disposition": "EVIDENCE_GAP",
+        "acceptance_scope": "NOT_APPLICABLE",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\x1d_llm_judge_outputs.json",
+        "complete": false
+      },
+      {
+        "run": "current_failure",
+        "sequence": 4,
+        "phase": "x3_disposition",
+        "attempt": "-",
+        "candidate_digest": "",
+        "word_count": 0,
+        "trigger_or_input": "",
+        "repair_or_action": "authorize or block product output",
+        "gate_scope": "X3",
+        "gate_result": "FAIL",
+        "failed_gate_ids": [],
+        "judge_result": "",
+        "disposition": "NOT_OBSERVED",
+        "acceptance_scope": "PRODUCT_AUTHORIZATION",
+        "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative\\x3_disposition.json",
+        "complete": false
+      }
+    ],
+    "gate_matrix": [],
+    "judge_matrix": [
+      {
+        "judge": "configured_panel",
+        "prior": "NOT_OBSERVED",
+        "current": "JUDGES_NOT_REACHED",
+        "reason": "No current judge rows were emitted because X2 failed first."
+      }
+    ],
+    "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+    "code_bindings": [
+      {
+        "role": "revision comparison",
+        "file": "",
+        "symbol": "",
+        "baseline_symbol_hash": "",
+        "current_symbol_hash": "",
+        "changed_between_revisions": false,
+        "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+      }
+    ],
+    "underlying_root_cause": {
+      "downstream_root_cause": {
+        "status": "ISOLATED_TO_UPSTREAM_SECTION",
+        "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+      }
+    },
+    "layperson_explanation": [
+      "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+      "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\apps_research\\runs\\r-d0838e0df8682e94b58fb932\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+      "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (failed gates not recorded), so EVIDENCE_NOT_RECORDED and the resume remained blocked."
+    ]
+  },
+  "layperson_explanation": [
+    "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+    "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\apps_research\\runs\\r-d0838e0df8682e94b58fb932\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+    "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (failed gates not recorded), so EVIDENCE_NOT_RECORDED and the resume remained blocked."
+  ],
+  "retry_attempts": [],
+  "retry_outputs": [],
+  "repair_ledger": {
+    "present": false,
+    "artifacts": []
+  },
+  "final_materialized_output": {
+    "present": false,
+    "ref": "",
+    "text": "",
+    "sha256": "",
+    "source": "not_found"
+  },
+  "exact_code_surface": {
+    "producer_files": [
+      "apps_rg/runtime/section_failure_forensics.py",
+      "apps_rg/runtime/sections/role_episode_lane.py"
+    ],
+    "artifact_refs": [
+      "artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/unify_narrative/integrated_lane_pre_run_failure.json"
+    ],
+    "lane_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\unify_narrative"
+  },
+  "why_it_passed_before": "The pinned prior-pass baseline was unavailable, so this RCA cannot claim a clean passing comparison.",
+  "why_it_failed_now": "This section did not independently certify because an upstream dependency or pre-run blocker prevented normal section authorization: Pre-run dependency blocked execution: upstream_not_finalized; pre_run_blocked:UPSTREAM_BULLETS_NOT_FINALIZED.",
+  "required_fix": [
+    "Resolve the upstream blocker before dispatching `unify_narrative`.",
+    "Write the upstream dependency status into the section pre-run receipt.",
+    "Keep the section blocked until its own X1-X3 inputs are present."
+  ],
+  "baseline_confidence": "pinned_baseline_unavailable",
+  "baseline_run_dir": ""
+}

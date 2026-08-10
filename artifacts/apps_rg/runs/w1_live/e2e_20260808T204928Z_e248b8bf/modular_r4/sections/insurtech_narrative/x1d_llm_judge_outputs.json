@@ -1,0 +1,58 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_insurtech_narrative",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "BLOCKED_TOKEN_BUDGET",
+      "provider_status": "BLOCKED_TOKEN_BUDGET",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": false,
+      "provider_blocked": true,
+      "exact_provider_error": "External-model token budget preflight blocked: INPUT_ATTEMPT_CAP_EXCEEDED; estimated_input_tokens=882695; prior_reserved_total_tokens=0; max_reserved_tokens_per_run=250000",
+      "raw_response_ref": null,
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "role_episode_x1d_v2",
+      "input_hash": "669adb4eec9b50d0",
+      "output_hash": "",
+      "score": null,
+      "score_scale": null,
+      "normalized_score": null,
+      "threshold": 0.8,
+      "normalized_threshold": null,
+      "decisive_failure": false,
+      "findings": [
+        "Judge blocked - see exact_provider_error and raw_response_ref for details."
+      ],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [
+        "Review provider configuration and raw response artifact."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": null,
+      "judge_packet_hash": "669adb4eec9b50d0",
+      "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w1_live/e2e_20260808T204928Z_e248b8bf/modular_r4/sections/insurtech_narrative/insurtech_narrative_judge_packet.json",
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": null,
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": null,
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "standard_reasoning",
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": "insurtech_narrative",
+      "pass": false
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "348038de58cce7a9d8aca4f4e8b4452785dfbafe998788d487ea13670747e8a6",
+  "graph_claim_binding_contract_digest": "dd9f7cbfe01b1c2f6a5380f378e6d1ea2ace0cc60f9d52ead14db54e8ca995ad",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

@@ -1,0 +1,149 @@
+{
+  "section_id": "headline",
+  "run_id": "headline_20260809_011152",
+  "gate_id": "x2_headline_xyz_literal_grounding",
+  "trigger_arm": "literal_grounding",
+  "trigger": {
+    "required_families": [
+      "runtime_governance",
+      "regulated_ai_systems"
+    ],
+    "specificity_floor": 2,
+    "families_matched_pre": {
+      "governance_signal": [
+        "runtime_governance"
+      ],
+      "specificity_floor": [
+        "runtime_governance",
+        "enterprise_ai_architecture"
+      ],
+      "narrowing_labels": [],
+      "segments_missing_executive_abstraction": [],
+      "literal_grounding": {
+        "segments": [
+          {
+            "segment": "Enterprise Pursuit Leadership",
+            "ground_pass": false,
+            "cited_fact_ids": [
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [
+              "pursuit"
+            ],
+            "grounded_tokens": [],
+            "majority_grounded": false
+          },
+          {
+            "segment": "Runtime Governance Rollback",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [
+                  "rollback"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "rollback"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Partner Portfolio Expansion",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [
+                  "expansion",
+                  "portfolio"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [
+                  "partner"
+                ],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "expansion",
+              "partner",
+              "portfolio"
+            ],
+            "majority_grounded": true
+          }
+        ],
+        "checked": 3
+      }
+    },
+    "headline_pre": "SVP Engineering | Enterprise Pursuit Leadership | Runtime Governance Rollback | Partner Portfolio Expansion"
+  },
+  "attempted": true,
+  "regen_call_made": true,
+  "accepted": false,
+  "headline_post": "SVP Engineering | Enterprise Pursuit Leadership | Runtime Governance Rollback | Partner Portfolio Expansion",
+  "families_matched_post": {
+    "governance_signal": [],
+    "specificity_floor": [],
+    "narrowing_labels": [],
+    "segments_missing_executive_abstraction": [],
+    "literal_grounding": {}
+  },
+  "rejected_reason": "literal_grounding_still_missing",
+  "bounded": {
+    "max_attempts": 1,
+    "attempts_used": 1
+  },
+  "env_kill_switch_state": "unset"
+}

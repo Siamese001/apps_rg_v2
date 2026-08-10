@@ -1,0 +1,84 @@
+{
+  "section_id": "competencies",
+  "run_id": "competencies_20260809_025600",
+  "runtime_generation_status": "REAL_LLM",
+  "e2e_closeout_mode": false,
+  "max_regen_rounds_allowed": 2,
+  "lane_phases": [
+    {
+      "phase": "load_section_proof_for_lane",
+      "duration_s": 3.532,
+      "at": "2026-08-09T02:56:00.752684+00:00"
+    },
+    {
+      "phase": "compile_prompt",
+      "duration_s": 3.453,
+      "at": "2026-08-09T02:56:04.207863+00:00"
+    },
+    {
+      "phase": "prepare_l2_before_provider",
+      "duration_s": 0.187,
+      "at": "2026-08-09T02:56:04.382901+00:00"
+    },
+    {
+      "phase": "self_consistency_generation_and_selector",
+      "duration_s": 214.485,
+      "at": "2026-08-09T02:59:38.866392+00:00"
+    },
+    {
+      "phase": "deterministic_repairs",
+      "duration_s": 0.047,
+      "at": "2026-08-09T02:59:38.918123+00:00"
+    },
+    {
+      "phase": "x1d",
+      "duration_s": 25.781,
+      "at": "2026-08-09T03:00:04.697284+00:00"
+    },
+    {
+      "phase": "x2",
+      "duration_s": 0.25,
+      "at": "2026-08-09T03:00:04.944852+00:00"
+    },
+    {
+      "phase": "x3_and_l2_finalize",
+      "duration_s": 0.39,
+      "at": "2026-08-09T03:00:05.340534+00:00"
+    },
+    {
+      "phase": "l6_shadow",
+      "duration_s": 0.047,
+      "at": "2026-08-09T03:00:05.395495+00:00"
+    }
+  ],
+  "generation_selector_phases": [
+    {
+      "phase": "self_consistency_generation_round_0",
+      "started_at": "2026-08-09T02:56:04.383901+00:00",
+      "duration_s": 91.828,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 8
+    },
+    {
+      "phase": "selector_round_0",
+      "started_at": "2026-08-09T02:57:36.218418+00:00",
+      "duration_s": 12.375,
+      "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass"
+    },
+    {
+      "phase": "self_consistency_generation_round_1",
+      "started_at": "2026-08-09T02:57:48.599868+00:00",
+      "duration_s": 96.641,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 4
+    },
+    {
+      "phase": "selector_round_1",
+      "started_at": "2026-08-09T02:59:25.236188+00:00",
+      "duration_s": 13.625,
+      "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass"
+    }
+  ]
+}

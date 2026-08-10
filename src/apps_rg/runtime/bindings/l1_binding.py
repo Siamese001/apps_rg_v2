@@ -10,8 +10,8 @@ import logging
 import os
 from typing import Any, Mapping
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-from agentic_core.runtime.contracts.l1_plan_contract import L1PlanContract
+from apps_rg.runtime.spine_contracts import ValidatedRequest
+from apps_rg.runtime.spine_contracts import L1PlanContract
 from apps_rg.runtime.bindings.l1_planning_capsule import (
     build_apps_rg_l1_planning_capsule,
     verify_planning_profile_ref_digest,

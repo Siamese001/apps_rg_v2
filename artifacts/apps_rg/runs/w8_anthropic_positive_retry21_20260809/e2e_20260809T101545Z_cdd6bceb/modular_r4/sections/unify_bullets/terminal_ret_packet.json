@@ -1,0 +1,63 @@
+{
+  "artifact_hash": "sha256:fadfedc358d3cb2e883ee6b72b4d1db59c33df0d74b6a8580d552306efe43c26",
+  "emitted_at": "2026-08-09T10:19:12Z",
+  "payload": {
+    "chain_kind": "R4_SINGLE_ACTION",
+    "emitted_at_utc": "2026-08-09T10:19:12Z",
+    "execution_form": "R4_SINGLE_ACTION",
+    "l2_execution_status": "EXECUTED",
+    "l2_fault": "",
+    "l2_recipe_executed": true,
+    "l2_recipe_run_report_ref": "",
+    "l2_sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.006,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 38038.574,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.007,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "BYPASSED",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "no_l2_execution_assertion": false,
+    "request_id": "req-fc5e33e8338a4346ac00e89d9e97be41",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "d0599137-2eb1-4534-9f2a-cbe2a1c5824c",
+    "trace_root": "trace-74329821924d4268a1337bfccf1f91d2"
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:bef87729e51e779ff988f4134f9fa4807b6ad2cdea9d79bd355eecb2712cb028"
+}

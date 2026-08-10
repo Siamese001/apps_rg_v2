@@ -1,0 +1,73 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 4.4,
+    "threshold": 4.0,
+    "pass": true,
+    "decisive_failure": false,
+    "findings": [
+      "Evidence-backed executive narrative integrates alliance, secure delivery, platform, and commercial themes.",
+      "S5 repeats the IBM-AWS co-sell evidence foregrounded in S1 and briefly disrupts the narrative cadence.",
+      "The only failed deterministic gate concerns missing display-override parity in the judge packet, not unsupported candidate prose."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      5
+    ],
+    "remediation_suggestions": [
+      "Reduce the S1/S5 co-sell repetition while preserving the supported scope.",
+      "Correct judge-packet display-override parity for fact_engineering_platform_002."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "MINOR_CADENCE_BREAK"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "MINOR_EVIDENCE_REPETITION"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "X2_JUDGE_PACKET_DISPLAY_OVERRIDE_PARITY_FALSE"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry16_20260809\\e2e_20260809T090140Z_6b8a9546\\modular_r4\\sections\\executive_summary\\x1d_openai_provider_response_raw_20260809_090859_666.json",
+  "original_model": null,
+  "fallback_model": null
+}

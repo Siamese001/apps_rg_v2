@@ -59,6 +59,28 @@ REQUIRED_CAPABILITY_FAMILIES: dict[str, frozenset[str]] = {
     }),
 }
 
+_BUNDLE_ID_TO_REQUIRED_CAPABILITY_FAMILY: dict[str, str] = {
+    "ccb_agentic_platforms": "agentic_platform",
+    "ccb_runtime_governance": "runtime_governance",
+    "ccb_retrieval_context_engineering": "retrieval_context",
+    "ccb_llmops_reliability": "llmops",
+    "ccb_distributed_systems_engineering": "distributed_infra",
+    "ccb_platform_productization": "productization",
+    "ccb_partner_applied_ai_architecture": "partner_architecture",
+    "ccb_engineering_leadership": "engineering_leadership",
+}
+
+_GRAPH_FAMILY_TO_REQUIRED_CAPABILITY_FAMILY: dict[str, str] = {
+    "agentic_platforms": "agentic_platform",
+    "runtime_governance": "runtime_governance",
+    "retrieval_context_engineering": "retrieval_context",
+    "llmops_reliability": "llmops",
+    "distributed_systems_engineering": "distributed_infra",
+    "platform_productization": "productization",
+    "partner_applied_ai_architecture": "partner_architecture",
+    "engineering_leadership": "engineering_leadership",
+}
+
 # ---------------------------------------------------------------------------
 # Generic category labels that MUST be backed by graph-derived terms
 # ---------------------------------------------------------------------------
@@ -195,10 +217,30 @@ def check_competencies_capability_family_coverage(
             all_tokens |= _term_tokens(term)
         all_tokens.update(_tokenize(_category_label(cat)))
 
-    matched_families: list[str] = []
+    matched_family_set: set[str] = set()
     for family_name, signals in REQUIRED_CAPABILITY_FAMILIES.items():
         if signals & all_tokens:
-            matched_families.append(family_name)
+            matched_family_set.add(family_name)
+
+    # Final competencies carry a governed one-bundle/one-family identity. The
+    # earlier text-only detector lost productization when the visible wrapper
+    # was the generic taxonomy label "Commercial & Operating Impact", despite
+    # the category being explicitly bound to ccb_platform_productization.
+    # Treat exact governed identities as stronger evidence than vocabulary,
+    # while retaining token detection for legacy/unbound callers.
+    for cat in competencies or []:
+        if not isinstance(cat, dict):
+            continue
+        bundle_id = str(cat.get("competency_bundle_id") or "").strip()
+        graph_family = str(cat.get("capability_family") or "").strip()
+        if bundle_id in _BUNDLE_ID_TO_REQUIRED_CAPABILITY_FAMILY:
+            matched_family_set.add(_BUNDLE_ID_TO_REQUIRED_CAPABILITY_FAMILY[bundle_id])
+        if graph_family in _GRAPH_FAMILY_TO_REQUIRED_CAPABILITY_FAMILY:
+            matched_family_set.add(_GRAPH_FAMILY_TO_REQUIRED_CAPABILITY_FAMILY[graph_family])
+
+    matched_families = [
+        family for family in REQUIRED_CAPABILITY_FAMILIES if family in matched_family_set
+    ]
 
     passed = len(matched_families) >= min_families
     return CompQualityResult(
@@ -723,8 +765,27 @@ def check_partner_architecture_terms_require_bundle(
     bundles_by_id = _proof_bundles_by_id(proof_pool_metadata)
     violations: list[str] = []
     for i, cat in enumerate(competencies or []):
-        text = _cat_text_for_partner_checks(cat)
-        if not PARTNER_ARCHITECTURE_TEXT_RE.search(text):
+        visible_segments: list[str] = []
+        if isinstance(cat, dict):
+            visible_segments.extend(
+                str(value)
+                for value in (
+                    cat.get("category_label"),
+                    cat.get("resume_display_label"),
+                )
+                if value
+            )
+            visible_segments.extend(
+                str(term.get("term") or term.get("text") or "")
+                if isinstance(term, dict)
+                else str(term or "")
+                for term in _category_terms(cat)
+            )
+        # Evaluate each visible phrase independently. Concatenating a whole
+        # category caused a false positive when one term contained "solution"
+        # and a different term contained "partner", even though neither made
+        # a partner-architecture claim.
+        if not any(PARTNER_ARCHITECTURE_TEXT_RE.search(text) for text in visible_segments):
             continue
         bundle_id = _cat_bundle_id(cat)
         family = _cat_capability_family(cat, bundles_by_id)

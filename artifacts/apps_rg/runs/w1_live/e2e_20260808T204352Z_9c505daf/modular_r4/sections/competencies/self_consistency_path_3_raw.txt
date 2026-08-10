@@ -1,0 +1,100 @@
+```json
+{
+  "categories": [
+    {
+      "competency_bundle_id": "ccb_llmops_reliability",
+      "category_label": "LLMOps, Evaluation & Reliability",
+      "terms": [
+        {"text": "audit-grade observability for agentic systems", "source_fact_id": "fact_engineering_platform_003", "source_fact_ids": ["fact_engineering_platform_003"]},
+        {"text": "output quality and schema evaluation gates", "source_fact_id": "fact_engineering_platform_004", "source_fact_ids": ["fact_engineering_platform_004"]},
+        {"text": "fail-closed runtime reliability controls", "source_fact_id": "fact_engineering_platform_003", "source_fact_ids": ["fact_engineering_platform_003"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_runtime_governance",
+      "category_label": "Runtime Evaluation & Control Gates",
+      "terms": [
+        {"text": "fail-closed gate semantics for agents", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "policy-bound runtime evaluation design", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "exit control checkpoints across execution", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_agentic_platforms",
+      "category_label": "Agentic Platform Observability Architecture",
+      "terms": [
+        {"text": "agentic control plane telemetry design", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "route policy dispatch for agent evaluation", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+        {"text": "governed multi-agent orchestration monitoring", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+      "category_label": "Partner AI Solution Evaluation & Enablement",
+      "terms": [
+        {"text": "partner-led AI solution architecture reviews", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+        {"text": "joint solution development with hyperscalers", "source_fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]},
+        {"text": "technical pre-sales discovery for pursuits", "source_fact_id": "reb_ibm_presales_solution_engineering", "source_fact_ids": ["reb_ibm_presales_solution_engineering"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_distributed_systems_engineering",
+      "category_label": "Release Reliability & Delivery Engineering",
+      "terms": [
+        {"text": "automated release pipeline resilience checks", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+        {"text": "security scanning embedded in delivery", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+        {"text": "regulated modernization delivery observability", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_platform_productization",
+      "category_label": "Adoption Readiness & Value Evaluation",
+      "terms": [
+        {"text": "client value-realization adoption tracking", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+        {"text": "expansion readiness stakeholder alignment", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+        {"text": "presales-to-delivery handoff evaluation", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_engineering_leadership",
+      "category_label": "Technical Team Leadership & Coaching",
+      "terms": [
+        {"text": "enterprise pursuit solution leadership", "source_fact_id": "reb_ibm_revenue_sales_target_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]},
+        {"text": "quota-aligned portfolio expansion ownership", "source_fact_id": "reb_ibm_revenue_sales_target_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]},
+        {"text": "cross-functional alliance GTM execution", "source_fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]}
+      ]
+    }
+  ],
+  "selected_fact_plan": {
+    "section_id": "ccb_path3_llmops",
+    "selection_method": "lens_biased_neighborhood_expansion",
+    "required_fact_ids": [
+      "fact_engineering_platform_001",
+      "fact_engineering_platform_003",
+      "fact_engineering_platform_004",
+      "reb_unify_agentic_platform_architecture",
+      "reb_unify_partner_channel_cosell",
+      "reb_ibm_aws_alliance_partner_cosell_gtm",
+      "reb_ibm_presales_solution_engineering",
+      "reb_ibm_devsecops_release_resilience",
+      "reb_ibm_customer_success_value_realization",
+      "reb_ibm_revenue_sales_target_execution"
+    ]
+  },
+  "claim_ledger": [
+    {"claim": "audit-grade observability for agentic systems", "source_fact_ids": ["fact_engineering_platform_003"]},
+    {"claim": "fail-closed gate semantics for agents", "source_fact_ids": ["fact_engineering_platform_001"]},
+    {"claim": "agentic control plane telemetry design", "source_fact_ids": ["fact_engineering_platform_001"]},
+    {"claim": "partner-led AI solution architecture reviews", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+    {"claim": "automated release pipeline resilience checks", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+    {"claim": "client value-realization adoption tracking", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+    {"claim": "enterprise pursuit solution leadership", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]}
+  ],
+  "jd_alignment": ["llmops_reliability", "partner_solution_architecture", "technical_partner_leadership"],
+  "excluded_jd_skills": ["hiring_and_org_design_at_anthropic_scale", "claude_product_specific_experience"],
+  "removed_or_rewritten_terms": [],
+  "gap_notes": ["no_direct_evidence_of_llm_eval_harness_authorship"],
+  "change_log": ["path3_lens_biased_toward_llmops_evaluation_observability"],
+  "self_check": ["all_terms_have_source_fact_ids", "7_categories_3_terms_each", "no_forbidden_partner_roots_used"]
+}
+```

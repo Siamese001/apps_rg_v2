@@ -1,0 +1,77 @@
+{
+  "categories": [
+    {
+      "category_id": "ccb_runtime_governance",
+      "display_label": "Runtime Governance & Fail-Closed Gates",
+      "terms": [
+        {"text": "fail-closed runtime control gate design", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "policy enforcement across agent execution", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "sandboxed decision workflows with audit trails", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]}
+      ]
+    },
+    {
+      "category_id": "ccb_agentic_platforms",
+      "display_label": "Governed Agentic Control-Plane Architecture",
+      "terms": [
+        {"text": "agentic control-plane route policy dispatch", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+        {"text": "multi-agent orchestration contracts", "source_fact_id": "skill_unify_agentic_multi_agent_orchestration_contracts", "source_fact_ids": ["skill_unify_agentic_multi_agent_orchestration_contracts"]},
+        {"text": "human override escalation paths", "source_fact_id": "skill_unify_agentic_human_override_escalation_paths", "source_fact_ids": ["skill_unify_agentic_human_override_escalation_paths"]}
+      ]
+    },
+    {
+      "category_id": "ccb_llmops_reliability",
+      "display_label": "Audit-Grade Runtime Reliability",
+      "terms": [
+        {"text": "replay key audit manifest design", "source_fact_id": "skill_unify_agentic_replay_key_audit_manifest_design", "source_fact_ids": ["skill_unify_agentic_replay_key_audit_manifest_design"]},
+        {"text": "runtime proof bundle lineage", "source_fact_id": "skill_unify_agentic_runtime_proof_bundle_lineage", "source_fact_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"]},
+        {"text": "automated release pipeline hardening", "source_fact_id": "skill_ibm_automated_release_pipelines", "source_fact_ids": ["skill_ibm_automated_release_pipelines"]}
+      ]
+    },
+    {
+      "category_id": "ccb_partner_applied_ai_architecture",
+      "display_label": "Partner-Facing Applied AI Solutions Architecture",
+      "terms": [
+        {"text": "hyperscaler alliance co-sell motions", "source_fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]},
+        {"text": "partner-led AI solution development", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+        {"text": "technical pre-sales discovery for pursuits", "source_fact_id": "reb_ibm_presales_solution_engineering", "source_fact_ids": ["reb_ibm_presales_solution_engineering"]}
+      ]
+    },
+    {
+      "category_id": "ccb_engineering_leadership",
+      "display_label": "Enterprise Deal Governance & Negotiation",
+      "terms": [
+        {"text": "quota-aligned solution leadership", "source_fact_id": "reb_ibm_revenue_sales_target_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]},
+        {"text": "enterprise negotiation ownership", "source_fact_id": "skill_partner_enterprise_negotiations", "source_fact_ids": ["skill_partner_enterprise_negotiations"]},
+        {"text": "partner customer deal support", "source_fact_id": "skill_partner_customer_deal_support", "source_fact_ids": ["skill_partner_customer_deal_support"]}
+      ]
+    },
+    {
+      "category_id": "ccb_platform_productization",
+      "display_label": "Delivery-to-Adoption Handoff Controls",
+      "terms": [
+        {"text": "presales-to-delivery handoff processes", "source_fact_id": "skill_p2_gtm_presales_delivery_handoff", "source_fact_ids": ["skill_p2_gtm_presales_delivery_handoff"]},
+        {"text": "value-realization adoption tracking", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+        {"text": "release resilience gate embedding", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]}
+      ]
+    }
+  ],
+  "selected_fact_plan": {
+    "section_id": "ccb_path1_runtime_governance",
+    "selection_method": "lens_biased_neighborhood_expansion",
+    "required_fact_ids": ["fact_engineering_platform_001", "reb_unify_agentic_platform_architecture", "skill_unify_agentic_replay_key_audit_manifest_design", "reb_ibm_aws_alliance_partner_cosell_gtm", "reb_ibm_revenue_sales_target_execution", "skill_p2_gtm_presales_delivery_handoff"]
+  },
+  "claim_ledger": [
+    {"claim": "runtime governance and fail-closed gate design", "source_fact_ids": ["fact_engineering_platform_001"]},
+    {"claim": "agentic control-plane architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+    {"claim": "audit-grade runtime lineage design", "source_fact_ids": ["skill_unify_agentic_replay_key_audit_manifest_design"]},
+    {"claim": "partner co-sell and pre-sales architecture", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm", "reb_ibm_presales_solution_engineering"]},
+    {"claim": "enterprise negotiation and quota ownership", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution", "skill_partner_enterprise_negotiations"]},
+    {"claim": "delivery handoff and value realization", "source_fact_ids": ["skill_p2_gtm_presales_delivery_handoff", "reb_ibm_customer_success_value_realization"]}
+  ],
+  "jd_alignment": ["technical partner architecture leadership", "partner-led pre-sales enablement", "cross-functional GTM alignment"],
+  "excluded_jd_skills": ["hiring/mentoring PSA team", "GSI/RSI partner ecosystem specifics"],
+  "removed_or_rewritten_terms": [],
+  "gap_notes": ["no direct fact evidence for people management of solutions architects"],
+  "change_log": ["path1 lens biased toward runtime governance and fail-closed gates"],
+  "self_check": ["3 terms per category verified", "all source_fact_ids from allowed list", "6 categories emitted"]
+}

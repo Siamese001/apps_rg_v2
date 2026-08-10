@@ -1,0 +1,31 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_034746",
+  "gate_id": "x2_ibm_narrative_claim_theme_coverage",
+  "fired": true,
+  "trigger": {
+    "themes_detected_pre": [
+      "bul_ibm_002",
+      "bul_ibm_005"
+    ],
+    "count_pre": 2,
+    "missing_in_ledger_union_pre": [
+      "bul_ibm_005"
+    ],
+    "narrative_pre": "Championed partner-led solution architecture and BI at IBM, establishing a repeatable operating discipline that translated cloud modernization into executive adoption and scalable enterprise pursuits."
+  },
+  "accepted": false,
+  "themes_post": [
+    "bul_ibm_002",
+    "bul_ibm_005"
+  ],
+  "rejected_reason": "provider_not_real",
+  "bounded": {
+    "max_attempts": 1,
+    "attempts_used": 1
+  },
+  "kill_switch": "unset",
+  "regen_max_tokens": 4000,
+  "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+  "regen_parse_error": null
+}

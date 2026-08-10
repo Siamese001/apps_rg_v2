@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from typing import Any, Mapping, Sequence
 
-from agentic_core.runtime.contracts.final_evidence_contract import EvidenceItem
+from apps_rg.runtime.spine_contracts import EvidenceItem
 from apps_rg.runtime.c0.hybrid_informed_fact_plan_reorder import (
     HYBRID_INFORMED_ORDER_SUFFIX,
     apply_hybrid_informed_fact_plan_reorder,

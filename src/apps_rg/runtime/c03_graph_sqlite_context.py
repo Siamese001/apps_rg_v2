@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L4_state.adapters import sqlite3_adapter as sqlite3
+from apps_rg.runtime.core_sqlite import sqlite3_adapter as sqlite3
 from apps_rg.fact_inventory.augmented_skills_graph import (
     SOURCE_AUTHORITY_AUGMENTED_SKILLS_GRAPH,
     load_augmented_skills_graph,
@@ -832,7 +832,7 @@ def write_c03_graph_sqlite_context_receipt(
     )
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"c03_graph_sqlite_context_{rid}.json"
-    from agentic_core.L2_execution.utils import write_gateway as _wg
+    from apps_rg.runtime.core_io import write_gateway as _wg
 
     payload = bundle.get("receipt") or bundle
     if out_path.exists() and run_id is None:

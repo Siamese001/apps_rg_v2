@@ -63,8 +63,11 @@ def verify_recorded_modular_r4_proof_bundle(
         if not isinstance(man, dict):
             errs.append("r4_run_manifest_not_object")
         else:
-            if str(man.get("x3_disposition") or "") != "X3D":
-                errs.append(f"x3_disposition_expected_X3D_got:{man.get('x3_disposition')!r}")
+            if str(man.get("x3_disposition") or "") != "X3D_ALLOW_FINISH":
+                errs.append(
+                    "x3_disposition_expected_X3D_ALLOW_FINISH_got:"
+                    f"{man.get('x3_disposition')!r}"
+                )
             if str(man.get("l2_fault") or "") != "":
                 errs.append(f"expected_empty_l2_fault_got:{man.get('l2_fault')!r}")
 
@@ -98,8 +101,11 @@ def verify_recorded_modular_r4_proof_bundle(
         if isinstance(er, dict):
             pay = er.get("payload")
             if isinstance(pay, dict):
-                if str(pay.get("x3_disposition") or "") != "X3D":
-                    errs.append(f"exit_review_x3_expected_X3D_got:{pay.get('x3_disposition')!r}")
+                if str(pay.get("x3_disposition") or "") != "X3D_ALLOW_FINISH":
+                    errs.append(
+                        "exit_review_x3_expected_X3D_ALLOW_FINISH_got:"
+                        f"{pay.get('x3_disposition')!r}"
+                    )
                 if str(pay.get("l2_fault") or "") != "":
                     errs.append(f"exit_review_expected_empty_l2_fault_got:{pay.get('l2_fault')!r}")
 

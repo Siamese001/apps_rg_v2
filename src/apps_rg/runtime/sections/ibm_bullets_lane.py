@@ -33,7 +33,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 try:
     from dotenv import load_dotenv
@@ -350,11 +350,33 @@ _IBM_FROZEN_ALLOCATION_DISPLAY_COMPOSITIONS: dict[tuple[str, str], str] = {
     (
         "reb_ibm_revenue_sales_target_execution",
         "skill_partner_pnl_oversight",
-    ): "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions.",
+    ): (
+        "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, "
+        "applying pipeline discipline to client portfolio expansion motions."
+    ),
     (
         "reb_ibm_data_modeling_bi_decision_support",
         "skill_p2_tech_reference_architecture",
     ): "Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.",
+    (
+        "reb_ibm_data_modeling_bi_decision_support",
+        "skill_sr_cloud_data_platform_engineering",
+    ): "Built decision-support data models and BI views that connected modernization programs to executive operating decisions.",
+    (
+        "reb_ibm_presales_solution_engineering",
+        "skill_p2_gtm_solution_mapping",
+    ): "Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.",
+    (
+        "reb_ibm_presales_solution_engineering",
+        "skill_p2_gtm_executive_buyer_alignment",
+    ): "Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.",
+    (
+        "reb_ibm_revenue_sales_target_execution",
+        "skill_p2_gtm_enterprise_deal_support",
+    ): (
+        "Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, "
+        "and buyer readiness, connecting technical validation to executive deal support."
+    ),
 }
 
 
@@ -1168,7 +1190,9 @@ def run_ibm_bullets_execution(
     section_model = (
         external_openai_generation_model(section_id=LANE_KEY)
         if str(args.provider) == "external_openai"
-        else resolve_section_generation_model(LANE_KEY)
+        else resolve_section_generation_model(
+            LANE_KEY, provider_profile=str(args.provider)
+        )
     )
     provider_req, provider_payload = build_section_request(
         messages=messages,
@@ -1758,6 +1782,7 @@ def run_ibm_bullets_execution(
         artifact_dir=artifact_dir,
         section_id="ibm_bullets",
         runtime_payload=runtime_payload,
+        defer_graph_binding_l2_persistence=True,
         aggregate_x3_fn=_aggregate_ibm_bullets_x3,
         resume_display_text=display_for_x3,
         claim_ledger=claim_ledger,
@@ -1768,11 +1793,6 @@ def run_ibm_bullets_execution(
         canonical_claims_for_hash=canon_doc.get("claims"),
         section_input_usage_ledger=usage_doc,
     )
-    finalize_section_l2_after_output(artifact_dir, "ibm_bullets", runtime_payload)
-    finalize_section_runtime_exhaust_before_l6(
-        artifact_dir, "ibm_bullets", runtime_payload, repo_root=REPO_ROOT
-    )
-
     bundle = compute_lane_proof_bundle(
         args,
         section_id="ibm_bullets",
@@ -1789,7 +1809,19 @@ def run_ibm_bullets_execution(
         runtime_generation_status=runtime_generation_status,
         bundle=bundle,
     )
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        merge_resume_graph_claim_binding_fields,
+    )
+
+    l2_output = merge_resume_graph_claim_binding_fields(
+        l2_output,
+        artifact_dir=artifact_dir,
+    )
     write_json(artifact_dir / "l2_output.json", l2_output)
+    finalize_section_l2_after_output(artifact_dir, "ibm_bullets", runtime_payload)
+    finalize_section_runtime_exhaust_before_l6(
+        artifact_dir, "ibm_bullets", runtime_payload, repo_root=REPO_ROOT
+    )
 
     l6_temp = float(args.temperature) if args.provider == "external_claude" else IBM_TEMP_DEFAULT
     l6_max = IBM_MAX_OUTPUT_TOKENS if args.provider == "external_claude" else None

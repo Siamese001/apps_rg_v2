@@ -1,0 +1,734 @@
+{
+  "schema_version": "c02_fact_vector_index_preflight_v1",
+  "generated_at_utc": "2026-08-09T07:19:59.627627+00:00",
+  "section_id": "insurtech_bullets",
+  "product_hybrid_required": false,
+  "authority_mode": "direct_vector_proof",
+  "direct_vector_proof": true,
+  "inherited_bullet_proof": false,
+  "aggregate_section_proof": false,
+  "positioning_only": false,
+  "upstream_sections": [],
+  "direct_fact_vector_required": true,
+  "authority_manifest": {
+    "competencies": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "executive_summary": {
+      "authority_mode": "aggregate_section_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": true,
+      "positioning_only": false,
+      "upstream_sections": [
+        "competencies",
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets",
+        "unify_narrative",
+        "ibm_narrative",
+        "insurtech_narrative",
+        "ey_narrative"
+      ],
+      "product_hybrid_allowed": true
+    },
+    "ey_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "ey_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "ey_bullets"
+      ],
+      "product_hybrid_allowed": false
+    },
+    "headline": {
+      "authority_mode": "positioning_only",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": true,
+      "positioning_only": true,
+      "upstream_sections": [
+        "executive_summary",
+        "competencies",
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets"
+      ],
+      "product_hybrid_allowed": true
+    },
+    "ibm_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "ibm_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "ibm_bullets"
+      ],
+      "product_hybrid_allowed": false
+    },
+    "insurtech_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "insurtech_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "insurtech_bullets"
+      ],
+      "product_hybrid_allowed": false
+    },
+    "unify_bullets": {
+      "authority_mode": "direct_vector_proof",
+      "direct_vector_proof": true,
+      "inherited_bullet_proof": false,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [],
+      "product_hybrid_allowed": true
+    },
+    "unify_narrative": {
+      "authority_mode": "inherited_bullet_proof",
+      "direct_vector_proof": false,
+      "inherited_bullet_proof": true,
+      "aggregate_section_proof": false,
+      "positioning_only": false,
+      "upstream_sections": [
+        "unify_bullets"
+      ],
+      "product_hybrid_allowed": false
+    }
+  },
+  "status": "PASS",
+  "reasons": [],
+  "manifest_ref": "artifacts/apps_rg/c0/fact_vectors_bootstrap_manifest.json",
+  "manifest_present": true,
+  "manifest_schema_version": "apps_rg.fact_vectors_bootstrap_manifest.v1",
+  "manifest_checksum": "5bb9e0f19494b87cb75e067a86f3bf781845395a642d45f8724fa395a3815b41",
+  "manifest_generated_at_utc": "2026-08-09T07:14:42.365983+00:00",
+  "manifest_source": "candidate_fact_ledger + base_resume_employment_bullets (tracked first-principles sources); generated output is never a live fact source",
+  "manifest_dry_run": false,
+  "manifest_upserted_count": 45,
+  "manifest_collection_count_after": 45,
+  "manifest_sparse_sidecar_built": true,
+  "manifest_section_target_count": 4,
+  "locked_deterministic_lane": false,
+  "chroma_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\data\\cache\\chromadb",
+  "expected_embedding_model": "BAAI/bge-m3",
+  "expected_embedding_dim": 1024,
+  "collection": {
+    "collection_name": "fact_vectors",
+    "collection_count": 45,
+    "metadata_rows_audited": 45,
+    "metadata_audit_truncated": false,
+    "collection_metadata": {
+      "chroma_default_ef_forbidden": "true",
+      "hnsw:space": "cosine",
+      "collection_role": "fact_vectors",
+      "apps_rg_embedding_provider": "bge_local_explicit"
+    },
+    "section_target_count": 4,
+    "section_source_document_ids": [
+      "bul_insurtech_001",
+      "bul_insurtech_002",
+      "bul_insurtech_003",
+      "fact_insurtech_aws_001"
+    ],
+    "source_document_id_counts": {
+      "bul_ey_001": 1,
+      "bul_ey_002": 1,
+      "bul_ey_003": 1,
+      "bul_ey_004": 1,
+      "bul_ey_005": 1,
+      "bul_ibm_001": 1,
+      "bul_ibm_002": 1,
+      "bul_ibm_003": 1,
+      "bul_ibm_004": 1,
+      "bul_ibm_005": 1,
+      "bul_insurtech_001": 1,
+      "bul_insurtech_002": 1,
+      "bul_insurtech_003": 1,
+      "bul_unify_001": 1,
+      "bul_unify_002": 1,
+      "bul_unify_003": 1,
+      "bul_unify_004": 1,
+      "bul_unify_005": 1,
+      "bul_unify_006": 1,
+      "fact_bcbs239_001": 1,
+      "fact_certs_001": 1,
+      "fact_consulting_001": 1,
+      "fact_credit_001": 1,
+      "fact_engineering_platform_001": 1,
+      "fact_engineering_platform_002": 1,
+      "fact_engineering_platform_003": 1,
+      "fact_engineering_platform_004": 1,
+      "fact_engineering_platform_005": 1,
+      "fact_engineering_platform_006": 1,
+      "fact_exec_002": 1,
+      "fact_ey_guidewire_001": 1,
+      "fact_governance_003": 1,
+      "fact_insurance_liabilities_001": 1,
+      "fact_insurance_software_001": 1,
+      "fact_insurtech_aws_001": 1,
+      "fact_quant_act_001": 1,
+      "fact_quant_act_002": 1,
+      "fact_quant_act_003": 1,
+      "fact_quant_act_004": 1,
+      "fact_quant_hpc_001": 1,
+      "fact_quant_hpc_002": 1,
+      "fact_quant_hpc_003": 1,
+      "fact_rag_insurance_001": 1,
+      "fact_solvency_001": 1,
+      "fact_three_lines_001": 1
+    },
+    "section_source_class_counts": {
+      "candidate_profile": 1,
+      "project_evidence": 3
+    },
+    "section_tier_counts": {
+      "seed": 4
+    },
+    "embedding_model_counts": {
+      "BAAI/bge-m3": 45
+    },
+    "embedding_dim_counts": {
+      "1024": 45
+    },
+    "source_class_counts": {
+      "candidate_profile": 26,
+      "project_evidence": 19
+    },
+    "tier_counts": {
+      "seed": 45
+    },
+    "bad_model_count": 0,
+    "missing_model_count": 0,
+    "bad_dim_count": 0,
+    "missing_dim_count": 0
+  },
+  "delayed_loop_policy": {
+    "pre_run_fact_vector_index_required": true,
+    "live_write_during_c0": false,
+    "generated_output_route": "stage_or_semantic_cache_after_generation",
+    "promotion_gate": "fact_vectors_staging_to_live_after_validation_or_hitl"
+  },
+  "role_episode_bullets_sufficiency": {
+    "schema_version": "role_episode_bullets_fact_vector_sufficiency_v1",
+    "status": "PASS",
+    "section_id": "insurtech_bullets",
+    "employer_label": "InsurTech",
+    "reasons": [],
+    "expected_slot_ids": [
+      "bul_insurtech_001",
+      "bul_insurtech_002",
+      "bul_insurtech_003"
+    ],
+    "source_slot_presence": {
+      "bul_insurtech_001": true,
+      "bul_insurtech_002": true,
+      "bul_insurtech_003": true
+    },
+    "missing_source_fact_slots": [],
+    "extra_source_fact_slots": [],
+    "slot_bundle_map": {
+      "bul_insurtech_001": "reb_insurtech_aws_migration_execution",
+      "bul_insurtech_002": "reb_insurtech_regulated_aws_control_implementation",
+      "bul_insurtech_003": "reb_insurtech_resilient_core_operations"
+    },
+    "slot_bundle_ids": {
+      "bul_insurtech_001": "reb_insurtech_aws_migration_execution",
+      "bul_insurtech_002": "reb_insurtech_regulated_aws_control_implementation",
+      "bul_insurtech_003": "reb_insurtech_resilient_core_operations"
+    },
+    "missing_bundle_slots": [],
+    "invalid_bundle_slots": {},
+    "slot_metric_outcome_ids": {
+      "bul_insurtech_001": [
+        "metric_insurtech_workloads_classified_by_cloud_fit_count",
+        "metric_insurtech_migration_waves_completed_count",
+        "metric_insurtech_core_workloads_migrated_count",
+        "metric_insurtech_cutover_downtime_hours"
+      ],
+      "bul_insurtech_002": [
+        "metric_insurtech_controls_mapped_count",
+        "metric_insurtech_audit_logging_coverage_pct",
+        "metric_insurtech_sensitive_data_controls_count"
+      ],
+      "bul_insurtech_003": [
+        "metric_insurtech_rto_rpo_targets_met_count",
+        "metric_insurtech_incident_runbooks_count"
+      ]
+    },
+    "missing_metric_outcome_slots": [],
+    "unapproved_metric_outcome_slots": {},
+    "unique_metric_outcome_ids": [
+      "metric_insurtech_audit_logging_coverage_pct",
+      "metric_insurtech_controls_mapped_count",
+      "metric_insurtech_core_workloads_migrated_count",
+      "metric_insurtech_cutover_downtime_hours",
+      "metric_insurtech_incident_runbooks_count",
+      "metric_insurtech_migration_waves_completed_count",
+      "metric_insurtech_rto_rpo_targets_met_count",
+      "metric_insurtech_sensitive_data_controls_count",
+      "metric_insurtech_workloads_classified_by_cloud_fit_count"
+    ],
+    "metric_distribution_pass": true,
+    "slot_graph_skill_counts": {
+      "bul_insurtech_001": 6,
+      "bul_insurtech_002": 6,
+      "bul_insurtech_003": 5
+    },
+    "graph_traversal_pass": true,
+    "graph_granularity_pass": true,
+    "graph_traversal_receipt": {
+      "receipt_schema": "role_episode_bullet_traversal_sufficiency_v1",
+      "section_id": "insurtech_bullets",
+      "employer_label": "InsurTech",
+      "slot_bundle_map_resolved": {
+        "bul_insurtech_001": "reb_insurtech_aws_migration_execution",
+        "bul_insurtech_002": "reb_insurtech_regulated_aws_control_implementation",
+        "bul_insurtech_003": "reb_insurtech_resilient_core_operations"
+      },
+      "selected_role_episode_bundle_ids": [
+        "reb_insurtech_aws_migration_execution",
+        "reb_insurtech_regulated_aws_control_implementation",
+        "reb_insurtech_resilient_core_operations"
+      ],
+      "rejected_sibling_role_episode_bundle_ids": [
+        "reb_insurtech_founder_led_market_creation",
+        "reb_insurtech_founder_led_gtm_revenue",
+        "reb_insurtech_lean_delivery_operating_model",
+        "reb_insurtech_public_vs_private_cloud_strategy",
+        "reb_insurtech_aws_cloud_economics",
+        "reb_insurtech_aws_shared_responsibility_operating_model",
+        "reb_insurtech_insurance_regulatory_cloud_adoption_standards",
+        "reb_insurtech_aws_guidewire_core_modernization",
+        "reb_insurtech_insurance_data_bi_decisioning"
+      ],
+      "selected_role_episode_root_count": 3,
+      "selected_unique_leaf_skill_count": 17,
+      "selected_unique_metric_count": 9,
+      "rejected_sibling_skill_count": 34,
+      "rejected_sibling_metric_count": 19,
+      "selected_leaf_skill_ids": [
+        "skill_aws_migration_readiness_assessment",
+        "skill_application_dependency_mapping",
+        "skill_migration_wave_cutover_planning",
+        "skill_database_migration_dms_sct",
+        "skill_sr_insurtech_legacy_cloud_modernization",
+        "skill_p2_tech_aws_modernization_patterns",
+        "skill_aws_iam_kms_cloudtrail_controls",
+        "skill_aws_config_change_auditability",
+        "skill_soc2_control_mapping_for_aws",
+        "skill_pii_encryption_for_insurance_data",
+        "skill_sr_insurtech_regulated_insurer_controls",
+        "skill_soc2_zero_trust_security",
+        "skill_multi_az_insurance_workload_design",
+        "skill_rto_rpo_dr_planning",
+        "skill_cloudwatch_operational_monitoring",
+        "skill_high_availability_underwriting_workflows",
+        "skill_sr_insurance_systems_resilience_internal"
+      ],
+      "rejected_sibling_skill_ids": [
+        "skill_zero_to_one_insurtech_venture_building",
+        "skill_founder_market_thesis_development",
+        "skill_early_adopter_insurer_customer_development",
+        "skill_founder_led_insurtech_sales",
+        "skill_insurer_executive_buyer_discovery",
+        "skill_aws_modernization_pipeline_generation",
+        "skill_proposal_sow_development_for_insurers",
+        "skill_lean_insurtech_mvp_to_production",
+        "skill_founder_resource_constraint_tradeoffs",
+        "skill_agile_delivery_for_regulated_insurers",
+        "skill_public_vs_private_cloud_tco_framing",
+        "skill_private_cloud_complexity_objection_handling",
+        "skill_regulated_workload_placement_strategy",
+        "skill_hybrid_cloud_transition_architecture",
+        "skill_aws_tco_modeling_for_insurers",
+        "skill_capex_to_opex_cloud_business_case",
+        "skill_reserved_instance_rightsizing_strategy",
+        "skill_cost_explorer_budget_forecasting",
+        "skill_aws_shared_responsibility_model_framing",
+        "skill_cloud_control_ownership_mapping",
+        "skill_customer_vs_aws_security_raci",
+        "skill_regulated_cloud_adoption_guardrails",
+        "skill_insurance_regulator_cloud_adoption_engagement",
+        "skill_naic_data_security_model_law_readiness",
+        "skill_nydfs_23nycrr500_cloud_control_alignment",
+        "skill_insurance_commissioner_exam_readiness",
+        "skill_guidewire_insurancesuite_modernization",
+        "skill_policycenter_workflow_mapping",
+        "skill_claimcenter_billingcenter_integration",
+        "skill_insurance_core_data_model_mapping",
+        "skill_guidewire_datahub_infocenter_bi",
+        "skill_pc_insurance_data_warehouse_design",
+        "skill_underwriting_analytics_enablement",
+        "skill_pricing_loss_ratio_reporting"
+      ],
+      "selected_metric_outcome_ids": [
+        "metric_insurtech_workloads_classified_by_cloud_fit_count",
+        "metric_insurtech_migration_waves_completed_count",
+        "metric_insurtech_core_workloads_migrated_count",
+        "metric_insurtech_cutover_downtime_hours",
+        "metric_insurtech_controls_mapped_count",
+        "metric_insurtech_audit_logging_coverage_pct",
+        "metric_insurtech_sensitive_data_controls_count",
+        "metric_insurtech_rto_rpo_targets_met_count",
+        "metric_insurtech_incident_runbooks_count"
+      ],
+      "rejected_sibling_metric_ids": [
+        "metric_insurtech_founder_buyer_discovery_count",
+        "metric_insurtech_qualified_pipeline_stage_count",
+        "metric_insurtech_poc_to_paid_conversion_pct",
+        "metric_insurtech_proposals_sows_count",
+        "metric_insurtech_mvp_to_production_cycle_time",
+        "metric_insurtech_control_ownership_matrix_count",
+        "metric_insurtech_safety_operating_model_artifacts_count",
+        "metric_insurtech_cloud_economics_comparison_models",
+        "metric_insurtech_workloads_classified_by_cloud_fit_count",
+        "metric_insurtech_reserved_instance_coverage_pct",
+        "metric_insurtech_cost_allocation_coverage_pct",
+        "metric_insurtech_regulatory_bodies_engaged_count",
+        "metric_insurtech_cloud_standards_artifacts_count",
+        "metric_insurtech_regulatory_objections_resolved_count",
+        "metric_insurtech_guidewire_workflows_mapped_count",
+        "metric_insurtech_core_data_entities_mapped_count",
+        "metric_insurtech_reporting_latency_reduction",
+        "metric_insurtech_real_time_ingestion_feeds_count",
+        "metric_insurtech_decision_cycle_time_reduction"
+      ],
+      "frontier_size_by_hop_depth": {
+        "hop_0_role_episode_roots": 3,
+        "hop_1_graph_skill_nodes": 17,
+        "hop_2_metric_outcome_nodes": 9,
+        "rejected_hop_0_sibling_roots": 9,
+        "rejected_hop_1_sibling_skill_nodes": 34,
+        "rejected_hop_2_sibling_metric_nodes": 19
+      },
+      "candidate_conservation": {
+        "eligible_role_episode_root_count": 12,
+        "selected_role_episode_root_count": 3,
+        "rejected_role_episode_root_count": 9,
+        "unexplained_selected_role_episode_bundle_ids": [],
+        "pass": true
+      }
+    }
+  },
+  "insurtech_bullets_sufficiency": {
+    "schema_version": "role_episode_bullets_fact_vector_sufficiency_v1",
+    "status": "PASS",
+    "section_id": "insurtech_bullets",
+    "employer_label": "InsurTech",
+    "reasons": [],
+    "expected_slot_ids": [
+      "bul_insurtech_001",
+      "bul_insurtech_002",
+      "bul_insurtech_003"
+    ],
+    "source_slot_presence": {
+      "bul_insurtech_001": true,
+      "bul_insurtech_002": true,
+      "bul_insurtech_003": true
+    },
+    "missing_source_fact_slots": [],
+    "extra_source_fact_slots": [],
+    "slot_bundle_map": {
+      "bul_insurtech_001": "reb_insurtech_aws_migration_execution",
+      "bul_insurtech_002": "reb_insurtech_regulated_aws_control_implementation",
+      "bul_insurtech_003": "reb_insurtech_resilient_core_operations"
+    },
+    "slot_bundle_ids": {
+      "bul_insurtech_001": "reb_insurtech_aws_migration_execution",
+      "bul_insurtech_002": "reb_insurtech_regulated_aws_control_implementation",
+      "bul_insurtech_003": "reb_insurtech_resilient_core_operations"
+    },
+    "missing_bundle_slots": [],
+    "invalid_bundle_slots": {},
+    "slot_metric_outcome_ids": {
+      "bul_insurtech_001": [
+        "metric_insurtech_workloads_classified_by_cloud_fit_count",
+        "metric_insurtech_migration_waves_completed_count",
+        "metric_insurtech_core_workloads_migrated_count",
+        "metric_insurtech_cutover_downtime_hours"
+      ],
+      "bul_insurtech_002": [
+        "metric_insurtech_controls_mapped_count",
+        "metric_insurtech_audit_logging_coverage_pct",
+        "metric_insurtech_sensitive_data_controls_count"
+      ],
+      "bul_insurtech_003": [
+        "metric_insurtech_rto_rpo_targets_met_count",
+        "metric_insurtech_incident_runbooks_count"
+      ]
+    },
+    "missing_metric_outcome_slots": [],
+    "unapproved_metric_outcome_slots": {},
+    "unique_metric_outcome_ids": [
+      "metric_insurtech_audit_logging_coverage_pct",
+      "metric_insurtech_controls_mapped_count",
+      "metric_insurtech_core_workloads_migrated_count",
+      "metric_insurtech_cutover_downtime_hours",
+      "metric_insurtech_incident_runbooks_count",
+      "metric_insurtech_migration_waves_completed_count",
+      "metric_insurtech_rto_rpo_targets_met_count",
+      "metric_insurtech_sensitive_data_controls_count",
+      "metric_insurtech_workloads_classified_by_cloud_fit_count"
+    ],
+    "metric_distribution_pass": true,
+    "slot_graph_skill_counts": {
+      "bul_insurtech_001": 6,
+      "bul_insurtech_002": 6,
+      "bul_insurtech_003": 5
+    },
+    "graph_traversal_pass": true,
+    "graph_granularity_pass": true,
+    "graph_traversal_receipt": {
+      "receipt_schema": "role_episode_bullet_traversal_sufficiency_v1",
+      "section_id": "insurtech_bullets",
+      "employer_label": "InsurTech",
+      "slot_bundle_map_resolved": {
+        "bul_insurtech_001": "reb_insurtech_aws_migration_execution",
+        "bul_insurtech_002": "reb_insurtech_regulated_aws_control_implementation",
+        "bul_insurtech_003": "reb_insurtech_resilient_core_operations"
+      },
+      "selected_role_episode_bundle_ids": [
+        "reb_insurtech_aws_migration_execution",
+        "reb_insurtech_regulated_aws_control_implementation",
+        "reb_insurtech_resilient_core_operations"
+      ],
+      "rejected_sibling_role_episode_bundle_ids": [
+        "reb_insurtech_founder_led_market_creation",
+        "reb_insurtech_founder_led_gtm_revenue",
+        "reb_insurtech_lean_delivery_operating_model",
+        "reb_insurtech_public_vs_private_cloud_strategy",
+        "reb_insurtech_aws_cloud_economics",
+        "reb_insurtech_aws_shared_responsibility_operating_model",
+        "reb_insurtech_insurance_regulatory_cloud_adoption_standards",
+        "reb_insurtech_aws_guidewire_core_modernization",
+        "reb_insurtech_insurance_data_bi_decisioning"
+      ],
+      "selected_role_episode_root_count": 3,
+      "selected_unique_leaf_skill_count": 17,
+      "selected_unique_metric_count": 9,
+      "rejected_sibling_skill_count": 34,
+      "rejected_sibling_metric_count": 19,
+      "selected_leaf_skill_ids": [
+        "skill_aws_migration_readiness_assessment",
+        "skill_application_dependency_mapping",
+        "skill_migration_wave_cutover_planning",
+        "skill_database_migration_dms_sct",
+        "skill_sr_insurtech_legacy_cloud_modernization",
+        "skill_p2_tech_aws_modernization_patterns",
+        "skill_aws_iam_kms_cloudtrail_controls",
+        "skill_aws_config_change_auditability",
+        "skill_soc2_control_mapping_for_aws",
+        "skill_pii_encryption_for_insurance_data",
+        "skill_sr_insurtech_regulated_insurer_controls",
+        "skill_soc2_zero_trust_security",
+        "skill_multi_az_insurance_workload_design",
+        "skill_rto_rpo_dr_planning",
+        "skill_cloudwatch_operational_monitoring",
+        "skill_high_availability_underwriting_workflows",
+        "skill_sr_insurance_systems_resilience_internal"
+      ],
+      "rejected_sibling_skill_ids": [
+        "skill_zero_to_one_insurtech_venture_building",
+        "skill_founder_market_thesis_development",
+        "skill_early_adopter_insurer_customer_development",
+        "skill_founder_led_insurtech_sales",
+        "skill_insurer_executive_buyer_discovery",
+        "skill_aws_modernization_pipeline_generation",
+        "skill_proposal_sow_development_for_insurers",
+        "skill_lean_insurtech_mvp_to_production",
+        "skill_founder_resource_constraint_tradeoffs",
+        "skill_agile_delivery_for_regulated_insurers",
+        "skill_public_vs_private_cloud_tco_framing",
+        "skill_private_cloud_complexity_objection_handling",
+        "skill_regulated_workload_placement_strategy",
+        "skill_hybrid_cloud_transition_architecture",
+        "skill_aws_tco_modeling_for_insurers",
+        "skill_capex_to_opex_cloud_business_case",
+        "skill_reserved_instance_rightsizing_strategy",
+        "skill_cost_explorer_budget_forecasting",
+        "skill_aws_shared_responsibility_model_framing",
+        "skill_cloud_control_ownership_mapping",
+        "skill_customer_vs_aws_security_raci",
+        "skill_regulated_cloud_adoption_guardrails",
+        "skill_insurance_regulator_cloud_adoption_engagement",
+        "skill_naic_data_security_model_law_readiness",
+        "skill_nydfs_23nycrr500_cloud_control_alignment",
+        "skill_insurance_commissioner_exam_readiness",
+        "skill_guidewire_insurancesuite_modernization",
+        "skill_policycenter_workflow_mapping",
+        "skill_claimcenter_billingcenter_integration",
+        "skill_insurance_core_data_model_mapping",
+        "skill_guidewire_datahub_infocenter_bi",
+        "skill_pc_insurance_data_warehouse_design",
+        "skill_underwriting_analytics_enablement",
+        "skill_pricing_loss_ratio_reporting"
+      ],
+      "selected_metric_outcome_ids": [
+        "metric_insurtech_workloads_classified_by_cloud_fit_count",
+        "metric_insurtech_migration_waves_completed_count",
+        "metric_insurtech_core_workloads_migrated_count",
+        "metric_insurtech_cutover_downtime_hours",
+        "metric_insurtech_controls_mapped_count",
+        "metric_insurtech_audit_logging_coverage_pct",
+        "metric_insurtech_sensitive_data_controls_count",
+        "metric_insurtech_rto_rpo_targets_met_count",
+        "metric_insurtech_incident_runbooks_count"
+      ],
+      "rejected_sibling_metric_ids": [
+        "metric_insurtech_founder_buyer_discovery_count",
+        "metric_insurtech_qualified_pipeline_stage_count",
+        "metric_insurtech_poc_to_paid_conversion_pct",
+        "metric_insurtech_proposals_sows_count",
+        "metric_insurtech_mvp_to_production_cycle_time",
+        "metric_insurtech_control_ownership_matrix_count",
+        "metric_insurtech_safety_operating_model_artifacts_count",
+        "metric_insurtech_cloud_economics_comparison_models",
+        "metric_insurtech_workloads_classified_by_cloud_fit_count",
+        "metric_insurtech_reserved_instance_coverage_pct",
+        "metric_insurtech_cost_allocation_coverage_pct",
+        "metric_insurtech_regulatory_bodies_engaged_count",
+        "metric_insurtech_cloud_standards_artifacts_count",
+        "metric_insurtech_regulatory_objections_resolved_count",
+        "metric_insurtech_guidewire_workflows_mapped_count",
+        "metric_insurtech_core_data_entities_mapped_count",
+        "metric_insurtech_reporting_latency_reduction",
+        "metric_insurtech_real_time_ingestion_feeds_count",
+        "metric_insurtech_decision_cycle_time_reduction"
+      ],
+      "frontier_size_by_hop_depth": {
+        "hop_0_role_episode_roots": 3,
+        "hop_1_graph_skill_nodes": 17,
+        "hop_2_metric_outcome_nodes": 9,
+        "rejected_hop_0_sibling_roots": 9,
+        "rejected_hop_1_sibling_skill_nodes": 34,
+        "rejected_hop_2_sibling_metric_nodes": 19
+      },
+      "candidate_conservation": {
+        "eligible_role_episode_root_count": 12,
+        "selected_role_episode_root_count": 3,
+        "rejected_role_episode_root_count": 9,
+        "unexplained_selected_role_episode_bundle_ids": [],
+        "pass": true
+      }
+    }
+  },
+  "section_sufficiency": {
+    "schema_version": "section_fact_vector_sufficiency_v1",
+    "section_id": "insurtech_bullets",
+    "status": "PASS",
+    "reasons": [],
+    "known_generated_lane": true,
+    "authority_mode": "direct_vector_proof",
+    "direct_vector_proof": true,
+    "inherited_bullet_proof": false,
+    "aggregate_section_proof": false,
+    "positioning_only": false,
+    "upstream_sections": [],
+    "direct_fact_vector_required": true,
+    "product_hybrid_required": false,
+    "manifest_section_target_count": 4,
+    "manifest_coverage_present": true,
+    "live_section_target_count": 4,
+    "pre_run_hydration_present": true,
+    "collection_count": 45,
+    "model_dim_pass": true,
+    "section_source_class_counts": {
+      "candidate_profile": 1,
+      "project_evidence": 3
+    },
+    "section_tier_counts": {
+      "seed": 4
+    },
+    "expected_source_slot_prefix": "bul_insurtech_",
+    "expected_source_slot_min_count": 3,
+    "source_slot_count": 3,
+    "source_slot_ids": [
+      "bul_insurtech_001",
+      "bul_insurtech_002",
+      "bul_insurtech_003"
+    ],
+    "delayed_loop_policy_pass": true
+  },
+  "insurtech_bullets_section_sufficiency": {
+    "schema_version": "section_fact_vector_sufficiency_v1",
+    "section_id": "insurtech_bullets",
+    "status": "PASS",
+    "reasons": [],
+    "known_generated_lane": true,
+    "authority_mode": "direct_vector_proof",
+    "direct_vector_proof": true,
+    "inherited_bullet_proof": false,
+    "aggregate_section_proof": false,
+    "positioning_only": false,
+    "upstream_sections": [],
+    "direct_fact_vector_required": true,
+    "product_hybrid_required": false,
+    "manifest_section_target_count": 4,
+    "manifest_coverage_present": true,
+    "live_section_target_count": 4,
+    "pre_run_hydration_present": true,
+    "collection_count": 45,
+    "model_dim_pass": true,
+    "section_source_class_counts": {
+      "candidate_profile": 1,
+      "project_evidence": 3
+    },
+    "section_tier_counts": {
+      "seed": 4
+    },
+    "expected_source_slot_prefix": "bul_insurtech_",
+    "expected_source_slot_min_count": 3,
+    "source_slot_count": 3,
+    "source_slot_ids": [
+      "bul_insurtech_001",
+      "bul_insurtech_002",
+      "bul_insurtech_003"
+    ],
+    "delayed_loop_policy_pass": true
+  },
+  "section_coverage_present": true,
+  "same_run_write_policy": "forbidden_for_product_retrieval",
+  "write_authority": false,
+  "comparison_authority": true
+}

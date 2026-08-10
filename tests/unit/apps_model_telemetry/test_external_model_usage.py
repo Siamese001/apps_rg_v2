@@ -97,7 +97,7 @@ def test_external_provider_writes_usage_to_the_bound_run_ledger(tmp_path: Path) 
         result = provider.generate(_Prompt(), token_budget=77)
 
     assert result.runtime_generation_status == "REAL_LLM"
-    event = _events(tmp_path)[0]
+    event = next(event for event in _events(tmp_path) if event["outcome"] == "SUCCESS")
     assert event["provider"] == "external_openai"
     assert event["model"] == "gpt-test-actual"
     assert event["run_id"] == "run-token-test"
@@ -166,6 +166,7 @@ def test_x1d_gemini_writes_provider_reported_thinking_usage(
         "judge-input-digest",
         "gemini_pro",
         artifact_base=tmp_path,
+        thinking_level="high",
         section_id="competencies",
     )
 

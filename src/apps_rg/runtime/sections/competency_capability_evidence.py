@@ -21,6 +21,7 @@ from apps_rg.runtime.sections.competencies_term_phrase import term_phrase
 logger = logging.getLogger(__name__)
 from apps_rg.runtime.sections.competency_capability_registry import (
     REQUIRED_CAPABILITY_FAMILIES,
+    get_bundle_by_id,
     get_bundles_for_section,
     validate_competency_bundle,
 )
@@ -286,19 +287,19 @@ VISIBLE_GRAPH_SURFACE_TERM_OVERRIDES: dict[str, tuple[str, ...]] = {
         "sandboxed decision workflows with audit trails",
     ),
     "ccb_retrieval_context_engineering": (
-        "GraphRAG context grounding for enterprise workflows",
+        "relationship-grounded context retrieval for enterprise workflows",
         "dense-sparse retrieval with relationship-aware ranking",
         "authority-ordered prompt context assembly pipelines",
     ),
     "ccb_platform_productization": (
         "demoable AI accelerators for executive buyers",
-        "reusable platform IP commercialization motions",
-        "evaluation-ready delivery from prototype to adoption",
+        "reusable AI platform commercialization for adoption",
+        "production-to-adoption platform value realization operating model",
     ),
     "ccb_llmops_reliability": (
-        "audit-grade telemetry for agentic systems",
+        "audit-ready agent reliability evidence for governed systems",
         "evaluation gauntlets for behavior assurance",
-        "reliability lifecycle for governed AI workflows",
+        "production reliability lifecycle for agentic workflows",
     ),
     "ccb_distributed_systems_engineering": (
         "cloud-native AI data reference architectures",
@@ -306,9 +307,9 @@ VISIBLE_GRAPH_SURFACE_TERM_OVERRIDES: dict[str, tuple[str, ...]] = {
         "lakehouse modernization for decision intelligence",
     ),
     "ccb_engineering_leadership": (
-        "executive-aligned engineering operating cadences for adoption",
-        "cross-functional delivery governance at scale",
-        "organization scale-out for platform operating model",
+        "executive-aligned technical discovery operating cadences",
+        "cross-functional enterprise solution architecture delivery governance",
+        "enterprise pursuit operating model scale-out",
     ),
 }
 
@@ -366,6 +367,32 @@ VISIBLE_GRAPH_SURFACE_TAXONOMY_BY_BUNDLE: dict[str, tuple[str, str]] = {
     "ccb_distributed_systems_engineering": ("data_analytics_modernization", "Data & Analytics Modernization"),
     "ccb_engineering_leadership": ("engineering_delivery_leadership", "Engineering & Delivery Leadership"),
 }
+
+
+def visible_graph_surface_taxonomy_for_bundle(
+    bundle_id: str,
+    *,
+    record: dict[str, Any] | None = None,
+) -> tuple[str, str]:
+    """Return the approved display taxonomy wrapper for one graph bundle.
+
+    The explicit map covers the primary families. Optional bundles use their
+    declared ``target_taxonomy_category_ids`` and the taxonomy label SSOT. This
+    keeps selector diversity, projection, and visible-surface enrichment on one
+    identity rule instead of allowing each stage to infer a different label.
+    """
+
+    bid = str(bundle_id or "").strip()
+    if bid in VISIBLE_GRAPH_SURFACE_TAXONOMY_BY_BUNDLE:
+        return VISIBLE_GRAPH_SURFACE_TAXONOMY_BY_BUNDLE[bid]
+    rec = record if isinstance(record, dict) else get_bundle_by_id(bid)
+    target_ids = rec.get("target_taxonomy_category_ids") if isinstance(rec, dict) else []
+    taxonomy_id = str((target_ids or [""])[0] or "").strip()
+    if not taxonomy_id:
+        return "", ""
+    from apps_rg.runtime.sections.competencies_v3_contract import label_for_category_id
+
+    return taxonomy_id, str(label_for_category_id(taxonomy_id) or "").strip()
 
 _AUTHORITY_HEADER_LINES: tuple[str, ...] = (
     "proof_authority = graph_competency_bundles_plus_linked_source_facts",
@@ -669,8 +696,11 @@ def format_competency_capability_evidence_pack(
         "- Partner architecture wording MUST bind to allowed_partner_roots and must not bind to forbidden_partner_roots.",
         "- Generic taxonomy labels may be display wrappers only — never proof on their own.",
         "- A term attached only to default_fid is NOT proof.",
-        "- Required capability families to cover (>=8): "
-        + ", ".join(REQUIRED_CAPABILITY_FAMILIES[:8]) + ".",
+        "- Candidate capability families to prioritize: "
+        + ", ".join(REQUIRED_CAPABILITY_FAMILIES[:8])
+        + ". The final X2 coverage floor is all eight differentiated families across "
+        "the selector-authorized 6-8 categories. A category may carry more than one "
+        "graph-backed family, but every family must remain visibly represented.",
     ]
     header = "\n".join(header_lines)
 
@@ -729,7 +759,11 @@ def stamp_competency_bundle_bindings(
     pkt = packet or build_competency_capability_section_packet("competencies")
     by_category: dict[str, dict[str, Any]] = {}
     by_family: dict[str, dict[str, Any]] = {}
+    by_bundle_id: dict[str, dict[str, Any]] = {}
     for rec in pkt.get("competency_bundles") or []:
+        bundle_id = str(rec.get("competency_bundle_id") or "").strip()
+        if bundle_id:
+            by_bundle_id[bundle_id] = rec
         for cat_id in rec.get("target_taxonomy_category_ids") or []:
             by_category.setdefault(str(cat_id), rec)
         # Family fallback: a category whose id/label names a capability family (e.g.
@@ -745,7 +779,15 @@ def stamp_competency_bundle_bindings(
         if not isinstance(cat, dict):
             continue
         cid = str(cat.get("category_id") or "").strip()
-        rec = by_category.get(cid) or by_family.get(cid)
+        # A selector-authorized bundle is stronger authority than the packet's
+        # first generic taxonomy match. Multiple bundles intentionally target
+        # some shared executive taxonomy categories, so looking up only by
+        # category ID can silently replace Engineering Leadership with LLMOps
+        # (or another first-registered bundle) after selection.
+        existing_bundle_id = str(cat.get("competency_bundle_id") or "").strip()
+        rec = by_bundle_id.get(existing_bundle_id)
+        if rec is None:
+            rec = by_category.get(cid) or by_family.get(cid)
         if not rec:
             label_key = re.sub(r"[^a-z0-9]+", "_", str(cat.get("category_label") or "").lower()).strip("_")
             rec = by_family.get(label_key)
@@ -1257,41 +1299,57 @@ def enrich_competencies_visible_graph_surface(
     order = {bundle_id: idx for idx, bundle_id in enumerate(PARTNERSHIP_FIRST_COMPETENCIES_BUNDLE_ORDER)}
     receipt_rows: list[dict[str, Any]] = []
     token_counts: dict[str, int] = {}
+    surface_category_counts: dict[str, dict[str, int]] = {}
 
     def _rewrite(cats: Any, *, surface_name: str) -> list[dict[str, Any]]:
         if not isinstance(cats, list):
             return []
+        input_categories = [cat for cat in cats if isinstance(cat, dict)]
+        input_category_count = len(input_categories)
         by_bundle: dict[str, dict[str, Any]] = {}
         surplus: list[dict[str, Any]] = []
-        for cat in cats:
-            if not isinstance(cat, dict):
-                continue
+        for cat in input_categories:
             bid = str(cat.get("competency_bundle_id") or "").strip()
             if bid and bid not in by_bundle:
                 by_bundle[bid] = cat
             else:
                 surplus.append(cat)
-        unassigned = list(surplus)
+
+        # The graph-pool selector is the authority for the adaptive 6-8
+        # product shape.  This projection used to iterate the entire bundle
+        # registry and create categories for bundles the selector omitted,
+        # silently turning an authorized six-category result into eight.  It
+        # must enrich and reorder only the selected bundle identities; an
+        # unbound category remains visible for downstream fail-closed gates
+        # instead of being rebound to an unrelated capability family.
+        selected_bundle_ids = [
+            bid for bid in PARTNERSHIP_FIRST_COMPETENCIES_BUNDLE_ORDER if bid in by_bundle
+        ]
+        selected_bundle_ids.extend(
+            bid for bid in by_bundle if bid not in selected_bundle_ids
+        )
         out: list[dict[str, Any]] = []
-        for bid in PARTNERSHIP_FIRST_COMPETENCIES_BUNDLE_ORDER:
+        for bid in selected_bundle_ids:
             rec = by_id.get(bid)
             if not rec:
+                # Retain the selected category so missing packet authority is
+                # observable to the bundle gates.  Dropping it here would
+                # mutate the selector decision and hide the defect.
+                out.append(by_bundle[bid])
                 continue
             display_idx = len(out)
-            cat = by_bundle.get(bid)
-            if cat is None and unassigned:
-                cat = unassigned.pop(0)
-            if cat is None:
-                cat = {"terms": []}
+            cat = by_bundle[bid]
             before_label = str(cat.get("resume_display_label") or cat.get("category_label") or "").strip()
             display_label = str(rec.get("display_label_candidate") or before_label).strip()
-            taxonomy_id, taxonomy_label = VISIBLE_GRAPH_SURFACE_TAXONOMY_BY_BUNDLE.get(
+            taxonomy_id, taxonomy_label = visible_graph_surface_taxonomy_for_bundle(
                 bid,
-                (
-                    str((rec.get("target_taxonomy_category_ids") or [bid])[0]),
-                    before_label or display_label,
-                ),
+                record=rec,
             )
+            if not taxonomy_id or not taxonomy_label:
+                # Keep the defect observable; downstream taxonomy gates will
+                # fail closed instead of receiving a fabricated wrapper.
+                taxonomy_id = str(cat.get("category_id") or bid)
+                taxonomy_label = str(cat.get("category_label") or before_label or display_label)
             linked_fact_ids = _bundle_allowed_linked_facts(
                 rec,
                 cat,
@@ -1372,8 +1430,16 @@ def enrich_competencies_visible_graph_surface(
                     "order_index": order.get(bid, 500),
                 }
             )
-            if len(out) >= 8:
-                break
+        out.extend(surplus)
+        if len(out) != input_category_count:
+            raise RuntimeError(
+                "competencies visible graph projection changed the selector-authorized "
+                f"category count: input={input_category_count} output={len(out)}"
+            )
+        surface_category_counts[surface_name] = {
+            "input": input_category_count,
+            "output": len(out),
+        }
         return out
 
     if isinstance(parsed.get("categories"), list):
@@ -1389,6 +1455,11 @@ def enrich_competencies_visible_graph_surface(
         "bundle_order": list(PARTNERSHIP_FIRST_COMPETENCIES_BUNDLE_ORDER),
         "visible_terms_min": VISIBLE_GRAPH_TERMS_MIN,
         "visible_terms_max": VISIBLE_GRAPH_TERMS_MAX,
+        "category_count_policy": "preserve_selector_authorized_adaptive_6_8",
+        "category_count_by_surface": surface_category_counts,
+        "category_count_preserved": all(
+            row["input"] == row["output"] for row in surface_category_counts.values()
+        ),
         "enriched_category_count": len(
             {
                 str(row.get("competency_bundle_id") or "")
@@ -1639,6 +1710,7 @@ __all__ = [
     "build_competency_capability_section_packet",
     "compact_competencies_self_consistency_messages",
     "enrich_competencies_visible_graph_surface",
+    "visible_graph_surface_taxonomy_for_bundle",
     "format_competency_capability_evidence_pack",
     "hydrate_competency_bundle_graph_evidence",
     "is_flat_taxonomy_only_packet",

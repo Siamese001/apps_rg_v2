@@ -4,7 +4,10 @@ import json
 from pathlib import Path
 
 from apps_rg.runtime.spine.l6_shadow_eval_runner import (
+    _canonical_digest,
     _emit_l6_observability_closure_receipt,
+    _validate_l5_certification_receipt,
+    emit_l5_certification_receipt_from_core,
 )
 
 
@@ -100,3 +103,53 @@ def test_observability_closure_fails_on_gate_or_artifact_gap(tmp_path: Path) -> 
     assert payload["observability_closure_status"] == "FAIL"
     assert "g29_pass" in payload["failed_checks"]
     assert "l6_microstep_rca_exists" in payload["failed_checks"]
+
+
+def test_deferred_l5_projection_is_digest_bound_to_core_and_lane(tmp_path: Path) -> None:
+    native = {
+        "run_id": "lane-run",
+        "parent_run_id": "product-run",
+        "child_run_id": "lane-run",
+        "section_attempt_id": "headline:lane-run:attempt:1",
+        "tenant_id": "tenant-1",
+    }
+    (tmp_path / "apps_rg_section_runtime_exhaust_bundle.json").write_text(
+        json.dumps(native), encoding="utf-8"
+    )
+    core = {
+        "run_id": "core-run",
+        "cert_status": "certified",
+        "certification_status": "L5_CERTIFIED",
+    }
+    (tmp_path / "runtime_certification_binding.json").write_text(
+        json.dumps({"artifact_hash": _canonical_digest(core), "payload": core}),
+        encoding="utf-8",
+    )
+    (tmp_path / "product_certification_receipt.json").write_text(
+        json.dumps(
+            {
+                "run_id": "lane-run",
+                "product_certification": "ONE_SPINE_SECTION_CERTIFIED",
+                "required_chain_complete": True,
+                "proof_eligible": True,
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    receipt_path = emit_l5_certification_receipt_from_core(
+        artifact_dir=tmp_path,
+        repo_root=tmp_path,
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    valid, gaps, ref, digest = _validate_l5_certification_receipt(
+        artifact_dir=tmp_path,
+        repo_root=tmp_path,
+        ref=receipt_path.name,
+        raw_exhaust=native,
+    )
+
+    assert valid is True
+    assert gaps == []
+    assert ref == receipt_path.name
+    assert digest == receipt["receipt_digest"]

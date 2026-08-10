@@ -3,8 +3,8 @@
 Structural math: the clause decomposer splits on ', establishing' (maxsplit=1 → max 2 ledger
 rows) and clause-decomposition allows max 2 bul_ibm_* roots per row → ledger union ≤ 4 roots.
 A narrative tripping 5 theme triggers can NEVER pass both x2_ibm_narrative_claim_theme_coverage
-and x2_ibm_narrative_claim_ledger_clause_decomposition. The rung is ONE bounded same-authority
-regen (headline content-signal idiom, PR #284) with fail-closed acceptance; gates unchanged.
+and x2_ibm_narrative_claim_ledger_clause_decomposition. The bounded same-authority rung also
+repairs mechanism-only support failures, with fail-closed acceptance; gates unchanged.
 """
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from types import SimpleNamespace
 import pytest
 
 from apps_rg.runtime.sections import ibm_narrative_lane_runtime as lane_runtime
+from apps_rg.runtime.section_model_limits import resolve_section_generation_model
 from apps_rg.runtime.sections.ibm_narrative_lane_defaults import NARRATIVE_MAX_OUTPUT_TOKENS
 from apps_rg.runtime.validators.ibm_narrative_x2 import (
     check_ibm_narrative_claim_ledger_clause_decomposition,
@@ -96,15 +97,27 @@ def _regen_json(narrative: str) -> str:
 
 
 class _RecordingProvider:
-    def __init__(self, status: str, raw: str) -> None:
+    def __init__(self, status: str, raw: str | list[str]) -> None:
         self.status = status
-        self.raw = raw
+        self.raws = list(raw) if isinstance(raw, list) else [raw]
         self.calls = 0
+        self.payloads: list[dict] = []
 
-    def __call__(self, payload: dict) -> SimpleNamespace:
+    def __call__(self, payload: dict, **kwargs) -> SimpleNamespace:
         self.calls += 1
         self.last_payload = payload
-        return SimpleNamespace(runtime_generation_status=self.status, raw_model_output=self.raw)
+        self.payloads.append(payload)
+        self.last_kwargs = kwargs
+        raw = self.raws[min(self.calls - 1, len(self.raws) - 1)]
+        return SimpleNamespace(
+            runtime_generation_status=self.status,
+            raw_model_output=raw,
+            provider_requested="external_openai",
+            provider_attempted=self.status == "REAL_LLM",
+            provider_available=self.status == "REAL_LLM",
+            model=resolve_section_generation_model("ibm_narrative"),
+            exact_provider_error="" if self.status == "REAL_LLM" else "blocked",
+        )
 
 
 def _run_rung(
@@ -116,6 +129,7 @@ def _run_rung(
     runtime_payload=None,
     runtime_generation_status="REAL_LLM",
     raw_output=None,
+    companion_text="",
 ):
     monkeypatch.setattr(lane_runtime, "generate_section", provider)
     payload = runtime_payload if runtime_payload is not None else _runtime_payload()
@@ -129,6 +143,7 @@ def _run_rung(
         runtime_payload=payload,
         artifact_dir=tmp_path,
         runtime_generation_status=runtime_generation_status,
+        companion_text=companion_text,
     )
 
 
@@ -147,6 +162,37 @@ def test_fixture_sentences_have_expected_theme_counts() -> None:
     assert ibm_narrative_material_fact_ids_for_sentence(
         SINGLE_CLAUSE_3_THEME_NARRATIVE
     ) == frozenset({"bul_ibm_002", "bul_ibm_004", "bul_ibm_005"})
+
+
+def test_regen_sanitizer_removes_only_unsupported_companion_theme_words() -> None:
+    companion = (
+        "- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization.\n"
+        "- bul_ibm_002: Applied pipeline discipline to client portfolio expansion motions.\n"
+        "- bul_ibm_003: Built decision-support data models and BI views."
+    )
+    parsed = {
+        "narrative_sentence": (
+            "Championed AWS alliance leadership at IBM, establishing pipeline discipline "
+            "across regulated financial-services portfolios and partner ecosystems at scale."
+        ),
+        "change_log": [],
+    }
+
+    out = lane_runtime._sanitize_regen_unsupported_companion_theme_phrases(
+        parsed,
+        companion,
+    )
+
+    narrative = out["narrative_sentence"]
+    assert "regulated financial" not in narrative.lower()
+    assert "ecosystem" not in narrative.lower()
+    themes = ibm_narrative_material_fact_ids_for_sentence(narrative, companion)
+    assert not [value for value in themes if value.startswith("unsupported_companion_theme:")]
+    assert "financial-services" in narrative
+    assert any(
+        row.get("operation") == "sanitize_regen_unsupported_companion_theme_phrases"
+        for row in out["change_log"]
+    )
 
 
 class TestThemeOverpackRepairRung:
@@ -210,7 +256,7 @@ class TestThemeOverpackRepairRung:
         assert receipt["fired"] is False
         assert receipt["rejected_reason"] == "kill_switch_off"
         assert receipt["kill_switch"] == "0"
-        assert receipt["bounded"] == {"max_attempts": 1, "attempts_used": 0}
+        assert receipt["bounded"] == {"max_attempts": 2, "attempts_used": 0}
         assert receipt["trigger"]["count_pre"] == 5
         assert receipt["trigger"]["themes_detected_pre"] == ALL_IBM_POOL
         assert receipt["trigger"]["missing_in_ledger_union_pre"] == ["bul_ibm_004"]
@@ -253,6 +299,10 @@ class TestThemeOverpackRepairRung:
             tmp_path, monkeypatch, provider=provider, parsed=_attempt1_parsed()
         )
         assert provider.calls == 1
+        assert provider.last_kwargs == {
+            "artifact_dir": tmp_path,
+            "run_id": "theme-repair-test",
+        }
         assert accepted is True
         narrative_post = str(out["narrative_sentence"]).strip()
         themes_post = ibm_narrative_material_fact_ids_for_sentence(narrative_post)
@@ -280,7 +330,7 @@ class TestThemeOverpackRepairRung:
         assert receipt["fired"] is True
         assert receipt["accepted"] is True
         assert receipt["rejected_reason"] is None
-        assert receipt["bounded"] == {"max_attempts": 1, "attempts_used": 1}
+        assert receipt["bounded"] == {"max_attempts": 2, "attempts_used": 1}
         assert receipt["themes_post"] == sorted(themes_post)
         assert any(
             e.get("operation") == "ibm_narrative_theme_overpack_repair"
@@ -305,6 +355,14 @@ class TestThemeOverpackRepairRung:
             GOOD_REGEN_NARRATIVE
         )
         assert receipt["regen_parse_error"] is None
+        assert receipt["regen_provider_result"] == {
+            "runtime_generation_status": "REAL_LLM",
+            "provider_requested": "external_openai",
+            "provider_attempted": True,
+            "provider_available": True,
+            "model": resolve_section_generation_model("ibm_narrative"),
+            "exact_provider_error": "",
+        }
 
     def test_reject_themes_still_overpacked_keeps_attempt1(self, tmp_path, monkeypatch):
         from apps_rg.runtime.section_repair_ledger import KIND_REGEN_LLM, init_ledger, load_ledger
@@ -323,6 +381,146 @@ class TestThemeOverpackRepairRung:
         ledger = load_ledger(tmp_path) or {}
         assert not [
             r for r in (ledger.get("repairs") or []) if r.get("kind") == KIND_REGEN_LLM
+        ]
+
+    def test_second_attempt_corrects_cited_companion_mechanism_support(
+        self, tmp_path, monkeypatch
+    ):
+        from apps_rg.runtime.section_repair_ledger import init_ledger
+
+        companion = (
+            "- bul_ibm_001: Led IBM-AWS alliance co-sell motions.\n"
+            "- bul_ibm_002: Built decision-support BI views.\n"
+            "- bul_ibm_003: Led technical discovery and solution architecture.\n"
+            "- bul_ibm_004: Owned pipeline governance across enterprise pursuits.\n"
+            "- bul_ibm_005: Architected cloud modernization reference architectures."
+        )
+        bad = (
+            "Drove AWS alliance and solution architecture across enterprise client pursuits at "
+            "IBM, establishing a BI and microservices operating discipline for repeatable growth."
+        )
+        good = (
+            "Drove AWS alliance and solution architecture across enterprise client pursuits at "
+            "IBM, establishing a BI operating discipline for repeatable growth."
+        )
+
+        def candidate(narrative: str) -> str:
+            opening, closing = narrative.split(", establishing ", 1)
+            return json.dumps(
+                {
+                    "narrative_sentence": narrative,
+                    "selected_fact_plan": {"section_id": "ibm_narrative", "facts": []},
+                    "claim_ledger": [
+                        {"claim_text": opening, "source_fact_ids": ["bul_ibm_001"]},
+                        {
+                            "claim_text": "establishing " + closing.rstrip("."),
+                            "source_fact_ids": ["bul_ibm_002"],
+                        },
+                    ],
+                    "jd_alignment": {"targeting_only": True},
+                    "gap_notes": [],
+                    "change_log": [],
+                    "self_check": {},
+                }
+            )
+
+        init_ledger(tmp_path, section_id="ibm_narrative", run_id="theme-repair-test")
+        provider = _RecordingProvider("REAL_LLM", [candidate(bad), candidate(good)])
+        _raw, out, accepted = _run_rung(
+            tmp_path,
+            monkeypatch,
+            provider=provider,
+            parsed=_attempt1_parsed(),
+            companion_text=companion,
+        )
+
+        assert provider.calls == 2
+        assert accepted is True
+        assert "microservices" not in out["narrative_sentence"].lower()
+        receipt = _read_receipt(tmp_path)
+        assert receipt["bounded"] == {"max_attempts": 2, "attempts_used": 2}
+        assert [row["rejected_reason"] for row in receipt["attempts"]] == [
+            "mechanism_support_unsatisfied",
+            None,
+        ]
+        assert "MECHANISM_CITATION_CORRECTION" in provider.payloads[1]["messages"][-1][
+            "content"
+        ]
+
+    def test_mechanism_only_failure_triggers_same_authority_repair(
+        self, tmp_path, monkeypatch
+    ):
+        """Live retry8: in-budget themes must not suppress the mechanism support rung."""
+        from apps_rg.runtime.section_repair_ledger import init_ledger
+
+        companion = (
+            "- bul_ibm_001: Led IBM-AWS alliance co-sell motions.\n"
+            "- bul_ibm_002: Built decision-support BI views.\n"
+            "- bul_ibm_003: Led technical discovery and solution architecture.\n"
+            "- bul_ibm_004: Owned pipeline governance across enterprise pursuits.\n"
+            "- bul_ibm_005: Architected cloud modernization reference architectures."
+        )
+        initial_narrative = (
+            "Drove AWS alliance work at IBM, establishing a pipeline for pursuits."
+        )
+        initial = _attempt1_parsed(
+            initial_narrative,
+            [
+                {
+                    "claim_text": "Drove AWS alliance work at IBM",
+                    "source_fact_ids": ["bul_ibm_001"],
+                },
+                {
+                    "claim_text": (
+                        "establishing a pipeline for pursuits"
+                    ),
+                    "source_fact_ids": ["bul_ibm_001"],
+                },
+            ],
+        )
+        repaired_narrative = (
+            "Drove AWS alliance and solution architecture across enterprise client pursuits at "
+            "IBM, establishing a BI operating discipline for repeatable growth."
+        )
+        opening, closing = repaired_narrative.split(", establishing ", 1)
+        repaired = json.dumps(
+            {
+                "narrative_sentence": repaired_narrative,
+                "selected_fact_plan": {"section_id": "ibm_narrative", "facts": []},
+                "claim_ledger": [
+                    {"claim_text": opening, "source_fact_ids": ["bul_ibm_001"]},
+                    {
+                        "claim_text": "establishing " + closing.rstrip("."),
+                        "source_fact_ids": ["bul_ibm_002"],
+                    },
+                ],
+                "jd_alignment": {"targeting_only": True},
+                "gap_notes": [],
+                "change_log": [],
+                "self_check": {},
+            }
+        )
+
+        init_ledger(tmp_path, section_id="ibm_narrative", run_id="theme-repair-test")
+        provider = _RecordingProvider("REAL_LLM", repaired)
+        _raw, out, accepted = _run_rung(
+            tmp_path,
+            monkeypatch,
+            provider=provider,
+            parsed=initial,
+            companion_text=companion,
+        )
+
+        assert provider.calls == 1
+        assert accepted is True
+        assert out["narrative_sentence"] == repaired_narrative
+        receipt = _read_receipt(tmp_path)
+        assert receipt["trigger"]["unsupported_mechanisms_pre"] == ["pipeline"]
+        assert receipt["gate_id"] == (
+            "x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets"
+        )
+        assert "MECHANISM_CITATION_REVISION" in provider.payloads[0]["messages"][-1][
+            "content"
         ]
 
     def test_reject_theme_coverage_unsatisfied_keeps_attempt1(self, tmp_path, monkeypatch):
@@ -437,7 +635,7 @@ class TestThemeOverpackRepairRung:
 
         monkeypatch.delenv("APPS_RG_IBM_NARRATIVE_THEME_REPAIR", raising=False)
         assert theme_repair_enabled() is True
-        assert THEME_REPAIR_MAX_ATTEMPTS == 1
+        assert THEME_REPAIR_MAX_ATTEMPTS == 2
         for off in ("0", "false", "no", "off"):
             monkeypatch.setenv("APPS_RG_IBM_NARRATIVE_THEME_REPAIR", off)
             assert theme_repair_enabled() is False

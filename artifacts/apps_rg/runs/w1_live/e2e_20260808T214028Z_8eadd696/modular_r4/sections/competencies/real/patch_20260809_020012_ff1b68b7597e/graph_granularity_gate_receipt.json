@@ -1,0 +1,34 @@
+{
+  "schema_version": "graph_granularity_gate_receipt_v1",
+  "producer": "apps_rg.runtime.sections.competencies_lane_execution",
+  "section_id": "competencies",
+  "input_artifact_paths": [
+    "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w1_live/e2e_20260808T214028Z_8eadd696/modular_r4/sections/competencies/real/patch_20260809_020012_ff1b68b7597e/competencies_graph_sufficiency_receipt.json",
+    "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w1_live/e2e_20260808T214028Z_8eadd696/modular_r4/sections/competencies/real/patch_20260809_020012_ff1b68b7597e/competencies_graph_traversal_sufficiency_receipt.json"
+  ],
+  "deterministic_gate_id": "x2_competencies_graph_granularity_gates",
+  "deterministic_gate_verdict": "PASS",
+  "observed_value": {
+    "category_count": 6,
+    "min_unique_leaf_skills_per_category": 1,
+    "categories_missing_leaf_skills": [],
+    "min_unique_source_facts_per_category": 1,
+    "categories_missing_source_facts": [],
+    "dominant_source_fact_id": "fact_engineering_platform_001",
+    "dominant_source_fact_category_share": 0.5,
+    "source_fact_concentration_threshold": 0.75,
+    "target_role_profile": "ai_partnerships_gtm",
+    "required_role_axes": [
+      "co_sell",
+      "gtm_enablement",
+      "hyperscaler_alliance",
+      "joint_solution",
+      "partner_architecture",
+      "partner_motions"
+    ],
+    "missing_role_axes": []
+  },
+  "failure_reason": null,
+  "pass": true,
+  "human_readable_explanation": "Validates per-category graph leaf/source lineage, source concentration, and role-critical axis coverage for competencies."
+}

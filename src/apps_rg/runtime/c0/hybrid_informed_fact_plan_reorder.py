@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any, Mapping, Sequence
 
-from agentic_core.runtime.contracts.final_evidence_contract import EvidenceItem
+from apps_rg.runtime.spine_contracts import EvidenceItem
 
 HYBRID_INFORMED_ORDER_SUFFIX = "+hybrid_informed_order_v1"
 _FACT_ID_TOKEN_RE = re.compile(r"\bfact_[a-z0-9_]+\b", re.IGNORECASE)

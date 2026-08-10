@@ -149,9 +149,13 @@ def decompose_ibm_narrative_claim_ledger_by_clause(
     *,
     narrative_sentence: str,
     allowed_fact_ids: set[str] | frozenset[str],
+    companion_bullet_texts: str = "",
 ) -> None:
     """Rewrite claim_ledger into clause rows with theme-scoped bul_ibm_* roots (max 2 per row)."""
-    from apps_rg.runtime.validators.ibm_narrative_x2 import ibm_narrative_material_fact_ids_for_sentence
+    from apps_rg.runtime.validators.ibm_narrative_x2 import (
+        ibm_narrative_material_fact_ids_for_sentence,
+        ibm_narrative_mechanism_fact_ids_for_sentence,
+    )
 
     narrative = str(parsed.get("narrative_sentence") or narrative_sentence or "").strip()
     if not narrative:
@@ -164,14 +168,19 @@ def decompose_ibm_narrative_claim_ledger_by_clause(
     new_led: list[dict[str, Any]] = []
     if len(parts) >= 2:
         clauses = [p.strip().rstrip(".") for p in parts if p.strip()]
-        clause_themes: list[list[str]] = [
-            sorted(
-                t
-                for t in ibm_narrative_material_fact_ids_for_sentence(clause)
-                if t in allowed_bul
+        clause_themes: list[list[str]] = []
+        for clause in clauses:
+            grounded = set(
+                ibm_narrative_material_fact_ids_for_sentence(
+                    clause, companion_bullet_texts
+                )
             )
-            for clause in clauses
-        ]
+            grounded.update(
+                ibm_narrative_mechanism_fact_ids_for_sentence(
+                    clause, companion_bullet_texts
+                )
+            )
+            clause_themes.append(sorted(t for t in grounded if t in allowed_bul))
         # Coverage-aware root assignment (postW4 live fail, run postW4_20260610_1716:
         # naive per-clause `themes[:2]` dropped a grounded theme — bul_ibm_004 on a
         # 3-theme clause — which the downstream theme-coverage binder then re-appended
@@ -227,9 +236,17 @@ def decompose_ibm_narrative_claim_ledger_by_clause(
                     }
                 )
     else:
-        themes = sorted(
-            t for t in ibm_narrative_material_fact_ids_for_sentence(narrative) if t in allowed_bul
+        grounded = set(
+            ibm_narrative_material_fact_ids_for_sentence(
+                narrative, companion_bullet_texts
+            )
         )
+        grounded.update(
+            ibm_narrative_mechanism_fact_ids_for_sentence(
+                narrative, companion_bullet_texts
+            )
+        )
+        themes = sorted(t for t in grounded if t in allowed_bul)
         if not themes:
             themes = allowed_bul[:2]
         new_led.append(
@@ -323,6 +340,7 @@ def bind_missing_ibm_narrative_theme_citations(
     parsed: dict[str, Any],
     *,
     allowed_fact_ids: set[str] | frozenset[str],
+    companion_bullet_texts: str = "",
 ) -> list[str]:
     """Cite detected-but-uncited sentence themes on a grounded ledger row with root capacity.
 
@@ -353,7 +371,9 @@ def bind_missing_ibm_narrative_theme_citations(
         for row in ledger
         for s in (row.get("source_fact_ids") or [])
     }
-    themes = ibm_narrative_material_fact_ids_for_sentence(narrative)
+    themes = ibm_narrative_material_fact_ids_for_sentence(
+        narrative, companion_bullet_texts
+    )
     bound: list[str] = []
     for theme in sorted(t for t in themes if t in allowed and t not in cited):
         for row in ledger:
@@ -361,7 +381,7 @@ def bind_missing_ibm_narrative_theme_citations(
             if theme in roots or len(roots) >= 2:
                 continue
             if theme not in ibm_narrative_material_fact_ids_for_sentence(
-                str(row.get("claim_text") or "")
+                str(row.get("claim_text") or ""), companion_bullet_texts
             ):
                 continue
             row["source_fact_ids"] = list(row.get("source_fact_ids") or []) + [theme]
@@ -390,11 +410,24 @@ def align_ibm_narrative_claim_ledger_to_bul_ibm(
     narrative_sentence: str,
     allowed_fact_ids: set[str] | frozenset[str],
     runtime_payload: dict[str, Any] | None = None,
+    companion_bullet_texts: str = "",
 ) -> None:
     """Bind narrative claim_ledger to bul_ibm_* (required by X2; graph pool may emit fact_* only)."""
-    from apps_rg.runtime.validators.ibm_narrative_x2 import ibm_narrative_material_fact_ids_for_sentence
+    from apps_rg.runtime.validators.ibm_narrative_x2 import (
+        ibm_narrative_material_fact_ids_for_sentence,
+        ibm_narrative_mechanism_fact_ids_for_sentence,
+    )
 
-    themes = ibm_narrative_material_fact_ids_for_sentence(narrative_sentence)
+    themes = set(
+        ibm_narrative_material_fact_ids_for_sentence(
+            narrative_sentence, companion_bullet_texts
+        )
+    )
+    themes.update(
+        ibm_narrative_mechanism_fact_ids_for_sentence(
+            narrative_sentence, companion_bullet_texts
+        )
+    )
     bul_ids = sorted(t for t in themes if str(t).startswith("bul_ibm_"))
     if not bul_ids:
         bul_ids = sorted(str(x) for x in allowed_fact_ids if str(x).startswith("bul_ibm_"))[:3]
@@ -439,6 +472,7 @@ def align_ibm_narrative_claim_ledger_to_bul_ibm(
 def remap_ibm_narrative_claim_ledger_to_fact_pool(
     parsed: dict[str, Any],
     runtime_payload: dict[str, Any],
+    companion_bullet_texts: str = "",
 ) -> None:
     """Map narrative claim_ledger off bul_ibm_* placeholders onto allowed fact_* pool ids."""
     pp = runtime_payload.get("proof_pool_metadata") or {}
@@ -448,6 +482,7 @@ def remap_ibm_narrative_claim_ledger_to_fact_pool(
             narrative_sentence=str(parsed.get("narrative_sentence") or ""),
             allowed_fact_ids={str(x) for x in (runtime_payload.get("allowed_fact_ids") or [])},
             runtime_payload=runtime_payload,
+            companion_bullet_texts=companion_bullet_texts,
         )
         return
     if pp.get("claim_evidence_source_type") != "candidate_fact_ledger":

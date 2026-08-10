@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-from agentic_core.runtime.contracts.final_evidence_contract import FinalEvidenceContract
-from agentic_core.runtime.contracts.l1_plan_contract import L1PlanContract
+from apps_rg.runtime.spine_contracts import ValidatedRequest
+from apps_rg.runtime.spine_contracts import FinalEvidenceContract
+from apps_rg.runtime.spine_contracts import L1PlanContract
 from apps_rg.runtime.bindings.c0_binding import C0EvidenceGapError, c0_retrieve_apps_rg
 from apps_rg.runtime.bindings.l1_planning_capsule import (
     extract_verified_planning_capsule,

@@ -33,7 +33,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 try:
     from dotenv import load_dotenv
@@ -333,6 +333,14 @@ _UNIFY_METRIC_REWRITE_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
 )
 
 _UNIFY_COMPANION_COPY_REWRITE_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
+    # Retry32: the model copied the finalized companion's exact four-gram
+    # ``a repeatable operating model`` into the narrative.  The selected Unify
+    # commercial/adoption facts support operating discipline, so preserve that
+    # meaning while removing the duplicated transport phrase.
+    (
+        re.compile(r"\ba\s+repeatable\s+operating\s+model\b", re.IGNORECASE),
+        "consistent operating discipline",
+    ),
     # The commercial root explicitly supports reusable platform services. This
     # replaces the exact four-gram copied from the finalized companion bullet
     # without adding a new claim to the narrative's source surface.
@@ -687,6 +695,51 @@ def normalize_unify_narrative_parsed(
                 "platform governance",
                 "innovation programs",
             ]
+    # A one-sentence narrative is one visible claim unit. Providers sometimes
+    # return several paraphrased ledger rows for that single sentence; those
+    # rows are not themselves materialized and therefore cannot be certified.
+    # Preserve the ordered union of their already-normalized source ids and
+    # collapse only the ledger shape/text to the exact visible sentence.
+    ledger = out.get("claim_ledger")
+    final_narrative = str(out.get("narrative_sentence") or "").strip()
+    valid_rows = (
+        [row for row in ledger if isinstance(row, dict)]
+        if isinstance(ledger, list)
+        else []
+    )
+    source_union: list[str] = []
+    for row in valid_rows:
+        for source_id in row.get("source_fact_ids") or []:
+            token = str(source_id).strip()
+            if token and token not in source_union:
+                source_union.append(token)
+    if (
+        final_narrative
+        and valid_rows
+        and len(valid_rows) == len(ledger)
+        and source_union
+        and (
+            len(valid_rows) > 1
+            or str(valid_rows[0].get("claim_text") or "").strip() != final_narrative
+        )
+    ):
+        out["claim_ledger"] = [
+            {"claim_text": final_narrative, "source_fact_ids": source_union}
+        ]
+        operation = (
+            "synchronize_single_sentence_claim_ledger_text"
+            if len(valid_rows) == 1
+            else "collapse_single_sentence_claim_ledger_to_visible_claim"
+        )
+        out.setdefault("change_log", [])
+        if isinstance(out["change_log"], list):
+            out["change_log"].append(
+                {
+                    "operation": operation,
+                    "reason": "final_materialized_claim_text_must_equal_visible_narrative",
+                    "source_row_count": len(valid_rows),
+                }
+            )
     out.setdefault("gap_notes", [])
     out.setdefault("change_log", [])
     out.setdefault("self_check", {"normalized_by_lane": True})

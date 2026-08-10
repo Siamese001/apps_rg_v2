@@ -7,7 +7,7 @@ from dataclasses import replace
 from datetime import datetime, timezone
 from typing import Any
 
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import (
     EvidenceItem,
     FinalEvidenceContract,
     SUPPORT_STATUS_PASS,

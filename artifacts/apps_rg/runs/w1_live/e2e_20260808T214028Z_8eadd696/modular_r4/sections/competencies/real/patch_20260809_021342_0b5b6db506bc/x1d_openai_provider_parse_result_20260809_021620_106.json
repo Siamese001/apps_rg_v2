@@ -1,0 +1,103 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 2.8,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "Six records yield only five distinct categories because LLMOps and Reliability is duplicated.",
+      "Audit-grade telemetry repeats across both LLMOps records.",
+      "Partner architecture lacks a reusable mechanism tied to partner deployment outcomes.",
+      "Several terms mechanically echo summary and bullet language.",
+      "The final LLMOps record is tactical rather than a distinct executive capability family.",
+      "Partner-led AI solution framework for partners is tautological and recruiter-unclean."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "remediation_suggestions": [
+      "Consolidate the duplicate LLMOps records.",
+      "Add a sixth distinct graph-backed capability family.",
+      "Specify a reusable partner architecture pattern and deployment outcome.",
+      "Reduce overlap with summary and experience proof surfaces."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "duplicate_llmops_cluster",
+          "repeated_telemetry_phrase"
+        ]
+      },
+      "seniority_executive_relevance": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "tactical_release_control_cluster"
+        ]
+      },
+      "complementarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "summary_bullet_surface_overlap"
+        ]
+      },
+      "no_bullet_restatement": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "recycled_proof_language"
+        ]
+      },
+      "anti_overfit": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "tautological_partner_phrase",
+          "generated_phrase_pattern"
+        ]
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "duplicate_category",
+          "only_five_distinct_categories"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "partner_architecture_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "missing_partner_mechanism_outcome_pair"
+        ]
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_021342_0b5b6db506bc\\x1d_openai_provider_response_raw_20260809_021620_104.json",
+  "original_model": null,
+  "fallback_model": null
+}

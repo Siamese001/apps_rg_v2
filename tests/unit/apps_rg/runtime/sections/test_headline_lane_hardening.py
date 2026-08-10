@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import ast
+import inspect
 import json
 from types import SimpleNamespace
 
 import pytest
 
 from apps_rg.runtime.claim_ledger.headline_claim_ledger import build_headline_text_claim_coverage
+from apps_rg.runtime.section_model_limits import resolve_section_generation_model
 from apps_rg.runtime.sections import headline_lane
 from apps_rg.runtime.sections.headline_lane import (
     W3_EXECUTION_PATH_BUCKET,
@@ -26,12 +29,31 @@ from apps_rg.runtime.validators.headline_positioning_x2 import (
 from apps_rg.runtime.validators.headline_quality_x2 import POSITIONING_FAMILIES
 from apps_rg.runtime.validators.headline_x2 import (
     check_headline_xyz_literal_grounding,
+    headline_executive_abstraction_report,
     headline_word_count,
     run_headline_x2_gates,
 )
 from apps_rg.runtime.w3_execution_path_labels import BUCKET_GOVERNED_PA_L2_EXIT
 
 HL = "SVP Engineering | Governed Agentic Platforms | Runtime Infrastructure | Regulated Delivery"
+
+
+def test_internal_normalize_calls_only_pass_supported_keywords() -> None:
+    """Every live branch must match the normalizer signature."""
+    supported = set(inspect.signature(headline_lane.normalize_parsed_output).parameters)
+    tree = ast.parse(inspect.getsource(headline_lane))
+    invalid: list[str] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if not isinstance(node.func, ast.Name) or node.func.id != "normalize_parsed_output":
+            continue
+        invalid.extend(
+            keyword.arg
+            for keyword in node.keywords
+            if keyword.arg is not None and keyword.arg not in supported
+        )
+    assert invalid == []
 METRIC_ID = "fact_engineering_platform_001_metric_deadbeef"
 BASE_ID = "fact_engineering_platform_001"
 
@@ -410,19 +432,93 @@ PRE_HL_NO_GOV = "SVP Engineering | Distributed AI Infrastructure | Retrieval Con
 GOV_HL = "SVP Engineering | Governed Agentic AI Platforms | Runtime Governance Gates | Regulated Enterprise Delivery"
 NO_GOV_REGEN_HL = "SVP Engineering | Distributed AI Platforms | Retrieval Context Systems | Platform Productization Scale"
 SHORT_GOV_HL = "SVP Engineering | Governed Platforms | Runtime Gates | Regulated Delivery"
+RETRY8_OPAQUE_HL = (
+    "SVP Engineering | Governed Runtime Reliability | Distributed Partner Solution "
+    "Infrastructure | Agentic Context Evaluation Platform"
+)
+RESUME_NATIVE_HL = (
+    "SVP Engineering | Runtime Governance | Partner Solution Architecture | Agentic AI Platforms"
+)
+
+
+def test_resume_native_clarity_report_rejects_retry8_opaque_noun_stacks() -> None:
+    retry8 = headline_lane.headline_resume_native_clarity_report(RETRY8_OPAQUE_HL)
+    assert retry8["pass"] is False
+    assert retry8["opaque_segments"] == [
+        "Distributed Partner Solution Infrastructure",
+        "Agentic Context Evaluation Platform",
+    ]
+
+    clear = headline_lane.headline_resume_native_clarity_report(RESUME_NATIVE_HL)
+    assert clear["pass"] is True
+    assert clear["opaque_segments"] == []
+
+
+def test_retry14_repeated_runtime_pillars_fail_prejudge_clarity() -> None:
+    headline = (
+        "SVP Engineering | Alliance GTM Leadership | Runtime Reliability Governance | "
+        "Telemetry Evaluation Runtime"
+    )
+
+    report = headline_lane.headline_resume_native_clarity_report(headline)
+
+    assert report["pass"] is False
+    assert report["semantic_overlap_issues"] == [
+        "repeated_positioning_token:runtime:seg3,seg4"
+    ]
 
 
 class _RecordingProvider:
-    def __init__(self, status: str, raw: str) -> None:
+    def __init__(self, status: str, raw: str | list[str]) -> None:
         self.status = status
-        self.raw = raw
+        self.raws = list(raw) if isinstance(raw, list) else [raw]
         self.calls = 0
         self.payloads: list[dict] = []
 
-    def __call__(self, payload: dict) -> SimpleNamespace:
+    def __call__(self, payload: dict, **kwargs) -> SimpleNamespace:
         self.calls += 1
         self.payloads.append(payload)
-        return SimpleNamespace(runtime_generation_status=self.status, raw_model_output=self.raw)
+        raw = self.raws[min(self.calls - 1, len(self.raws) - 1)]
+        result = SimpleNamespace(
+            runtime_generation_status=self.status,
+            raw_model_output=raw,
+            provider_requested="external_claude",
+            provider_attempted=self.status == "REAL_LLM",
+            provider_available=self.status == "REAL_LLM",
+            model=resolve_section_generation_model("headline"),
+            exact_provider_error="" if self.status == "REAL_LLM" else "blocked",
+        )
+        result.to_dict = lambda: {
+            "runtime_generation_status": result.runtime_generation_status,
+            "raw_model_output": result.raw_model_output,
+            "provider_requested": result.provider_requested,
+            "provider_attempted": result.provider_attempted,
+            "provider_available": result.provider_available,
+            "model": result.model,
+            "exact_provider_error": result.exact_provider_error,
+        }
+        return result
+
+
+def test_headline_repair_anchor_excludes_hydrated_graph_payload() -> None:
+    parsed = _attempt1_parsed()
+    parsed["selected_fact_plan"] = {
+        "section_id": "headline",
+        "selection_method": "graph",
+        "required_fact_ids": ["fact_1"],
+        "facts": [{"fact_id": "fact_1", "oversized": "x" * 500_000}],
+        "graph_candidate_decision_ledger": [{"oversized": "y" * 500_000}],
+    }
+
+    anchor = headline_lane._compact_headline_repair_anchor(
+        parsed, fallback_raw="unused"
+    )
+    decoded = json.loads(anchor)
+
+    assert len(anchor) < 10_000
+    assert decoded["selected_fact_plan"]["required_fact_ids"] == ["fact_1"]
+    assert "facts" not in decoded["selected_fact_plan"]
+    assert "graph_candidate_decision_ledger" not in decoded["selected_fact_plan"]
 
 
 def _bundle_runtime_payload() -> dict:
@@ -472,6 +568,7 @@ def _run_content_signal_rung(
     runtime_payload=None,
     runtime_generation_status="REAL_LLM",
     prior_repair_provider_call_made=False,
+    allowed_fact_ids=None,
 ):
     monkeypatch.setattr(headline_lane, "generate_section", provider)
     payload = runtime_payload if runtime_payload is not None else _bundle_runtime_payload()
@@ -482,7 +579,7 @@ def _run_content_signal_rung(
         raw_output=raw,
         parsed=parsed,
         runtime_payload=payload,
-        allowed_fact_ids=set(),
+        allowed_fact_ids=set(allowed_fact_ids or set()),
         artifact_dir=tmp_path,
         runtime_generation_status=runtime_generation_status,
         prior_repair_provider_call_made=prior_repair_provider_call_made,
@@ -557,7 +654,7 @@ class TestHeadlineContentSignalRepairRung:
         assert receipt["rejected_reason"] == "kill_switch_off"
         assert receipt["attempted"] is False
         assert receipt["regen_call_made"] is False
-        assert receipt["bounded"] == {"max_attempts": 1, "attempts_used": 0}
+        assert receipt["bounded"] == {"max_attempts": 3, "attempts_used": 0}
         assert receipt["env_kill_switch_state"] == "0"
         assert receipt["gate_id"] == _CS_GATE_ID
 
@@ -593,6 +690,35 @@ class TestHeadlineContentSignalRepairRung:
         receipt = _read_receipt(tmp_path)
         assert receipt["rejected_reason"] == "regen_budget_consumed"
 
+    def test_proof_shape_retry_does_not_suppress_content_repair(self, tmp_path, monkeypatch):
+        from apps_rg.runtime.section_repair_ledger import (
+            KIND_REGEN_LLM,
+            init_ledger,
+            record_repair,
+        )
+
+        init_ledger(tmp_path, section_id="headline", run_id="csr-test")
+        record_repair(
+            tmp_path,
+            kind=KIND_REGEN_LLM,
+            operation="headline_proof_shape_retry",
+            replaced_l2=True,
+        )
+        provider = _RecordingProvider("REAL_LLM", _regen_json(GOV_HL))
+
+        _raw, out, snap, accepted = _run_content_signal_rung(
+            tmp_path,
+            monkeypatch,
+            provider=provider,
+            parsed=_attempt1_parsed(),
+            prior_repair_provider_call_made=True,
+        )
+
+        assert provider.calls == 1
+        assert accepted is True
+        assert snap is not None
+        assert out["headline_line"] == GOV_HL
+
     def test_accept_path_swaps_output_and_records_regen(self, tmp_path, monkeypatch):
         from apps_rg.runtime.section_repair_ledger import KIND_REGEN_LLM, init_ledger, load_ledger
 
@@ -621,11 +747,70 @@ class TestHeadlineContentSignalRepairRung:
         assert receipt["families_matched_post"]
         assert receipt["trigger"]["headline_pre"] == PRE_HL_NO_GOV
         assert receipt["trigger"]["required_families"] == ["runtime_governance", "regulated_ai_systems"]
-        assert receipt["bounded"] == {"max_attempts": 1, "attempts_used": 1}
+        assert receipt["bounded"] == {"max_attempts": 3, "attempts_used": 1}
         assert any(
             e.get("operation") == "headline_content_signal_repair"
             for e in (out.get("change_log") or [])
         )
+
+    def test_second_attempt_corrects_parseable_first_candidate(self, tmp_path, monkeypatch):
+        from apps_rg.runtime.section_repair_ledger import init_ledger
+
+        init_ledger(tmp_path, section_id="headline", run_id="csr-test")
+        provider = _RecordingProvider(
+            "REAL_LLM",
+            [_regen_json(SHORT_GOV_HL), _regen_json(GOV_HL)],
+        )
+
+        _raw, out, snap, accepted = _run_content_signal_rung(
+            tmp_path,
+            monkeypatch,
+            provider=provider,
+            parsed=_attempt1_parsed(),
+        )
+
+        assert provider.calls == 2
+        assert accepted is True
+        assert out["headline_line"] == GOV_HL
+        assert snap is not None and snap["headline_line"] == GOV_HL
+        receipt = _read_receipt(tmp_path)
+        assert receipt["bounded"] == {"max_attempts": 3, "attempts_used": 2}
+        assert [row["rejected_reason"] for row in receipt["attempts"]] == [
+            "shape_invalid",
+            None,
+        ]
+
+    def test_third_attempt_repairs_retry8_opaque_noun_stack(self, tmp_path, monkeypatch):
+        from apps_rg.runtime.section_repair_ledger import init_ledger
+
+        init_ledger(tmp_path, section_id="headline", run_id="csr-test")
+        provider = _RecordingProvider(
+            "REAL_LLM",
+            [
+                _regen_json(SHORT_GOV_HL),
+                _regen_json(RETRY8_OPAQUE_HL),
+                _regen_json(RESUME_NATIVE_HL),
+            ],
+        )
+
+        _raw, out, snap, accepted = _run_content_signal_rung(
+            tmp_path,
+            monkeypatch,
+            provider=provider,
+            parsed=_attempt1_parsed(),
+        )
+
+        assert provider.calls == 3
+        assert accepted is True
+        assert out["headline_line"] == RESUME_NATIVE_HL
+        assert snap is not None and snap["headline_line"] == RESUME_NATIVE_HL
+        receipt = _read_receipt(tmp_path)
+        assert receipt["bounded"] == {"max_attempts": 3, "attempts_used": 3}
+        assert [row["rejected_reason"] for row in receipt["attempts"]] == [
+            "shape_invalid",
+            "resume_clarity_still_missing",
+            None,
+        ]
 
     def test_reject_signal_still_missing_keeps_attempt1_and_gate_still_fails(self, tmp_path, monkeypatch):
         from apps_rg.runtime.section_repair_ledger import KIND_REGEN_LLM, init_ledger, load_ledger
@@ -636,7 +821,7 @@ class TestHeadlineContentSignalRepairRung:
         _raw, out, snap, accepted = _run_content_signal_rung(
             tmp_path, monkeypatch, provider=provider, parsed=parsed
         )
-        assert provider.calls == 1
+        assert provider.calls == 3
         assert not accepted and snap is None
         assert out is parsed
         assert out["headline_line"] == PRE_HL_NO_GOV
@@ -683,7 +868,7 @@ class TestHeadlineContentSignalRepairRung:
         _raw, out, snap, accepted = _run_content_signal_rung(
             tmp_path, monkeypatch, provider=provider, parsed=parsed
         )
-        assert provider.calls == 1
+        assert provider.calls == 3
         assert not accepted and out is parsed
         receipt = _read_receipt(tmp_path)
         assert receipt["rejected_reason"] == "shape_invalid"
@@ -696,7 +881,7 @@ class TestHeadlineContentSignalRepairRung:
 
         monkeypatch.delenv("APPS_RG_HEADLINE_CONTENT_SIGNAL_REPAIR", raising=False)
         assert content_signal_repair_enabled() is True
-        assert CONTENT_SIGNAL_REPAIR_MAX_ATTEMPTS == 1
+        assert CONTENT_SIGNAL_REPAIR_MAX_ATTEMPTS == 3
         for off in ("0", "false", "no", "off"):
             monkeypatch.setenv("APPS_RG_HEADLINE_CONTENT_SIGNAL_REPAIR", off)
             assert content_signal_repair_enabled() is False
@@ -709,6 +894,22 @@ class TestHeadlineContentSignalRepairRung:
 # ---------------------------------------------------------------------------
 
 _SPEC_GATE_ID = "x2_headline_technical_specificity_floor_met"
+
+
+def test_retry13_graph_bound_partnership_headline_counts_partner_family_and_abstraction():
+    """A required graph positioning family must not disappear at the X2 vocabulary seam."""
+    headline = (
+        "SVP Engineering | Alliance GTM Partnerships | "
+        "Runtime Reliability Governance | Telemetry Rollback Controls"
+    )
+
+    assert positioning_families_matched(headline) == [
+        "runtime_governance",
+        "partner_applied_ai_architecture",
+    ]
+    assert headline_executive_abstraction_report(headline)[
+        "segments_missing_executive_abstraction"
+    ] == []
 # governance present, only ONE positioning family (runtime_governance) -> specificity arm.
 SPEC_FLOOR_HL = "SVP Engineering | Runtime Governance Gates | Deterministic Policy Controls | Resilient Delivery Programs"
 # no governance signal AND only one positioning family (platform_productization) -> both arms.
@@ -821,7 +1022,7 @@ class TestHeadlineContentSignalSpecificityArm:
         _raw, out, snap, accepted = _run_content_signal_rung(
             tmp_path, monkeypatch, provider=provider, parsed=parsed
         )
-        assert provider.calls == 1
+        assert provider.calls == 3
         assert not accepted and snap is None
         assert out is parsed
         assert out["headline_line"] == SPEC_FLOOR_HL
@@ -843,7 +1044,7 @@ class TestHeadlineContentSignalSpecificityArm:
         _raw, out, _snap, accepted = _run_content_signal_rung(
             tmp_path, monkeypatch, provider=provider, parsed=parsed
         )
-        assert provider.calls == 1
+        assert provider.calls == 3
         assert not accepted and out is parsed
         assert _read_receipt(tmp_path)["rejected_reason"] == "signal_still_missing"
 
@@ -854,7 +1055,7 @@ class TestHeadlineContentSignalSpecificityArm:
         _raw, out, _snap, accepted = _run_content_signal_rung(
             tmp_path, monkeypatch, provider=provider, parsed=parsed
         )
-        assert provider.calls == 1
+        assert provider.calls == 3
         assert not accepted and out is parsed
         assert _read_receipt(tmp_path)["rejected_reason"] == "signal_still_missing"
 
@@ -883,7 +1084,7 @@ class TestHeadlineContentSignalSpecificityArm:
         assert accepted is True
         assert out["headline_line"] == GOV_HL
         receipt = _read_receipt(tmp_path)
-        assert receipt["bounded"] == {"max_attempts": 1, "attempts_used": 1}
+        assert receipt["bounded"] == {"max_attempts": 3, "attempts_used": 1}
 
 
 # ---------------------------------------------------------------------------
@@ -904,6 +1105,329 @@ GOV_PLUS_NARROWING_HL = "SVP Engineering | Distributed AI Infrastructure | Digit
 TRIPLE_ARM_HL = "SVP Engineering | Digital Transformation Leadership | Enterprise Delivery Programs | Innovation Leadership Excellence"
 # Regen with governance + 2 families but STILL carrying a narrowing label -> rejected.
 NARROWING_REGEN_STILL_DIRTY_HL = "SVP Engineering | Runtime Governance Gates | Agentic AI Platforms | Digital Transformation Leadership"
+
+
+def test_graph_content_repair_triggers_and_accepts_full_x2_content_contract(
+    tmp_path, monkeypatch
+) -> None:
+    failed = (
+        "SVP Engineering | Quota-Aligned Solution Leadership | "
+        "Multi-Agent Runtime Governance | Partner Portfolio Oversight"
+    )
+    repaired = (
+        "SVP Engineering | Quota-Aligned Platform Leadership | "
+        "Runtime Reliability Governance | Enterprise Partner Portfolio"
+    )
+    facts = [
+        {
+            "fact_id": "reb_ibm_revenue_sales_target_execution",
+            "claim_text": (
+                "Owned quota-aligned solution leadership across enterprise pursuits "
+                "and client portfolio expansion motions"
+            ),
+        },
+        {
+            "fact_id": "reb_unify_runtime_reliability_governance",
+            "claim_text": "Runtime reliability, governance, telemetry, evaluation, rollback",
+        },
+    ]
+    ledger = [
+        {
+            "claim_text": segment,
+            "source_fact_ids": [
+                "reb_ibm_revenue_sales_target_execution",
+                "reb_unify_runtime_reliability_governance",
+            ],
+        }
+        for segment in repaired.split(" | ")[1:]
+    ]
+    provider = _RecordingProvider(
+        "REAL_LLM",
+        json.dumps(
+            {
+                "headline_line": repaired,
+                "claim_ledger": ledger,
+                "selected_fact_plan": {"facts": facts, "required_fact_ids": []},
+                "jd_alignment": {
+                    "targeting_only": True,
+                    "jd_used_as_proof": False,
+                    "briefing_used_as_proof": False,
+                },
+                "gap_notes": [],
+                "change_log": [],
+                "self_check": {},
+            }
+        ),
+    )
+    parsed = _attempt1_parsed(failed)
+    parsed["selected_fact_plan"] = {"facts": facts, "required_fact_ids": []}
+    parsed["claim_ledger"] = [
+        {"claim_text": segment, "source_fact_ids": [fact["fact_id"] for fact in facts]}
+        for segment in failed.split(" | ")[1:]
+    ]
+    runtime_payload = _bundle_runtime_payload()
+    runtime_payload["selected_fact_plan"] = {"facts": facts, "required_fact_ids": []}
+
+    _raw, out, snap, accepted = _run_content_signal_rung(
+        tmp_path,
+        monkeypatch,
+        provider=provider,
+        parsed=parsed,
+        runtime_payload=runtime_payload,
+        allowed_fact_ids={fact["fact_id"] for fact in facts},
+    )
+
+    assert accepted is True and snap is not None
+    assert out["headline_line"] == repaired
+    receipt = _read_receipt(tmp_path)
+    assert "executive_abstraction" in receipt["trigger_arm"]
+    assert "literal_grounding" in receipt["trigger_arm"]
+    assert receipt["families_matched_post"]["segments_missing_executive_abstraction"] == []
+
+
+def test_retry29_recomputes_trigger_after_abstraction_fix_exposes_opaque_segment(
+    tmp_path, monkeypatch
+) -> None:
+    """Bounded retries must target the candidate's defect, not the stale first defect."""
+
+    failed = (
+        "SVP Engineering | Runtime Telemetry Governance | "
+        "Quota-Aligned Solution Leadership | Alliance Co-Sell Motions"
+    )
+    abstraction_fixed_but_opaque = (
+        "SVP Engineering | Runtime Telemetry Governance | "
+        "Enterprise Quota-Aligned Solution Leadership | Alliance Co-Sell Motions"
+    )
+    repaired = (
+        "SVP Engineering | Runtime Telemetry Governance | "
+        "Enterprise Solution Leadership | Alliance Co-Sell Motions"
+    )
+    facts = [
+        {
+            "fact_id": "reb_unify_runtime_reliability_governance",
+            "claim_text": "Runtime reliability, governance, telemetry, evaluation, rollback",
+        },
+        {
+            "fact_id": "reb_ibm_revenue_sales_target_execution",
+            "claim_text": (
+                "Owned quota-aligned solution leadership across enterprise pursuits "
+                "and client portfolio expansion motions"
+            ),
+        },
+        {
+            "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "claim_text": (
+                "Led IBM-AWS alliance co-sell motions for financial-services "
+                "modernization opportunities"
+            ),
+        },
+    ]
+    fact_ids = {str(fact["fact_id"]) for fact in facts}
+    segment_fact_ids = [
+        ["reb_unify_runtime_reliability_governance"],
+        ["reb_ibm_revenue_sales_target_execution"],
+        ["reb_ibm_aws_alliance_partner_cosell_gtm"],
+    ]
+
+    def candidate_json(headline: str) -> str:
+        return json.dumps(
+            {
+                "headline_line": headline,
+                "claim_ledger": [
+                    {"claim_text": segment, "source_fact_ids": source_ids}
+                    for segment, source_ids in zip(
+                        headline.split(" | ")[1:], segment_fact_ids, strict=True
+                    )
+                ],
+                "selected_fact_plan": {"facts": facts, "required_fact_ids": sorted(fact_ids)},
+                "jd_alignment": {
+                    "targeting_only": True,
+                    "jd_used_as_proof": False,
+                    "briefing_used_as_proof": False,
+                },
+                "gap_notes": [],
+                "change_log": [],
+                "self_check": {},
+            }
+        )
+
+    provider = _RecordingProvider(
+        "REAL_LLM",
+        [candidate_json(abstraction_fixed_but_opaque), candidate_json(repaired)],
+    )
+    parsed = json.loads(candidate_json(failed))
+    runtime_payload = _bundle_runtime_payload()
+    runtime_payload["selected_fact_plan"] = {
+        "facts": facts,
+        "required_fact_ids": sorted(fact_ids),
+    }
+
+    _raw, out, snap, accepted = _run_content_signal_rung(
+        tmp_path,
+        monkeypatch,
+        provider=provider,
+        parsed=parsed,
+        runtime_payload=runtime_payload,
+        allowed_fact_ids=fact_ids,
+    )
+
+    assert provider.calls == 2
+    assert accepted is True and snap is not None
+    assert out["headline_line"] == repaired
+    second_emphasis = provider.payloads[1]["messages"][-1]["content"]
+    assert "headline_pre_x1d_resume_native_clarity" in second_emphasis
+    assert "Enterprise Quota-Aligned Solution Leadership" in second_emphasis
+    receipt = _read_receipt(tmp_path)
+    assert [row["trigger_arm"] for row in receipt["attempts"]] == [
+        "executive_abstraction",
+        "resume_native_clarity",
+    ]
+    assert [row["rejected_reason"] for row in receipt["attempts"]] == [
+        "resume_clarity_still_missing",
+        None,
+    ]
+
+
+def test_retry32_repairs_orphan_frozen_headline_allocation_before_acceptance(
+    tmp_path, monkeypatch
+) -> None:
+    failed = (
+        "SVP Engineering | Runtime Reliability Leadership | "
+        "Telemetry Governance Controls | Alliance Co-Sell Leadership"
+    )
+    repaired = (
+        "SVP Engineering | Runtime Reliability Governance | "
+        "Enterprise Solution Leadership | Alliance Co-Sell Motions"
+    )
+    facts = [
+        {
+            "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "claim_text": (
+                "Led IBM-AWS alliance co-sell motions for financial-services "
+                "modernization opportunities"
+            ),
+        },
+        {
+            "fact_id": "reb_ibm_revenue_sales_target_execution",
+            "claim_text": (
+                "Owned quota-aligned solution leadership across enterprise pursuits "
+                "and client portfolio expansion motions"
+            ),
+        },
+        {
+            "fact_id": "reb_unify_runtime_reliability_governance",
+            "claim_text": "Runtime reliability, governance, telemetry, evaluation, rollback",
+        },
+    ]
+    allocation_roots = [
+        (
+            "headline:skill:01",
+            "skill_partner_pnl_oversight",
+            "reb_ibm_revenue_sales_target_execution",
+        ),
+        (
+            "headline:skill:02",
+            "skill_context_engineering",
+            "reb_unify_runtime_reliability_governance",
+        ),
+        (
+            "headline:skill:03",
+            "skill_sr_w12_hyperscaler_alliance_co_sell",
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+        ),
+    ]
+    fact_text = {str(row["fact_id"]): str(row["claim_text"]) for row in facts}
+    plan = {
+        "section_id": "headline",
+        "allocation_plan_digest": "retry32-frozen-allocation",
+        "facts": facts,
+        "allocation_assignments": [
+            {
+                "section_id": "headline",
+                "claim_unit_id": claim_unit_id,
+                "skill_id": skill_id,
+                "fact_id": root_id,
+                "root_id": root_id,
+                "root_claim_text": fact_text[root_id],
+                "root_claim_outcome": "Represent this frozen claim in one visible segment.",
+                "counts_toward_global_uniqueness": True,
+                "graph_path_ids": [f"root:{root_id}"],
+                "citation_refs": [root_id],
+                "proof_strength_raw": 1.0,
+                "target_alignment_score": 1.0,
+                "claim_entailment_score": 1.0,
+                "path_confidence_raw": 1.0,
+                "source_independence_score": 1.0,
+                "selection_margin": 0.1,
+            }
+            for claim_unit_id, skill_id, root_id in allocation_roots
+        ],
+    }
+
+    def parsed_for(headline: str, source_ids_by_segment: list[list[str]]) -> dict:
+        return {
+            "headline_line": headline,
+            "claim_ledger": [
+                {"claim_text": segment, "source_fact_ids": source_ids}
+                for segment, source_ids in zip(
+                    headline.split(" | ")[1:], source_ids_by_segment, strict=True
+                )
+            ],
+            "selected_fact_plan": plan,
+            "jd_alignment": {
+                "targeting_only": True,
+                "jd_used_as_proof": False,
+                "briefing_used_as_proof": False,
+            },
+            "gap_notes": [],
+            "change_log": [],
+            "self_check": {},
+        }
+
+    initial = parsed_for(
+        failed,
+        [
+            ["reb_ibm_aws_alliance_partner_cosell_gtm", "reb_unify_runtime_reliability_governance"],
+            ["reb_ibm_aws_alliance_partner_cosell_gtm", "reb_unify_runtime_reliability_governance"],
+            ["reb_ibm_aws_alliance_partner_cosell_gtm", "reb_unify_runtime_reliability_governance"],
+        ],
+    )
+    candidate = parsed_for(
+        repaired,
+        [
+            ["reb_unify_runtime_reliability_governance"],
+            ["reb_ibm_revenue_sales_target_execution"],
+            ["reb_ibm_aws_alliance_partner_cosell_gtm"],
+        ],
+    )
+    runtime_payload = _bundle_runtime_payload()
+    runtime_payload["selected_fact_plan"] = plan
+    provider = _RecordingProvider("REAL_LLM", json.dumps(candidate))
+
+    _raw, out, snap, accepted = _run_content_signal_rung(
+        tmp_path,
+        monkeypatch,
+        provider=provider,
+        parsed=initial,
+        runtime_payload=runtime_payload,
+        allowed_fact_ids=set(fact_text),
+    )
+
+    assert accepted is True and snap is not None
+    assert out["headline_line"] == repaired
+    receipt = _read_receipt(tmp_path)
+    assert receipt["trigger_arm"] == "graph_claim_binding"
+    assert receipt["trigger"]["families_matched_pre"]["unbound_graph_allocations"] == [
+        {
+            "claim_unit_id": "headline:skill:01",
+            "root_id": "reb_ibm_revenue_sales_target_execution",
+            "skill_id": "skill_partner_pnl_oversight",
+            "root_claim_text": fact_text["reb_ibm_revenue_sales_target_execution"],
+            "root_claim_outcome": "Represent this frozen claim in one visible segment.",
+        }
+    ]
+    assert receipt["families_matched_post"]["resume_graph_claim_binding"]["pass"] is True
+    assert "reb_ibm_revenue_sales_target_execution" in provider.payloads[0]["messages"][-1]["content"]
 
 
 class TestHeadlineContentSignalNarrowingArm:
@@ -1019,7 +1543,7 @@ class TestHeadlineContentSignalNarrowingArm:
         _raw, out, snap, accepted = _run_content_signal_rung(
             tmp_path, monkeypatch, provider=provider, parsed=parsed
         )
-        assert provider.calls == 1
+        assert provider.calls == 3
         assert not accepted and snap is None
         assert out is parsed
         assert out["headline_line"] == LIVE_NARROWING_HL
@@ -1041,7 +1565,7 @@ class TestHeadlineContentSignalNarrowingArm:
         _raw, out, _snap, accepted = _run_content_signal_rung(
             tmp_path, monkeypatch, provider=provider, parsed=parsed
         )
-        assert provider.calls == 1
+        assert provider.calls == 3
         assert not accepted and out is parsed
         receipt = _read_receipt(tmp_path)
         assert receipt["trigger_arm"] == "governance_signal"
@@ -1078,7 +1602,7 @@ class TestHeadlineContentSignalNarrowingArm:
         assert _NARROW_GATE_ID in emphasis
         receipt = _read_receipt(tmp_path)
         assert receipt["trigger_arm"] == "governance_signal+specificity_floor+narrowing_labels"
-        assert receipt["bounded"] == {"max_attempts": 1, "attempts_used": 1}
+        assert receipt["bounded"] == {"max_attempts": 3, "attempts_used": 1}
 
 
 # ---------------------------------------------------------------------------

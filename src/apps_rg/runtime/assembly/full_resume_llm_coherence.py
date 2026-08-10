@@ -26,7 +26,7 @@ from apps_rg.runtime.sections.competencies_certification_contract import (
     check_competencies_no_reserved_certification_category,
 )
 
-FULL_RESUME_COHERENCE_RUBRIC_VERSION = "full_resume_llm_coherence_v1"
+FULL_RESUME_COHERENCE_RUBRIC_VERSION = "full_resume_llm_coherence_v2"
 # Judge panel SSOT = section_judge_policy.REQUIRED_JUDGE_PROVIDER_KEYS (the recalibrated cross-provider
 # dual panel gemini_pro + openai_chatgpt; anthropic_claude dropped as a self-judge since Claude is the
 # generator). Sourced from the SSOT — NOT a separate hardcoded roster that can silently diverge.
@@ -51,6 +51,8 @@ Evaluate:
 8. cross_section_consistency: titles, dates, metrics, claims consistent across sections.
 9. competencies_quality: executive capability clusters (3–6 items per category), not credential relisting or bare metrics-as-skills; preserve high-signal C0.3 graph-skills evidence without repeating EY/IBM/summary bullets.
 10. cross_section_overlap: minimize redundancy between executive summary, experience bullets, and competencies while keeping locked verbatim blocks (EY, InsurTech, early career, education, certifications) intact.
+
+CANDIDATE_EVIDENCE_PACKET is candidate proof, not targeting context. Graph IDs and source-fact IDs in that packet are the claim-authority spine. A globally unique metric or skill may be intentionally allocated to one rendered section; do not call it unsupported merely because the same wording is not duplicated in professional experience. Still flag a claim when the packet provides no candidate-evidence binding or when the rendered claim conflicts with its evidence.
 
 Lines marked [NOT COMPLETED: <section> — <reason>] are intentional gaps — do not score as prose; judge flow/overlap only on completed sections.
 
@@ -83,17 +85,134 @@ def assembly_product_release_mode() -> bool:
     return full_resume_coherence_review_enabled()
 
 
+def _strings(value: Any) -> list[str]:
+    if not isinstance(value, (list, tuple, set)):
+        return []
+    return [str(item).strip() for item in value if str(item).strip()]
+
+
+def _mapping_rows(value: Any) -> list[dict[str, Any]]:
+    if isinstance(value, list):
+        return [dict(row) for row in value if isinstance(row, dict)]
+    if isinstance(value, dict):
+        return [dict(row) for row in value.values() if isinstance(row, dict)]
+    return []
+
+
+def build_full_resume_evidence_packet(final_resume: dict[str, Any]) -> dict[str, Any]:
+    """Compact candidate-proof context for the whole-resume coherence panel.
+
+    This projection intentionally excludes traversal, ranking, and candidate-pool
+    diagnostics. It carries only visible claims and their candidate fact/graph
+    bindings, so the judge can distinguish proof from JD targeting without being
+    asked to infer authority from repeated surface prose.
+    """
+    section_evidence: list[dict[str, Any]] = []
+    for section in final_resume.get("sections") or []:
+        if not isinstance(section, dict):
+            continue
+        snapshot = section.get("l2_output_snapshot")
+        if not isinstance(snapshot, dict):
+            continue
+        claims = [
+            {
+                "claim_text": str(row.get("claim_text") or row.get("claim") or "").strip(),
+                "source_fact_ids": _strings(row.get("source_fact_ids")),
+                "claim_unit_id": str(row.get("claim_unit_id") or "").strip(),
+            }
+            for row in _mapping_rows(snapshot.get("claim_ledger"))
+            if str(row.get("claim_text") or row.get("claim") or "").strip()
+        ]
+        plan = snapshot.get("selected_fact_plan")
+        plan = plan if isinstance(plan, dict) else {}
+        facts = [
+            {
+                "fact_id": str(row.get("fact_id") or row.get("candidate_fact_id") or "").strip(),
+                "claim_text": str(row.get("claim_text") or "").strip(),
+                "employer_lane": str(
+                    row.get("employer_lane") or row.get("source_employment") or ""
+                ).strip(),
+                "source_fact_ids": _strings(
+                    row.get("source_fact_ids") or row.get("linked_source_fact_ids")
+                ),
+                "graph_skill_node_ids": _strings(row.get("graph_skill_node_ids")),
+                "metric_outcome_ids": _strings(
+                    row.get("metric_outcome_ids") or row.get("selected_metric_ids")
+                ),
+                "metric_values": _strings(row.get("metric_values")),
+                "allocation_claim_unit_ids": _strings(
+                    row.get("allocation_claim_unit_ids")
+                ),
+                "verification_status": str(
+                    row.get("verification_status") or row.get("support_level") or ""
+                ).strip(),
+            }
+            for row in _mapping_rows(plan.get("facts"))
+        ]
+        bindings = [
+            {
+                "visible_claim_text": str(row.get("visible_claim_text") or "").strip(),
+                "fact_ids": _strings(row.get("fact_ids")),
+                "skill_ids": _strings(row.get("skill_ids")),
+                "metric_outcome_id": str(row.get("metric_outcome_id") or "").strip(),
+                "metric_value": str(row.get("metric_value") or "").strip(),
+                "citation_refs": _strings(row.get("citation_refs")),
+                "binding_status": str(row.get("binding_status") or "").strip(),
+            }
+            for row in _mapping_rows(snapshot.get("graph_claim_bindings"))
+        ]
+        if not claims and not facts and not bindings:
+            continue
+        section_evidence.append(
+            {
+                "section_id": str(section.get("section_id") or "").strip(),
+                "allocation_plan_digest": str(
+                    snapshot.get("resume_graph_allocation_plan_digest")
+                    or plan.get("allocation_plan_digest")
+                    or ""
+                ).strip(),
+                "claim_binding_pass": snapshot.get("resume_graph_claim_binding_pass"),
+                "visible_claims": claims,
+                "selected_candidate_facts": facts,
+                "graph_claim_bindings": bindings,
+            }
+        )
+    return {
+        "schema": "apps_rg.full_resume_candidate_evidence_packet.v1",
+        "authority_semantics": [
+            "This packet is candidate proof; TARGETING_CONTEXT is not proof.",
+            "Graph IDs and source-fact IDs are claim authority.",
+            "Whole-resume allocation may place a fact or metric in exactly one rendered section; surface-text repetition is not required for support.",
+        ],
+        "sections": section_evidence,
+    }
+
+
 def _build_prompt(
     *,
     full_resume_text: str,
     target_company: str,
     target_role: str,
     jd_context: str,
+    evidence_packet: dict[str, Any] | None = None,
 ) -> str:
     jd_block = f"\nTARGETING_CONTEXT (not proof):\ncompany={target_company}\nrole={target_role}\n{jd_context}\n"
+    evidence_block = ""
+    if evidence_packet:
+        evidence_block = (
+            "\nCANDIDATE_EVIDENCE_PACKET (candidate proof):\n"
+            + json.dumps(
+                evidence_packet,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        )
     return (
         f"{FULL_RESUME_COHERENCE_RUBRIC}\n\n{JUDGE_COMPACT_OUTPUT}\n\n"
         f"ASSEMBLED_RESUME_TEXT:\n{full_resume_text}\n"
+        f"{evidence_block}"
         f"{jd_block}"
     )
 
@@ -135,6 +254,7 @@ def run_full_resume_coherence_judges(
     target_company: str,
     target_role: str,
     jd_context: str = "",
+    evidence_packet: dict[str, Any] | None = None,
     judge_roster: list[str] | None = None,
     mode: str = "blocked_if_unavailable",
     artifact_base: Path | None = None,
@@ -145,6 +265,7 @@ def run_full_resume_coherence_judges(
         "target_company": target_company,
         "target_role": target_role,
         "rubric": FULL_RESUME_COHERENCE_RUBRIC,
+        "evidence_packet": evidence_packet or {},
     }
     input_hash = hashlib.sha256(json.dumps(input_payload, sort_keys=True).encode()).hexdigest()[:16]
     prompt = _build_prompt(
@@ -152,6 +273,7 @@ def run_full_resume_coherence_judges(
         target_company=target_company,
         target_role=target_role,
         jd_context=jd_context,
+        evidence_packet=evidence_packet,
     )
 
     outputs: list[JudgeOutput] = []
@@ -288,6 +410,21 @@ def _deterministic_preflight_blockers(final_resume: dict[str, Any]) -> list[str]
         for needle in ("AWS Certified", "Databricks Lakehouse Fundamentals", "Fellow of the Society"):
             if needle in comp_block:
                 blockers.append(f"credential_name_in_competencies_block:{needle}")
+    certification_heading = "CERTIFICATIONS & CREDENTIALS"
+    if certification_heading in flat:
+        before_certifications, certification_block = flat.split(
+            certification_heading,
+            1,
+        )
+        for needle in (
+            "AWS Certified",
+            "Databricks Lakehouse Fundamentals",
+            "Fellow of the Society of Actuaries",
+        ):
+            if needle in certification_block and needle in before_certifications:
+                blockers.append(
+                    f"credential_section_ownership_duplicate:{needle}"
+                )
     return blockers
 
 
@@ -430,11 +567,21 @@ def emit_full_resume_llm_coherence_review(
 
     provider_artifact_base = output_dir / "coherence_judge_providers"
     provider_artifact_base.mkdir(parents=True, exist_ok=True)
+    evidence_packet = build_full_resume_evidence_packet(final_resume)
+    evidence_packet_digest = hashlib.sha256(
+        json.dumps(
+            evidence_packet,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
     judges = run_full_resume_coherence_judges(
         full_resume_text=full_text,
         target_company=target_company,
         target_role=target_role,
         jd_context=jd_context,
+        evidence_packet=evidence_packet,
         judge_roster=judge_roster,
         mode=mode,
         # Raw provider request/response artifacts go in a subdir: the structural
@@ -455,11 +602,29 @@ def emit_full_resume_llm_coherence_review(
         "final_resume_hash": final_hash,
         "target_company": target_company,
         "target_role": target_role,
+        "candidate_evidence_packet": {
+            "schema": evidence_packet["schema"],
+            "sha256": evidence_packet_digest,
+            "section_count": len(evidence_packet["sections"]),
+            "visible_claim_count": sum(
+                len(section["visible_claims"])
+                for section in evidence_packet["sections"]
+            ),
+            "selected_candidate_fact_count": sum(
+                len(section["selected_candidate_facts"])
+                for section in evidence_packet["sections"]
+            ),
+            "graph_claim_binding_count": sum(
+                len(section["graph_claim_bindings"])
+                for section in evidence_packet["sections"]
+            ),
+        },
         **agg,
         "explicit_non_claims": [
             "Section-level X2 PASS does not imply full_resume_coherence_pass.",
             "MOCKED or BLOCKED judges do not count toward quorum pass.",
             "UNKNOWN is not PASS.",
+            "Targeting context is not candidate proof; the candidate evidence packet is.",
         ],
     }
 
@@ -489,5 +654,3 @@ def emit_full_resume_llm_coherence_review(
     x1d_path.write_text(json.dumps(x1d_blob, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     review["x1d_full_resume_judge_outputs_json"] = str(x1d_path)
     return review
-
-

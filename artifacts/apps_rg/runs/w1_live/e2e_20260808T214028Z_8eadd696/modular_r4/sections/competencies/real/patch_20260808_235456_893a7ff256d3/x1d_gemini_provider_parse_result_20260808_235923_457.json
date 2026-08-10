@@ -1,0 +1,88 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.2,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Raw skill slugs 'sr w12 hyperscaler alliance co sell' and 'partner ibm aws alliance joint revenue' leaked as visible terms in Category 5.",
+      "Exact term 'AWS modernization architecture from on-prem estate constraints' is duplicated in Category 4 and Category 7.",
+      "Mundane term 'Core reporting workflow integration handoff' weakens executive seniority."
+    ],
+    "cited_sentence_indexes": [
+      4,
+      5,
+      7,
+      8
+    ],
+    "remediation_suggestions": [
+      "Format raw skill ID slugs into clean executive capability terms.",
+      "Eliminate term duplication across categories with unique domain phrases.",
+      "Elevate junior reporting handoff phrasing to reflect strategic operating model governance."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "seniority_executive_relevance": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "MUNDANE_EXECUTION_TERM"
+        ]
+      },
+      "complementarity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "no_bullet_restatement": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DUPLICATE_CROSS_CATEGORY_TERM"
+        ]
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "RAW_SLUG_LEAKAGE"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "UNFORMATTED_SKILL_ID"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260808_235456_893a7ff256d3\\x1d_gemini_provider_response_raw_20260808_235923_453.json",
+  "original_model": null,
+  "fallback_model": null
+}

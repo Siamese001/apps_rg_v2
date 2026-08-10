@@ -1,0 +1,40 @@
+{
+  "schema_version": "1",
+  "correlation_id": null,
+  "integrated_run_id": null,
+  "correlation_method": null,
+  "correlation_missing_reason": "no correlated integrated cli_* run discovered for this section proof root; section_root='artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/executive_summary'; section_id='executive_summary'; APPS_RG_CORRELATED_CLI_RUN='artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd' did not resolve to cli_* directory; scanned_cli_run_dirs=0; tried: env_APPS_RG_CORRELATED_CLI_RUN, section_run_manifest, modular_r4/sections/<lane>/latest_real_run.json, integrated RUN_LINKS, integrated RUN_BUNDLE_INDEX, integrated top-level json corpus, runtime_payload correlation_id",
+  "section_run_id": "exec_summary_20260809_070310",
+  "section_id": "executive_summary",
+  "created_at": "2026-08-09T07:04:50.835080+00:00",
+  "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/executive_summary",
+  "artifact_namespace": "artifacts/apps_rg/runs",
+  "log_namespace": "apps_rg/pipeline_logs",
+  "log_discovery": {
+    "mode": "telemetry_only",
+    "log_namespace": "apps_rg/pipeline_logs",
+    "log_root_path": null,
+    "notes": "No on-disk directory at log_namespace `apps_rg/pipeline_logs` at index time; pipeline_defaults.yaml declares telemetry_prefix `apps_rg.r4_integrated` (OpenTelemetry spans/metrics)."
+  },
+  "lane_bundle_refs": [
+    {
+      "lane": "executive_summary",
+      "proof_mode": "real",
+      "run_id": "exec_summary_20260809_070310",
+      "bundle_index_ref": "artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/executive_summary/RUN_BUNDLE_INDEX.json",
+      "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/executive_summary",
+      "exists": true,
+      "producer": "apps_rg.runtime.section_evidence_package.build_lane_run_links_document"
+    }
+  ],
+  "integrated_run_refs": [],
+  "aggregate_refs": [],
+  "modular_sections_root": {
+    "mode": "default",
+    "source_env_var": "APPS_RG_MODULAR_R4_SECTIONS_ROOT",
+    "manifest_ref": null,
+    "root_path": null,
+    "exists": false,
+    "notes": "section proof root is narrative audit package for this lane run"
+  }
+}

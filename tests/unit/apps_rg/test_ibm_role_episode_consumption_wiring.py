@@ -387,6 +387,65 @@ class TestX2RoleEpisodeGates:
         assert gate.pass_ is True
 
 
+def test_current_ibm_presales_and_deal_support_allocations_surface_mechanisms() -> None:
+    from apps_rg.runtime.sections.ibm_bullets_graph_evidence import (
+        IBM_BULLET_MECHANISM_VOCAB,
+    )
+    from apps_rg.runtime.sections.ibm_bullets_lane import (
+        _materialize_ibm_bullets_from_frozen_allocation,
+    )
+    from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+        run_bullet_quality_floor_gates,
+    )
+
+    parsed = {
+        "bullets": [
+            {"bullet_id": f"bul_ibm_{index:03d}", "bullet_text": "placeholder"}
+            for index in range(1, 6)
+        ]
+    }
+    allocations = [
+        {
+            "section_id": "ibm_bullets",
+            "claim_unit_id": f"ibm_bullets:bul_ibm_{index:03d}",
+            "root_id": root_id,
+            "skill_id": skill_id,
+            "root_claim_text": text,
+        }
+        for index, (root_id, skill_id, text) in enumerate(
+            (
+                ("root_1", "skill_1", "Architected AWS alliance solutions"),
+                ("root_2", "skill_2", "Built BI decision-support data models"),
+                (
+                    "reb_ibm_presales_solution_engineering",
+                    "skill_p2_gtm_solution_mapping",
+                    "Led technical discovery and solution mapping for enterprise pursuits",
+                ),
+                (
+                    "reb_ibm_revenue_sales_target_execution",
+                    "skill_p2_gtm_enterprise_deal_support",
+                    "Owned quota-aligned solution leadership across enterprise pursuits",
+                ),
+                ("root_5", "skill_5", "Architected AI reference architectures"),
+            ),
+            start=1,
+        )
+    ]
+
+    assert _materialize_ibm_bullets_from_frozen_allocation(
+        parsed, selected_fact_plan={"allocation_assignments": allocations}
+    )
+    by_id = {row["bullet_id"]: row["bullet_text"] for row in parsed["bullets"]}
+    assert "solution architecture mapping" in by_id["bul_ibm_003"]
+    assert "pipeline governance" in by_id["bul_ibm_004"]
+    _, _, technical_pass, technical_rows, _, _ = run_bullet_quality_floor_gates(
+        parsed["bullets"],
+        section_id="ibm_bullets",
+        mechanism_vocab_by_slot=IBM_BULLET_MECHANISM_VOCAB,
+    )
+    assert technical_pass, [row.failure_reason for row in technical_rows]
+
+
 class TestForbiddenMetricsScan:
     def test_scan_detects_hold_metrics(self) -> None:
         from apps_rg.runtime.sections.ibm_role_episode_evidence import (

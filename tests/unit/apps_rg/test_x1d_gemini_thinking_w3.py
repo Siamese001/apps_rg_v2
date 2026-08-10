@@ -6,41 +6,29 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
+
 from apps_rg.runtime.judges import executive_summary_x1d as subject
 from apps_rg.runtime.section_judge_policy import policy_matrix_export
 
 
-def test_w3_gemini_thinking_is_off_by_default(monkeypatch) -> None:
-    monkeypatch.delenv(subject.ENV_APPS_RG_GEMINI_GRADE_ONLY_THINKING, raising=False)
-
-    config = subject._gemini_generation_config(
-        model="gemini-3.1-pro-preview",
-        section_id="headline",
-    )
-
-    assert subject.gemini_grade_only_thinking_enabled() is False
-    assert "thinkingConfig" not in config
+def test_w3_gemini_thinking_level_is_mandatory() -> None:
+    with pytest.raises(ValueError, match="thinking_level must be explicit"):
+        subject._gemini_generation_config(thinking_level="", section_id="headline")
 
 
-def test_w3_gemini_thinking_uses_source_controlled_tier_levels(monkeypatch) -> None:
-    monkeypatch.setenv(subject.ENV_APPS_RG_GEMINI_GRADE_ONLY_THINKING, "1")
-
+def test_w3_gemini_thinking_uses_source_controlled_tier_levels() -> None:
     standard = subject._gemini_generation_config(
-        model="gemini-3.1-pro-preview",
+        thinking_level="low",
         section_id="headline",
     )
     enhanced = subject._gemini_generation_config(
-        model="gemini-3.1-pro-preview",
+        thinking_level="medium",
         section_id="executive_summary",
-    )
-    unsupported = subject._gemini_generation_config(
-        model="gemini-2.5-pro",
-        section_id="headline",
     )
 
     assert standard["thinkingConfig"] == {"thinkingLevel": "low"}
     assert enhanced["thinkingConfig"] == {"thinkingLevel": "medium"}
-    assert "thinkingConfig" not in unsupported
     matrix = policy_matrix_export()
     assert matrix["headline"]["judge_runtime_profile"]["gemini_thinking_level"] == "low"
     assert matrix["executive_summary"]["judge_runtime_profile"]["gemini_thinking_level"] == "medium"
@@ -50,7 +38,6 @@ def test_w3_gemini_request_and_receipt_disclose_applied_thinking_level(
     monkeypatch,
     tmp_path: Path,
 ) -> None:
-    monkeypatch.setenv(subject.ENV_APPS_RG_GEMINI_GRADE_ONLY_THINKING, "1")
     monkeypatch.setattr(subject, "_judge_live_https_allowed_under_pytest", lambda: True)
     response_doc = {
         "candidates": [
@@ -95,6 +82,7 @@ def test_w3_gemini_request_and_receipt_disclose_applied_thinking_level(
         "input-hash",
         "gemini_pro",
         artifact_base=tmp_path,
+        thinking_level="low",
         section_id="headline",
     )
 

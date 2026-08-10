@@ -1,0 +1,91 @@
+{
+  "generation_mode": "model_competencies_graph_pool_adaptive_6_8_regen",
+  "section_lane": "competencies",
+  "initial_path_count": 4,
+  "total_paths_executed": 4,
+  "regen_rounds_executed": 0,
+  "adaptive_sc_enabled": true,
+  "max_path_count": 8,
+  "stop_reason": "selection_gate_passed",
+  "min_selection_score": 0.72,
+  "high_signal_selection_score": 0.84,
+  "selection_gate": {
+    "ok": true,
+    "section_lane": "competencies",
+    "final_category_count": 6,
+    "min_category_count": 6,
+    "max_category_count": 8,
+    "min_score_threshold": 0.72,
+    "categories_passing": [
+      "agentic control-plane architecture",
+      "agentic platform productization",
+      "engineering leadership for ai platforms",
+      "llmops evaluation & reliability",
+      "multi-agent runtime governance",
+      "partner applied ai architecture"
+    ],
+    "categories_below_threshold": [],
+    "categories_missing": [],
+    "categories_in_merged": 6,
+    "bundle_ids_missing": [],
+    "duplicate_bundle_ids": [],
+    "taxonomy_category_ids_missing": [],
+    "duplicate_taxonomy_category_ids": []
+  },
+  "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass",
+  "source_path_by_slot": {
+    "partner applied ai architecture": 0,
+    "agentic control-plane architecture": 0,
+    "agentic platform productization": 0,
+    "engineering leadership for ai platforms": 0,
+    "multi-agent runtime governance": 0,
+    "llmops evaluation & reliability": 3
+  },
+  "claude_selection_count": 8,
+  "candidate_category_count": 8,
+  "min_category_count": 6,
+  "max_category_count": 8,
+  "final_category_count": 6,
+  "phase_timings": [
+    {
+      "phase": "self_consistency_generation_round_0",
+      "started_at": "2026-08-09T02:09:39.946095+00:00",
+      "duration_s": 97.719,
+      "batch_paths": 4,
+      "requested_batch_paths": 4,
+      "remaining_path_budget_before_batch": 8
+    },
+    {
+      "phase": "selector_round_0",
+      "started_at": "2026-08-09T02:11:17.667258+00:00",
+      "duration_s": 11.671,
+      "selection_mode": "competencies_advisory_selector_adaptive_6_8_pass"
+    }
+  ],
+  "e2e_closeout_mode": false,
+  "max_regen_rounds_allowed": 2,
+  "competencies_rejected_neighbor_audit": {
+    "schema_version": "competencies_rejected_neighbor_audit_v1",
+    "audit_status": "present",
+    "candidate_label_count": 26,
+    "candidate_variant_count": 29,
+    "selected_count": 6,
+    "rejected_neighbor_count": 23
+  },
+  "selector_empty": true,
+  "selector_selection_mode": "competencies_advisory_selector_adaptive_6_8_pass",
+  "selector_bullets_in_merged": 0,
+  "selector_selection_count": 8,
+  "selector_subthreshold_scores": [
+    0.9,
+    0.72,
+    0.85,
+    0.84,
+    0.83,
+    0.78,
+    0.8,
+    0.73
+  ],
+  "selector_block_reason": "selector_returned_no_candidates_above_threshold",
+  "competencies_rejected_neighbor_audit_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_020928_432f3bde4612\\competencies_rejected_neighbor_audit.json"
+}

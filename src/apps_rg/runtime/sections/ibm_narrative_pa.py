@@ -11,6 +11,7 @@ W11-M4B SSOT: apps_rg.runtime.sections.ibm_narrative_pa."""
 from __future__ import annotations
 
 from pathlib import Path
+import re
 from typing import Any
 
 import yaml
@@ -76,7 +77,14 @@ def _theme_family_summary(phrases: tuple[str, ...]) -> str:
     return " / ".join(picked)
 
 
-def _theme_budget_block() -> str:
+def _companion_mechanism_terms(companion_text: str) -> list[str]:
+    from apps_rg.runtime.validators.narrative_quality_x2 import MECHANISM_VOCAB
+
+    tokens = set(re.findall(r"[a-z0-9]+", str(companion_text or "").lower()))
+    return sorted(tokens.intersection(MECHANISM_VOCAB))
+
+
+def _theme_budget_block(companion_text: str = "") -> str:
     """Structural theme budget the deterministic X2 ledger math enforces.
 
     Derived from ``IBM_NARRATIVE_THEME_TRIGGERS`` (the X2 theme-detection SSOT) so the prompt
@@ -89,12 +97,11 @@ def _theme_budget_block() -> str:
     x2_narrative_technical_specificity_floor; runtime I0 names the laws without
     enumerating X2 gate IDs.
     """
-    from apps_rg.runtime.validators.ibm_narrative_x2 import IBM_NARRATIVE_THEME_TRIGGERS
-
     lines = [
         "THEME BUDGET (STRUCTURAL — deterministic X2 ledger math, not style advice):",
         "- narrative_sentence may materially express AT MOST 4 of the 5 IBM bullet theme "
-        "families below, with AT MOST 2 theme families per clause.",
+        "families currently finalized below, with AT MOST 2 theme families per clause; every "
+        "theme family must cite its current bullet id.",
         "- The ', establishing' clause split yields at most 2 claim_ledger rows and each row "
         "may cite at most 2 bul_ibm_* roots, so a sentence tripping all 5 families can never "
         "pass both theme-coverage and clause-decomposition gates.",
@@ -106,10 +113,14 @@ def _theme_budget_block() -> str:
         "the ', establishing' clause or drop it entirely.",
         "- THESIS SHAPE (follow this intent, not a fixed string): choose ONE executive "
         "through-line and let the bullets carry the detailed proof. Do not enumerate four "
-        "program families in the opening clause. Strong pattern: 'Drove governed <mechanism> "
+        "program families in the opening clause. Strong pattern: 'Led governed <mechanism> "
         "work for enterprise clients at IBM, establishing <operating discipline> that made "
         "<plain outcome> more repeatable.' Keep each clause to at most two theme families, "
         "and prefer two or three material families total over the full four-family budget.",
+        "- GRAPH-ROOT CAUSALITY LAW: a claim_ledger row that cites two bul_ibm_* roots must use "
+        "descriptive leadership wording such as 'Led' or 'Owned', never causal/result verbs such as "
+        "drove, driving, yielded, resulted, increased, reduced, generated, or delivered. If a causal "
+        "verb is essential, that row may cite exactly one bullet root.",
         "- OPENER LAW (deterministic opener gate; PRODUCT_SHAPE carries the gate ID): the sentence "
         "MUST begin with a past-tense action verb. NEVER open with a preposition or "
         "scene-setting lead-in (At/In/As/With/During/While/Throughout/Across/Within/From/"
@@ -117,33 +128,56 @@ def _theme_budget_block() -> str:
         "successfully/also/built/delivered/designed/implemented/architected/scaled/productized; "
         "prefer Drove, Owned, Championed, Operationalized, Established, Anchored, Stewarded. "
         "Keep the employer anchor 'IBM' mid-sentence, never as the opener.",
-        "- MECHANISM LAW (deterministic mechanism-specificity gate; PRODUCT_SHAPE carries the gate ID): the "
-        "sentence MUST name at least one concrete mechanism/technology token. For IBM's "
-        "enterprise-modernization scope use one of: observability, telemetry, microservices, "
-        "pipeline, runtime, HPC, lakehouse, API (all IBM-truthful). Generic words alone — cloud, "
-        "data, platform, modernization, lineage — do NOT satisfy this gate.",
-        "Theme families (trigger vocabulary classes):",
     ]
-    for fid, phrases in IBM_NARRATIVE_THEME_TRIGGERS:
-        lines.append(f"- {fid}: {_theme_family_summary(phrases)}")
+    mechanism_terms = _companion_mechanism_terms(companion_text)
+    if mechanism_terms:
+        lines.append(
+            "- MECHANISM LAW: name at least one concrete mechanism/technology token that is "
+            "actually present in a cited finalized bullet. Current supported tokens: "
+            + ", ".join(mechanism_terms)
+            + "."
+        )
+    else:
+        lines.append(
+            "- MECHANISM LAW: name at least one concrete mechanism/technology token from the "
+            "cited proof, never from a generic example or targeting context."
+        )
+    companion_rows = [
+        line.strip()
+        for line in str(companion_text or "").splitlines()
+        if re.search(r"\bbul_ibm_\d{3}\b", line)
+    ]
+    if companion_rows:
+        lines.append("Current finalized bullet families (runtime authority):")
+        lines.extend(f"- {line.lstrip('- ').strip()}" for line in companion_rows[:5])
+    else:
+        from apps_rg.runtime.validators.ibm_narrative_x2 import IBM_NARRATIVE_THEME_TRIGGERS
+
+        lines.append("Legacy theme families (used only when finalized companion text is absent):")
+        for fid, phrases in IBM_NARRATIVE_THEME_TRIGGERS:
+            lines.append(f"- {fid}: {_theme_family_summary(phrases)}")
     return "\n".join(lines)
 
 
-def _yaml_instruction_layers(spec: dict[str, Any]) -> str:
+def _yaml_instruction_layers(
+    spec: dict[str, Any],
+    *,
+    dynamic_companion: bool = False,
+) -> str:
     chunks: list[str] = []
     purpose = str(spec.get("purpose") or "").strip()
-    if purpose:
+    if purpose and not dynamic_companion:
         chunks.append(purpose)
     oath = str(spec.get("sovereign_oath") or "").strip()
     if oath:
         chunks.append(oath)
 
     ns = spec.get("north_star_semantic_contract")
-    if isinstance(ns, str) and ns.strip():
+    if isinstance(ns, str) and ns.strip() and not dynamic_companion:
         chunks.append("IBM NARRATIVE NORTH STAR (STYLE TARGET — PARAPHRASE ALLOWED):\n" + ns.strip())
 
     cc = spec.get("claim_ledger_coverage_contract")
-    if isinstance(cc, str) and cc.strip():
+    if isinstance(cc, str) and cc.strip() and not dynamic_companion:
         chunks.append("CLAIM_LEDGER THEME COVERAGE (DETERMINISTIC X2 GATE):\n" + cc.strip())
 
     sah = spec.get("source_authority_hierarchy")
@@ -161,7 +195,7 @@ def _yaml_instruction_layers(spec: dict[str, Any]) -> str:
         chunks.append("\n".join(lines))
 
     ng = spec.get("narrative_complement_guidance")
-    if isinstance(ng, dict):
+    if isinstance(ng, dict) and not dynamic_companion:
         np = str(ng.get("purpose") or "").strip()
         if np:
             chunks.append(np)
@@ -179,7 +213,7 @@ def _yaml_instruction_layers(spec: dict[str, Any]) -> str:
             )
 
     pe = spec.get("prompt_engineering_hardening")
-    if isinstance(pe, dict):
+    if isinstance(pe, dict) and not dynamic_companion:
         proc = pe.get("private_process")
         if isinstance(proc, list) and proc:
             chunks.append(
@@ -188,7 +222,7 @@ def _yaml_instruction_layers(spec: dict[str, Any]) -> str:
             )
 
     mh = spec.get("metric_handling_rules")
-    if isinstance(mh, dict):
+    if isinstance(mh, dict) and not dynamic_companion:
         lines: list[str] = ["METRIC HANDLING (from IBM narrative spec):"]
         dp = mh.get("default_policy")
         if isinstance(dp, str) and dp.strip():
@@ -232,10 +266,13 @@ def _yaml_instruction_layers(spec: dict[str, Any]) -> str:
     return "\n\n".join(c for c in chunks if c.strip())
 
 
-def _i0_from_spec(runtime_payload: dict[str, Any]) -> str:
+def _i0_from_spec(runtime_payload: dict[str, Any], companion_text: str = "") -> str:
     spec = _ibm_position_narrative_spec()
     header = runtime_payload["ibm_header"]
-    layers = _yaml_instruction_layers(spec)
+    layers = _yaml_instruction_layers(
+        spec,
+        dynamic_companion=bool(str(companion_text or "").strip()),
+    )
     mechanical = (
         "<!-- UNIFY_IBM_PROMPT_CORE_LAW_V3 — section I0; X2 gate IDs in PRODUCT_SHAPE only -->\n\n"
         "ROLE:\n"
@@ -270,14 +307,12 @@ def _i0_from_spec(runtime_payload: dict[str, Any]) -> str:
         f"title={header['title']}, location={header['location']}, dates={header['start_date']} to "
         f"{header['end_date']}.\n\n"
         f"{_format_allowed_fact_ids(runtime_payload)}\n"
-        f"{_theme_budget_block()}\n\n"
+        f"{_theme_budget_block(companion_text)}\n\n"
         "COMPANION SYNTHESIS:\n"
         "- ACCEPTED_IBM_BULLETS are primary synthesis context after finalization; C0 remains proof/provenance.\n"
-        "- Pick one executive through-line: foundation, modernization, governed delivery, or alliance execution.\n"
-        "- Avoid verbatim/topic-rollup phrasing from accepted bullets such as \"AWS modernization\", "
-        "\"decision-support\", \"pre-sales\", \"alliance execution\", and \"BI and data models\" in one sentence; "
-        "recast into a higher-level thesis such as governed delivery, reference architecture, operating discipline, "
-        "or repeatable regulated transformation.\n"
+        "- Pick one executive through-line that is entailed by the current finalized bullets.\n"
+        "- Use only themes and mechanisms found in the cited current companion bullets; historical examples and "
+        "targeting language are not proof.\n"
         "- Prefer one clean executive sentence over a comma-packed mechanism list; bullets carry detailed proof.\n"
         "- Do not summarize all five bullets, repeat the KPI set, or spin a different role story not entailed by "
         "bul_ibm_* facts and the accepted bullet themes.\n\n"
@@ -286,14 +321,15 @@ def _i0_from_spec(runtime_payload: dict[str, Any]) -> str:
     return mechanical.strip()
 
 
-def _u0(companion_nonempty: bool) -> str:
+def _u0(companion_text: str) -> str:
+    companion_nonempty = bool(str(companion_text or "").strip())
     closing = (
         "Write exactly one narrative_sentence: synthesize accepted IBM bullets into a north-star role thesis, "
         "polished SVP-level executive prose, third person or implied subject, "
         f"IBM as employer anchor once, one period, preferred 34–48 words and hard max {NARRATIVE_MAX_WORDS} words. "
         "Use one clean executive through-line; do not write a five-bullet summary. "
-        "When ACCEPTED_IBM_BULLETS companion lines include the standard IBM KPI set ($15M, 99.9%, 30%, 25%, 50%), "
-        "do not restate those digits or percentages in narrative_sentence — use conceptual language only."
+        "Do not restate companion metrics in narrative_sentence; use conceptual language while preserving exact "
+        "source attribution in claim_ledger."
     )
     if companion_nonempty:
         return closing
@@ -323,7 +359,7 @@ def compile_ibm_narrative_prompt(
         d0_fences=slots["D0"],
         e0_examples=slots["E0"],
         y0_style_preferences=slots["Y0"],
-        i0_instructions=_i0_from_spec(runtime_payload),
+        i0_instructions=_i0_from_spec(runtime_payload, companion_text),
         c0_candidate_facts=EvidenceSource(
             source_type="candidate_facts",
             content=fact_lines,
@@ -336,7 +372,7 @@ def compile_ibm_narrative_prompt(
             confidence=0.0,
             source_tag="jd_requirements",
         ),
-        u0_user_task=_u0(companion_nonempty),
+        u0_user_task=_u0(companion_text),
         r0_response_schema=NARRATIVE_R0,
         render_context={
             "section_id": "ibm_narrative",

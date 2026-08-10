@@ -6,7 +6,7 @@ import json
 from datetime import datetime, timezone
 from typing import Any
 
-from agentic_core.runtime.contracts.route_contract import RouteContract
+from apps_rg.runtime.spine_contracts import RouteContract
 
 
 def _digest(payload: dict[str, Any]) -> str:

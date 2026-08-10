@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Optional
 
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import (
     FinalEvidenceContract,
     STATUS_UNKNOWN,
     SUPPORT_STATUS_BLOCKED,
@@ -23,7 +23,7 @@ from agentic_core.runtime.contracts.final_evidence_contract import (
     SUPPORT_STATUS_PASS,
     SUPPORT_STATUS_WEAK_WITH_CAVEATS,
 )
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg.runtime.spine_contracts import SealedL2Artifact
 
 from apps_rg.runtime.bindings.judge_calibration_baseline import (
     APPS_RG_EXEC_POSITIONING_CALIBRATION_IDENTITY,
@@ -598,7 +598,7 @@ def build_apps_rg_exit_harness(
 APPS_RG_EXIT_CERT_REF: str = "exit-apps-rg-resume-generation-w3p5"
 
 try:
-    from agentic_core.runtime.contracts.x3_disposition import X3Disposition  # noqa: F401
+    from apps_rg.runtime.spine_contracts import X3Disposition  # noqa: F401
 except ImportError:
     X3Disposition = None  # type: ignore[assignment,misc]
 

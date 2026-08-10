@@ -98,13 +98,27 @@ def exp_header(hdr: dict[str, Any]) -> list[str]:
     return out
 
 
-def bullets_from_list(bullets: list[Any]) -> list[str]:
+def _normalized_role_sentence(value: Any) -> str:
+    """Narrow comparison key for generated narrative/bullet presentation dedupe."""
+    return " ".join(str(value or "").split()).casefold()
+
+
+def bullets_from_list(
+    bullets: list[Any],
+    *,
+    exclude_texts: tuple[str, ...] = (),
+) -> list[str]:
+    excluded = {
+        normalized
+        for value in exclude_texts
+        if (normalized := _normalized_role_sentence(value))
+    }
     rows: list[str] = []
     for b in bullets or []:
         if not isinstance(b, dict):
             continue
         t = str(b.get("bullet_text") or b.get("text") or "").strip()
-        if t:
+        if t and _normalized_role_sentence(t) not in excluded:
             rows.append(f"• {t}")
     return rows
 
@@ -204,7 +218,10 @@ def _append_generated_role(
         narr = str(narr_snap.get("narrative_sentence") or "").strip()
         if narr:
             lines.append(narr)
-        bullets = bullets_from_list(bullet_snap.get("bullets") or [])
+        bullets = bullets_from_list(
+            bullet_snap.get("bullets") or [],
+            exclude_texts=(narr,),
+        )
         lines.extend(bullets)
         if not narr and not bullets:
             lines.extend(
@@ -300,7 +317,10 @@ def flatten_final_resume_to_text(final_resume: dict[str, Any]) -> str:
         narr = str(un_n.get("narrative_sentence") or "").strip()
         if narr:
             lines.append(narr)
-        bullets = bullets_from_list(un_b.get("bullets") or [])
+        bullets = bullets_from_list(
+            un_b.get("bullets") or [],
+            exclude_texts=(narr,),
+        )
         lines.extend(bullets)
         if not narr and not bullets:
             lines.extend(
@@ -322,7 +342,10 @@ def flatten_final_resume_to_text(final_resume: dict[str, Any]) -> str:
         narr = str(ibm_n.get("narrative_sentence") or "").strip()
         if narr:
             lines.append(narr)
-        bullets = bullets_from_list(ibm_b.get("bullets") or [])
+        bullets = bullets_from_list(
+            ibm_b.get("bullets") or [],
+            exclude_texts=(narr,),
+        )
         lines.extend(bullets)
         if not narr and not bullets:
             lines.extend(

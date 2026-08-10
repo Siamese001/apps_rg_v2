@@ -1,0 +1,61 @@
+{
+  "artifact_hash": "sha256:9cd001959905bec1e01775d8ee581d2081d484c8a96c8c75d605a32d1a580541",
+  "payload": {
+    "executed": true,
+    "fault": "",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-fb4cdbbb17a843c7b5b4ba47ef5ea564",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "bf6d8a40-b460-46ae-9cdc-a08872cac2f0",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:c7807f0f167974aef226b094f0936a7ec6c774fcf2c91da08acbe3046a510387",
+    "status": "PASS",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.008,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 25528.892,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.003,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "BYPASSED",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "trace-9aa2265dbb06442fa5542921aa843531"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:c7807f0f167974aef226b094f0936a7ec6c774fcf2c91da08acbe3046a510387"
+}

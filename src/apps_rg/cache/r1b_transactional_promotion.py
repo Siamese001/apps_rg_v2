@@ -150,7 +150,7 @@ def promote_r1b_transactionally(
         or candidate.record.x3_disposition
         or ""
     ).strip().upper()
-    if x3_code != "X3C":
+    if x3_code != "X3C_COMMIT_REQUEST_TO_UWG":
         outcome = R1BPromotionOutcome(
             status="BLOCKED",
             record_id=candidate.record.record_id,

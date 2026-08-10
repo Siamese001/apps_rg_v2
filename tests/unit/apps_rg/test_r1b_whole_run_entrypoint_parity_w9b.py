@@ -79,8 +79,8 @@ def test_audit_matrix_canonical_paths_wired() -> None:
 
 def test_production_preflight_accepted_hit(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     store = R1BSemanticCacheStore(tmp_path)
-    _seed(store)
     _enable_r1b(monkeypatch, tmp_path)
+    _seed(store)
     monkeypatch.setenv("APPS_RG_R1B_CACHE_ROOT", str(store.root))
     pf = run_whole_run_cache_preflight(
         entrypoint=ENTRYPOINT_CANONICAL_DISPATCH,
@@ -105,8 +105,8 @@ def test_production_preflight_accepted_hit(tmp_path: Path, monkeypatch: pytest.M
 
 def test_production_preflight_miss_fallthrough(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     store = R1BSemanticCacheStore(tmp_path)
-    _seed(store)
     _enable_r1b(monkeypatch, tmp_path)
+    _seed(store)
     monkeypatch.setenv("APPS_RG_R1B_CACHE_ROOT", str(store.root))
     pf = run_whole_run_cache_preflight(
         entrypoint=ENTRYPOINT_CANONICAL_DISPATCH,
@@ -177,7 +177,7 @@ def test_canonical_dispatch_invokes_preflight_before_pipeline(
             (),
             {
                 "fault": "",
-                "x3_disposition": "X3_ALLOW",
+                "x3_disposition": "X3D_ALLOW_FINISH",
                 "run_id": "r1",
                 "request_id": "req1",
                 "terminal_r5": False,

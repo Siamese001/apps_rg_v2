@@ -16,7 +16,7 @@ from pathlib import Path
 
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 
 
@@ -87,6 +87,11 @@ from apps_rg.runtime.assembly.final_resume_x2 import (
     sha256_utf8,
 
 )
+from apps_rg.runtime.assembly.l2_snapshot_projection import (
+    L2_SNAPSHOT_PROJECTION_SCHEMA,
+    omitted_l2_projection_paths,
+    project_l2_output_for_final_resume,
+)
 from apps_rg.runtime.spine.section_x3_finalize import FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT
 from apps_rg.runtime.c0.whole_resume_graph_evidence import (
     ARTIFACT_NAME as WHOLE_RESUME_GRAPH_EVIDENCE_ARTIFACT,
@@ -128,6 +133,71 @@ def _resolved_run_dir(repo: Path, rel: str) -> Path:
 def _sha256_file_digest(path: Path) -> str:
 
     return sha256_hex(path.read_text(encoding="utf-8"))
+
+
+def _resolve_full_resume_targeting_context(
+    *,
+    output_dir: Path,
+    rollup_blob: dict[str, Any],
+) -> tuple[str, str, str]:
+    """Resolve aggregate-judge targeting from durable run evidence.
+
+    The Retry 15 run recorded Anthropic and the partnership role in root
+    ``ingress_raw.json`` but the final review emitted empty target fields because
+    aggregate assembly consulted only process environment and rollup lane rows.
+    Root ingress is the authoritative fallback for a whole-run assembly.
+    """
+
+    import os
+
+    target_company = os.environ.get("APPS_RG_TARGET_COMPANY", "").strip()
+    target_role = os.environ.get("APPS_RG_TARGET_ROLE", "").strip()
+    sources: list[str] = []
+    if target_company or target_role:
+        sources.append("environment")
+
+    lanes_raw = rollup_blob.get("lanes")
+    lane_iter: list[Any] = []
+    if isinstance(lanes_raw, dict):
+        lane_iter = list(lanes_raw.values())
+    elif isinstance(lanes_raw, list):
+        lane_iter = lanes_raw
+    for lane in lane_iter:
+        if not isinstance(lane, dict):
+            continue
+        if not target_company:
+            target_company = str(lane.get("target_company") or "").strip()
+            if target_company:
+                sources.append("generated_lane_rollup")
+        if not target_role:
+            target_role = str(
+                lane.get("target_role") or lane.get("target_title") or ""
+            ).strip()
+            if target_role:
+                sources.append("generated_lane_rollup")
+
+    if not target_company or not target_role:
+        for parent in (output_dir, *output_dir.parents):
+            ingress_path = parent / "ingress_raw.json"
+            if not ingress_path.is_file():
+                continue
+            try:
+                ingress = json.loads(ingress_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                break
+            if not isinstance(ingress, dict):
+                break
+            if not target_company:
+                target_company = str(ingress.get("target_company") or "").strip()
+            if not target_role:
+                target_role = str(
+                    ingress.get("target_role")
+                    or ingress.get("target_title")
+                    or ""
+                ).strip()
+            sources.append("ingress_raw.json")
+            break
+    return target_company, target_role, "+".join(dict.fromkeys(sources)) or "unresolved"
 
 
 def _generated_lane_assembly_gap_snapshot(section_id: str, reason: str) -> dict[str, Any]:
@@ -360,7 +430,28 @@ def assemble_final_resume(
 
                 assert run_dir is not None and l2_path is not None and isinstance(lane, dict)
 
-                snapshot = json.loads(l2_path.read_text(encoding="utf-8"))
+                source_l2 = json.loads(l2_path.read_text(encoding="utf-8"))
+
+                binding_contract = None
+                binding_ref = str(
+                    source_l2.get("graph_claim_bindings_ref") or ""
+                ).strip()
+                if binding_ref:
+                    if Path(binding_ref).name != binding_ref:
+                        raise ValueError(
+                            f"lane {sid} graph binding ref must be a local filename"
+                        )
+                    binding_path = run_dir / binding_ref
+                    binding_contract = json.loads(
+                        binding_path.read_text(encoding="utf-8")
+                    )
+
+                snapshot = project_l2_output_for_final_resume(
+                    source_l2,
+                    graph_claim_binding_contract=binding_contract,
+                )
+
+                omitted_projection_paths = omitted_l2_projection_paths(source_l2)
 
                 sec_hash = sha256_utf8(canonical_json_sorted(snapshot))
 
@@ -438,6 +529,14 @@ def assemble_final_resume(
                     "section_kind": "generated_lane",
 
                     "l2_output_snapshot": snapshot,
+
+                    "l2_output_snapshot_schema": (
+                        L2_SNAPSHOT_PROJECTION_SCHEMA if not gap_reason else "assembly_gap_v1"
+                    ),
+
+                    "l2_output_omitted_paths": (
+                        omitted_projection_paths if not gap_reason else []
+                    ),
 
                     "section_hash": sec_hash,
 
@@ -670,34 +769,24 @@ def assemble_final_resume(
     whole_resume_graph_evidence_path = (
         paths.output_dir / WHOLE_RESUME_GRAPH_EVIDENCE_ARTIFACT
     )
-    _wg.write_text(
+    # This declared artifact is a regenerated snapshot, not an in-place edit.
+    # A patch run can legitimately replace the tiny inactive contract with the
+    # complete active reconciliation contract. Use the gateway's atomic JSON
+    # replacement operation so that transition does not trip the text-edit
+    # amplification guard or leave a delete/write crash gap.
+    _wg.write_json_atomic(
         whole_resume_graph_evidence_path,
-        json.dumps(
-            whole_resume_graph_evidence,
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=False,
-        )
-        + "\n",
-        encoding="utf-8",
+        whole_resume_graph_evidence,
+        indent=2,
     )
 
     if coherence_required:
-        target_company = os.environ.get("APPS_RG_TARGET_COMPANY", "").strip()
-        target_role = os.environ.get("APPS_RG_TARGET_ROLE", "").strip()
-        lanes_raw = rollup_blob.get("lanes")
-        lane_iter: list[Any] = []
-        if isinstance(lanes_raw, dict):
-            lane_iter = list(lanes_raw.values())
-        elif isinstance(lanes_raw, list):
-            lane_iter = lanes_raw
-        for lane in lane_iter:
-            if not isinstance(lane, dict):
-                continue
-            if not target_company:
-                target_company = str(lane.get("target_company") or "").strip()
-            if not target_role:
-                target_role = str(lane.get("target_role") or "").strip()
+        target_company, target_role, targeting_context_source = (
+            _resolve_full_resume_targeting_context(
+                output_dir=paths.output_dir,
+                rollup_blob=rollup_blob,
+            )
+        )
         judge_mode = os.environ.get("APPS_RG_FULL_RESUME_COHERENCE_JUDGE_MODE", "blocked_if_unavailable").strip()
         coherence_review = emit_full_resume_llm_coherence_review(
             final_resume=final_resume,
@@ -706,6 +795,12 @@ def assemble_final_resume(
             target_company=target_company,
             target_role=target_role,
             mode=judge_mode or "blocked_if_unavailable",
+        )
+        coherence_review["targeting_context_source"] = targeting_context_source
+        _wg.write_json_atomic(
+            paths.output_dir / "full_resume_llm_coherence_review.json",
+            coherence_review,
+            indent=2,
         )
         final_resume["calls"]["judge_calls_made"] = True
         final_resume["calls"]["provider_calls_made"] = True

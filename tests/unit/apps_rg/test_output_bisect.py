@@ -278,6 +278,104 @@ def test_output_bisect_isolates_retry_failure_and_judges_not_reached(
     assert "PR #474 passed without a judge-driven retry" in rendered
 
 
+def test_output_bisect_reports_aggregate_quorum_failure_not_upstream_section(
+    tmp_path: Path,
+) -> None:
+    run = tmp_path / "current"
+    lane = run / "modular_r4" / "final_resume_assembly"
+    lane.mkdir(parents=True)
+    _write_json(
+        run / "ingress_raw.json",
+        {
+            "target_company": "Anthropic",
+            "target_role": "Manager of Applied AI Architecture, Partnerships",
+        },
+    )
+    _write_json(
+        lane / "final_resume.json",
+        {
+            "sections": [
+                {
+                    "section_id": "executive_summary",
+                    "l2_output_snapshot": {
+                        "resume_display_text": "Six evidence-backed sentences were assembled."
+                    },
+                }
+            ]
+        },
+    )
+    _write_json(
+        lane / "final_resume_x2_gate_outputs.json",
+        {
+            "gates": [
+                {
+                    "gate_id": "x2_full_resume_llm_coherence_aggregation",
+                    "pass": False,
+                    "failure_reason": "quorum_not_met",
+                }
+            ]
+        },
+    )
+    _write_json(
+        lane / "x1d_full_resume_judge_outputs.json",
+        {
+            "judges": [
+                {
+                    "judge_id": "gemini",
+                    "provider_key": "gemini_pro",
+                    "score": 4.5,
+                    "threshold": 4.0,
+                    "pass": True,
+                    "provider_status": "MODEL_BACKED_PASS",
+                    "findings": [],
+                },
+                {
+                    "judge_id": "openai",
+                    "provider_key": "openai_chatgpt",
+                    "score": 3.8,
+                    "threshold": 4.0,
+                    "pass": False,
+                    "provider_status": "MODEL_BACKED_FAIL",
+                    "findings": ["IBM repeats quota-aligned solution leadership."],
+                },
+            ]
+        },
+    )
+    _write_json(
+        lane / "full_resume_llm_coherence_review.json",
+        {
+            "final_resume_hash": "resume-hash",
+            "full_resume_coherence_pass": False,
+            "aggregation_method": "quorum_majority_model_backed",
+            "decisive_reason": "quorum_not_met",
+        },
+    )
+
+    doc = build_section_output_bisect(
+        section_id="final_resume_aggregation",
+        run_root=run,
+        repo_root=tmp_path,
+        current_lane=lane,
+        baseline_run=None,
+        baseline_lane=None,
+        baseline_revision={},
+        current_revision={"git_commit": "b" * 40},
+    )
+
+    assert doc["scope"] == "CURRENT_RUN_AGGREGATE_BISECT"
+    assert doc["first_causally_relevant_divergence"]["stage"] == (
+        "aggregate_coherence_quorum"
+    )
+    assert doc["underlying_root_cause"]["aggregate_coherence_root_cause"][
+        "status"
+    ] == "ISOLATED_TO_AGGREGATE_JUDGE"
+    assert any(row["judge"] == "openai_chatgpt" for row in doc["judge_matrix"])
+    explanation = " ".join(doc["layperson_explanation"])
+    assert "executive summary never" not in explanation.lower()
+    assert "aggregate panel ran" in explanation.lower()
+    assert validate_section_output_bisect(doc) == []
+
+
 def test_output_bisect_hard_stops_unisolated_code_cause() -> None:
     doc = {
         "schema_version": subject.OUTPUT_BISECT_SCHEMA_VERSION,

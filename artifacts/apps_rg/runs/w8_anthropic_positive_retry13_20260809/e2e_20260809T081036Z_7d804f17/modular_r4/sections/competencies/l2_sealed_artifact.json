@@ -1,0 +1,61 @@
+{
+  "artifact_hash": "sha256:995cd1cb533547133c2997bae906f4bf4949bfa69bac5dc885a60e851451d978",
+  "payload": {
+    "executed": true,
+    "fault": "",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-a7ae717531ca404b9cec364fdc7b23ef",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "01356d03-72bc-4ae0-8dd2-c4b35b150c1d",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:00795f04d3548400558c3862b81fe1308544119bfc104bdb156f84c28fe8f318",
+    "status": "PASS",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.004,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 117375.931,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.005,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "BYPASSED",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "trace-e93829ab98324e0591b47990e2dfc57d"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:00795f04d3548400558c3862b81fe1308544119bfc104bdb156f84c28fe8f318"
+}

@@ -1,0 +1,211 @@
+{
+  "allowed_file_roots": [],
+  "allowed_models": [
+    "claude-sonnet-5"
+  ],
+  "allowed_networks": [],
+  "allowed_tools": [],
+  "app_id": "apps_rg",
+  "audit_manifest_ref": "l2_receipt_bundle.json",
+  "audit_refs": [
+    "section_lane:ibm_narrative",
+    "l2_packet:b038113301ac5c06c40fb9cdf26203f2111efee0792484c03f7bab4d4475b73a",
+    "frozen_execution_room:be6ac5162593f98d00f74180d668b31839ea8a4d9df7fbbe919adeaa41a2d08e",
+    "receipt:attempt_receipt.json:0a0c8bb3d5c85cbaa6ff2a2f9f6fc524732fe7dc8c93f904f02d63cb06e24219",
+    "receipt:frozen_execution_context.json:8213215fbd1d2a3f27b19bc09e60c95716465d48d33be84517521631476296df",
+    "receipt:l2_execution_packet.json:9359fd642f14a82f2b81de9cf24b811b4ea1f65f09af460dbd193e541a4be75b",
+    "receipt:prep_receipt.json:6af7193fb92d678320cf5edc2023e9cb447083c8c8ff7072959ef007b1b5a430",
+    "receipt:validation_receipt.json:848edc9117517eacf0e62c8354b68cb7df67f0ca3dba0d4b8b920993b57c7335"
+  ],
+  "canonical_exit_claimed": false,
+  "canonical_l2_receipt_bundle_ref": "l2_receipt_bundle.json",
+  "canonical_seal_receipt_ref": "seal_receipt.json",
+  "compilation_hash": "e215cc7c8e5ea8d5ff588c0c367404dc4e0ba4d393d1b37e52e5943b7ac50697",
+  "contract_type": "SealedL2Artifact",
+  "durable_commit_occurred": false,
+  "egress_policy_ref": "apps_rg::provider_model::resume_generation::v1",
+  "evidence_refs": [
+    "aba86b7c09b3e7c1d2e0fbf932ab6eed0e0be4e6e1d2de23921e0ba1827b61b4"
+  ],
+  "execution_duration_ms": 0,
+  "execution_status": "completed",
+  "execution_timestamp": "",
+  "gate_verdict_refs": [
+    "G11:PASS:MODEL_REGISTRY_BOUND",
+    "G12:PASS:SIGNED_ARGS_AND_IDENTITY_BOUND",
+    "G13:PASS:EVIDENCE_AND_SCHEMA_BOUND",
+    "G15:PASS:SANDBOX_ENVELOPE_BOUND",
+    "G19:PASS:RETRY_BUDGET_BOUND",
+    "G20:PASS:EXECUTION_BUDGET_BOUND"
+  ],
+  "generated_content": "{\"graph_claim_binding_contract_digest\": \"02def05b1c6f2c13200618a0f8446a176b014319e3ff61be16a232e20f3eff48\", \"graph_claim_bindings\": [{\"allocation_claim_unit_ids\": [\"ibm_narrative:derived:01\"], \"allocation_plan_digest\": \"84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df\", \"binding_status\": \"PASS\", \"citation_refs\": [\"fact_partnerships_gtm_002\"], \"claim_entailment_score\": 1.0, \"claim_source_fact_ids\": [\"bul_ibm_001\"], \"claim_unit_id\": \"ibm_narrative_claim_1_7c5c7c3a\", \"edge_ids\": [\"edge:a544fe64c0b84f10ec5c5c60\", \"edge:ab44170417c11551ae68a66d\", \"edge:08c93a4b511f512e46815def\"], \"fact_ids\": [\"fact_partnerships_gtm_002\"], \"graph_path_ids\": [\"root:reb_ibm_aws_alliance_partner_cosell_gtm\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth\"], \"metric_binding_score\": 0.0, \"metric_outcome_id\": \"\", \"metric_unit\": \"\", \"metric_value\": \"\", \"normalized_metric_signature\": \"\", \"path_confidence_raw\": 1.0, \"proof_strength_raw\": 1.2, \"schema_version\": \"graph_claim_binding_v1\", \"section_id\": \"ibm_narrative\", \"selection_margin\": 0.066667, \"skill_ids\": [\"skill_partner_joint_solution_development\"], \"source_independence_score\": 0.75, \"target_alignment_score\": 1.166667, \"visible_claim_hash\": \"d20c75c3b0f24acab14268b3cbd9c0907b3f1e284d64f452251ce20aa200a2ff\", \"visible_claim_text\": \"Championed IBM-AWS alliance modernization for financial-services pursuits\"}, {\"allocation_claim_unit_ids\": [\"ibm_narrative:derived:01\", \"ibm_narrative:derived:02\"], \"allocation_plan_digest\": \"84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df\", \"binding_status\": \"PASS\", \"citation_refs\": [\"fact_partnerships_gtm_002\", \"fact_revenue_ops_002\"], \"claim_entailment_score\": 1.0, \"claim_source_fact_ids\": [\"bul_ibm_001\", \"bul_ibm_002\"], \"claim_unit_id\": \"ibm_narrative_claim_2_db8d5313\", \"edge_ids\": [\"edge:a544fe64c0b84f10ec5c5c60\", \"edge:ab44170417c11551ae68a66d\", \"edge:08c93a4b511f512e46815def\", \"edge:5644557d40383b876d6003cb\", \"edge:c0749340728d10069ea80454\"], \"fact_ids\": [\"fact_partnerships_gtm_002\", \"fact_revenue_ops_002\"], \"graph_path_ids\": [\"root:reb_ibm_aws_alliance_partner_cosell_gtm\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth\", \"root:reb_ibm_revenue_sales_target_execution\", \"root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight\", \"root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_002\"], \"metric_binding_score\": 0.0, \"metric_outcome_id\": \"\", \"metric_unit\": \"\", \"metric_value\": \"\", \"normalized_metric_signature\": \"\", \"path_confidence_raw\": 1.0, \"proof_strength_raw\": 1.1, \"schema_version\": \"graph_claim_binding_v1\", \"section_id\": \"ibm_narrative\", \"selection_margin\": -0.2, \"skill_ids\": [\"skill_partner_joint_solution_development\", \"skill_partner_pnl_oversight\"], \"source_independence_score\": 0.5, \"target_alignment_score\": 0.583333, \"visible_claim_hash\": \"f731674f0413d940482ca6af1ce7cee9ee2c8f6b8a4d5cfcb75f6790940e88f6\", \"visible_claim_text\": \"establishing executive decision support and a repeatable operating discipline that aligned complex solution choices with portfolio priorities and enabled clearer enterprise action\"}], \"graph_claim_bindings_ref\": \"graph_claim_bindings.json\", \"resume_graph_allocation_plan_digest\": \"84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df\"}",
+  "generated_content_origin": "MODEL_GENERATION",
+  "is_future_run_only": false,
+  "is_uwg_write_authority": false,
+  "l2_output_ref": "l2_output.json",
+  "l5_certification_packet": null,
+  "l5_certification_packet_digest": "",
+  "l5_certification_packet_ref": "",
+  "l5_certification_ref": "l5:apps_rg:u0:40aa6f360600fe9d7e53d50f",
+  "l5_certification_status": "",
+  "l5_certification_verification_digest": "",
+  "l5_certification_verified": false,
+  "l5_egress_receipt_digests": [],
+  "l5_egress_receipt_refs": [],
+  "l5_egress_receipts": [],
+  "l5_evidence_contract_digest": "",
+  "l5_prompt_artifact_digest": "",
+  "l5_runtime_binding_digest": "",
+  "model_call_refs": [
+    "provider_request:1e80764e4f48e70bc3ff8a908c8892cfed983ffd875510cf48de66340431c80a"
+  ],
+  "otel_span_refs": [],
+  "posture": {
+    "external_call": false,
+    "hitl_required": false,
+    "posture_class": "write_intent",
+    "read_only": false,
+    "write_intent": true
+  },
+  "product_certification": "CANONICAL_L2_RECEIPT_BUNDLE",
+  "prompt_artifact_digest": "f169776e9bf596dc3afb681a6edbb3e162a468e0668c647aeb5185fb956a02d8",
+  "prompt_refs": [
+    "f169776e9bf596dc3afb681a6edbb3e162a468e0668c647aeb5185fb956a02d8"
+  ],
+  "proposed_state_diff": {
+    "payload": {
+      "graph_claim_binding_contract_digest": "02def05b1c6f2c13200618a0f8446a176b014319e3ff61be16a232e20f3eff48",
+      "graph_claim_bindings": [
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:01"
+          ],
+          "allocation_plan_digest": "84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_partnerships_gtm_002"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_001"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_1_7c5c7c3a",
+          "edge_ids": [
+            "edge:a544fe64c0b84f10ec5c5c60",
+            "edge:ab44170417c11551ae68a66d",
+            "edge:08c93a4b511f512e46815def"
+          ],
+          "fact_ids": [
+            "fact_partnerships_gtm_002"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.2,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": 0.066667,
+          "skill_ids": [
+            "skill_partner_joint_solution_development"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 1.166667,
+          "visible_claim_hash": "d20c75c3b0f24acab14268b3cbd9c0907b3f1e284d64f452251ce20aa200a2ff",
+          "visible_claim_text": "Championed IBM-AWS alliance modernization for financial-services pursuits"
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:01",
+            "ibm_narrative:derived:02"
+          ],
+          "allocation_plan_digest": "84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_partnerships_gtm_002",
+            "fact_revenue_ops_002"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_001",
+            "bul_ibm_002"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_2_db8d5313",
+          "edge_ids": [
+            "edge:a544fe64c0b84f10ec5c5c60",
+            "edge:ab44170417c11551ae68a66d",
+            "edge:08c93a4b511f512e46815def",
+            "edge:5644557d40383b876d6003cb",
+            "edge:c0749340728d10069ea80454"
+          ],
+          "fact_ids": [
+            "fact_partnerships_gtm_002",
+            "fact_revenue_ops_002"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth",
+            "root:reb_ibm_revenue_sales_target_execution",
+            "root:reb_ibm_revenue_sales_target_execution/skill:skill_partner_pnl_oversight",
+            "root:reb_ibm_revenue_sales_target_execution/fact:fact_revenue_ops_002"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 1.1,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": -0.2,
+          "skill_ids": [
+            "skill_partner_joint_solution_development",
+            "skill_partner_pnl_oversight"
+          ],
+          "source_independence_score": 0.5,
+          "target_alignment_score": 0.583333,
+          "visible_claim_hash": "f731674f0413d940482ca6af1ce7cee9ee2c8f6b8a4d5cfcb75f6790940e88f6",
+          "visible_claim_text": "establishing executive decision support and a repeatable operating discipline that aligned complex solution choices with portfolio priorities and enabled clearer enterprise action"
+        }
+      ],
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "resume_graph_allocation_plan_digest": "84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df"
+    },
+    "section_id": "ibm_narrative",
+    "section_output_ref": "l2_output.json"
+  },
+  "provider_receipts": [
+    "provider_response:828a95b8d52115b936a1c01fdcd474f4fec64f25a87be26c14795cc8a99a8f26"
+  ],
+  "provider_request_ref": "provider_request.json",
+  "provider_response_ref": "provider_response.json",
+  "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:3ff1138c33b6e377::v1",
+  "replay_manifest": "replay_key:818d11e3366d8cedbfaf81d7c919b577753b3e83040cf4865f00637901b4b84a",
+  "request_id": "req-337c939b86a341f2ba626d5473ffd42c",
+  "run_id": "f913c834-5d17-4999-9c65-743b54ad4933",
+  "runtime_exhaust_bundle_claimed": false,
+  "sandbox_required": false,
+  "schema_version": "section_sealed_l2_artifact_v2",
+  "section_id": "ibm_narrative",
+  "signature": "",
+  "snapshot_refs": [
+    "b038113301ac5c06c40fb9cdf26203f2111efee0792484c03f7bab4d4475b73a",
+    "be6ac5162593f98d00f74180d668b31839ea8a4d9df7fbbe919adeaa41a2d08e"
+  ],
+  "sovereign_execution_receipt": "l2_packet:b038113301ac5c06c40fb9cdf26203f2111efee0792484c03f7bab4d4475b73a",
+  "state_diff_authorized": false,
+  "tenant_id": "default",
+  "tool_call_refs": [],
+  "trace_id": "4fb5d97e-b253-4b48-9748-3bae4cfb0037"
+}

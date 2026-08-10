@@ -1,0 +1,198 @@
+{
+  "generated_at_utc": "2026-08-09T06:58:36.191524+00:00",
+  "local_artifact_refs": {
+    "commit_request.json": null,
+    "exit_review_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/competencies/exit_review_packet.json",
+    "l6_v40_shadow_eval_package.json": null,
+    "provider_response.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/competencies/provider_response.json",
+    "state_commit_receipt.json": null,
+    "uwg_block_receipt.json": null,
+    "uwg_commit_receipt.json": null,
+    "uwg_validation_receipt.json": null,
+    "x1d_llm_judge_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/competencies/x1d_llm_judge_outputs.json",
+    "x2_gate_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/competencies/x2_gate_outputs.json",
+    "x3_disposition.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/competencies/x3_disposition.json"
+  },
+  "local_json_load_issues": [],
+  "local_provider_attempt_span_count": 1,
+  "local_provider_attempt_span_source": "provider_response.provider_attempt_spans",
+  "local_provider_attempt_timing_summary": {
+    "accepted_output_model": "claude-sonnet-5",
+    "accepted_output_provider": "external_claude",
+    "attempted_count": 1,
+    "fallback_attempt_count": 0,
+    "fallback_attempted": false,
+    "models": [
+      "claude-sonnet-5"
+    ],
+    "providers": [
+      "external_claude"
+    ],
+    "runtime_generation_statuses": [
+      "REAL_LLM"
+    ],
+    "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+    "span_count": 1,
+    "total_duration_seconds": 22.535282
+  },
+  "otel_provider_attempt_span_count": 0,
+  "otel_snapshot_available": true,
+  "otel_snapshot_ref": "provided",
+  "otel_span_count": 0,
+  "producer": "apps_rg.runtime.observability.trace_reconciliation",
+  "row_export_digest": "sha256:4d50bc0a9e39eb7cd9f63dca1165e39c2a63f933bdfe55fd41a49969e4d75f92",
+  "row_export_ref": "trace_reconciliation_rows.jsonl",
+  "rows": [
+    {
+      "check_id": "otel_snapshot.available",
+      "expected_value": "bounded OTel trace snapshot or explicit unavailable receipt",
+      "future_run_only": true,
+      "observed_value": {
+        "snapshot_ref": "provided",
+        "span_count": 0
+      },
+      "reason": "OTel snapshot available for post-run reconciliation",
+      "row_id": "3b5a6f0df870faf8b93d",
+      "run_id": "competencies_20260809_065555",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "WARN",
+      "source_refs": {
+        "otel_snapshot_ref": "provided"
+      },
+      "stage_id": "L7",
+      "verdict": "PASS"
+    },
+    {
+      "check_id": "l7_provider_attempts.local_receipts",
+      "expected_value": "apps_rg_provider_attempt_timing_summary_v1",
+      "future_run_only": true,
+      "observed_value": {
+        "accepted_output_model": "claude-sonnet-5",
+        "accepted_output_provider": "external_claude",
+        "attempted_count": 1,
+        "fallback_attempt_count": 0,
+        "fallback_attempted": false,
+        "models": [
+          "claude-sonnet-5"
+        ],
+        "providers": [
+          "external_claude"
+        ],
+        "runtime_generation_statuses": [
+          "REAL_LLM"
+        ],
+        "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+        "span_count": 1,
+        "total_duration_seconds": 22.535282
+      },
+      "reason": "local provider-attempt receipts present",
+      "row_id": "6b6205975b7017941519",
+      "run_id": "competencies_20260809_065555",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "WARN",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "PASS"
+    },
+    {
+      "check_id": "l7_provider_attempts.otel_mirror",
+      "expected_value": "same provider attempt identity/order",
+      "future_run_only": true,
+      "observed_value": {
+        "local_provider_keys": [
+          [
+            "1",
+            "external_claude",
+            "claude-sonnet-5"
+          ]
+        ],
+        "otel_provider_keys": []
+      },
+      "reason": "OTel provider-attempt spans do not match local receipt order",
+      "row_id": "f15c5a28ee1514853ae4",
+      "run_id": "competencies_20260809_065555",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "FAIL"
+    },
+    {
+      "check_id": "l7_provider_attempts.timing_drift",
+      "expected_value": "<=0.25s duration drift when both sides expose timing",
+      "future_run_only": true,
+      "observed_value": [],
+      "reason": "provider-attempt timing drift not observed or not applicable",
+      "row_id": "38b47eeb0e507e9ca121",
+      "run_id": "competencies_20260809_065555",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "NOT_APPLICABLE"
+    },
+    {
+      "check_id": "x3_disposition.otel_mirror",
+      "expected_value": "local X3 code present in OTel span attributes",
+      "future_run_only": true,
+      "observed_value": {
+        "local_x3": "X3_ALLOW",
+        "otel_x3_values": []
+      },
+      "reason": "OTel X3 disposition attribute missing or mismatched",
+      "row_id": "e46b6a751f8c4daca2b5",
+      "run_id": "competencies_20260809_065555",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "MAJOR",
+      "source_refs": {
+        "x3_disposition_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry8_20260809/e2e_20260809T065510Z_3f589fcd/modular_r4/sections/competencies/x3_disposition.json"
+      },
+      "stage_id": "X3",
+      "verdict": "FAIL"
+    },
+    {
+      "check_id": "uwg_handoff.otel_mirror",
+      "expected_value": "UWG local receipt plus optional mirrored OTel span",
+      "future_run_only": true,
+      "observed_value": {
+        "uwg_local_refs": {},
+        "uwg_otel_spans": []
+      },
+      "reason": "no UWG refs in this artifact directory",
+      "row_id": "6a5488600fa32f815868",
+      "run_id": "competencies_20260809_065555",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "competencies",
+      "severity": "WARN",
+      "source_refs": {},
+      "stage_id": "UWG",
+      "verdict": "NOT_APPLICABLE"
+    }
+  ],
+  "rows_digest": "sha256:4d50bc0a9e39eb7cd9f63dca1165e39c2a63f933bdfe55fd41a49969e4d75f92",
+  "run_id": "competencies_20260809_065555",
+  "schema_version": "apps_rg.trace_reconciliation.v1",
+  "section_id": "competencies",
+  "summary": {
+    "current_run_mutation_assertion": false,
+    "fail_count": 2,
+    "future_run_only": true,
+    "not_applicable_count": 2,
+    "proof_authority": "local_receipts",
+    "row_count": 6,
+    "warn_count": 0
+  },
+  "trace_root": "",
+  "trace_verdict": "TRACE_MISMATCH"
+}

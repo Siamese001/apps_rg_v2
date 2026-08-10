@@ -1,0 +1,61 @@
+{
+  "artifact_hash": "sha256:c35a731804021e663a463260bd04e550319ff6e63c0f728626cf58fb34683429",
+  "payload": {
+    "executed": true,
+    "fault": "",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-9dce17307d9f4856b07959f4a611a263",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "14545c22-21a9-4d11-b956-33c7f1304830",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:b8acfe20e6684de16657690e55002c6aea033c05099d550772e513fa876e6956",
+    "status": "PASS",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.005,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 39308.825,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.006,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "BYPASSED",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "trace-d9f68cd230574c4a89eed6053f3796b0"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:b8acfe20e6684de16657690e55002c6aea033c05099d550772e513fa876e6956"
+}

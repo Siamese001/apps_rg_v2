@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from agentic_core.runtime.contracts import lifecycle_trace_contract as trace_contract
+from apps_rg.runtime.spine_contracts import lifecycle_trace_contract as trace_contract
 
 trace_contract.emit_replay_key("p0", "verb_canonicalizer_validator")
 trace_contract.emit_determinism_digest("p0", "verb_canonicalizer_validator")

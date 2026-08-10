@@ -15,8 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import ValidatedRequest
+from apps_rg.runtime.spine_contracts import (
     FinalEvidenceContract,
     EvidenceItem,
     ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY,

@@ -1,0 +1,295 @@
+{
+  "run_id": "f33bd275942a4e2c",
+  "lane_status": {
+    "competencies": "ok",
+    "unify_bullets": "ok",
+    "ibm_bullets": "ok",
+    "insurtech_bullets": "ok",
+    "ey_bullets": "ok",
+    "unify_narrative": "pre_run_blocked:UPSTREAM_BULLETS_NOT_FINALIZED",
+    "ibm_narrative": "dispatch_error:lane_exit_error",
+    "insurtech_narrative": "ok",
+    "ey_narrative": "ok",
+    "executive_summary": "dispatch_error:lane_exit_error",
+    "headline": "ok"
+  },
+  "sections_root_rel": "artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections",
+  "phase1_parallel_enabled": false,
+  "phase1_max_parallel": 1,
+  "phase1_allow_non_allow_exit_zero_effective": false,
+  "phase1_lane_provider_global_override": "",
+  "phase1_lane_provider_by_lane": {
+    "competencies": "external_openai",
+    "unify_bullets": "external_openai",
+    "ibm_bullets": "external_openai",
+    "insurtech_bullets": "external_openai",
+    "ey_bullets": "external_openai",
+    "unify_narrative": "external_openai",
+    "ibm_narrative": "external_openai",
+    "insurtech_narrative": "external_openai",
+    "ey_narrative": "external_openai",
+    "executive_summary": "external_openai",
+    "headline": "external_openai"
+  },
+  "phase1_lane_provider_resolution_source_by_lane": {
+    "competencies": "ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP",
+    "unify_bullets": "ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP",
+    "ibm_bullets": "ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP",
+    "insurtech_bullets": "ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP",
+    "ey_bullets": "ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP",
+    "unify_narrative": "DEV_DEFAULT_EXTERNAL_OPENAI",
+    "ibm_narrative": "DEV_DEFAULT_EXTERNAL_OPENAI",
+    "insurtech_narrative": "DEV_DEFAULT_EXTERNAL_OPENAI",
+    "ey_narrative": "DEV_DEFAULT_EXTERNAL_OPENAI",
+    "executive_summary": "ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP",
+    "headline": "ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP"
+  },
+  "phase1_anthropic_limit_preflight": {
+    "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+    "scope": "apps_rg_whole_run_phase1_generation",
+    "active": true,
+    "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+    "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+    "requested_provider": "external_claude",
+    "routed_provider": "external_openai",
+    "primary_attempt_skipped": true,
+    "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+    "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+    "evidence": {
+      "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}"
+    }
+  },
+  "phase1_anthropic_limit_preflight_by_lane": {
+    "competencies": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_claude",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": true,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "competencies",
+        "original_provider": "external_claude",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+        "route_applied": true
+      }
+    },
+    "unify_bullets": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_claude",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": true,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "unify_bullets",
+        "original_provider": "external_claude",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+        "route_applied": true
+      }
+    },
+    "ibm_bullets": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_claude",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": true,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "ibm_bullets",
+        "original_provider": "external_claude",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+        "route_applied": true
+      }
+    },
+    "insurtech_bullets": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_claude",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": true,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "insurtech_bullets",
+        "original_provider": "external_claude",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+        "route_applied": true
+      }
+    },
+    "ey_bullets": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_claude",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": true,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "ey_bullets",
+        "original_provider": "external_claude",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+        "route_applied": true
+      }
+    },
+    "unify_narrative": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_openai",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": false,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "unify_narrative",
+        "original_provider": "external_openai",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_OPENAI",
+        "route_applied": false
+      }
+    },
+    "ibm_narrative": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_openai",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": false,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "ibm_narrative",
+        "original_provider": "external_openai",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_OPENAI",
+        "route_applied": false
+      }
+    },
+    "insurtech_narrative": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_openai",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": false,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "insurtech_narrative",
+        "original_provider": "external_openai",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_OPENAI",
+        "route_applied": false
+      }
+    },
+    "ey_narrative": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_openai",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": false,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "ey_narrative",
+        "original_provider": "external_openai",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_OPENAI",
+        "route_applied": false
+      }
+    },
+    "executive_summary": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_claude",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": true,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "executive_summary",
+        "original_provider": "external_claude",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+        "route_applied": true
+      }
+    },
+    "headline": {
+      "policy": "apps_rg_anthropic_limit_preflight_to_openai_backup",
+      "scope": "apps_rg_whole_run_phase1_generation",
+      "active": true,
+      "source": "APPS_RG_ANTHROPIC_LIMIT_PREFLIGHT_RECEIPT",
+      "reason_category": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "requested_provider": "external_claude",
+      "routed_provider": "external_openai",
+      "primary_attempt_skipped": true,
+      "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry9_20260809\\e2e_20260809T071441Z_0e86eeeb\\modular_r4\\sections\\executive_summary\\provider_response.json",
+      "receipt_sha256": "d7c865f74fab8286c1157b197ff9dc4b48151ff3d7e5f8d7750a4d5696d4b1f8",
+      "evidence": {
+        "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+        "section_id": "headline",
+        "original_provider": "external_claude",
+        "original_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+        "route_applied": true
+      }
+    }
+  },
+  "resume_graph_allocation_plan_digest": "84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df",
+  "resume_graph_allocation_refs": {
+    "allocation_plan": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\resume_graph_allocation\\resume_graph_allocation_plan.json",
+    "usage_ledger": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\resume_graph_allocation\\resume_graph_usage_ledger.json",
+    "section_final_evidence_contracts": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\resume_graph_allocation\\section_final_graph_evidence_contracts.json",
+    "section_plans": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\resume_graph_allocation\\c03_section_graph_plans.json"
+  },
+  "graph_skill_embeddings_required": false,
+  "graph_skill_embedding_allowlists_digest": "",
+  "graph_skill_embedding_runtime_refs": {},
+  "lane_argv_targeting": {
+    "target_company": "Anthropic",
+    "target_title": "Manager of Applied AI Architecture, Partnerships",
+    "jd_text": "apps_rg/config/targeting/anthropic_manager_applied_ai_architecture_partnerships_jd.txt",
+    "jd_source": "RUN_SPECIFIC",
+    "jd_digest": "c79476e3bb14cc6989d1fae51cefba87b30db6f871b1f566207955088e587029",
+    "jd_ref_used": "inline:jd_data",
+    "briefing_text": "# Anthropic - Manager, Applied AI Architecture Partnerships briefing packet\n| Manager, Applied AI Architecture Partnerships | Compensation not disclosed | Reports to function not disclosed |\n\n## JD Complement\nAnthropic’s public positioning makes enterprise AI adoption an operating challenge, not merely a software-selection exercise. Claude is presented around safety, accuracy, security, and usefulness; customers must translate those qualities\ninto\ndurable workflows, controls, and measurable business value.\n\nThe central tension is scaling customer outcomes through partners while protecting technical quality and trust. This role appears adjacent to the point where customer architecture, partner capability, and product adoption need to reinforce\none\nanother.\n\n## Company DNA & Operating Model\nAnthropic is a San Francisco-based public benefit corporation focused on AI safety and research. Claude is its flagship assistant, positioned for complex problem solving across analysis, coding, writing, and knowledge work.\n\nIts operating model appears hybrid: a product and developer foundation paired with an enterprise motion supported by cloud, technology, and services ecosystems. Partners extend customer reach and implementation capacity, but the company’s\ntechnical and safety posture sets a high bar for delivery consistency.\n\n- Claude’s value must carry from access and experimentation into governed business workflows.\n- Ecosystem participants need practical ways to apply product capabilities in customer environments.\n- Repeatable patterns are necessary, while complex deployments still require informed technical judgment.\n- Safety, reliability, and security claims must remain credible throughout implementation and adoption.\n\n## Company Strategy & Operating Pressure\nAnthropic serves individual users, developers, business teams, and enterprise customers. Its enterprise materials emphasize security, compliance, administration, and organizational rollout, indicating that customer success extends beyond\ninitial technical access.\n\nPublic deployment guidance treats implementation as both a technical and organizational process. That creates an alignment challenge across product, customer-facing, partner, and customer teams: determine what is standardized, what is\nconfigurable, and where change support is essential.\n\n- Enterprise outcomes depend on use-case focus, access controls, rollout design, and sustained employee usage.\n- Partners can accelerate reach, yet uneven technical delivery can weaken product trust.\n- Developers and business users may use the same platform with different workflows and success measures.\n- Security and compliance need to be reflected in real operating patterns, not only external messaging.\n\n## Leadership & Stakeholder Map\nAvailable research supports a cross-functional stakeholder view rather than a confirmed reporting hierarchy. Relevant groups include customer technical leaders, enterprise administrators, business sponsors, developers, cloud providers,\ntechnology partners, services partners, and internal product and commercial teams.\n\nThe role’s influence is likely defined by its ability to convert shared customer needs into clear architecture choices, enablement materials, and delivery expectations across these groups.\n\n- Customer business teams and technical builders are both stated enterprise audiences.\n- Cloud, technology, and services participants are formal ecosystem categories.\n\n## AI, Data, Platform, Architecture Signals\nAnthropic describes its technical mission in terms of reliable, interpretable, and steerable AI systems. For enterprise customers, that framing makes practical architecture guidance material: teams need a path from model capability to\ncontrolled usage in existing environments.\n\nClaude for Enterprise is positioned around security, compliance, and support for business teams and developers. The architecture conversation therefore likely spans more than integration mechanics; it includes administration, access design,\nworkflow fit, organizational controls, and user enablement.\n\n- Claude is positioned for data analysis, coding, writing, and complex reasoning tasks.\n- Enterprise rollout materials include both technical preparation and change-management considerations.\n- The platform serves technical builders alongside nontechnical business users.\n- Security and compliance are core elements of the enterprise proposition.\n- Interpretability and steerability provide a distinctive lens for applied solution design.\n\n## Partnership / Ecosystem Motion\nAnthropic publicly organizes partners across cloud, technology, and services categories. The ecosystem is framed around helping customers address AI challenges, suggesting a model that combines distribution, solution development,\nimplementation capacity, and adoption support.\n\nCloud participants can influence access, commercial routes, and deployment patterns. Technology participants can extend Claude into existing tools and workflows. Services participants can help customers move from technical readiness to\norganizational adoption.\n\nAccenture publicly presents its relationship with Anthropic around enterprise AI deployment, productivity, value creation, and new-product development. This supports the view that joint customer outcomes and delivery readiness matter beside\nsimple product availability.\n\n- Cloud partners matter for customer access, operating patterns, and shared account engagement.\n- Technology partners can place Claude within established customer workflows.\n- Services partners can support implementation, change, and sustained adoption.\n- Commercial activation is insufficient without strong technical credibility.\n- Enablement should make secure, enterprise-ready solution patterns easier to repeat.\n\n## Recent Events & Urgency\nAnthropic’s visible enterprise resources point to growing attention on operational adoption, including enterprise offerings, administrator guidance, and training related to customer rollout. Its partner network further indicates an\necosystem-oriented approach to enterprise scale.\n\nThe immediate execution issue is ensuring that broader ecosystem participation improves customer outcomes rather than creating fragmented implementations, inconsistent expectations, or uneven trust.\n\n- Enterprise adoption is presented as a staged journey rather than a one-time launch.\n- Partner materials bring cloud, technology, and services participants into a shared network.\n- Public Accenture messaging reinforces demand for deployment-oriented joint solutions.\n- Architecture consistency and partner readiness are important as ecosystem activity expands.\n\n## apps_rg Positioning Themes (targeting only, not proof)\n- Enterprise AI architecture connecting platform capability to governed production workflows.\n- Partner enablement that strengthens technical delivery quality and customer consistency.\n- Joint solution design across cloud, technology, and services ecosystems.\n- Practical implementation patterns for security, compliance, and adoption needs.\n- Repeatable playbooks that preserve room for complex customer environments.\n- Operating models spanning product, partners, customers, and delivery teams.\n- Change-aware enterprise technology rollout alongside technical integration.\n- Distinct adoption paths for developers and business users on a shared platform.\n\n## apps_lic Outreach Angles (targeting only, not proof)\n- Anthropic’s ecosystem spans cloud, technology, and services rather than a single partner category.\n- Administrator guidance frames customer rollout as technical preparation plus organizational change.\n- Accenture’s public materials emphasize enterprise deployment and new-product development.\n\n## Do Not Use As Proof\nThe JD and this briefing are targeting inputs only. Candidate claims, achievements, scope, leadership examples, technical depth, and outcomes must come from the governed resume and proof graph.",
+    "briefing_source": "RUN_SPECIFIC",
+    "briefing_digest": "25719b1801b93eb601559c9c1c6df97d569336e1887de4f37498453f5c6a417e",
+    "briefing_ref_used": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\apps_research\\runs\\r-d0838e0df8682e94b58fb932\\briefing.md"
+  }
+}

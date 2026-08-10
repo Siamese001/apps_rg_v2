@@ -418,12 +418,15 @@ def run_fresh_e2e_preflight(
     repo_root: Path,
     baseline_ref: Path,
     environ: Mapping[str, str] | None = None,
+    dependency_check: Callable[[], Any] | None = None,
     runtime_check: Callable[[], Any] | None = None,
     bootstrap: Callable[[], Any] | None = None,
     run_identity: Mapping[str, Any] | None = None,
     continuation_ttl_seconds: int = DEFAULT_CONTINUATION_TTL_SECONDS,
     clock: Callable[[], datetime] = _now_utc,
     nonce_factory: Callable[[], str] | None = None,
+    initial_failure_code: str = "",
+    initial_failure_detail: str = "",
 ) -> FreshE2EPreflightOutcome:
     """Run all non-retriable checks before research and close out failures in-run."""
     root = Path(artifact_dir).resolve()
@@ -438,17 +441,58 @@ def run_fresh_e2e_preflight(
     if not key_id:
         missing.append("APPS_RG_ROUTE_HMAC_KEY_ID")
     baseline: dict[str, str] = {}
-    failure_code = ""
-    failure_detail = ""
-    if missing:
+    failure_code = str(initial_failure_code or "").strip()
+    failure_detail = (
+        _redact_error(
+            RuntimeError(str(initial_failure_detail or failure_code)),
+            env,
+        )
+        if failure_code
+        else ""
+    )
+    if missing and not failure_code:
         failure_code = "APPS_RG_ROUTE_SIGNING_CONFIGURATION_REQUIRED"
         failure_detail = "Required route-signing environment variables were absent at process ingestion."
-    else:
+    if not failure_code:
         try:
             baseline = validate_pinned_baseline(repo, Path(baseline_ref))
         except RuntimeError as exc:
             failure_code = "PINNED_BASELINE_PREFLIGHT_FAILED"
             failure_detail = _redact_error(exc, env)
+    dependency_receipt: dict[str, Any] | None = None
+    dependency_receipt_ref = "NOT_REQUESTED:PREFLIGHT"
+    if not failure_code and dependency_check is not None:
+        try:
+            from apps_rg.runtime.standalone_dependency_posture import (
+                EXTERNAL_RUNTIME_BOUND,
+                STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME,
+                validate_standalone_runtime_dependency_receipt,
+                write_standalone_runtime_dependency_receipt,
+            )
+
+            raw_dependency = dependency_check()
+            dependency_receipt = (
+                raw_dependency if isinstance(raw_dependency, dict) else {}
+            )
+            validate_standalone_runtime_dependency_receipt(dependency_receipt)
+            dependency_receipt_ref = str(
+                write_standalone_runtime_dependency_receipt(
+                    artifact_dir=root,
+                    receipt=dependency_receipt,
+                )
+            )
+            if dependency_receipt.get("status") != EXTERNAL_RUNTIME_BOUND:
+                failure_code = "EXTERNAL_RUNTIME_DEPENDENCY_PREFLIGHT_FAILED"
+                failure_detail = (
+                    "External agentic_core runtime did not match its approved "
+                    "commit, package tree, cleanliness, and module contract."
+                )
+        except Exception as exc:
+            failure_code = "EXTERNAL_RUNTIME_DEPENDENCY_PREFLIGHT_FAILED"
+            failure_detail = _redact_error(exc, env)
+            candidate = root / STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME
+            if candidate.is_file():
+                dependency_receipt_ref = str(candidate)
     if not failure_code and runtime_check is not None:
         try:
             runtime_check()
@@ -518,6 +562,8 @@ def run_fresh_e2e_preflight(
         "l6_shadow_bridge_ref": "NOT_REACHED:PREFLIGHT",
         "l7_audit_status": "NOT_REACHED:PREFLIGHT",
         "bootstrap_receipt": bootstrap_receipt or {},
+        "standalone_runtime_dependency_receipt": dependency_receipt or {},
+        "standalone_runtime_dependency_receipt_ref": dependency_receipt_ref,
         "created_at_utc": issued_at.isoformat(),
     }
     receipt = {
@@ -563,6 +609,7 @@ def run_fresh_e2e_preflight(
         "missing_environment_variables": missing,
         "preflight_receipt": str(receipt_path),
         "baseline_ref": str(Path(baseline_ref).resolve()),
+        "standalone_runtime_dependency_receipt_ref": dependency_receipt_ref,
         "retry_policy": receipt["retry_policy"],
         "research_attempt_count": 0,
         "generation_attempt_count": 0,

@@ -1,0 +1,80 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.4,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Partner Applied AI Architecture category contains generic GTM wording without concrete technical solution patterns or reference architecture mechanisms.",
+      "Partner alliance terms are split across Category 1 and Category 5 rather than consolidated.",
+      "Category 5 and Category 8 rely on table-stakes phrases such as hyperscaler co-sell and delivery governance without agentic operating context."
+    ],
+    "cited_sentence_indexes": [],
+    "remediation_suggestions": [
+      "Inject concrete architecture mechanisms and partner-facing outcomes into the Partner Applied AI Architecture category.",
+      "Consolidate partner co-sell and alliance GTM phrases into the dedicated partner architecture bundle.",
+      "Replace generic governance terms in Category 8 with specific agentic platform operating mechanisms."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "seniority_executive_relevance": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "complementarity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "no_bullet_restatement": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "category_clarity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "TABLE_STAKES_GENERIC_PHRASES"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "GENERIC_PARTNER_GTM_WITHOUT_ARCHITECTURE_MECHANISM",
+          "PARTNER_TERMS_SPLIT_OUTSIDE_BUNDLE"
+        ]
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_001552_5a15fae3ccf3\\x1d_gemini_provider_response_raw_20260809_001948_081.json",
+  "original_model": null,
+  "fallback_model": null
+}

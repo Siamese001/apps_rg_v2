@@ -1,0 +1,618 @@
+{
+  "schema_version": "section_runtime_exhaust_bundle_v1",
+  "generated_at_utc": "2026-08-09T13:44:46.409468+00:00",
+  "contract_type": "RuntimeExhaustBundle",
+  "section_id": "executive_summary",
+  "request_id": "req-f641e070479745978654dcb75a6f8594",
+  "run_id": "exec_summary_20260809_134305",
+  "parent_run_id": "062ef2e4-aa36-4d78-a1db-fbcd6a33ebd6",
+  "child_run_id": "exec_summary_20260809_134305",
+  "section_attempt_id": "executive_summary:exec_summary_20260809_134305:attempt:1",
+  "session_id": "bridge:rg_research_bridge:41ad1d81:d1869180-caaf-4032-af3c-a980b5460ee7",
+  "tenant_id": "default",
+  "trace_root": "d1869180-caaf-4032-af3c-a980b5460ee7",
+  "policy_hash": "sha256:a68c413ed3c1a7161ef38cffbaa9f2baa8e98c5649fef39eda3eee51b057dac1",
+  "blueprint_hash": "sha256:3cc01784d2e937acc4f0f01723828367d2f8a3c1267b8a97556f45f9cfc452dd",
+  "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:686987e96381c87e::v1",
+  "producer_stage": "Exit",
+  "consumer_stage": "L6",
+  "exit_disposition_receipt_ref": "exit_disposition_receipt.json",
+  "sealed_l2_artifact_ref": "sealed_l2_artifact.json",
+  "l2_execution_packet_ref": "l2_execution_packet.json",
+  "section_x3_disposition_ref": "x3_disposition.json",
+  "section_x3_authoritative": false,
+  "canonical_exit_authority_ref": "exit_disposition_receipt.json",
+  "x3_disposition": {
+    "x3_code": "X3_ALLOW",
+    "decisive_reason": "REAL_LLM output, X2 pass, all X1D judges model-backed pass, product quality PASS.",
+    "review_reason": "",
+    "authorization_scope": "PRODUCT_QUALITY",
+    "proceed_to_runtime": true,
+    "runtime_generation_status": "REAL_LLM",
+    "x1d_evaluator_mode": "MODEL_BACKED",
+    "product_quality_status": "PASS",
+    "x2_failed_gates": [],
+    "blocked_judges": [],
+    "mocked_judges": [],
+    "soft_failed_judges": [],
+    "decisive_judge_failures": [],
+    "final_summary_hash": "1145cbe15bf2232d",
+    "claim_ledger_hash": "b85265d61c65eff3",
+    "required_remediation": [],
+    "blocked_judge_detail_rows": [],
+    "model_backed_pass_provider_keys": [
+      "gemini_pro",
+      "openai_chatgpt"
+    ],
+    "proof_eligible_allow_requires": "every_configured_x1d_judge_model_backed_pass",
+    "pass": true,
+    "disposition_authority": "lane",
+    "section_x3_authoritative": false,
+    "section_x3_mirror_only": true,
+    "spine_x3_claimed": false,
+    "publish_disposition": "certified",
+    "x1d_certified": true,
+    "blocking_judge_ids": [],
+    "final_materialized_acceptance_contract_ref": "final_materialized_acceptance_contract.json",
+    "final_materialized_acceptance_ok": true,
+    "authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+    "artifact_authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+    "core_exit_authority_ref": "exit_disposition_receipt.json",
+    "core_exit_authority_scope": "agentic_core_exit_disposition_receipt"
+  },
+  "x3_code": "X3_ALLOW",
+  "artifact_inventory": [
+    {
+      "name": "allowlist_coherence_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "attempt_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c01_retrieval_plan.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c02_atoms.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c02_fact_vector_index_preflight.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c02_semantic_cache_payload.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c02_vector_query.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c03_graphrag_bound.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c03_promotion_candidates.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c06_weak_refine_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c0_evidence_room_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c0_fec_compose_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c0_graph_lane_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "c0_metrics.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "candidate_pool_summary.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "canonical_claim_ledger_v2.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "canonical_evidence_digest_chain.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "canonical_judge_contract.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "claim_ledger.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "compiled_prompt.txt",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "compiled_prompt_artifact.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "dimension_upstream_triangulation.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "evidence_capsule_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "exec_summary_word_budget_repair_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "executive_summary_composition_plan.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "executive_summary_finalize_coherence.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "executive_summary_judge_packet_post_x2.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "executive_summary_provider_call_plan.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "exit_disposition_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "exit_review_packet.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "exit_spine_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "external_model_token_reservations.jsonl",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "external_model_usage_ledger.jsonl",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "fact_check_result.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "final_evidence_contract.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "final_evidence_contract_bridge.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "final_evidence_contract_snapshot.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "final_materialized_acceptance_contract.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "frozen_execution_context.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "generation_grade_contract_manifest.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "graph_claim_bindings.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "graph_selection_rationale.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "graph_targeting_capsule.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "judge_attempt_ledger.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "judge_remediation_cycles.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "judge_score_variance_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "l1_plan_contract.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "l2_execution_packet.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "l2_handoff_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "l2_output.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "l2_receipt_bundle.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "l2_spine_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "lane_dispatch_attempt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "native_c03_final_evidence.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "parsed_output.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "post_x2_x1d_refresh_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "prep_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "prompt_selection_trace.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "provider_request.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "provider_response.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "publish_disposition.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "publish_integrity_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "r4_c0_bypass_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "r4_identity_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "raw_model_output.txt",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "regen_token_budget_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "resume_display_text.txt",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "route_contract.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "runtime_payload.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "seal_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "sealed_l2_artifact.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "section_exit_x1_result.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "section_exit_x2_result.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "section_front_spine_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "section_input_usage_ledger.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "section_repair_ledger.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "section_spine_c0_retrieve_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "selected_fact_plan.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "spine_pa_core_signing_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "spine_span_emit_receipt.jsonl",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "stage_sequence.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "targeting_context_parity_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "targeting_context_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "targeting_ingress_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "text_claim_coverage.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "token_budget_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "validated_request.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "validation_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_dimension_matrix.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_gemini_provider_parse_result_20260809_134346_918.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_gemini_provider_parse_result_20260809_134417_422.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_gemini_provider_request_20260809_134330_393.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_gemini_provider_request_20260809_134408_716.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_gemini_provider_response_raw_20260809_134346_915.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_gemini_provider_response_raw_20260809_134417_422.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_llm_judge_outputs.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_openai_provider_parse_result_20260809_134407_999.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_openai_provider_parse_result_20260809_134444_041.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_openai_provider_request_20260809_134346_944.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_openai_provider_request_20260809_134417_445.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_openai_provider_response_raw_20260809_134407_994.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x1d_openai_provider_response_raw_20260809_134444_031.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x2_gate_outputs.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x2_source_fact_pool_receipt.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    },
+    {
+      "name": "x3_disposition.json",
+      "kind": "file",
+      "section_id": "executive_summary"
+    }
+  ],
+  "artifact_inventory_count": 105,
+  "l6_v40_shadow_eval_package_ref": "l6_v40_shadow_eval_package.json",
+  "l6_v40_shadow_eval_spans_ref": "l6_v40_shadow_eval_spans.json",
+  "trace_refs": {
+    "route_contract.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/route_contract.json",
+    "final_evidence_contract_bridge.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/final_evidence_contract_bridge.json",
+    "l2_execution_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/l2_execution_packet.json",
+    "exit_review_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/exit_review_packet.json",
+    "provider_request.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/provider_request.json",
+    "provider_response.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/provider_response.json",
+    "x2_gate_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/x2_gate_outputs.json",
+    "x1d_llm_judge_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final7_20260809/e2e_20260809T133612Z_53df76de/modular_r4/sections/executive_summary/x1d_llm_judge_outputs.json"
+  },
+  "proof_refs": {
+    "exit_spine_receipt": "exit_spine_receipt.json",
+    "l2_spine_receipt": "l2_spine_receipt.json"
+  },
+  "runtime_terminal_boundary": "post_exit_disposition",
+  "durable_commit_occurred": false,
+  "uwg_commit_occurred": false,
+  "product_certification": "NOT_CLAIMED",
+  "spine_runtime_exhaust_bundle_claimed": true,
+  "explicit_non_claims": [
+    "L6 is post-run shadow only; cannot mutate or rescue current run",
+    "not product certification",
+    "not durable UWG/L4 commit"
+  ]
+}

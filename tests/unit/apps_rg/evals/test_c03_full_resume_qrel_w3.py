@@ -9,6 +9,10 @@ from pathlib import Path
 
 import pytest
 
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_derived_clusters as derived_subject
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_w1c as w1c_subject
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_w2 as w2_subject
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_w3 as subject
 from apps_rg.evals.owner_solo.c03_full_resume_qrel_w1c import (
     build_combined_registry,
 )
@@ -30,6 +34,22 @@ W6_RECEIPT = ROOT / (
     "artifacts/apps_rg/c03/graph_evidence_cluster_embeddings/"
     "wave6_cluster_vector_generation_receipt.json"
 )
+
+
+@pytest.fixture(autouse=True)
+def _algorithm_test_uses_explicit_non_authorizing_scope_override(monkeypatch) -> None:
+    for module in (derived_subject, w1c_subject, w2_subject):
+        monkeypatch.setattr(module, "validate_full_resume_scope", lambda *_args, **_kwargs: [])
+    monkeypatch.setattr(
+        subject,
+        "_target_context",
+        lambda root, query: (
+            "Target job description:\n"
+            + (root / str(query["jd_path"])).read_text(encoding="utf-8").strip()
+            + "\n\nApplication brief:\n"
+            + (root / str(query["brief_path"])).read_text(encoding="utf-8").strip()
+        ),
+    )
 
 
 def _model_manifest() -> dict[str, object]:

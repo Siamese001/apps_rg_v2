@@ -8,9 +8,9 @@ import json
 import os
 from typing import Any, Mapping, Sequence
 
-from agentic_core.runtime.contracts.l1_plan_contract import L1PlanContract
-from agentic_core.runtime.contracts.route_contract import RouteContract
-from agentic_core.runtime.contracts.route_gate_receipt import RouteGateReceipt
+from apps_rg.runtime.spine_contracts import L1PlanContract
+from apps_rg.runtime.spine_contracts import RouteContract
+from apps_rg.runtime.spine_contracts import RouteGateReceipt
 
 __all__ = [
     "L1PlanNotReadyError",

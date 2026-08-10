@@ -1,0 +1,21 @@
+# Full resume — per-section status
+
+Run folder: `e2e_20260809T075910Z_f008baa6`
+
+| Section | X3 | X2 | Product quality | Runtime | Judges / score | Display text |
+|---|---|---|---|---|---|---|
+| competencies | X3_ALLOW | PASS | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.2/5 vs 4 PASS | [modular_r4/sections/competencies/competencies_display.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/competencies/competencies_display.txt) |
+| unify_bullets | X3_BLOCK_FINAL_MATERIALIZED_ACCEPTANCE | FAIL | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.74/5 vs 0.72 PASS | [modular_r4/sections/unify_bullets/unify_bullets_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/unify_bullets/unify_bullets_output.txt) |
+| ↳ failed gates | | | | | | `x2_resume_graph_claim_binding` |
+| ibm_bullets | X3_ALLOW | PASS | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 4.5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.77/5 vs 0.72 PASS | [modular_r4/sections/ibm_bullets/ibm_bullets_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/ibm_bullets/ibm_bullets_output.txt) |
+| insurtech_bullets | X3_ALLOW | PASS | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.78/5 vs 0.72 PASS | [modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt) |
+| ey_bullets | X3_ALLOW | PASS | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.74/5 vs 0.72 PASS | [modular_r4/sections/ey_bullets/ey_bullets_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/ey_bullets/ey_bullets_output.txt) |
+| unify_narrative | PRE_RUN:upstream_not_finalized | UNKNOWN | UNKNOWN | UNKNOWN | — | — (missing) |
+| ↳ pre-run | | | | | | `PRE_RUN:upstream_not_finalized` |
+| ibm_narrative | X3_BLOCK | FAIL | FAIL | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS | [modular_r4/sections/ibm_narrative/ibm_narrative_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/ibm_narrative/ibm_narrative_output.txt) |
+| ↳ failed gates | | | | | | `x2_ibm_narrative_claim_theme_coverage, x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets` |
+| insurtech_narrative | X3_ALLOW | PASS | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS | [modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt) |
+| ey_narrative | X3_ALLOW | PASS | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS | [modular_r4/sections/ey_narrative/ey_narrative_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/ey_narrative/ey_narrative_output.txt) |
+| executive_summary | X3_BLOCK | PASS | FAIL | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 4.2/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.6/5 vs 4 PASS | [modular_r4/sections/executive_summary/resume_display_text.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/executive_summary/resume_display_text.txt) |
+| headline | X3_ALLOW | PASS | PASS | REAL_LLM | Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.2/5 vs 4 PASS | [modular_r4/sections/headline/headline_output.txt](artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/headline/headline_output.txt) |
+| final_resume_aggregation | NOT_RUN | — | — | — | — | — (missing) |

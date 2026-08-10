@@ -1,0 +1,144 @@
+{
+  "artifact_hash": "sha256:e2be7203b4adc7527869e37bb1b45a41e9512fc28c6d1b7461823ec7a549327b",
+  "emitted_at": "2026-08-09T05:54:38Z",
+  "payload": {
+    "attempt_evidence_refs": [],
+    "attempt_evidence_status": "NOT_REPORTED_BY_L2",
+    "c0": {
+      "reason": "BYPASS_PRELOADED_CONTEXT",
+      "status": "BYPASSED_PRELOADED_CONTEXT",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.1",
+          "sub_stage_name": "Query Normalization"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.2",
+          "sub_stage_name": "Embedding Lookup"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.3",
+          "sub_stage_name": "D1 Exact Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.4",
+          "sub_stage_name": "D2 Semantic Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.5",
+          "sub_stage_name": "Retrieval Augmentation"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.6",
+          "sub_stage_name": "Grounding Context Assembly"
+        }
+      ]
+    },
+    "generation_provider_attempt_count": 0,
+    "judge_attempt_count": 0,
+    "l2": {
+      "executed": true,
+      "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:ibm_narrative:EXECUTED_X3_BLOCK' schema_ok=False lane_ok=False",
+      "status": "FAIL",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "app_name": "apps_rg"
+          },
+          "status": "PASS",
+          "sub_stage_id": "E1",
+          "sub_stage_name": "Prep: Plan Decomposition"
+        },
+        {
+          "duration_ms": 0.006,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E2",
+          "sub_stage_name": "Valid: Pre-Execution Contract Check"
+        },
+        {
+          "duration_ms": 595521.815,
+          "meta": {
+            "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:ibm_narrative:EXECUTED_X3_BLOCK' schema_ok=False lane_ok=False"
+          },
+          "status": "FAIL",
+          "sub_stage_id": "E3",
+          "sub_stage_name": "Exec: Tool Dispatch"
+        },
+        {
+          "duration_ms": 0.005,
+          "meta": {
+            "retry_attempted": false
+          },
+          "status": "NOT_APPLICABLE",
+          "sub_stage_id": "E4",
+          "sub_stage_name": "Heal: Retry / Recovery"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {},
+          "status": "FAIL",
+          "sub_stage_id": "E5",
+          "sub_stage_name": "Seal: Output Assembly"
+        }
+      ]
+    },
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-3e5c4933c29d471aa606a54947460393",
+    "route_id": "R4_SINGLE_ACTION",
+    "run_id": "c90dee34-d2c4-41cf-bcb3-8dc793c1dbd7",
+    "schema_version": "agentic_core.runtime_execution_witness.v1",
+    "trace_root": "3249f556-641a-4524-b80c-b056157e7df2",
+    "x1": {
+      "status": "EXECUTED",
+      "sub_stages": []
+    },
+    "x2": {
+      "disposition": "X3A",
+      "failed_gate_ids": [],
+      "reason_codes": [],
+      "status": "EXECUTED",
+      "x3_disposition": "X3A_DENY_REROUTE"
+    },
+    "x3": {
+      "disposition": "X3A",
+      "status": "EMITTED",
+      "x3_disposition": "X3A_DENY_REROUTE"
+    }
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:627f0dd2e3f4d37d9faee573fbf43566f727c541090b0ec66604149b2ec4aa86"
+}

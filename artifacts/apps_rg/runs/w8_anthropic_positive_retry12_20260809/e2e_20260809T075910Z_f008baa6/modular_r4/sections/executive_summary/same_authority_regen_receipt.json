@@ -1,0 +1,65 @@
+{
+  "schema": "executive_summary_core_same_authority_regen_v1",
+  "accepted": true,
+  "regen_engine": "agentic_core.L2_execution.regen.SameAuthorityRegenRunner",
+  "max_delta_tokens": 2000000,
+  "same_authority_regen_receipt": {
+    "contract_type": "SameAuthorityRegenReceipt",
+    "contract_version": "1.0.0",
+    "producer_stage": "L2_E4_HEAL",
+    "consumer_stage": "L2_E3_EXEC",
+    "request_id": "exec_summary_20260809_080600",
+    "run_id": "exec_summary_20260809_080600",
+    "trace_root": "exec_summary_20260809_080600",
+    "parent_contract_ref": "attempt-1",
+    "contract_digest": "d073c3b6537e392080a6a5647c3739f48b5dc1654398a7b578492d9c4548ef67",
+    "policy_hash": "policy-unset",
+    "blueprint_hash": "blueprint-unset",
+    "registry_digest_set": [
+      "registry-unset"
+    ],
+    "replay_key": "replay-key-unset",
+    "repair_attempt_id": "heal-regen-5e1425bb14e646dbade35890aa3c3de2",
+    "parent_attempt_receipt_id": "attempt-1",
+    "repair_tactic": "incremental_delta_turn_v1",
+    "semantic_regen_attempt_index": 1,
+    "transport_retry_count": 0,
+    "max_semantic_regen_attempts": 3,
+    "semantic_regen_budget_exhausted": false,
+    "trigger_source": "X3_JUDGE",
+    "frozen_compile_ref": "6be369a83ed59479",
+    "anchor_output_hash": "ab4fd555a6114e39614feb8d26216ff9395bf2a5a84ec29d18e7dceeaaae3601",
+    "delta_message_hash": "86e5ffae089593330463cd3a8b4fb5bfd60199e1c7c439b245cf3e5a9322360a",
+    "prior_output_hash": "ab4fd555a6114e39614feb8d26216ff9395bf2a5a84ec29d18e7dceeaaae3601",
+    "regenerated_output_hash": "9a63779ccae7dcdcf21524c800a59d065fb7df18feb055dab8b0e64ecbc13f38",
+    "provider_request_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\executive_summary\\provider_request_regen.json",
+    "provider_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\executive_summary\\provider_response_judge_regen.json",
+    "anchor_classification": "last_approved",
+    "same_authority_assertions": {
+      "frozen_compile_preserved": true,
+      "delta_only_append": true,
+      "provider_lane_unchanged": true,
+      "semantic_budget_ok": true
+    },
+    "no_prompt_recompile_assertion": true,
+    "no_provider_substitution_assertion": true,
+    "no_app_policy_decision_assertion": true,
+    "heal_outcome": "PASS",
+    "next_action": "RETURN_TO_E3",
+    "refusal_code": null,
+    "l5_governance_context_digest": "",
+    "runtime_gate_refs": [
+      "G19",
+      "G20",
+      "G21",
+      "G24"
+    ],
+    "receipt_refs": [],
+    "authority_scope": "same_authority_no_commit"
+  },
+  "heal_receipt_bridge": {
+    "repair_tactic": "incremental_delta_turn_v1",
+    "next_action": "RETURN_TO_E3",
+    "heal_outcome": "PASS"
+  }
+}

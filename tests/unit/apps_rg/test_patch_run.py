@@ -28,6 +28,10 @@ from apps_rg.runtime.orchestration.patch_run import (
     select_patch_lanes,
 )
 
+
+def test_patch_run_input_error_has_cli_config_exit_code() -> None:
+    assert pr.PatchRunInputError.exit_code == 2
+
 _GREEN_DEFAULT = tuple(
     lane
     for lane in GENERATED_LANES
@@ -384,6 +388,57 @@ def test_auto_selection_picks_exactly_non_authorized_lanes(tmp_path: Path) -> No
     assert set(targets) == {"headline", "executive_summary", "ibm_bullets", "ibm_narrative"}
 
 
+def test_banked_lane_requires_binding_to_current_frozen_allocation(tmp_path: Path) -> None:
+    repo, run_dir = _seed_integrated_run(tmp_path)
+    digest = "a" * 64
+    _write_json(
+        run_dir
+        / "modular_r4"
+        / "resume_graph_allocation"
+        / "resume_graph_allocation_plan.json",
+        {"allocation_plan_digest": digest},
+    )
+    lane_dir = latest_lane_run_dir_any(
+        run_dir / "modular_r4" / "sections", "competencies"
+    )
+    assert lane_dir is not None
+
+    missing = pr.classify_lane_state(repo, run_dir, "competencies")
+    assert missing["authorized"] is False
+    assert missing["state"] == "STALE_WHOLE_RESUME_GRAPH_AUTHORITY"
+    assert missing["reason"] == "frozen_graph_claim_binding_missing"
+
+    _write_json(
+        lane_dir / "graph_claim_bindings.json",
+        {
+            "active": True,
+            "status": "PASS",
+            "pass": True,
+            "allocation_plan_digest": "b" * 64,
+            "claim_count": 2,
+            "bound_claim_count": 2,
+        },
+    )
+    mismatched = pr.classify_lane_state(repo, run_dir, "competencies")
+    assert mismatched["authorized"] is False
+    assert "frozen_graph_allocation_digest_mismatch" in mismatched["reason"]
+
+    _write_json(
+        lane_dir / "graph_claim_bindings.json",
+        {
+            "active": True,
+            "status": "PASS",
+            "pass": True,
+            "allocation_plan_digest": digest,
+            "claim_count": 2,
+            "bound_claim_count": 2,
+        },
+    )
+    current = pr.classify_lane_state(repo, run_dir, "competencies")
+    assert current["authorized"] is True
+    assert current["state"] == "AUTHORIZED:X3_ALLOW"
+
+
 def test_ordering_narrative_after_its_bullets_lane(tmp_path: Path) -> None:
     repo, run_dir = _seed_integrated_run(tmp_path)
     plan = build_patch_plan(run_dir)
@@ -431,6 +486,43 @@ def test_build_plan_refuses_non_integrated_dir(tmp_path: Path) -> None:
     with pytest.raises(PatchRunInputError) as ei:
         build_patch_plan(d)
     assert "modular_r4/sections" in str(ei.value)
+
+
+def test_patch_runtime_preflight_blocks_missing_signing_secret_before_dispatch(
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    with pytest.raises(PatchRunInputError, match="missing APPS_RG_ROUTE_HMAC_SECRET"):
+        pr._run_patch_runtime_preflight(run_dir, environ={})
+
+    receipt = json.loads(
+        (run_dir / pr.PATCH_RUN_PREFLIGHT_ARTIFACT).read_text(encoding="utf-8")
+    )
+    assert receipt["status"] == "BLOCKED"
+    assert receipt["dispatch_eligible"] is False
+    assert receipt["route_signing_secret_present"] is False
+    assert receipt["secret_material_recorded"] is False
+
+
+def test_patch_runtime_preflight_records_presence_without_secret_material(
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    secret = "never-write-this-secret"
+    receipt = pr._run_patch_runtime_preflight(
+        run_dir,
+        environ={
+            "APPS_RG_ROUTE_HMAC_SECRET": secret,
+            "APPS_RG_ROUTE_HMAC_KEY_ID": "patch-session-key",
+        },
+    )
+
+    raw = (run_dir / pr.PATCH_RUN_PREFLIGHT_ARTIFACT).read_text(encoding="utf-8")
+    assert receipt["status"] == "PASS"
+    assert receipt["route_signing_key_id_present"] is True
+    assert secret not in raw
 
 
 # --------------------------------------------------------------- latest-dir determinism
@@ -627,6 +719,97 @@ def _patch_embedding_preflight(
     )
 
 
+def test_patch_run_restores_persisted_whole_resume_graph_authority(tmp_path: Path) -> None:
+    from apps_rg.runtime.c0.resume_graph_allocation import (
+        ALL_CLAIM_BEARING_SECTIONS,
+        finalize_resume_graph_allocation_plan,
+    )
+
+    run_dir = tmp_path / "run"
+    allocation_dir = run_dir / "modular_r4" / "resume_graph_allocation"
+    plan = finalize_resume_graph_allocation_plan(
+        {
+            "schema_version": "resume_graph_allocation_plan_v1",
+            "allocation_scope": "WHOLE_RESUME",
+            "global_uniqueness_claimed": True,
+            "assignments": [
+                {
+                    "section_id": section_id,
+                    "claim_unit_id": f"{section_id}:claim-1",
+                    "candidate_id": f"candidate-{index}",
+                    "skill_id": f"skill-{index}",
+                    "metric_outcome_id": f"metric-{index}",
+                    "normalized_metric_signature": f"signature-{index}",
+                    "counts_toward_global_uniqueness": True,
+                }
+                for index, section_id in enumerate(ALL_CLAIM_BEARING_SECTIONS)
+            ],
+            "candidate_decisions": [],
+            "candidate_conservation_receipt": {"pass": True},
+            "durable_graph_state_mutated": False,
+        }
+    )
+    artifacts = {
+        "resume_graph_allocation_plan.json": plan,
+        "resume_graph_usage_ledger.json": {"allocation_plan_digest": plan["allocation_plan_digest"]},
+        "section_final_graph_evidence_contracts.json": {"headline": {"pass": True}},
+        "c03_section_graph_plans.json": {"headline": {"section_id": "headline"}},
+    }
+    for name, payload in artifacts.items():
+        _write_json(allocation_dir / name, payload)
+
+    bindings = pr._whole_resume_graph_env_for_patch(run_dir)
+
+    assert Path(bindings["APPS_RG_RESUME_GRAPH_ALLOCATION_PLAN"]).name == (
+        "resume_graph_allocation_plan.json"
+    )
+    assert Path(bindings["APPS_RG_RESUME_GRAPH_USAGE_LEDGER"]).name == (
+        "resume_graph_usage_ledger.json"
+    )
+    assert Path(bindings["APPS_RG_SECTION_FINAL_GRAPH_EVIDENCE_CONTRACTS"]).name == (
+        "section_final_graph_evidence_contracts.json"
+    )
+    authority = pr._whole_resume_graph_rollup_authority(
+        repo=tmp_path,
+        run_dir=run_dir,
+    )
+    assert authority["resume_graph_allocation_plan_digest"] == plan[
+        "allocation_plan_digest"
+    ]
+    assert authority["resume_graph_allocation_refs"] == {
+        "allocation_plan": (
+            "run/modular_r4/resume_graph_allocation/resume_graph_allocation_plan.json"
+        ),
+        "usage_ledger": (
+            "run/modular_r4/resume_graph_allocation/resume_graph_usage_ledger.json"
+        ),
+        "section_final_evidence_contracts": (
+            "run/modular_r4/resume_graph_allocation/section_final_graph_evidence_contracts.json"
+        ),
+        "section_plans": (
+            "run/modular_r4/resume_graph_allocation/c03_section_graph_plans.json"
+        ),
+    }
+    assert "resume_graph_w6_release_evidence" not in authority
+    assert Path(bindings["APPS_RG_SECTION_GRAPH_SOURCE_PLANS"]).name == (
+        "c03_section_graph_plans.json"
+    )
+
+
+def test_patch_run_rejects_partial_whole_resume_graph_authority(tmp_path: Path) -> None:
+    run_dir = tmp_path / "run"
+    _write_json(
+        run_dir
+        / "modular_r4"
+        / "resume_graph_allocation"
+        / "resume_graph_usage_ledger.json",
+        {"allocation_plan_digest": "partial"},
+    )
+
+    with pytest.raises(PatchRunInputError, match="bundle is incomplete"):
+        pr._whole_resume_graph_env_for_patch(run_dir)
+
+
 def test_default_dispatch_threads_derived_jd_brief_into_canonical_primitives(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -703,7 +886,11 @@ def test_default_dispatch_threads_derived_jd_brief_into_canonical_primitives(
         assert attempt_dir.parent.name == "real"
         assert attempt_dir.parent.parent.name == lane
         assert attempt_dir.parent.parent.parent == run_dir / "modular_r4" / "sections"
-        assert attempt_dir.name.startswith("patch_")
+        assert attempt_dir.name.startswith("p_")
+        assert len(attempt_dir.name) == 8
+        # The longest mandatory core-chain filename must remain below the
+        # legacy Windows path limit used by this runtime boundary.
+        assert len(str(attempt_dir / "integrated_runtime_entrypoint_invocation.json")) < 260
         assert kwargs["resume_path"] == ""
         assert str(kwargs["lane_provider"]).strip() != ""
         if lane == "ibm_narrative":

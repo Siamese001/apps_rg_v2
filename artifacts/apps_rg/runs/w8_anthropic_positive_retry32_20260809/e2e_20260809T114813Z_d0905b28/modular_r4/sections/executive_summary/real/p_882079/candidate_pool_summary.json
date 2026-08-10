@@ -1,0 +1,134 @@
+{
+  "schema": "executive_summary_candidate_pool_summary_v1",
+  "candidates": [
+    {
+      "candidate_id": "scratch",
+      "candidate_digest": "5246e7fa82fa8129ed04ce89835d93f755dbb62b07e59ccc9ef9ddb60f26341f",
+      "publish_eligible": true,
+      "x2_all_pass": true,
+      "scores_freshness": "carried_forward",
+      "model_backed_scores_snapshot": {
+        "schema": "executive_summary_judge_score_snapshot_v1",
+        "providers": [
+          {
+            "provider_key": "gemini_pro",
+            "score": 5.0,
+            "normalized_score": 1.0,
+            "pass": true,
+            "provider_status": "MODEL_BACKED_PASS",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          },
+          {
+            "provider_key": "openai_chatgpt",
+            "score": 4.2,
+            "normalized_score": 0.8400000000000001,
+            "pass": true,
+            "provider_status": "MODEL_BACKED_PASS",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "publish_eligible_ids": [
+    "scratch"
+  ],
+  "full_panel_rescore": [
+    {
+      "candidate_id": "scratch",
+      "pre_rank_digest": "5246e7fa82fa8129ed04ce89835d93f755dbb62b07e59ccc9ef9ddb60f26341f",
+      "full_panel_digest": "c50b23312f3c98708d68b2ee5ee99ed4aeb0a7bd6115e3f5e78300331d112c0b",
+      "rescore_receipt": {
+        "schema": "executive_summary_post_x2_x1d_refresh_v1",
+        "enabled": true,
+        "prior_scores": {
+          "gemini_pro": 5.0,
+          "openai_chatgpt": 4.2
+        },
+        "targeting_parity": {
+          "schema": "targeting_context_parity_v2",
+          "targeting_bundle_digest": "e9db3de0552d34d5d8b437b920fe58a9758ab541a624b53ca3cde7a7dbdc66f9",
+          "generation_material_digest": "e9db3de0552d34d5d8b437b920fe58a9758ab541a624b53ca3cde7a7dbdc66f9",
+          "judge_material_digest": "e9db3de0552d34d5d8b437b920fe58a9758ab541a624b53ca3cde7a7dbdc66f9",
+          "generation_targeting_digest": "6b82d2dd7b3d5539abd4181bc3e531fce0da57e936311a0b5506d8e7963ed7e5",
+          "judge_targeting_digest": "6b82d2dd7b3d5539abd4181bc3e531fce0da57e936311a0b5506d8e7963ed7e5",
+          "targeting_parity_status": "match",
+          "targeting_binding_match": true,
+          "target_title": "Manager of Applied AI Architecture, Partnerships",
+          "target_company": "Anthropic",
+          "parity_match": true,
+          "bundle_matches_generation_material": true,
+          "generation_jd_chars": 4382,
+          "generation_briefing_chars": 7926,
+          "judge_jd_chars": 4382,
+          "judge_briefing_chars": 7926,
+          "substantive_jd_fit_certification_allowed": true
+        },
+        "refreshed_scores": {
+          "gemini_pro": 5.0,
+          "openai_chatgpt": 4.5
+        },
+        "gate_summary_gate_count": 86,
+        "judge_packet_post_x2_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\executive_summary\\real\\p_882079\\executive_summary_judge_packet_post_x2.json",
+        "judge_score_variance": {
+          "schema": "executive_summary_judge_score_variance_v1",
+          "judge_packet_hash": "445dbd66c7b062ea",
+          "variance_threshold": 0.3,
+          "dual_panel": true,
+          "comparisons": [
+            {
+              "provider_key": "gemini_pro",
+              "score_before": 5.0,
+              "score_after": 5.0,
+              "score_delta": 0.0,
+              "abs_score_delta": 0.0,
+              "variance_flagged": false
+            },
+            {
+              "provider_key": "openai_chatgpt",
+              "score_before": 4.2,
+              "score_after": 4.5,
+              "score_delta": 0.3,
+              "abs_score_delta": 0.3,
+              "variance_flagged": true
+            }
+          ],
+          "flagged_provider_keys": [
+            "openai_chatgpt"
+          ],
+          "any_variance_flagged": true,
+          "artifact_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry32_20260809\\e2e_20260809T114813Z_d0905b28\\modular_r4\\sections\\executive_summary\\real\\p_882079\\judge_score_variance_receipt.json"
+        }
+      },
+      "final_materialized_x2_all_pass": true,
+      "judge_certified": true
+    }
+  ],
+  "publish_selected_snapshot_id": "scratch",
+  "published_candidate_digest": "c50b23312f3c98708d68b2ee5ee99ed4aeb0a7bd6115e3f5e78300331d112c0b",
+  "publish_reason": "only_scratch_publish_eligible",
+  "rank": {
+    "rank_comparison": [
+      {
+        "candidate_id": "scratch",
+        "candidate_digest": "c50b23312f3c98708d68b2ee5ee99ed4aeb0a7bd6115e3f5e78300331d112c0b",
+        "min_holistic": 4.5,
+        "sum_holistic": 9.5,
+        "major_dimension_fail_total": 2,
+        "scratch_tie_preference": 1
+      }
+    ],
+    "winning_key": [
+      4.5,
+      9.5,
+      -2,
+      1
+    ]
+  },
+  "x2_publish_eligible": true,
+  "judge_certified": true
+}

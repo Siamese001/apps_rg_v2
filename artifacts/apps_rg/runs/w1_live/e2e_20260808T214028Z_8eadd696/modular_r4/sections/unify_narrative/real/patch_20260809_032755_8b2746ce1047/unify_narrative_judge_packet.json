@@ -1,0 +1,67 @@
+{
+  "judge_packet_version": "apps_rg_grade_only_judge_packet_v2",
+  "section": "unify_narrative",
+  "judge_task": "GRADE_ONLY",
+  "candidate_output": {
+    "narrative_sentence": "Owned Unify Consulting’s mandate to industrialize agentic AI from control-plane architecture through productized delivery, creating an IP-led commercial engine and operating model that helped regulated enterprise clients adopt governed solutions through repeatable services and partner-channel enablement.",
+    "resume_display_text": "Owned Unify Consulting’s mandate to industrialize agentic AI from control-plane architecture through productized delivery, creating an IP-led commercial engine and operating model that helped regulated enterprise clients adopt governed solutions through repeatable services and partner-channel enablement.",
+    "companion_bullets_context": "- bul_unify_001: Architected a policy-gated agent execution surface for governed enterprise AI workflows, combining L0 route-policy dispatch, multi-agent orchestration contracts, and human override escalation paths.\n- bul_unify_002: Drove CFO-aligned enterprise adoption motions tied to reusable AI platform commercialization through partner-supported deal cycles and usage-based subscription forecasting.\n- bul_unify_003: Established audit-grade runtime observability coverage for regulated AI workflows by instrumenting evaluation gates, telemetry, and rollback controls across production agent execution.\n- bul_unify_004: Standardized the AI systems lifecycle end to end, compressing the lab-to-production cycle from six months to three weeks through managed workflow orchestration.\n- bul_unify_005: Engineered high-availability distributed service patterns for enterprise AI platforms, integrating Databricks Lakehouse pipelines with dense sparse exact retrieval design.\n- bul_unify_006: Scaled the platform engineering team from 8 to 28 while commercializing reusable AI platform capability under a disciplined operating model for agentic AI."
+  },
+  "claim_ledger": [
+    {
+      "claim_text": "Owned agentic AI control-plane architecture for governed enterprise workflows.",
+      "source_fact_ids": [
+        "reb_unify_agentic_platform_architecture",
+        "fact_engineering_platform_001"
+      ]
+    },
+    {
+      "claim_text": "Industrialized agentic AI through productization, IP-led commercialization, and an operating model for scalable delivery.",
+      "source_fact_ids": [
+        "reb_unify_platform_commercialization_leadership",
+        "fact_engineering_platform_006",
+        "skill_agentic_platform_productization",
+        "skill_ai_platform_commercialization",
+        "skill_operating_model_for_agentic_ai"
+      ]
+    },
+    {
+      "claim_text": "Supported enterprise adoption through partner-enabled commercial motions and reusable platform capability.",
+      "source_fact_ids": [
+        "reb_unify_enterprise_adoption_revenue",
+        "reb_unify_platform_commercialization_leadership",
+        "skill_enterprise_workflow_adoption",
+        "skill_partner_customer_deal_support"
+      ]
+    }
+  ],
+  "source_fact_ids": [],
+  "allowed_fact_packet": null,
+  "targeting_context": {
+    "target_title": "",
+    "target_company": "",
+    "jd_text": "",
+    "briefing": ""
+  },
+  "proof_boundary": {
+    "jd_is_targeting_context_only": true,
+    "briefing_is_targeting_context_only": true,
+    "claims_must_be_supported_by_allowed_fact_packet": true,
+    "judges_must_not_rewrite": true,
+    "metadata_only_graph_context_is_insufficient": true
+  },
+  "graph_binding_materiality_summary": {},
+  "deterministic_gate_summary": {
+    "x2_judge_snapshot_pending": {
+      "pass": true,
+      "detail": "Pre-X2 GRADE_ONLY for unify_narrative: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys."
+    }
+  },
+  "section_specific_rubric": "You are evaluating one Unify Consulting role narrative sentence (executive thesis above six bullets).\nReturn JSON only with: score_scale, score, threshold, pass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n\nRubric dimensions (must score each):\n1. north_star_alignment: role-level capstone emphasizing platform roadmap, core systems architecture,\n   commercialization, reusable IP / platform economics, and enterprise deployment within consulting-firm context.\n2. fact_ledger_grounding: every material claim in the narrative maps to claim_ledger and bul_unify_* and/or\n   unify_narrative_base_* resume facts (no JD/briefing/target-company-as-experience).\n3. jd_briefing_targeting: JD and briefing themes shape emphasis without becoming proof (belongs in jd_alignment object,\n   not the sentence as invented experience).\n4. complementarity_vs_bullets: states the executive thesis the bullets prove without recap, checklist, or six-bullet walk.\n5. executive_signal: SVP Engineering platform leadership — governed runtime, commercialization, regulated enterprise scale.\n6. no_metric_rehash: avoids repeating bullet metrics unless narrowly justified; prefers conceptual commercialization language.\n7. no_cross_employer_leakage: no IBM, InsurTech, EY, education, or early-career contamination.\n8. resume_voice: third person or implied subject; clean board-readable executive tone; no hype or comma-packed mechanism list.\n9. role_fit_targeting: JD/briefing influence emphasis only — never proof of experience.\n10. why_role_mattered: narrative answers why the Unify role mattered (mandate, commercialization, IP) — companion bullets answer what was delivered.\n11. executive_brevity: exactly one sentence; product shape max 58 words and 360 characters; JD/briefing targeting only (never proof).\n\nDecisive failure triggers:\n- merely summarizes the six bullets or mirrors bullet labels/metrics as the thesis\n- spins a different role story not entailed by the finalized bullets or claim_ledger\n- uses JD, briefing, or target company as proof of candidate experience\n- omits commercialization / reusable platform / IP angle when base anchor facts support that arc\n- lacks role-level platform mandate (reads like a delivery task list)\n- multiple sentences or bullet-list formatting",
+  "grading_only_instructions": "You are grading a generated resume section candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write replacement section content.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (when provided), and candidate_output.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).",
+  "required_judge_output_schema": "Return ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[]}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.",
+  "rubric_ref": "apps_rg/runtime/judges/unify_narrative_x1d.py#UNIFY_NARRATIVE_GRADE_ONLY_RUBRIC",
+  "judge_tier": "STANDARD_REASONING",
+  "judge_packet_required": true,
+  "judge_packet_hash": "8004c5e5085fe75b"
+}

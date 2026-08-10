@@ -496,17 +496,18 @@ def test_anthropic_messages_transport_does_not_duplicate_system_only_prompt(monk
     assert captured["body"]["messages"][0]["content"] != "system: System guard."
 
 
-def test_anthropic_stream_attempts_scale_to_wall_clock(monkeypatch) -> None:
+def test_anthropic_stream_default_uses_one_long_lived_wall_budget(monkeypatch) -> None:
     calls = {"count": 0}
 
     def _urlopen(req, timeout):
         calls["count"] += 1
-        assert timeout == 20.0
+        assert timeout <= 235.0
+        assert timeout > 234.0
         raise TimeoutError("read timed out")
 
     monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
     monkeypatch.setattr(subject.time, "sleep", lambda *_args, **_kwargs: None)
-    monkeypatch.setenv("APPS_RG_STREAM_READ_TIMEOUT_S", "20")
+    monkeypatch.delenv("APPS_RG_STREAM_READ_TIMEOUT_S", raising=False)
     monkeypatch.delenv("APPS_RG_STREAM_ATTEMPTS", raising=False)
     provider = ExternalProvider(
         provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
@@ -519,7 +520,70 @@ def test_anthropic_stream_attempts_scale_to_wall_clock(monkeypatch) -> None:
             {"prompt": "Return JSON", "max_tokens": 20, "temperature": 0.4, "timeout_seconds": 240}
         )
 
-    assert calls["count"] == 12
+    assert calls["count"] == 2
+
+
+def test_anthropic_stream_never_replays_after_response_started(monkeypatch) -> None:
+    calls = {"count": 0}
+
+    class _StartedThenStalled:
+        headers = {"request-id": "req-started"}
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def __iter__(self):
+            yield _anthropic_message_start()
+            raise TimeoutError("read body timed out")
+
+    def _urlopen(req, timeout):
+        calls["count"] += 1
+        return _StartedThenStalled()
+
+    monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
+    monkeypatch.setenv("APPS_RG_STREAM_READ_TIMEOUT_S", "5")
+    monkeypatch.setenv("APPS_RG_STREAM_ATTEMPTS", "3")
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
+        model=pins.CLAUDE_GENERATOR_MODEL,
+        environ={"ANTHROPIC_API_KEY": "test-key"},
+    )
+
+    with pytest.raises(TimeoutError):
+        provider._anthropic_messages_transport(
+            {"prompt": "Return JSON", "max_tokens": 20, "temperature": 0.4}
+        )
+
+    assert calls["count"] == 1
+
+
+def test_anthropic_stream_attempt_override_is_hard_capped_at_two(monkeypatch) -> None:
+    calls = {"count": 0}
+
+    def _urlopen(_request, timeout):
+        assert timeout > 0
+        calls["count"] += 1
+        raise OSError("pre-response transport failure")
+
+    monkeypatch.setattr(subject.urllib.request, "urlopen", _urlopen)
+    monkeypatch.setattr(subject.time, "sleep", lambda *_args, **_kwargs: None)
+    monkeypatch.setenv("APPS_RG_STREAM_ATTEMPTS", "99")
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
+        model=pins.CLAUDE_GENERATOR_MODEL,
+        environ={"ANTHROPIC_API_KEY": "test-key"},
+    )
+
+    with pytest.raises(OSError, match="pre-response transport failure"):
+        provider._anthropic_messages_transport(
+            {"prompt": "Return JSON", "max_tokens": 20, "temperature": 0.4}
+        )
+
+    assert calls["count"] == 2
 
 
 def test_external_provider_requires_explicit_model() -> None:

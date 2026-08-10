@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import copy
 from datetime import datetime, timezone
 import json
 import os
@@ -10,7 +11,7 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 
 from apps_rg.runtime.judges.bullet_pool_claude_selector import (
     PoolSelectionResult,
@@ -51,6 +52,7 @@ from apps_rg.runtime.reasoning.employment_bullet_pool import (
 
 NormalizeFn = Callable[[dict[str, Any]], dict[str, Any]]
 ParseFn = Callable[[str], tuple[dict[str, Any] | None, str]]
+GOVERNED_COMPETENCIES_BASELINE_PATH_INDEX = 10_000
 
 
 def _normalize_selector_paths(
@@ -65,6 +67,41 @@ def _normalize_selector_paths(
         else:
             normalized.append(path)
     return normalized
+
+
+def _selector_paths_with_governed_competencies_baseline(
+    paths: list[SelfConsistencyPath],
+    targeting_context: dict[str, Any] | None,
+) -> list[SelfConsistencyPath]:
+    """Add a non-provider candidate path containing the eight governed bundles.
+
+    Provider self-consistency paths remain the source of model-authored variants.
+    This baseline guarantees that stochastic generation cannot make a required
+    graph bundle absent from the selector's candidate universe. It does not
+    auto-authorize the rows: selector completion still requires deterministic
+    graph/fact support and final X1D/X2/X3 evaluation remains unchanged.
+    """
+    candidates = list(
+        (targeting_context or {}).get("governed_required_bundle_candidates") or []
+    )
+    if not candidates:
+        return list(paths)
+    parsed = {
+        "categories": copy.deepcopy(candidates),
+        "competencies": copy.deepcopy(candidates),
+        "claim_ledger": [],
+        "candidate_origin": "governed_required_bundle_baseline",
+    }
+    baseline = SelfConsistencyPath(
+        path_index=GOVERNED_COMPETENCIES_BASELINE_PATH_INDEX,
+        temperature=0.0,
+        runtime_generation_status="GOVERNED_GRAPH_BASELINE",
+        raw_output="",
+        parsed=parsed,
+        parse_error="",
+        provider_result=None,
+    )
+    return [*paths, baseline]
 
 
 SELECTOR_EMPTY_BLOCK_REASON = "selector_returned_no_candidates_above_threshold"
@@ -515,19 +552,41 @@ def _generate_competencies_graph_pool_lane(
         regen_note = ""
         if regen_round > 0 and not gate.ok:
             failed = list(gate.categories_below_threshold) + list(gate.categories_missing)
+            identity_issues = [
+                *(f"missing_bundle:{label}" for label in gate.bundle_ids_missing),
+                *(f"duplicate_bundle:{bundle_id}" for bundle_id in gate.duplicate_bundle_ids),
+                *(
+                    f"missing_taxonomy:{label}"
+                    for label in gate.taxonomy_category_ids_missing
+                ),
+                *(
+                    f"duplicate_taxonomy:{taxonomy_id}"
+                    for taxonomy_id in gate.duplicate_taxonomy_category_ids
+                ),
+                *(
+                    f"missing_capability_family:{family}"
+                    for family in gate.missing_capability_families
+                ),
+            ]
             regen_note = (
                 "REGEN ROUND: prior selection did not meet minimum score or category coverage. "
                 f"Re-score pool including new paths. Categories needing stronger winners: {', '.join(failed)}. "
+                f"Identity diversity defects: {', '.join(identity_issues) or 'none'}. "
                 f"Select {COMPETENCIES_MIN_CATEGORY_COUNT}-{COMPETENCIES_MAX_CATEGORY_COUNT} categories "
-                f"with score >= {min_score:.2f} and passes=true."
+                f"with score >= {min_score:.2f} and passes=true, using distinct competency_bundle_id "
+                "and taxonomy_category_id values."
             )
 
         _sel_started = datetime.now(timezone.utc).isoformat()
         _sel_t0 = time.monotonic()
+        selector_paths = _selector_paths_with_governed_competencies_baseline(
+            all_paths,
+            targeting_context,
+        )
         pool = run_claude_bullet_pool_selection(
             section_id=section_lane,
             slot_kind="competencies",
-            paths=all_paths,
+            paths=selector_paths,
             required_bullet_ids=None,
             targeting_context=targeting_context,
             artifact_dir=artifact_dir,

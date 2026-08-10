@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 from apps_rg.runtime.run_output_contract import L7_AUDIT_ABILITY_OUTPUT_MD
 
 L7_HOW_TRACE_JSON = "agentic_core_how_trace.json"

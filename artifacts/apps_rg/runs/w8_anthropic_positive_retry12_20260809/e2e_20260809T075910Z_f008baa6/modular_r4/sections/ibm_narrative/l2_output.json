@@ -1,0 +1,179 @@
+{
+  "run_id": "ibm_narrative_20260809_080432",
+  "section_id": "ibm_narrative",
+  "runtime_generation_status": "REAL_LLM",
+  "product_quality_status": "FAIL",
+  "ibm_header": {
+    "employer": "IBM",
+    "title": "Partner",
+    "location": "Edgewater, NJ",
+    "start_date": "2017-04",
+    "end_date": "2022-10",
+    "is_current": false,
+    "fact_id": "exp_ibm_001"
+  },
+  "narrative_sentence": "Championed AWS alliance and solution-architecture leadership at IBM, establishing BI-informed pipeline discipline that made executive alignment and repeatable enterprise modernization pursuits more consistent across complex, regulated financial-services client portfolios and partner ecosystems at scale.",
+  "selected_fact_plan": {
+    "role_episode_bundle_ids": [
+      "reb_ibm_aws_alliance_partner_cosell_gtm",
+      "reb_ibm_presales_solution_engineering",
+      "reb_ibm_data_modeling_bi_decision_support",
+      "reb_ibm_revenue_sales_target_execution"
+    ],
+    "theme_families": [
+      "alliance GTM",
+      "presales solutioning",
+      "decision-support BI",
+      "quota-aligned pipeline leadership"
+    ],
+    "mechanisms": [
+      "AWS",
+      "BI",
+      "pipeline"
+    ]
+  },
+  "claim_ledger": [
+    {
+      "claim_text": "Championed AWS alliance and solution-architecture leadership at IBM",
+      "source_fact_ids": [
+        "bul_ibm_001"
+      ]
+    },
+    {
+      "claim_text": "establishing BI-informed pipeline discipline that made executive alignment and repeatable enterprise modernization pursuits more consistent across complex, regulated financial-services client portfolios and partner ecosystems at scale",
+      "source_fact_ids": [
+        "bul_ibm_002"
+      ]
+    }
+  ],
+  "jd_alignment": {
+    "briefing_used_as_proof": false,
+    "jd_used_as_proof": false,
+    "selected_briefing_themes": [
+      "partner enablement",
+      "repeatable implementation patterns",
+      "enterprise adoption"
+    ],
+    "selected_jd_themes": [
+      "enterprise AI architecture",
+      "partnerships and joint solution design",
+      "technical delivery quality"
+    ],
+    "targeting_only": true,
+    "targeting_rationale": "Targeting themes emphasize the role's architecture, partner, and repeatability requirements without adding unsupported experience claims."
+  },
+  "gap_notes": [],
+  "change_log": [
+    {
+      "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+      "source_fact_ids": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm"
+      ],
+      "change": "Used alliance and AWS themes as the opening leadership through-line."
+    },
+    {
+      "role_episode_bundle_id": "reb_ibm_presales_solution_engineering",
+      "source_fact_ids": [
+        "reb_ibm_presales_solution_engineering"
+      ],
+      "change": "Paired solution-architecture leadership with the alliance theme."
+    },
+    {
+      "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support",
+      "source_fact_ids": [
+        "reb_ibm_data_modeling_bi_decision_support"
+      ],
+      "change": "Used BI-informed decision support as the operating mechanism."
+    },
+    {
+      "role_episode_bundle_id": "reb_ibm_revenue_sales_target_execution",
+      "source_fact_ids": [
+        "reb_ibm_revenue_sales_target_execution"
+      ],
+      "change": "Connected pipeline discipline to enterprise pursuit consistency without repeating a metric."
+    },
+    {
+      "operation": "align_ibm_narrative_claim_ledger_to_bul_ibm",
+      "reason": "graph_skills_authority_bul_ibm_x2_binding"
+    },
+    {
+      "operation": "decompose_ibm_narrative_claim_ledger_by_clause",
+      "reason": "clause_level_bul_ibm_theme_binding"
+    }
+  ],
+  "self_check": {
+    "exactly_one_sentence": true,
+    "ibm_anchor_once": true,
+    "candidate_name_omitted": true,
+    "unsupported_metrics_added": false,
+    "jd_or_briefing_used_as_proof": false,
+    "forbidden_terms_present": false,
+    "mechanism_token_present": true,
+    "narrative_word_count": 34
+  },
+  "prompt_id": "ibm_position_narrative_dispatch_v1",
+  "prompt_hash": "a85d101fb3c48c51",
+  "section_prompt_adapter": true,
+  "apps_rg_prompt_template_ref": "apps_rg/prompt_assembly/templates/ibm_position_narrative_v1.yaml",
+  "compiler_template_id": "strategic_tailor_v1",
+  "input_payload_hash": "ab221f1387af1752",
+  "judge_preflight_blocked": false,
+  "text_claim_coverage": {
+    "sentences": [
+      {
+        "sentence_index": 1,
+        "sentence_text": "Championed AWS alliance and solution-architecture leadership at IBM, establishing BI-informed pipeline discipline that made executive alignment and repeatable enterprise modernization pursuits more consistent across complex, regulated financial-services client portfolios and partner ecosystems at scale.",
+        "material_claims": [
+          {
+            "claim_text": "Championed AWS alliance and solution-architecture leadership at IBM",
+            "source_fact_ids": [
+              "bul_ibm_001"
+            ],
+            "support_status": "SUPPORTED",
+            "reason": "Mapped from claim_ledger."
+          },
+          {
+            "claim_text": "establishing BI-informed pipeline discipline that made executive alignment and repeatable enterprise modernization pursuits more consistent across complex, regulated financial-services client portfolios and partner ecosystems at scale",
+            "source_fact_ids": [
+              "bul_ibm_002"
+            ],
+            "support_status": "SUPPORTED",
+            "reason": "Mapped from claim_ledger."
+          }
+        ],
+        "sentence_pass": true
+      }
+    ],
+    "overall_pass": true
+  },
+  "product_quality_reason": "X2 failed gates: ['x2_ibm_narrative_claim_theme_coverage', 'x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets']",
+  "section_repair_ledger": "section_repair_ledger.json",
+  "authoritative_attempt_number": 1,
+  "authoritative_l2_source": "initial_llm",
+  "judge_required_for_proof": true,
+  "judge_tier": "STANDARD_REASONING",
+  "proof_eligible": false,
+  "generation_runtime_status": "REAL_LLM",
+  "mocked_provider_selected": false,
+  "proof_scope": "plumbing_only",
+  "proof_status": "NOT_PROOF_ELIGIBLE",
+  "authorization_scope": "PLUMBING_ONLY",
+  "test_only_mock_provider": false,
+  "runtime_certification": false,
+  "x1d_runtime_status": "MODEL_BACKED",
+  "judge_proof_eligible": false,
+  "required_judge_rows_missing": false,
+  "provider_proof_eligible": false,
+  "test_only_mock_judges": false,
+  "offline_contract_stub_used": false,
+  "artifact_namespace_class": "NON_PROOF_PLUMBING",
+  "runtime_generation_status_class": "REAL_LLM",
+  "allow_non_allow_exit_zero_cli": false,
+  "allow_test_mock_judges_hatch": false,
+  "proof_closeout_note": "",
+  "generation_class": "real_llm",
+  "judge_class": "model_backed",
+  "proof_class": "plumbing_only",
+  "certification_class": "runtime_slice_review",
+  "decisive_accounting_label": "FAIL"
+}

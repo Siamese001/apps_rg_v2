@@ -53,6 +53,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -61,7 +62,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 from apps_rg.cache.r1a_adapter import check_r1a_cache, compute_r1a_key, stamp_r1a_cache
 from apps_rg.runtime.cli_section_execution_report import (
     emit_cli_section_execution_summary,
@@ -464,6 +465,31 @@ _SECTION_PIN_MANIFEST_FILENAME = "section_pin_manifest.json"
 _SECTION_PIN_CLEANUP_RECEIPT_FILENAME = "section_pin_cleanup_receipt.json"
 _FRESH_E2E_ARTIFACT_DIR_RECEIPT_FILENAME = "fresh_e2e_artifact_dir_receipt.json"
 _FRESH_E2E_FACT_VECTOR_BOOTSTRAP_RECEIPT_FILENAME = "fresh_e2e_fact_vector_bootstrap_receipt.json"
+
+
+def _has_valid_sealed_stage_ledger(artifact_dir: Path) -> bool:
+    """Return whether closeout already made the stage ledger immutable."""
+
+    root = Path(artifact_dir)
+    seal_path = root / "e2e_stage_ledger_seal_receipt.json"
+    try:
+        seal = json.loads(seal_path.read_text(encoding="utf-8"))
+        ledger_ref = str(seal.get("ledger_ref") or "")
+        ledger_path = (root / ledger_ref).resolve()
+        expected = str(seal.get("ledger_sha256") or "")
+        root_resolved = root.resolve()
+        if (
+            seal.get("schema_version") != "apps_rg.e2e_stage_ledger_seal.v1"
+            or not ledger_ref
+            or ledger_path.parent != root_resolved
+            or not ledger_path.is_file()
+            or not expected.startswith("sha256:")
+        ):
+            return False
+        observed = "sha256:" + hashlib.sha256(ledger_path.read_bytes()).hexdigest()
+    except (OSError, json.JSONDecodeError, AttributeError, TypeError):
+        return False
+    return observed == expected
 _MANAGED_FULL_RESUME_E2E_ROUTE_FLAG = "APPS_RG_ENABLE_MANAGED_WORKFLOW_L0"
 
 
@@ -1018,7 +1044,73 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
             f"route_flag={fresh_e2e_receipt.get('managed_route_flag', '')}",
             flush=True,
         )
+        if not is_test_harness():
+            from apps_model_telemetry.otel_runtime import (
+                configure_otel_runtime,
+                verify_live_collector_receipt,
+            )
+
+            otel_status = configure_otel_runtime(
+                service_name="apps_e2e",
+                artifact_dir=Path(str(args.artifact_dir)),
+            )
+            if not otel_status.active:
+                from apps_rg.runtime.e2e_preflight import run_fresh_e2e_preflight
+
+                baseline_ref_text = str(
+                    os.environ.get("APPS_RG_E2E_BASELINE_REF")
+                    or "apps_rg/config/e2e_baselines/anthropic_partnership.v1.json"
+                )
+                preflight = run_fresh_e2e_preflight(
+                    artifact_dir=Path(str(args.artifact_dir)),
+                    e2e_run_id=Path(str(args.artifact_dir)).name,
+                    repo_root=_repo_root,
+                    baseline_ref=_resolve_e2e_baseline_ref(_repo_root, baseline_ref_text),
+                    initial_failure_code="OTEL_RUNTIME_UNAVAILABLE",
+                    initial_failure_detail=f"Verified OTel runtime unavailable: {otel_status.reason}",
+                )
+                print(
+                    "FRESH_E2E_PREFLIGHT status=BLOCKED "
+                    "failure_code=OTEL_RUNTIME_UNAVAILABLE "
+                    f"reason={otel_status.reason} run_dir={args.artifact_dir}",
+                    flush=True,
+                )
+                return preflight.exit_code
+            collector_receipt = verify_live_collector_receipt(
+                artifact_dir=Path(str(args.artifact_dir))
+            )
+            if collector_receipt.get("status") != "PASS":
+                from apps_rg.runtime.e2e_preflight import run_fresh_e2e_preflight
+
+                failure_code = str(
+                    collector_receipt.get("reason") or "COLLECTOR_UNAVAILABLE"
+                )
+                baseline_ref_text = str(
+                    os.environ.get("APPS_RG_E2E_BASELINE_REF")
+                    or "apps_rg/config/e2e_baselines/anthropic_partnership.v1.json"
+                )
+                preflight = run_fresh_e2e_preflight(
+                    artifact_dir=Path(str(args.artifact_dir)),
+                    e2e_run_id=Path(str(args.artifact_dir)).name,
+                    repo_root=_repo_root,
+                    baseline_ref=_resolve_e2e_baseline_ref(_repo_root, baseline_ref_text),
+                    initial_failure_code=failure_code,
+                    initial_failure_detail=(
+                        "The configured collector did not capture the per-run "
+                        "preflight marker."
+                    ),
+                )
+                print(
+                    "FRESH_E2E_PREFLIGHT status=BLOCKED "
+                    f"failure_code={failure_code} "
+                    f"run_dir={args.artifact_dir}",
+                    flush=True,
+                )
+                return preflight.exit_code
         from apps_rg.runtime.e2e_preflight import run_fresh_e2e_preflight
+        from apps_rg.runtime.standalone_dependency_posture import (
+            verify_external_agentic_core_runtime,
+        )
 
         baseline_ref_text = str(
             os.environ.get("APPS_RG_E2E_BASELINE_REF")
@@ -1029,6 +1121,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
             e2e_run_id=Path(str(args.artifact_dir)).name,
             repo_root=_repo_root,
             baseline_ref=_resolve_e2e_baseline_ref(_repo_root, baseline_ref_text),
+            dependency_check=lambda: verify_external_agentic_core_runtime(
+                repo_root=_repo_root
+            ),
             runtime_check=(
                 None
                 if is_test_harness()
@@ -1612,7 +1707,8 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
                     and (ad / "apps_rg_e2e_terminal_manifest.json").is_file()
                     and (ad / "apps_rg_pipeline_completion_receipt.json").is_file()
                 )
-                if not terminal_sealed and (
+                stage_ledger_sealed = _has_valid_sealed_stage_ledger(ad)
+                if not terminal_sealed and not stage_ledger_sealed and (
                     is_integrated_whole_run_artifact_dir(ad)
                     or result.get("full_run_section_status_md")
                 ):

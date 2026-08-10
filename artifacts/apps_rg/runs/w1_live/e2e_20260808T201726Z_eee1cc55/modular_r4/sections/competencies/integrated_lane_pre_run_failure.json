@@ -1,0 +1,54 @@
+{
+  "blocker": "EXECUTED_X3A_DENY_REROUTE",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T201726Z_eee1cc55\\modular_r4\\sections\\competencies",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:PoolSelectorUnavailableError:competencies selector unavailable: no parsed candidate paths; first failure: External provider call failed: TimeoutError: External provider wall-clock timeout after 240s [last_progress_after_s=229.828, chars_received=0, chunk_count=2]",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-79211e2172fe4dcc99dd46ebf2b9e6d9",
+    "run_id": "03fec6e4-7bfb-4d63-be7a-a7d0da5eb449",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "no resolvable run_dir pointer for lane 'competencies' under C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T201726Z_eee1cc55\\modular_r4\\sections",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/runs/w1_live/e2e_20260808T201726Z_eee1cc55/modular_r4/sections/competencies/real/<run_id>/",
+  "generated_at_utc": "2026-08-08T20:26:36.878558+00:00",
+  "integrated_run_id": "e2e_20260808T201726Z_eee1cc55",
+  "lane_exec_status": "dispatch_error:L2_EXECUTION_ERROR:PoolSelectorUnavailableError:competencies selector unavailable: no parsed candidate paths; first failure: External provider call failed: TimeoutError: External provider wall-clock timeout after 240s [last_progress_after_s=229.828, chars_received=0, chunk_count=2]",
+  "lane_id": "competencies",
+  "primary_failure": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T201726Z_eee1cc55\\modular_r4\\sections\\competencies",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:PoolSelectorUnavailableError:competencies selector unavailable: no parsed candidate paths; first failure: External provider call failed: TimeoutError: External provider wall-clock timeout after 240s [last_progress_after_s=229.828, chars_received=0, chunk_count=2]",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-79211e2172fe4dcc99dd46ebf2b9e6d9",
+    "run_id": "03fec6e4-7bfb-4d63-be7a-a7d0da5eb449",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/runs/w1_live/e2e_20260808T201726Z_eee1cc55/modular_r4/sections",
+  "status": "PRE_RUN_BLOCKED"
+}

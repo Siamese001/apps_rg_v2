@@ -1,4 +1,5 @@
 """Tests for RUN_BUNDLE_INDEX.json emission (apps_rg/run_bundle_index.py)."""
+
 from __future__ import annotations
 
 import json
@@ -42,18 +43,31 @@ def test_schema_integrated_and_lane(tmp_path: Path) -> None:
     int_dir = tmp_path / "artifacts" / "apps_rg" / "runs" / "cli_x"
     int_dir.mkdir(parents=True)
     (int_dir / "terminal_ret_packet.json").write_text("{}", encoding="utf-8")
-    idoc = build_integrated_run_bundle_document(repo, int_dir, run_id="a", correlation_id="a")
+    idoc = build_integrated_run_bundle_document(
+        repo, int_dir, run_id="a", correlation_id="a"
+    )
     assert_run_bundle_index_document_shape(idoc)
     assert idoc["bundle_kind"] == "integrated_run"
     for e in idoc["entries"]:
-        for ek in ("role", "relative_path", "content_type", "required", "exists", "producer"):
+        for ek in (
+            "role",
+            "relative_path",
+            "content_type",
+            "required",
+            "exists",
+            "producer",
+        ):
             assert ek in e
 
-    lane_dir = tmp_path / "artifacts" / "apps_rg" / "runtime_proofs" / "h" / "mock" / "z"
+    lane_dir = (
+        tmp_path / "artifacts" / "apps_rg" / "runtime_proofs" / "h" / "mock" / "z"
+    )
     lane_dir.mkdir(parents=True)
     (lane_dir / "run_manifest.json").write_text("{}", encoding="utf-8")
     (lane_dir / "l2_output.json").write_text("{}", encoding="utf-8")
-    ldoc = build_lane_runtime_proof_bundle_document(repo, lane_dir, lane="headline", run_id="z")
+    ldoc = build_lane_runtime_proof_bundle_document(
+        repo, lane_dir, lane="headline", run_id="z"
+    )
     assert_run_bundle_index_document_shape(ldoc)
     assert ldoc["lane"] == "headline"
 
@@ -67,7 +81,9 @@ def test_path_safety_root_and_entries_no_absolute_no_dup(tmp_path: Path) -> None
     out = run_dir / "outputs"
     out.mkdir()
     (out / "extra_out.json").write_text("{}", encoding="utf-8")
-    doc = build_integrated_run_bundle_document(repo, run_dir, run_id="s", correlation_id=None)
+    doc = build_integrated_run_bundle_document(
+        repo, run_dir, run_id="s", correlation_id=None
+    )
     _assert_repo_safe_posix(str(doc["root_path"]))
     rels: list[str] = []
     for e in doc["entries"]:
@@ -80,7 +96,9 @@ def test_path_safety_root_and_entries_no_absolute_no_dup(tmp_path: Path) -> None
     lane.mkdir(parents=True)
     (lane / "run_manifest.json").write_text("{}", encoding="utf-8")
     (lane / "l2_output.json").write_text("{}", encoding="utf-8")
-    ldoc = build_lane_runtime_proof_bundle_document(repo, lane, lane="executive_summary", run_id="r1")
+    ldoc = build_lane_runtime_proof_bundle_document(
+        repo, lane, lane="executive_summary", run_id="r1"
+    )
     _assert_repo_safe_posix(str(ldoc["root_path"]))
     lr = [str(e["relative_path"]) for e in ldoc["entries"]]
     assert len(lr) == len(set(lr))
@@ -99,6 +117,7 @@ def test_integrated_coverage_roles_when_files_present(tmp_path: Path) -> None:
         "r4_run_manifest.json": "{}",
         "agentic_core_l7_route_family_coverage.json": '{"summary":{}}',
         "agentic_core_how_trace.json": "{}",
+        "apps_rg_core_runtime_authority.json": "{}",
         "runtime_exhaust_bundle.json": "{}",
         "exit_review_packet.json": "{}",
         "FINAL_RESUME_OUTPUT.txt": "resume",
@@ -115,7 +134,9 @@ def test_integrated_coverage_roles_when_files_present(tmp_path: Path) -> None:
     outp.mkdir()
     (outp / "generated_resume.json").write_text("[]", encoding="utf-8")
     (outp / "resume.docx").write_text("x", encoding="utf-8")
-    doc = build_integrated_run_bundle_document(repo, d, run_id="full_i", correlation_id="full_i")
+    doc = build_integrated_run_bundle_document(
+        repo, d, run_id="full_i", correlation_id="full_i"
+    )
     by_role = {e["role"]: e for e in doc["entries"]}
     assert by_role["spine_terminal_ret_packet"]["exists"] is True
     assert by_role["narrative_run_report"]["exists"] is True
@@ -123,6 +144,8 @@ def test_integrated_coverage_roles_when_files_present(tmp_path: Path) -> None:
     assert by_role["spine_r4_run_manifest"]["exists"] is True
     assert by_role["audit_l7_route_family_coverage"]["exists"] is True
     assert by_role["audit_how_trace"]["exists"] is True
+    assert by_role["core_runtime_authority"]["exists"] is True
+    assert by_role["core_runtime_authority"]["required"] is True
     assert by_role["spine_runtime_exhaust"]["exists"] is True
     assert by_role["spine_exit_review_packet"]["exists"] is True
     assert by_role["product_resume_json_flat"]["exists"] is True
@@ -139,7 +162,15 @@ def test_integrated_coverage_roles_when_files_present(tmp_path: Path) -> None:
 
 def test_lane_coverage_roles_when_files_present(tmp_path: Path) -> None:
     repo = tmp_path
-    d = tmp_path / "artifacts" / "apps_rg" / "runtime_proofs" / "executive_summary" / "real" / "lr1"
+    d = (
+        tmp_path
+        / "artifacts"
+        / "apps_rg"
+        / "runtime_proofs"
+        / "executive_summary"
+        / "real"
+        / "lr1"
+    )
     d.mkdir(parents=True)
     names = (
         "run_manifest.json",
@@ -153,7 +184,9 @@ def test_lane_coverage_roles_when_files_present(tmp_path: Path) -> None:
     )
     for n in names:
         (d / n).write_text("{}", encoding="utf-8")
-    doc = build_lane_runtime_proof_bundle_document(repo, d, lane="executive_summary", run_id="lr1")
+    doc = build_lane_runtime_proof_bundle_document(
+        repo, d, lane="executive_summary", run_id="lr1"
+    )
     br = {e["role"]: e for e in doc["entries"]}
     assert br["lane_run_manifest"]["exists"] is True
     assert br["lane_l2_output"]["exists"] is True
@@ -174,8 +207,14 @@ def test_extras_indexed_once_under_root_and_outputs(tmp_path: Path) -> None:
     od = d / "outputs"
     od.mkdir()
     (od / "other.json").write_text("{}", encoding="utf-8")
-    doc = build_integrated_run_bundle_document(repo, d, run_id="ex", correlation_id=None)
-    paths = [e["relative_path"] for e in doc["entries"] if e["role"].startswith("integrated_emitted_")]
+    doc = build_integrated_run_bundle_document(
+        repo, d, run_id="ex", correlation_id=None
+    )
+    paths = [
+        e["relative_path"]
+        for e in doc["entries"]
+        if e["role"].startswith("integrated_emitted_")
+    ]
     assert len(paths) == len(set(paths))
     assert any(p.endswith("/zing.txt") or p.endswith("zing.txt") for p in paths)
     assert any("outputs/other.json" in p for p in paths)
@@ -185,7 +224,9 @@ def test_required_missing_shows_exists_false(tmp_path: Path) -> None:
     repo = tmp_path
     d = tmp_path / "artifacts" / "apps_rg" / "runs" / "empty_req"
     d.mkdir(parents=True)
-    doc = build_integrated_run_bundle_document(repo, d, run_id="empty_req", correlation_id=None)
+    doc = build_integrated_run_bundle_document(
+        repo, d, run_id="empty_req", correlation_id=None
+    )
     by_role = {e["role"]: e for e in doc["entries"]}
     for role in (
         "spine_terminal_ret_packet",
@@ -199,10 +240,18 @@ def test_required_missing_shows_exists_false(tmp_path: Path) -> None:
         assert by_role[role]["exists"] is False
     lane = tmp_path / "lane_min"
     lane.mkdir(parents=True)
-    ldoc = build_lane_runtime_proof_bundle_document(repo, lane, lane="headline", run_id="x")
+    ldoc = build_lane_runtime_proof_bundle_document(
+        repo, lane, lane="headline", run_id="x"
+    )
     br = {e["role"]: e for e in ldoc["entries"]}
-    assert br["lane_run_manifest"]["required"] is True and br["lane_run_manifest"]["exists"] is False
-    assert br["lane_l2_output"]["required"] is True and br["lane_l2_output"]["exists"] is False
+    assert (
+        br["lane_run_manifest"]["required"] is True
+        and br["lane_run_manifest"]["exists"] is False
+    )
+    assert (
+        br["lane_l2_output"]["required"] is True
+        and br["lane_l2_output"]["exists"] is False
+    )
 
 
 def test_headline_proof_strict_marks_core_bundle_paths_required(tmp_path: Path) -> None:
@@ -212,11 +261,21 @@ def test_headline_proof_strict_marks_core_bundle_paths_required(tmp_path: Path) 
     )
 
     repo = tmp_path
-    lane = tmp_path / "artifacts" / "apps_rg" / "runtime_proofs" / "headline" / "real" / "r_strict"
+    lane = (
+        tmp_path
+        / "artifacts"
+        / "apps_rg"
+        / "runtime_proofs"
+        / "headline"
+        / "real"
+        / "r_strict"
+    )
     lane.mkdir(parents=True)
     (lane / "run_manifest.json").write_text("{}", encoding="utf-8")
     (lane / "l2_output.json").write_text("{}", encoding="utf-8")
-    doc_loose = build_lane_runtime_proof_bundle_document(repo, lane, lane="headline", run_id="r_strict")
+    doc_loose = build_lane_runtime_proof_bundle_document(
+        repo, lane, lane="headline", run_id="r_strict"
+    )
     doc_strict = build_lane_runtime_proof_bundle_document(
         repo, lane, lane="headline", run_id="r_strict", proof_contract_strict=True
     )
@@ -239,7 +298,9 @@ def test_headline_proof_strict_marks_core_bundle_paths_required(tmp_path: Path) 
         assert row["producer"] == _CANONICAL_HEADLINE_PRODUCER
 
 
-def test_emit_integrated_logs_on_write_oserror(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_emit_integrated_logs_on_write_oserror(
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     caplog.set_level(logging.WARNING, logger="apps_rg.runtime.run_bundle_index")
 
     def boom(*_a: object, **_k: object) -> None:
@@ -261,7 +322,9 @@ def test_finalize_runtime_proof_emits_index(tmp_path: Path) -> None:
     lane_root = repo / "artifacts" / "apps_rg" / "runtime_proofs" / lane
     ad = lane_root / "mock" / "t_final"
     ad.mkdir(parents=True)
-    (ad / "l2_output.json").write_text('{"runtime_generation_status":"MOCKED"}', encoding="utf-8")
+    (ad / "l2_output.json").write_text(
+        '{"runtime_generation_status":"MOCKED"}', encoding="utf-8"
+    )
 
     (ad / "l6_shadow_eval_package.json").write_text("{}", encoding="utf-8")
     finalize_runtime_proof_run(
@@ -280,10 +343,22 @@ def test_finalize_runtime_proof_emits_index(tmp_path: Path) -> None:
     assert "l2_output.json" in mf["artifact_links"]
     assert "l6_shadow_eval_package.json" in mf["artifact_links"]
     assert mf["l2_output_repo_relative"].endswith("/mock/t_final/l2_output.json")
-    assert mf["l6_shadow_eval_package_repo_relative"].endswith("/mock/t_final/l6_shadow_eval_package.json")
-    ptr_path = repo / "artifacts" / "apps_rg" / "runtime_proofs" / lane / "latest_mock_run.json"
+    assert mf["l6_shadow_eval_package_repo_relative"].endswith(
+        "/mock/t_final/l6_shadow_eval_package.json"
+    )
+    ptr_path = (
+        repo
+        / "artifacts"
+        / "apps_rg"
+        / "runtime_proofs"
+        / lane
+        / "latest_mock_run.json"
+    )
     ptr = json.loads(ptr_path.read_text(encoding="utf-8"))
-    assert ptr["l6_shadow_eval_package_repo_relative"] == mf["l6_shadow_eval_package_repo_relative"]
+    assert (
+        ptr["l6_shadow_eval_package_repo_relative"]
+        == mf["l6_shadow_eval_package_repo_relative"]
+    )
 
     idx = ad / RUN_BUNDLE_INDEX_FILENAME
     assert idx.is_file()
@@ -293,7 +368,8 @@ def test_finalize_runtime_proof_emits_index(tmp_path: Path) -> None:
 
 
 def test_finalize_does_not_fail_when_index_write_oserror(
-    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     """OSError on index write is logged; run_manifest and pointers still finalize."""
     from apps_rg.runtime.runtime_proof_layout import finalize_runtime_proof_run
 
@@ -308,7 +384,9 @@ def test_finalize_does_not_fail_when_index_write_oserror(
     lane = "headline"
     ad = repo / "artifacts" / "apps_rg" / "runtime_proofs" / lane / "mock" / "t_bo"
     ad.mkdir(parents=True)
-    (ad / "l2_output.json").write_text('{"runtime_generation_status":"MOCKED"}', encoding="utf-8")
+    (ad / "l2_output.json").write_text(
+        '{"runtime_generation_status":"MOCKED"}', encoding="utf-8"
+    )
 
     finalize_runtime_proof_run(
         repo,
@@ -341,7 +419,9 @@ def test_emit_integrated_writes_file(tmp_path: Path) -> None:
 def test_render_run_summary_succeeds_on_fixture_dir(tmp_path: Path) -> None:
     run_dir = tmp_path / "fixture_run"
     run_dir.mkdir()
-    (run_dir / "terminal_ret_packet.json").write_text('{"payload":{}}', encoding="utf-8")
+    (run_dir / "terminal_ret_packet.json").write_text(
+        '{"payload":{}}', encoding="utf-8"
+    )
     (run_dir / "run_report.json").write_text("{}", encoding="utf-8")
     (run_dir / "r4_run_manifest.json").write_text("{}", encoding="utf-8")
     (run_dir / "runtime_identity_envelope.json").write_text("{}", encoding="utf-8")
@@ -349,7 +429,9 @@ def test_render_run_summary_succeeds_on_fixture_dir(tmp_path: Path) -> None:
     repo_root = Path(__file__).resolve().parents[3]
     script = repo_root / "tools" / "apps_rg" / "render_run_summary.py"
     if not script.is_file():
-        pytest.skip("standalone source baseline excludes the monorepo run-summary renderer")
+        pytest.skip(
+            "standalone source baseline excludes the monorepo run-summary renderer"
+        )
     proc = subprocess.run(
         [sys.executable, str(script), str(run_dir)],
         cwd=str(repo_root),

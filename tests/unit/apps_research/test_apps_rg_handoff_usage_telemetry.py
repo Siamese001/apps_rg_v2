@@ -6,17 +6,22 @@ from pathlib import Path
 from agentic_core.L3_orchestration.exit_eval.dimension import Dimension, GraderClass
 from agentic_core.L3_orchestration.exit_eval.graders.llm_judge import JudgeResponse
 from apps_model_telemetry.external_model_usage import LEDGER_FILENAME
+from apps_research.config.model_pins import apps_rg_handoff_judge_pin
 from apps_research.integrations.apps_rg_handoff import (
     _AppsRgTargetingBriefGoogleJudge,
     run_apps_rg_handoff_x2_judge,
 )
 
 
+_JUDGE_PIN = apps_rg_handoff_judge_pin()
+
+
 class _UsageReportingJudge:
+    observed_model = _JUDGE_PIN.model
     model_usage_attempts = [
         {
-            "provider": "gemini_pro",
-            "model": "gemini-3.1-pro-preview",
+            "provider": _JUDGE_PIN.provider,
+            "model": _JUDGE_PIN.model,
             "response_id": "response-1",
             "prompt_tokens": 100,
             "output_tokens": 50,
@@ -64,13 +69,13 @@ def test_google_x2_usage_is_appended_to_a_bound_run_ledger(
     tmp_path: Path,
 ) -> None:
     judge = _AppsRgTargetingBriefGoogleJudge(
-        model="gemini-3.1-pro-preview",
+        model=_JUDGE_PIN.model,
         api_key="test-key",
         usage_artifact_dir=tmp_path,
     )
     raw = {
         "responseId": "gemini-response-1",
-        "modelVersion": "gemini-3.1-pro-preview",
+        "modelVersion": _JUDGE_PIN.model,
         "usageMetadata": {
             "promptTokenCount": 101,
             "candidatesTokenCount": 21,
@@ -98,7 +103,7 @@ def test_google_x2_usage_is_appended_to_a_bound_run_ledger(
             return False
 
     monkeypatch.setattr(
-        "apps_research.integrations.apps_rg_handoff.urllib.request.urlopen",
+        "apps_research.integrations.provider_gateway.urllib.request.urlopen",
         lambda _request, timeout: _Response(),
     )
 
@@ -119,9 +124,19 @@ def test_google_x2_usage_is_appended_to_a_bound_run_ledger(
     )
 
     assert response.score == 0.91
-    event = json.loads((tmp_path / LEDGER_FILENAME).read_text(encoding="utf-8").strip())
-    assert event["provider"] == "gemini_pro"
+    events = [
+        json.loads(line)
+        for line in (tmp_path / LEDGER_FILENAME).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    event = next(row for row in events if row["outcome"] == "SUCCESS")
+    assert event["provider"] == _JUDGE_PIN.provider
     assert event["prompt_tokens"] == 101
     assert event["thought_tokens"] == 13
     assert event["total_tokens"] == 135
     assert "Company Thesis" not in json.dumps(event)
+    lifecycle = [row for row in events if row.get("evidence_event")]
+    assert lifecycle[-1]["remote_outcome"] == "PROVIDER_RESPONDED"
+    assert lifecycle[-1]["response_headers_received"] is True
+    assert lifecycle[-1]["first_byte_received"] is True
+    assert all(row["request_bytes_sent"] is False for row in lifecycle)

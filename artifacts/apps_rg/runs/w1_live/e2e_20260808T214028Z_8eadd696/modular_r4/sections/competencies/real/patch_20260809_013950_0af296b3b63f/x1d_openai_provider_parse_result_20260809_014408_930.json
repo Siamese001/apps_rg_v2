@@ -1,0 +1,107 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 2.3,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "Six entries yield only four unique categories because S1/S5 and S3/S6 duplicate.",
+      "The required partner-applied AI architecture category is absent; S1 offers only generic partner and GTM wording.",
+      "S1 combines agentic architecture, presales, negotiation, quota execution, and partner GTM.",
+      "S2 misclassifies customer success and deal support as governance and runtime control.",
+      "The taxonomy repeatedly draws from the same Unify platform, routing, and observability surfaces.",
+      "Generic labels and the phrase \"framework for partners\" weaken recruiter clarity and AI authenticity."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      3,
+      5,
+      6
+    ],
+    "remediation_suggestions": [
+      "Consolidate duplicates and retain six to eight distinct categories.",
+      "Add a dedicated Unify or IBM rooted partner AI architecture category with mechanism and deployment outcome.",
+      "Separate commercial execution and customer value capabilities from technical governance.",
+      "Broaden proof surfaces without repeating platform routing and observability language."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_QUERY_CLUSTERS",
+          "REPEATED_PROOF_SURFACES"
+        ]
+      },
+      "seniority_executive_relevance": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "INSUFFICIENT_UNIQUE_BREADTH",
+          "MIXED_CAPABILITY_LEVELS"
+        ]
+      },
+      "complementarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "SUMMARY_SURFACE_REUSE",
+          "UNIFY_SURFACE_CONCENTRATION"
+        ]
+      },
+      "no_bullet_restatement": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_TEMPLATE_GROUPS",
+          "GENERIC_PARTNER_PHRASING"
+        ]
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_LABELS",
+          "CATEGORY_TERM_MISMATCH",
+          "FOUR_UNIQUE_CATEGORIES"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "GENERIC_COMMERCIAL_TERMS",
+          "INCONSISTENT_AGENTIC_DEPTH"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MISSING_PARTNER_ARCHITECTURE_CATEGORY",
+          "NO_MECHANISM_OUTCOME_PAIR"
+        ]
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_013950_0af296b3b63f\\x1d_openai_provider_response_raw_20260809_014408_928.json",
+  "original_model": null,
+  "fallback_model": null
+}

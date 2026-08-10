@@ -1,0 +1,215 @@
+{
+  "boundary": "terminal_closeout",
+  "bytes_read": 121193,
+  "checkpoint_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry10_20260809\\e2e_20260809T073104Z_c0030da0\\otel_collector_checkpoint.json",
+  "collector_generation": 0,
+  "collector_source": "C:\\Git\\Agentic-Workflow-FRESH\\artifacts\\otel_collector_export\\spans.json",
+  "collector_source_configured": true,
+  "exporter_endpoint_configured": true,
+  "offset_end": 1865966,
+  "offset_start": 1744773,
+  "rotation_detected": false,
+  "runtime_active": true,
+  "schema_version": "apps.otel_trace_snapshot.v3",
+  "spans": [
+    {
+      "attributes": [
+        {
+          "key": "attempt.id",
+          "value": {
+            "stringValue": "attempt-255010ed53d4454db2c9f38e4707e0c4"
+          }
+        },
+        {
+          "key": "attempt.logical_id",
+          "value": {
+            "stringValue": "2b94c62e-39fe-43df-a99b-63d972ca1773:logical:2"
+          }
+        },
+        {
+          "key": "attempt.transport_id",
+          "value": {
+            "stringValue": "2b94c62e-39fe-43df-a99b-63d972ca1773:logical:2:transport:1"
+          }
+        },
+        {
+          "key": "attempt.logical_index",
+          "value": {
+            "intValue": "2"
+          }
+        },
+        {
+          "key": "attempt.transport_index",
+          "value": {
+            "intValue": "1"
+          }
+        },
+        {
+          "key": "app.id",
+          "value": {
+            "stringValue": "apps_research"
+          }
+        },
+        {
+          "key": "run.id",
+          "value": {
+            "stringValue": "2b94c62e-39fe-43df-a99b-63d972ca1773"
+          }
+        },
+        {
+          "key": "trace.root",
+          "value": {
+            "stringValue": "abeb27b6-8900-4756-8053-cb6897803280"
+          }
+        },
+        {
+          "key": "stage",
+          "value": {
+            "stringValue": "L2.X2_research_semantic_gate"
+          }
+        },
+        {
+          "key": "section.id",
+          "value": {
+            "stringValue": "X2"
+          }
+        },
+        {
+          "key": "provider",
+          "value": {
+            "stringValue": "google_gemini"
+          }
+        },
+        {
+          "key": "model.requested",
+          "value": {
+            "stringValue": "gemini-3.6-flash"
+          }
+        },
+        {
+          "key": "model.observed",
+          "value": {
+            "stringValue": "gemini-3.6-flash"
+          }
+        },
+        {
+          "key": "request.digest",
+          "value": {
+            "stringValue": "db86ca540ba1ec9c32fc38fdf9a3d85016d6857ab4b18a404a5428ff671aa3c8"
+          }
+        },
+        {
+          "key": "local.dispatch_started",
+          "value": {
+            "boolValue": true
+          }
+        },
+        {
+          "key": "request.bytes_sent",
+          "value": {
+            "boolValue": true
+          }
+        },
+        {
+          "key": "request.bytes_count",
+          "value": {
+            "intValue": "283"
+          }
+        },
+        {
+          "key": "request.bytes_proof",
+          "value": {
+            "stringValue": "http.client.HTTPSConnection.send_after_socket_sendall"
+          }
+        },
+        {
+          "key": "response.headers_received",
+          "value": {
+            "boolValue": true
+          }
+        },
+        {
+          "key": "response.first_byte_received",
+          "value": {
+            "boolValue": true
+          }
+        },
+        {
+          "key": "response.sdk_returned",
+          "value": {
+            "boolValue": false
+          }
+        },
+        {
+          "key": "response.id",
+          "value": {
+            "stringValue": "1Sx4asWMNsLBqtsP0NajwQQ"
+          }
+        },
+        {
+          "key": "http.status_code",
+          "value": {
+            "intValue": "200"
+          }
+        },
+        {
+          "key": "remote.outcome",
+          "value": {
+            "stringValue": "PROVIDER_RESPONDED"
+          }
+        }
+      ],
+      "endTimeUnixNano": "1786260698416322400",
+      "events": [
+        {
+          "name": "ATTEMPT_STARTED",
+          "timeUnixNano": "1786260694219157600"
+        },
+        {
+          "name": "LOCAL_DISPATCH_STARTED",
+          "timeUnixNano": "1786260694219157600"
+        },
+        {
+          "attributes": [
+            {
+              "key": "byte_count",
+              "value": {
+                "stringValue": "283"
+              }
+            },
+            {
+              "key": "proof_source",
+              "value": {
+                "stringValue": "http.client.HTTPSConnection.send_after_socket_sendall"
+              }
+            }
+          ],
+          "name": "REQUEST_BYTES_SENT",
+          "timeUnixNano": "1786260694413500900"
+        },
+        {
+          "name": "RESPONSE_HEADERS_RECEIVED",
+          "timeUnixNano": "1786260698415674900"
+        },
+        {
+          "name": "FIRST_BYTE_RECEIVED",
+          "timeUnixNano": "1786260698416322400"
+        },
+        {
+          "name": "ATTEMPT_FINISHED",
+          "timeUnixNano": "1786260698416322400"
+        }
+      ],
+      "flags": 256,
+      "kind": 1,
+      "name": "apps.model.provider_attempt",
+      "parentSpanId": "",
+      "spanId": "3674ef6ea8b2b2ef",
+      "startTimeUnixNano": "1786260694219157600",
+      "status": {},
+      "traceId": "b8ea97285c8f0adf492a1d7396efc98f"
+    }
+  ],
+  "status": "CAPTURED",
+  "trace_id": "abeb27b6-8900-4756-8053-cb6897803280"
+}

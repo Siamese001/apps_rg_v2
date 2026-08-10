@@ -1,0 +1,61 @@
+{
+  "artifact_hash": "sha256:04a026e155a7826e6f9c2ce7bf15567db65a3671c3f6047cdfa2b44aaba57066",
+  "payload": {
+    "executed": true,
+    "fault": "",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-fcb3bc73fd2447a6b8cd4927abf3e8ec",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "d2a05e3f-1191-4072-bee7-dcbc44f387b6",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:97342cfe1461572551a6950e44efb2859ada72bdb67a94e6593b2f7b5953f1f3",
+    "status": "PASS",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.005,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 13899.611,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.005,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "BYPASSED",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "trace-7b0d46d964cb4b66a136ed1a47ca60ed"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:97342cfe1461572551a6950e44efb2859ada72bdb67a94e6593b2f7b5953f1f3"
+}

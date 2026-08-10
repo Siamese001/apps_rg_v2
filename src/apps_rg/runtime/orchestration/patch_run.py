@@ -27,6 +27,7 @@ clear error (exit 2) when inputs cannot be derived.
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import uuid
 from collections import Counter
@@ -43,8 +44,151 @@ from apps_rg.runtime.runtime_proof_layout import (
 )
 
 PATCH_RUN_RECEIPT_ARTIFACT = "patch_run_receipt.json"
+PATCH_RUN_PREFLIGHT_ARTIFACT = "patch_run_preflight_receipt.json"
 _WHOLE_RUN_ENVELOPE_ENV = "APPS_RG_WHOLE_RUN_ENVELOPE"
 _CORRELATED_CLI_RUN_ENV = "APPS_RG_CORRELATED_CLI_RUN"
+
+
+def _whole_resume_graph_env_for_patch(run_dir: Path) -> dict[str, str]:
+    """Restore the immutable whole-run graph allocation for patch lanes.
+
+    The integrated runner freezes section source plans before dispatch and
+    exposes them through process-local environment variables. A later
+    ``--patch-run`` is a new process, so those variables no longer exist even
+    though their governed artifacts remain in the run bundle. Falling back to
+    fresh section selection can choose different roots and makes the patched
+    lane disagree with the original allocation. Rebind the persisted bundle;
+    if a bundle exists only partially, fail closed instead of mixing frozen and
+    reselected authority.
+    """
+
+    from apps_rg.runtime.c0.graph_skill_embedding_allocation import (
+        GRAPH_SKILL_EMBEDDING_ALLOWLISTS_ENV,
+    )
+    from apps_rg.runtime.c0.resume_graph_allocation import (
+        ALLOCATION_PLAN_ENV,
+        ALLOCATION_USAGE_LEDGER_ENV,
+        SECTION_EVIDENCE_CONTRACTS_ENV,
+        SECTION_SOURCE_PLANS_ENV,
+        load_resume_graph_allocation_plan,
+    )
+
+    allocation_dir = run_dir / "modular_r4" / "resume_graph_allocation"
+    required = {
+        ALLOCATION_PLAN_ENV: allocation_dir / "resume_graph_allocation_plan.json",
+        ALLOCATION_USAGE_LEDGER_ENV: allocation_dir / "resume_graph_usage_ledger.json",
+        SECTION_EVIDENCE_CONTRACTS_ENV: (
+            allocation_dir / "section_final_graph_evidence_contracts.json"
+        ),
+        SECTION_SOURCE_PLANS_ENV: allocation_dir / "c03_section_graph_plans.json",
+    }
+    present = {name: path for name, path in required.items() if path.is_file()}
+    if not present:
+        return {}
+    missing = sorted(name for name in required if name not in present)
+    if missing:
+        raise PatchRunInputError(
+            "patch-run whole-resume graph allocation bundle is incomplete; missing "
+            + ", ".join(missing)
+        )
+
+    # Validate the digest-bound allocation and the JSON shape of every paired
+    # authority artifact before any lane is dispatched.
+    load_resume_graph_allocation_plan(required[ALLOCATION_PLAN_ENV])
+    malformed = [
+        path.name
+        for name, path in required.items()
+        if name != ALLOCATION_PLAN_ENV and _load_json(path) is None
+    ]
+    if malformed:
+        raise PatchRunInputError(
+            "patch-run whole-resume graph allocation artifacts are malformed: "
+            + ", ".join(sorted(malformed))
+        )
+
+    bindings = {name: str(path.resolve()) for name, path in required.items()}
+    embedding_allowlists = (
+        run_dir
+        / "modular_r4"
+        / "graph_skill_embedding_allocation"
+        / "lane_graph_skill_embedding_allowlists.json"
+    )
+    if embedding_allowlists.is_file():
+        if _load_json(embedding_allowlists) is None:
+            raise PatchRunInputError(
+                "patch-run graph skill embedding allowlists artifact is malformed"
+            )
+        bindings[GRAPH_SKILL_EMBEDDING_ALLOWLISTS_ENV] = str(
+            embedding_allowlists.resolve()
+        )
+    return bindings
+
+
+def _whole_resume_graph_rollup_authority(
+    *,
+    repo: Path,
+    run_dir: Path,
+) -> dict[str, Any]:
+    """Rehydrate persisted whole-run graph identity at the aggregation boundary.
+
+    Restoring process environment is sufficient for re-dispatched lanes, but the
+    final W7 reconciliation reads the generated rollup. A patch aggregation must
+    therefore carry the same frozen plan digest and artifact references that the
+    original full-run aggregator emits. Existing W6 authority is preserved only
+    when it was already present; this function never creates release authority.
+    """
+    from apps_rg.runtime.c0.resume_graph_allocation import (
+        ALLOCATION_PLAN_ENV,
+        ALLOCATION_USAGE_LEDGER_ENV,
+        SECTION_EVIDENCE_CONTRACTS_ENV,
+        SECTION_SOURCE_PLANS_ENV,
+    )
+
+    bindings = _whole_resume_graph_env_for_patch(run_dir)
+    if not bindings:
+        return {}
+    plan = _load_json(Path(bindings[ALLOCATION_PLAN_ENV]))
+    if not isinstance(plan, dict):
+        raise PatchRunInputError("patch-run allocation plan became unreadable")
+    digest = str(plan.get("allocation_plan_digest") or "").strip()
+    if not digest:
+        raise PatchRunInputError("patch-run allocation plan digest is missing")
+
+    def _ref(env_name: str) -> str:
+        path = Path(bindings[env_name]).resolve()
+        try:
+            return path.relative_to(repo.resolve()).as_posix()
+        except ValueError:
+            return str(path)
+
+    authority: dict[str, Any] = {
+        "resume_graph_allocation_plan_digest": digest,
+        "resume_graph_allocation_refs": {
+            "allocation_plan": _ref(ALLOCATION_PLAN_ENV),
+            "usage_ledger": _ref(ALLOCATION_USAGE_LEDGER_ENV),
+            "section_final_evidence_contracts": _ref(
+                SECTION_EVIDENCE_CONTRACTS_ENV
+            ),
+            "section_plans": _ref(SECTION_SOURCE_PLANS_ENV),
+        },
+    }
+
+    inventory = _load_json(run_dir / "modular_r4" / "phase1_lane_inventory.json") or {}
+    for key in (
+        "graph_skill_embeddings_required",
+        "graph_skill_embedding_allowlists_digest",
+        "graph_skill_embedding_runtime_refs",
+    ):
+        if key in inventory:
+            authority[key] = inventory[key]
+
+    prior_rollup = _load_json(
+        run_dir / "modular_r4" / "generated_lane_rollup" / "generated_lane_rollup.json"
+    ) or {}
+    prior_w6 = prior_rollup.get("resume_graph_w6_release_evidence")
+    if isinstance(prior_w6, dict):
+        authority["resume_graph_w6_release_evidence"] = dict(prior_w6)
+    return authority
 
 # CLI flags whose values we re-derive from a persisted lane ``run_manifest.json`` command.
 _COMMAND_FLAGS_OF_INTEREST = (
@@ -79,6 +223,46 @@ class PatchRunInputError(Exception):
     exit_code = 2
 
 
+def _run_patch_runtime_preflight(
+    run_dir: Path,
+    *,
+    environ: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Fail before lane dispatch when route-signing configuration is absent."""
+
+    env = environ if environ is not None else os.environ
+    test_mode = str(env.get("APPS_RG_TEST_HARNESS") or "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    } or bool(str(env.get("PYTEST_CURRENT_TEST") or "").strip())
+    unsigned_test = str(env.get("APPS_RG_ROUTE_SIGNING_POSTURE") or "").strip().lower() == (
+        "unsigned_test"
+    )
+    secret_present = bool(str(env.get("APPS_RG_ROUTE_HMAC_SECRET") or "").strip())
+    required = not test_mode and not unsigned_test
+    missing = ["APPS_RG_ROUTE_HMAC_SECRET"] if required and not secret_present else []
+    receipt = {
+        "schema_version": "apps_rg_patch_run_preflight_v1",
+        "generated_at_utc": _utc_now(),
+        "status": "BLOCKED" if missing else "PASS",
+        "dispatch_eligible": not missing,
+        "route_signing_required": required,
+        "route_signing_secret_present": secret_present,
+        "route_signing_key_id_present": bool(
+            str(env.get("APPS_RG_ROUTE_HMAC_KEY_ID") or "").strip()
+        ),
+        "missing_environment_variables": missing,
+        "secret_material_recorded": False,
+    }
+    _write_json(Path(run_dir) / PATCH_RUN_PREFLIGHT_ARTIFACT, receipt)
+    if missing:
+        raise PatchRunInputError(
+            "patch-run preflight blocked before lane dispatch: missing "
+            + ", ".join(missing)
+        )
+    return receipt
+
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -91,6 +275,40 @@ def _load_json(path: Path) -> dict[str, Any] | None:
     except (OSError, json.JSONDecodeError):
         return None
     return raw if isinstance(raw, dict) else None
+
+
+def _patch_canonical_run_identity(run_dir: Path) -> dict[str, Any]:
+    """Revalidate the persisted fresh-E2E identity for a new patch process."""
+
+    path = Path(run_dir) / "e2e_preflight_product_entry_receipt.json"
+    if not path.is_file():
+        return {}
+    receipt = _load_json(path)
+    if not isinstance(receipt, dict) or receipt.get("status") != "PASS":
+        raise PatchRunInputError("patch-run canonical product-entry receipt is invalid")
+    identity = receipt.get("identity")
+    if not isinstance(identity, dict):
+        raise PatchRunInputError("patch-run canonical product identity is missing")
+    from apps_rg.runtime.orchestration.canonical_identity_context import (
+        validate_canonical_run_identity,
+    )
+
+    try:
+        normalized = validate_canonical_run_identity(identity)
+    except ValueError as exc:
+        raise PatchRunInputError(str(exc)) from exc
+    computed = "sha256:" + hashlib.sha256(
+        json.dumps(
+            normalized,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            default=str,
+        ).encode("utf-8")
+    ).hexdigest()
+    if str(receipt.get("identity_sha256") or "") != computed:
+        raise PatchRunInputError("patch-run canonical product identity digest mismatch")
+    return normalized
 
 
 def _write_json(path: Path, data: Any) -> None:
@@ -520,6 +738,62 @@ def derive_patch_targeting(repo: Path, run_dir: Path) -> PatchTargeting:
 # --------------------------------------------------------------------- lane states
 
 
+def _whole_resume_graph_digest_for_run(run_dir: Path) -> str:
+    """Return the frozen whole-resume allocation digest, when this run has one."""
+
+    plan = _load_json(
+        Path(run_dir)
+        / "modular_r4"
+        / "resume_graph_allocation"
+        / "resume_graph_allocation_plan.json"
+    )
+    if not isinstance(plan, dict):
+        return ""
+    return str(plan.get("allocation_plan_digest") or "").strip()
+
+
+def _lane_matches_frozen_graph_authority(
+    lane_run_dir: Path,
+    *,
+    expected_digest: str,
+) -> tuple[bool, str]:
+    """Require a lane's final visible claims to bind to the run's frozen plan.
+
+    Per-lane X3 authorization proves section quality, but it does not prove
+    that a banked lane belongs to the current whole-resume allocation.  Patch
+    runs previously treated stale/missing graph bindings as green and later
+    failed only at W7 aggregation.  When a whole-resume plan exists, banking is
+    valid only with the final claim-binding contract for that exact digest.
+    """
+
+    if not expected_digest:
+        return True, "whole_resume_graph_not_active"
+    contract = _load_json(Path(lane_run_dir) / "graph_claim_bindings.json")
+    if not isinstance(contract, dict):
+        return False, "frozen_graph_claim_binding_missing"
+    observed_digest = str(contract.get("allocation_plan_digest") or "").strip()
+    if observed_digest != expected_digest:
+        return (
+            False,
+            "frozen_graph_allocation_digest_mismatch:"
+            f"expected={expected_digest}:observed={observed_digest or 'missing'}",
+        )
+    if contract.get("active") is not True:
+        return False, "frozen_graph_claim_binding_inactive"
+    if contract.get("pass") is not True or str(contract.get("status") or "") != "PASS":
+        failures = ",".join(str(x) for x in (contract.get("failure_reasons") or []))
+        return False, f"frozen_graph_claim_binding_nonpass:{failures or 'unspecified'}"
+    claim_count = int(contract.get("claim_count") or 0)
+    bound_claim_count = int(contract.get("bound_claim_count") or 0)
+    if claim_count <= 0 or bound_claim_count != claim_count:
+        return (
+            False,
+            "frozen_graph_claim_binding_incomplete:"
+            f"claims={claim_count}:bound={bound_claim_count}",
+        )
+    return True, "ok"
+
+
 def classify_lane_state(repo: Path, run_dir: Path, lane: str) -> dict[str, Any]:
     """Classify one lane's current state from on-disk evidence (env-independent).
 
@@ -552,13 +826,27 @@ def classify_lane_state(repo: Path, run_dir: Path, lane: str) -> dict[str, Any]:
             ok, reason = lane_run_dir_meets_product_bar(rd)
             x3 = _lane_x3_from_artifact_dir(rd) or "UNKNOWN"
             if ok:
+                graph_ok, graph_reason = _lane_matches_frozen_graph_authority(
+                    rd,
+                    expected_digest=_whole_resume_graph_digest_for_run(run_dir),
+                )
+                if graph_ok:
+                    out.update(
+                        {
+                            "authorized": True,
+                            "state": f"AUTHORIZED:{x3}",
+                            "run_dir": str(rd),
+                            "run_id": str(ptr.get("run_id") or rd.name),
+                            "reason": "ok",
+                        }
+                    )
+                    return out
                 out.update(
                     {
-                        "authorized": True,
-                        "state": f"AUTHORIZED:{x3}",
+                        "state": "STALE_WHOLE_RESUME_GRAPH_AUTHORITY",
                         "run_dir": str(rd),
                         "run_id": str(ptr.get("run_id") or rd.name),
-                        "reason": "ok",
+                        "reason": graph_reason,
                     }
                 )
                 return out
@@ -729,11 +1017,21 @@ def _patch_lane_attempt_artifact_dir(plan: PatchPlan, lane: str) -> Path:
     ``real/`` preserves both attempts and keeps the write-amplification guard
     meaningful instead of weakening it.
     """
-    attempt_id = (
-        f"patch_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_"
-        f"{uuid.uuid4().hex[:12]}"
+    # Keep the immutable child name deliberately short. Fresh E2E run roots can
+    # already put ordinary lane artifacts near the legacy Windows MAX_PATH
+    # boundary; the old 34-character ``patch_<timestamp>_<uuid>`` suffix made
+    # ``section_front_spine_receipt.json`` land at exactly 260 characters and
+    # fail before provider dispatch. Six random hex digits are collision-safe
+    # for this bounded local retry set, and the loop preserves immutability.
+    attempt_root = plan.run_dir / "modular_r4" / "sections" / lane / "real"
+    for _ in range(32):
+        attempt_id = f"p_{uuid.uuid4().hex[:6]}"
+        candidate = attempt_root / attempt_id
+        if not candidate.exists():
+            return candidate
+    raise PatchRunInputError(
+        f"could not allocate a unique short patch attempt directory for {lane}"
     )
-    return plan.run_dir / "modular_r4" / "sections" / lane / "real" / attempt_id
 
 
 def _default_dispatch_lane(
@@ -959,6 +1257,9 @@ def aggregate_patched_run(
 
     if len(lane_run_dirs) == len(GENERATED_LANES):
         rollup_blob = build_modular_lane_rollup(repo, lane_run_dirs)
+        rollup_blob.update(
+            _whole_resume_graph_rollup_authority(repo=repo, run_dir=art)
+        )
         for lane in GENERATED_LANES:
             row = rollup_blob["lanes"].get(lane)
             if isinstance(row, dict):
@@ -1220,6 +1521,8 @@ def execute_patch_run(
             "(dry-run works from anywhere)."
         )
 
+    _run_patch_runtime_preflight(plan.run_dir)
+
     # Whole-run env preflight parity (live defect 2026-06-11, patch_run_1.log):
     # the --patch-run CLI branch returns from main() BEFORE the embedding bootstrap
     # block every full run executes (apps_rg/__main__.py + r3r4_whole_run_orchestration),
@@ -1256,22 +1559,36 @@ def execute_patch_run(
     prior_states = {lane: plan.lane_states[lane]["state"] for lane in GENERATED_LANES}
     run_token = f"patch_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
 
+    graph_env = _whole_resume_graph_env_for_patch(plan.run_dir)
+
     saved_env = {
         name: os.environ.get(name)
-        for name in (MODULAR_R4_SECTIONS_ROOT_ENV, _WHOLE_RUN_ENVELOPE_ENV, _CORRELATED_CLI_RUN_ENV)
+        for name in (
+            MODULAR_R4_SECTIONS_ROOT_ENV,
+            _WHOLE_RUN_ENVELOPE_ENV,
+            _CORRELATED_CLI_RUN_ENV,
+            *graph_env,
+        )
     }
     os.environ[MODULAR_R4_SECTIONS_ROOT_ENV] = str(sections_root.resolve())
     os.environ[_WHOLE_RUN_ENVELOPE_ENV] = "1"
     os.environ[_CORRELATED_CLI_RUN_ENV] = repo_relative_posix(plan.repo, plan.run_dir.resolve())
+    os.environ.update(graph_env)
     try:
         require_manifest_for_modular_sections_root(
             sections_root, env_name=MODULAR_R4_SECTIONS_ROOT_ENV
         )
-        dispatch_results = _dispatch_patch_lanes(
-            plan,
-            lane_provider=lane_provider,
-            dispatch_fn=dispatch_fn,
+        from apps_rg.runtime.orchestration.canonical_identity_context import (
+            canonical_run_identity_scope,
         )
+
+        patch_identity = _patch_canonical_run_identity(plan.run_dir)
+        with canonical_run_identity_scope(patch_identity or None):
+            dispatch_results = _dispatch_patch_lanes(
+                plan,
+                lane_provider=lane_provider,
+                dispatch_fn=dispatch_fn,
+            )
         aggregate = aggregate_fn or aggregate_patched_run
         agg = aggregate(
             plan,
@@ -1325,6 +1642,10 @@ def execute_patch_run(
         "failure_reason": str(agg.get("failure_reason") or ""),
         "all_lanes_authorized": all_authorized,
         "full_success_eligibility": agg.get("full_success_eligibility"),
+        "whole_resume_graph_env_restored": {
+            name: repo_relative_posix(plan.repo, Path(path))
+            for name, path in graph_env.items()
+        },
         "exit_code": exit_code,
         "explicit_non_claims": [
             "patch-run does not re-emit root X3 — root x3_disposition_receipt.json / "

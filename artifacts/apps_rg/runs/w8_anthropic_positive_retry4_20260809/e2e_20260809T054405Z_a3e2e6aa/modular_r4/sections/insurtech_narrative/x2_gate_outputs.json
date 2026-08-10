@@ -1,0 +1,144 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_insurtech_narrative_allowed_fact_ids_non_empty",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 13
+    },
+    {
+      "gate_id": "x2_insurtech_narrative_source_fact_ids_supported",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "bad": [],
+        "cited_count": 1
+      }
+    },
+    {
+      "gate_id": "x2_claim_ledger_claim_text_non_empty",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 1
+    },
+    {
+      "gate_id": "x2_insurtech_narrative_display_text_proof_authorized",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "status": "PASS",
+        "display_text_authority": "selected_fact_plan_claim_text",
+        "rows": [
+          {
+            "row_id": "narrative_sentence",
+            "source_fact_ids": [
+              "reb_insurtech_aws_migration_execution"
+            ],
+            "source_fact_ids_allowed": true,
+            "text_matches_selected_fact_claim_text": true
+          }
+        ]
+      }
+    },
+    {
+      "gate_id": "x2_insurtech_narrative_runtime_real_llm",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": "REAL_LLM"
+    },
+    {
+      "gate_id": "x2_no_first_person",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_no_em_dash",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_insurtech_narrative_targeting_only_not_experience_claim",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": []
+    },
+    {
+      "gate_id": "x2_insurtech_narrative_exactly_one_sentence",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "sentence_count": 1,
+        "text": "Led AWS modernization execution for monolithic policy administration and insurance platform workloads."
+      }
+    },
+    {
+      "gate_id": "x2_insurtech_narrative_word_budget",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 12
+    },
+    {
+      "gate_id": "x2_insurtech_narrative_char_budget",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 102
+    },
+    {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority",
+      "pass": true,
+      "observed_value": {
+        "allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79",
+        "claim_count": 1,
+        "bound_claim_count": 1,
+        "binding_coverage": 1.0,
+        "metric_exactness_pass": true,
+        "orphan_allocation_claim_unit_ids": [],
+        "failure_reasons": []
+      },
+      "threshold": {
+        "binding_coverage": 1.0,
+        "metric_exactness": 1.0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "",
+      "evidence_ref": "graph_claim_bindings.json"
+    }
+  ],
+  "x2_failed": 0,
+  "x2_passed": 12,
+  "failed_gates": [],
+  "final_materialized_input_binding": {
+    "schema_version": "apps_rg.final_materialized_input_binding.v1",
+    "section_id": "insurtech_narrative",
+    "final_materialized_output_ref": "command_output.txt",
+    "final_materialized_output_present": true,
+    "final_materialized_output_char_count": 102,
+    "final_materialized_output_sha256": "a616b325c1045b0a92b377e5686837c238fc8b984dbd570b0d82c72b130f11f9",
+    "l2_output_present": true,
+    "l2_output_sha256": "4e1fdc038d728548d8f891f46819009167fa7d20a7e24010c68208e057501bd3",
+    "final_claim_ledger_present": true,
+    "final_claim_ledger_row_count": 1,
+    "final_claim_ledger_sha256": "c7d8270435bcfcbe0f90e4666fc0666c48254634fafcba49fa2fad13f76a57d3"
+  },
+  "final_materialized_output_sha256": "a616b325c1045b0a92b377e5686837c238fc8b984dbd570b0d82c72b130f11f9",
+  "final_claim_ledger_sha256": "c7d8270435bcfcbe0f90e4666fc0666c48254634fafcba49fa2fad13f76a57d3",
+  "l2_output_sha256": "4e1fdc038d728548d8f891f46819009167fa7d20a7e24010c68208e057501bd3",
+  "total_x2_gates": 12,
+  "resume_graph_allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79",
+  "graph_claim_binding_contract_digest": "b6a07881258b3ac85c7cba2c3b6785a7278c193a0deac32cbc455a4a39fea2d3",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

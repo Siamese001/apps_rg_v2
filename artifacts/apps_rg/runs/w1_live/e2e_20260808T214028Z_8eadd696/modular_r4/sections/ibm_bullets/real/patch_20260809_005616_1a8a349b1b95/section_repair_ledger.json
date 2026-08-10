@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "section_id": "ibm_bullets",
+  "run_id": "ibm_bullets_20260809_005623",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 1,
+  "authoritative_l2_source": "initial_llm",
+  "attempt_1_x2_failed": false,
+  "attempt_1_x2_failed_gate_ids": [],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "mechanical",
+      "operation": "align_ibm_claim_ledger_from_canonical_facts",
+      "reason": "graph_plan_fact_id_alignment",
+      "replaced_l2": false
+    },
+    {
+      "seq": 2,
+      "kind": "mechanical",
+      "operation": "inject_ibm_plan_fact_metric_anchors",
+      "reason": "surface_fact_backed_metric_tokens_model_dropped",
+      "replaced_l2": false
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "initial_llm",
+      "failed_gate_ids": [],
+      "passed": true
+    }
+  ]
+}

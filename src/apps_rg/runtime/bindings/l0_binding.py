@@ -14,9 +14,9 @@ from typing import Any, Mapping
 
 import yaml
 
-from agentic_core.runtime.contracts.l1_plan_contract import L1PlanContract
-from agentic_core.runtime.contracts.route_contract import GraphTraversePolicy, RouteContract
-from agentic_core.runtime.contracts.route_gate_receipt import RouteGateReceipt
+from apps_rg.runtime.spine_contracts import L1PlanContract
+from apps_rg.runtime.spine_contracts import GraphTraversePolicy, RouteContract
+from apps_rg.runtime.spine_contracts import RouteGateReceipt
 from apps_rg.repository_layout import repository_root, resolve_apps_rg_path
 
 __all__ = [

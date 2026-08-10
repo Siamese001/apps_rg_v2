@@ -19,7 +19,7 @@ import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from agentic_core.config.model_catalog import BGE_M3_MODEL_ID
+from apps_rg.runtime.core_model_catalog import BGE_M3_MODEL_ID
 from apps_rg.runtime.cli_exit_codes import EXIT_CONFIG_ERROR, EXIT_SUCCESS
 
 REQUIRED = "required"

@@ -9,8 +9,86 @@ from typing import Any
 
 from apps_rg.runtime.section_judge_policy import get_section_judge_policy, normalize_section_id
 
-JUDGE_PACKET_VERSION = "apps_rg_grade_only_judge_packet_v1"
+JUDGE_PACKET_VERSION = "apps_rg_grade_only_judge_packet_v2"
 _PRE_X2_PENDING_GATE_KEY = "x2_judge_snapshot_pending"
+
+# ``selected_fact_plan`` is both a proof surface and an operational audit surface.
+# Judges need the former, but traversal ledgers and ranking diagnostics can be
+# megabytes large and are not claim authority.  Keep the proof-bearing fields in
+# provider input and bind the omitted audit fields by digest so the durable lane
+# artifacts remain traceable without exceeding provider input limits.
+_SELECTED_FACT_PLAN_JUDGE_FIELDS = frozenset(
+    {
+        "allocation_assignments",
+        "allocation_plan_digest",
+        "allocation_plan_id",
+        "allocation_scope",
+        "allowed_graph_evidence_ids",
+        "briefing_signal_packet",
+        "durable_graph_state_mutated",
+        "facts",
+        "final_graph_evidence_contract",
+        "global_uniqueness_claimed",
+        "graph_candidate_receipt",
+        "graph_evidence_depth_status",
+        "graph_evidence_semantic_coverage_pct",
+        "plan_digest",
+        "plan_id",
+        "pretarget_authority_receipt",
+        "required_fact_ids",
+        "role_family_key",
+        "schema_version",
+        "section_id",
+        "selected_competency_families",
+        "selected_edges",
+        "selected_employer_lane_ids",
+        "selected_employer_lanes",
+        "selected_employer_roots",
+        "selected_headline_positioning_families",
+        "selected_metrics",
+        "selected_metrics_detail",
+        "selected_nodes",
+        "selected_skill_ids",
+        "selected_skills",
+        "selection_method",
+        "selection_rationale",
+        "source_authority_contract",
+        "target_role_profile",
+    }
+)
+
+
+def _canonical_json_bytes(value: Any) -> bytes:
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=True).encode(
+        "utf-8"
+    )
+
+
+def compact_candidate_output_for_judge(candidate_output: dict[str, Any]) -> dict[str, Any]:
+    """Project candidate output to proof-bearing judge input.
+
+    The complete candidate remains in its lane artifact.  This projection only
+    removes non-authoritative traversal/ranking diagnostics nested under
+    ``selected_fact_plan`` and records a digest plus exact omitted field names.
+    """
+    compact = dict(candidate_output)
+    selected_fact_plan = candidate_output.get("selected_fact_plan")
+    if not isinstance(selected_fact_plan, dict):
+        return compact
+
+    projected = {
+        key: value
+        for key, value in selected_fact_plan.items()
+        if key in _SELECTED_FACT_PLAN_JUDGE_FIELDS
+    }
+    omitted_fields = sorted(set(selected_fact_plan) - set(projected))
+    projected["judge_projection"] = {
+        "projection_version": "selected_fact_plan_judge_projection_v1",
+        "source_sha256": hashlib.sha256(_canonical_json_bytes(selected_fact_plan)).hexdigest(),
+        "omitted_non_authoritative_fields": omitted_fields,
+    }
+    compact["selected_fact_plan"] = projected
+    return compact
 
 
 def ensure_panel_gate_summary(
@@ -91,7 +169,7 @@ def build_grade_only_judge_packet(
         "judge_packet_version": JUDGE_PACKET_VERSION,
         "section": sid,
         "judge_task": "GRADE_ONLY",
-        "candidate_output": candidate_output,
+        "candidate_output": compact_candidate_output_for_judge(candidate_output),
         "claim_ledger": list(claim_ledger or []),
         "source_fact_ids": list(source_fact_ids or []),
         "allowed_fact_packet": allowed_fact_packet,
@@ -177,6 +255,7 @@ __all__ = [
     "REQUIRED_JUDGE_OUTPUT_SCHEMA",
     "_PRE_X2_PENDING_GATE_KEY",
     "build_grade_only_judge_packet",
+    "compact_candidate_output_for_judge",
     "ensure_panel_gate_summary",
     "judge_packet_hash",
     "render_judge_prompt_from_packet",

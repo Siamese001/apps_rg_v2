@@ -1,0 +1,211 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_exec_summary",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\executive_summary\\x1d_gemini_provider_response_raw_20260809_124710_810.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "67e6c33de6a60525",
+      "output_hash": "e32b9ada5300e27f",
+      "score": 4.8,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.96,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Minor awkward pronoun opening at S6 ('It can carry') where direct executive phrasing would be cleaner."
+      ],
+      "cited_sentence_indexes": [
+        6
+      ],
+      "remediation_suggestions": [
+        "Smooth the opening of S6 to avoid ambiguous pronoun reference 'It'."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "67e6c33de6a60525",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "minor",
+          "codes": [
+            "awkward_pronoun_reference"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_exec_summary",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\executive_summary\\x1d_openai_provider_response_raw_20260809_124733_850.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "67e6c33de6a60525",
+      "output_hash": "5aef13ffe953cc7a",
+      "score": 4.4,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.8800000000000001,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Strong, evidence-backed executive platform narrative with clear governance and commercial outcomes.",
+        "S6's pronoun and abstract phrasing weaken an otherwise credible capstone.",
+        "Judge-packet parity failed because display_override_text is missing for fact_engineering_platform_002."
+      ],
+      "cited_sentence_indexes": [
+        6
+      ],
+      "remediation_suggestions": [
+        "Clarify S6's antecedent and tighten its executive message.",
+        "Restore the missing display override in the judge packet."
+      ],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": "67e6c33de6a60525",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "minor",
+          "codes": [
+            "AWKWARD_CAPSTONE"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "minor",
+          "codes": [
+            "S6_ABSTRACT_PHRASING"
+          ]
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "ad78cea95a8518f36c4487d8732c0577494c0d98f4d4360743ed36ae605cf766",
+  "graph_claim_binding_contract_digest": "74c39c2b172e540d756adcc787c9e8744906ab4d98bcecb10ec9b9fb2f7d7ed3",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json",
+  "resume_graph_claim_binding_active": true,
+  "resume_graph_claim_binding_pass": true
+}

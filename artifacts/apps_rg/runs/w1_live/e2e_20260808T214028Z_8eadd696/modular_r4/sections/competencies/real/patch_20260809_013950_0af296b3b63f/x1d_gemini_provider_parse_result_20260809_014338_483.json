@@ -1,0 +1,87 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 2.5,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Duplicate category groups present for AI Platform Leadership and LLMOps & Reliability.",
+      "Missing required ccb_partner_applied_ai_architecture category bundle for applied AI partner roles.",
+      "Partner architecture wording is scattered across general categories rather than in a dedicated bundle."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "remediation_suggestions": [
+      "Consolidate duplicate category groups into 6 to 8 distinct capability families.",
+      "Add a dedicated Partner-Applied AI Architecture category bundle with clear joint solution patterns.",
+      "Restrict partner architecture terms to the dedicated partner architecture category."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "seniority_executive_relevance": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "complementarity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "no_bullet_restatement": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_CATEGORY_GROUPS"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "partner_architecture_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MISSING_PARTNER_ARCHITECTURE_BUNDLE",
+          "PARTNER_TERMS_MISPLACED"
+        ]
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_013950_0af296b3b63f\\x1d_gemini_provider_response_raw_20260809_014338_481.json",
+  "original_model": null,
+  "fallback_model": null
+}

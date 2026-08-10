@@ -1,0 +1,124 @@
+{
+  "schema_version": "one_spine_certification_receipt_v1",
+  "generated_at_utc": "2026-08-09T10:23:56.785651+00:00",
+  "contract_type": "OneSpineCertificationReceipt",
+  "plan_slug": "one-canonical-spine",
+  "wave": "8",
+  "section_id": "unify_bullets",
+  "run_id": "unify_bullets_20260809_102324",
+  "required_chain_complete": true,
+  "all_required_artifacts_present": true,
+  "all_required_refs_valid": true,
+  "chain_artifacts_inspected": [
+    "validated_request.json",
+    "l1_plan_contract.json",
+    "route_contract.json",
+    "final_evidence_contract_bridge.json",
+    "compiled_prompt_artifact.json",
+    "l2_execution_packet.json",
+    "sealed_l2_artifact.json",
+    "exit_disposition_receipt.json",
+    "runtime_exhaust_bundle.json"
+  ],
+  "artifact_status": [
+    {
+      "artifact": "validated_request.json",
+      "present": true
+    },
+    {
+      "artifact": "l1_plan_contract.json",
+      "present": true
+    },
+    {
+      "artifact": "route_contract.json",
+      "present": true
+    },
+    {
+      "artifact": "final_evidence_contract.json",
+      "present": true
+    },
+    {
+      "artifact": "compiled_prompt_artifact.json",
+      "present": true
+    },
+    {
+      "artifact": "l2_execution_packet.json",
+      "present": true
+    },
+    {
+      "artifact": "sealed_l2_artifact.json",
+      "present": true
+    },
+    {
+      "artifact": "exit_disposition_receipt.json",
+      "present": true
+    },
+    {
+      "artifact": "runtime_exhaust_bundle.json",
+      "present": true
+    }
+  ],
+  "ref_checks": [
+    {
+      "check": "fec_refs_route",
+      "ok": true,
+      "expected": "route_contract.json",
+      "actual": "route_contract.json"
+    },
+    {
+      "check": "compiled_refs_fec_mode",
+      "ok": true,
+      "expected": "section_fec_bridge consumed",
+      "actual": "spine_c0_fec_compose/True"
+    },
+    {
+      "check": "l2_pkt_refs_route",
+      "ok": true,
+      "expected": "route_contract.json or signed packet route_id binding",
+      "actual": "R3R4_MANAGED_WORKFLOW"
+    },
+    {
+      "check": "l2_pkt_refs_compiled",
+      "ok": true,
+      "expected": "compiled_prompt_artifact.json or matching signed prompt digest",
+      "actual": "7b7734e8e2645ad24749d8e451e8bb14525193d94d4d17eaf8363027bf0f09fd"
+    },
+    {
+      "check": "sealed_refs_l2_pkt",
+      "ok": true,
+      "expected": "l2_execution_packet.json or packet-digest-bound sovereign receipt",
+      "actual": "l2_packet:210c42422b666cc72c76eea483ad4eaaa764ae37880b9975b733489ed5f95bdf"
+    },
+    {
+      "check": "exit_refs_sealed",
+      "ok": true,
+      "expected": "sealed_l2_artifact.json",
+      "actual": "sealed_l2_artifact.json"
+    },
+    {
+      "check": "exhaust_refs_exit",
+      "ok": true,
+      "expected": "exit_disposition_receipt.json",
+      "actual": "exit_disposition_receipt.json"
+    },
+    {
+      "check": "validated_contract",
+      "ok": true,
+      "expected": "ValidatedRequest or non-empty",
+      "actual": "ValidatedRequest"
+    },
+    {
+      "check": "l1_contract",
+      "ok": true,
+      "expected": "L1PlanContract or non-empty",
+      "actual": "L1PlanContract"
+    }
+  ],
+  "fec_artifact_used": "final_evidence_contract.json",
+  "certification_status": "PASS",
+  "x3_allow_required_for_chain": false,
+  "explicit_non_claims": [
+    "chain completeness does not require X3_ALLOW",
+    "not full tests/_apps_contract suite certification"
+  ]
+}

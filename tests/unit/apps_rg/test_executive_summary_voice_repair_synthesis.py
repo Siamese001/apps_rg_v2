@@ -7,6 +7,7 @@ import re
 
 from apps_rg.runtime.sections.executive_summary_voice_repair import (
     finalize_executive_summary_coherence,
+    polish_executive_summary_judge_alignment,
     repair_generic_filler_prose,
     strip_unsupported_source_sensitive_prose,
 )
@@ -17,6 +18,7 @@ from apps_rg.runtime.validators.executive_summary_x2 import (
     check_claim_ledger_orphan_source_ids,
     check_exec_summary_no_mechanism_inventory,
     has_jd_phrase_copy,
+    split_sentences,
 )
 
 _BAD_S5_S6 = (
@@ -671,6 +673,98 @@ def test_ai_partnership_judge_findings_are_repaired_before_x1d() -> None:
     assert coverage["overall_pass"] is True
     assert orphan_ok is True, orphan_reason
     assert mechanism_ok is True, mechanism_reason
+
+
+def test_ai_partnership_polish_bridges_dependency_graph_and_repairs_speculative_s6() -> None:
+    display = (
+        "Executive technology leader who turns alliance-led solution development into repeatable growth. "
+        "That leadership connects IBM-AWS co-sell strategy with agentic platform productization. "
+        "Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility. "
+        "Release automation strengthened regulated modernization delivery through controlled gates. "
+        "Platform productization generated measurable IP-led revenue and team growth. "
+        "The combined model can guide future partner solution development and platform investment."
+    )
+    facts = [
+        {"fact_id": "fact_engineering_platform_002"},
+        {"fact_id": "reb_unify_partner_channel_cosell"},
+        {"fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm"},
+    ]
+
+    out, receipt = polish_executive_summary_judge_alignment(
+        {"resume_display_text": display, "claim_ledger": []},
+        selected_facts=facts,
+        target_role="Manager of Applied AI Architecture, Partnerships",
+    )
+
+    text = out["resume_display_text"]
+    assert receipt["applied"] is True
+    assert "Within that partner-platform model" in text
+    assert "can guide future" not in text
+    assert "converted applied-AI architectures" in text
+
+
+def test_anthropic_retry19_summary_repairs_temporal_repetition_and_close() -> None:
+    display = (
+        "Technology executive who leads IBM-AWS alliance co-sell motions for financial-services "
+        "modernization and platform productization, connecting secure delivery with IP-led revenue outcomes. "
+        "From that alliance base, financial-services modernization opportunities were shaped through partner collaboration. "
+        "Within that partner-platform model, software dependency graph intelligence enables accelerated legacy-system analysis, "
+        "exposes architecture dependency chains, and improves transformation visibility across enterprise complexity. "
+        "In parallel, platform productization produced $22M in IP-led revenue and margin expansion, while team scale reinforced "
+        "the platform operating model. "
+        "That operating model reinforced secure delivery through regulated modernization paths through operating discipline. "
+        "Future partner-led platform decisions can draw on this operating model to connect secure modernization with IP-led "
+        "revenue growth across alliance ecosystems."
+    )
+    source_rows = [
+        [
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "reb_unify_platform_commercialization_leadership",
+            "reb_ibm_devsecops_release_resilience",
+        ],
+        [
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "skill_partner_alliance_gtm_execution",
+            "skill_partner_joint_solution_development",
+        ],
+        ["fact_engineering_platform_002"],
+        [
+            "reb_unify_platform_commercialization_leadership",
+            "fact_engineering_platform_006",
+            "metric_unify_22m_ip_led_revenue",
+        ],
+        ["reb_ibm_devsecops_release_resilience"],
+        [
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "reb_ibm_devsecops_release_resilience",
+            "reb_unify_platform_commercialization_leadership",
+        ],
+    ]
+    facts = [{"fact_id": fid} for fid in sorted({x for row in source_rows for x in row})]
+    parsed = {
+        "resume_display_text": display,
+        "claim_ledger": [
+            {"claim_text": sentence, "source_fact_ids": ids}
+            for sentence, ids in zip(split_sentences(display), source_rows)
+        ],
+        "gap_notes": [],
+    }
+
+    out, receipt = polish_executive_summary_judge_alignment(
+        parsed,
+        selected_facts=facts,
+        target_role="Manager of Applied AI Architecture, Partnerships",
+    )
+
+    text = str(out["resume_display_text"])
+    assert receipt["applied"] is True
+    assert "who leads IBM-AWS" not in text
+    assert "who led IBM-AWS" in text
+    assert "From that alliance base" not in text
+    assert " through regulated modernization paths through " not in text
+    assert "Future partner-led platform decisions" not in text
+    assert "established a repeatable enterprise adoption model" in text
+    assert all(row.get("source_fact_ids") for row in out["claim_ledger"])
 
 
 def test_graph_era_trim_repair_restores_metric_nouns_after_word_budget() -> None:

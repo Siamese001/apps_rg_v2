@@ -62,7 +62,7 @@ def _write_section_exit_bundle(
     (run_dir / "x3_disposition.json").write_text(
         json.dumps(
             {
-                "x3_code": "X3_ALLOW",
+                "x3_code": "X3D_ALLOW_FINISH",
                 "proof_eligible": True,
                 "runtime_generation_status": "REAL_LLM",
                 "proceed_to_runtime": True,
@@ -159,7 +159,7 @@ def test_whole_run_ingest_collects_all_lane_display_chunks(tmp_path: Path) -> No
     (root / "x3_disposition.json").write_text(
         json.dumps(
             {
-                "x3_code": "X3_ALLOW",
+                "x3_code": "X3D_ALLOW_FINISH",
                 "proof_eligible": True,
                 "runtime_generation_status": "REAL_LLM",
             }
@@ -261,7 +261,7 @@ def test_section_lookup_filter_p5() -> None:
         prompt_profile_hash="p",
         model_profile_hash="",
         gate_profile_hash="g",
-        x3_disposition="X3_ALLOW",
+        x3_disposition="X3D_ALLOW_FINISH",
         proof_eligible=True,
         cache_admissible=True,
         generated_at_utc="2026-05-20T00:00:00+00:00",

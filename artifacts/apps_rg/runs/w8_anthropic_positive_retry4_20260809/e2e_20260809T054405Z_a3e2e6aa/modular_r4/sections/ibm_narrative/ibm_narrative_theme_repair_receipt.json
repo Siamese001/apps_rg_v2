@@ -1,0 +1,33 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_055054",
+  "gate_id": "x2_ibm_narrative_claim_theme_coverage",
+  "fired": true,
+  "trigger": {
+    "themes_detected_pre": [
+      "bul_ibm_001",
+      "bul_ibm_002",
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "count_pre": 3,
+    "missing_in_ledger_union_pre": [
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "narrative_pre": "Operationalized solution architecture and pipeline governance across regulated financial-services pursuits at IBM, using BI decision support to make executive qualification and partner-led enterprise pursuits more consistent across large modernization portfolios."
+  },
+  "accepted": false,
+  "themes_post": [
+    "bul_ibm_001",
+    "bul_ibm_002",
+    "unsupported_companion_theme:regulated_financial"
+  ],
+  "rejected_reason": "provider_not_real",
+  "bounded": {
+    "max_attempts": 1,
+    "attempts_used": 1
+  },
+  "kill_switch": "unset",
+  "regen_max_tokens": 4000,
+  "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+  "regen_parse_error": null
+}

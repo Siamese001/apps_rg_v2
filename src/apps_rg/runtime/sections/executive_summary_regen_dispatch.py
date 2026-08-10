@@ -61,7 +61,17 @@ def provider_artifact_filename(
     attempt_index: int,
     call_id: str,
 ) -> str:
-    return f"provider_{kind}_{phase}_cycle{cycle_index:02d}_attempt{attempt_index:02d}_{call_id}.json"
+    # ``call_id`` already repeats phase/cycle/attempt. Keeping that entire ID in
+    # the filename pushed patch-run executive-summary paths beyond Windows'
+    # common 260-character boundary. Preserve the full identity inside the JSON
+    # receipt and use only its content hash in the filesystem name.
+    call_hash = str(call_id or "").rsplit("-", 1)[-1].strip()
+    if not call_hash or len(call_hash) > 16:
+        call_hash = hashlib.sha256(str(call_id).encode("utf-8")).hexdigest()[:8]
+    return (
+        f"provider_{kind}_{phase}_c{cycle_index:02d}_a{attempt_index:02d}_"
+        f"{call_hash}.json"
+    )
 
 
 class ExecutiveSummaryRegenBudgetLedger:

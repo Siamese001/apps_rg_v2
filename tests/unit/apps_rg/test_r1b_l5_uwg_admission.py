@@ -32,7 +32,7 @@ def _record() -> HistoricalIntentRecord:
             "base_resume_digest": "resume",
             "final_resume_digest": "",
             "model_profile_hash": "",
-            "x3_disposition": "X3_ALLOW",
+            "x3_disposition": "X3D_ALLOW_FINISH",
             "proof_eligible": True,
             "generated_at_utc": "2026-07-12T00:00:00+00:00",
             "job_family": "",

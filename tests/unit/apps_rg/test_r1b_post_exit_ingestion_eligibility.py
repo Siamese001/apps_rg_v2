@@ -38,7 +38,7 @@ def _raw_request() -> dict:
 def _write_exit_bundle(
     run_dir: Path,
     *,
-    x3_code: str = "X3C",
+    x3_code: str = "X3C_COMMIT_REQUEST_TO_UWG",
     proof_eligible: bool = True,
     runtime_status: str = "REAL_LLM",
     include_final_resume: bool = True,
@@ -71,7 +71,8 @@ def _write_exit_bundle(
                     "proof_eligible": proof_eligible,
                     "runtime_generation_status": runtime_status,
                     "proceed_to_runtime": True,
-                    "pass": x3_code in ("X3_ALLOW", "X3C", "X3D", "EXIT_OK"),
+                    "pass": x3_code
+                    in {"X3C_COMMIT_REQUEST_TO_UWG", "X3D_ALLOW_FINISH"},
                 }
             ),
             encoding="utf-8",
@@ -166,7 +167,11 @@ def test_adapter_blocks_pre_exit_store(tmp_path: Path) -> None:
 
 def test_adapter_allows_post_exit_with_x3c_artifact_dir(tmp_path: Path) -> None:
     run_dir = tmp_path / "artifact"
-    _write_exit_bundle(run_dir, x3_code="X3C", request_id="hir_w8_live")
+    _write_exit_bundle(
+        run_dir,
+        x3_code="X3C_COMMIT_REQUEST_TO_UWG",
+        request_id="hir_w8_live",
+    )
     store_root = tmp_path / "store"
     adapter = AppsRgR1BCacheAdapter(runs_dir=str(store_root))
     rid = adapter.store_intent_and_output(
@@ -185,7 +190,7 @@ def test_adapter_allows_post_exit_with_x3c_artifact_dir(tmp_path: Path) -> None:
             "post_exit_ingestion": True,
             "artifact_dir": str(run_dir),
             "record_id": "hir_w8_live",
-            "x3_disposition": "X3C",
+            "x3_disposition": "X3C_COMMIT_REQUEST_TO_UWG",
             "proof_eligible": True,
             "runtime_generation_status": "REAL_LLM",
             "prompt_profile_hash": "prompt_w8",
@@ -205,7 +210,7 @@ def test_adapter_allows_post_exit_with_x3c_artifact_dir(tmp_path: Path) -> None:
 
 def test_adapter_rejects_finish_only_disposition_for_durable_write(tmp_path: Path) -> None:
     run_dir = tmp_path / "artifact_finish_only"
-    _write_exit_bundle(run_dir, x3_code="X3D")
+    _write_exit_bundle(run_dir, x3_code="X3D_ALLOW_FINISH")
     store_root = tmp_path / "store"
     adapter = AppsRgR1BCacheAdapter(runs_dir=str(store_root))
 
@@ -216,7 +221,7 @@ def test_adapter_rejects_finish_only_disposition_for_durable_write(tmp_path: Pat
             "post_exit_ingestion": True,
             "artifact_dir": str(run_dir),
             "record_id": "hir_finish_only",
-            "x3_disposition": "X3D",
+            "x3_disposition": "X3D_ALLOW_FINISH",
             "proof_eligible": True,
             "runtime_generation_status": "REAL_LLM",
             "prompt_profile_hash": "prompt_w8",
@@ -231,7 +236,7 @@ def test_adapter_rejects_finish_only_disposition_for_durable_write(tmp_path: Pat
 def test_ingest_post_exit_from_run_dir_after_x3c(tmp_path: Path) -> None:
     run_dir = tmp_path / "run_ingest"
     store_root = tmp_path / "store"
-    _write_exit_bundle(run_dir, x3_code="X3C")
+    _write_exit_bundle(run_dir, x3_code="X3C_COMMIT_REQUEST_TO_UWG")
     rid = ingest_post_exit_from_run_dir(
         run_dir=run_dir,
         raw_request=_raw_request(),

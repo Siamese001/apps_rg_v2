@@ -1,0 +1,61 @@
+{
+  "artifact_hash": "sha256:92d615ec6203a8d1d8d0f7a3a3349ead19bd6f726c898e3f2fd94cdf4ff938d7",
+  "payload": {
+    "executed": true,
+    "fault": "",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-65ad9206826c4f6d8453291aa2d80b49",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "161ed207-192d-4aba-a32a-6524ee96e82a",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:c8d15b86234904cd3371c7e7116410611c707475f10f057a4269cea77b3d181c",
+    "status": "PASS",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.008,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 16874.845,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.003,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "BYPASSED",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "trace-8122a66681574d5485bcef0c32d688f0"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:c8d15b86234904cd3371c7e7116410611c707475f10f057a4269cea77b3d181c"
+}

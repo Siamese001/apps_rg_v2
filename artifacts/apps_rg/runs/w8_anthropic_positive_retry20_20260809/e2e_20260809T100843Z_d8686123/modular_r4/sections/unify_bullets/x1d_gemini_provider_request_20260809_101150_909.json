@@ -1,0 +1,355 @@
+{
+  "payload": {
+    "contents": [
+      {
+        "parts": [
+          {
+            "text": "You are grading a generated resume section candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write replacement section content.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (when provided), and candidate_output.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).\n\nSECTION: unify_bullets\n\nRUBRIC_REF: apps_rg/runtime/judges/employment_bullet_judge_rubric.py#unify_bullets\n\nYou are evaluating exactly 6 employment bullets (bul_unify_001..006).\nThis is a BULLET-LINE lane — not an executive summary paragraph.\nReturn JSON only with: score_scale, score, threshold, pass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n- Keep score and threshold within the declared scale.\n- Employment pool lanes: min_selection_score is the pass floor for Claude pool selection.\n\nRubric dimensions (employment bullets — not executive summary):\n1. claim_ledger_grounding: each bullet maps to bul_* source_fact_ids in the claim ledger; metrics match allowed facts verbatim.\n2. bullet_line_discipline: one high-impact resume bullet per slot — concise line, no narrative paragraph or multi-sentence block.\n3. jd_briefing_targeting_discipline: JD and briefing shape emphasis only — never JD-as-proof, briefing-as-proof, or target company as experience.\n4. keyword_discipline_without_stuffing: role-relevant phrasing without ATS keyword bags or copied JD phrases as proof.\n5. cross_bullet_outcome_diversity: each bullet answers a distinct outcome spine — not six restatements of the same mechanism stack.\n6. employer_scope_purity: no cross-employer fact leakage, wrong-company names, or facts from other employment slices.\n7. current_role_unify_platform_signal: Unify reads as the candidate's current-role platform proof (governance, commercialization, scale) where evidenced.\n8. protected_metric_anchor: bul_unify_006 preserves locked commercial metrics ($22M / margin / team scale) and approved metric_outcome_id anchors without splitting or diluting.\n9. mechanism_inventory_cap: at most one mechanism-dense bullet; others stay outcome-led, not comma-stacked architecture inventories.\n\nDecisive failure triggers:\n- unsupported metric or cross-employer fact leakage (IBM/InsurTech/EY)\n- first-person language\n- wrong bullet count (expected 6)\n- protected bul_unify_006 metrics missing or split incorrectly\n- JD phrase copied as proof (>4 consecutive words)\n- generic filler that loses Unify-specific mechanisms or protected metrics\n\nReturn ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[]}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.\n\nCANDIDATE_OUTPUT:\n{\n  \"bullets\": [\n    {\n      \"bullet_id\": \"bul_unify_001\",\n      \"bullet_text\": \"Established a policy-gated agent execution surface for governed enterprise AI workflows by setting control-plane architecture for deterministic routing, GraphRAG grounding, and runtime release decisions.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"metric_unify_policy_gated_agent_execution_surface\",\n      \"source_fact_ids\": [\n        \"fact_engineering_platform_001\",\n        \"bul_unify_001\"\n      ]\n    },\n    {\n      \"bullet_id\": \"bul_unify_002\",\n      \"bullet_text\": \"Expanded enterprise AI platform adoption through CFO-aligned adoption motions, usage-based forecasting, and workflow value realization tied to reusable commercialization patterns.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"metric_unify_cfo_aligned_adoption_motion_count\",\n      \"source_fact_ids\": [\n        \"bul_unify_002\",\n        \"exp_unify_001\"\n      ]\n    },\n    {\n      \"bullet_id\": \"bul_unify_003\",\n      \"bullet_text\": \"Strengthened production reliability with audit-grade runtime observability coverage for regulated AI workflows through evaluation gates, telemetry, and rollback controls.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"metric_unify_audit_grade_runtime_observability_coverage\",\n      \"source_fact_ids\": [\n        \"fact_engineering_platform_003\",\n        \"bul_unify_003\"\n      ]\n    },\n    {\n      \"bullet_id\": \"bul_unify_004\",\n      \"bullet_text\": \"Standardized the AI solution lifecycle with production-readiness gates across intake, execution, monitoring, and remediation, enabling managed workflow orchestration and replayable runtime design.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"metric_unify_production_readiness_gate_set\",\n      \"source_fact_ids\": [\n        \"fact_engineering_platform_004\",\n        \"bul_unify_004\"\n      ]\n    },\n    {\n      \"bullet_id\": \"bul_unify_005\",\n      \"bullet_text\": \"Built high-availability distributed service patterns for enterprise AI platforms across AWS and Databricks Lakehouse data infrastructure, vector services, and parallel decision workflows.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"metric_unify_high_availability_distributed_service_patterns\",\n      \"source_fact_ids\": [\n        \"bul_unify_005\",\n        \"fact_engineering_platform_002\"\n      ]\n    },\n    {\n      \"bullet_id\": \"bul_unify_006\",\n      \"bullet_text\": \"Scaled the engineering team from 8 to 28 while commercializing reusable AI platform capability through agentic platform productization and a repeatable operating model.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"metric_unify_team_scaled_8_to_28\",\n      \"source_fact_ids\": [\n        \"fact_engineering_platform_006\",\n        \"bul_unify_006\"\n      ]\n    }\n  ],\n  \"resume_display_text\": \"[1] bul_unify_001: Established a policy-gated agent execution surface for governed enterprise AI workflows by setting control-plane architecture for deterministic routing, GraphRAG grounding, and runtime release decisions.\\n[2] bul_unify_002: Expanded enterprise AI platform adoption through CFO-aligned adoption motions, usage-based forecasting, and workflow value realization tied to reusable commercialization patterns.\\n[3] bul_unify_003: Strengthened production reliability with audit-grade runtime observability coverage for regulated AI workflows through evaluation gates, telemetry, and rollback controls.\\n[4] bul_unify_004: Standardized the AI solution lifecycle with production-readiness gates across intake, execution, monitoring, and remediation, enabling managed workflow orchestration and replayable runtime design.\\n[5] bul_unify_005: Built high-availability distributed service patterns for enterprise AI platforms across AWS and Databricks Lakehouse data infrastructure, vector services, and parallel decision workflows.\\n[6] bul_unify_006: Scaled the engineering team from 8 to 28 while commercializing reusable AI platform capability through agentic platform productization and a repeatable operating model.\"\n}\n\nALLOWED_FACT_PACKET:\nnull\n\nCLAIM_LEDGER:\n[{\"claim_text\":\"Established a policy-gated agent execution surface for governed enterprise AI workflows by setting control-plane architecture for deterministic routing, GraphRAG grounding, and runtime release decisions.\",\"source_fact_ids\":[\"fact_engineering_platform_001\",\"bul_unify_001\"]},{\"claim_text\":\"Expanded enterprise AI platform adoption through CFO-aligned adoption motions, usage-based forecasting, and workflow value realization tied to reusable commercialization patterns.\",\"source_fact_ids\":[\"bul_unify_002\",\"exp_unify_001\"]},{\"claim_text\":\"Strengthened production reliability with audit-grade runtime observability coverage for regulated AI workflows through evaluation gates, telemetry, and rollback controls.\",\"source_fact_ids\":[\"fact_engineering_platform_003\",\"bul_unify_003\"]},{\"claim_text\":\"Standardized the AI solution lifecycle with production-readiness gates across intake, execution, monitoring, and remediation, enabling managed workflow orchestration and replayable runtime design.\",\"source_fact_ids\":[\"fact_engineering_platform_004\",\"bul_unify_004\"]},{\"claim_text\":\"Built high-availability distributed service patterns for enterprise AI platforms across AWS and Databricks Lakehouse data infrastructure, vector services, and parallel decision workflows.\",\"source_fact_ids\":[\"bul_unify_005\",\"fact_engineering_platform_002\"]},{\"claim_text\":\"Scaled the engineering team from 8 to 28 while commercializing reusable AI platform capability through agentic platform productization and a repeatable operating model.\",\"source_fact_ids\":[\"fact_engineering_platform_006\",\"bul_unify_006\"]}]\n\nTARGETING_CONTEXT (not proof):\n{\n  \"target_title\": \"Manager of Applied AI Architecture, Partnerships\",\n  \"target_company\": \"Anthropic\",\n  \"jd_text\": \"apps_rg/config/targeting/anthropic_manager_applied_ai_architecture_partnerships_jd.txt\",\n  \"briefing\": \"# Anthropic - Manager, Applied AI Architecture Partnerships briefing packet\\n| Manager, Applied AI Architecture Partnerships | Compensation not disclosed | Reports to Partnerships (function context not disclosed) |\\n\\n## JD Complement\\nAnthropic’s enterprise opportunity depends on making advanced AI useful within real operating environments. The role context sits at the intersection of platform capability, customer architecture, partner delivery, and responsible adoption.\\n\\nThe central challenge is to help external ecosystem participants turn Claude capabilities into credible enterprise solutions without creating fragmented technical patterns, unclear ownership, or inconsistent customer experiences.\\n\\n## Company DNA & Operating Model\\nAnthropic is a San Francisco-based public benefit corporation founded in 2021. Its flagship product is Claude, and its public identity emphasizes reliable, interpretable, and steerable AI systems.\\n\\nThe company combines frontier-model development with an expanding enterprise platform motion. Customer value is not limited to model access: it depends on workflow design, data and system connections, administrative controls, user adoption,\\nand measurable operating outcomes.\\n\\nThis creates demand for reusable architecture patterns that can travel across customers and partners while remaining grounded in what the platform can support. The operating model must connect product evolution with field learning and\\npartner-led implementation capacity.\\n\\n## Company Strategy & Operating Pressure\\nAnthropic’s safety and reliability orientation raises expectations for enterprise use. Buyers and delivery partners need more than compelling demonstrations; they need confidence in security, governance, deployment design, and ongoing\\noperational use.\\n\\nClaude addresses both business users and technical builders. This creates two related adoption paths: teams seeking productivity or knowledge-work improvements, and technical organizations building AI-enabled products, workflows, and\\nintegrations.\\n\\nA likely tension is balancing local solution flexibility with global technical consistency. Cloud providers, software companies, services firms, and enterprise teams may each tailor approaches to customer needs, while Anthropic needs\\nclear boundaries around supported designs, product direction, and responsible-use expectations.\\n\\n## Leadership & Stakeholder Map\\nAnthropic’s public benefit structure and safety-centered identity are important context for conversations about commercial scale, enterprise trust, and ecosystem design.\\n\\nLikely stakeholder groups include:\\n- Partnerships and ecosystem teams shaping partner coverage, joint motions, and route-to-market strategy.\\n- Enterprise and field organizations aligning customer needs, account priorities, and adoption outcomes.\\n- Product, engineering, and research functions defining platform capabilities, technical constraints, and future direction.\\n- Security, legal, policy, and trust teams supporting customer assurance and responsible deployment practices.\\n- Cloud, technology, and services partners extending distribution, solution development, and implementation capacity.\\n\\n## AI, Data, Platform, Architecture Signals\\nAnthropic presents Claude as an AI assistant for complex work, including analysis, coding, and problem solving. The platform must therefore support both employee-facing use cases and developer-driven application experiences.\\n\\nClaude for Enterprise is positioned around security, compliance, and use across business and technical teams. Enterprise materials also address setup, launch, change management, and adoption measurement, indicating that implementation is\\nviewed as an ongoing organizational process rather than a one-time activation.\\n\\nAnthropic’s emphasis on reliability, interpretability, and steerability has direct architectural implications. Customer and partner solutions need to account for system integration, workflow design, access controls, administration,\\nevaluation practices, and user change management.\\n\\n## Partnership / Ecosystem Motion\\nAnthropic publicly identifies cloud, technology, and services partners as core ecosystem categories. This points to a multi-party enterprise strategy in which different partner types contribute distinct capabilities across distribution,\\nsolution creation, and delivery.\\n\\nThe ecosystem has practical roles:\\n- Cloud partners can align Claude with established infrastructure, commercial paths, and enterprise buying processes.\\n- Technology partners can incorporate Claude into products, platforms, and workflow experiences.\\n- Services partners can provide implementation, organizational change, industry context, and scaled delivery capacity.\\n- Partner architecture can convert broad platform potential into repeatable solution patterns and realistic deployment paths.\\n\\nAnthropic’s work with Accenture signals the importance of pairing the platform with enterprise delivery capacity. The relationship is positioned around AI deployment, productivity, value realization, and new product creation.\\n\\nThe important ecosystem question is not simply partner volume. Scale depends on whether partners can identify viable customer opportunities, define technically sound approaches, set expectations accurately, and support adoption after the\\ninitial launch.\\n\\n## Recent Events & Urgency\\nAnthropic’s enterprise-facing materials increasingly address operational deployment topics such as administration, launch planning, and organizational adoption. This suggests a growing need to make successful customer outcomes more\\nrepeatable as enterprise usage expands.\\n\\nA partner network spanning cloud, technology, and services firms increases coordination demands. Each route can accelerate reach, but overlapping roles can also create inconsistent solution positioning, duplicated effort, or uncertainty\\nabout technical ownership.\\n\\nThe immediate opportunity is to create enough shared structure that partners can move quickly while preserving a coherent customer experience. Strong architecture guidance can help distinguish exploratory work from scalable,\\ngoverned deployments.\\n\\n## apps_rg Positioning Themes (targeting only, not proof)\\n- Enterprise AI architecture that translates platform capabilities into deployable business and technical workflows.\\n- Partner enablement centered on reusable solution patterns, technical readiness, and practical delivery guidance.\\n- Ecosystem coordination across cloud, software, and services participants with complementary roles.\\n- Customer discovery and solution shaping that improve feasibility, confidence, and implementation quality.\\n- Governance-aware adoption that incorporates security, compliance, administration, and organizational change.\\n- Translation across product, field, partner, and enterprise technical teams.\\n- Scalable operating motions that move customers from experimentation toward durable, measurable use.\\n\\n## apps_lic Outreach Angles (targeting only, not proof)\\n- Anthropic’s mix of cloud, technology, and services partners makes shared technical standards important to ecosystem scale.\\n- Enterprise materials indicate that value realization depends on setup, launch discipline, and adoption management in addition to model capability.\\n- The Accenture relationship illustrates how platform value can be paired with enterprise delivery expertise.\\n- Anthropic’s reliability and steerability framing supports an enterprise conversation that extends beyond benchmark performance.\\n- The company appears positioned to benefit from stronger bridges between product knowledge, field needs, partner delivery, and customer architecture.\\n- A well-designed partner architecture motion can improve consistency while preserving the flexibility needed for varied enterprise environments.\\n\\n## Do Not Use As Proof\\nThe JD and this briefing are targeting inputs only. Candidate claims must come from the governed resume/proof graph.\"\n}\n\nPROOF_BOUNDARY:\n{\n  \"jd_is_targeting_context_only\": true,\n  \"briefing_is_targeting_context_only\": true,\n  \"claims_must_be_supported_by_allowed_fact_packet\": true,\n  \"judges_must_not_rewrite\": true,\n  \"metadata_only_graph_context_is_insufficient\": true\n}\n\nGRAPH_BINDING_MATERIALITY_SUMMARY:\n{}\n\nDETERMINISTIC_GATE_SUMMARY:\n{\n  \"x2_judge_snapshot_pending\": {\n    \"pass\": true,\n    \"detail\": \"Pre-X2 GRADE_ONLY for unify_bullets: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys.\"\n  }\n}"
+          }
+        ]
+      }
+    ],
+    "systemInstruction": {
+      "parts": [
+        {
+          "text": "You are a strict executive resume judge. Output a single compact JSON object only. No markdown fences, no explanatory prose, no nested finding objects.\n\nGRADE_ONLY authority (all providers — Gemini, OpenAI, Anthropic):\n- Do NOT rewrite, replace, or edit candidate_output.resume_display_text.\n- deterministic_gate_summary is authoritative: if a gate shows \"pass\": true, do NOT fail or cite that axis.\n- Do NOT apply retired SRFS slot mandates as decisive failures: five-part S1–S5 arc, mandatory S5 credibility\n  sentence, S2 mechanism-only / S4 outcomes slot shapes, srfs_sentence_responsibility.\n- When x2_exec_summary_evidence_utilization.pass is true, unused_fact_ids are optional weave targets, not defects.\n\nReturn ONLY one compact JSON object. No markdown fences, no prose before or after, no nested objects.\nRequired shape (findings and remediation_suggestions must be arrays of short strings only):\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\"findings\":[\"...\"],\"cited_sentence_indexes\":[1],\"remediation_suggestions\":[],\"dimension_verdicts\":{...8 rubric keys...}}\nAt most 6 short strings in findings and 4 in remediation_suggestions.\ncited_sentence_indexes: 1-based indexes (S1=1 … S6=6) for every sentence your findings ask to change.\nInclude dimension_verdicts with all eight rubric dimension ids (pass/severity/codes per dimension).\n\nScore contract (mandatory - every judge response MUST comply):\n- Include score_scale as exactly one of: \"0_to_1\" or \"0_to_5\". Do not omit score_scale.\n- If score_scale is \"0_to_1\": score and threshold MUST each be a number from 0.0 through 1.0 inclusive.\n- If score_scale is \"0_to_5\": score and threshold MUST each be a number from 0.0 through 5.0 inclusive.\n- Forbidden: 0_to_10 scales, percentage scores (0–100), or values like score=9.2 with threshold=8.0.\n- Do not infer scale from magnitude; declare score_scale explicitly and keep score/threshold within that scale."
+        }
+      ]
+    },
+    "generationConfig": {
+      "thinkingConfig": {
+        "thinkingLevel": "high"
+      },
+      "maxOutputTokens": 4096,
+      "responseMimeType": "application/json",
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "score_scale": {
+            "type": "string",
+            "enum": [
+              "0_to_1",
+              "0_to_5"
+            ]
+          },
+          "score": {
+            "type": "number"
+          },
+          "threshold": {
+            "type": "number"
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "decisive_failure": {
+            "type": "boolean"
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cited_sentence_indexes": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "remediation_suggestions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dimension_verdicts": {
+            "type": "object",
+            "properties": {
+              "factual_support": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "executive_signal": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "resume_voice": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "ats_alignment_without_keyword_stuffing": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "anti_overfit": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "synthesis_quality": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "evidence_utilization": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "deterministic_alignment": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              }
+            },
+            "required": [
+              "factual_support",
+              "executive_signal",
+              "resume_voice",
+              "ats_alignment_without_keyword_stuffing",
+              "anti_overfit",
+              "synthesis_quality",
+              "evidence_utilization",
+              "deterministic_alignment"
+            ]
+          }
+        },
+        "required": [
+          "score_scale",
+          "score",
+          "threshold",
+          "pass",
+          "decisive_failure",
+          "findings",
+          "cited_sentence_indexes",
+          "remediation_suggestions",
+          "dimension_verdicts"
+        ]
+      }
+    }
+  },
+  "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+  "resolved_model": "gemini-3.6-flash",
+  "resolved_model_source": "yaml_judge_models",
+  "model_requested": "gemini-3.6-flash",
+  "model_actual": "gemini-3.6-flash",
+  "thinking_level": "high",
+  "provider_key": "gemini_pro",
+  "request_timeout_seconds": 60,
+  "gemini_max_retries_configured": 4,
+  "judge_max_attempts": 2,
+  "input_hash": "6a5da00571b84c25",
+  "timestamp": "2026-08-09T10:11:50.909077+00:00",
+  "judge_attempt": 1,
+  "gemini_thinking_config": {
+    "thinkingLevel": "high"
+  },
+  "gemini_thinking_optimization_enabled": true,
+  "provider_name": "gemini",
+  "model_env_source": "yaml_judge_models",
+  "canonical_contract_hash": "6f528751d0e1032c875a6069a55e69b66791208a860354b50e1ba25e357d9e2c",
+  "packet_hash": "6a5da00571b84c25",
+  "schema_hash": "2d3f3d956b325217",
+  "max_tokens": 4096,
+  "temperature": null,
+  "response_format": "responseSchema",
+  "judge_receipt": {
+    "judge_packet_hash": "6a5da00571b84c25",
+    "packet_hash": "6a5da00571b84c25",
+    "canonical_contract_hash": "6f528751d0e1032c875a6069a55e69b66791208a860354b50e1ba25e357d9e2c",
+    "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry20_20260809/e2e_20260809T100843Z_d8686123/modular_r4/sections/unify_bullets/unify_bullets_judge_packet.json",
+    "candidate_output_ref": "candidate_output.resume_display_text",
+    "allowed_fact_packet_ref": "allowed_fact_packet",
+    "rubric_ref": "apps_rg/runtime/judges/employment_bullet_judge_rubric.py#unify_bullets",
+    "deterministic_gate_summary": {
+      "x2_judge_snapshot_pending": {
+        "pass": true,
+        "detail": "Pre-X2 GRADE_ONLY for unify_bullets: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys."
+      }
+    },
+    "gate_closure_map_version": "executive_summary_gate_closure_v2"
+  },
+  "redacted_query_param_names": [
+    "key"
+  ]
+}

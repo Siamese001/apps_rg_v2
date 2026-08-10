@@ -13,8 +13,8 @@ from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from agentic_core.runtime.contracts.origin import Origin
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg.runtime.spine_contracts import Origin
+from apps_rg.runtime.spine_contracts import SealedL2Artifact
 from apps_rg.runtime.bindings.l2_authority import (
     build_signed_execution_packet,
     freeze_execution_room,

@@ -10,6 +10,7 @@ from apps_rg.runtime.c0.competencies_graph_authority import (
     _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS,
     _INSURANCE_IT_STRATEGY_FROZEN_ALLOCATION_LAYOUT,
     _allocation_surface_category,
+    _allocation_surface_phrase,
     build_competencies_graph_authority_discrepancy_ledger,
     insurance_it_strategy_frozen_layout_is_present,
     materialize_unmatched_competencies_allocation_terms,
@@ -41,6 +42,38 @@ from apps_rg.runtime.sections.competencies_rigor import (
     check_competencies_keyword_repetition_limit,
     check_competencies_visible_terms_svp_agentic_richness,
 )
+
+
+def test_anthropic_alliance_allocation_has_bound_compact_surface() -> None:
+    assignment = {
+        "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_id": "skill_partner_alliance_gtm_execution",
+        "root_bundle_theme": "AWS partnership, alliance co-sell, and joint GTM execution",
+        "root_claim_outcome": (
+            "Frame as alliance GTM leadership: joint planning, solution architecture, "
+            "and co-sell execution."
+        ),
+        "skill_label": "Partner alliance GTM execution",
+        "source_refs": [],
+    }
+    selected_plan = {
+        "facts": [
+            {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "domain": "AWS partnership, alliance co-sell, and joint GTM execution",
+            }
+        ],
+        "graph_candidate_decision_ledger": [],
+    }
+
+    phrase, source = _allocation_surface_phrase(
+        assignment,
+        selected_plan=selected_plan,
+    )
+
+    assert phrase == "AWS alliance joint architecture leadership"
+    assert source == "graph_authority_surface_composition"
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -428,6 +461,351 @@ def test_materialization_fails_closed_when_two_units_share_one_surface() -> None
     assert receipt["unresolved_claim_unit_ids"] == ["competencies:skill:02"]
 
 
+def test_reconciliation_preserves_explicit_allocation_identity_on_second_pass() -> None:
+    assignments = [
+        {
+            "section_id": "competencies",
+            "claim_unit_id": f"competencies:skill:{index:02d}",
+            "root_id": "reb_shared_runtime",
+            "skill_id": f"skill_runtime_{index:02d}",
+            "fact_id": "fact_runtime",
+        }
+        for index in (1, 2)
+    ]
+    parsed = {
+        "competencies": [
+            {
+                "source_fact_ids": ["fact_runtime"],
+                "graph_skill_node_ids": [row["skill_id"] for row in assignments],
+                "terms": [
+                    {
+                        "text": f"governed runtime execution path {index}",
+                        "source_fact_ids": ["fact_runtime"],
+                        "source_skill_ids": [assignment["skill_id"]],
+                        "allocation_claim_unit_id": assignment["claim_unit_id"],
+                    }
+                    for index, assignment in enumerate(assignments, start=1)
+                ],
+            }
+        ],
+        "claim_ledger": [],
+    }
+
+    receipt = reconcile_competencies_allocation_claim_units(
+        parsed,
+        selected_plan={
+            "allocation_plan_digest": "explicit-identity-test",
+            "allocation_assignments": assignments,
+            "facts": [],
+        },
+        allowed_fact_ids={"fact_runtime"},
+    )
+
+    assert receipt["pass"] is True
+    assert [
+        term["allocation_claim_unit_id"]
+        for term in parsed["competencies"][0]["terms"]
+    ] == ["competencies:skill:01", "competencies:skill:02"]
+    assert all(
+        "EXPLICIT_ALLOCATION_CLAIM_UNIT_ID" in row["match_reasons"]
+        for row in receipt["matches"]
+    )
+
+
+def test_materialization_replaces_optional_term_at_category_ceiling() -> None:
+    assignment = {
+        "section_id": "competencies",
+        "claim_unit_id": "competencies:skill:01",
+        "root_id": "reb_unify_agentic_platform_architecture",
+        "skill_id": "skill_unify_agentic_l0_route_policy_dispatch",
+        "fact_id": "fact_runtime",
+        "root_bundle_theme": "SVP Engineering agentic AI platform control-plane architecture",
+    }
+    optional_terms = [
+        {"text": f"optional governed platform execution anchor {index}"}
+        for index in range(6)
+    ]
+    parsed = {
+        "categories": [
+            {"category_label": "AI Platform Leadership", "terms": copy.deepcopy(optional_terms)}
+        ],
+        "competencies": [
+            {"category_label": "AI Platform Leadership", "terms": copy.deepcopy(optional_terms)}
+        ],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan={
+            "allocation_plan_digest": "category-cap-test",
+            "allocation_assignments": [assignment],
+            "facts": [
+                {
+                    "role_episode_bundle_id": assignment["root_id"],
+                    "claim_text": assignment["root_bundle_theme"],
+                }
+            ],
+        },
+        allowed_fact_ids={"fact_runtime"},
+        claim_unit_ids=[assignment["claim_unit_id"]],
+    )
+
+    assert receipt["pass"] is True
+    assert len(receipt["optional_term_replacements"]) == 2
+    assert all(len(parsed[key][0]["terms"]) == 6 for key in ("categories", "competencies"))
+    assert all(
+        any(
+            term.get("allocation_claim_unit_id") == assignment["claim_unit_id"]
+            for term in parsed[key][0]["terms"]
+        )
+        for key in ("categories", "competencies")
+    )
+
+
+def test_partner_gtm_projection_preserves_productization_family_and_drops_stale_fact() -> None:
+    assignment = {
+        "section_id": "competencies",
+        "claim_unit_id": "competencies:skill:01",
+        "root_id": "reb_unify_partner_channel_cosell",
+        "skill_id": "skill_partner_partner_revenue_3m",
+        "fact_id": "exp_unify_001",
+        "root_bundle_theme": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+        "source_refs": ["3 million dollars in partner-derived revenue"],
+    }
+    parsed = {
+        key: [
+            {
+                "category_label": "Commercial & Operating Impact",
+                "competency_bundle_id": "ccb_platform_productization",
+                "capability_family": "platform_productization",
+                "source_fact_ids": ["fact_stale_replaced_term"],
+                "terms": [],
+            }
+        ]
+        for key in ("categories", "competencies")
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan={
+            "allocation_plan_digest": "partner-category-authority-test",
+            "allocation_assignments": [assignment],
+            "facts": [
+                {
+                    "role_episode_bundle_id": assignment["root_id"],
+                    "claim_text": assignment["root_bundle_theme"],
+                }
+            ],
+        },
+        allowed_fact_ids={"exp_unify_001"},
+        claim_unit_ids=[assignment["claim_unit_id"]],
+    )
+
+    assert receipt["pass"] is True
+    assert receipt["category_authority_rebindings"] == []
+    for key in ("categories", "competencies"):
+        category = parsed[key][0]
+        assert category["competency_bundle_id"] == "ccb_platform_productization"
+        assert category["capability_family"] == "platform_productization"
+        assert category["source_fact_ids"] == ["exp_unify_001"]
+
+
+def test_partner_allocation_routes_units_without_density_or_family_orphans() -> None:
+    category_specs = (
+        ("Cloud & Partner Ecosystems", "ccb_partner_applied_ai_architecture", "partner_applied_ai_architecture"),
+        ("AI Platform Leadership", "ccb_agentic_platforms", "agentic_platforms"),
+        ("Governance, Risk & Compliance", "ccb_runtime_governance", "runtime_governance"),
+        ("Technology Strategy & Innovation", "ccb_retrieval_context_engineering", "retrieval_context_engineering"),
+        ("Commercial & Operating Impact", "ccb_platform_productization", "platform_productization"),
+        ("LLMOps & Reliability", "ccb_llmops_reliability", "llmops_reliability"),
+        ("Data & Analytics Modernization", "ccb_distributed_systems_engineering", "distributed_systems_engineering"),
+        ("Engineering & Delivery Leadership", "ccb_engineering_leadership", "engineering_leadership"),
+    )
+    categories = [
+        {
+            "category_label": label,
+            "competency_bundle_id": bundle,
+            "capability_family": family,
+            "terms": [{"text": f"optional {label} anchor {index}"} for index in range(3)],
+        }
+        for label, bundle, family in category_specs
+    ]
+    assignments = [
+        {
+            "section_id": "competencies",
+            "claim_unit_id": f"competencies:skill:{index:02d}",
+            "root_id": root_id,
+            "skill_id": skill_id,
+            "fact_id": fact_id,
+            "root_bundle_theme": theme,
+        }
+        for index, root_id, skill_id, fact_id, theme in (
+            (1, "reb_ibm_presales_solution_engineering", "skill_partner_pre_sales", "fact_revenue_ops_004", "Technical pre-sales solution engineering and buyer-specific architecture mapping"),
+            (2, "reb_ibm_revenue_sales_target_execution", "skill_partner_enterprise_negotiations", "fact_revenue_ops_001", "Revenue target execution and quota-aligned solution leadership"),
+            (4, "reb_ibm_devsecops_release_resilience", "skill_ibm_automated_release_pipelines", "fact_engineering_platform_002", "DevSecOps release resilience and governed delivery automation"),
+            (5, "reb_ibm_aws_alliance_partner_cosell_gtm", "skill_partner_alliance_gtm_execution", "fact_partnerships_gtm_002", "AWS partnership, alliance co-sell, and joint GTM execution"),
+            (6, "reb_ibm_customer_success_value_realization", "skill_p2_gtm_presales_delivery_handoff", "fact_revenue_ops_004", "Customer success and value-realization operating cadence"),
+            (7, "reb_unify_partner_channel_cosell", "skill_partner_partner_led_ai_solutions", "exp_unify_001", "AI Partnerships, Co-Sell Channel & Alliance GTM"),
+            (8, "reb_ibm_customer_success_value_realization", "skill_partner_customer_deal_support", "fact_revenue_ops_004", "Partner customer deal support and value realization"),
+        )
+    ]
+    assignments[0]["root_claim_action"] = (
+        "Led technical discovery and solution mapping for enterprise financial-services pursuits"
+    )
+    assignments[3]["root_claim_outcome"] = (
+        "Frame as alliance GTM leadership: joint planning, solution architecture, "
+        "and co-sell execution."
+    )
+    parsed = {
+        "categories": copy.deepcopy(categories),
+        "competencies": copy.deepcopy(categories),
+    }
+    plan = {
+        "allocation_plan_digest": "retry16-partner-routing",
+        "allocation_assignments": assignments,
+        "facts": [
+            {
+                "role_episode_bundle_id": row["root_id"],
+                "claim_text": row["root_bundle_theme"],
+            }
+            for row in assignments
+        ],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={row["fact_id"] for row in assignments},
+        claim_unit_ids=[row["claim_unit_id"] for row in assignments],
+    )
+
+    assert receipt["pass"] is True, receipt["unresolved_claim_unit_ids"]
+    assert receipt["unresolved_claim_unit_ids"] == []
+    assert receipt["category_authority_rebindings"] == []
+    expected_units = {row["claim_unit_id"] for row in assignments}
+    for surface in ("categories", "competencies"):
+        assert sum(len(category["terms"]) for category in parsed[surface]) == 24
+        assert {category["competency_bundle_id"] for category in parsed[surface]} >= {
+            "ccb_platform_productization",
+            "ccb_partner_applied_ai_architecture",
+            "ccb_engineering_leadership",
+        }
+        visible_units = [
+            term.get("allocation_claim_unit_id")
+            for category in parsed[surface]
+            for term in category["terms"]
+            if term.get("allocation_claim_unit_id")
+        ]
+        assert set(visible_units) == expected_units
+        assert len(visible_units) == len(expected_units)
+
+        engineering = next(
+            category
+            for category in parsed[surface]
+            if category["competency_bundle_id"] == "ccb_engineering_leadership"
+        )
+        engineering_allocations = {
+            term.get("allocation_claim_unit_id")
+            for term in engineering["terms"]
+            if term.get("allocation_claim_unit_id")
+        }
+        assert engineering_allocations == {"competencies:skill:06"}
+        assert sum(
+            1 for term in engineering["terms"] if not term.get("allocation_claim_unit_id")
+        ) == 2
+        assert "Presales-to-delivery customer success operating handoff cadence" in {
+            term.get("text") or term.get("term") for term in engineering["terms"]
+        }
+        commercial = next(
+            category
+            for category in parsed[surface]
+            if category["competency_bundle_id"] == "ccb_platform_productization"
+        )
+        assert commercial["resume_display_label"] == (
+            "Partner Commercialization & Value Realization"
+        )
+
+
+def test_partner_gtm_projection_replaces_generic_anchors_at_three_item_ceiling() -> None:
+    assignments = [
+        {
+            "section_id": "competencies",
+            "claim_unit_id": f"competencies:skill:{index:02d}",
+            "root_id": root_id,
+            "skill_id": skill_id,
+            "fact_id": fact_id,
+            "root_bundle_theme": phrase,
+        }
+        for index, root_id, skill_id, fact_id, phrase in (
+            (
+                1,
+                "reb_unify_partner_channel_cosell",
+                "skill_partner_partner_revenue_3m",
+                "exp_unify_001",
+                "Partner channel commercialization and alliance co-sell execution",
+            ),
+            (
+                2,
+                "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "skill_partner_cloud_vendor_joint_gtm",
+                "fact_partnerships_gtm_002",
+                "AWS alliance joint architecture leadership",
+            ),
+            (
+                3,
+                "reb_ibm_customer_success_value_realization",
+                "skill_partner_customer_success_value_realization",
+                "fact_revenue_ops_004",
+                "Customer success and value realization operating cadence",
+            ),
+        )
+    ]
+    optional = [
+        {"text": "demoable AI accelerators for executive buyers"},
+        {"text": "reusable AI platform commercialization for adoption"},
+        {"text": "generic commercial solution execution cadence"},
+    ]
+    parsed = {
+        key: [
+            {
+                "category_label": "Commercial & Operating Impact",
+                "competency_bundle_id": "ccb_platform_productization",
+                "capability_family": "platform_productization",
+                "terms": copy.deepcopy(optional),
+            }
+        ]
+        for key in ("categories", "competencies")
+    }
+    plan = {
+        "allocation_plan_digest": "compact-partner-gtm",
+        "allocation_assignments": assignments,
+        "facts": [
+            {
+                "role_episode_bundle_id": row["root_id"],
+                "claim_text": row["root_bundle_theme"],
+            }
+            for row in assignments
+        ],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan=plan,
+        allowed_fact_ids={row["fact_id"] for row in assignments},
+        claim_unit_ids=[row["claim_unit_id"] for row in assignments],
+    )
+
+    assert receipt["pass"] is True
+    assert len(receipt["optional_term_replacements"]) == 6
+    for key in ("categories", "competencies"):
+        terms = parsed[key][0]["terms"]
+        assert len(terms) == 3
+        assert {
+            term.get("allocation_claim_unit_id")
+            for term in terms
+        } == {row["claim_unit_id"] for row in assignments}
+
+
 def test_materialization_uses_distinct_bound_surfaces_for_revenue_assignments() -> None:
     assignments = [
         {
@@ -488,7 +866,7 @@ def test_materialization_uses_distinct_bound_surfaces_for_revenue_assignments() 
     }
     assert receipt["pass"] is True
     assert "Revenue target execution and quota-aligned solution leadership" in visible
-    assert "Enterprise solution negotiation and quota execution" in visible
+    assert "Enterprise pursuit execution across portfolio expansion motions" in visible
     assert reconciliation["pass"] is True
 
 
@@ -599,7 +977,7 @@ def test_presales_recovery_surface_is_bound_and_meets_visible_rigor() -> None:
 
     assert receipt["pass"] is True
     assert parsed["competencies"][0]["terms"][0]["text"] == (
-        "Enterprise technical pre-sales architecture mapping"
+        "Buyer-specific solution mapping for enterprise pursuits"
     )
     assert check_competencies_visible_terms_svp_agentic_richness(
         parsed["competencies"]
@@ -794,7 +1172,7 @@ def test_unmatched_allocations_materialize_only_graph_authored_terms(monkeypatch
     }
 
 
-def test_joint_alliance_surface_is_placed_in_commercialization_category() -> None:
+def test_joint_solution_surface_is_placed_in_partner_architecture_category() -> None:
     categories = [
         {"category_label": "Partner Applied AI Architecture", "terms": []},
         {
@@ -810,19 +1188,19 @@ def test_joint_alliance_surface_is_placed_in_commercialization_category() -> Non
 
     category = _allocation_surface_category(
         categories,
-        phrase="AWS alliance modernization co-sell and joint development",
+        phrase="AI analytics framework co-development for partners",
         assignment=assignment,
     )
 
-    assert category is categories[1]
+    assert category is categories[0]
     rich, reason = check_competencies_visible_terms_svp_agentic_richness(
         [
             {
                 "visible_graph_surface": True,
-                "resume_display_label": "Platform Productization & Commercialization",
+                "resume_display_label": "Partner Applied AI Architecture",
                 "terms": [
                     {
-                        "text": "AWS alliance modernization co-sell and joint development"
+                        "text": "AI analytics framework co-development for partners"
                     }
                 ],
             }
@@ -933,17 +1311,17 @@ def test_unmatched_allocations_use_bound_resume_surfaces_for_compact_graph_skill
     )
 
     expected = {
-        "PII encryption controls for insurance data",
+        "PII encryption controls for regulated data",
         "IAM KMS CloudTrail controls for insurers",
         "SOC2 zero-trust security controls for compliance",
         "SOC2 control frameworks for regulated insurers",
         "Application dependency mapping for migration execution",
-        "Migration wave cutover planning for platforms",
+        "Migration wave cutover execution planning",
         "AI credit adjudication for enterprise risk",
         "Enterprise three-lines-of-defense risk operating model",
         "Model explainability for enterprise risk operating model",
         "Insurance claims workflow automation integration",
-        "Core reporting workflow integration handoff",
+        "Insurance core reporting integration and BI workflows",
         "Guidewire platform workflow modernization integration",
     }
     visible = {
@@ -962,6 +1340,115 @@ def test_unmatched_allocations_use_bound_resume_surfaces_for_compact_graph_skill
         parsed["categories"]
     )
     assert richness_ok, richness_reason
+
+
+def test_anthropic_allocation_recovery_emits_distinct_graph_bound_surfaces() -> None:
+    assignments = [
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:04",
+            "root_id": "reb_unify_agentic_platform_architecture",
+            "skill_id": "skill_unify_agentic_l0_route_policy_dispatch",
+            "fact_id": "fact_engineering_platform_001",
+            "root_bundle_theme": "SVP Engineering agentic AI platform control-plane architecture",
+            "root_claim_scope": "Runtime control plane and governed execution for regulated institutions.",
+        },
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:05",
+            "root_id": "reb_unify_agentic_platform_architecture",
+            "skill_id": "skill_unify_agentic_graphrag_context_pack_grounding",
+            "fact_id": "fact_engineering_platform_001",
+            "root_bundle_theme": "SVP Engineering agentic AI platform control-plane architecture",
+            "root_claim_scope": (
+                "Production-grade agentic AI Solution Accelerator within a consulting firm; "
+                "SVP Engineering ownership of runtime control plane, GraphRAG grounding, "
+                "multi-agent orchestration, and governed execution for regulated financial "
+                "institutions."
+            ),
+        },
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:06",
+            "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "skill_id": "skill_partner_cloud_vendor_joint_gtm",
+            "fact_id": "fact_partnerships_gtm_002",
+            "root_bundle_theme": "AWS partnership alliance co-sell and joint GTM execution",
+            "root_claim_scope": "Cloud and AI modernization opportunities.",
+            "root_claim_outcome": "Joint planning, solution architecture, and co-sell execution.",
+        },
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:07",
+            "root_id": "reb_ibm_customer_success_value_realization",
+            "skill_id": "skill_partner_customer_deal_support",
+            "fact_id": "fact_revenue_ops_004",
+            "root_bundle_theme": "Customer success and value-realization operating cadence",
+            "root_claim_outcome": "Client success cadence and value-realization leadership.",
+        },
+        {
+            "section_id": "competencies",
+            "claim_unit_id": "competencies:skill:08",
+            "root_id": "reb_unify_partner_channel_cosell",
+            "skill_id": "skill_partner_partner_led_ai_solutions",
+            "fact_id": "exp_unify_001",
+            "root_bundle_theme": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+            "root_claim_scope": (
+                "Global AI channel program from inception: co-developed analytics "
+                "frameworks with strategic partners, co-sell bundling with cloud vendors."
+            ),
+            "root_claim_outcome": "Frame as AI partnerships and co-sell channel leadership.",
+        },
+    ]
+    facts = [
+        {
+            "role_episode_bundle_id": row["root_id"],
+            "fact_id": row["fact_id"],
+            "domain": row.get("root_claim_scope", ""),
+            "claim_text": row.get("root_bundle_theme", ""),
+            "claim_outcome": row.get("root_claim_outcome", ""),
+        }
+        for row in assignments
+    ]
+    parsed = {
+        "categories": [
+            {
+                "category_label": "Agentic Platforms & Partner Architecture",
+                "visible_graph_surface": True,
+                "terms": [],
+            }
+        ],
+        "claim_ledger": [],
+    }
+
+    receipt = materialize_unmatched_competencies_allocation_terms(
+        parsed,
+        selected_plan={
+            "allocation_plan_digest": "anthropic-plan",
+            "allocation_assignments": assignments,
+            "facts": facts,
+        },
+        allowed_fact_ids={row["fact_id"] for row in assignments},
+        claim_unit_ids=[row["claim_unit_id"] for row in assignments],
+    )
+
+    visible = {term["text"] for term in parsed["categories"][0]["terms"]}
+    assert receipt["pass"] is True, receipt["unresolved_claim_unit_ids"]
+    assert visible == {
+        "Agentic platform route-policy dispatch architecture",
+        "GraphRAG context pack grounding for governed execution",
+        "Partner AI solution architecture and co-sell execution",
+        "Partner value-realization operating cadence and deal support",
+        "AI co-sell bundling with strategic partners",
+    }
+    assert "AI Partnerships, Co-Sell Channel & Alliance GTM" not in visible
+    assert check_competencies_visible_terms_svp_agentic_richness(
+        parsed["categories"]
+    ) == (True, None)
+    assert check_competencies_keyword_repetition_limit(
+        parsed["categories"]
+    ) == (True, None)
+    assert all(len(text) < 36 or "SVP Engineering" not in text for text in visible)
 
 
 def test_allocation_sync_copies_provenance_to_canonical_v3_categories() -> None:

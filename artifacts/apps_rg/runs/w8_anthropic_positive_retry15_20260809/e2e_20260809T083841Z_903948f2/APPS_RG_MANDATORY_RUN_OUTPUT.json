@@ -1,0 +1,2772 @@
+{
+  "schema_version": "apps_rg.mandatory_run_output.v1",
+  "generated_at_utc": "2026-08-09T08:49:24Z",
+  "run_root_abs": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2",
+  "run_root": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2",
+  "result_summary": {
+    "exit_status": "error",
+    "execution_status": "failed",
+    "outcome_authorized": false,
+    "decisive_status": "",
+    "all_lanes_authorized": null,
+    "x3_disposition": "X3A_DENY_REROUTE",
+    "completion_disposition": "X3A_DENY_REROUTE",
+    "completion_status": "BLOCKED",
+    "completion_fault": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE",
+    "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='deterministic_assembly_gates_failed' schema_ok=False lane_ok=False",
+    "run_id": "5eefd2fc-744d-4fc5-9f03-e579c50e8a18",
+    "request_id": "req-b49c42b9d67f4357a7fcd3dab79ce84a",
+    "proof_gate_status": "",
+    "proof_classification": "",
+    "decisive_reason": "",
+    "operational_failure": {},
+    "research_artifact_dir": "",
+    "research_briefing_path": "",
+    "research_company_brief_path": "",
+    "research_handoff_v2_path": "",
+    "apps_eval_record_ref": "",
+    "l6_shadow_bridge_ref": "",
+    "l7_audit_status": "",
+    "product_authorized": false,
+    "pipeline_complete": false,
+    "observability_repair_required": false,
+    "mandatory_output_upstream_fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='deterministic_assembly_gates_failed' schema_ok=False lane_ok=False",
+    "mandatory_output_upstream_completion_fault": ""
+  },
+  "section_counts": {
+    "total": 12,
+    "ran_real_llm": 11,
+    "allowed": 11,
+    "blocked": 0,
+    "pre_run_blocked": 0,
+    "not_run": 0,
+    "unknown": 1
+  },
+  "sections": [
+    {
+      "section": "competencies",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies",
+      "display_txt_relpath": "modular_r4/sections/competencies/competencies_display.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\competencies\\competencies_display.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "Evidence mapping failure: visible content was not fully backed by source facts or graph lineage.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 4.3,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.3/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 17,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_shadow_learning.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/competencies/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "unify_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets",
+      "display_txt_relpath": "modular_r4/sections/unify_bullets/unify_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\unify_bullets\\unify_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.78,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.78/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ibm_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets",
+      "display_txt_relpath": "modular_r4/sections/ibm_bullets/ibm_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\ibm_bullets\\ibm_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 4.2,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.74,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 4.2/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.74/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_bullets/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "insurtech_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/insurtech_bullets",
+      "display_txt_relpath": "modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\insurtech_bullets\\insurtech_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.73,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.73/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/insurtech_bullets/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ey_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ey_bullets",
+      "display_txt_relpath": "modular_r4/sections/ey_bullets/ey_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\ey_bullets\\ey_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.74,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.74/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ey_bullets/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "unify_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative",
+      "display_txt_relpath": "modular_r4/sections/unify_narrative/unify_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\unify_narrative\\unify_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 16,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_shadow_learning.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/unify_narrative/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ibm_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative",
+      "display_txt_relpath": "modular_r4/sections/ibm_narrative/ibm_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\ibm_narrative\\ibm_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ibm_narrative/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "insurtech_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/insurtech_narrative",
+      "display_txt_relpath": "modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\insurtech_narrative\\insurtech_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/insurtech_narrative/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ey_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ey_narrative",
+      "display_txt_relpath": "modular_r4/sections/ey_narrative/ey_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\ey_narrative\\ey_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/ey_narrative/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "executive_summary",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary",
+      "display_txt_relpath": "modular_r4/sections/executive_summary/resume_display_text.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\executive_summary\\resume_display_text.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 4.6,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.6/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 18,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_shadow_learning.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/l6_v40_shadow_eval_spans.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/post_runtime/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/executive_summary/post_runtime/l6_shadow_learning.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "headline",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline",
+      "display_txt_relpath": "modular_r4/sections/headline/headline_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\sections\\headline\\headline_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 4.8,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 4.8,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 4.8/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.8/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/sections/headline/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "final_resume_aggregation",
+      "status_bucket": "assembled",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/final_resume_assembly",
+      "display_txt_relpath": "modular_r4/final_resume_assembly/final_resume.json",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\final_resume.json",
+      "x3_code": "X3_REVIEW_AGGREGATION",
+      "x2_pass": "FAIL",
+      "product_quality_status": "FAIL",
+      "runtime_generation_status": "ASSEMBLED",
+      "failed_gates": [
+        {
+          "gate_id": "x2_full_resume_llm_coherence_aggregation",
+          "failure_reason": "quorum_not_met",
+          "observed_value": {
+            "full_resume_coherence_pass": false,
+            "decisive_reason": "quorum_not_met",
+            "blockers": [
+              "judge_fail:x1d_openai_chatgpt_full_resume_coherence"
+            ],
+            "model_backed_pass_count": 1,
+            "quorum_required": 2
+          },
+          "threshold": "full_resume_coherence_pass=true",
+          "evidence_ref": null
+        }
+      ],
+      "failure_classification": "Final resume aggregation provider quorum failure: the full-resume coherence judge panel did not reach the required model-backed quorum.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 4.5,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": null,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 3.8,
+          "threshold": 4.0,
+          "pass": false,
+          "provider_status": "MODEL_BACKED_FAIL",
+          "decisive_failure": null,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 4.5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 3.8/5 vs 4 FAIL",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": []
+      },
+      "l6": {
+        "file_count": 0,
+        "files": [],
+        "product_authority": "not_observed"
+      }
+    }
+  ],
+  "section_lane_table": [
+    {
+      "order": 0,
+      "section": "research_briefing_input",
+      "research_source_class": "FRESH_APPS_RESEARCH",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-terra",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "N/A",
+      "secondary_model_observed": "N/A",
+      "generation_status": "BRIEFING_PRESENT:RUN_SPECIFIC",
+      "judges_run": "N/A",
+      "judge_models_scores": "N/A",
+      "judge_retry_fallback": "N/A",
+      "x2": "PASS; judge=gemini-3.6-flash",
+      "x3": "X3D_ALLOW_FINISH; X1=PASS",
+      "past_fail_blocker": "auto_research_internal=True; research_delegation_executed=True; source=RUN_SPECIFIC; digest=e4c801f53861c0e898af9e6146ea8450db2a44edccbc64d6ac96112ce93dce68; ref=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\apps_research\\runs\\r-75796b14b54a83a7ebc56c63\\briefing.md; target=Anthropic / Manager of Applied AI Architecture, Partnerships; briefing_text_chars=7619",
+      "display_output": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\apps_research\\runs\\r-75796b14b54a83a7ebc56c63\\briefing.md",
+      "l6_evidence": "N/A"
+    },
+    {
+      "order": 1,
+      "section": "competencies",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.3 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "Evidence mapping failure: visible content was not fully backed by source facts or graph lineage.",
+      "display_output": "modular_r4/sections/competencies/competencies_display.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 2,
+      "section": "unify_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.78 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/unify_bullets/unify_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 3,
+      "section": "ibm_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.2 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ibm_bullets/ibm_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 4,
+      "section": "insurtech_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.73 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 5,
+      "section": "ey_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ey_bullets/ey_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 6,
+      "section": "unify_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/unify_narrative/unify_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 7,
+      "section": "ibm_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ibm_narrative/ibm_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 8,
+      "section": "insurtech_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 9,
+      "section": "ey_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ey_narrative/ey_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 10,
+      "section": "executive_summary",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.6 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/executive_summary/resume_display_text.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 11,
+      "section": "headline",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.8 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.8 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/headline/headline_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 12,
+      "section": "final_resume_aggregation",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": "NOT_OBSERVED",
+      "primary_provider": "NOT_OBSERVED",
+      "primary_model_observed": "NOT_OBSERVED",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "ASSEMBLED",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 3.8 vs 4 FAIL",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "FAIL",
+      "x3": "X3_REVIEW_AGGREGATION",
+      "past_fail_blocker": "Final resume aggregation provider quorum failure: the full-resume coherence judge panel did not reach the required model-backed quorum.",
+      "display_output": "modular_r4/final_resume_assembly/final_resume.json",
+      "l6_evidence": "not_observed"
+    }
+  ],
+  "final_resume_output": {
+    "schema_version": "apps_rg.final_resume_output.v1",
+    "generated_at_utc": "2026-08-09T08:49:23Z",
+    "required": true,
+    "status": "PASS",
+    "failed_gate_ids": [],
+    "run_root": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2",
+    "final_resume_json": {
+      "relpath": "modular_r4/final_resume_assembly/final_resume.json",
+      "exists": true,
+      "bytes": 882733,
+      "sha256": "9dc0587b79665402349d3b511236891ad3f863c706548924ea88744b9cad28da"
+    },
+    "rendered_resume_text": {
+      "relpath": "FINAL_RESUME_OUTPUT.txt",
+      "exists": true,
+      "bytes": 7427,
+      "sha256": "96f89489788ad923e9683ab60fa7e320513996b4c55065b167a98cba1de53b8e"
+    },
+    "resume_docx": {
+      "relpath": "outputs/resume.docx",
+      "exists": true,
+      "bytes": 5078,
+      "sha256": "b0337db6abb2fc6dd480222d0ebc4197307bf5bf0f3013524dc1edde66e6468a"
+    },
+    "rendered_order": [
+      "candidate_header",
+      "headline",
+      "executive_summary",
+      "competencies",
+      "professional_experience",
+      "education",
+      "certifications"
+    ],
+    "base_resume_role_facts": [
+      {
+        "role_key": "unify",
+        "employer": "Unify Consulting",
+        "title": "SVP Engineering, Agentic AI Platforms",
+        "location": "Boca Raton, FL",
+        "start_date": "2023-02",
+        "end_date": "present",
+        "is_current": true
+      },
+      {
+        "role_key": "ibm",
+        "employer": "IBM",
+        "title": "Partner",
+        "location": "Edgewater, NJ",
+        "start_date": "2017-04",
+        "end_date": "2022-10",
+        "is_current": false
+      },
+      {
+        "role_key": "insurtech",
+        "employer": "InsurTech Cloud Solutions",
+        "title": "Chief Technology Officer",
+        "location": "New York, NY",
+        "start_date": "2014-04",
+        "end_date": "2017-03",
+        "is_current": false
+      },
+      {
+        "role_key": "ey",
+        "employer": "Ernst & Young",
+        "title": "Principal",
+        "location": "New York, NY",
+        "start_date": "2009-10",
+        "end_date": "2014-03",
+        "is_current": false
+      },
+      {
+        "role_key": "early_career",
+        "employer": "Early Career Roles",
+        "title": "Actuarial Consultant and Quantitative Roles",
+        "location": "Philadelphia, PA",
+        "start_date": "2002-10",
+        "end_date": "2009-09",
+        "is_current": false
+      }
+    ],
+    "content_sources": {
+      "identity_contact_source": "base_resume_locked_profile",
+      "role_header_source": "final_resume.locked_copy_invariants",
+      "generated_content_source": "final_resume.sections[].l2_output_snapshot",
+      "education_certification_source": "final_resume.sections[].copied_text_exact",
+      "locked_copy_source": "final_resume.sections[].copied_text_exact"
+    },
+    "gates": [
+      {
+        "gate_id": "final_resume_json_spine_present",
+        "pass": true,
+        "observed_value": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/modular_r4/final_resume_assembly/final_resume.json",
+        "threshold": "modular_r4/final_resume_assembly/final_resume.json",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_rendered_text_present",
+        "pass": true,
+        "observed_value": {
+          "relpath": "FINAL_RESUME_OUTPUT.txt",
+          "exists": true,
+          "bytes": 7427,
+          "sha256": "96f89489788ad923e9683ab60fa7e320513996b4c55065b167a98cba1de53b8e"
+        },
+        "threshold": "nonempty text output",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_present_nonempty",
+        "pass": true,
+        "observed_value": {
+          "relpath": "outputs/resume.docx",
+          "exists": true,
+          "bytes": 5078,
+          "sha256": "b0337db6abb2fc6dd480222d0ebc4197307bf5bf0f3013524dc1edde66e6468a"
+        },
+        "threshold": "nonempty DOCX output",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_rendered_order_valid",
+        "pass": true,
+        "observed_value": {
+          "EXECUTIVE SUMMARY": 244,
+          "ENGINEERING & PLATFORM COMPETENCIES": 1283,
+          "PROFESSIONAL EXPERIENCE": 2894,
+          "EDUCATION": 6901,
+          "CERTIFICATIONS": 7065
+        },
+        "threshold": [
+          "candidate_header",
+          "headline",
+          "executive_summary",
+          "competencies",
+          "professional_experience",
+          "education",
+          "certifications"
+        ],
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_order_valid",
+        "pass": true,
+        "observed_value": {
+          "EXECUTIVE SUMMARY": 242,
+          "ENGINEERING & PLATFORM COMPETENCIES": 1280,
+          "PROFESSIONAL EXPERIENCE": 2890,
+          "EDUCATION": 6891,
+          "CERTIFICATIONS": 7054
+        },
+        "threshold": [
+          "candidate_header",
+          "headline",
+          "executive_summary",
+          "competencies",
+          "professional_experience",
+          "education",
+          "certifications"
+        ],
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_base_role_headers_preserved",
+        "pass": true,
+        "observed_value": {
+          "role_headers": {
+            "unify": [
+              "Unify Consulting \u2014 SVP Engineering, Agentic AI Platforms",
+              "Boca Raton, FL | Feb 2023 \u2013 Present"
+            ],
+            "ibm": [
+              "IBM \u2014 Partner",
+              "Edgewater, NJ | Apr 2017 \u2013 Oct 2022"
+            ],
+            "insurtech": [
+              "InsurTech Cloud Solutions \u2014 Chief Technology Officer",
+              "New York, NY | Apr 2014 \u2013 Mar 2017"
+            ],
+            "ey": [
+              "Ernst & Young \u2014 Principal",
+              "New York, NY | Oct 2009 \u2013 Mar 2014"
+            ],
+            "early_career": [
+              "Early Career Roles \u2014 Actuarial Consultant and Quantitative Roles",
+              "Philadelphia, PA | Oct 2002 \u2013 Sep 2009"
+            ]
+          },
+          "positions": {
+            "unify": [
+              2919,
+              2976
+            ],
+            "ibm": [
+              4409,
+              4423
+            ],
+            "insurtech": [
+              5377,
+              5430
+            ],
+            "ey": [
+              5765,
+              5791
+            ],
+            "early_career": [
+              6394,
+              6459
+            ]
+          }
+        },
+        "threshold": "base resume employer/title/location/date headers in order",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_base_role_headers_preserved",
+        "pass": true,
+        "observed_value": {
+          "role_headers": {
+            "unify": [
+              "Unify Consulting \u2014 SVP Engineering, Agentic AI Platforms",
+              "Boca Raton, FL | Feb 2023 \u2013 Present"
+            ],
+            "ibm": [
+              "IBM \u2014 Partner",
+              "Edgewater, NJ | Apr 2017 \u2013 Oct 2022"
+            ],
+            "insurtech": [
+              "InsurTech Cloud Solutions \u2014 Chief Technology Officer",
+              "New York, NY | Apr 2014 \u2013 Mar 2017"
+            ],
+            "ey": [
+              "Ernst & Young \u2014 Principal",
+              "New York, NY | Oct 2009 \u2013 Mar 2014"
+            ],
+            "early_career": [
+              "Early Career Roles \u2014 Actuarial Consultant and Quantitative Roles",
+              "Philadelphia, PA | Oct 2002 \u2013 Sep 2009"
+            ]
+          },
+          "positions": {
+            "unify": [
+              2914,
+              2971
+            ],
+            "ibm": [
+              4403,
+              4417
+            ],
+            "insurtech": [
+              5370,
+              5423
+            ],
+            "ey": [
+              5757,
+              5783
+            ],
+            "early_career": [
+              6385,
+              6450
+            ]
+          }
+        },
+        "threshold": "base resume employer/title/location/date headers in order",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_education_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "education",
+          "expected_lines": [
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+          ],
+          "positions": {
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 6911,
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 6996
+          }
+        },
+        "threshold": "base resume education lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_education_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "education",
+          "expected_lines": [
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+          ],
+          "positions": {
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 6901,
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 6986
+          }
+        },
+        "threshold": "base resume education lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_certifications_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "certifications",
+          "expected_lines": [
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025",
+            "Databricks Lakehouse Fundamentals Accreditation, 2023",
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023",
+            "Fellow of the Society of Actuaries, 2010"
+          ],
+          "positions": {
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025": 7094,
+            "Databricks Lakehouse Fundamentals Accreditation, 2023": 7153,
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023": 7207,
+            "Fellow of the Society of Actuaries, 2010": 7263
+          }
+        },
+        "threshold": "base resume certification lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_certifications_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "certifications",
+          "expected_lines": [
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025",
+            "Databricks Lakehouse Fundamentals Accreditation, 2023",
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023",
+            "Fellow of the Society of Actuaries, 2010"
+          ],
+          "positions": {
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025": 7083,
+            "Databricks Lakehouse Fundamentals Accreditation, 2023": 7142,
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023": 7196,
+            "Fellow of the Society of Actuaries, 2010": 7252
+          }
+        },
+        "threshold": "base resume certification lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_no_gap_markers",
+        "pass": true,
+        "observed_value": {
+          "not_completed": false,
+          "not_generated_by_run": false
+        },
+        "threshold": false,
+        "failure_reason": ""
+      }
+    ]
+  },
+  "rca_findings": [
+    {
+      "section": "final_resume_aggregation",
+      "classification": "Final resume aggregation provider quorum failure: the full-resume coherence judge panel did not reach the required model-backed quorum.",
+      "root_cause": "The final full-resume coherence judge panel produced fewer model-backed verdicts than the required quorum, so final aggregation stayed blocked even though the generated section lanes may have product-authorized evidence.",
+      "evidence": "x2_full_resume_llm_coherence_aggregation",
+      "causal_allocation": {
+        "dominant_cause": "The final aggregation judge panel could not count enough model-backed full-resume coherence verdicts to satisfy quorum.",
+        "retry_recoverability": "HIGH_AFTER_ARTIFACT_FIX",
+        "retry_recoverability_reason": "A rerun can recover after repairing the provider artifact path/transport blocker; blind reruns before that fix reproduce the same zero-quorum result.",
+        "allocation": [
+          {
+            "domain": "Provider artifact persistence",
+            "causal_role": "PRIMARY",
+            "root_cause_link": "x2_full_resume_llm_coherence_aggregation: quorum_not_met observed={'full_resume_coherence_pass': False, 'decisive_reason': 'quorum_not_met', 'blockers': ['judge_fail:x1d_openai_chatgpt_full_resume_coherence'], 'model_backed_pass_count': 1, 'quorum_required': 2}",
+            "work_share": "45%",
+            "evidence_refs": [
+              "coherence_judge_providers/*provider_request*.json",
+              "x1d_full_resume_judge_outputs.json"
+            ],
+            "required_work": "Make X1D provider request/response artifact paths compact and long-path safe before provider calls run."
+          },
+          {
+            "domain": "Judge panel quorum",
+            "causal_role": "CONTRIBUTING",
+            "root_cause_link": "The aggregation contract requires two model-backed pass verdicts; blocked providers do not count toward quorum.",
+            "work_share": "25%",
+            "evidence_refs": [
+              "full_resume_llm_coherence_review.json"
+            ],
+            "required_work": "Preserve fail-closed quorum semantics and rerun the required Gemini/OpenAI full-resume judges after artifact persistence is repaired."
+          },
+          {
+            "domain": "Product authorization gate",
+            "causal_role": "DETECTION",
+            "root_cause_link": "Final resume output remained unauthorized because x2_full_resume_llm_coherence_aggregation did not pass.",
+            "work_share": "20%",
+            "evidence_refs": [
+              "x2_full_resume_llm_coherence_aggregation"
+            ],
+            "required_work": "Continue withholding inline resume/DOCX authorization until final aggregation X2 and product gates pass in the same run root."
+          },
+          {
+            "domain": "Observability / RCA reporting",
+            "causal_role": "REPORTING_GAP",
+            "root_cause_link": "Mandatory outputs must distinguish final judge provider quorum from missing upstream generated lanes.",
+            "work_share": "10%",
+            "evidence_refs": [
+              "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+            ],
+            "required_work": "Name provider_blocked_count, model_backed_pass_count, quorum_required, and failed aggregation gate IDs in RCA outputs."
+          }
+        ]
+      },
+      "implementation_plan": [
+        "Repair X1D full-resume judge artifact persistence and provider transport so Gemini/OpenAI request and response artifacts can be written under long run roots.",
+        "Rerun final aggregation with the required model-backed judge roster and require model_backed_pass_count to meet quorum_required before authorization.",
+        "Keep final resume inline output withheld whenever provider_blocked_count is nonzero or model_backed_pass_count is below quorum_required.",
+        "Add regression tests for long-path provider artifacts and mandatory RCA provider-quorum reporting."
+      ],
+      "action": "Implement the final aggregation provider-quorum fix before rerunning final assembly."
+    }
+  ],
+  "section_failure_forensics": {
+    "gate_id": "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+    "pass": false,
+    "required": true,
+    "failed_section_count": 1,
+    "artifact_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics",
+    "artifacts": [
+      {
+        "section_id": "final_resume_aggregation",
+        "json_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.json",
+        "md_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.md",
+        "complete": false,
+        "errors": [
+          "invalid:comparison_incomplete"
+        ],
+        "failure_type": "aggregation_downstream",
+        "baseline_confidence": "pinned_baseline_unavailable"
+      }
+    ],
+    "missing_or_incomplete": [
+      {
+        "section_id": "final_resume_aggregation",
+        "json_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.json",
+        "md_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.md",
+        "complete": false,
+        "errors": [
+          "invalid:comparison_incomplete"
+        ],
+        "failure_type": "aggregation_downstream",
+        "baseline_confidence": "pinned_baseline_unavailable"
+      }
+    ],
+    "failure_reason": "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+    "baseline_confidence": "pinned_baseline_unavailable",
+    "baseline_run_dir": ""
+  },
+  "operational_failure_forensics": {},
+  "output_bisect": {
+    "required": true,
+    "sections": [
+      {
+        "schema_version": "apps_rg.output_bisect.v1",
+        "section_id": "final_resume_aggregation",
+        "scope": "NO_PRIOR_BASELINE",
+        "first_observed_divergence": {
+          "order": 1,
+          "stage": "u0_ingress",
+          "prior_value": "NOT_OBSERVED",
+          "current_value": "e681b16d8a98f0e429731eccb971d069477498c0743315701f1ba48b087eadc1",
+          "prior_detail": "NOT_OBSERVED",
+          "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\apps_research\\runs\\r-75796b14b54a83a7ebc56c63\\briefing.md",
+          "match": false,
+          "classification": "CORRELATED_ONLY",
+          "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+          "prior_evidence_ref": "",
+          "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\ingress_raw.json"
+        },
+        "first_causally_relevant_divergence": {
+          "order": 0,
+          "stage": "upstream_section_authorization",
+          "classification": "CAUSAL",
+          "reason": "Final assembly was blocked because the executive summary never reached product authorization."
+        },
+        "ingestion_to_outcome_lineage": [
+          {
+            "order": 1,
+            "stage": "u0_ingress",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "e681b16d8a98f0e429731eccb971d069477498c0743315701f1ba48b087eadc1",
+            "prior_detail": "NOT_OBSERVED",
+            "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\apps_research\\runs\\r-75796b14b54a83a7ebc56c63\\briefing.md",
+            "match": false,
+            "classification": "CORRELATED_ONLY",
+            "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\ingress_raw.json"
+          },
+          {
+            "order": 2,
+            "stage": "u0_payload",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "fad5c3b4609100d03efc503274ed6d49caf3353d50a1ac1a23cf7e150fb3c46e",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "CORRELATED_ONLY",
+            "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\u0_receipt.json"
+          },
+          {
+            "order": 3,
+            "stage": "jd_material",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\section_input_usage_ledger.json"
+          },
+          {
+            "order": 4,
+            "stage": "briefing_material",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\section_input_usage_ledger.json"
+          },
+          {
+            "order": 5,
+            "stage": "targeting_bundle",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\section_input_usage_ledger.json"
+          },
+          {
+            "order": 6,
+            "stage": "proof_pool",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\section_input_usage_ledger.json"
+          },
+          {
+            "order": 7,
+            "stage": "selected_fact_plan",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\section_input_usage_ledger.json"
+          },
+          {
+            "order": 8,
+            "stage": "provider_request",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\provider_request.json"
+          },
+          {
+            "order": 9,
+            "stage": "initial_candidate",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 10,
+            "stage": "retry_loop",
+            "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+            "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": true,
+            "classification": "RULED_OUT",
+            "reason": "The evidence is identical at this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\synthesis_regen_receipt.json"
+          },
+          {
+            "order": 11,
+            "stage": "deterministic_finalization",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\executive_summary_finalize_coherence.json"
+          },
+          {
+            "order": 12,
+            "stage": "final_x2",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\x2_gate_outputs.json"
+          },
+          {
+            "order": 13,
+            "stage": "judges",
+            "prior_value": "NO_JUDGE_ROWS",
+            "current_value": "NO_JUDGE_ROWS",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": true,
+            "classification": "RULED_OUT",
+            "reason": "The evidence is identical at this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\x1d_llm_judge_outputs.json"
+          },
+          {
+            "order": 14,
+            "stage": "x3",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\x3_disposition.json"
+          }
+        ],
+        "prior_attempt_timeline": [
+          {
+            "run": "prior_passing",
+            "sequence": 1,
+            "phase": "lane_resolution",
+            "attempt": "-",
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "no prior passing lane was found",
+            "repair_or_action": "none",
+            "gate_scope": "NONE",
+            "gate_result": "NOT_APPLICABLE",
+            "failed_gate_ids": [],
+            "judge_result": "NO_PRIOR_PASSING_RUN",
+            "disposition": "NO_BASELINE",
+            "acceptance_scope": "NOT_APPLICABLE",
+            "evidence_ref": "",
+            "complete": true
+          }
+        ],
+        "current_attempt_timeline": [
+          {
+            "run": "current_failure",
+            "sequence": 1,
+            "phase": "initial_generation",
+            "attempt": 0,
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "initial candidate",
+            "repair_or_action": "dispatch provider generation",
+            "gate_scope": "FULL_X2",
+            "gate_result": "PASS_OR_NOT_TRIGGERED",
+            "failed_gate_ids": [],
+            "judge_result": "PENDING",
+            "disposition": "ADVANCED_TO_X2",
+            "acceptance_scope": "INITIAL_CANDIDATE",
+            "evidence_ref": "",
+            "complete": false
+          },
+          {
+            "run": "current_failure",
+            "sequence": 2,
+            "phase": "final_x2",
+            "attempt": 1,
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "all deterministic product gates",
+            "repair_or_action": "evaluate full X2 gate set",
+            "gate_scope": "FULL_X2",
+            "gate_result": "PASS",
+            "failed_gate_ids": [],
+            "judge_result": "ADVANCED_TO_JUDGES",
+            "disposition": "ADVANCED",
+            "acceptance_scope": "PRODUCT_GATE",
+            "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\x2_gate_outputs.json",
+            "complete": false
+          },
+          {
+            "run": "current_failure",
+            "sequence": 3,
+            "phase": "judge_panel",
+            "attempt": "-",
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "judge evidence absent",
+            "repair_or_action": "none",
+            "gate_scope": "X1D_MODEL_BACKED_JUDGE",
+            "gate_result": "EVIDENCE_NOT_RECORDED",
+            "failed_gate_ids": [],
+            "judge_result": "EVIDENCE_NOT_RECORDED",
+            "disposition": "EVIDENCE_GAP",
+            "acceptance_scope": "NOT_APPLICABLE",
+            "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\x1d_llm_judge_outputs.json",
+            "complete": false
+          },
+          {
+            "run": "current_failure",
+            "sequence": 4,
+            "phase": "x3_disposition",
+            "attempt": "-",
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "",
+            "repair_or_action": "authorize or block product output",
+            "gate_scope": "X3",
+            "gate_result": "FAIL",
+            "failed_gate_ids": [],
+            "judge_result": "",
+            "disposition": "NOT_OBSERVED",
+            "acceptance_scope": "PRODUCT_AUTHORIZATION",
+            "evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\modular_r4\\final_resume_assembly\\x3_disposition.json",
+            "complete": false
+          }
+        ],
+        "gate_matrix": [],
+        "judge_matrix": [
+          {
+            "judge": "configured_panel",
+            "prior": "NOT_OBSERVED",
+            "current": "JUDGES_NOT_REACHED",
+            "reason": "No current judge rows were emitted because X2 failed first."
+          }
+        ],
+        "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+        "code_bindings": [
+          {
+            "role": "revision comparison",
+            "file": "",
+            "symbol": "",
+            "baseline_symbol_hash": "",
+            "current_symbol_hash": "",
+            "changed_between_revisions": false,
+            "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+          }
+        ],
+        "underlying_root_cause": {
+          "downstream_root_cause": {
+            "status": "ISOLATED_TO_UPSTREAM_SECTION",
+            "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+          }
+        },
+        "layperson_explanation": [
+          "The prior passing revision authorized final assembly because every required section, including the executive summary, had already cleared its product checks.",
+          "The current final assembly did not fail as an independent writing attempt; it was blocked downstream because the executive summary never became eligible for assembly.",
+          "No aggregation retry or aggregation judge could repair that upstream section failure, so the underlying executive-summary retry and X2 evidence remains the controlling root cause."
+        ]
+      }
+    ]
+  },
+  "mandatory_artifacts": {
+    "bcg_executive_output_md": "01_BCG_executive_output.md",
+    "output_bisect_md": "02_output_bisect.md",
+    "mandatory_run_output_md": "02_section_lane_summary_table.md",
+    "mandatory_run_output_json": "APPS_RG_MANDATORY_RUN_OUTPUT.json",
+    "section_failure_forensics_dir": "section_failure_forensics",
+    "final_resume_output_txt": "FINAL_RESUME_OUTPUT.txt",
+    "final_resume_output_json": "FINAL_RESUME_OUTPUT.json",
+    "final_resume_docx": "outputs/resume.docx",
+    "canonical_final_resume_json": "modular_r4/final_resume_assembly/final_resume.json"
+  },
+  "inline_required_output": {
+    "schema_version": "apps_rg.inline_required_output.v1",
+    "immutable_section_order": [
+      "bcg",
+      "section_lane_summary_table",
+      "resume_docx_full_version_inline"
+    ],
+    "bcg": {
+      "title": "BCG Executive Output - apps_rg Run",
+      "section_order": [
+        "executive_answer",
+        "p0_p1_px_recommendations",
+        "board_level_readout",
+        "issue_tree",
+        "recommended_next_move",
+        "evidence_map"
+      ],
+      "executive_answer": "The run is blocked and must not authorize a final resume. Required generation and/or final product gates did not clear. The source X3 decision was X3A_DENY_REROUTE, but completion ended BLOCKED because APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE. Use the P0/P1/PX recommendations below as the repair order.",
+      "p0_p1_px_recommendations": {
+        "columns": [
+          "priority",
+          "recommendation",
+          "evidence",
+          "gate_outcome"
+        ],
+        "rows": [
+          {
+            "priority": "P0",
+            "recommendation": "Fix final_resume_aggregation before authorizing the final resume.",
+            "evidence": "final_resume_aggregation: x2_full_resume_llm_coherence_aggregation; x2=FAIL; product=FAIL; x3=X3_REVIEW_AGGREGATION",
+            "gate_outcome": "Outcome remains blocked until full-resume aggregation clears X2/product gates."
+          }
+        ]
+      },
+      "board_level_readout": {
+        "columns": [
+          "question",
+          "answer"
+        ],
+        "rows": [
+          {
+            "question": "Did apps_research run?",
+            "answer": "Yes"
+          },
+          {
+            "question": "Research source class",
+            "answer": "FRESH_APPS_RESEARCH"
+          },
+          {
+            "question": "Research input used",
+            "answer": "external_openai"
+          },
+          {
+            "question": "Briefing evidence",
+            "answer": "auto_research_internal=True; research_delegation_executed=True; source=RUN_SPECIFIC; digest=e4c801f53861c0e898af9e6146ea8450db2a44edccbc64d6ac96112ce93dce68; ref=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\apps_research\\runs\\r-75796b14b54a83a7ebc56c63\\briefing.md; target=Anthropic / Manager of Applied AI Architecture, Partnerships; briefing_text_chars=7619"
+          },
+          {
+            "question": "Did resume generation run?",
+            "answer": "11 REAL_LLM section(s)"
+          },
+          {
+            "question": "Source X3 decision",
+            "answer": "X3A_DENY_REROUTE"
+          },
+          {
+            "question": "Completion status",
+            "answer": "BLOCKED"
+          },
+          {
+            "question": "Completion fault",
+            "answer": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE"
+          },
+          {
+            "question": "Final product authorized?",
+            "answer": "False"
+          },
+          {
+            "question": "Primary blocker",
+            "answer": "Fix final_resume_aggregation before authorizing the final resume. Evidence: final_resume_aggregation: x2_full_resume_llm_coherence_aggregation; x2=FAIL; product=FAIL; x3=X3_REVIEW_AGGREGATION"
+          },
+          {
+            "question": "Decision",
+            "answer": "Do not authorize; fix P0 gates first."
+          }
+        ]
+      },
+      "issue_tree": [
+        {
+          "section": "final_resume_aggregation",
+          "classification": "Final resume aggregation provider quorum failure: the full-resume coherence judge panel did not reach the required model-backed quorum.",
+          "root_cause": "The final full-resume coherence judge panel produced fewer model-backed verdicts than the required quorum, so final aggregation stayed blocked even though the generated section lanes may have product-authorized evidence.",
+          "evidence": [
+            "x2_full_resume_llm_coherence_aggregation",
+            "forensics_json=artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.json",
+            "forensics_md=artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.md",
+            "forensics_complete=False"
+          ],
+          "causal_allocation": {
+            "dominant_cause": "The final aggregation judge panel could not count enough model-backed full-resume coherence verdicts to satisfy quorum.",
+            "retry_recoverability": "HIGH_AFTER_ARTIFACT_FIX",
+            "retry_recoverability_reason": "A rerun can recover after repairing the provider artifact path/transport blocker; blind reruns before that fix reproduce the same zero-quorum result.",
+            "allocation": [
+              {
+                "domain": "Provider artifact persistence",
+                "causal_role": "PRIMARY",
+                "root_cause_link": "x2_full_resume_llm_coherence_aggregation: quorum_not_met observed={'full_resume_coherence_pass': False, 'decisive_reason': 'quorum_not_met', 'blockers': ['judge_fail:x1d_openai_chatgpt_full_resume_coherence'], 'model_backed_pass_count': 1, 'quorum_required': 2}",
+                "work_share": "45%",
+                "evidence_refs": [
+                  "coherence_judge_providers/*provider_request*.json",
+                  "x1d_full_resume_judge_outputs.json"
+                ],
+                "required_work": "Make X1D provider request/response artifact paths compact and long-path safe before provider calls run."
+              },
+              {
+                "domain": "Judge panel quorum",
+                "causal_role": "CONTRIBUTING",
+                "root_cause_link": "The aggregation contract requires two model-backed pass verdicts; blocked providers do not count toward quorum.",
+                "work_share": "25%",
+                "evidence_refs": [
+                  "full_resume_llm_coherence_review.json"
+                ],
+                "required_work": "Preserve fail-closed quorum semantics and rerun the required Gemini/OpenAI full-resume judges after artifact persistence is repaired."
+              },
+              {
+                "domain": "Product authorization gate",
+                "causal_role": "DETECTION",
+                "root_cause_link": "Final resume output remained unauthorized because x2_full_resume_llm_coherence_aggregation did not pass.",
+                "work_share": "20%",
+                "evidence_refs": [
+                  "x2_full_resume_llm_coherence_aggregation"
+                ],
+                "required_work": "Continue withholding inline resume/DOCX authorization until final aggregation X2 and product gates pass in the same run root."
+              },
+              {
+                "domain": "Observability / RCA reporting",
+                "causal_role": "REPORTING_GAP",
+                "root_cause_link": "Mandatory outputs must distinguish final judge provider quorum from missing upstream generated lanes.",
+                "work_share": "10%",
+                "evidence_refs": [
+                  "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+                ],
+                "required_work": "Name provider_blocked_count, model_backed_pass_count, quorum_required, and failed aggregation gate IDs in RCA outputs."
+              }
+            ]
+          },
+          "required_implementation_plan": [
+            "Repair X1D full-resume judge artifact persistence and provider transport so Gemini/OpenAI request and response artifacts can be written under long run roots.",
+            "Rerun final aggregation with the required model-backed judge roster and require model_backed_pass_count to meet quorum_required before authorization.",
+            "Keep final resume inline output withheld whenever provider_blocked_count is nonzero or model_backed_pass_count is below quorum_required.",
+            "Add regression tests for long-path provider artifacts and mandatory RCA provider-quorum reporting."
+          ]
+        }
+      ],
+      "recommended_next_move": [
+        "Resolve P0: Fix final_resume_aggregation before authorizing the final resume. Evidence: final_resume_aggregation: x2_full_resume_llm_coherence_aggregation; x2=FAIL; product=FAIL; x3=X3_REVIEW_AGGREGATION.",
+        "Rerun the integrated apps_rg path only after the listed P0 evidence clears.",
+        "Treat final assembly as valid only when every required section and product output is product-authorized."
+      ],
+      "evidence_map": [
+        {
+          "label": "Mandatory run ledger",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\02_section_lane_summary_table.md"
+        },
+        {
+          "label": "Machine-readable ledger",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\APPS_RG_MANDATORY_RUN_OUTPUT.json"
+        },
+        {
+          "label": "Final resume text",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\FINAL_RESUME_OUTPUT.txt"
+        },
+        {
+          "label": "Final resume output contract",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\FINAL_RESUME_OUTPUT.json"
+        },
+        {
+          "label": "Resume DOCX",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\outputs/resume.docx"
+        },
+        {
+          "label": "Section failure forensics index",
+          "path": "@artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/index.json; @artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/index.md"
+        },
+        {
+          "label": "Section forensic RCA: final_resume_aggregation",
+          "path": "@artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.json; @artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.md"
+        }
+      ]
+    },
+    "section_lane_summary_table": {
+      "title": "Section Lane Summary Table",
+      "columns": [
+        "order",
+        "section",
+        "research_source_class",
+        "r1a",
+        "r1b",
+        "lane_record",
+        "provider_call_attempted",
+        "primary_provider",
+        "primary_model_observed",
+        "pooling_selector_llm",
+        "secondary_provider",
+        "secondary_model_observed",
+        "generation_status",
+        "judges_run",
+        "judge_models_scores",
+        "judge_retry_fallback",
+        "x2",
+        "x3",
+        "past_fail_blocker",
+        "display_output",
+        "l6_evidence"
+      ],
+      "rows": [
+        {
+          "order": 0,
+          "section": "research_briefing_input",
+          "research_source_class": "FRESH_APPS_RESEARCH",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-terra",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "N/A",
+          "secondary_model_observed": "N/A",
+          "generation_status": "BRIEFING_PRESENT:RUN_SPECIFIC",
+          "judges_run": "N/A",
+          "judge_models_scores": "N/A",
+          "judge_retry_fallback": "N/A",
+          "x2": "PASS; judge=gemini-3.6-flash",
+          "x3": "X3D_ALLOW_FINISH; X1=PASS",
+          "past_fail_blocker": "auto_research_internal=True; research_delegation_executed=True; source=RUN_SPECIFIC; digest=e4c801f53861c0e898af9e6146ea8450db2a44edccbc64d6ac96112ce93dce68; ref=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\apps_research\\runs\\r-75796b14b54a83a7ebc56c63\\briefing.md; target=Anthropic / Manager of Applied AI Architecture, Partnerships; briefing_text_chars=7619",
+          "display_output": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\\apps_research\\runs\\r-75796b14b54a83a7ebc56c63\\briefing.md",
+          "l6_evidence": "N/A"
+        },
+        {
+          "order": 1,
+          "section": "competencies",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.3 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "Evidence mapping failure: visible content was not fully backed by source facts or graph lineage.",
+          "display_output": "modular_r4/sections/competencies/competencies_display.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 2,
+          "section": "unify_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.78 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/unify_bullets/unify_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 3,
+          "section": "ibm_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.2 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ibm_bullets/ibm_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 4,
+          "section": "insurtech_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.73 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 5,
+          "section": "ey_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ey_bullets/ey_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 6,
+          "section": "unify_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/unify_narrative/unify_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 7,
+          "section": "ibm_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ibm_narrative/ibm_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 8,
+          "section": "insurtech_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 9,
+          "section": "ey_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ey_narrative/ey_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 10,
+          "section": "executive_summary",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.6 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/executive_summary/resume_display_text.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 11,
+          "section": "headline",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.8 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.8 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/headline/headline_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 12,
+          "section": "final_resume_aggregation",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": "NOT_OBSERVED",
+          "primary_provider": "NOT_OBSERVED",
+          "primary_model_observed": "NOT_OBSERVED",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "ASSEMBLED",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 3.8 vs 4 FAIL",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "FAIL",
+          "x3": "X3_REVIEW_AGGREGATION",
+          "past_fail_blocker": "Final resume aggregation provider quorum failure: the full-resume coherence judge panel did not reach the required model-backed quorum.",
+          "display_output": "modular_r4/final_resume_assembly/final_resume.json",
+          "l6_evidence": "not_observed"
+        }
+      ]
+    },
+    "resume_docx_full_version_inline": {
+      "title": "Resume DOCX Full Version Inline",
+      "source": "No authorized resume text emitted; this block is derived only from the current E2E run ledger and final-resume output contract.",
+      "text": "NO_AUTHORIZED_RESUME_OUTPUT\nsource_of_truth=current_e2e_run_artifacts_only\nrun_root=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry15_20260809\\e2e_20260809T083841Z_903948f2\nstatus=BLOCKED\nreason=outcome_authorized_false; x3_blocked=final_resume_aggregation\npolicy=do_not_inline_FINAL_RESUME_OUTPUT_txt_unless_current_run_authorized"
+    }
+  },
+  "mandatory_inline_output_gates": [
+    {
+      "gate_id": "mandatory_bcg_inline_output_present",
+      "pass": true,
+      "observed_value": "01_BCG_executive_output.md",
+      "threshold": "BCG executive markdown rendered inline",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_section_lane_table_inline_present",
+      "pass": true,
+      "observed_value": 13,
+      "threshold": ">=1 lane table row",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_resume_text_inline_present",
+      "pass": false,
+      "observed_value": {
+        "artifact": {
+          "relpath": "FINAL_RESUME_OUTPUT.txt",
+          "exists": true,
+          "bytes": 7427,
+          "sha256": "96f89489788ad923e9683ab60fa7e320513996b4c55065b167a98cba1de53b8e"
+        },
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "x3_blocked=final_resume_aggregation"
+        ]
+      },
+      "threshold": "current-run authorized nonempty FINAL_RESUME_OUTPUT.txt",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "mandatory_final_resume_json_present",
+      "pass": false,
+      "observed_value": {
+        "artifact": {
+          "relpath": "modular_r4/final_resume_assembly/final_resume.json",
+          "exists": true,
+          "bytes": 882733,
+          "sha256": "9dc0587b79665402349d3b511236891ad3f863c706548924ea88744b9cad28da"
+        },
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "x3_blocked=final_resume_aggregation"
+        ]
+      },
+      "threshold": "current-run authorized modular_r4/final_resume_assembly/final_resume.json",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "mandatory_resume_docx_present",
+      "pass": false,
+      "observed_value": {
+        "artifact": {
+          "relpath": "outputs/resume.docx",
+          "exists": true,
+          "bytes": 5078,
+          "sha256": "b0337db6abb2fc6dd480222d0ebc4197307bf5bf0f3013524dc1edde66e6468a"
+        },
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "x3_blocked=final_resume_aggregation"
+        ]
+      },
+      "threshold": "current-run authorized outputs/resume.docx",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "mandatory_inline_required_json_shape_locked",
+      "pass": true,
+      "observed_value": {
+        "schema_version": "apps_rg.inline_required_output.v1",
+        "immutable_section_order": [
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ],
+        "shape_errors": []
+      },
+      "threshold": {
+        "schema_version": "apps_rg.inline_required_output.v1",
+        "immutable_section_order": [
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ],
+        "top_level_keys": [
+          "schema_version",
+          "immutable_section_order",
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ]
+      },
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_bcg_p0_p1_px_recommendations_locked",
+      "pass": false,
+      "observed_value": {
+        "title": "BCG Executive Output - apps_rg Run",
+        "section_order": [
+          "executive_answer",
+          "p0_p1_px_recommendations",
+          "board_level_readout",
+          "issue_tree",
+          "recommended_next_move",
+          "evidence_map"
+        ],
+        "priorities": [
+          "P0"
+        ],
+        "truth_errors": [
+          "bcg.forensics.incomplete_artifact:final_resume_aggregation",
+          "bcg.issue_tree.incomplete_forensic_artifact:final_resume_aggregation"
+        ]
+      },
+      "threshold": "BCG title + section order + evidence-backed recommendations and next moves",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "mandatory_research_briefing_input_row0_locked",
+      "pass": true,
+      "observed_value": {
+        "order": 0,
+        "section": "research_briefing_input",
+        "generation_status": "BRIEFING_PRESENT:RUN_SPECIFIC"
+      },
+      "threshold": "row 0 research_briefing_input",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_apps_research_row0_x1_x2_x3_gates_locked",
+      "pass": true,
+      "observed_value": {
+        "research_source_class": "FRESH_APPS_RESEARCH",
+        "x2": "PASS; judge=gemini-3.6-flash",
+        "x3": "X3D_ALLOW_FINISH; X1=PASS"
+      },
+      "threshold": "row 0 research_source_class plus compact X2/X3 handoff cells",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_resume_docx_inline_json_present",
+      "pass": false,
+      "observed_value": {
+        "title": "Resume DOCX Full Version Inline",
+        "text_chars": 394,
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "x3_blocked=final_resume_aggregation"
+        ]
+      },
+      "threshold": "resume_docx_full_version_inline.text is current-run authorized resume content",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+      "pass": false,
+      "observed_value": {
+        "required": true,
+        "failed_section_count": 1,
+        "artifact_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics",
+        "missing_or_incomplete": [
+          {
+            "section_id": "final_resume_aggregation",
+            "json_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.json",
+            "md_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry15_20260809/e2e_20260809T083841Z_903948f2/section_failure_forensics/final_resume_aggregation.md",
+            "complete": false,
+            "errors": [
+              "invalid:comparison_incomplete"
+            ],
+            "failure_type": "aggregation_downstream",
+            "baseline_confidence": "pinned_baseline_unavailable"
+          }
+        ]
+      },
+      "threshold": "every non-X3_ALLOW, cascaded, or aggregation-failed section has complete section_failure_forensics/<section>.json and .md",
+      "failure_reason": "E2E_FAIL_WITHOUT_SECTION_FORENSICS"
+    },
+    {
+      "gate_id": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE",
+      "required": true,
+      "pass": false,
+      "errors": [
+        "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+        "comparison:final_resume_aggregation:invalid:comparison_incomplete"
+      ],
+      "required_artifacts": [
+        "01_BCG_executive_output.md",
+        "02_output_bisect.md",
+        "02_section_lane_summary_table.md",
+        "03_L7_audit_ability_output.md",
+        "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+      ],
+      "product_artifacts_required": false,
+      "failed_section_comparison_required": true,
+      "operational_failure_comparison_required": false,
+      "failure_reason": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE"
+    }
+  ],
+  "mandatory_output_hard_stop": {
+    "gate_id": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE",
+    "required": true,
+    "pass": false,
+    "errors": [
+      "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+      "comparison:final_resume_aggregation:invalid:comparison_incomplete"
+    ],
+    "required_artifacts": [
+      "01_BCG_executive_output.md",
+      "02_output_bisect.md",
+      "02_section_lane_summary_table.md",
+      "03_L7_audit_ability_output.md",
+      "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+    ],
+    "product_artifacts_required": false,
+    "failed_section_comparison_required": true,
+    "operational_failure_comparison_required": false,
+    "failure_reason": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE"
+  }
+}

@@ -249,7 +249,7 @@ def build_cache_hit_dispatch_result(
     }
     if preflight.r1a_hit:
         base["artifact_dir"] = preflight.r1a_artifact_dir
-        base["x3_disposition"] = "X3_ALLOW"
+        base["x3_disposition"] = "X3D_ALLOW_FINISH"
         base["run_id"] = "r1a_cache_hit"
         return base
     if preflight.r1b_hit and preflight.r1b_result:
@@ -257,7 +257,9 @@ def build_cache_hit_dispatch_result(
         base["artifact_dir"] = str(
             resolve_preflight_receipt_dir(artifact_dir=None, runs_dir=None)
         )
-        base["x3_disposition"] = str(tp.get("x3_disposition") or "X3_ALLOW")
+        base["x3_disposition"] = str(
+            tp.get("x3_disposition") or "X3D_ALLOW_FINISH"
+        )
         base["run_id"] = str(tp.get("run_id") or tp.get("source_run_id") or "")
         base["r1b_terminal_packet"] = tp
         base["r1b_child_chunk_inspection"] = preflight.r1b_result.child_chunk_inspection

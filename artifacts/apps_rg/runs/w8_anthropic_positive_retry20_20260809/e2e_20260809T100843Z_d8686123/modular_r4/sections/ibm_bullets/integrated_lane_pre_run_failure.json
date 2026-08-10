@@ -1,0 +1,54 @@
+{
+  "blocker": "EXECUTED_X3A_DENY_REROUTE",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry20_20260809\\e2e_20260809T100843Z_d8686123\\modular_r4\\sections\\ibm_bullets",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:WriteAmplificationError:WRITE_AMPLIFICATION_DETECTED: path=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry20_20260809\\e2e_20260809T100843Z_d8686123\\modular_r4\\sections\\ibm_bullets\\l2_output.json original=8914 proposed=22400 growth_ratio=2.51x max=2.0x",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-e174c09f96474832a123a52eea8b6843",
+    "run_id": "1c01e077-99b0-492e-b104-2b2c4e8cd665",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "no resolvable run_dir pointer for lane 'ibm_bullets' under C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry20_20260809\\e2e_20260809T100843Z_d8686123\\modular_r4\\sections",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/runs/w8_anthropic_positive_retry20_20260809/e2e_20260809T100843Z_d8686123/modular_r4/sections/ibm_bullets/real/<run_id>/",
+  "generated_at_utc": "2026-08-09T10:12:42.238233+00:00",
+  "integrated_run_id": "e2e_20260809T100843Z_d8686123",
+  "lane_exec_status": "dispatch_error:L2_EXECUTION_ERROR:WriteAmplificationError:WRITE_AMPLIFICATION_DETECTED: path=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry20_20260809\\e2e_20260809T100843Z_d8686123\\modular_r4\\sections\\ibm_bullets\\l2_output.json original=8914 proposed=22400 growth_ratio=2.51x max=2.0x",
+  "lane_id": "ibm_bullets",
+  "primary_failure": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry20_20260809\\e2e_20260809T100843Z_d8686123\\modular_r4\\sections\\ibm_bullets",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:WriteAmplificationError:WRITE_AMPLIFICATION_DETECTED: path=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry20_20260809\\e2e_20260809T100843Z_d8686123\\modular_r4\\sections\\ibm_bullets\\l2_output.json original=8914 proposed=22400 growth_ratio=2.51x max=2.0x",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-e174c09f96474832a123a52eea8b6843",
+    "run_id": "1c01e077-99b0-492e-b104-2b2c4e8cd665",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/runs/w8_anthropic_positive_retry20_20260809/e2e_20260809T100843Z_d8686123/modular_r4/sections",
+  "status": "PRE_RUN_BLOCKED"
+}

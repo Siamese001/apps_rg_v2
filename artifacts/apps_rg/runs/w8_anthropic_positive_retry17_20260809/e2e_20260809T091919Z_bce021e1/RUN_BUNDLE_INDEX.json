@@ -1,0 +1,619 @@
+{
+  "schema_version": "1",
+  "run_id": "8b290cfa-e51d-4ce3-b4ee-5da19764365d",
+  "correlation_id": "8b290cfa-e51d-4ce3-b4ee-5da19764365d",
+  "created_at": "2026-08-09T09:28:01.403836+00:00",
+  "bundle_kind": "integrated_run",
+  "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1",
+  "artifact_namespace": "artifacts/apps_rg/runs",
+  "log_namespace": "apps_rg/pipeline_logs",
+  "entries": [
+    {
+      "role": "spine_terminal_ret_packet",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/terminal_ret_packet.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "spine_runtime_identity_envelope",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/runtime_identity_envelope.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "spine_r4_run_manifest",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/r4_run_manifest.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "audit_l7_route_family_coverage",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/agentic_core_l7_route_family_coverage.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "audit_how_trace",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/agentic_core_how_trace.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "audit_spine_proof",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/agentic_core_spine_proof.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "core_runtime_authority",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/apps_rg_core_runtime_authority.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "apps_rg.runtime.orchestration.core_runtime_authority"
+    },
+    {
+      "role": "narrative_run_report",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/run_report.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_narrative_or_auxiliary"
+    },
+    {
+      "role": "telemetry_runtime_receipt",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/otel_runtime_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_model_telemetry.otel_runtime"
+    },
+    {
+      "role": "telemetry_collector_preflight",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/otel_collector_preflight.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_model_telemetry.otel_runtime"
+    },
+    {
+      "role": "telemetry_collector_preflight_snapshot",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/otel_preflight_snapshot.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_model_telemetry.otel_runtime"
+    },
+    {
+      "role": "telemetry_collector_checkpoint",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/otel_collector_checkpoint.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_model_telemetry.otel_runtime"
+    },
+    {
+      "role": "product_final_resume_output_text",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/FINAL_RESUME_OUTPUT.txt",
+      "content_type": "text/plain",
+      "required": true,
+      "exists": false,
+      "producer": "apps_rg_final_resume_output_gate"
+    },
+    {
+      "role": "product_final_resume_output_json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/FINAL_RESUME_OUTPUT.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": false,
+      "producer": "apps_rg_final_resume_output_gate"
+    },
+    {
+      "role": "product_final_resume_spine_json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/modular_r4/final_resume_assembly/final_resume.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": false,
+      "producer": "apps_rg_final_resume_assembly"
+    },
+    {
+      "role": "product_resume_json_flat",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/generated_resume.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_resume_assembly"
+    },
+    {
+      "role": "product_resume_docx_branded",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/Amit_Ayer_Resume.docx",
+      "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_docx_export"
+    },
+    {
+      "role": "product_resume_json_outputs",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/outputs/generated_resume.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_resume_assembly"
+    },
+    {
+      "role": "product_resume_docx_outputs",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/outputs/resume.docx",
+      "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "required": true,
+      "exists": false,
+      "producer": "apps_rg_docx_export"
+    },
+    {
+      "role": "spine_integrated_manifest",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/integrated_runtime_artifact_manifest.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "spine_exit_review_packet",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/exit_review_packet.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "spine_runtime_exhaust",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/runtime_exhaust_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "integrated_single_action_spine"
+    },
+    {
+      "role": "integrated_emitted_apps_rg_embedding_settings.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/apps_rg_embedding_settings.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_apps_rg_u0_validated_request.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/apps_rg_u0_validated_request.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_c0_bypass_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/c0_bypass_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_e2e_preflight_continuation_consumption_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/e2e_preflight_continuation_consumption_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_e2e_preflight_continuation_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/e2e_preflight_continuation_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_e2e_preflight_product_entry_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/e2e_preflight_product_entry_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_e2e_preflight_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/e2e_preflight_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_e2e_stage_ledger.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/e2e_stage_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_e2e_stage_ledger_preidentity_non_product.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/e2e_stage_ledger_preidentity_non_product.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_fresh_e2e_artifact_dir_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/fresh_e2e_artifact_dir_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_fresh_e2e_fact_vector_bootstrap_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/fresh_e2e_fact_vector_bootstrap_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_ingress_raw.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/ingress_raw.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_integrated_lane_evidence_status.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/integrated_lane_evidence_status.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_integrated_runtime_entrypoint_invocation.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/integrated_runtime_entrypoint_invocation.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_l1_plan_contract.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/l1_plan_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_l1_planning_capsule.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/l1_planning_capsule.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_l2_sealed_artifact.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/l2_sealed_artifact.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_l3_bypass_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/l3_bypass_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_l5_hitl_reclearance.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/l5_hitl_reclearance.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_mock_elimination_proof.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/mock_elimination_proof.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_no_harness_stamp_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/no_harness_stamp_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_plan_execution_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/plan_execution_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_plan_replan_decision.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/plan_replan_decision.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_post_u0_section_sufficiency_preview.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/post_u0_section_sufficiency_preview.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_pre_u0_fact_vector_readiness.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/pre_u0_fact_vector_readiness.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_prompt_assembly_bypass_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/prompt_assembly_bypass_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_r4_c0_bypass_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/r4_c0_bypass_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_r4_identity_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/r4_identity_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_research_bridge_request.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/research_bridge_request.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_research_bridge_response.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/research_bridge_response.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_research_final_evidence_contract.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/research_final_evidence_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_route_contract.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/route_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_route_contract_pre_research.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/route_contract_pre_research.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_RUN_LINKS.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/RUN_LINKS.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_runtime_certification_binding.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/runtime_certification_binding.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_runtime_execution_witness.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/runtime_execution_witness.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_runtime_gate_verdict_bundle.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/runtime_gate_verdict_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_runtime_trace_snapshot.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/runtime_trace_snapshot.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_section_pin_cleanup_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/section_pin_cleanup_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_semantic_cache_safe_reuse_decision.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/semantic_cache_safe_reuse_decision.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_spine_run_manifest.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/spine_run_manifest.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_standalone_runtime_dependency_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/standalone_runtime_dependency_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_u0_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/u0_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_validated_request.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/validated_request.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_whole_run_cache_preflight.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/whole_run_cache_preflight.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_whole_run_cache_preflight_miss.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/whole_run_cache_preflight_miss.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "integrated_emitted_x3_disposition_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry17_20260809/e2e_20260809T091919Z_bce021e1/x3_disposition_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "unknown_or_tests",
+      "notes": "discovered_at_index_time"
+    }
+  ],
+  "telemetry_activation": {
+    "status": "CONSISTENT",
+    "runtime_active": true,
+    "runtime_reason": "VERIFIED_ACTIVE",
+    "global_provider_verified": true,
+    "collector_preflight_status": "PASS",
+    "collector_preflight_reason": "COLLECTOR_MARKER_CAPTURED"
+  }
+}

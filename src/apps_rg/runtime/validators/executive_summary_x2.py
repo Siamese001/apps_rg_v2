@@ -701,6 +701,60 @@ def check_synthesis_quality(text: str) -> tuple[bool, str | None]:
     return True, None
 
 
+def check_exec_summary_partner_narrative_continuity(
+    text: str,
+    selected_facts: list[dict[str, Any]] | None,
+) -> tuple[bool, str | None]:
+    """Keep dependency-graph proof connected to an active partnership/platform arc.
+
+    Retry 15 contained valid graph proof, but its unconnected S3 read as a technical
+    detour in the whole resume. This gate activates only when the selected evidence
+    itself contains both dependency-graph and partnership roots.
+    """
+
+    fact_ids = {
+        str(row.get("fact_id") or row.get("candidate_fact_id") or "").strip()
+        for row in selected_facts or []
+        if isinstance(row, dict)
+    }
+    partner_arc = bool(
+        {
+            "reb_unify_partner_channel_cosell",
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+        }
+        & fact_ids
+    )
+    if "fact_engineering_platform_002" not in fact_ids or not partner_arc:
+        return True, None
+    graph_sentences = [
+        sentence
+        for sentence in split_sentences(text)
+        if "dependency graph intelligence" in sentence.casefold()
+    ]
+    if not graph_sentences:
+        return True, None
+    if any(
+        "partner-platform" in sentence.casefold()
+        or "partner platform" in sentence.casefold()
+        or "alliance-led platform" in sentence.casefold()
+        for sentence in graph_sentences
+    ):
+        return True, None
+    return False, "dependency_graph_sentence_missing_partner_platform_bridge"
+
+
+def check_exec_summary_speculative_capstone(text: str) -> tuple[bool, str | None]:
+    """Reject cover-letter-style future speculation in the six-sentence capstone."""
+
+    sentences = split_sentences(text)
+    if len(sentences) != EXEC_SUMMARY_MAX_SENTENCES:
+        return True, None
+    s6 = sentences[-1].casefold()
+    if re.search(r"\bcan\s+guide\s+future\b|\bguide\s+future\s+partner\b", s6):
+        return False, "s6_speculative_future_guidance_not_demonstrated_impact"
+    return True, None
+
+
 def check_claim_ledger_orphan_source_ids(
     claim_ledger: list[dict[str, Any]], allowed_fact_ids: set[str]
 ) -> tuple[bool, str | None]:
@@ -1695,8 +1749,18 @@ def check_c03_selected_fact_ids_claimable_subset_allowed_fact_ids(
     filtered = meta.get("c03_filtered_out_fact_ids") or []
     if violations and not filtered:
         return False, f"claimable_outside_pool:{violations}"
-    if violations and filtered and sorted(filtered) != violations:
-        return False, f"filtered_out_mismatch:violations={violations}:filtered={filtered}"
+    # ``filtered`` is the complete C0 context slice excluded from the claimable
+    # pool; ``violations`` is only the subset that the generated expansion
+    # attempted to use.  Extra, correctly filtered context facts are expected
+    # and must not turn a fail-closed exclusion receipt into a false negative.
+    # Every violating id must still be accounted for by the upstream filter.
+    filtered_ids = {str(value).strip() for value in filtered if str(value).strip()}
+    missing_from_filter = sorted(set(violations) - filtered_ids)
+    if violations and missing_from_filter:
+        return False, (
+            f"filtered_out_mismatch:violations={violations}:filtered={filtered}:"
+            f"missing={missing_from_filter}"
+        )
     return True, None
 
 
@@ -2788,6 +2852,28 @@ def run_x2_gates(
     # New synthesis quality gate
     synthesis_ok, synthesis_reason = check_synthesis_quality(resume_display_text)
     add("x2_executive_summary_synthesis_quality", synthesis_ok, synthesis_reason, None, synthesis_reason)
+
+    continuity_ok, continuity_reason = check_exec_summary_partner_narrative_continuity(
+        resume_display_text,
+        selected_facts,
+    )
+    add(
+        "x2_exec_summary_partner_narrative_continuity",
+        continuity_ok,
+        continuity_reason or "ok",
+        "dependency_graph_sentence_bridged_to_selected_partner_platform_arc",
+        continuity_reason,
+    )
+    capstone_ok, capstone_reason = check_exec_summary_speculative_capstone(
+        resume_display_text
+    )
+    add(
+        "x2_exec_summary_speculative_capstone_zero",
+        capstone_ok,
+        capstone_reason or "ok",
+        "evidence_led_s6_without_can_guide_future",
+        capstone_reason,
+    )
 
     mech_stack_ok, mech_stack_reason = check_exec_summary_mechanical_opener_stack(resume_display_text)
     add(

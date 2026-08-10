@@ -63,6 +63,7 @@ def _write_receipt(
         json.dumps(
             {
                 "schema_version": f"test.{stage_id.lower()}.v1",
+                "stage_id": stage_id,
                 "status": status,
                 "identity": identity,
                 **stage_fields,
@@ -296,6 +297,71 @@ def test_whole_run_product_activation_replaces_preidentity_ledger_with_v2(
     assert report.complete is False
 
 
+def test_product_activation_failure_persists_exception_checkpoint_and_otel_ref(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from apps_rg.runtime import failure_evidence
+    from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
+        _emit_product_authority_activation_failure,
+    )
+
+    _write_json(
+        tmp_path / "e2e_stage_ledger.json",
+        {
+            "schema_version": "apps_rg.e2e_stage_ledger.v2",
+            "entries": [
+                {
+                    "stage_id": "FRESH_PREFLIGHT",
+                    "status": "PASS",
+                    "next_stage_id": "APPS_RESEARCH_U0",
+                }
+            ],
+        },
+    )
+    (tmp_path / "e2e_stage_ledger_preidentity_non_product.json").write_text(
+        "{}\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(
+        failure_evidence,
+        "capture_failure_otel_evidence",
+        lambda **_: {"status": "PASS"},
+    )
+
+    try:
+        raise RuntimeError("authoritative receipt identity mismatch")
+    except RuntimeError as exc:
+        receipt_path = _emit_product_authority_activation_failure(
+            artifact_dir=tmp_path,
+            identity=_identity(),
+            exc=exc,
+        )
+
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert receipt["status"] == "FAILED"
+    assert receipt["product_authorized"] is False
+    assert receipt["pipeline_complete"] is False
+    assert receipt["failure"]["exception_class"] == "RuntimeError"
+    assert receipt["failure"]["exception_message"] == (
+        "authoritative receipt identity mismatch"
+    )
+    assert receipt["failure"]["trace_root"] == "trace-001"
+    assert receipt["ledger_checkpoint"] == {
+        "ledger_ref": "e2e_stage_ledger.json",
+        "ledger_present": True,
+        "ledger_read_error": "",
+        "entry_count": 1,
+        "last_stage_id": "FRESH_PREFLIGHT",
+        "last_stage_status": "PASS",
+        "next_stage_id": "APPS_RESEARCH_U0",
+        "preidentity_ledger_present": True,
+    }
+    assert receipt["otel_capture_status"] == "PASS"
+    assert receipt["otel_snapshot_ref"] == (
+        "product_e2e_authority_activation_otel_trace_snapshot.json"
+    )
+
+
 def test_product_terminal_helper_closes_only_after_product_mandatory_profile(
     tmp_path: Path,
 ) -> None:
@@ -345,10 +411,11 @@ def test_product_terminal_helper_closes_only_after_product_mandatory_profile(
         required_artifacts=tuple(sealed_files),
     )
     _write_json(
-        tmp_path / "x3_disposition_receipt.json",
+        tmp_path / "apps_rg_whole_run_exit_review_packet.json",
         {
-            "schema_version": "x3_disposition_receipt.v1",
-            "disposition": "X3D_ALLOW_FINISH",
+            "schema_version": "apps_rg.whole_run_exit_review_packet.v1",
+            "x3_disposition": "X3D_ALLOW_FINISH",
+            "status": "PASS",
         },
     )
     decision = tmp_path / "uwg" / "uwg_commit_receipt.json"
@@ -480,20 +547,277 @@ def test_product_v2_ledger_entries_are_receipt_derived_and_external_sealed(
     assert report.sealed is True
 
 
-def test_product_v2_ledger_detects_authoritative_receipt_byte_tamper(
+def test_product_v2_ledger_owns_immutable_receipt_snapshots(
     tmp_path: Path,
 ) -> None:
     from apps_rg.runtime.e2e_stage_ledger import verify_e2e_stage_ledger
 
     ledger, _, receipts = _build_product_ledger(tmp_path)
+    payload = json.loads(ledger.path.read_text(encoding="utf-8"))
+    x2_entry = next(
+        entry for entry in payload["entries"] if entry["stage_id"] == "X2_AGGREGATION"
+    )
+    snapshot = tmp_path / x2_entry["authoritative_receipt_ref"]
     receipts["X2_AGGREGATION"].write_text(
         receipts["X2_AGGREGATION"].read_text(encoding="utf-8") + " ",
         encoding="utf-8",
     )
 
     report = verify_e2e_stage_ledger(ledger.path)
+
+    assert report.valid is True
+    assert snapshot.resolve() != receipts["X2_AGGREGATION"].resolve()
+    assert snapshot.parent.name == "e2e_ledger_receipts"
+
+
+def test_product_v2_snapshot_path_stays_below_historical_windows_failure_length(
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime.e2e_stage_ledger import ReceiptDerivedE2EStageLedger
+
+    old_relative = Path(
+        "e2e_ledger_receipts/"
+        "0000_fresh_preflight_" + "a" * 64 + ".json"
+    )
+    new_relative = Path("e2e_ledger_receipts/0000_fresh_preflight.json")
+    root = tmp_path
+    while len(str(root / old_relative)) <= 260:
+        root = root / ("nested" + "x" * 12)
+    assert len(str(root / new_relative)) < 260
+    root.mkdir(parents=True)
+
+    identity = _identity()
+    ledger = ReceiptDerivedE2EStageLedger.create(
+        artifact_dir=root,
+        identity=identity,
+    )
+    receipt = _write_receipt(
+        root,
+        sequence=0,
+        stage_id="FRESH_PREFLIGHT",
+        identity=identity,
+    )
+    entry = ledger.record_from_receipt(
+        stage_id="FRESH_PREFLIGHT",
+        receipt_ref=receipt,
+        next_stage_id="APPS_RG_U0",
+    )
+
+    assert entry["authoritative_receipt_ref"] == new_relative.as_posix()
+    assert (root / new_relative).is_file()
+
+
+def test_product_v2_ledger_detects_snapshot_byte_tamper(tmp_path: Path) -> None:
+    from apps_rg.runtime.e2e_stage_ledger import verify_e2e_stage_ledger
+
+    ledger, _, _ = _build_product_ledger(tmp_path)
+    payload = json.loads(ledger.path.read_text(encoding="utf-8"))
+    x2_entry = next(
+        entry for entry in payload["entries"] if entry["stage_id"] == "X2_AGGREGATION"
+    )
+    snapshot = tmp_path / x2_entry["authoritative_receipt_ref"]
+    snapshot.write_text(snapshot.read_text(encoding="utf-8") + " ", encoding="utf-8")
+
+    report = verify_e2e_stage_ledger(ledger.path)
+
     assert report.valid is False
     assert "authoritative_receipt_digest_mismatch:X2_AGGREGATION" in report.errors
+
+
+def test_product_v2_verifier_rejects_mutable_source_ref(tmp_path: Path) -> None:
+    from apps_rg.runtime.e2e_stage_ledger import verify_e2e_stage_ledger
+
+    ledger, _, receipts = _build_product_ledger(tmp_path)
+    payload = json.loads(ledger.path.read_text(encoding="utf-8"))
+    x2_entry = next(
+        entry for entry in payload["entries"] if entry["stage_id"] == "X2_AGGREGATION"
+    )
+    x2_entry["authoritative_receipt_ref"] = receipts[
+        "X2_AGGREGATION"
+    ].relative_to(tmp_path).as_posix()
+    ledger.path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    report = verify_e2e_stage_ledger(ledger.path)
+
+    assert report.valid is False
+    assert "authoritative_receipt_not_immutable_snapshot:X2_AGGREGATION" in (
+        report.errors
+    )
+
+
+@pytest.mark.parametrize("decisive_stage", ["APPS_RG_C0", "APPS_RG_L2"])
+def test_whole_run_helper_seals_governed_pre_x3_failure(
+    tmp_path: Path,
+    decisive_stage: str,
+) -> None:
+    from apps_rg.runtime.e2e_stage_ledger import (
+        ReceiptDerivedE2EStageLedger,
+        verify_e2e_stage_ledger,
+    )
+    from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
+        _seal_pending_non_product_stage_ledger,
+    )
+
+    identity = _identity()
+    ledger = ReceiptDerivedE2EStageLedger.create(
+        artifact_dir=tmp_path,
+        identity=identity,
+    )
+    stages = [
+        ("FRESH_PREFLIGHT", "PASS"),
+        ("APPS_RG_U0", "PASS"),
+        ("APPS_RG_L1", "PASS"),
+        ("APPS_RG_L0", "PASS"),
+        ("APPS_RG_C0", "BLOCKED" if decisive_stage == "APPS_RG_C0" else "PASS"),
+    ]
+    if decisive_stage == "APPS_RG_L2":
+        stages.extend((("APPS_RG_PA", "PASS"), ("APPS_RG_L2", "BLOCKED")))
+    for sequence, (stage_id, status) in enumerate(stages):
+        receipt = _write_receipt(
+            tmp_path,
+            sequence=sequence,
+            stage_id=stage_id,
+            identity=identity,
+            status=status,
+        )
+        ledger.record_from_receipt(
+            stage_id=stage_id,
+            receipt_ref=receipt,
+            next_stage_id="APPS_RG_U0" if stage_id == "FRESH_PREFLIGHT" else None,
+        )
+
+    refs = _seal_pending_non_product_stage_ledger(
+        artifact_dir=tmp_path,
+        product_ledger=ledger,
+        identity=identity,
+    )
+    report = verify_e2e_stage_ledger(ledger.path)
+
+    assert Path(refs["terminal_non_product_receipt_ref"]).is_file()
+    assert Path(refs["stage_ledger_seal_ref"]).is_file()
+    terminal = json.loads(
+        Path(refs["terminal_non_product_receipt_ref"]).read_text(encoding="utf-8")
+    )
+    assert terminal["failed_stage_id"] == decisive_stage
+    assert terminal["causal_receipt_ref"].startswith("e2e_ledger_receipts/")
+    expected_first_successor = (
+        "APPS_RG_PA" if decisive_stage == "APPS_RG_C0" else "X1_REVIEW"
+    )
+    assert terminal["blocked_successor_stage_ids"][0] == expected_first_successor
+    assert "PRODUCT_AUTHORIZATION_CLOSE" in terminal[
+        "blocked_successor_stage_ids"
+    ]
+    assert report.valid is True
+    assert report.complete is True
+    assert report.terminal_stage == "TERMINAL_NON_PRODUCT"
+
+
+def test_ambiguous_first_stage_failure_auto_routes_non_product(tmp_path: Path) -> None:
+    from apps_rg.runtime.e2e_stage_ledger import (
+        ReceiptDerivedE2EStageLedger,
+        verify_e2e_stage_ledger,
+    )
+    from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
+        _seal_pending_non_product_stage_ledger,
+    )
+
+    identity = _identity()
+    ledger = ReceiptDerivedE2EStageLedger.create(
+        artifact_dir=tmp_path,
+        identity=identity,
+    )
+    failed = _write_receipt(
+        tmp_path,
+        sequence=0,
+        stage_id="FRESH_PREFLIGHT",
+        identity=identity,
+        status="BLOCKED",
+    )
+    entry = ledger.record_from_receipt(
+        stage_id="FRESH_PREFLIGHT",
+        receipt_ref=failed,
+    )
+
+    assert entry["next_stage_id"] == "TERMINAL_NON_PRODUCT"
+    _seal_pending_non_product_stage_ledger(
+        artifact_dir=tmp_path,
+        product_ledger=ledger,
+        identity=identity,
+    )
+    report = verify_e2e_stage_ledger(ledger.path)
+    assert report.valid is True
+    assert report.complete is True
+
+
+def test_product_v2_ledger_rejects_legacy_x3_code(tmp_path: Path) -> None:
+    from apps_rg.runtime.e2e_stage_ledger import (
+        ReceiptDerivedE2EStageLedger,
+        StageTransitionError,
+    )
+
+    identity = _identity()
+    ledger = ReceiptDerivedE2EStageLedger.create(
+        artifact_dir=tmp_path,
+        identity=identity,
+    )
+    stages = (
+        "FRESH_PREFLIGHT",
+        "APPS_RG_U0",
+        "APPS_RG_L1",
+        "APPS_RG_L0",
+        "APPS_RG_C0",
+        "APPS_RG_PA",
+        "APPS_RG_L2",
+        "X1_REVIEW",
+        "X2_AGGREGATION",
+    )
+    for sequence, stage_id in enumerate(stages):
+        receipt = _write_receipt(
+            tmp_path,
+            sequence=sequence,
+            stage_id=stage_id,
+            identity=identity,
+        )
+        ledger.record_from_receipt(
+            stage_id=stage_id,
+            receipt_ref=receipt,
+            next_stage_id="APPS_RG_U0" if stage_id == "FRESH_PREFLIGHT" else None,
+        )
+    legacy = _write_receipt(
+        tmp_path,
+        sequence=len(stages),
+        stage_id="X3_DISPOSITION",
+        identity=identity,
+    )
+    payload = json.loads(legacy.read_text(encoding="utf-8"))
+    payload["x3_code"] = "X3D"
+    legacy.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(StageTransitionError, match="legacy or unknown"):
+        ledger.record_from_receipt(
+            stage_id="X3_DISPOSITION",
+            receipt_ref=legacy,
+        )
+
+
+def test_product_x3_surfaces_do_not_reintroduce_legacy_global_codes() -> None:
+    repo = Path(__file__).resolve().parents[3]
+    surfaces = (
+        "src/apps_rg/runtime/whole_run_exit.py",
+        "src/apps_rg/cache/r1b_commit_authority.py",
+        "src/apps_rg/cache/r1b_constants.py",
+        "src/apps_rg/cache/r1b_transactional_promotion.py",
+        "src/apps_rg/l2_recipe/r4_modular_proof_verification.py",
+        "src/apps_rg/runtime/integrated_product_proof_gate.py",
+        "src/apps_rg/config/e2e_baselines/anthropic_partnership.v1.json",
+    )
+    forbidden = ('"X3A"', '"X3B"', '"X3C"', '"X3D"', '"X3E"', "X3B_REVIEW")
+    for relative in surfaces:
+        text = (repo / relative).read_text(encoding="utf-8")
+        assert not any(token in text for token in forbidden), relative
 
 
 def test_authority_contract_uses_external_ledger_and_pipeline_close_receipts() -> None:
@@ -523,6 +847,47 @@ def test_authority_contract_uses_external_ledger_and_pipeline_close_receipts() -
     assert (
         stages["PIPELINE_COMPLETION_CLOSE"]["authoritative_receipt"]
         != "apps_rg_e2e_terminal_manifest.json"
+    )
+    failure_terminal_stages = (
+        "FRESH_PREFLIGHT",
+        "APPS_RESEARCH_U0",
+        "APPS_RESEARCH_RUNTIME",
+        "APPS_RESEARCH_EXIT",
+        "HANDOFF_BUNDLE_COMMIT",
+        "APPS_RG_U0",
+        "APPS_RG_L1",
+        "APPS_RG_L0",
+        "APPS_RG_C0",
+        "APPS_RG_PA",
+        "APPS_RG_L2",
+        "X1_REVIEW",
+        "X2_AGGREGATION",
+        "X3_DISPOSITION",
+        "PRODUCT_ELIGIBILITY",
+        "UWG_COMMIT",
+        "PRODUCT_AUTHORIZATION_CLOSE",
+    )
+    assert all(
+        "TERMINAL_NON_PRODUCT" in stages[stage_id]["allowed_next"]
+        for stage_id in failure_terminal_stages
+    )
+    assert stages["X3_DISPOSITION"]["authoritative_receipt"] == (
+        "apps_rg_whole_run_exit_review_packet.json"
+    )
+    assert all(
+        stages[stage_id]["authoritative_receipt"]
+        == "apps_rg_whole_run_exit_review_packet.json"
+        for stage_id in (
+            "APPS_RG_C0",
+            "APPS_RG_PA",
+            "APPS_RG_L2",
+            "X1_REVIEW",
+            "X2_AGGREGATION",
+            "X3_DISPOSITION",
+        )
+    )
+    assert stages["TERMINAL_NON_PRODUCT"]["authoritative_receipt"] == (
+        "terminal_non_product_authority_receipt.json"
     )
 
 

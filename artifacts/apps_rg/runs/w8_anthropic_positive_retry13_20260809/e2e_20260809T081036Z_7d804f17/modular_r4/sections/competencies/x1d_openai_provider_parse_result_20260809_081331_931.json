@@ -1,0 +1,89 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.8,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Category 5 label conflicts with its productization and runtime-readiness terms.",
+      "Categories 1 and 5 blur partner architecture, co-sell, and GTM execution.",
+      "Category 8 relies on generic delivery language with limited agentic mechanism.",
+      "All competency terms have claim-ledger bindings, and the eight-category shape is valid."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      5,
+      8
+    ],
+    "remediation_suggestions": [
+      "Keep category 1 focused on partner architecture and deployment assurance.",
+      "Realign category 5 around one distinct capability family.",
+      "Strengthen category 8 with graph-backed executive mechanisms and operating context."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "seniority_executive_relevance": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "GENERIC_EXECUTIVE_TERMS"
+        ]
+      },
+      "complementarity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "no_bullet_restatement": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "PARTNER_GTM_OVERLAP"
+        ]
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "CATEGORY_LABEL_TERM_MISMATCH",
+          "OVERLAPPING_CAPABILITY_FAMILIES"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "MUNDANE_DELIVERY_LANGUAGE"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry13_20260809\\e2e_20260809T081036Z_7d804f17\\modular_r4\\sections\\competencies\\x1d_openai_provider_response_raw_20260809_081331_921.json",
+  "original_model": null,
+  "fallback_model": null
+}

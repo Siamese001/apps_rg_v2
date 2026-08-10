@@ -632,14 +632,24 @@ def _exact_code_surface(
         producer_files.append("apps_rg/runtime/mandatory_run_outputs.py")
     artifact_refs: list[str] = []
     if lane_dir is not None:
-        for name in (
+        names = [
             "x2_gate_outputs.json",
             "x3_disposition.json",
             "l2_output.json",
             "selected_fact_plan.json",
             "provider_request.json",
             "integrated_lane_pre_run_failure.json",
-        ):
+        ]
+        if section_id == "final_resume_aggregation":
+            names.extend(
+                [
+                    "final_resume_x2_gate_outputs.json",
+                    "full_resume_llm_coherence_review.json",
+                    "x1d_full_resume_judge_outputs.json",
+                    "final_resume.json",
+                ]
+            )
+        for name in names:
             path = lane_dir / name
             if path.is_file():
                 artifact_refs.append(_repo_rel(path, repo_root))
@@ -705,9 +715,9 @@ def _required_fix(section: dict[str, Any], failure_type: str) -> list[str]:
         ]
     if failure_type == "aggregation_downstream":
         return [
-            "Require final aggregation to consume only sections with accepted X3 evidence.",
-            "Record the exact upstream section or product-output gate that blocked assembly.",
-            "Rerun aggregation only after the failed section RCA artifacts are complete.",
+            "Preserve the accepted X3 section snapshots and repair the content findings named by the failed aggregate judge.",
+            "Record every whole-resume judge score, finding, raw-response reference, and quorum calculation in the aggregation RCA.",
+            "Keep product authorization blocked until the required model-backed whole-resume quorum passes.",
         ]
     if failure_type == "mandatory_output_authorization_block":
         return [
@@ -887,7 +897,8 @@ def validate_section_failure_rca(doc: dict[str, Any]) -> list[str]:
             commit = str(row.get("git_commit") or "").strip()
             if not re.fullmatch(r"[0-9a-fA-F]{7,64}", commit):
                 errors.append(f"invalid:revision_comparison_{side}_commit")
-    if doc.get("comparison_complete") is not True:
+    baseline_found = bool(baseline_output.get("baseline_found"))
+    if baseline_found and doc.get("comparison_complete") is not True:
         errors.append("invalid:comparison_incomplete")
     output_bisect = doc.get("output_bisect")
     if not isinstance(output_bisect, dict):

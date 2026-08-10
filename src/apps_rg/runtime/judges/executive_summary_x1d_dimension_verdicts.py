@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Sequence
 from typing import Any, Callable
 
 from apps_rg.runtime.validators.executive_summary_x2 import EXEC_SUMMARY_MAX_WORDS
@@ -129,18 +130,30 @@ _TEXT_HINTS: tuple[tuple[str, tuple[str, ...]], ...] = (
 )
 
 
-def dimension_verdicts_json_schema_fragment() -> dict[str, Any]:
-    """Gemini/OpenAPI-style fragment for dimension_verdicts object."""
+def dimension_verdicts_json_schema_fragment(
+    dimension_ids: Sequence[str] = EXEC_SUMMARY_RUBRIC_DIMENSION_IDS,
+) -> dict[str, Any]:
+    """Strict provider schema fragment for a section's dimension verdicts."""
     verdict_props = {
         "pass": {"type": "boolean"},
         "severity": {"type": "string", "enum": ["none", "minor", "major"]},
         "codes": {"type": "array", "items": {"type": "string"}},
     }
-    dim_props = {dim: {"type": "object", "properties": verdict_props} for dim in EXEC_SUMMARY_RUBRIC_DIMENSION_IDS}
+    dimensions = tuple(str(dim) for dim in dimension_ids)
+    dim_props = {
+        dim: {
+            "type": "object",
+            "properties": verdict_props,
+            "required": list(verdict_props),
+            "additionalProperties": False,
+        }
+        for dim in dimensions
+    }
     return {
         "type": "object",
         "properties": dim_props,
-        "required": list(EXEC_SUMMARY_RUBRIC_DIMENSION_IDS),
+        "required": list(dimensions),
+        "additionalProperties": False,
     }
 
 

@@ -1,0 +1,142 @@
+{
+  "artifact_hash": "sha256:0e51d1bc70f189d8a7879b5054f911cc67f900e86f6f81660fee6b193eff846e",
+  "emitted_at": "2026-08-09T00:59:38Z",
+  "payload": {
+    "attempt_evidence_refs": [
+      "judge_attempt_ledger.json",
+      "provider_response.json"
+    ],
+    "attempt_evidence_status": "COMPLETE",
+    "c0": {
+      "reason": "BYPASS_PRELOADED_CONTEXT",
+      "status": "BYPASSED_PRELOADED_CONTEXT",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.1",
+          "sub_stage_name": "Query Normalization"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.2",
+          "sub_stage_name": "Embedding Lookup"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.3",
+          "sub_stage_name": "D1 Exact Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.4",
+          "sub_stage_name": "D2 Semantic Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.5",
+          "sub_stage_name": "Retrieval Augmentation"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.6",
+          "sub_stage_name": "Grounding Context Assembly"
+        }
+      ]
+    },
+    "generation_provider_attempt_count": 1,
+    "judge_attempt_count": 1,
+    "l2": {
+      "executed": true,
+      "fault": "",
+      "status": "PASS",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "app_name": "apps_rg"
+          },
+          "status": "PASS",
+          "sub_stage_id": "E1",
+          "sub_stage_name": "Prep: Plan Decomposition"
+        },
+        {
+          "duration_ms": 0.004,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E2",
+          "sub_stage_name": "Valid: Pre-Execution Contract Check"
+        },
+        {
+          "duration_ms": 15469.808,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E3",
+          "sub_stage_name": "Exec: Tool Dispatch"
+        },
+        {
+          "duration_ms": 0.004,
+          "meta": {
+            "retry_attempted": false
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "E4",
+          "sub_stage_name": "Heal: Retry / Recovery"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E5",
+          "sub_stage_name": "Seal: Output Assembly"
+        }
+      ]
+    },
+    "request_id": "req-67c95cc5c08a4947b0f3768f83fd1027",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "8ad60171-7f31-422f-9acc-aa24ec58ff5f",
+    "schema_version": "agentic_core.runtime_execution_witness.v1",
+    "trace_root": "trace-7b3e05a2706940ee82123ea39e5b20c8",
+    "x1": {
+      "status": "EXECUTED",
+      "sub_stages": []
+    },
+    "x2": {
+      "disposition": "X3A",
+      "failed_gate_ids": [],
+      "reason_codes": [],
+      "status": "EXECUTED"
+    },
+    "x3": {
+      "disposition": "X3A",
+      "status": "EMITTED"
+    }
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:7ad9facd9d9ab359ddfc718c9476dc995aa5b42d93fbc477a5c9edc5411ec922"
+}

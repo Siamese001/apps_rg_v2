@@ -8,6 +8,8 @@ from apps_research.types.apps_rg_targeting_brief_contract import (
     BriefStatus,
     assess_targeting_brief_semantics,
     blocked_targeting_brief,
+    fit_targeting_brief_to_budget,
+    normalize_targeting_brief_text,
     seal_targeting_brief,
     validate_targeting_brief_text,
 )
@@ -144,6 +146,39 @@ def test_valid_brief_passes() -> None:
     assert v.bullet_count <= MAX_BULLETS
     assert v.char_count <= BRIEFING_PROFILES["apps_rg"].max_total_chars
     assert v.section_count >= BRIEFING_PROFILES["apps_rg"].min_section_count
+
+
+def test_budget_fitter_removes_whole_bullets_but_preserves_every_section() -> None:
+    headers = (
+        "JD Complement",
+        "Company DNA & Operating Model",
+        "Company Strategy & Operating Pressure",
+        "Leadership & Stakeholder Map",
+        "AI, Data, Platform, Architecture Signals",
+        "Partnership / Ecosystem Motion",
+        "Recent Events & Urgency",
+        "apps_rg Positioning Themes",
+        "apps_lic Outreach Angles",
+        "Do Not Use As Proof",
+    )
+    dense_bullet = "- " + ("Grounded company signal supports targeting context and operating decisions. " * 3)
+    oversized = "\n\n".join(
+        (
+            "Anthropic - partnership targeting brief\n| role | band | Reports to leader (2026) |",
+            *(f"## {header}\n" + "\n".join(dense_bullet for _ in range(4)) for header in headers),
+        )
+    )
+    normalized = normalize_targeting_brief_text(oversized)
+    assert len(normalized) > BRIEFING_PROFILES["apps_rg"].max_total_chars
+
+    fitted = fit_targeting_brief_to_budget(normalized)
+    validation = validate_targeting_brief_text(fitted)
+
+    assert validation.valid, validation.violations
+    assert len(fitted) <= BRIEFING_PROFILES["apps_rg"].max_total_chars
+    for header in headers:
+        assert f"## {header}" in fitted
+    assert validation.bullet_count >= len(headers)
 
 
 def test_seal_valid_brief() -> None:

@@ -1,0 +1,86 @@
+```json
+{
+  "categories": [
+    {
+      "competency_bundle_id": "ccb_agentic_platforms",
+      "category_label": "Agentic Control Plane Architecture",
+      "terms": [
+        {"text": "agentic control-plane routing design", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+        {"text": "L0 route policy dispatch", "source_fact_id": "skill_unify_agentic_l0_route_policy_dispatch", "source_fact_ids": ["skill_unify_agentic_l0_route_policy_dispatch"]},
+        {"text": "governed multi-agent orchestration contracts", "source_fact_id": "skill_unify_agentic_multi_agent_orchestration_contracts", "source_fact_ids": ["skill_unify_agentic_multi_agent_orchestration_contracts"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_runtime_governance",
+      "category_label": "Multi-Agent Runtime Assurance",
+      "terms": [
+        {"text": "human override escalation paths", "source_fact_id": "skill_unify_agentic_human_override_escalation_paths", "source_fact_ids": ["skill_unify_agentic_human_override_escalation_paths"]},
+        {"text": "runtime proof bundle lineage", "source_fact_id": "skill_unify_agentic_runtime_proof_bundle_lineage", "source_fact_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"]},
+        {"text": "regulated devsecops release resilience", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience", "skill_ibm_automated_release_pipelines"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+      "category_label": "Partner Solution Architecture for Agentic AI",
+      "terms": [
+        {"text": "partner-led AI solution development", "source_fact_id": "skill_partner_partner_led_ai_solutions", "source_fact_ids": ["skill_partner_partner_led_ai_solutions", "reb_unify_partner_channel_cosell"]},
+        {"text": "joint solution development with partners", "source_fact_id": "skill_partner_joint_solution_development", "source_fact_ids": ["skill_partner_joint_solution_development"]},
+        {"text": "partner GTM motions and enablement", "source_fact_id": "skill_partner_gtm_enablement", "source_fact_ids": ["skill_partner_gtm_enablement", "skill_partner_partner_motions"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+      "category_label": "Hyperscaler Cloud Co-Sell Architecture",
+      "terms": [
+        {"text": "AWS alliance joint revenue motions", "source_fact_id": "skill_partner_ibm_aws_alliance_joint_revenue", "source_fact_ids": ["skill_partner_ibm_aws_alliance_joint_revenue", "reb_ibm_aws_alliance_partner_cosell_gtm"]},
+        {"text": "hyperscaler co-sell execution", "source_fact_id": "skill_sr_w12_hyperscaler_alliance_co_sell", "source_fact_ids": ["skill_sr_w12_hyperscaler_alliance_co_sell", "skill_partner_hyperscaler_cosell"]},
+        {"text": "cloud vendor joint go-to-market", "source_fact_id": "skill_partner_cloud_vendor_joint_gtm", "source_fact_ids": ["skill_partner_cloud_vendor_joint_gtm", "reb_ibm_aws_alliance_partner_cosell_gtm"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_engineering_leadership",
+      "category_label": "Technical Pre-Sales Leadership for Partnerships",
+      "terms": [
+        {"text": "technical discovery for enterprise pursuits", "source_fact_id": "reb_ibm_presales_solution_engineering", "source_fact_ids": ["reb_ibm_presales_solution_engineering", "skill_partner_pre_sales"]},
+        {"text": "presales delivery handoff ownership", "source_fact_id": "skill_p2_gtm_presales_delivery_handoff", "source_fact_ids": ["skill_p2_gtm_presales_delivery_handoff"]},
+        {"text": "customer deal support engagement", "source_fact_id": "skill_partner_customer_deal_support", "source_fact_ids": ["skill_partner_customer_deal_support", "reb_ibm_customer_success_value_realization"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_platform_productization",
+      "category_label": "Enterprise Deal Execution for Agentic Solutions",
+      "terms": [
+        {"text": "quota-aligned enterprise pursuit ownership", "source_fact_id": "reb_ibm_revenue_sales_target_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]},
+        {"text": "enterprise negotiations leadership", "source_fact_id": "skill_partner_enterprise_negotiations", "source_fact_ids": ["skill_partner_enterprise_negotiations"]},
+        {"text": "alliance GTM execution motions", "source_fact_id": "skill_partner_alliance_gtm_execution", "source_fact_ids": ["skill_partner_alliance_gtm_execution"]}
+      ]
+    },
+    {
+      "competency_bundle_id": "ccb_data_governance_security",
+      "category_label": "Partner Revenue Growth Motions",
+      "terms": [
+        {"text": "partner revenue growth to 3M", "source_fact_id": "skill_partner_partner_revenue_3m", "source_fact_ids": ["skill_partner_partner_revenue_3m"]},
+        {"text": "value-realization adoption alignment", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+        {"text": "alliance co-sell GTM channel building", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]}
+      ]
+    }
+  ],
+  "selected_fact_plan": [
+    {"section_id": "agentic_control_plane", "selection_method": "lens_biased", "required_fact_ids": ["reb_unify_agentic_platform_architecture", "skill_unify_agentic_l0_route_policy_dispatch"]},
+    {"section_id": "runtime_governance", "selection_method": "lens_biased", "required_fact_ids": ["skill_unify_agentic_human_override_escalation_paths", "skill_unify_agentic_runtime_proof_bundle_lineage"]},
+    {"section_id": "partner_architecture", "selection_method": "jd_targeted", "required_fact_ids": ["skill_partner_partner_led_ai_solutions", "skill_partner_joint_solution_development"]},
+    {"section_id": "hyperscaler_cosell", "selection_method": "jd_targeted", "required_fact_ids": ["skill_partner_ibm_aws_alliance_joint_revenue", "skill_sr_w12_hyperscaler_alliance_co_sell"]}
+  ],
+  "claim_ledger": [
+    {"claim": "agentic control-plane routing design", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+    {"claim": "partner-led AI solution development", "source_fact_ids": ["skill_partner_partner_led_ai_solutions", "reb_unify_partner_channel_cosell"]},
+    {"claim": "hyperscaler co-sell execution", "source_fact_ids": ["skill_sr_w12_hyperscaler_alliance_co_sell", "skill_partner_hyperscaler_cosell"]}
+  ],
+  "jd_alignment": ["applied AI architecture", "partner solutions architecture", "cloud partner co-sell", "technical pre-sales leadership"],
+  "excluded_jd_skills": ["hire and manage SA team", "run performance reviews"],
+  "removed_or_rewritten_terms": [],
+  "gap_notes": ["no direct people-management fact evidence retained"],
+  "change_log": ["path0: lens-biased toward agentic platform/control-plane/orchestration"],
+  "self_check": ["all source_fact_ids drawn from allowed list", "3 terms per category maintained", "7 categories emitted"]
+}
+```

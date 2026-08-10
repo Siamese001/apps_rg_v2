@@ -1,0 +1,49 @@
+{
+  "x3_code": "X3_REVIEW_JUDGE_PROVIDER_BLOCKED",
+  "decisive_reason": "One or more required X1D judge providers are blocked.",
+  "review_reason": "One or more required X1D judge providers are blocked.",
+  "authorization_scope": "PLUMBING_ONLY",
+  "proceed_to_runtime": false,
+  "runtime_generation_status": "REAL_LLM",
+  "x1d_evaluator_mode": "BLOCKED_PROVIDER_UNAVAILABLE",
+  "product_quality_status": "PASS",
+  "x2_failed_gates": [],
+  "blocked_judges": [
+    "openai_chatgpt"
+  ],
+  "mocked_judges": [],
+  "soft_failed_judges": [],
+  "decisive_judge_failures": [],
+  "final_summary_hash": "87aac3e7d3769f51",
+  "claim_ledger_hash": "ace07753e8df5026",
+  "required_remediation": [
+    "Configure blocked judge providers: openai_chatgpt"
+  ],
+  "blocked_judge_detail_rows": [
+    {
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "BLOCKED_TOKEN_BUDGET",
+      "provider_status": "BLOCKED_TOKEN_BUDGET",
+      "provider_blocked": true,
+      "exact_provider_error": "External-model token budget preflight blocked: RUN_RESERVED_TOKEN_CAP_EXCEEDED; estimated_input_tokens=17551; prior_reserved_total_tokens=227093; max_reserved_tokens_per_run=250000"
+    }
+  ],
+  "model_backed_pass_provider_keys": [
+    "gemini_pro"
+  ],
+  "proof_eligible_allow_requires": "every_configured_x1d_judge_model_backed_pass",
+  "pass": false,
+  "disposition_authority": "lane",
+  "section_x3_authoritative": false,
+  "section_x3_mirror_only": true,
+  "spine_x3_claimed": false,
+  "publish_disposition": "certified",
+  "x1d_certified": true,
+  "blocking_judge_ids": [],
+  "final_materialized_acceptance_ok": true,
+  "final_materialized_acceptance_contract_ref": "final_materialized_acceptance_contract.json",
+  "authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+  "artifact_authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+  "core_exit_authority_ref": "exit_disposition_receipt.json",
+  "core_exit_authority_scope": "agentic_core_exit_disposition_receipt"
+}

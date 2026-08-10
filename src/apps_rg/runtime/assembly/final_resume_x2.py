@@ -9,6 +9,11 @@ from typing import Any
 
 from apps_rg.runtime.assembly.final_resume_manifest import FinalResumePaths, resolve_default_paths
 from apps_rg.runtime.assembly.full_resume_llm_coherence import assembly_product_release_mode
+from apps_rg.runtime.assembly.l2_snapshot_projection import (
+    L2_SNAPSHOT_PROJECTION_SCHEMA,
+    omitted_l2_projection_paths,
+    project_l2_output_for_final_resume,
+)
 from apps_rg.runtime.spine.section_x3_finalize import FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT
 
 CANONICAL_ASSEMBLED_SECTION_ORDER: tuple[str, ...] = (
@@ -329,17 +334,61 @@ def run_final_resume_x2_gates(
             break
         l2p = _run_rel_path(repo_root, rd) / "l2_output.json"
         try:
-            from_disk = json.loads(l2p.read_text(encoding="utf-8"))
+            source_l2_text = l2p.read_text(encoding="utf-8")
+            from_disk = json.loads(source_l2_text)
         except (OSError, json.JSONDecodeError, ValueError) as exc:
             l2_snap_ok = False
             sr = f"{sid} l2 read failed: {exc}"
             break
-        if from_disk != snap:
+        binding_contract = None
+        binding_ref = str(from_disk.get("graph_claim_bindings_ref") or "").strip()
+        if binding_ref:
+            if Path(binding_ref).name != binding_ref:
+                l2_snap_ok = False
+                sr = f"{sid} graph binding ref must be a local filename"
+                break
+            try:
+                binding_contract = json.loads(
+                    (l2p.parent / binding_ref).read_text(encoding="utf-8")
+                )
+            except (OSError, json.JSONDecodeError, ValueError) as exc:
+                l2_snap_ok = False
+                sr = f"{sid} graph binding sidecar read failed: {exc}"
+                break
+        try:
+            projected_from_disk = project_l2_output_for_final_resume(
+                from_disk,
+                graph_claim_binding_contract=binding_contract,
+            )
+        except ValueError as exc:
             l2_snap_ok = False
-            sr = f"{sid} snapshot mismatch vs {paths.rel(l2p)}"
+            sr = f"{sid} graph binding projection failed: {exc}"
+            break
+        expected_omitted_paths = omitted_l2_projection_paths(from_disk)
+        if projected_from_disk != snap:
+            l2_snap_ok = False
+            sr = f"{sid} projected snapshot mismatch vs {paths.rel(l2p)}"
+            break
+        if sec.get("l2_output_snapshot_schema") != L2_SNAPSHOT_PROJECTION_SCHEMA:
+            l2_snap_ok = False
+            sr = f"{sid} missing or invalid L2 projection schema"
+            break
+        if sec.get("l2_output_omitted_paths") != expected_omitted_paths:
+            l2_snap_ok = False
+            sr = f"{sid} omitted-path declaration mismatch"
+            break
+        if str(sec.get("section_digest") or "") != sha256_utf8(source_l2_text):
+            l2_snap_ok = False
+            sr = f"{sid} full source L2 digest mismatch"
             break
 
-    _add(gates, "x2_no_generated_section_rewritten", l2_snap_ok, sr, "l2 equality")
+    _add(
+        gates,
+        "x2_no_generated_section_rewritten",
+        l2_snap_ok,
+        sr,
+        "deterministic product projection equality plus full source L2 digest binding",
+    )
 
     lc_ok = True
     lx = "ok"

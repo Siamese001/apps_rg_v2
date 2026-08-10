@@ -22,9 +22,9 @@ from apps_rg.runtime.sections.executive_summary_repair_policy import (
 # apps-test-model: APP CONTRACT
 
 
-def test_synthesis_regen_max_attempts_default_is_two(monkeypatch) -> None:
+def test_synthesis_regen_max_attempts_default_is_three(monkeypatch) -> None:
     monkeypatch.delenv("APPS_RG_EXEC_SUMMARY_SYNTHESIS_REGEN_MAX_ATTEMPTS", raising=False)
-    assert synthesis_regen_max_attempts() == SYNTHESIS_REGEN_MAX_ATTEMPTS == 2
+    assert synthesis_regen_max_attempts() == SYNTHESIS_REGEN_MAX_ATTEMPTS == 3
 
 
 def test_synthesis_regen_max_attempts_env_clamped_only_when_caps_enabled(monkeypatch) -> None:
@@ -117,6 +117,48 @@ def test_repair_user_includes_evidence_weave_and_anti_shrink() -> None:
     assert "MECHANISM_CONTROL" in msg
     assert "PRIOR REGEN SHRANK" in msg
     assert "102" in msg
+
+
+def test_repair_user_treats_mechanism_comma_list_as_mechanism_failure() -> None:
+    msg = _build_synthesis_repair_user(
+        "sentence 1: mechanism_comma_list; dominant_source_fact=unknown",
+        attempt_index=2,
+        prior_word_count=128,
+        prior_ledger_rows=6,
+    )
+
+    assert "MECHANISM_CONTROL" in msg
+    assert "two or more commas" in msg
+
+
+def test_mechanism_comma_list_repair_may_reduce_density_without_false_regression() -> None:
+    from apps_rg.runtime.sections.executive_summary_synthesis_monotonic import (
+        evaluate_synthesis_regen_monotonicity,
+    )
+
+    prior = {
+        "resume_display_text": " ".join(["word"] * 128),
+        "claim_ledger": [
+            {"source_fact_ids": [f"fact_{index}"]} for index in range(6)
+        ],
+    }
+    repaired = {
+        "resume_display_text": " ".join(["word"] * 105),
+        "claim_ledger": [
+            {"source_fact_ids": [f"fact_{index}"]} for index in range(6)
+        ],
+    }
+
+    accepted, detail = evaluate_synthesis_regen_monotonicity(
+        prior_parsed=prior,
+        prior_reject_reason="sentence 1: mechanism_comma_list",
+        new_parsed=repaired,
+    )
+
+    assert accepted is True
+    assert detail["prior_needs_prose_tighten"] is True
+    assert detail["prior_needs_density_reduction"] is True
+    assert detail["shrink_waived"] is True
 
 
 def test_regen_candidate_preferred_rejects_mono_rejected_shrink_with_lower_fail_count() -> None:

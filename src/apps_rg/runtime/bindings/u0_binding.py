@@ -184,7 +184,7 @@ def u0_validate_apps_rg(
     TypeError
         If the envelope type is not supported.
     """
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+    from apps_rg.runtime.spine_contracts import (
         RequestEnvelope,
         ValidatedRequest,
     )
@@ -594,7 +594,7 @@ def u0_validate_apps_rg(
 def _coerce_envelope_to_app_payload(envelope: Any) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return ``(app_payload_dict, envelope_meta)``."""
 
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+    from apps_rg.runtime.spine_contracts import (
         AppsRgIngressPayload,
         RequestEnvelope,
     )

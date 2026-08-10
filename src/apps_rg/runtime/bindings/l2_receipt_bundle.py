@@ -203,8 +203,8 @@ def build_authority_rejection_seal(
     error: L2AuthorityError,
 ) -> Any:
     """Create a provider-free sealed rejection for authority failures."""
-    from agentic_core.runtime.contracts.origin import Origin
-    from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+    from apps_rg.runtime.spine_contracts import Origin
+    from apps_rg.runtime.spine_contracts import SealedL2Artifact
 
     payload = {
         "status": "REJECTED",

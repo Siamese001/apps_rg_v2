@@ -1,0 +1,63 @@
+{
+  "artifact_hash": "sha256:2c0f5c845641859a90993c6ee5c021b2ae79e477224948862e1bf5b1ac19b06e",
+  "payload": {
+    "executed": true,
+    "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:ibm_bullets:EXECUTED_X3A_DENY_REROUTE; insurtech_bullets:PHASE1_NO_RUN_DIR; ey_bullets:PHASE1_NO_RUN_DIR; unify_narrative:PHASE1_NO_RUN_DIR; ibm_narrative:PHASE1_NO_RUN_DIR; insurtech_narrative:PHASE1_NO_RUN_DIR; ey_narrative:PHASE1_NO_RUN_DIR; executive_summary:PHASE1_NO_RUN_DIR' schema_ok=False lane_ok=False",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-219562c41233433882ad43b5075662be",
+    "route_id": "R4_SINGLE_ACTION",
+    "run_id": "e0343fb7-c5b8-4984-8950-a990e9c9d3a6",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:d6de4c0276ba6f0c9d94eb5d298b05bbdca88a6466824ed2ba79e0d7945a468d",
+    "status": "FAIL",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.008,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 177428.152,
+        "meta": {
+          "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:ibm_bullets:EXECUTED_X3A_DENY_REROUTE; insurtech_bullets:PHASE1_NO_RUN_DIR; ey_bullets:PHASE1_NO_RUN_DIR; unify_narrative:PHASE1_NO_RUN_DIR; ibm_narrative:PHASE1_NO_RUN_DIR; insurtech_narrative:PHASE1_NO_RUN_DIR; ey_narrative:PHASE1_NO_RUN_DIR; executive_summary:PHASE1_NO_RUN_DIR' schema_ok=False lane_ok=False"
+        },
+        "status": "FAIL",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.006,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "FAIL",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "662f2803-2efa-4590-ba8d-790c0131fceb"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:d6de4c0276ba6f0c9d94eb5d298b05bbdca88a6466824ed2ba79e0d7945a468d"
+}

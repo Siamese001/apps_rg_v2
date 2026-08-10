@@ -9,10 +9,12 @@ from apps_rg.runtime.sections.ibm_canonical_hydration import (
     decompose_ibm_narrative_claim_ledger_by_clause,
     redact_banned_lexicon_from_attestation_change_log,
     redact_banned_lexicon_from_attestation_metadata,
+    remap_ibm_narrative_claim_ledger_to_fact_pool,
     should_hydrate_ibm_bullets_from_canonical,
 )
 from apps_rg.runtime.validators.ibm_narrative_x2 import (
     check_ibm_narrative_claim_ledger_clause_decomposition,
+    ibm_narrative_mechanism_support_observation,
     ibm_narrative_material_fact_ids_for_sentence,
 )
 
@@ -111,6 +113,41 @@ def test_decompose_then_binder_passes_clause_decomposition_gate_live_shape() -> 
         for s in row["source_fact_ids"]
     }
     assert ibm_narrative_material_fact_ids_for_sentence(LIVE_POSTW4_NARRATIVE) <= cited
+
+
+def test_decompose_binds_visible_mechanisms_to_current_companion_rows() -> None:
+    narrative = (
+        "Operationalized AWS partner solution architecture across enterprise pursuits at IBM, "
+        "establishing BI-backed decision discipline that made modernization delivery more repeatable."
+    )
+    companion = (
+        "- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization.\n"
+        "- bul_ibm_002: Built decision-support data models and BI views."
+    )
+    parsed = {
+        "narrative_sentence": narrative,
+        "claim_ledger": [
+            {"claim_text": narrative, "source_fact_ids": ["bul_ibm_002"]}
+        ],
+    }
+
+    decompose_ibm_narrative_claim_ledger_by_clause(
+        parsed,
+        narrative_sentence=narrative,
+        allowed_fact_ids={"bul_ibm_001", "bul_ibm_002"},
+        companion_bullet_texts=companion,
+    )
+
+    assert parsed["claim_ledger"] == [
+        {
+            "claim_text": "Operationalized AWS partner solution architecture across enterprise pursuits at IBM",
+            "source_fact_ids": ["bul_ibm_001"],
+        },
+        {
+            "claim_text": "establishing BI-backed decision discipline that made modernization delivery more repeatable",
+            "source_fact_ids": ["bul_ibm_002"],
+        },
+    ]
 
 
 def test_binder_places_missing_theme_on_grounded_row_with_capacity() -> None:
@@ -227,6 +264,64 @@ def test_align_narrative_ledger_replaces_fact_ids_with_bul_ibm() -> None:
     src = parsed["claim_ledger"][0]["source_fact_ids"]
     assert all(str(s).startswith("bul_ibm_") for s in src)
     assert themes.issubset(set(src)) or src
+
+
+def test_retry17_companion_remap_allows_actual_aws_bi_pipeline_support_roots() -> None:
+    sentence = (
+        "Championed enterprise solution governance at IBM through AWS partnership and "
+        "BI-backed decision support, establishing a pipeline-informed architecture "
+        "discipline for executive pursuit choices and modernization delivery."
+    )
+    companion = (
+        "- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities.\n"
+        "- bul_ibm_002: Owned quota-aligned solution leadership, applying pipeline discipline.\n"
+        "- bul_ibm_003: Built decision-support data models and BI views.\n"
+        "- bul_ibm_004: Prioritized pursuits using solution-architecture feasibility reviews.\n"
+        "- bul_ibm_005: Led technical discovery and solution mapping."
+    )
+    parsed = {
+        "narrative_sentence": sentence,
+        "claim_ledger": [
+            {
+                "claim_text": sentence.split(", establishing", 1)[0],
+                "source_fact_ids": ["bul_ibm_002", "bul_ibm_005"],
+            }
+        ],
+    }
+    runtime_payload = {
+        "proof_pool_metadata": {
+            "claim_evidence_source_type": "augmented_skills_graph"
+        },
+        "allowed_fact_ids": ["fact_revenue_ops_001"],
+    }
+
+    remap_ibm_narrative_claim_ledger_to_fact_pool(
+        parsed,
+        runtime_payload,
+        companion,
+    )
+    allowed = set(runtime_payload["allowed_fact_ids"])
+    assert {"bul_ibm_001", "bul_ibm_002", "bul_ibm_003"} <= allowed
+    decompose_ibm_narrative_claim_ledger_by_clause(
+        parsed,
+        narrative_sentence=sentence,
+        allowed_fact_ids=allowed,
+        companion_bullet_texts=companion,
+    )
+
+    cited = {
+        fact_id
+        for row in parsed["claim_ledger"]
+        for fact_id in row["source_fact_ids"]
+    }
+    themes = ibm_narrative_material_fact_ids_for_sentence(sentence, companion)
+    observation = ibm_narrative_mechanism_support_observation(
+        sentence,
+        parsed["claim_ledger"],
+        companion,
+    )
+    assert themes <= cited
+    assert observation["unsupported_mechanisms"] == []
 
 
 def test_decompose_overflow_row_covers_third_theme_in_one_clause() -> None:

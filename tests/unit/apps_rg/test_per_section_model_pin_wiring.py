@@ -110,7 +110,8 @@ def test_legacy_bullet_lanes_pass_explicit_section_model_pin_to_section_request(
         source = resolve_apps_rg_path(
             repo_root, *Path(lane_relpath).parts[1:]
         ).read_text(encoding="utf-8")
-        assert "resolve_section_generation_model(LANE_KEY)" in source
+        assert "resolve_section_generation_model(" in source
+        assert "LANE_KEY, provider_profile=str(args.provider)" in source
         assert "external_openai_generation_model(section_id=LANE_KEY)" in source
         assert "model=section_model" in source
 

@@ -1,0 +1,89 @@
+```json
+{
+  "categories": [
+    {
+      "category_id": "ccb_engineering_leadership",
+      "display_label": "Engineering Operating Model & Executive Alignment",
+      "terms": [
+        {"text": "Executive-aligned delivery governance cadences", "source_fact_id": "fact_exec_001", "source_fact_ids": ["fact_exec_001"]},
+        {"text": "Cross-functional stakeholder alignment at scale", "source_fact_id": "fact_exec_001", "source_fact_ids": ["fact_exec_001"]},
+        {"text": "Org scale-out for platform execution", "source_fact_id": "fact_exec_001", "source_fact_ids": ["fact_exec_001"]}
+      ]
+    },
+    {
+      "category_id": "ccb_agentic_platforms",
+      "display_label": "Agentic Platform Control-Plane Leadership",
+      "terms": [
+        {"text": "Agentic AI control-plane architecture leadership", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+        {"text": "Route/policy dispatch design for agents", "source_fact_id": "skill_unify_agentic_l0_route_policy_dispatch", "source_fact_ids": ["skill_unify_agentic_l0_route_policy_dispatch"]},
+        {"text": "Engineering leadership over AI platform teams", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]}
+      ]
+    },
+    {
+      "category_id": "ccb_partner_applied_ai_architecture",
+      "display_label": "Partner Technical Program Leadership",
+      "terms": [
+        {"text": "Partner-led AI solution architecture leadership", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+        {"text": "Hyperscaler alliance co-sell program leadership", "source_fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]},
+        {"text": "Joint solution development with partner teams", "source_fact_id": "skill_partner_joint_solution_development", "source_fact_ids": ["skill_partner_joint_solution_development"]}
+      ]
+    },
+    {
+      "category_id": "ccb_gtm_team_enablement",
+      "display_label": "GTM Team Enablement & Process Design",
+      "terms": [
+        {"text": "Pre-sales engagement process establishment", "source_fact_id": "skill_partner_pre_sales", "source_fact_ids": ["skill_partner_pre_sales", "reb_ibm_presales_solution_engineering"]},
+        {"text": "Presales delivery handoff enablement design", "source_fact_id": "skill_p2_gtm_presales_delivery_handoff", "source_fact_ids": ["skill_p2_gtm_presales_delivery_handoff"]},
+        {"text": "Partner GTM enablement motions", "source_fact_id": "skill_partner_gtm_enablement", "source_fact_ids": ["skill_partner_gtm_enablement"]}
+      ]
+    },
+    {
+      "category_id": "ccb_revenue_operating_impact",
+      "display_label": "Revenue Operating Model & Deal Execution",
+      "terms": [
+        {"text": "Quota-aligned enterprise pursuit ownership", "source_fact_id": "reb_ibm_revenue_sales_target_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]},
+        {"text": "Enterprise negotiation leadership", "source_fact_id": "skill_partner_enterprise_negotiations", "source_fact_ids": ["skill_partner_enterprise_negotiations"]},
+        {"text": "Customer deal support coordination", "source_fact_id": "skill_partner_customer_deal_support", "source_fact_ids": ["skill_partner_customer_deal_support"]}
+      ]
+    },
+    {
+      "category_id": "ccb_release_delivery_resilience",
+      "display_label": "Regulated Delivery Pipeline Resilience",
+      "terms": [
+        {"text": "Automated release pipeline embedding", "source_fact_id": "skill_ibm_automated_release_pipelines", "source_fact_ids": ["skill_ibm_automated_release_pipelines"]},
+        {"text": "Security scanning in modernization delivery paths", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+        {"text": "Regulated financial-services delivery discipline", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]}
+      ]
+    },
+    {
+      "category_id": "ccb_customer_value_realization",
+      "display_label": "Adoption & Value Realization Leadership",
+      "terms": [
+        {"text": "Adoption progress and expansion readiness tracking", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+        {"text": "Stakeholder alignment for value realization", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+        {"text": "Cloud vendor joint GTM motions", "source_fact_id": "skill_partner_cloud_vendor_joint_gtm", "source_fact_ids": ["skill_partner_cloud_vendor_joint_gtm"]}
+      ]
+    }
+  ],
+  "selected_fact_plan": {
+    "section_id": "ccb_path7_engineering_operating_model",
+    "selection_method": "lens_biased_neighborhood_expansion",
+    "required_fact_ids": ["fact_exec_001", "reb_unify_agentic_platform_architecture", "fact_engineering_platform_001", "reb_unify_partner_channel_cosell", "reb_ibm_aws_alliance_partner_cosell_gtm", "skill_partner_pre_sales", "reb_ibm_revenue_sales_target_execution", "reb_ibm_devsecops_release_resilience", "reb_ibm_customer_success_value_realization"]
+  },
+  "claim_ledger": [
+    {"claim": "engineering_leadership_exec_alignment", "source_fact_ids": ["fact_exec_001"]},
+    {"claim": "agentic_control_plane_leadership", "source_fact_ids": ["reb_unify_agentic_platform_architecture", "fact_engineering_platform_001"]},
+    {"claim": "partner_technical_program_leadership", "source_fact_ids": ["reb_unify_partner_channel_cosell", "reb_ibm_aws_alliance_partner_cosell_gtm"]},
+    {"claim": "gtm_enablement_process_design", "source_fact_ids": ["skill_partner_pre_sales", "reb_ibm_presales_solution_engineering", "skill_partner_gtm_enablement"]},
+    {"claim": "revenue_deal_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution", "skill_partner_enterprise_negotiations"]},
+    {"claim": "release_delivery_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+    {"claim": "customer_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]}
+  ],
+  "jd_alignment": ["team_leadership_partner_SAs", "partner_led_presales_process", "technical_thought_partner_GTM"],
+  "excluded_jd_skills": ["hiring_mentorship_specific_metrics", "claude_product_specific_knowledge"],
+  "removed_or_rewritten_terms": [],
+  "gap_notes": ["no_direct_people_management_fact"],
+  "change_log": ["path7_engineering_operating_lens_applied", "4plus_nonstandard_category_labels_used"],
+  "self_check": ["all_source_fact_ids_from_allowlist", "3_terms_per_category", "6-8_categories_present"]
+}
+```

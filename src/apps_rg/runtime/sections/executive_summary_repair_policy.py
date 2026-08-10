@@ -10,9 +10,12 @@ RELEASE_SRFS_EMERGENCY_FINALIZER_ENABLED = False
 RELEASE_SRFS_JUDGE_SAFE_REPAIR_ENABLED = False
 RELEASE_SRFS_DENSITY_MICRO_EXPANSION_ENABLED = False
 
-# Bounded same-authority synthesis regen (retry_provider_for_synthesis).
+# Bounded same-authority synthesis regen (retry_provider_for_synthesis).  Three
+# attempts are required because a graph-root correction can expose a second,
+# independently deterministic prose-shape defect.  The third call is still the
+# existing absolute hard cap; it is not an open-ended retry.
 RELEASE_SYNTHESIS_REGENERATION_ENABLED = True
-SYNTHESIS_REGEN_MAX_ATTEMPTS = 2
+SYNTHESIS_REGEN_MAX_ATTEMPTS = 3
 SYNTHESIS_REGEN_MAX_ATTEMPTS_HARD_CAP = 3
 
 # Graph-only path may deterministically reformat from allowed facts (not template finalizer).

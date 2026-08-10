@@ -1,0 +1,67 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.0,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "bul_unify_006 omits required protected commercial metrics ($22M / margin)."
+    ],
+    "cited_sentence_indexes": [
+      6
+    ],
+    "remediation_suggestions": [
+      "Restore protected $22M ARR and margin metrics to bul_unify_006 without splitting or diluting."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "evidence_utilization": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "PROTECTED_METRICS_MISSING"
+        ]
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "PROTECTED_METRIC_ANCHOR_FAILURE"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T204928Z_e248b8bf\\modular_r4\\sections\\unify_bullets\\x1d_gemini_provider_response_raw_20260808_205359_890.json",
+  "original_model": null,
+  "fallback_model": null
+}

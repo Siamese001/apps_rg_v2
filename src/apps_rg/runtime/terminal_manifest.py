@@ -154,7 +154,8 @@ def seal_terminal_manifest(
     if not isinstance(x3_payload, dict):
         raise TerminalStateError("X3 authority receipt must be a JSON object")
     receipt_x3_code = str(
-        x3_payload.get("x3_code")
+        x3_payload.get("x3_disposition")
+        or x3_payload.get("x3_code")
         or x3_payload.get("code")
         or x3_payload.get("disposition")
         or ""

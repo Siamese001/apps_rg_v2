@@ -72,6 +72,99 @@ def _load_json(artifact_dir: Path, name: str) -> dict[str, Any]:
         return {}
 
 
+def _payload(value: dict[str, Any]) -> dict[str, Any]:
+    nested = value.get("payload")
+    return dict(nested) if isinstance(nested, dict) else value
+
+
+def _first_text(*values: Any) -> str:
+    for value in values:
+        text = str(value or "").strip()
+        if text:
+            return text
+    return ""
+
+
+def _section_runtime_identity(
+    *,
+    section_id: str,
+    runtime_payload: dict[str, Any],
+    artifact_dir: Path,
+) -> dict[str, str]:
+    """Resolve the lane identity already present at the nested core boundary."""
+
+    dispatch = _load_json(artifact_dir, "lane_dispatch_attempt.json")
+    canonical = dispatch.get("identity")
+    canonical = dict(canonical) if isinstance(canonical, dict) else {}
+    from apps_rg.runtime.orchestration.canonical_identity_context import (
+        current_canonical_run_identity,
+    )
+
+    # Section-only and patch-run entrypoints do not have the outer modular
+    # dispatcher receipt. Their validated product identity remains available at
+    # the app-owned dynamic boundary while the native exhaust is emitted.
+    canonical = {**current_canonical_run_identity(), **canonical}
+    core_identity = _payload(_load_json(artifact_dir, "runtime_identity_envelope.json"))
+    route = _payload(_load_json(artifact_dir, "route_contract.json"))
+    exit_receipt = _load_json(artifact_dir, EXIT_DISPOSITION_RECEIPT_ARTIFACT)
+    lane_run_id = _first_text(
+        runtime_payload.get("run_id"), exit_receipt.get("run_id"), section_id
+    )
+    parent_run_id = _first_text(
+        runtime_payload.get("parent_run_id"),
+        canonical.get("parent_run_id"),
+        core_identity.get("run_id"),
+    )
+    child_run_id = _first_text(runtime_payload.get("child_run_id"), lane_run_id)
+    section_attempt_id = _first_text(
+        runtime_payload.get("section_attempt_id"),
+        f"{section_id}:{child_run_id}:attempt:1" if child_run_id else "",
+    )
+    return {
+        "request_id": _first_text(
+            runtime_payload.get("request_id"),
+            canonical.get("request_id"),
+            core_identity.get("request_id"),
+            route.get("request_id"),
+        ),
+        "run_id": lane_run_id,
+        "parent_run_id": parent_run_id,
+        "child_run_id": child_run_id,
+        "section_attempt_id": section_attempt_id,
+        "session_id": _first_text(
+            runtime_payload.get("session_id"),
+            canonical.get("child_run_id"),
+            parent_run_id,
+        ),
+        "tenant_id": _first_text(
+            runtime_payload.get("tenant_id"),
+            canonical.get("tenant_id"),
+            "default",
+        ),
+        "trace_root": _first_text(
+            runtime_payload.get("trace_root"),
+            canonical.get("trace_root"),
+            core_identity.get("trace_root"),
+            route.get("trace_root"),
+        ),
+        "policy_hash": _first_text(
+            runtime_payload.get("policy_hash"),
+            canonical.get("policy_hash"),
+            route.get("policy_hash"),
+            "no-policy",
+        ),
+        "blueprint_hash": _first_text(
+            runtime_payload.get("blueprint_hash"),
+            canonical.get("blueprint_hash"),
+            route.get("blueprint_hash"),
+            "no-blueprint",
+        ),
+        "replay_key": _first_text(
+            runtime_payload.get("replay_key"),
+            route.get("replay_key"),
+            f"section:{section_id}:{child_run_id}",
+        ),
+    }
 def _repo_rel(repo_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(repo_root.resolve()).as_posix()
@@ -152,6 +245,11 @@ def build_runtime_exhaust_bundle_for_section(
     repo_root: Path,
 ) -> dict[str, Any]:
     edr = _load_json(artifact_dir, EXIT_DISPOSITION_RECEIPT_ARTIFACT)
+    identity = _section_runtime_identity(
+        section_id=section_id,
+        runtime_payload=runtime_payload,
+        artifact_dir=artifact_dir,
+    )
     sealed_ref = str(runtime_payload.get("sealed_l2_artifact_ref") or SEALED_L2_ARTIFACT)
     x3_from_exit = edr.get("x3_disposition") if isinstance(edr.get("x3_disposition"), dict) else {}
     inventory = _build_artifact_inventory(artifact_dir, section_id=section_id)
@@ -175,7 +273,7 @@ def build_runtime_exhaust_bundle_for_section(
         "generated_at_utc": _utc_now(),
         "contract_type": "RuntimeExhaustBundle",
         "section_id": section_id,
-        "run_id": str(runtime_payload.get("run_id") or edr.get("run_id") or ""),
+        **identity,
         "producer_stage": "Exit",
         "consumer_stage": "L6",
         "exit_disposition_receipt_ref": EXIT_DISPOSITION_RECEIPT_ARTIFACT,

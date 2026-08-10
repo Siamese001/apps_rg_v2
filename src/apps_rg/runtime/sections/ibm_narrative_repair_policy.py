@@ -6,8 +6,9 @@ import os
 
 # Bounded same-authority theme-overpack regen (apply_ibm_narrative_theme_overpack_repair).
 RELEASE_IBM_NARRATIVE_THEME_REPAIR_ENABLED = True
-# Hard cap — absolute ceiling, not operator-raisable (no env knob exists for attempts).
-THEME_REPAIR_MAX_ATTEMPTS = 1
+# Hard cap — one initial rewrite plus one correction when the first candidate is
+# real/parseable and fails only cited-companion mechanism support.
+THEME_REPAIR_MAX_ATTEMPTS = 2
 
 
 def theme_repair_enabled() -> bool:

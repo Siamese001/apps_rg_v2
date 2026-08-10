@@ -15,6 +15,13 @@ from apps_rg.runtime.section_cli_defaults import (
     CLI_PROVIDER_RESOLUTION_DEV_DEFAULT_EXTERNAL_CLAUDE,
     CLI_PROVIDER_RESOLUTION_DEV_DEFAULT_EXTERNAL_OPENAI,
 )
+from apps_rg.runtime.section_model_limits import (
+    resolve_section_generation_effort,
+    resolve_section_generation_model,
+    resolve_selector_provider_model,
+    resolve_selector_reasoning_effort,
+)
+from apps_rg.runtime.providers import load_provider_profiles_config
 
 
 def test_known_anthropic_limit_env_routes_claude_whole_run_lane_to_openai(monkeypatch) -> None:
@@ -74,3 +81,34 @@ def test_known_anthropic_limit_receipt_routes_and_audits_digest(tmp_path, monkey
     assert route.receipt_sha256 == hashlib.sha256(raw.encode("utf-8")).hexdigest()
     assert provider == "external_openai"
     assert source == ANTHROPIC_LIMIT_PREFLIGHT_OPENAI_BACKUP_SOURCE
+
+
+def test_known_limit_routes_generator_and_selector_to_complete_backup_identity(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv(ANTHROPIC_LIMIT_PREFLIGHT_ENV, "credit balance too low")
+    config = load_provider_profiles_config()
+    openai = config["profiles"]["external_openai_generator"]
+    selector = config["selector_models"]["competencies_graph_pool_selector"]
+    backup_selector = selector["anthropic_limit_backup"]
+
+    provider, _source = modular._resolve_phase1_lane_provider_for_section(
+        "", "competencies"
+    )
+
+    assert provider == "external_openai"
+    assert resolve_section_generation_model(
+        "competencies", provider_profile=provider
+    ) == openai["anthropic_limit_backup_model_by_section"]["competencies"]
+    assert resolve_section_generation_effort(
+        "competencies", provider_profile=provider
+    ) == openai["anthropic_limit_backup_effort_by_section"]["competencies"]
+    selector_provider, selector_model, selector_source = (
+        resolve_selector_provider_model("competencies_graph_pool_selector")
+    )
+    assert selector_provider == backup_selector["provider_key"]
+    assert selector_model == backup_selector["model"]
+    assert selector_source.endswith("anthropic_limit_backup.model")
+    assert resolve_selector_reasoning_effort(
+        "competencies_graph_pool_selector"
+    ) == backup_selector["reasoning_effort"]

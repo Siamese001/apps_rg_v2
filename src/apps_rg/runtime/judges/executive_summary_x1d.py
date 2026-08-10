@@ -276,9 +276,12 @@ def build_x1d_judge_system_prompt(*, compact: bool = True) -> str:
         )
     return f"You are a strict executive resume judge. Return JSON only.\n\n{JUDGE_SCORE_SCHEMA}"
 
-GEMINI_JUDGE_RESPONSE_SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "properties": {
+def build_judge_response_schema(
+    dimension_ids: tuple[str, ...] | None = None,
+) -> dict[str, Any]:
+    """Build the strict structured-output schema for one section's rubric."""
+
+    properties = {
         "score_scale": {"type": "string", "enum": ["0_to_1", "0_to_5"]},
         "score": {"type": "number"},
         "threshold": {"type": "number"},
@@ -287,11 +290,36 @@ GEMINI_JUDGE_RESPONSE_SCHEMA: dict[str, Any] = {
         "findings": {"type": "array", "items": {"type": "string"}},
         "cited_sentence_indexes": {"type": "array", "items": {"type": "integer"}},
         "remediation_suggestions": {"type": "array", "items": {"type": "string"}},
-        "dimension_verdicts": dimension_verdicts_json_schema_fragment(),
-    },
-    "required": list(JUDGE_REQUIRED_FIELDS)
-    + ["decisive_failure", "findings", "cited_sentence_indexes", "remediation_suggestions"],
-}
+        "dimension_verdicts": dimension_verdicts_json_schema_fragment(dimension_ids)
+        if dimension_ids is not None
+        else dimension_verdicts_json_schema_fragment(),
+    }
+    return {
+        "type": "object",
+        "properties": properties,
+        "required": list(properties),
+        "additionalProperties": False,
+    }
+
+
+GEMINI_JUDGE_RESPONSE_SCHEMA: dict[str, Any] = build_judge_response_schema()
+
+
+def _gemini_compatible_response_schema(schema: Mapping[str, Any]) -> dict[str, Any]:
+    """Remove JSON-Schema keywords rejected by Gemini's Schema protobuf."""
+
+    def convert(value: Any) -> Any:
+        if isinstance(value, Mapping):
+            return {
+                str(key): convert(child)
+                for key, child in value.items()
+                if str(key) != "additionalProperties"
+            }
+        if isinstance(value, list):
+            return [convert(child) for child in value]
+        return value
+
+    return convert(schema)
 
 JUDGE_SCORE_SCHEMA = """
 Score contract (mandatory - every judge response MUST comply):
@@ -602,6 +630,7 @@ def _gemini_generation_config(
     thinking_level: str,
     attempt: int = 1,
     section_id: str | None = None,
+    response_schema: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Gemini generationConfig for compact schema-valid judge JSON."""
     resolved_thinking_level = str(thinking_level or "").strip().lower()
@@ -616,7 +645,9 @@ def _gemini_generation_config(
         "thinkingConfig": {"thinkingLevel": resolved_thinking_level},
         "maxOutputTokens": max_tokens,
         "responseMimeType": "application/json",
-        "responseSchema": GEMINI_JUDGE_RESPONSE_SCHEMA,
+        "responseSchema": _gemini_compatible_response_schema(
+            response_schema or GEMINI_JUDGE_RESPONSE_SCHEMA
+        ),
     }
 
 
@@ -1055,6 +1086,7 @@ def _call_openai(
     attempt: int = 1,
     model_env_source: str = "openai",
     section_id: str | None = None,
+    response_schema: dict[str, Any] | None = None,
 ) -> JudgeOutput:
     """Call OpenAI API with full artifact preservation."""
     system_content = build_x1d_judge_system_prompt(compact=True)
@@ -1083,7 +1115,7 @@ def _call_openai(
                 "type": "json_schema",
                 "name": "apps_rg_x1d_judge",
                 "strict": True,
-                "schema": GEMINI_JUDGE_RESPONSE_SCHEMA,
+                "schema": response_schema or GEMINI_JUDGE_RESPONSE_SCHEMA,
             }
         },
     }
@@ -1416,6 +1448,7 @@ def _call_gemini(
     thinking_level: str | None = None,
     attempt: int = 1,
     section_id: str | None = None,
+    response_schema: dict[str, Any] | None = None,
 ) -> JudgeOutput:
     """Call Gemini API with full artifact preservation."""
     logical_attempt = attempt
@@ -1432,6 +1465,7 @@ def _call_gemini(
         thinking_level=resolved_thinking_level,
         attempt=attempt,
         section_id=section_id,
+        response_schema=response_schema,
     )
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],

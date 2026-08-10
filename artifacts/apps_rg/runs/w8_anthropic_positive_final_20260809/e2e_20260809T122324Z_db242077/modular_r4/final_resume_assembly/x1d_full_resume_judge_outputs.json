@@ -1,0 +1,224 @@
+{
+  "schema": "apps_rg.x1d_full_resume_judge_outputs.v1",
+  "emitted_at_utc": "2026-08-09T12:34:38.412688+00:00",
+  "judge_roster": [
+    "gemini_pro",
+    "openai_chatgpt"
+  ],
+  "full_resume_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final_20260809\\e2e_20260809T122324Z_db242077\\modular_r4\\final_resume_assembly\\final_resume.json",
+  "final_resume_hash": "857c98baaa408b795540fb60361149e954621186c20f827c7f52c2418f4a2dae",
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_full_resume_coherence",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final_20260809\\e2e_20260809T122324Z_db242077\\modular_r4\\final_resume_assembly\\coherence_judge_providers\\x1d_gemini_provider_response_raw_20260809_123421_273.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "d0d15b19bf739d73",
+      "output_hash": "95a3448e770467ad",
+      "score": 5.0,
+      "score_scale": "0_to_5",
+      "normalized_score": 1.0,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": null,
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": null,
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": null,
+      "pass": true,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_full_resume_coherence",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final_20260809\\e2e_20260809T122324Z_db242077\\modular_r4\\final_resume_assembly\\coherence_judge_providers\\x1d_openai_provider_response_raw_20260809_123438_412.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "d0d15b19bf739d73",
+      "output_hash": "3fd96fc3031c1584",
+      "score": 4.1,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.82,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Clear SVP platform, governance, commercialization, and alliance narrative.",
+        "Credentials remain exclusively in the credentials section.",
+        "All material claims are bound to candidate evidence.",
+        "Competencies use executive clusters but repeat control-plane, reliability, and co-sell themes.",
+        "S2–S4 are jargon-dense, while S6 adds limited differentiation."
+      ],
+      "cited_sentence_indexes": [
+        2,
+        3,
+        4,
+        6
+      ],
+      "remediation_suggestions": [
+        "Consolidate overlapping competency phrases within each cluster.",
+        "Simplify S2–S4 and make S6 more outcome-specific."
+      ],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": null,
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": false,
+          "severity": "minor",
+          "codes": [
+            "JARGON_DENSITY"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": false,
+          "severity": "minor",
+          "codes": [
+            "COMPETENCY_OVERLAP"
+          ]
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": false,
+          "severity": "minor",
+          "codes": [
+            "ABSTRACT_SUMMARY_LANGUAGE"
+          ]
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": null,
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": null,
+      "pass": true
+    }
+  ],
+  "aggregation": {
+    "aggregation_method": "quorum_majority_model_backed",
+    "pass_threshold": 0.8,
+    "quorum_required": 2,
+    "full_resume_coherence_pass": true,
+    "decisive_reason": "quorum_pass_no_blockers",
+    "blockers": [],
+    "warnings": []
+  },
+  "explicit_non_claims": [
+    "Section-level X2 PASS does not imply full_resume_coherence_pass.",
+    "MOCKED or BLOCKED judges do not count toward quorum pass.",
+    "UNKNOWN is not PASS.",
+    "Targeting context is not candidate proof; the candidate evidence packet is."
+  ]
+}

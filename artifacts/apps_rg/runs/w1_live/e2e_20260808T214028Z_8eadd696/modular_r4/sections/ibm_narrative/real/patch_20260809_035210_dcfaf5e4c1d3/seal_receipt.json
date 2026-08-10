@@ -1,0 +1,210 @@
+{
+  "allowed_file_roots": [],
+  "allowed_models": [
+    "claude-sonnet-5"
+  ],
+  "allowed_networks": [],
+  "allowed_tools": [],
+  "app_id": "apps_rg",
+  "audit_manifest_ref": "l2_receipt_bundle.json",
+  "audit_refs": [
+    "section_lane:ibm_narrative",
+    "l2_packet:2b554063213e73196d3e9a1ada16fb72769e9d645adc2ebf10e2f7e045e22311",
+    "frozen_execution_room:1a603eaf585844164ac88b2c3b8eaac1587329c124aeb518a7a51868f7deb6f0",
+    "receipt:attempt_receipt.json:2de34a3a9affb60f3b55379e4c22be80356cbf2d28d7c74f430fd4f8af2f0913",
+    "receipt:frozen_execution_context.json:3c611acec1feefe6b8d3ec6e941263c017db026aa9f3436c9f4b052784d31be1",
+    "receipt:l2_execution_packet.json:24f9f9865b92a4d6545243010f37037d57a20b57de039a993ddd09d7b29d7228",
+    "receipt:prep_receipt.json:37ea07ed49a4194c4fa7fcd9d649f0bcb38c55a5d10f95639ba17a01c118d48f",
+    "receipt:validation_receipt.json:bde721747620cbe07d22349b30e3da7d5230d39a8083387c4a814377e438287d"
+  ],
+  "compilation_hash": "d154153f3f8776aa514d56f0c42bf1707aec6aa661115816e2e65c2ac38cf05e",
+  "egress_policy_ref": "apps_rg::provider_model::resume_generation::v1",
+  "evidence_refs": [
+    "aba86b7c09b3e7c1d2e0fbf932ab6eed0e0be4e6e1d2de23921e0ba1827b61b4"
+  ],
+  "execution_duration_ms": 0,
+  "execution_status": "completed",
+  "execution_timestamp": "",
+  "gate_verdict_refs": [
+    "G11:PASS:MODEL_REGISTRY_BOUND",
+    "G12:PASS:SIGNED_ARGS_AND_IDENTITY_BOUND",
+    "G13:PASS:EVIDENCE_AND_SCHEMA_BOUND",
+    "G15:PASS:SANDBOX_ENVELOPE_BOUND",
+    "G19:PASS:RETRY_BUDGET_BOUND",
+    "G20:PASS:EXECUTION_BUDGET_BOUND"
+  ],
+  "generated_content": "{\"graph_claim_binding_contract_digest\": \"9d5c30b6bb6a83e034f46c7c7c54a2cadb0e592ef227adfe6434513dd9fce391\", \"graph_claim_bindings\": [{\"allocation_claim_unit_ids\": [\"ibm_narrative:derived:01\", \"ibm_narrative:derived:02\"], \"allocation_plan_digest\": \"e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2\", \"binding_status\": \"PASS\", \"citation_refs\": [\"fact_partnerships_gtm_002\", \"fact_revenue_ops_005\"], \"claim_entailment_score\": 1.0, \"claim_source_fact_ids\": [\"bul_ibm_001\", \"bul_ibm_002\"], \"claim_unit_id\": \"ibm_narrative_claim_1_74168eac\", \"edge_ids\": [\"edge:244605aec5577e547cc2aede\", \"edge:ab44170417c11551ae68a66d\", \"edge:08c93a4b511f512e46815def\", \"edge:c2e8a8bcf8fd2c50727b2888\", \"edge:9343406f47c7c3166c2f3bd4\"], \"fact_ids\": [\"fact_partnerships_gtm_002\", \"fact_revenue_ops_005\"], \"graph_path_ids\": [\"root:reb_ibm_aws_alliance_partner_cosell_gtm\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth\", \"root:reb_ibm_data_modeling_bi_decision_support\", \"root:reb_ibm_data_modeling_bi_decision_support/skill:skill_sr_cloud_data_platform_engineering\", \"root:reb_ibm_data_modeling_bi_decision_support/fact:fact_revenue_ops_005\"], \"metric_binding_score\": 0.0, \"metric_outcome_id\": \"\", \"metric_unit\": \"\", \"metric_value\": \"\", \"normalized_metric_signature\": \"\", \"path_confidence_raw\": 1.0, \"proof_strength_raw\": 0.9, \"schema_version\": \"graph_claim_binding_v1\", \"section_id\": \"ibm_narrative\", \"selection_margin\": -0.4, \"skill_ids\": [\"skill_partner_alliance_gtm_execution\", \"skill_sr_cloud_data_platform_engineering\"], \"source_independence_score\": 0.75, \"target_alignment_score\": 2.85, \"visible_claim_hash\": \"309624c862741b80cc84d78fa3d99b28dd706cc07f13bc277f66b0e77a760669\", \"visible_claim_text\": \"Championed partner-led AWS modernization and executive solution architecture at IBM\"}, {\"allocation_claim_unit_ids\": [\"ibm_narrative:derived:01\", \"ibm_narrative:derived:02\"], \"allocation_plan_digest\": \"e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2\", \"binding_status\": \"PASS\", \"citation_refs\": [\"fact_partnerships_gtm_002\", \"fact_revenue_ops_005\"], \"claim_entailment_score\": 1.0, \"claim_source_fact_ids\": [\"bul_ibm_001\", \"bul_ibm_002\"], \"claim_unit_id\": \"ibm_narrative_claim_2_84abd23b\", \"edge_ids\": [\"edge:244605aec5577e547cc2aede\", \"edge:ab44170417c11551ae68a66d\", \"edge:08c93a4b511f512e46815def\", \"edge:c2e8a8bcf8fd2c50727b2888\", \"edge:9343406f47c7c3166c2f3bd4\"], \"fact_ids\": [\"fact_partnerships_gtm_002\", \"fact_revenue_ops_005\"], \"graph_path_ids\": [\"root:reb_ibm_aws_alliance_partner_cosell_gtm\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002\", \"root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth\", \"root:reb_ibm_data_modeling_bi_decision_support\", \"root:reb_ibm_data_modeling_bi_decision_support/skill:skill_sr_cloud_data_platform_engineering\", \"root:reb_ibm_data_modeling_bi_decision_support/fact:fact_revenue_ops_005\"], \"metric_binding_score\": 0.0, \"metric_outcome_id\": \"\", \"metric_unit\": \"\", \"metric_value\": \"\", \"normalized_metric_signature\": \"\", \"path_confidence_raw\": 1.0, \"proof_strength_raw\": 0.9, \"schema_version\": \"graph_claim_binding_v1\", \"section_id\": \"ibm_narrative\", \"selection_margin\": -0.4, \"skill_ids\": [\"skill_partner_alliance_gtm_execution\", \"skill_sr_cloud_data_platform_engineering\"], \"source_independence_score\": 0.75, \"target_alignment_score\": 2.85, \"visible_claim_hash\": \"14c800bdc007d84f205d4a6545b6112d3cce1d6d8001864617400a970c19ce3b\", \"visible_claim_text\": \"establishing decision-grade BI and disciplined pursuit governance across regulated financial-services portfolios and complex client environments as a repeatable model for enterprise adoption at scale\"}], \"graph_claim_bindings_ref\": \"graph_claim_bindings.json\", \"resume_graph_allocation_plan_digest\": \"e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2\"}",
+  "generated_content_origin": "MODEL_GENERATION",
+  "is_future_run_only": false,
+  "is_uwg_write_authority": false,
+  "l5_certification_packet": null,
+  "l5_certification_packet_digest": "",
+  "l5_certification_packet_ref": "",
+  "l5_certification_ref": "l5:apps_rg:u0:9ac6d36deec64d5f3aecd0e5",
+  "l5_certification_status": "",
+  "l5_certification_verification_digest": "",
+  "l5_certification_verified": false,
+  "l5_egress_receipt_digests": [],
+  "l5_egress_receipt_refs": [],
+  "l5_egress_receipts": [],
+  "l5_evidence_contract_digest": "",
+  "l5_prompt_artifact_digest": "",
+  "l5_runtime_binding_digest": "",
+  "model_call_refs": [
+    "provider_request:640ab2ee16efeb831d794af75a0dc602c9e3fa0b5e3f5f634ae820c06ebdefd3"
+  ],
+  "otel_span_refs": [],
+  "posture": {
+    "external_call": false,
+    "hitl_required": false,
+    "posture_class": "write_intent",
+    "read_only": false,
+    "write_intent": true
+  },
+  "prompt_artifact_digest": "ea3f73c03662c40c2814846fc0c50e9f0f16743128d1ac7af5cc3f1ed2ddd0d4",
+  "prompt_refs": [
+    "ea3f73c03662c40c2814846fc0c50e9f0f16743128d1ac7af5cc3f1ed2ddd0d4"
+  ],
+  "proposed_state_diff": {
+    "payload": {
+      "graph_claim_binding_contract_digest": "9d5c30b6bb6a83e034f46c7c7c54a2cadb0e592ef227adfe6434513dd9fce391",
+      "graph_claim_bindings": [
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:01",
+            "ibm_narrative:derived:02"
+          ],
+          "allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_partnerships_gtm_002",
+            "fact_revenue_ops_005"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_001",
+            "bul_ibm_002"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_1_74168eac",
+          "edge_ids": [
+            "edge:244605aec5577e547cc2aede",
+            "edge:ab44170417c11551ae68a66d",
+            "edge:08c93a4b511f512e46815def",
+            "edge:c2e8a8bcf8fd2c50727b2888",
+            "edge:9343406f47c7c3166c2f3bd4"
+          ],
+          "fact_ids": [
+            "fact_partnerships_gtm_002",
+            "fact_revenue_ops_005"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth",
+            "root:reb_ibm_data_modeling_bi_decision_support",
+            "root:reb_ibm_data_modeling_bi_decision_support/skill:skill_sr_cloud_data_platform_engineering",
+            "root:reb_ibm_data_modeling_bi_decision_support/fact:fact_revenue_ops_005"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 0.9,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": -0.4,
+          "skill_ids": [
+            "skill_partner_alliance_gtm_execution",
+            "skill_sr_cloud_data_platform_engineering"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 2.85,
+          "visible_claim_hash": "309624c862741b80cc84d78fa3d99b28dd706cc07f13bc277f66b0e77a760669",
+          "visible_claim_text": "Championed partner-led AWS modernization and executive solution architecture at IBM"
+        },
+        {
+          "allocation_claim_unit_ids": [
+            "ibm_narrative:derived:01",
+            "ibm_narrative:derived:02"
+          ],
+          "allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2",
+          "binding_status": "PASS",
+          "citation_refs": [
+            "fact_partnerships_gtm_002",
+            "fact_revenue_ops_005"
+          ],
+          "claim_entailment_score": 1.0,
+          "claim_source_fact_ids": [
+            "bul_ibm_001",
+            "bul_ibm_002"
+          ],
+          "claim_unit_id": "ibm_narrative_claim_2_84abd23b",
+          "edge_ids": [
+            "edge:244605aec5577e547cc2aede",
+            "edge:ab44170417c11551ae68a66d",
+            "edge:08c93a4b511f512e46815def",
+            "edge:c2e8a8bcf8fd2c50727b2888",
+            "edge:9343406f47c7c3166c2f3bd4"
+          ],
+          "fact_ids": [
+            "fact_partnerships_gtm_002",
+            "fact_revenue_ops_005"
+          ],
+          "graph_path_ids": [
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/metric:metric_ibm_20pct_joint_revenue_growth",
+            "root:reb_ibm_data_modeling_bi_decision_support",
+            "root:reb_ibm_data_modeling_bi_decision_support/skill:skill_sr_cloud_data_platform_engineering",
+            "root:reb_ibm_data_modeling_bi_decision_support/fact:fact_revenue_ops_005"
+          ],
+          "metric_binding_score": 0.0,
+          "metric_outcome_id": "",
+          "metric_unit": "",
+          "metric_value": "",
+          "normalized_metric_signature": "",
+          "path_confidence_raw": 1.0,
+          "proof_strength_raw": 0.9,
+          "schema_version": "graph_claim_binding_v1",
+          "section_id": "ibm_narrative",
+          "selection_margin": -0.4,
+          "skill_ids": [
+            "skill_partner_alliance_gtm_execution",
+            "skill_sr_cloud_data_platform_engineering"
+          ],
+          "source_independence_score": 0.75,
+          "target_alignment_score": 2.85,
+          "visible_claim_hash": "14c800bdc007d84f205d4a6545b6112d3cce1d6d8001864617400a970c19ce3b",
+          "visible_claim_text": "establishing decision-grade BI and disciplined pursuit governance across regulated financial-services portfolios and complex client environments as a repeatable model for enterprise adoption at scale"
+        }
+      ],
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "resume_graph_allocation_plan_digest": "e4e30b08c589f051b2eb20b73b06f56aec10ebff4b72eda748fdd77d09d66ff2"
+    },
+    "section_id": "ibm_narrative",
+    "section_output_ref": "l2_output.json"
+  },
+  "provider_receipts": [
+    "provider_response:f2180df90d20c64a6c2478994f51bd6b646680588f3468701efa66c6d35f06d5"
+  ],
+  "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:eef1bf82cda1d462::v1",
+  "replay_manifest": "replay_key:bbe7a27043cb170001e19a2c4305a84b1287e6c18ea015b5bb5cd2139725c143",
+  "request_id": "req-383143d267fb452caccf1fb2b2713cf4",
+  "run_id": "8020359a-c1bb-43c9-a00a-d947f3a9230d",
+  "sandbox_required": false,
+  "schema_version": "W6.0",
+  "signature": "",
+  "snapshot_refs": [
+    "2b554063213e73196d3e9a1ada16fb72769e9d645adc2ebf10e2f7e045e22311",
+    "1a603eaf585844164ac88b2c3b8eaac1587329c124aeb518a7a51868f7deb6f0"
+  ],
+  "sovereign_execution_receipt": "l2_packet:2b554063213e73196d3e9a1ada16fb72769e9d645adc2ebf10e2f7e045e22311",
+  "state_diff_authorized": false,
+  "tenant_id": "default",
+  "tool_call_refs": [],
+  "trace_id": "3da2370b-f1ae-4a16-955c-b48ffc256ab3"
+}

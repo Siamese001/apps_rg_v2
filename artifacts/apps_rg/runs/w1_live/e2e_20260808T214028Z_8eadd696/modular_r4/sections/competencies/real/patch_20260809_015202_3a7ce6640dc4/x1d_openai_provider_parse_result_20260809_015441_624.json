@@ -1,0 +1,107 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 2.3,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "Six entries yield only four distinct category families because two groups are duplicated",
+      "AI Platform Leadership mixes architecture, pre-sales, quota execution, and partner GTM",
+      "Governance mixes runtime controls with customer success and deal support",
+      "A dedicated partner-applied AI architecture category is missing",
+      "Partner terms lack a reusable architecture mechanism and partner deployment outcome",
+      "Duplicated agentic and LLMOps surfaces repeat the generated sections"
+    ],
+    "cited_sentence_indexes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "remediation_suggestions": [
+      "Consolidate duplicate categories into six distinct skill families",
+      "Separate commercial execution from agentic platform architecture",
+      "Add one partner architecture category grounded in Unify or IBM proof",
+      "Reduce overlap with summary and experience language"
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_stuffing": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DUPLICATE_QUERY_CLUSTERS"
+        ]
+      },
+      "seniority_executive_relevance": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "MIXED_EXECUTIVE_AND_OPERATOR_SCOPE"
+        ]
+      },
+      "complementarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "GENERATED_SECTION_OVERLAP",
+          "DUPLICATE_PROOF_SURFACES"
+        ]
+      },
+      "no_bullet_restatement": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "EXPERIENCE_PHRASE_RECYCLING"
+        ]
+      },
+      "anti_overfit": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "REPEATED_FACT_SURFACES",
+          "MISPLACED_PARTNER_TERMS"
+        ]
+      },
+      "category_clarity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_CATEGORIES",
+          "MIXED_SKILL_FAMILIES"
+        ]
+      },
+      "svp_agentic_specificity": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "GENERIC_COMMERCIAL_TERMS",
+          "UNEQUAL_MECHANISM_DEPTH"
+        ]
+      },
+      "partner_architecture_specificity": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MISSING_PARTNER_ARCHITECTURE_CATEGORY",
+          "MISSING_DEPLOYMENT_OUTCOME"
+        ]
+      },
+      "root_chronology_discipline": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w1_live\\e2e_20260808T214028Z_8eadd696\\modular_r4\\sections\\competencies\\real\\patch_20260809_015202_3a7ce6640dc4\\x1d_openai_provider_response_raw_20260809_015441_621.json",
+  "original_model": null,
+  "fallback_model": null
+}

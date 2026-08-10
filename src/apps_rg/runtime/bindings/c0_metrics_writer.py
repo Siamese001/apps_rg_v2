@@ -17,7 +17,7 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import (
     EvidenceItem,
     FinalEvidenceContract,
     STATUS_UNKNOWN,

@@ -1,0 +1,154 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_insurtech_bullets_allowed_fact_ids_non_empty",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 16
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_source_fact_ids_supported",
+      "gate_type": "deterministic",
+      "pass": false,
+      "failure_reason": "claim source_fact_ids missing or outside allowed pool",
+      "observed_value": {
+        "bad": [],
+        "cited_count": 0
+      }
+    },
+    {
+      "gate_id": "x2_claim_ledger_claim_text_non_empty",
+      "gate_type": "deterministic",
+      "pass": false,
+      "failure_reason": "claim_ledger missing or empty claim_text",
+      "observed_value": 0
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_display_text_proof_authorized",
+      "gate_type": "deterministic",
+      "pass": false,
+      "failure_reason": "display text must be rendered from selected proof fact claim_text",
+      "observed_value": {
+        "status": "FAIL",
+        "display_text_authority": "",
+        "rows": []
+      }
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_runtime_real_llm",
+      "gate_type": "deterministic",
+      "pass": false,
+      "failure_reason": "runtime_generation_status=BLOCKED",
+      "observed_value": "BLOCKED"
+    },
+    {
+      "gate_id": "x2_no_first_person",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_no_em_dash",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_targeting_only_not_experience_claim",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": []
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_graph_role_episode_bundle_consumed",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": true
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_bullet_count_3",
+      "gate_type": "deterministic",
+      "pass": false,
+      "failure_reason": "expected exactly 3 bullets",
+      "observed_value": 0
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_bullet_single_thought",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_insurtech_bullets_bullet_no_embedded_newline",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority",
+      "pass": false,
+      "observed_value": {
+        "allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79",
+        "claim_count": 0,
+        "bound_claim_count": 0,
+        "binding_coverage": 0.0,
+        "metric_exactness_pass": true,
+        "orphan_allocation_claim_unit_ids": [
+          "insurtech_bullets:bul_insurtech_001",
+          "insurtech_bullets:bul_insurtech_002",
+          "insurtech_bullets:bul_insurtech_003"
+        ],
+        "failure_reasons": [
+          "final_materialized_output_missing",
+          "orphan_allocation_claim_units:insurtech_bullets:bul_insurtech_001,insurtech_bullets:bul_insurtech_002,insurtech_bullets:bul_insurtech_003",
+          "visible_claim_ledger_missing"
+        ]
+      },
+      "threshold": {
+        "binding_coverage": 1.0,
+        "metric_exactness": 1.0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "resume_graph_claim_binding_failed",
+      "evidence_ref": "graph_claim_bindings.json"
+    }
+  ],
+  "x2_failed": 6,
+  "x2_passed": 7,
+  "failed_gates": [
+    "x2_insurtech_bullets_source_fact_ids_supported",
+    "x2_claim_ledger_claim_text_non_empty",
+    "x2_insurtech_bullets_display_text_proof_authorized",
+    "x2_insurtech_bullets_runtime_real_llm",
+    "x2_insurtech_bullets_bullet_count_3",
+    "x2_resume_graph_claim_binding"
+  ],
+  "final_materialized_input_binding": {
+    "schema_version": "apps_rg.final_materialized_input_binding.v1",
+    "section_id": "insurtech_bullets",
+    "final_materialized_output_ref": "",
+    "final_materialized_output_present": false,
+    "final_materialized_output_char_count": 0,
+    "final_materialized_output_sha256": "",
+    "l2_output_present": true,
+    "l2_output_sha256": "09aa1a6040d838fa351980921b43b96e69a89b5d4a6e058eb664cfff14ea784b",
+    "final_claim_ledger_present": false,
+    "final_claim_ledger_row_count": 0,
+    "final_claim_ledger_sha256": ""
+  },
+  "final_materialized_output_sha256": "",
+  "final_claim_ledger_sha256": "",
+  "l2_output_sha256": "09aa1a6040d838fa351980921b43b96e69a89b5d4a6e058eb664cfff14ea784b",
+  "total_x2_gates": 13,
+  "resume_graph_allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79",
+  "graph_claim_binding_contract_digest": "e3c1f80ff1d38a79565cd93850ff82abbfa32422144cbbed98c866ca01ee60d4",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

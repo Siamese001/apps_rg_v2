@@ -1,0 +1,148 @@
+{
+  "runtime_path": "apps_rg.runtime.sections.executive_summary_lane",
+  "prompt_id": "executive_summary.generate_scratch_v1",
+  "provider": "external_claude",
+  "provider_resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE",
+  "temperature": 0.45,
+  "monolithic_prompt_invoked": false,
+  "section_prompt_adapter": true,
+  "contract_template_ref": "apps_rg/prompt_assembly/templates/executive_summary.generate_scratch_v1.yaml",
+  "apps_rg_prompt_template_ref": "apps_rg/prompt_assembly/templates/executive_summary.generate_scratch_v1.yaml",
+  "pa_shell_ref": "apps_rg/prompt_assembly/templates/strategic_tailor_v1.yaml",
+  "prompt_bom_ref": "apps_rg/prompt_assembly/prompt_bom.yaml",
+  "selected_template_id": "strategic_tailor_v1",
+  "compiler_template_id": "strategic_tailor_v1",
+  "prompt_hash": "123f56db5ea54c42",
+  "component_hash_map": {
+    "pa_prompt_hash": "0ad6ccd4731e54dc71d3eff3c0f20a2f",
+    "provider_prompt_hash": "123f56db5ea54c42"
+  },
+  "w3_execution_path_bucket": "declared_temporary_slice",
+  "w3_execution_path_plan_slug": "apps-rg-agentic-core-boundary-remediation-child-f8e3c1",
+  "reasoning_section_lane": "executive_summary",
+  "reasoning_execution_receipt": {
+    "apps_rg_availability_retry": {
+      "policy": "apps_rg_generation_claude_availability_same_provider_retry",
+      "scope": "apps_rg_generation_only",
+      "receipt_created_at_utc": "2026-08-09T07:21:25.042437+00:00",
+      "retry_allowed": true,
+      "retry_reason_category": "provider_throttling_failure",
+      "retry_provider": "external_claude",
+      "retry_model": "claude-sonnet-5",
+      "retry_section_id": "executive_summary",
+      "max_retries": 1,
+      "retry_attempted_count": 1,
+      "retry_output_accepted": false,
+      "accepted_output_provider": null,
+      "accepted_output_model": null,
+      "accepted_output_source": "initial_blocked_result",
+      "initial_exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfpVoLWwF5XK1HRbCu\"}",
+      "latest_exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+      "provider_attempt_spans": [
+        {
+          "schema_version": "apps_rg_provider_attempt_span_v1",
+          "span_kind": "provider_attempt",
+          "attempt_kind": "requested",
+          "attempt_index": 0,
+          "provider": "external_claude",
+          "model": "claude-sonnet-5",
+          "provider_attempted": true,
+          "provider_available": false,
+          "runtime_generation_status": "BLOCKED",
+          "started_at_utc": "2026-08-09T07:21:23.983492+00:00",
+          "completed_at_utc": "2026-08-09T07:21:24.530084+00:00",
+          "duration_seconds": 0.546592,
+          "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfpVoLWwF5XK1HRbCu\"}",
+          "timeout_seconds": 90.0,
+          "token_budget": 4096,
+          "temperature": 0.45,
+          "transport_progress": {
+            "started_at": "2026-08-09T07:21:23.985496+00:00",
+            "first_byte_after_s": null,
+            "last_progress_after_s": null,
+            "chunk_count": 0,
+            "raw_output_chars": 0,
+            "completed": false
+          },
+          "section_id": "executive_summary",
+          "fallback_reason": "provider_throttling_failure",
+          "output_accepted": false,
+          "accepted_output_source": "initial_blocked_result"
+        },
+        {
+          "schema_version": "apps_rg_provider_attempt_span_v1",
+          "span_kind": "provider_attempt",
+          "attempt_kind": "retry",
+          "attempt_index": 1,
+          "provider": "external_claude",
+          "model": "claude-sonnet-5",
+          "provider_attempted": true,
+          "provider_available": false,
+          "runtime_generation_status": "BLOCKED",
+          "started_at_utc": "2026-08-09T07:21:24.543641+00:00",
+          "completed_at_utc": "2026-08-09T07:21:25.042437+00:00",
+          "duration_seconds": 0.498796,
+          "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}",
+          "timeout_seconds": 90.0,
+          "token_budget": 4096,
+          "temperature": 0.45,
+          "transport_progress": {
+            "started_at": "2026-08-09T07:21:24.545999+00:00",
+            "first_byte_after_s": null,
+            "last_progress_after_s": null,
+            "chunk_count": 0,
+            "raw_output_chars": 0,
+            "completed": false
+          },
+          "section_id": "executive_summary",
+          "fallback_reason": "provider_throttling_failure",
+          "output_accepted": false,
+          "accepted_output_source": "same_provider_retry_blocked"
+        }
+      ],
+      "provider_attempt_timing_summary": {
+        "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+        "span_count": 2,
+        "attempted_count": 2,
+        "fallback_attempt_count": 0,
+        "fallback_attempted": false,
+        "providers": [
+          "external_claude",
+          "external_claude"
+        ],
+        "models": [
+          "claude-sonnet-5",
+          "claude-sonnet-5"
+        ],
+        "runtime_generation_statuses": [
+          "BLOCKED",
+          "BLOCKED"
+        ],
+        "total_duration_seconds": 1.045388,
+        "accepted_output_provider": null,
+        "accepted_output_model": null
+      },
+      "model_attempts": [
+        {
+          "attempt": "requested",
+          "provider": "external_claude",
+          "model": "claude-sonnet-5",
+          "runtime_generation_status": "BLOCKED",
+          "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfpVoLWwF5XK1HRbCu\"}"
+        },
+        {
+          "attempt": "retry",
+          "provider": "external_claude",
+          "model": "claude-sonnet-5",
+          "started_at_utc": "2026-08-09T07:21:24.543641+00:00",
+          "completed_at_utc": "2026-08-09T07:21:25.042437+00:00",
+          "runtime_generation_status": "BLOCKED",
+          "exact_provider_error": "External provider HTTP 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CdrmfrHxFRg16755qLQuw\"}"
+        }
+      ]
+    }
+  },
+  "resume_graph_allocation_plan_digest": "32866090ae2d4a79dc4b301f6fecf82b63049014baf9e9040b4fe02fcf7cbc79",
+  "graph_claim_binding_contract_digest": "16380b842ef712ed8e852a4f7ce914246b85c106cb1c9cb197b1a2167d2b96ab",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

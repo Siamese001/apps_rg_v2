@@ -1,0 +1,145 @@
+{
+  "artifact_hash": "sha256:676cc75e883eb654d68bf56b6552623a3c3bc167cd7fe7167c32484cfee61172",
+  "emitted_at": "2026-08-09T11:18:35Z",
+  "payload": {
+    "attempt_evidence_refs": [
+      "judge_attempt_ledger.json",
+      "provider_response.json"
+    ],
+    "attempt_evidence_status": "COMPLETE",
+    "c0": {
+      "reason": "BYPASS_PRELOADED_CONTEXT",
+      "status": "BYPASSED_PRELOADED_CONTEXT",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.1",
+          "sub_stage_name": "Query Normalization"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.2",
+          "sub_stage_name": "Embedding Lookup"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.3",
+          "sub_stage_name": "D1 Exact Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.4",
+          "sub_stage_name": "D2 Semantic Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.5",
+          "sub_stage_name": "Retrieval Augmentation"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.6",
+          "sub_stage_name": "Grounding Context Assembly"
+        }
+      ]
+    },
+    "generation_provider_attempt_count": 1,
+    "judge_attempt_count": 2,
+    "l2": {
+      "executed": true,
+      "fault": "",
+      "status": "PASS",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "app_name": "apps_rg"
+          },
+          "status": "PASS",
+          "sub_stage_id": "E1",
+          "sub_stage_name": "Prep: Plan Decomposition"
+        },
+        {
+          "duration_ms": 0.005,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E2",
+          "sub_stage_name": "Valid: Pre-Execution Contract Check"
+        },
+        {
+          "duration_ms": 48372.174,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E3",
+          "sub_stage_name": "Exec: Tool Dispatch"
+        },
+        {
+          "duration_ms": 0.006,
+          "meta": {
+            "retry_attempted": false
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "E4",
+          "sub_stage_name": "Heal: Retry / Recovery"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E5",
+          "sub_stage_name": "Seal: Output Assembly"
+        }
+      ]
+    },
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-2e53682a6c114b59933f8ecbdbcbcd00",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "ac702ebf-2ff4-4b12-b801-b81284fb067b",
+    "schema_version": "agentic_core.runtime_execution_witness.v1",
+    "trace_root": "trace-fcf4906f444d4cdb8b15aa5d00ed4d97",
+    "x1": {
+      "status": "EXECUTED",
+      "sub_stages": []
+    },
+    "x2": {
+      "disposition": "X3A",
+      "failed_gate_ids": [],
+      "reason_codes": [],
+      "status": "EXECUTED",
+      "x3_disposition": "X3A_DENY_REROUTE"
+    },
+    "x3": {
+      "disposition": "X3A",
+      "status": "EMITTED",
+      "x3_disposition": "X3A_DENY_REROUTE"
+    }
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:7b66310ab861e6f944ac2bcaa782a8f983d30b6554bfe0ded8aed4a7f63b717a"
+}

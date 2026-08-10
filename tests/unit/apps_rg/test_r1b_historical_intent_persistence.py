@@ -57,7 +57,7 @@ def _write_post_exit_artifacts(
     artifact_dir: Path,
     *,
     record_id: str,
-    x3_code: str = "X3C",
+    x3_code: str = "X3C_COMMIT_REQUEST_TO_UWG",
     proof_eligible: bool = True,
     runtime_status: str = "REAL_LLM",
 ) -> None:
@@ -113,7 +113,7 @@ def _post_exit_ctx(
         "run_id": f"run_{record_id}",
         "post_exit_ingestion": True,
         "artifact_dir": str(artifact_dir),
-        "x3_disposition": "X3C",
+        "x3_disposition": "X3C_COMMIT_REQUEST_TO_UWG",
         "proof_eligible": proof_eligible,
         "runtime_generation_status": runtime_status,
         "prompt_profile_hash": prompt_hash,

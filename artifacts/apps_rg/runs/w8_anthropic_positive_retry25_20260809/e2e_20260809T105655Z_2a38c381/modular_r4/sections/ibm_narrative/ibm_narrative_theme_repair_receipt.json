@@ -1,0 +1,101 @@
+{
+  "section_id": "ibm_narrative",
+  "run_id": "ibm_narrative_20260809_110212",
+  "gate_id": "x2_ibm_narrative_claim_theme_coverage",
+  "fired": true,
+  "trigger": {
+    "themes_detected_pre": [
+      "bul_ibm_001",
+      "bul_ibm_002",
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "count_pre": 3,
+    "missing_in_ledger_union_pre": [
+      "unsupported_companion_theme:regulated_financial"
+    ],
+    "mechanism_support_pre": {
+      "mechanisms": [
+        "aws"
+      ],
+      "cited_companion_ids": [
+        "bul_ibm_001",
+        "bul_ibm_002"
+      ],
+      "unsupported_mechanisms": [],
+      "support_by_mechanism": {
+        "aws": [
+          "bul_ibm_001"
+        ]
+      },
+      "checked": true
+    },
+    "unsupported_mechanisms_pre": [],
+    "narrative_pre": "Drove governed AWS solution architecture and executive decision support across complex regulated financial-services engagements at IBM, establishing a repeatable partner operating discipline that aligned modernization pursuits with buyer priorities and executive deal support."
+  },
+  "accepted": true,
+  "themes_post": [
+    "bul_ibm_002"
+  ],
+  "rejected_reason": null,
+  "bounded": {
+    "max_attempts": 2,
+    "attempts_used": 1
+  },
+  "kill_switch": "unset",
+  "regen_max_tokens": 4000,
+  "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+  "regen_parse_error": null,
+  "regen_provider_result": {
+    "runtime_generation_status": "REAL_LLM",
+    "provider_requested": "external_openai",
+    "provider_attempted": true,
+    "provider_available": true,
+    "model": "gpt-5.6-luna",
+    "exact_provider_error": ""
+  },
+  "mechanism_support_post": {
+    "mechanisms": [
+      "bi"
+    ],
+    "cited_companion_ids": [
+      "bul_ibm_002"
+    ],
+    "unsupported_mechanisms": [],
+    "support_by_mechanism": {
+      "bi": [
+        "bul_ibm_002"
+      ]
+    },
+    "checked": true
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "regen_raw_response_ref": "ibm_narrative_theme_repair_regen_raw.txt",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_openai",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "gpt-5.6-luna",
+        "exact_provider_error": ""
+      },
+      "rejected_reason": null,
+      "mechanism_support": {
+        "mechanisms": [
+          "bi"
+        ],
+        "cited_companion_ids": [
+          "bul_ibm_002"
+        ],
+        "unsupported_mechanisms": [],
+        "support_by_mechanism": {
+          "bi": [
+            "bul_ibm_002"
+          ]
+        },
+        "checked": true
+      }
+    }
+  ]
+}

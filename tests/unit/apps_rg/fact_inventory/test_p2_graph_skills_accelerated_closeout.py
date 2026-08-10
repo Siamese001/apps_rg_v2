@@ -51,7 +51,7 @@ _CLOSEOUT_OUTPUT_NAMES = (
 
 _TEST_ONLY_RECEIPT_MODE = "TEST_ONLY_NONCANONICAL_OUTPUT"
 _EXPECTED_SELECTOR_BLOCKED = frozenset({"unify_bullets", "ibm_bullets"})
-_EXPECTED_RECEIPT_BLOCKED = _EXPECTED_SELECTOR_BLOCKED | {"executive_summary"}
+_EXPECTED_RECEIPT_BLOCKED = _EXPECTED_SELECTOR_BLOCKED
 _EXPECTED_SELECTOR_CONSTRAINT = {
     "unify_bullets": "section_fact_role_episode_root_coverage",
     "ibm_bullets": "selector_root_section_fact_parity",

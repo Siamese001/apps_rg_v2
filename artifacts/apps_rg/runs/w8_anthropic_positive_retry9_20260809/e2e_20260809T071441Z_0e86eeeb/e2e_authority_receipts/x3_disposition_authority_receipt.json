@@ -1,0 +1,44 @@
+{
+  "authority_contract_id": "apps_research_rg_e2e_authority",
+  "checks": {
+    "runtime_identity_match": true,
+    "unknown_never_pass": true,
+    "x3_receipt_exact_authorizing_code": false,
+    "x3_witness_emitted": true
+  },
+  "failed_checks": [
+    "x3_receipt_exact_authorizing_code"
+  ],
+  "identity": {
+    "blueprint_hash": "sha256:3cc01784d2e937acc4f0f01723828367d2f8a3c1267b8a97556f45f9cfc452dd",
+    "brief_sha256": "sha256:a7295c7ce2864c0a2db24403f65e30f8ec91e45737946a2b5f7b9baae043988f",
+    "child_run_id": "bridge:rg_research_bridge:00dde5b7:717cf959-2f26-42ff-b4ab-002c3e04e542",
+    "consumer_app_id": "apps_rg",
+    "jd_sha256": "sha256:eec782eeec09d5e789fba7dd79a9d1f6a52f7138ee0fd0729304f0fa87673b70",
+    "parent_run_id": "5b6c7138-6c97-4410-8351-f5491e059759",
+    "policy_hash": "sha256:28dd99b1745cf982941d1db70c50a51c37230a0d1064795f81e233bf9df01a6d",
+    "producer_app_id": "apps_research",
+    "request_id": "req-a934d5ee238145e99282a998b8e1bb2e",
+    "schema_version": "apps_research_rg_run_identity.v1",
+    "target_company": "Anthropic",
+    "target_role": "Manager of Applied AI Architecture, Partnerships",
+    "tenant_id": "default",
+    "trace_root": "717cf959-2f26-42ff-b4ab-002c3e04e542"
+  },
+  "schema_version": "apps_rg.e2e_stage_authority.x3_disposition.v1",
+  "source_bindings": [
+    {
+      "artifact_ref": "x3_disposition_receipt.json",
+      "byte_length": 882,
+      "sha256": "sha256:81a3d0f0f9b65db594e9f6c799c4c345e8a24abbf570d455a269d82e59511596"
+    },
+    {
+      "artifact_ref": "runtime_execution_witness.json",
+      "byte_length": 5020,
+      "sha256": "sha256:2475c2ef11d2e1d24e4c769537e3d28f1c91403209c8da3d6ed24f44391de688"
+    }
+  ],
+  "stage_id": "X3_DISPOSITION",
+  "status": "BLOCKED",
+  "x3_disposition": "X3A_DENY_REROUTE"
+}

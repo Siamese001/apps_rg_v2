@@ -1,0 +1,59 @@
+{
+  "authority_contract_id": "apps_research_rg_e2e_authority",
+  "blocked_successor_stage_ids": [
+    "X1_REVIEW",
+    "X2_AGGREGATION",
+    "X3_DISPOSITION",
+    "PRODUCT_ELIGIBILITY",
+    "UWG_COMMIT",
+    "PRODUCT_AUTHORIZATION_CLOSE",
+    "APPS_EVAL",
+    "L6_SHADOW",
+    "INDEPENDENT_PARITY",
+    "PROMOTION_TERMINAL",
+    "MANDATORY_OUTPUTS",
+    "STAGE_LEDGER_SEAL",
+    "TERMINAL_MANIFEST_SEAL",
+    "PIPELINE_COMPLETION_CLOSE"
+  ],
+  "causal_receipt_ref": "e2e_ledger_receipts/0010_apps_rg_l2.json",
+  "checks": {
+    "blocked_successors_recorded": true,
+    "decisive_identity_match": true,
+    "decisive_stage_failed": true,
+    "decisive_stage_id_match": true,
+    "product_authorization_denied": true
+  },
+  "decisive_receipt_ref": "e2e_ledger_receipts/0010_apps_rg_l2.json",
+  "decisive_stage_id": "APPS_RG_L2",
+  "failed_checks": [],
+  "failed_stage_id": "APPS_RG_L2",
+  "identity": {
+    "blueprint_hash": "sha256:3cc01784d2e937acc4f0f01723828367d2f8a3c1267b8a97556f45f9cfc452dd",
+    "brief_sha256": "sha256:7bebe9ed2a6033273560beb3ccce2597a7aff338e323863c7a737169a325ec20",
+    "child_run_id": "bridge:rg_research_bridge:c04d7b1f:9f3ac15e-911b-4657-bb67-726cead8424b",
+    "consumer_app_id": "apps_rg",
+    "jd_sha256": "sha256:40a79d00dfde2c7b4961b310e0672a10d246993392c18e0296bcbd8198bb850b",
+    "parent_run_id": "5eefd2fc-744d-4fc5-9f03-e579c50e8a18",
+    "policy_hash": "sha256:28dd99b1745cf982941d1db70c50a51c37230a0d1064795f81e233bf9df01a6d",
+    "producer_app_id": "apps_research",
+    "request_id": "req-b49c42b9d67f4357a7fcd3dab79ce84a",
+    "schema_version": "apps_research_rg_run_identity.v1",
+    "target_company": "Anthropic",
+    "target_role": "Manager of Applied AI Architecture, Partnerships",
+    "tenant_id": "default",
+    "trace_root": "9f3ac15e-911b-4657-bb67-726cead8424b"
+  },
+  "pipeline_complete": false,
+  "product_authorized": false,
+  "schema_version": "apps_rg.e2e_stage_authority.terminal_non_product.v1",
+  "source_bindings": [
+    {
+      "artifact_ref": "e2e_ledger_receipts/0010_apps_rg_l2.json",
+      "byte_length": 1759,
+      "sha256": "sha256:422b4ed228c55143b68cd660061314f74af6a3672aeea385ae072c780c46cb0c"
+    }
+  ],
+  "stage_id": "TERMINAL_NON_PRODUCT",
+  "status": "PASS"
+}

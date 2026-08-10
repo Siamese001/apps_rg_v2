@@ -1,0 +1,298 @@
+{
+  "schema": "executive_summary_judge_remediation_cycles_v2",
+  "schema_version": 2,
+  "max_cycles": 3,
+  "cycles": [
+    {
+      "cycle": 1,
+      "trigger_mode": "any_judge_below_floor",
+      "draft_parse_ok": true,
+      "accepted": true,
+      "output_changed": true,
+      "scores_before": {
+        "schema": "executive_summary_judge_score_snapshot_v1",
+        "providers": [
+          {
+            "provider_key": "gemini_pro",
+            "score": 3.5,
+            "normalized_score": 0.7,
+            "pass": false,
+            "provider_status": "MODEL_BACKED_FAIL",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          },
+          {
+            "provider_key": "openai_chatgpt",
+            "score": 4.4,
+            "normalized_score": 0.8800000000000001,
+            "pass": true,
+            "provider_status": "MODEL_BACKED_PASS",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          }
+        ]
+      },
+      "delta_class": "deterministic_alignment_structure",
+      "judge_feedback_lines_total": 4,
+      "judge_feedback_lines_included": 4,
+      "judge_feedback_lines_dropped": 0,
+      "dropped_reason": null,
+      "g1_passed": true,
+      "g5_delta_scope": {
+        "schema": "executive_summary_g5_delta_scope_v2",
+        "gate_mode": "disabled",
+        "passed": true,
+        "reject_gate": null,
+        "verdict": "regen_caps_disabled",
+        "delta_class": "deterministic_alignment_structure",
+        "allowlist": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "allowlist_passed": true,
+        "out_of_allowlist_indices": [],
+        "edited_sentence_count": 1,
+        "sentence_count_invariant_required": 6,
+        "sentence_count_invariant_passed": true,
+        "prior_sentence_count": 6,
+        "after_sentence_count": 6,
+        "edited_sentence_indices": [
+          5
+        ],
+        "allowlist_sources": [
+          "regen_caps_disabled"
+        ],
+        "g5_legacy_budget_advisory": {
+          "schema": "executive_summary_g5_delta_scope_v1",
+          "passed": true,
+          "gate_mode": "disabled"
+        }
+      },
+      "g5_passed": true,
+      "scores_after": null,
+      "score_deltas": null,
+      "g3_verdict_per_trigger_judge": [
+        {
+          "provider_key": "gemini_pro",
+          "score_before": 3.5,
+          "score_after": 4.2,
+          "g3_result": "PASS",
+          "reject_gate": null,
+          "major_dimension_fail_count_before": 1,
+          "major_dimension_fail_count_after": 1
+        }
+      ],
+      "publish_eligible": true,
+      "g3_passed": true,
+      "reject_gate": null,
+      "candidate_digest": "387587413f5bf7865a3b022ff325fbfb19822a1a8738928478c1c38b5a8aabb8",
+      "all_judges_pass": true,
+      "regen_output_hash": "31e098c909aef785d7d7e5a6d45a351e1a31cac5a4e196d5aa240eb488aaa9eb",
+      "anchor_output_hash": "f1021808cab1e57fb7911ee4712042aaaa5178bb880ebd170b6b1bd0b71afae9",
+      "post_regen_x2_failed_gate_ids": [],
+      "artifact_paths": {
+        "judge_remediation_receipt_cycle": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\executive_summary\\judge_remediation_receipt_cycle_1.json",
+        "x2_gate_outputs_post_regen_cycle": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\executive_summary\\x2_gate_outputs_post_regen_cycle_1.json"
+      },
+      "transport_attempts_per_cycle": 0,
+      "semantic_rewrite_attempts": 0
+    }
+  ],
+  "stopped_reason": "all_model_backed_judges_pass",
+  "generation_material_digest": "79ea2cdeae815e7d6417ebaee1dfa2485947804dea6a71fbe68fcec69b9d26d1",
+  "targeting_parity_at_regen_start": {
+    "schema": "targeting_context_parity_v2",
+    "targeting_bundle_digest": "79ea2cdeae815e7d6417ebaee1dfa2485947804dea6a71fbe68fcec69b9d26d1",
+    "generation_material_digest": "79ea2cdeae815e7d6417ebaee1dfa2485947804dea6a71fbe68fcec69b9d26d1",
+    "judge_material_digest": "79ea2cdeae815e7d6417ebaee1dfa2485947804dea6a71fbe68fcec69b9d26d1",
+    "generation_targeting_digest": "4791771dc7e540995f3a60c581a94efc2b6a90c58b010d2a70d98179dd13035e",
+    "judge_targeting_digest": "4791771dc7e540995f3a60c581a94efc2b6a90c58b010d2a70d98179dd13035e",
+    "targeting_parity_status": "match",
+    "targeting_binding_match": true,
+    "target_title": "Manager of Applied AI Architecture, Partnerships",
+    "target_company": "Anthropic",
+    "parity_match": true,
+    "bundle_matches_generation_material": true,
+    "generation_jd_chars": 152,
+    "generation_briefing_chars": 8008,
+    "judge_jd_chars": 152,
+    "judge_briefing_chars": 8008,
+    "substantive_jd_fit_certification_allowed": true
+  },
+  "judge_packet_targeting_audit": {
+    "schema": "judge_packet_targeting_digest_audit_v1",
+    "generation_material_digest": "79ea2cdeae815e7d6417ebaee1dfa2485947804dea6a71fbe68fcec69b9d26d1",
+    "packets": [
+      {
+        "path": "executive_summary_judge_packet_post_x2.json",
+        "judge_material_digest": "79ea2cdeae815e7d6417ebaee1dfa2485947804dea6a71fbe68fcec69b9d26d1",
+        "matches_generation": true
+      }
+    ],
+    "all_packets_match_generation": true
+  },
+  "allowed_fact_ids": [
+    "fact_engineering_platform_002",
+    "fact_engineering_platform_006",
+    "fact_partnerships_gtm_002",
+    "metric_ibm_20pct_joint_revenue_growth",
+    "metric_ibm_ai_driven_sales_frameworks",
+    "metric_ibm_alliance_cosell_operating_cadence",
+    "metric_unify_22m_ip_led_revenue",
+    "reb_ibm_aws_alliance_partner_cosell_gtm",
+    "reb_ibm_devsecops_release_resilience",
+    "reb_unify_platform_commercialization_leadership",
+    "skill_agentic_platform_productization",
+    "skill_ibm_devsecops_pipeline_security",
+    "skill_partner_alliance_gtm_execution",
+    "skill_partner_cloud_vendor_joint_gtm",
+    "skill_partner_hyperscaler_cosell",
+    "skill_partner_ibm_aws_alliance_joint_revenue",
+    "skill_partner_joint_solution_development",
+    "skill_sr_w12_hyperscaler_alliance_co_sell"
+  ],
+  "final_publish_baseline": "scratch",
+  "publish_reason": "regen_regressed_or_rejected_publish_scratch",
+  "publish_selected_snapshot_id": "scratch",
+  "published_candidate_digest": "54623deffda077a3869aff2172475b91273cb37f3c74554ed9285f9166f1a5ce",
+  "scratch_anchor_resume_preserved_in_receipt": "Executive technology leader who directs alliance-led modernization and platform productization, aligning partner operating models with IP-led revenue growth, margin expansion, and resilient regulated delivery. From that commercial base, IBM-AWS alliance co-sell motions connect financial-services modernization opportunities with joint go-to-market execution and hyperscaler partnership strategy. Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity. In parallel, release automation and security scanning were embedded in regulated modernization delivery paths, integrating security into release-resilience operations. Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities. The combined platform and partnership model can scale agentic platform productization and partner-led AI solutions while preserving release resilience for regulated modernization.",
+  "regen_outcome": "no_acceptable_candidate",
+  "cert_publish_guard": {
+    "cert_blocked": false,
+    "cert_block_reason": null,
+    "scores_freshness": "full_panel"
+  },
+  "publish_disposition": {
+    "schema": "executive_summary_publish_disposition_v1",
+    "publish_disposition": "certified",
+    "x1d_certified": true,
+    "proof_eligible": true,
+    "judge_certified": true,
+    "blocking_judge_ids": [],
+    "best_effort_publish_allowed": false,
+    "published_from_pool": true,
+    "x3_certification_note": "eligible_for_allow_when_x2_and_x3_allow"
+  },
+  "judge_regen_cycles": [
+    {
+      "cycle": 1,
+      "trigger_mode": "any_judge_below_floor",
+      "draft_parse_ok": true,
+      "accepted": true,
+      "output_changed": true,
+      "scores_before": {
+        "schema": "executive_summary_judge_score_snapshot_v1",
+        "providers": [
+          {
+            "provider_key": "gemini_pro",
+            "score": 3.5,
+            "normalized_score": 0.7,
+            "pass": false,
+            "provider_status": "MODEL_BACKED_FAIL",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          },
+          {
+            "provider_key": "openai_chatgpt",
+            "score": 4.4,
+            "normalized_score": 0.8800000000000001,
+            "pass": true,
+            "provider_status": "MODEL_BACKED_PASS",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          }
+        ]
+      },
+      "delta_class": "deterministic_alignment_structure",
+      "judge_feedback_lines_total": 4,
+      "judge_feedback_lines_included": 4,
+      "judge_feedback_lines_dropped": 0,
+      "dropped_reason": null,
+      "g1_passed": true,
+      "g5_delta_scope": {
+        "schema": "executive_summary_g5_delta_scope_v2",
+        "gate_mode": "disabled",
+        "passed": true,
+        "reject_gate": null,
+        "verdict": "regen_caps_disabled",
+        "delta_class": "deterministic_alignment_structure",
+        "allowlist": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "allowlist_passed": true,
+        "out_of_allowlist_indices": [],
+        "edited_sentence_count": 1,
+        "sentence_count_invariant_required": 6,
+        "sentence_count_invariant_passed": true,
+        "prior_sentence_count": 6,
+        "after_sentence_count": 6,
+        "edited_sentence_indices": [
+          5
+        ],
+        "allowlist_sources": [
+          "regen_caps_disabled"
+        ],
+        "g5_legacy_budget_advisory": {
+          "schema": "executive_summary_g5_delta_scope_v1",
+          "passed": true,
+          "gate_mode": "disabled"
+        }
+      },
+      "g5_passed": true,
+      "scores_after": null,
+      "score_deltas": null,
+      "g3_verdict_per_trigger_judge": [
+        {
+          "provider_key": "gemini_pro",
+          "score_before": 3.5,
+          "score_after": 4.2,
+          "g3_result": "PASS",
+          "reject_gate": null,
+          "major_dimension_fail_count_before": 1,
+          "major_dimension_fail_count_after": 1
+        }
+      ],
+      "publish_eligible": true,
+      "g3_passed": true,
+      "reject_gate": null,
+      "candidate_digest": "387587413f5bf7865a3b022ff325fbfb19822a1a8738928478c1c38b5a8aabb8",
+      "all_judges_pass": true,
+      "regen_output_hash": "31e098c909aef785d7d7e5a6d45a351e1a31cac5a4e196d5aa240eb488aaa9eb",
+      "anchor_output_hash": "f1021808cab1e57fb7911ee4712042aaaa5178bb880ebd170b6b1bd0b71afae9",
+      "post_regen_x2_failed_gate_ids": [],
+      "artifact_paths": {
+        "judge_remediation_receipt_cycle": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\executive_summary\\judge_remediation_receipt_cycle_1.json",
+        "x2_gate_outputs_post_regen_cycle": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\executive_summary\\x2_gate_outputs_post_regen_cycle_1.json"
+      },
+      "transport_attempts_per_cycle": 0,
+      "semantic_rewrite_attempts": 0
+    }
+  ],
+  "publishable_baseline_hash": "0d69fd57af7e1a59",
+  "rewrite_from": "387587413f5bf7865a3b022ff325fbfb19822a1a8738928478c1c38b5a8aabb8",
+  "use_rejected_as_negative_example": true,
+  "regen_lane_stats": {
+    "stuck_loop_detected": false,
+    "stopped_reason": "all_model_backed_judges_pass",
+    "stuck_signature": null,
+    "last_failure_signature": {
+      "failing_gate_ids": [],
+      "row_indexes": []
+    }
+  },
+  "transport_attempts_total": 0,
+  "semantic_rewrite_attempts_total": 0
+}

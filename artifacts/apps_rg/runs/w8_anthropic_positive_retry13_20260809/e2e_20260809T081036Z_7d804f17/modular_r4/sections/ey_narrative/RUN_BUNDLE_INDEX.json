@@ -1,0 +1,690 @@
+{
+  "schema_version": "1",
+  "run_id": "ey_narrative_dd9c54073754",
+  "correlation_id": null,
+  "created_at": "2026-08-09T08:17:43.421843+00:00",
+  "bundle_kind": "lane_runtime_proof",
+  "lane": "ey_narrative",
+  "root_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative",
+  "artifact_namespace": "artifacts/apps_rg/runs",
+  "log_namespace": "apps_rg/pipeline_logs",
+  "entries": [
+    {
+      "role": "lane_run_manifest",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/run_manifest.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "runtime_proof_layout.finalize_runtime_proof_run",
+      "notes": "lane=ey_narrative"
+    },
+    {
+      "role": "lane_l2_output",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/l2_output.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "lane=ey_narrative"
+    },
+    {
+      "role": "lane_runtime_payload",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/runtime_payload.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "prompt_compiled_text",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/compiled_prompt.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "prompt_compiled_artifact",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/compiled_prompt_artifact.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "prompt_selection_trace",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/prompt_selection_trace.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "provider_request",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/provider_request.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "provider_response",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/provider_response.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "judge_x1d_outputs",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/x1d_llm_judge_outputs.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "gate_x2_outputs",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/x2_gate_outputs.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "disposition_x3",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/x3_disposition.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "l6_shadow_eval_package",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/l6_shadow_eval_package.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "fact_check_result",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/fact_check_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "repair_receipt",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/repair_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "section_metric_receipt",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/section_metric_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "lane_c0_metrics",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c0_metrics.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg.runtime.bindings.section_lane_c0_metrics"
+    },
+    {
+      "role": "claim_ledger",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/claim_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "text_claim_coverage",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/text_claim_coverage.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "selected_fact_plan",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/selected_fact_plan.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "stage_sequence",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/stage_sequence.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "artifact_inventory",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/artifact_inventory.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "runtime_exhaust_bundle",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/runtime_exhaust_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "section_runtime_proof_bundle",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/section_runtime_proof_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_attempt_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/attempt_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c01_retrieval_plan.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c01_retrieval_plan.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c02_atoms.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c02_atoms.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c02_fact_vector_index_preflight.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c02_fact_vector_index_preflight.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c02_semantic_cache_payload.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c02_semantic_cache_payload.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c02_vector_query.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c02_vector_query.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c06_weak_refine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c06_weak_refine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c0_evidence_room_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c0_evidence_room_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c0_fec_compose_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c0_fec_compose_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_c0_graph_lane_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/c0_graph_lane_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_canonical_claim_ledger_v2.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/canonical_claim_ledger_v2.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_command_output.txt",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/command_output.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_exit_disposition_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/exit_disposition_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_exit_review_packet.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/exit_review_packet.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_exit_spine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/exit_spine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_external_model_token_reservations.jsonl",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/external_model_token_reservations.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_external_model_usage_ledger.jsonl",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/external_model_usage_ledger.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_ey_narrative_judge_packet.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/ey_narrative_judge_packet.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_ey_narrative_output.txt",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/ey_narrative_output.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_final_evidence_contract.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/final_evidence_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_final_evidence_contract_bridge.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/final_evidence_contract_bridge.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_final_materialized_acceptance_contract.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/final_materialized_acceptance_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_frozen_execution_context.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/frozen_execution_context.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_graph_claim_bindings.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/graph_claim_bindings.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_graph_selection_rationale.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/graph_selection_rationale.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_judge_attempt_ledger.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/judge_attempt_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_l1_plan_contract.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/l1_plan_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_l2_execution_packet.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/l2_execution_packet.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_l2_handoff_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/l2_handoff_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_l2_receipt_bundle.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/l2_receipt_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_l2_spine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/l2_spine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_lane_dispatch_attempt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/lane_dispatch_attempt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_latest_real_run.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/latest_real_run.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_latest_successful_real_run.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/latest_successful_real_run.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_parsed_output.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/parsed_output.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_prep_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/prep_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_r4_c0_bypass_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/r4_c0_bypass_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_r4_identity_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/r4_identity_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_real_l2_generation_result.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/real_l2_generation_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_route_contract.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/route_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_seal_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/seal_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_sealed_l2_artifact.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/sealed_l2_artifact.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_section_exit_x1_result.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/section_exit_x1_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_section_exit_x2_result.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/section_exit_x2_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_section_front_spine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/section_front_spine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_section_input_usage_ledger.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/section_input_usage_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_section_spine_c0_retrieve_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/section_spine_c0_retrieve_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_spine_span_emit_receipt.jsonl",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/spine_span_emit_receipt.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_validated_request.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/validated_request.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_validation_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/validation_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_x1d_gemini_provider_parse_result_20260809_081742_532.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/x1d_gemini_provider_parse_result_20260809_081742_532.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_x1d_gemini_provider_request_20260809_081737_432.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/x1d_gemini_provider_request_20260809_081737_432.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_x1d_gemini_provider_response_raw_20260809_081742_530.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/x1d_gemini_provider_response_raw_20260809_081742_530.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_ey_narrative_emitted_x2_source_fact_pool_receipt.json",
+      "relative_path": "artifacts/apps_rg/runs/w8_anthropic_positive_retry13_20260809/e2e_20260809T081036Z_7d804f17/modular_r4/sections/ey_narrative/x2_source_fact_pool_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    }
+  ],
+  "evidence_package_index_ref": null,
+  "verified_external_refs": [],
+  "imported_core_evidence_snapshots": [],
+  "runtime_proof_placement_bucket": "real",
+  "runtime_generation_status": "REAL_LLM"
+}

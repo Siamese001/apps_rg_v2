@@ -73,6 +73,44 @@ def test_normalize_executive_summary_llm_output_coerces_resume_and_uses_runtime_
     assert normalized["allowed_fact_ids_hash"] == "facts-hash"
 
 
+def test_normalize_repairs_retry28_speculative_capstone_and_syncs_ledger() -> None:
+    sentences = [
+        "Engineering leadership centers on governed agentic AI platform architecture.",
+        "The platform architecture sets a coherent control-plane direction for agentic AI.",
+        "Productization connects architecture to repeatable operating-model execution.",
+        "Release automation strengthens governance across regulated delivery paths.",
+        "Platform discipline generated measurable IP-led revenue.",
+        (
+            "That integrated foundation can guide future platform decisions toward controlled "
+            "execution and sustained IP-led growth without separating responsible operation "
+            "from technical ambition."
+        ),
+    ]
+    parsed = {
+        "executive_strategy_thesis": "Governed platform leadership creates enterprise value.",
+        "resume_display_text": " ".join(sentences),
+        "claim_ledger": [
+            {"claim": sentence, "claim_text": sentence, "source_fact_ids": ["fact_1"]}
+            for sentence in sentences
+        ],
+        "change_log": [],
+    }
+
+    normalized = normalize_executive_summary_llm_output(
+        parsed,
+        {"section_id": "executive_summary", "facts": []},
+    )
+
+    repaired = split_sentences(normalized["resume_display_text"])[-1]
+    assert repaired.startswith("That integrated foundation guides platform decisions")
+    assert "can guide future" not in repaired
+    assert normalized["claim_ledger"][-1]["claim"] == repaired
+    assert normalized["claim_ledger"][-1]["claim_text"] == repaired
+    assert normalized["change_log"][-1]["operation"] == (
+        "repair_exec_summary_speculative_capstone"
+    )
+
+
 def test_coerce_resume_display_sentence_count_band_splits_one_compound_sentence() -> None:
     coerced = coerce_resume_display_sentence_count_band(_five_sentence_resume())
 
@@ -196,4 +234,3 @@ def test_lane_fact_plan_and_repair_prompt_helpers() -> None:
     assert "123 words" in prompt
     assert "120 words" in prompt
     assert "six sentences" in prompt
-

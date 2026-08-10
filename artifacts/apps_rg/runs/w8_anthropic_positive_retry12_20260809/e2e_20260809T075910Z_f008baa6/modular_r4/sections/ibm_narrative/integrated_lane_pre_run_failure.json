@@ -1,0 +1,45 @@
+{
+  "blocker": "EXECUTED_X3_BLOCK",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\ibm_narrative",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "executive_summary_cli_output_text": "",
+    "exit_status": "error",
+    "fault": "",
+    "headline_cli_output_text": "",
+    "ibm_bullets_cli_output_text": "",
+    "ibm_narrative_cli_output_text": "IBM_NARRATIVE_OUTPUT:\nChampioned AWS alliance and solution-architecture leadership at IBM, establishing BI-informed pipeline discipline that made executive alignment and repeatable enterprise modernization pursuits more consistent across complex, regulated financial-services client portfolios and partner ecosystems at scale.\n\nX1D_LLM_JUDGE_OUTPUTS:\n| Provider | Mode | Status | Score | Pass | Decisive Failure |\n|---|---|---|---:|---|---|\n| Google Gemini 3.6 Flash | MODEL_BACKED | MODEL_BACKED_PASS | 5.0 | True | False |\n\nX2_DETERMINISTIC_GATE_OUTPUTS:\n- x2_ibm_narrative_exactly_one_sentence: PASS\n- x2_ibm_narrative_exactly_one_sentence_mechanical: PASS\n- x2_ibm_narrative_forbidden_opener: PASS\n- x2_ibm_narrative_metric_cap: PASS\n- x2_ibm_narrative_bullet_overlap_threshold: PASS\n- x2_ibm_narrative_word_budget: PASS\n- x2_ibm_narrative_no_candidate_name_tokens: PASS\n- x2_ibm_narrative_no_meta_disclaimer_in_display: PASS\n- x2_ibm_narrative_source_supported: PASS\n- x2_claim_ledger_source_fact_ids_allow_list: PASS\n- x2_claim_ledger_claim_text_non_empty: PASS\n- x2_ibm_narrative_role_episode_bundles_in_proof_pool: PASS\n- x2_ibm_narrative_role_episode_bundle_id_required: PASS\n- x2_ibm_narrative_hold_metric_forbidden: PASS\n- x2_ibm_narrative_ibm_only_fact_scope: PASS\n- x2_no_unify_fact_leakage: PASS\n- x2_no_insurtech_fact_leakage: PASS\n- x2_no_ey_fact_leakage: PASS\n- x2_no_jd_only_claims: PASS\n- x2_ibm_narrative_weak_resume_jargon_phrases: PASS\n- x2_ibm_narrative_claim_theme_coverage: FAIL\n- x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets: FAIL\n- x2_ibm_narrative_claim_ledger_clause_decomposition: PASS\n- x2_ibm_narrative_requires_finalized_bullets: PASS\n- x2_no_metric_repetition_unless_justified: PASS\n- x2_no_bullet_sentence_structure_copy: PASS\n- x2_no_five_bullet_roll_up_tone: PASS\n- x2_no_inline_source_tags: PASS\n- x2_no_first_person: PASS\n- x2_no_em_dash: PASS\n- x2_no_generic_filler: PASS\n- x2_no_unify_runtime_terms: PASS\n- x2_json_parse_valid: PASS\n- x2_provider_requested_attempted: PASS\n- x2_no_silent_mock_fallback: PASS\n- x2_x1d_required_judges_present: PASS\n- x2_x1d_schema_valid: PASS\n- x2_no_mock_or_plumbing_language_in_real_l2_output: PASS\n- x2_ibm_narrative_active_proof_pool_source_fact_ids: PASS\n- x2_section_input_usage_ledger_present: PASS\n- x2_jd_used_as_required_targeting_input: PASS\n- x2_briefing_used_as_required_context_input: PASS\n- x2_title_company_used_as_required_positioning_input: PASS\n- x2_no_non_evidence_inputs_as_claim_evidence: PASS\n- x2_no_non_evidence_inputs_in_source_fact_ids: PASS\n- x2_selected_fact_ids_only: PASS\n- x2_section_claims_supported_by_base_resume: PASS\n- x2_input_usage_accounting_consistent: PASS\n- x2_fec_subset_of_canonical_evidence_pool: PASS\n- x2_prompt_c0_ids_subset_of_fec: PASS\n- x2_claim_ledger_source_fact_ids_subset_of_fec: PASS\n- X2_BLOCK_ID_NAMESPACE_SPLIT: PASS\n- x2_active_pool_digest_matches_fec_digest: PASS\n- x2_narrative_seniority_floor: PASS\n- x2_narrative_no_consulting_language: PASS\n- x2_narrative_technical_specificity_floor: PASS\n- x2_narrative_not_bullet_recap: PASS\n- x2_narrative_upstream_graph_proof_required: PASS\n- x2_narrative_base_prose_ngram_overlap: PASS\n- x2_narrative_e0_ngram_overlap: PASS\n\nX3_DISPOSITION:\n{\n  \"x3_code\": \"X3_BLOCK\",\n  \"decisive_reason\": \"X2 deterministic gate failure\",\n  \"review_reason\": \"\",\n  \"authorization_scope\": \"PLUMBING_ONLY\",\n  \"proceed_to_runtime\": false,\n  \"runtime_generation_status\": \"REAL_LLM\",\n  \"x1d_evaluator_mode\": \"MODEL_BACKED\",\n  \"product_quality_status\": \"FAIL\",\n  \"x2_failed_gates\": [\n    \"x2_ibm_narrative_claim_theme_coverage\",\n    \"x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets\"\n  ],\n  \"blocked_judges\": [],\n  \"mocked_judges\": [],\n  \"soft_failed_judges\": [],\n  \"decisive_judge_failures\": [],\n  \"final_summary_hash\": \"0b37cb2461bd4eb9\",\n  \"claim_ledger_hash\": \"c1d961a41fa16d47\",\n  \"required_remediation\": [\n    \"Fix failed X2 gates: x2_ibm_narrative_claim_theme_coverage, x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets\",\n    \"Product quality must be PASS, currently FAIL.\"\n  ],\n  \"blocked_judge_detail_rows\": [],\n  \"model_backed_pass_provider_keys\": [\n    \"gemini_pro\"\n  ],\n  \"proof_eligible_allow_requires\": \"every_configured_x1d_judge_model_backed_pass\",\n  \"pass\": false,\n  \"disposition_authority\": \"lane\",\n  \"section_x3_authoritative\": false,\n  \"section_x3_mirror_only\": true,\n  \"spine_x3_claimed\": false\n}\n\nL6_SHADOW_EVAL_PACKAGE:\nC:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry12_20260809\\e2e_20260809T075910Z_f008baa6\\modular_r4\\sections\\ibm_narrative\\l6_shadow_eval_package.json\noffline_only=true",
+    "l7_how_trace_emitted": true,
+    "lane_run_id": "ibm_narrative_20260809_080432",
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-f960c15cb9a947ac872a35499cd8ac66",
+    "run_id": "0d402bef-8f00-4291-b135-21ea7e02c5ee",
+    "section_result_blocked": true,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "unify_bullets_cli_output_text": "",
+    "unify_narrative_cli_output_text": "",
+    "x3_disposition": "X3_BLOCK"
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "lane 'ibm_narrative' run_dir failed product bar (latest_successful_real_run.json): product_quality_not_PASS:FAIL",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections/ibm_narrative/real/<run_id>/",
+  "generated_at_utc": "2026-08-09T08:09:27.058608+00:00",
+  "integrated_run_id": "e2e_20260809T075910Z_f008baa6",
+  "lane_exec_status": "dispatch_error:lane_exit_error",
+  "lane_id": "ibm_narrative",
+  "primary_failure": {},
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/runs/w8_anthropic_positive_retry12_20260809/e2e_20260809T075910Z_f008baa6/modular_r4/sections",
+  "status": "PRE_RUN_BLOCKED"
+}

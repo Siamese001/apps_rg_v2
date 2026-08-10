@@ -11,6 +11,7 @@ from apps_rg.runtime.providers import provider_contract as retired_provider_prof
 from apps_rg.runtime.sections.executive_summary_regen_dispatch import (
     budgeted_regen_call,
     clear_regen_budget_ledger,
+    provider_artifact_filename,
     regen_budget_ledger,
     resolve_regen_max_output_tokens,
     resolve_scratch_max_output_tokens,
@@ -32,6 +33,19 @@ def test_regen_max_output_defaults_and_cap(monkeypatch) -> None:
     assert resolve_regen_max_output_tokens() == 4096
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_REGEN_MAX_OUTPUT_TOKENS", "3000")
     assert resolve_regen_max_output_tokens() == 4096
+
+
+def test_regen_provider_artifact_filename_is_windows_patch_path_safe() -> None:
+    name = provider_artifact_filename(
+        kind="request",
+        phase="synthesis_regen",
+        cycle_index=0,
+        attempt_index=1,
+        call_id="synthesis_regen-00-01-c6f9bf2f",
+    )
+
+    assert name == "provider_request_synthesis_regen_c00_a01_c6f9bf2f.json"
+    assert len(name) < 64
 
 
 def test_regen_dispatch_blocks_when_thread_exceeds_window(monkeypatch) -> None:

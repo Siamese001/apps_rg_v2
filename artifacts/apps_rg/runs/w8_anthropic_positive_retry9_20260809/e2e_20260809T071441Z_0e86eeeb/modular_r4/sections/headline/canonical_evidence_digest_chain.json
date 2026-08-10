@@ -1,0 +1,53 @@
+{
+  "schema_version": "canonical_evidence_digest_chain_v1",
+  "section_id": "headline",
+  "run_dir": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_retry9_20260809/e2e_20260809T071441Z_0e86eeeb/modular_r4/sections/headline",
+  "c05_canonical_evidence_digest": "9de857fbb1d8ecbff9db9398bf9df2ff0bad4daf112ba1ca1336b125e9227b1e",
+  "c06_final_evidence_contract_digest": "9de857fbb1d8ecbff9db9398bf9df2ff0bad4daf112ba1ca1336b125e9227b1e",
+  "c07_runtime_bound_evidence_digest": "4817e433886b126eb7805882ad6036ea92b11c45ad6ba752c21d68337a96cbda",
+  "pa_c0_slot_digest": "9de857fbb1d8ecbff9db9398bf9df2ff0bad4daf112ba1ca1336b125e9227b1e",
+  "provider_request_allowed_ids_digest": "9de857fbb1d8ecbff9db9398bf9df2ff0bad4daf112ba1ca1336b125e9227b1e",
+  "claim_ledger_source_fact_ids_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "x2_active_pool_digest": "2a11a60ea83266ec4c2501b421b4bdb4252954e7307585047d19fbad65b2b303",
+  "section_receipt_digest": "",
+  "c05_canonical_evidence_ids": [
+    "fact_engineering_platform_003",
+    "fact_revenue_ops_003",
+    "reb_ibm_revenue_sales_target_execution",
+    "reb_unify_runtime_reliability_governance",
+    "skill_context_engineering",
+    "skill_partner_pnl_oversight"
+  ],
+  "c06_fec_ids": [
+    "fact_engineering_platform_003",
+    "fact_revenue_ops_003",
+    "reb_ibm_revenue_sales_target_execution",
+    "reb_unify_runtime_reliability_governance",
+    "skill_context_engineering",
+    "skill_partner_pnl_oversight"
+  ],
+  "c07_bound_ids": [
+    "reb_ibm_revenue_sales_target_execution",
+    "reb_unify_runtime_reliability_governance"
+  ],
+  "invariants": {
+    "c06_fec_ids_subset_of_c05_canonical_evidence_ids": true,
+    "c07_bound_ids_subset_of_c06_fec_ids": true,
+    "pa_c0_subset_of_fec": true,
+    "provider_subset_of_fec": true,
+    "claim_ledger_subset_of_fec": true,
+    "digest_match_or_explicit_narrowing_receipt": true,
+    "no_namespace_split_without_alias": true,
+    "x2_namespace_gate_pass": true,
+    "violations": {
+      "fec_widening": [],
+      "c07_widening": [],
+      "pa_widening": [],
+      "provider_widening": [],
+      "ledger_widening": [],
+      "namespace_split_ids": []
+    },
+    "fec_narrowed_from_pool": true,
+    "all_pass": true
+  }
+}

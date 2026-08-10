@@ -131,7 +131,10 @@ def _build_r4_run(
 ) -> tuple[str, Path]:
     run_id = "r4-hotspot"
     run_dir = repo_root / "artifacts" / "apps_rg" / "runs" / run_id
-    _write_json(run_dir / "r4_run_manifest.json", {"x3_disposition": "X3D", "l2_fault": ""})
+    _write_json(
+        run_dir / "r4_run_manifest.json",
+        {"x3_disposition": "X3D_ALLOW_FINISH", "l2_fault": ""},
+    )
     _write_json(run_dir / "outputs" / "generated_resume.json", {"resume": {}})
     _write_json(
         run_dir / "apps_rg_output_manifest.json",

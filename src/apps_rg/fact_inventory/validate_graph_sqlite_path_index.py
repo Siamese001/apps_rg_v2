@@ -21,7 +21,7 @@ from apps_rg.fact_inventory.graph_sqlite_path_index import (
 )
 
 if TYPE_CHECKING:
-    from agentic_core.L4_state.adapters import sqlite3_adapter as sqlite3
+    from apps_rg.runtime.core_sqlite import sqlite3_adapter as sqlite3
 
 REQUIRED_TABLES = (
     "graph_paths",

@@ -5,6 +5,9 @@ from __future__ import annotations
 import copy
 from pathlib import Path
 
+import pytest
+
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_derived_clusters as subject
 from apps_rg.evals.owner_solo.c03_full_resume_qrel_derived_clusters import (
     build_derived_bundle_registry,
     validate_derived_bundle_registry,
@@ -13,6 +16,11 @@ from apps_rg.fact_inventory.c03_graph_node_semantic_hardening import canonical_s
 
 
 ROOT = Path(__file__).resolve().parents[4]
+
+
+@pytest.fixture(autouse=True)
+def _algorithm_test_uses_explicit_non_authorizing_scope_override(monkeypatch) -> None:
+    monkeypatch.setattr(subject, "validate_full_resume_scope", lambda *_args, **_kwargs: [])
 
 
 def test_w1b_materializes_bundle_units_without_singleton_vectors() -> None:

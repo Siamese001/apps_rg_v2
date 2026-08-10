@@ -93,6 +93,7 @@ def _trusted_contract(tmp_path: Path, package_root: Path) -> Path:
         "approved_package_tree": tree,
         "package_relative_path": "agentic_core",
         "require_clean_tracked_worktree": True,
+        "allowed_untracked_artifact_patterns": [".runtime/**"],
     }
     path = tmp_path / "runtime-contract.json"
     path.write_text(json.dumps(contract), encoding="utf-8")
@@ -220,6 +221,61 @@ def test_external_runtime_commit_or_tree_drift_is_fail_closed(
 
     assert receipt["status"] == "BLOCKED_AGENTIC_CORE_TRUST_PIN_MISMATCH"
     assert receipt["failure_code"] == "AGENTIC_CORE_RUNTIME_TRUST_PIN_MISMATCH"
+
+
+def test_external_runtime_allows_only_explicit_untracked_artifacts(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime import standalone_dependency_posture as posture
+
+    repo = tmp_path / "standalone"
+    repo.mkdir()
+    external = tmp_path / "external"
+    modules = _external_modules(external)
+    contract_path = _trusted_contract(tmp_path, external)
+    artifact = external / ".runtime" / "receipts" / "run.json"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text("{}\n", encoding="utf-8")
+    _patch_imports(monkeypatch, modules)
+
+    receipt = posture.verify_external_agentic_core_runtime(
+        repo_root=repo,
+        contract_path=contract_path,
+    )
+
+    assert receipt["status"] == posture.EXTERNAL_RUNTIME_BOUND
+    assert receipt["resolved_runtime_trust"]["permitted_untracked_paths"] == [
+        ".runtime/receipts/run.json"
+    ]
+    assert receipt["resolved_runtime_trust"]["rejected_untracked_paths"] == []
+
+
+@pytest.mark.parametrize("relative_path", ["plans/unreviewed.md", "agentic_core/new_code.py"])
+def test_external_runtime_rejects_unapproved_or_package_untracked_files(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    relative_path: str,
+) -> None:
+    from apps_rg.runtime import standalone_dependency_posture as posture
+
+    repo = tmp_path / "standalone"
+    repo.mkdir()
+    external = tmp_path / "external"
+    modules = _external_modules(external)
+    contract_path = _trusted_contract(tmp_path, external)
+    unapproved = external / relative_path
+    unapproved.parent.mkdir(parents=True, exist_ok=True)
+    unapproved.write_text("unapproved\n", encoding="utf-8")
+    _patch_imports(monkeypatch, modules)
+
+    receipt = posture.verify_external_agentic_core_runtime(
+        repo_root=repo,
+        contract_path=contract_path,
+    )
+
+    assert receipt["status"] == "BLOCKED_AGENTIC_CORE_TRUST_PIN_MISMATCH"
+    assert receipt["resolved_runtime_trust"]["rejected_untracked_paths"] == [relative_path]
 
 
 def test_invalid_dependency_contract_is_a_fail_closed_runtime_boundary(

@@ -90,7 +90,10 @@ def test_r1b_probe_only_hit_does_not_skip_generation(monkeypatch: pytest.MonkeyP
             r1b_hit=True,
             lookup_anchor="HistoricalIntentRecord.request_intent_vector",
             cache_grain=CACHE_GRAIN_ROLE_TARGET_RUN,
-            terminal_packet={"x3_disposition": "X3_ALLOW", "run_id": "source-run"},
+            terminal_packet={
+                "x3_disposition": "X3D_ALLOW_FINISH",
+                "run_id": "source-run",
+            },
             generation_required=False,
         ),
     )

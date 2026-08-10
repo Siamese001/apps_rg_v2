@@ -1,0 +1,2530 @@
+{
+  "schema_version": "apps_rg.mandatory_run_output.v1",
+  "generated_at_utc": "2026-08-09T12:49:22Z",
+  "run_root_abs": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195",
+  "run_root": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195",
+  "result_summary": {
+    "exit_status": "error",
+    "execution_status": "failed",
+    "outcome_authorized": true,
+    "decisive_status": "",
+    "all_lanes_authorized": null,
+    "x3_disposition": "X3D_ALLOW_FINISH",
+    "completion_disposition": "X3D_ALLOW_FINISH",
+    "completion_status": "BLOCKED",
+    "completion_fault": "",
+    "fault": "PRODUCT_E2E_RECEIPT_AUTHORITY_FAILED",
+    "run_id": "db9f8ee9-053d-4341-8fe4-4f5071e0d607",
+    "request_id": "req-b3eecc44f9fa4aa797069713c5a23912",
+    "proof_gate_status": "",
+    "proof_classification": "",
+    "decisive_reason": "",
+    "operational_failure": {},
+    "research_artifact_dir": "",
+    "research_briefing_path": "",
+    "research_company_brief_path": "",
+    "research_handoff_v2_path": "",
+    "apps_eval_record_ref": "",
+    "l6_shadow_bridge_ref": "",
+    "l7_audit_status": "",
+    "product_authorized": true,
+    "pipeline_complete": false,
+    "observability_repair_required": true
+  },
+  "section_counts": {
+    "total": 12,
+    "ran_real_llm": 11,
+    "allowed": 12,
+    "blocked": 0,
+    "pre_run_blocked": 0,
+    "not_run": 0,
+    "unknown": 0
+  },
+  "sections": [
+    {
+      "section": "competencies",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies",
+      "display_txt_relpath": "modular_r4/sections/competencies/competencies_display.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\competencies\\competencies_display.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "Evidence mapping failure: visible content was not fully backed by source facts or graph lineage.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 4.2,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.2/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 17,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_shadow_learning.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/competencies/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "unify_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets",
+      "display_txt_relpath": "modular_r4/sections/unify_bullets/unify_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\unify_bullets\\unify_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.76,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.76/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ibm_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets",
+      "display_txt_relpath": "modular_r4/sections/ibm_bullets/ibm_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\ibm_bullets\\ibm_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.78,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.78/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_bullets/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "insurtech_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/insurtech_bullets",
+      "display_txt_relpath": "modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\insurtech_bullets\\insurtech_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.74,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.74/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/insurtech_bullets/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ey_bullets",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ey_bullets",
+      "display_txt_relpath": "modular_r4/sections/ey_bullets/ey_bullets_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\ey_bullets\\ey_bullets_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 0.74,
+          "threshold": 0.72,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 0.74/5 vs 0.72 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ey_bullets/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "unify_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative",
+      "display_txt_relpath": "modular_r4/sections/unify_narrative/unify_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\unify_narrative\\unify_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 16,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_shadow_learning.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/unify_narrative/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ibm_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative",
+      "display_txt_relpath": "modular_r4/sections/ibm_narrative/ibm_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\ibm_narrative\\ibm_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ibm_narrative/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "insurtech_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/insurtech_narrative",
+      "display_txt_relpath": "modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\insurtech_narrative\\insurtech_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/insurtech_narrative/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "ey_narrative",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ey_narrative",
+      "display_txt_relpath": "modular_r4/sections/ey_narrative/ey_narrative_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\ey_narrative\\ey_narrative_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro"
+        ]
+      },
+      "l6": {
+        "file_count": 1,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/ey_narrative/l6_shadow_eval_package.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "executive_summary",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary",
+      "display_txt_relpath": "modular_r4/sections/executive_summary/resume_display_text.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\executive_summary\\resume_display_text.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 4.8,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 4.4,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 4.8/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.4/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 18,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_shadow_learning.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/l6_v40_shadow_eval_spans.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/post_runtime/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/executive_summary/post_runtime/l6_shadow_learning.json"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "headline",
+      "status_bucket": "ran_real_llm",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline",
+      "display_txt_relpath": "modular_r4/sections/headline/headline_output.txt",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\sections\\headline\\headline_output.txt",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "REAL_LLM",
+      "failed_gates": [],
+      "failure_classification": "No section-level failure recorded.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 4.6,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": false,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.6/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": [
+          "gemini_pro",
+          "openai_chatgpt"
+        ]
+      },
+      "l6": {
+        "file_count": 15,
+        "files": [
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_apps_eval_alignment.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_apps_eval_grain_parity.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_eval_before_learn_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_microstep_coverage.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_microstep_future_run_proposals.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_microstep_observations.jsonl",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_microstep_patterns.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_microstep_rca.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_observability_closure_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_shadow_handoff_receipt.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_trace_observability_summary.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_v40_shadow_eval_package.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_v40_shadow_eval_spans.json",
+          "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/sections/headline/l6_v40_shadow_eval_spans.jsonl"
+        ],
+        "product_authority": "future_run_advisory_only"
+      }
+    },
+    {
+      "section": "final_resume_aggregation",
+      "status_bucket": "assembled",
+      "executed": true,
+      "lane_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/final_resume_assembly",
+      "display_txt_relpath": "modular_r4/final_resume_assembly/final_resume.json",
+      "display_txt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\modular_r4\\final_resume_assembly\\final_resume.json",
+      "x3_code": "X3_ALLOW",
+      "x2_pass": "PASS",
+      "product_quality_status": "PASS",
+      "runtime_generation_status": "ASSEMBLED",
+      "failed_gates": [],
+      "failure_classification": "Final resume aggregation failure: full-resume coherence or product release gate did not pass.",
+      "pre_run_failure": {},
+      "judges": [
+        {
+          "provider": "Google Gemini 3.6 Flash",
+          "provider_key": "gemini_pro",
+          "model": "gemini-3.6-flash",
+          "score": 5.0,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": null,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        },
+        {
+          "provider": "OpenAI ChatGPT",
+          "provider_key": "openai_chatgpt",
+          "model": "gpt-5.6-sol",
+          "score": 4.2,
+          "threshold": 4.0,
+          "pass": true,
+          "provider_status": "MODEL_BACKED_PASS",
+          "decisive_failure": null,
+          "soft_fail": null,
+          "blocked": null,
+          "mocked": null,
+          "error": null,
+          "findings": [],
+          "remediation_suggestions": [],
+          "dimension_verdicts": {}
+        }
+      ],
+      "judge_summary": "Google Gemini 3.6 Flash `gemini-3.6-flash`: 5/5 vs 4 PASS; OpenAI ChatGPT `gpt-5.6-sol`: 4.2/5 vs 4 PASS",
+      "judge_issue_summary": {
+        "blocked_judges": [],
+        "mocked_judges": [],
+        "soft_failed_judges": [],
+        "decisive_judge_failures": [],
+        "model_backed_pass_provider_keys": []
+      },
+      "l6": {
+        "file_count": 0,
+        "files": [],
+        "product_authority": "not_observed"
+      }
+    }
+  ],
+  "section_lane_table": [
+    {
+      "order": 0,
+      "section": "research_briefing_input",
+      "research_source_class": "FRESH_APPS_RESEARCH",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-terra",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "N/A",
+      "secondary_model_observed": "N/A",
+      "generation_status": "BRIEFING_PRESENT:RUN_SPECIFIC",
+      "judges_run": "N/A",
+      "judge_models_scores": "N/A",
+      "judge_retry_fallback": "N/A",
+      "x2": "PASS; judge=gemini-3.6-flash",
+      "x3": "X3D_ALLOW_FINISH; X1=PASS",
+      "past_fail_blocker": "auto_research_internal=True; research_delegation_executed=True; source=RUN_SPECIFIC; digest=1f78f777b6a21173c7d918c97e20a37eed1284c9eb5ebd0e4b911114c835ade0; ref=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md; target=Anthropic / Manager of Applied AI Architecture, Partnerships; briefing_text_chars=7885",
+      "display_output": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md",
+      "l6_evidence": "N/A"
+    },
+    {
+      "order": 1,
+      "section": "competencies",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.2 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "Evidence mapping failure: visible content was not fully backed by source facts or graph lineage.",
+      "display_output": "modular_r4/sections/competencies/competencies_display.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 2,
+      "section": "unify_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.76 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/unify_bullets/unify_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 3,
+      "section": "ibm_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.78 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ibm_bullets/ibm_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 4,
+      "section": "insurtech_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 5,
+      "section": "ey_bullets",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "NOT_OBSERVED",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ey_bullets/ey_bullets_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 6,
+      "section": "unify_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/unify_narrative/unify_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 7,
+      "section": "ibm_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ibm_narrative/ibm_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 8,
+      "section": "insurtech_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 9,
+      "section": "ey_narrative",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/ey_narrative/ey_narrative_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 10,
+      "section": "executive_summary",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.8 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.4 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/executive_summary/resume_display_text.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 11,
+      "section": "headline",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": true,
+      "primary_provider": "external_openai",
+      "primary_model_observed": "gpt-5.6-luna",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "REAL_LLM",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.6 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "No section-level failure recorded.",
+      "display_output": "modular_r4/sections/headline/headline_output.txt",
+      "l6_evidence": "future_run_advisory_only"
+    },
+    {
+      "order": 12,
+      "section": "final_resume_aggregation",
+      "research_source_class": "N/A",
+      "r1a": "miss",
+      "r1b": "skipped",
+      "lane_record": "YES",
+      "provider_call_attempted": "NOT_OBSERVED",
+      "primary_provider": "NOT_OBSERVED",
+      "primary_model_observed": "NOT_OBSERVED",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "NOT_OBSERVED",
+      "secondary_model_observed": "NOT_OBSERVED",
+      "generation_status": "ASSEMBLED",
+      "judges_run": "YES",
+      "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.2 vs 4 PASS",
+      "judge_retry_fallback": "NOT_OBSERVED",
+      "x2": "PASS",
+      "x3": "X3_ALLOW",
+      "past_fail_blocker": "Final resume aggregation failure: full-resume coherence or product release gate did not pass.",
+      "display_output": "modular_r4/final_resume_assembly/final_resume.json",
+      "l6_evidence": "not_observed"
+    }
+  ],
+  "final_resume_output": {
+    "schema_version": "apps_rg.final_resume_output.v1",
+    "generated_at_utc": "2026-08-09T12:49:22Z",
+    "required": true,
+    "status": "PASS",
+    "failed_gate_ids": [],
+    "run_root": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195",
+    "final_resume_json": {
+      "relpath": "modular_r4/final_resume_assembly/final_resume.json",
+      "exists": true,
+      "bytes": 943902,
+      "sha256": "1a807a6943fb646e271c62c4626055a996fb955994c08110424062feadd1066f"
+    },
+    "rendered_resume_text": {
+      "relpath": "FINAL_RESUME_OUTPUT.txt",
+      "exists": true,
+      "bytes": 7292,
+      "sha256": "3d67911004e39e92b681f1ab74f2c7bedb97525f8a04f0827fcde6b8b5ded356"
+    },
+    "resume_docx": {
+      "relpath": "outputs/resume.docx",
+      "exists": true,
+      "bytes": 5056,
+      "sha256": "6b76d5c60bc3a28751435ec1b56be17c35101c1738640e8be9967fdb1746fe34"
+    },
+    "rendered_order": [
+      "candidate_header",
+      "headline",
+      "executive_summary",
+      "competencies",
+      "professional_experience",
+      "education",
+      "certifications"
+    ],
+    "base_resume_role_facts": [
+      {
+        "role_key": "unify",
+        "employer": "Unify Consulting",
+        "title": "SVP Engineering, Agentic AI Platforms",
+        "location": "Boca Raton, FL",
+        "start_date": "2023-02",
+        "end_date": "present",
+        "is_current": true
+      },
+      {
+        "role_key": "ibm",
+        "employer": "IBM",
+        "title": "Partner",
+        "location": "Edgewater, NJ",
+        "start_date": "2017-04",
+        "end_date": "2022-10",
+        "is_current": false
+      },
+      {
+        "role_key": "insurtech",
+        "employer": "InsurTech Cloud Solutions",
+        "title": "Chief Technology Officer",
+        "location": "New York, NY",
+        "start_date": "2014-04",
+        "end_date": "2017-03",
+        "is_current": false
+      },
+      {
+        "role_key": "ey",
+        "employer": "Ernst & Young",
+        "title": "Principal",
+        "location": "New York, NY",
+        "start_date": "2009-10",
+        "end_date": "2014-03",
+        "is_current": false
+      },
+      {
+        "role_key": "early_career",
+        "employer": "Early Career Roles",
+        "title": "Actuarial Consultant and Quantitative Roles",
+        "location": "Philadelphia, PA",
+        "start_date": "2002-10",
+        "end_date": "2009-09",
+        "is_current": false
+      }
+    ],
+    "content_sources": {
+      "identity_contact_source": "base_resume_locked_profile",
+      "role_header_source": "final_resume.locked_copy_invariants",
+      "generated_content_source": "final_resume.sections[].l2_output_snapshot",
+      "education_certification_source": "final_resume.sections[].copied_text_exact",
+      "locked_copy_source": "final_resume.sections[].copied_text_exact"
+    },
+    "gates": [
+      {
+        "gate_id": "final_resume_json_spine_present",
+        "pass": true,
+        "observed_value": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/modular_r4/final_resume_assembly/final_resume.json",
+        "threshold": "modular_r4/final_resume_assembly/final_resume.json",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_rendered_text_present",
+        "pass": true,
+        "observed_value": {
+          "relpath": "FINAL_RESUME_OUTPUT.txt",
+          "exists": true,
+          "bytes": 7292,
+          "sha256": "3d67911004e39e92b681f1ab74f2c7bedb97525f8a04f0827fcde6b8b5ded356"
+        },
+        "threshold": "nonempty text output",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_present_nonempty",
+        "pass": true,
+        "observed_value": {
+          "relpath": "outputs/resume.docx",
+          "exists": true,
+          "bytes": 5056,
+          "sha256": "6b76d5c60bc3a28751435ec1b56be17c35101c1738640e8be9967fdb1746fe34"
+        },
+        "threshold": "nonempty DOCX output",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_rendered_order_valid",
+        "pass": true,
+        "observed_value": {
+          "EXECUTIVE SUMMARY": 238,
+          "ENGINEERING & PLATFORM COMPETENCIES": 1249,
+          "PROFESSIONAL EXPERIENCE": 2826,
+          "EDUCATION": 6764,
+          "CERTIFICATIONS": 6928
+        },
+        "threshold": [
+          "candidate_header",
+          "headline",
+          "executive_summary",
+          "competencies",
+          "professional_experience",
+          "education",
+          "certifications"
+        ],
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_order_valid",
+        "pass": true,
+        "observed_value": {
+          "EXECUTIVE SUMMARY": 236,
+          "ENGINEERING & PLATFORM COMPETENCIES": 1246,
+          "PROFESSIONAL EXPERIENCE": 2822,
+          "EDUCATION": 6754,
+          "CERTIFICATIONS": 6917
+        },
+        "threshold": [
+          "candidate_header",
+          "headline",
+          "executive_summary",
+          "competencies",
+          "professional_experience",
+          "education",
+          "certifications"
+        ],
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_base_role_headers_preserved",
+        "pass": true,
+        "observed_value": {
+          "role_headers": {
+            "unify": [
+              "Unify Consulting \u2014 SVP Engineering, Agentic AI Platforms",
+              "Boca Raton, FL | Feb 2023 \u2013 Present"
+            ],
+            "ibm": [
+              "IBM \u2014 Partner",
+              "Edgewater, NJ | Apr 2017 \u2013 Oct 2022"
+            ],
+            "insurtech": [
+              "InsurTech Cloud Solutions \u2014 Chief Technology Officer",
+              "New York, NY | Apr 2014 \u2013 Mar 2017"
+            ],
+            "ey": [
+              "Ernst & Young \u2014 Principal",
+              "New York, NY | Oct 2009 \u2013 Mar 2014"
+            ],
+            "early_career": [
+              "Early Career Roles \u2014 Actuarial Consultant and Quantitative Roles",
+              "Philadelphia, PA | Oct 2002 \u2013 Sep 2009"
+            ]
+          },
+          "positions": {
+            "unify": [
+              2851,
+              2908
+            ],
+            "ibm": [
+              4267,
+              4281
+            ],
+            "insurtech": [
+              5296,
+              5349
+            ],
+            "ey": [
+              5679,
+              5705
+            ],
+            "early_career": [
+              6308,
+              6373
+            ]
+          }
+        },
+        "threshold": "base resume employer/title/location/date headers in order",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_base_role_headers_preserved",
+        "pass": true,
+        "observed_value": {
+          "role_headers": {
+            "unify": [
+              "Unify Consulting \u2014 SVP Engineering, Agentic AI Platforms",
+              "Boca Raton, FL | Feb 2023 \u2013 Present"
+            ],
+            "ibm": [
+              "IBM \u2014 Partner",
+              "Edgewater, NJ | Apr 2017 \u2013 Oct 2022"
+            ],
+            "insurtech": [
+              "InsurTech Cloud Solutions \u2014 Chief Technology Officer",
+              "New York, NY | Apr 2014 \u2013 Mar 2017"
+            ],
+            "ey": [
+              "Ernst & Young \u2014 Principal",
+              "New York, NY | Oct 2009 \u2013 Mar 2014"
+            ],
+            "early_career": [
+              "Early Career Roles \u2014 Actuarial Consultant and Quantitative Roles",
+              "Philadelphia, PA | Oct 2002 \u2013 Sep 2009"
+            ]
+          },
+          "positions": {
+            "unify": [
+              2846,
+              2903
+            ],
+            "ibm": [
+              4261,
+              4275
+            ],
+            "insurtech": [
+              5289,
+              5342
+            ],
+            "ey": [
+              5671,
+              5697
+            ],
+            "early_career": [
+              6299,
+              6364
+            ]
+          }
+        },
+        "threshold": "base resume employer/title/location/date headers in order",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_education_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "education",
+          "expected_lines": [
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+          ],
+          "positions": {
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 6774,
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 6859
+          }
+        },
+        "threshold": "base resume education lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_education_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "education",
+          "expected_lines": [
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+          ],
+          "positions": {
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 6764,
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 6849
+          }
+        },
+        "threshold": "base resume education lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_certifications_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "certifications",
+          "expected_lines": [
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025",
+            "Databricks Lakehouse Fundamentals Accreditation, 2023",
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023",
+            "Fellow of the Society of Actuaries, 2010"
+          ],
+          "positions": {
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025": 6957,
+            "Databricks Lakehouse Fundamentals Accreditation, 2023": 7016,
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023": 7070,
+            "Fellow of the Society of Actuaries, 2010": 7126
+          }
+        },
+        "threshold": "base resume certification lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_certifications_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "certifications",
+          "expected_lines": [
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025",
+            "Databricks Lakehouse Fundamentals Accreditation, 2023",
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023",
+            "Fellow of the Society of Actuaries, 2010"
+          ],
+          "positions": {
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025": 6946,
+            "Databricks Lakehouse Fundamentals Accreditation, 2023": 7005,
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023": 7059,
+            "Fellow of the Society of Actuaries, 2010": 7115
+          }
+        },
+        "threshold": "base resume certification lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_no_gap_markers",
+        "pass": true,
+        "observed_value": {
+          "not_completed": false,
+          "not_generated_by_run": false
+        },
+        "threshold": false,
+        "failure_reason": ""
+      }
+    ]
+  },
+  "rca_findings": [],
+  "section_failure_forensics": {
+    "gate_id": "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+    "pass": true,
+    "required": true,
+    "failed_section_count": 1,
+    "artifact_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics",
+    "artifacts": [
+      {
+        "section_id": "whole_run",
+        "json_path": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics/whole_run.json",
+        "md_path": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics/whole_run.md",
+        "complete": true,
+        "errors": [],
+        "failure_type": "mandatory_output_authorization_block",
+        "baseline_confidence": "pinned_contract_invalid"
+      }
+    ],
+    "missing_or_incomplete": [],
+    "failure_reason": "",
+    "baseline_confidence": "pinned_contract_invalid",
+    "baseline_run_dir": ""
+  },
+  "operational_failure_forensics": {},
+  "output_bisect": {
+    "required": true,
+    "sections": [
+      {
+        "schema_version": "apps_rg.output_bisect.v1",
+        "section_id": "whole_run",
+        "scope": "NO_PRIOR_BASELINE",
+        "first_observed_divergence": {
+          "order": 1,
+          "stage": "u0_ingress",
+          "prior_value": "NOT_OBSERVED",
+          "current_value": "662530a44833338e44d72686bfbf92bd411e88b053b2af710a0cd0f2c9f7d5e0",
+          "prior_detail": "NOT_OBSERVED",
+          "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md",
+          "match": false,
+          "classification": "CORRELATED_ONLY",
+          "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+          "prior_evidence_ref": "",
+          "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\ingress_raw.json"
+        },
+        "first_causally_relevant_divergence": {},
+        "ingestion_to_outcome_lineage": [
+          {
+            "order": 1,
+            "stage": "u0_ingress",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "662530a44833338e44d72686bfbf92bd411e88b053b2af710a0cd0f2c9f7d5e0",
+            "prior_detail": "NOT_OBSERVED",
+            "current_detail": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md",
+            "match": false,
+            "classification": "CORRELATED_ONLY",
+            "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\ingress_raw.json"
+          },
+          {
+            "order": 2,
+            "stage": "u0_payload",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "2b221c05af06f1c1dae703c9119a7cb6ffae95c72953927a62597c96bb725617",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "CORRELATED_ONLY",
+            "reason": "The runs differ here, but the available artifacts do not prove this targeting change caused the failed sentence shape.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\u0_receipt.json"
+          },
+          {
+            "order": 3,
+            "stage": "jd_material",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 4,
+            "stage": "briefing_material",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 5,
+            "stage": "targeting_bundle",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 6,
+            "stage": "proof_pool",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 7,
+            "stage": "selected_fact_plan",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 8,
+            "stage": "provider_request",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 9,
+            "stage": "initial_candidate",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 10,
+            "stage": "retry_loop",
+            "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+            "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": true,
+            "classification": "RULED_OUT",
+            "reason": "The evidence is identical at this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 11,
+            "stage": "deterministic_finalization",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 12,
+            "stage": "final_x2",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 13,
+            "stage": "judges",
+            "prior_value": "NO_JUDGE_ROWS",
+            "current_value": "NO_JUDGE_ROWS",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": true,
+            "classification": "RULED_OUT",
+            "reason": "The evidence is identical at this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 14,
+            "stage": "x3",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          }
+        ],
+        "prior_attempt_timeline": [
+          {
+            "run": "prior_passing",
+            "sequence": 1,
+            "phase": "lane_resolution",
+            "attempt": "-",
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "no prior passing lane was found",
+            "repair_or_action": "none",
+            "gate_scope": "NONE",
+            "gate_result": "NOT_APPLICABLE",
+            "failed_gate_ids": [],
+            "judge_result": "NO_PRIOR_PASSING_RUN",
+            "disposition": "NO_BASELINE",
+            "acceptance_scope": "NOT_APPLICABLE",
+            "evidence_ref": "",
+            "complete": true
+          }
+        ],
+        "current_attempt_timeline": [
+          {
+            "run": "current_failure",
+            "sequence": 1,
+            "phase": "lane_resolution",
+            "attempt": "-",
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "lane artifact directory not found",
+            "repair_or_action": "none",
+            "gate_scope": "NONE",
+            "gate_result": "EVIDENCE_NOT_RECORDED",
+            "failed_gate_ids": [],
+            "judge_result": "EVIDENCE_NOT_RECORDED",
+            "disposition": "EVIDENCE_GAP",
+            "acceptance_scope": "NOT_APPLICABLE",
+            "evidence_ref": "",
+            "complete": false
+          }
+        ],
+        "gate_matrix": [],
+        "judge_matrix": [
+          {
+            "judge": "configured_panel",
+            "prior": "NOT_OBSERVED",
+            "current": "JUDGES_NOT_REACHED",
+            "reason": "No current judge rows were emitted because X2 failed first."
+          }
+        ],
+        "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+        "code_bindings": [
+          {
+            "role": "revision comparison",
+            "file": "",
+            "symbol": "",
+            "baseline_symbol_hash": "",
+            "current_symbol_hash": "",
+            "changed_between_revisions": false,
+            "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+          }
+        ],
+        "underlying_root_cause": {
+          "downstream_root_cause": {
+            "status": "ISOLATED_TO_UPSTREAM_SECTION",
+            "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+          }
+        },
+        "layperson_explanation": [
+          "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+          "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+          "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (failed gates not recorded), so the judges were not reached and the resume remained blocked."
+        ]
+      }
+    ]
+  },
+  "mandatory_artifacts": {
+    "bcg_executive_output_md": "01_BCG_executive_output.md",
+    "output_bisect_md": "02_output_bisect.md",
+    "mandatory_run_output_md": "02_section_lane_summary_table.md",
+    "mandatory_run_output_json": "APPS_RG_MANDATORY_RUN_OUTPUT.json",
+    "section_failure_forensics_dir": "section_failure_forensics",
+    "final_resume_output_txt": "FINAL_RESUME_OUTPUT.txt",
+    "final_resume_output_json": "FINAL_RESUME_OUTPUT.json",
+    "final_resume_docx": "outputs/resume.docx",
+    "canonical_final_resume_json": "modular_r4/final_resume_assembly/final_resume.json"
+  },
+  "inline_required_output": {
+    "schema_version": "apps_rg.inline_required_output.v1",
+    "immutable_section_order": [
+      "bcg",
+      "section_lane_summary_table",
+      "resume_docx_full_version_inline"
+    ],
+    "bcg": {
+      "title": "BCG Executive Output - apps_rg Run",
+      "section_order": [
+        "executive_answer",
+        "p0_p1_px_recommendations",
+        "board_level_readout",
+        "issue_tree",
+        "recommended_next_move",
+        "evidence_map"
+      ],
+      "executive_answer": "The run reached an authorized product outcome. Preserve the generated outputs and review the run ledger for section and judge proof.",
+      "p0_p1_px_recommendations": {
+        "columns": [
+          "priority",
+          "recommendation",
+          "evidence",
+          "gate_outcome"
+        ],
+        "rows": [
+          {
+            "priority": "PX",
+            "recommendation": "Review L6 shadow observations as future-run hardening inputs, not product blockers.",
+            "evidence": "competencies: future_run_advisory_only | unify_bullets: future_run_advisory_only | ibm_bullets: future_run_advisory_only | insurtech_bullets: future_run_advisory_only | ey_bullets: future_run_advisory_only | unify_narrative: future_run_advisory_only",
+            "gate_outcome": "Passing run stays authorized; L6 remains advisory unless promoted by policy."
+          }
+        ]
+      },
+      "board_level_readout": {
+        "columns": [
+          "question",
+          "answer"
+        ],
+        "rows": [
+          {
+            "question": "Did apps_research run?",
+            "answer": "Yes"
+          },
+          {
+            "question": "Research source class",
+            "answer": "FRESH_APPS_RESEARCH"
+          },
+          {
+            "question": "Research input used",
+            "answer": "external_openai"
+          },
+          {
+            "question": "Briefing evidence",
+            "answer": "auto_research_internal=True; research_delegation_executed=True; source=RUN_SPECIFIC; digest=1f78f777b6a21173c7d918c97e20a37eed1284c9eb5ebd0e4b911114c835ade0; ref=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md; target=Anthropic / Manager of Applied AI Architecture, Partnerships; briefing_text_chars=7885"
+          },
+          {
+            "question": "Did resume generation run?",
+            "answer": "11 REAL_LLM section(s)"
+          },
+          {
+            "question": "Source X3 decision",
+            "answer": "X3D_ALLOW_FINISH"
+          },
+          {
+            "question": "Completion status",
+            "answer": "BLOCKED"
+          },
+          {
+            "question": "Completion fault",
+            "answer": "NONE"
+          },
+          {
+            "question": "Final product authorized?",
+            "answer": "True"
+          },
+          {
+            "question": "Primary blocker",
+            "answer": "BRIEFING_PRESENT:RUN_SPECIFIC"
+          },
+          {
+            "question": "Decision",
+            "answer": "Authorized; preserve evidence."
+          }
+        ]
+      },
+      "issue_tree": [],
+      "recommended_next_move": [
+        "Preserve the generated output package and run evidence.",
+        "Review the mandatory ledger and section-status table for audit details.",
+        "Treat future edits as new changes requiring the same X2/X3 gates."
+      ],
+      "evidence_map": [
+        {
+          "label": "Mandatory run ledger",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\02_section_lane_summary_table.md"
+        },
+        {
+          "label": "Machine-readable ledger",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\APPS_RG_MANDATORY_RUN_OUTPUT.json"
+        },
+        {
+          "label": "Final resume text",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\FINAL_RESUME_OUTPUT.txt"
+        },
+        {
+          "label": "Final resume output contract",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\FINAL_RESUME_OUTPUT.json"
+        },
+        {
+          "label": "Resume DOCX",
+          "path": "@C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\outputs/resume.docx"
+        },
+        {
+          "label": "Section failure forensics index",
+          "path": "@artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics/index.json; @artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics/index.md"
+        },
+        {
+          "label": "Section forensic RCA: whole_run",
+          "path": "@artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics/whole_run.json; @artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics/whole_run.md"
+        }
+      ]
+    },
+    "section_lane_summary_table": {
+      "title": "Section Lane Summary Table",
+      "columns": [
+        "order",
+        "section",
+        "research_source_class",
+        "r1a",
+        "r1b",
+        "lane_record",
+        "provider_call_attempted",
+        "primary_provider",
+        "primary_model_observed",
+        "pooling_selector_llm",
+        "secondary_provider",
+        "secondary_model_observed",
+        "generation_status",
+        "judges_run",
+        "judge_models_scores",
+        "judge_retry_fallback",
+        "x2",
+        "x3",
+        "past_fail_blocker",
+        "display_output",
+        "l6_evidence"
+      ],
+      "rows": [
+        {
+          "order": 0,
+          "section": "research_briefing_input",
+          "research_source_class": "FRESH_APPS_RESEARCH",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-terra",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "N/A",
+          "secondary_model_observed": "N/A",
+          "generation_status": "BRIEFING_PRESENT:RUN_SPECIFIC",
+          "judges_run": "N/A",
+          "judge_models_scores": "N/A",
+          "judge_retry_fallback": "N/A",
+          "x2": "PASS; judge=gemini-3.6-flash",
+          "x3": "X3D_ALLOW_FINISH; X1=PASS",
+          "past_fail_blocker": "auto_research_internal=True; research_delegation_executed=True; source=RUN_SPECIFIC; digest=1f78f777b6a21173c7d918c97e20a37eed1284c9eb5ebd0e4b911114c835ade0; ref=C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md; target=Anthropic / Manager of Applied AI Architecture, Partnerships; briefing_text_chars=7885",
+          "display_output": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_final2_20260809\\e2e_20260809T123909Z_c47b7195\\apps_research\\runs\\r-85734540453469c2a16a23a9\\briefing.md",
+          "l6_evidence": "N/A"
+        },
+        {
+          "order": 1,
+          "section": "competencies",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.2 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "Evidence mapping failure: visible content was not fully backed by source facts or graph lineage.",
+          "display_output": "modular_r4/sections/competencies/competencies_display.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 2,
+          "section": "unify_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.76 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/unify_bullets/unify_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 3,
+          "section": "ibm_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.78 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ibm_bullets/ibm_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 4,
+          "section": "insurtech_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/insurtech_bullets/insurtech_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 5,
+          "section": "ey_bullets",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "NOT_OBSERVED",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 0.74 vs 0.72 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ey_bullets/ey_bullets_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 6,
+          "section": "unify_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/unify_narrative/unify_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 7,
+          "section": "ibm_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ibm_narrative/ibm_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 8,
+          "section": "insurtech_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/insurtech_narrative/insurtech_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 9,
+          "section": "ey_narrative",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/ey_narrative/ey_narrative_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 10,
+          "section": "executive_summary",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 4.8 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.4 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/executive_summary/resume_display_text.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 11,
+          "section": "headline",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": true,
+          "primary_provider": "external_openai",
+          "primary_model_observed": "gpt-5.6-luna",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "REAL_LLM",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.6 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "No section-level failure recorded.",
+          "display_output": "modular_r4/sections/headline/headline_output.txt",
+          "l6_evidence": "future_run_advisory_only"
+        },
+        {
+          "order": 12,
+          "section": "final_resume_aggregation",
+          "research_source_class": "N/A",
+          "r1a": "miss",
+          "r1b": "skipped",
+          "lane_record": "YES",
+          "provider_call_attempted": "NOT_OBSERVED",
+          "primary_provider": "NOT_OBSERVED",
+          "primary_model_observed": "NOT_OBSERVED",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "NOT_OBSERVED",
+          "secondary_model_observed": "NOT_OBSERVED",
+          "generation_status": "ASSEMBLED",
+          "judges_run": "YES",
+          "judge_models_scores": "Google Gemini 3.6 Flash / gemini-3.6-flash: 5 vs 4 PASS; OpenAI ChatGPT / gpt-5.6-sol: 4.2 vs 4 PASS",
+          "judge_retry_fallback": "NOT_OBSERVED",
+          "x2": "PASS",
+          "x3": "X3_ALLOW",
+          "past_fail_blocker": "Final resume aggregation failure: full-resume coherence or product release gate did not pass.",
+          "display_output": "modular_r4/final_resume_assembly/final_resume.json",
+          "l6_evidence": "not_observed"
+        }
+      ]
+    },
+    "resume_docx_full_version_inline": {
+      "title": "Resume DOCX Full Version Inline",
+      "source": "FINAL_RESUME_OUTPUT.txt rendered from the current E2E run final-resume spine used for outputs/resume.docx.",
+      "text": "Amit Ayer\n+1-917-239-3830 | amitayer1@gmail.com | linkedin.com/in/amitayer1 | github.com/Siamese001/Agentic-Workflow\n\nHEADLINE\nSVP Engineering | Runtime Reliability Governance | Alliance Co-Sell Motions | Enterprise Solutions Leadership\n\nEXECUTIVE SUMMARY\nEngineering executive leading regulated modernization, governed agentic AI platform architecture, and IP-led growth through disciplined operating models. From that leadership mandate, designs control-plane architecture that gives agentic AI execution clear policy boundaries and traceable runtime evidence. Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity. In parallel, embeds release automation and security scanning into regulated modernization delivery paths, reinforcing dependable, secure movement from development through release. The same platform discipline pairs human override and escalation paths with runtime proof-bundle lineage, while platform productization generated $22M in IP-led revenue. It can carry this governed architecture and release resilience into broader platform IP growth, preserving control as operating scope expands.\n\nENGINEERING & PLATFORM COMPETENCIES\nCloud & Partner Ecosystems: partner-ready applied AI reference architectures, Buyer-specific solution mapping for enterprise pursuits, Partner AI solution architecture and co-sell execution\nAI Platform Leadership: governed multi-agent orchestration control planes, agentic workflow routing across enterprise systems, Agentic platform route-policy dispatch architecture\nGovernance, Risk & Compliance: fail-closed runtime control gate design, policy enforcement across agent execution paths, Regulated DevSecOps release governance pipelines\nTechnology Strategy & Innovation: relationship-grounded context retrieval for enterprise workflows, dense-sparse retrieval with relationship-aware ranking, authority-ordered prompt context assembly pipelines\nCommercial & Operating Impact: Enterprise pursuit execution across portfolio expansion motions, Partner value-realization operating cadence and deal support, AI co-sell bundling with strategic partners\nLLMOps & Reliability: audit-ready agent reliability evidence for governed systems, evaluation gauntlets for behavior assurance, production reliability lifecycle for agentic workflows\nData & Analytics Modernization: cloud-native AI data reference architectures, microservices integration for regulated ecosystems, lakehouse modernization for decision intelligence\nEngineering & Delivery Leadership: executive-aligned technical discovery operating cadences, cross-functional enterprise solution architecture delivery governance, Presales-to-delivery customer success operating handoff cadence\n\nPROFESSIONAL EXPERIENCE\n\nUnify Consulting \u2014 SVP Engineering, Agentic AI Platforms\nBoca Raton, FL | Feb 2023 \u2013 Present\nOwned Unify Consulting\u2019s mandate to make agentic AI a repeatable enterprise capability, uniting control-plane architecture, lifecycle discipline, distributed infrastructure and commercial operating design so regulated clients could move from tailored engagements toward durable, IP-led platform services and partner-enabled adoption.\n\u2022 Established a policy-gated agent execution surface for governed enterprise AI workflows by setting control-plane architecture for deterministic routing and multi-agent orchestration.\n\u2022 Advanced enterprise AI platform adoption through CFO-aligned adoption motions, connecting reusable workflow capabilities with commercialization and usage-based forecasting.\n\u2022 Strengthened production trust with audit-grade observability for regulated AI workflows through evaluation gates, telemetry, and rollback controls.\n\u2022 Accelerated the AI systems lifecycle from six months to three weeks by standardizing managed workflow orchestration from intake through production monitoring.\n\u2022 Built high-availability distributed service patterns for enterprise AI platforms across AWS and Databricks Lakehouse data paths, vector services, and parallel decision workflows.\n\u2022 Scaled the engineering team from 8 to 28 while commercializing reusable AI platform capability through a productized operating model.\n\nIBM \u2014 Partner\nEdgewater, NJ | Apr 2017 \u2013 Oct 2022\nChampioned AWS alliance architecture at IBM, establishing a disciplined discovery-to-executive-alignment practice that made regulated modernization pursuits more repeatable, connected partner-led solutioning to buyer priorities, and strengthened the path from technical validation to executive deal support.\n\u2022 Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\n\u2022 Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\n\u2022 Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.\n\u2022 Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, and buyer readiness, connecting technical validation to executive deal support.\n\u2022 Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.\n\nInsurTech Cloud Solutions \u2014 Chief Technology Officer\nNew York, NY | Apr 2014 \u2013 Mar 2017\nLed AWS modernization execution for monolithic policy administration and insurance platform workloads.\n\u2022 Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\n\u2022 Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\n\nErnst & Young \u2014 Principal\nNew York, NY | Oct 2009 \u2013 Mar 2014\nLed quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.\n\u2022 Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.\n\u2022 Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.\n\nEarly Career Roles \u2014 Actuarial Consultant and Quantitative Roles\nPhiladelphia, PA | Oct 2002 \u2013 Sep 2009\n\u2022 Actuarial & Quantitative Foundation: Priced exotic derivatives and structured multi-Greek hedging strategies, built stochastic capital models, and supported HPC-based valuation frameworks for scenario testing and capital adequacy \u2014 quantitative rigor and risk discipline that now underpin my work in AI platform architecture and runtime governance.\n\nEDUCATION\nMaster of Science in Biostatistics, Columbia University (Graduated with Distinction)\nBachelor of Arts in Biology, Brown University (Graduated Cum Laude)\n\nCERTIFICATIONS & CREDENTIALS\nCertified Machine Learning Engineer \u2013 Associate, AWS, 2025\nDatabricks Lakehouse Fundamentals Accreditation, 2023\nCertified Solutions Architect \u2013 Professional, AWS, 2023\nFellow of the Society of Actuaries, 2010"
+    }
+  },
+  "mandatory_inline_output_gates": [
+    {
+      "gate_id": "mandatory_bcg_inline_output_present",
+      "pass": true,
+      "observed_value": "01_BCG_executive_output.md",
+      "threshold": "BCG executive markdown rendered inline",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_section_lane_table_inline_present",
+      "pass": true,
+      "observed_value": 13,
+      "threshold": ">=1 lane table row",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_resume_text_inline_present",
+      "pass": true,
+      "observed_value": {
+        "artifact": {
+          "relpath": "FINAL_RESUME_OUTPUT.txt",
+          "exists": true,
+          "bytes": 7292,
+          "sha256": "3d67911004e39e92b681f1ab74f2c7bedb97525f8a04f0827fcde6b8b5ded356"
+        },
+        "current_run_authorized": true,
+        "blockers": []
+      },
+      "threshold": "current-run authorized nonempty FINAL_RESUME_OUTPUT.txt",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_final_resume_json_present",
+      "pass": true,
+      "observed_value": {
+        "artifact": {
+          "relpath": "modular_r4/final_resume_assembly/final_resume.json",
+          "exists": true,
+          "bytes": 943902,
+          "sha256": "1a807a6943fb646e271c62c4626055a996fb955994c08110424062feadd1066f"
+        },
+        "current_run_authorized": true,
+        "blockers": []
+      },
+      "threshold": "current-run authorized modular_r4/final_resume_assembly/final_resume.json",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_resume_docx_present",
+      "pass": true,
+      "observed_value": {
+        "artifact": {
+          "relpath": "outputs/resume.docx",
+          "exists": true,
+          "bytes": 5056,
+          "sha256": "6b76d5c60bc3a28751435ec1b56be17c35101c1738640e8be9967fdb1746fe34"
+        },
+        "current_run_authorized": true,
+        "blockers": []
+      },
+      "threshold": "current-run authorized outputs/resume.docx",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_inline_required_json_shape_locked",
+      "pass": true,
+      "observed_value": {
+        "schema_version": "apps_rg.inline_required_output.v1",
+        "immutable_section_order": [
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ],
+        "shape_errors": []
+      },
+      "threshold": {
+        "schema_version": "apps_rg.inline_required_output.v1",
+        "immutable_section_order": [
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ],
+        "top_level_keys": [
+          "schema_version",
+          "immutable_section_order",
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ]
+      },
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_bcg_p0_p1_px_recommendations_locked",
+      "pass": true,
+      "observed_value": {
+        "title": "BCG Executive Output - apps_rg Run",
+        "section_order": [
+          "executive_answer",
+          "p0_p1_px_recommendations",
+          "board_level_readout",
+          "issue_tree",
+          "recommended_next_move",
+          "evidence_map"
+        ],
+        "priorities": [
+          "PX"
+        ],
+        "truth_errors": []
+      },
+      "threshold": "BCG title + section order + evidence-backed recommendations and next moves",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_research_briefing_input_row0_locked",
+      "pass": true,
+      "observed_value": {
+        "order": 0,
+        "section": "research_briefing_input",
+        "generation_status": "BRIEFING_PRESENT:RUN_SPECIFIC"
+      },
+      "threshold": "row 0 research_briefing_input",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_apps_research_row0_x1_x2_x3_gates_locked",
+      "pass": true,
+      "observed_value": {
+        "research_source_class": "FRESH_APPS_RESEARCH",
+        "x2": "PASS; judge=gemini-3.6-flash",
+        "x3": "X3D_ALLOW_FINISH; X1=PASS"
+      },
+      "threshold": "row 0 research_source_class plus compact X2/X3 handoff cells",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_resume_docx_inline_json_present",
+      "pass": true,
+      "observed_value": {
+        "title": "Resume DOCX Full Version Inline",
+        "text_chars": 7166,
+        "current_run_authorized": true,
+        "blockers": []
+      },
+      "threshold": "resume_docx_full_version_inline.text is current-run authorized resume content",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+      "pass": true,
+      "observed_value": {
+        "required": true,
+        "failed_section_count": 1,
+        "artifact_dir": "artifacts/apps_rg/runs/w8_anthropic_positive_final2_20260809/e2e_20260809T123909Z_c47b7195/section_failure_forensics",
+        "missing_or_incomplete": []
+      },
+      "threshold": "every non-X3_ALLOW, cascaded, or aggregation-failed section has complete section_failure_forensics/<section>.json and .md",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE",
+      "required": true,
+      "pass": true,
+      "errors": [],
+      "required_artifacts": [
+        "01_BCG_executive_output.md",
+        "02_output_bisect.md",
+        "02_section_lane_summary_table.md",
+        "03_L7_audit_ability_output.md",
+        "APPS_RG_MANDATORY_RUN_OUTPUT.json",
+        "FINAL_RESUME_OUTPUT.txt",
+        "FINAL_RESUME_OUTPUT.json",
+        "outputs/resume.docx",
+        "modular_r4/final_resume_assembly/final_resume.json",
+        "apps_rg_output_manifest.json"
+      ],
+      "product_artifacts_required": true,
+      "failed_section_comparison_required": true,
+      "operational_failure_comparison_required": false,
+      "failure_reason": ""
+    }
+  ],
+  "mandatory_output_hard_stop": {
+    "gate_id": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE",
+    "required": true,
+    "pass": true,
+    "errors": [],
+    "required_artifacts": [
+      "01_BCG_executive_output.md",
+      "02_output_bisect.md",
+      "02_section_lane_summary_table.md",
+      "03_L7_audit_ability_output.md",
+      "APPS_RG_MANDATORY_RUN_OUTPUT.json",
+      "FINAL_RESUME_OUTPUT.txt",
+      "FINAL_RESUME_OUTPUT.json",
+      "outputs/resume.docx",
+      "modular_r4/final_resume_assembly/final_resume.json",
+      "apps_rg_output_manifest.json"
+    ],
+    "product_artifacts_required": true,
+    "failed_section_comparison_required": true,
+    "operational_failure_comparison_required": false,
+    "failure_reason": ""
+  }
+}

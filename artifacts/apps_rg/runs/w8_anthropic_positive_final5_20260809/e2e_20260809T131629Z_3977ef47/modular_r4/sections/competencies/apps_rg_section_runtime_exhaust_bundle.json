@@ -1,0 +1,626 @@
+{
+  "schema_version": "section_runtime_exhaust_bundle_v1",
+  "generated_at_utc": "2026-08-09T13:19:49.397306+00:00",
+  "contract_type": "RuntimeExhaustBundle",
+  "section_id": "competencies",
+  "request_id": "req-c755a2d0a2464dbf913772e13b647666",
+  "run_id": "competencies_20260809_131740",
+  "parent_run_id": "",
+  "child_run_id": "competencies_20260809_131740",
+  "section_attempt_id": "competencies:competencies_20260809_131740:attempt:1",
+  "session_id": "",
+  "tenant_id": "default",
+  "trace_root": "",
+  "policy_hash": "no-policy",
+  "blueprint_hash": "no-blueprint",
+  "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:686987e96381c87e::v1",
+  "producer_stage": "Exit",
+  "consumer_stage": "L6",
+  "exit_disposition_receipt_ref": "exit_disposition_receipt.json",
+  "sealed_l2_artifact_ref": "sealed_l2_artifact.json",
+  "l2_execution_packet_ref": "l2_execution_packet.json",
+  "section_x3_disposition_ref": "x3_disposition.json",
+  "section_x3_authoritative": false,
+  "canonical_exit_authority_ref": "exit_disposition_receipt.json",
+  "x3_disposition": {
+    "x3_code": "X3_ALLOW",
+    "decisive_reason": "REAL_LLM output, X2 pass, all X1D judges model-backed pass, product quality PASS.",
+    "review_reason": "",
+    "authorization_scope": "PRODUCT_QUALITY",
+    "proceed_to_runtime": true,
+    "runtime_generation_status": "REAL_LLM",
+    "x1d_evaluator_mode": "MODEL_BACKED",
+    "product_quality_status": "PASS",
+    "x2_failed_gates": [],
+    "blocked_judges": [],
+    "mocked_judges": [],
+    "soft_failed_judges": [],
+    "decisive_judge_failures": [],
+    "final_summary_hash": "acfda4dadf5f0e6f",
+    "claim_ledger_hash": "1ec56c9eea523899",
+    "required_remediation": [],
+    "blocked_judge_detail_rows": [],
+    "model_backed_pass_provider_keys": [
+      "gemini_pro",
+      "openai_chatgpt"
+    ],
+    "proof_eligible_allow_requires": "every_configured_x1d_judge_model_backed_pass",
+    "pass": true,
+    "disposition_authority": "lane",
+    "section_x3_authoritative": false,
+    "section_x3_mirror_only": true,
+    "spine_x3_claimed": false,
+    "proof_eligible": true,
+    "judge_proof_eligible": true,
+    "resume_graph_allocation_plan_digest": "ad78cea95a8518f36c4487d8732c0577494c0d98f4d4360743ed36ae605cf766",
+    "graph_claim_binding_contract_digest": "74414ebb57f013f0fe804ffc6655275ec01e6a390403afb682beae80021d9996",
+    "graph_claim_bindings_ref": "graph_claim_bindings.json",
+    "resume_graph_claim_binding_pass": true,
+    "final_materialized_acceptance_contract_ref": "final_materialized_acceptance_contract.json",
+    "final_materialized_acceptance_ok": true,
+    "authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+    "artifact_authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+    "core_exit_authority_ref": "exit_disposition_receipt.json",
+    "core_exit_authority_scope": "agentic_core_exit_disposition_receipt"
+  },
+  "x3_code": "X3_ALLOW",
+  "artifact_inventory": [
+    {
+      "name": "attempt_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "bullet_lane_generation.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "bullet_pool_claude_selector_judge.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "bullet_pool_claude_selector_timing.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "bullet_pool_selection.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c01_retrieval_plan.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c02_atoms.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c02_fact_vector_index_preflight.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c02_semantic_cache_payload.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c02_vector_query.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c03_graphrag_bound.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c06_weak_refine_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c0_evidence_room_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c0_fec_compose_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c0_graph_lane_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "c0_metrics.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "canonical_claim_ledger_v2.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "canonical_evidence_digest_chain.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "claim_ledger.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "companion_generated_sections.txt",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_allocation_claim_reconciliation_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_allocation_visible_surface_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_frozen_allocation_output_projection_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_graph_authority_discrepancy_ledger.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_graph_pool_regen.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_graph_pool_selector_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_graph_sufficiency_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_graph_traversal_sufficiency_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_output.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_rejected_neighbor_audit.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_section_output.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "competencies_visible_graph_surface_enrichment_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "compiled_prompt.txt",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "compiled_prompt_artifact.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "exit_disposition_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "exit_review_packet.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "exit_spine_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "external_model_token_reservations.jsonl",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "external_model_usage_ledger.jsonl",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "fact_check_result.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "final_evidence_contract.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "final_evidence_contract_bridge.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "final_materialized_acceptance_contract.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "frozen_execution_context.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "graph_candidate_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "graph_claim_bindings.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "graph_fact_concentration_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "graph_granularity_gate_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "graph_selection_rationale.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "graph_selector_judge_arbitration_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "l1_plan_contract.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "l2_execution_packet.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "l2_handoff_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "l2_output.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "l2_receipt_bundle.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "l2_spine_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "lane_dispatch_attempt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "native_c03_final_evidence.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "parsed_output.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "prep_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "prompt_selection_trace.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "provider_request.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "provider_response.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "r4_c0_bypass_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "r4_identity_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "raw_model_output.txt",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "route_contract.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "runtime_graph_sourcing_assessment.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "runtime_payload.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "seal_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "sealed_l2_artifact.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "section_exit_x1_result.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "section_exit_x2_result.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "section_front_spine_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "section_input_usage_ledger.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "section_repair_ledger.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "section_spine_c0_retrieve_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "selected_fact_plan.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_0_parsed.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_0_raw.txt",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_1_parsed.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_1_raw.txt",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_2_parsed.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_2_raw.txt",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_3_parsed.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_path_3_raw.txt",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_paths.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "self_consistency_progress.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "spine_span_emit_receipt.jsonl",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "text_claim_coverage.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "traversal_sufficiency_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "validated_request.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "validation_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_gemini_provider_parse_result_20260809_131901_181.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_gemini_provider_request_20260809_131850_387.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_gemini_provider_response_raw_20260809_131901_181.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_llm_judge_outputs.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_openai_provider_parse_result_20260809_131850_125.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_openai_provider_parse_result_20260809_131948_800.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_openai_provider_request_20260809_131835_226.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_openai_provider_request_20260809_131901_246.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_openai_provider_response_raw_20260809_131850_118.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x1d_openai_provider_response_raw_20260809_131948_797.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x2_gate_outputs.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x2_source_fact_pool_receipt.json",
+      "kind": "file",
+      "section_id": "competencies"
+    },
+    {
+      "name": "x3_disposition.json",
+      "kind": "file",
+      "section_id": "competencies"
+    }
+  ],
+  "artifact_inventory_count": 106,
+  "l6_v40_shadow_eval_package_ref": "l6_v40_shadow_eval_package.json",
+  "l6_v40_shadow_eval_spans_ref": "l6_v40_shadow_eval_spans.json",
+  "trace_refs": {
+    "route_contract.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/route_contract.json",
+    "final_evidence_contract_bridge.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/final_evidence_contract_bridge.json",
+    "l2_execution_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/l2_execution_packet.json",
+    "exit_review_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/exit_review_packet.json",
+    "provider_request.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/provider_request.json",
+    "provider_response.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/provider_response.json",
+    "x2_gate_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/x2_gate_outputs.json",
+    "x1d_llm_judge_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-e2e-defect-remediation-w0/artifacts/apps_rg/runs/w8_anthropic_positive_final5_20260809/e2e_20260809T131629Z_3977ef47/modular_r4/sections/competencies/x1d_llm_judge_outputs.json"
+  },
+  "proof_refs": {
+    "exit_spine_receipt": "exit_spine_receipt.json",
+    "l2_spine_receipt": "l2_spine_receipt.json"
+  },
+  "runtime_terminal_boundary": "post_exit_disposition",
+  "durable_commit_occurred": false,
+  "uwg_commit_occurred": false,
+  "product_certification": "NOT_CLAIMED",
+  "spine_runtime_exhaust_bundle_claimed": true,
+  "explicit_non_claims": [
+    "L6 is post-run shadow only; cannot mutate or rescue current run",
+    "not product certification",
+    "not durable UWG/L4 commit"
+  ]
+}

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from agentic_core.mixins.subatomic_testing_mixin import SubatomicTestingMixin
+from apps_rg.runtime.core_mixins import SubatomicTestingMixin
 
 
 @dataclass

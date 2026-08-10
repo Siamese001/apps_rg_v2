@@ -1,0 +1,117 @@
+{
+  "schema": "executive_summary_synthesis_regen_v2",
+  "triggered": true,
+  "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'",
+  "initial_candidate_digest": "fcb6c3566d72f8f9",
+  "initial_defects": [
+    "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence",
+    "DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'"
+  ],
+  "first_pass_resume_word_count": 120,
+  "first_pass_claim_ledger_rows": 6,
+  "max_attempts": 2,
+  "acceptance_semantics": {
+    "monotonicity_accepted": "candidate improved relative to the prior draft; full pre-X2 shape closure is not implied",
+    "receipt_accepted": "the selected candidate cleared every pre-X2 synthesis-shape check",
+    "transport_accepted": "the provider call completed and parsed; product acceptance is not implied"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'",
+      "call_id": "synthesis_regen-00-01-fb15ae5f",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "083be03e767e49bf",
+      "regen_resume_word_count": 118,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [
+        "DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'"
+      ],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": false,
+        "failed_reasons": [
+          "DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'"
+        ]
+      },
+      "shape_failure_count": 1,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 120,
+        "post_resume_word_count": 118,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 15,
+        "post_unique_source_fact_ids": 12,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": false,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "MONOTONIC_IMPROVEMENT_ONLY",
+      "advanced_to_next_attempt": true,
+      "best_candidate": true
+    },
+    {
+      "attempt": 2,
+      "reject_reason": "DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'",
+      "call_id": "synthesis_regen-00-02-29c9e087",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "8c2ce8925970bb98",
+      "regen_resume_word_count": 117,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": true,
+        "failed_reasons": []
+      },
+      "shape_failure_count": 0,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 118,
+        "post_resume_word_count": 117,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 12,
+        "post_unique_source_fact_ids": 13,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": false,
+        "prior_needs_density_reduction": false,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": false,
+        "ledger_rows_gained": false,
+        "facts_gained": true,
+        "shrink_ratio": 0.0085,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": false
+      },
+      "acceptance_scope": "FULL_PRE_X2_SHAPE_PASS",
+      "advanced_to_next_attempt": false,
+      "best_candidate": true
+    }
+  ],
+  "accepted_via": "shape_pass_after_regen",
+  "accepted": true,
+  "authoritative_candidate_digest": "8c2ce8925970bb98",
+  "judge_stage_eligible_from_retry": true,
+  "final_resume_word_count": 117,
+  "final_claim_ledger_rows": 6
+}

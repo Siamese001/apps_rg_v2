@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.L2_execution.utils import write_gateway as _wg
+from apps_rg.runtime.core_io import write_gateway as _wg
 from apps_rg.cache.r1b_commit_authority import X3C_COMMIT_AUTHORITY
 from apps_rg.cache.r1b_post_exit_ingest import evaluate_post_exit_ingestion
 from apps_rg.cache.r1b_strict_gateway import get_r1b_strict_gateway

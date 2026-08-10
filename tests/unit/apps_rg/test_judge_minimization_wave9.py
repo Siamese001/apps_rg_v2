@@ -1,7 +1,10 @@
 """Wave 9 judge minimization and compact-packet policy tests."""
 from __future__ import annotations
 
-from apps_rg.runtime.judges.grade_only_judge_packet import build_grade_only_judge_packet
+from apps_rg.runtime.judges.grade_only_judge_packet import (
+    build_grade_only_judge_packet,
+    render_judge_prompt_from_packet,
+)
 from apps_rg.runtime.section_cli_defaults import (
     resolve_cli_x1d_judges,
     resolve_section_default_x1d_judges,
@@ -97,3 +100,54 @@ def test_grade_only_packet_keeps_judges_compact_and_non_repairing() -> None:
     assert packet["judge_task"] == "GRADE_ONLY"
     assert "Do NOT write replacement" in packet["grading_only_instructions"]
     assert packet["deterministic_gate_summary"] == {"x2_no_repair": True}
+
+
+def test_grade_only_packet_projects_large_selected_fact_plan_to_proof_fields() -> None:
+    fact = {
+        "fact_id": "bul_insurtech_001",
+        "claim_text": "Delivered a regulated platform outcome.",
+        "role_episode_bundle_id": "reb_insurtech_platform_delivery",
+        "graph_skill_node_ids": ["skill_platform_delivery"],
+    }
+    packet = build_grade_only_judge_packet(
+        section_id="insurtech_bullets",
+        candidate_output={
+            "bullets": [
+                {
+                    "bullet_text": "Delivered a regulated platform outcome.",
+                    "source_fact_ids": ["bul_insurtech_001"],
+                }
+            ],
+            "selected_fact_plan": {
+                "section_id": "insurtech_bullets",
+                "plan_digest": "plan-digest",
+                "required_fact_ids": ["bul_insurtech_001"],
+                "facts": [fact],
+                "graph_candidate_decision_ledger": [{"diagnostic": "x" * 700_000}],
+                "allocation_source_traversal_evidence": {"trace": "y" * 700_000},
+                "graph_traversal_receipt": {"trace": "z" * 700_000},
+            },
+        },
+        claim_ledger=[
+            {
+                "claim_text": "Delivered a regulated platform outcome.",
+                "source_fact_ids": ["bul_insurtech_001"],
+            }
+        ],
+        allowed_fact_packet={"allowed_fact_ids": ["bul_insurtech_001"]},
+        section_rubric="Grade proof and product shape only.",
+        rubric_ref="tests/wave9/role_episode",
+    )
+
+    projected = packet["candidate_output"]["selected_fact_plan"]
+    assert projected["facts"] == [fact]
+    assert projected["required_fact_ids"] == ["bul_insurtech_001"]
+    assert projected["plan_digest"] == "plan-digest"
+    assert set(projected["judge_projection"]["omitted_non_authoritative_fields"]) == {
+        "allocation_source_traversal_evidence",
+        "graph_candidate_decision_ledger",
+        "graph_traversal_receipt",
+    }
+    assert len(projected["judge_projection"]["source_sha256"]) == 64
+    assert "graph_candidate_decision_ledger" not in projected
+    assert len(render_judge_prompt_from_packet(packet)) < 25_000

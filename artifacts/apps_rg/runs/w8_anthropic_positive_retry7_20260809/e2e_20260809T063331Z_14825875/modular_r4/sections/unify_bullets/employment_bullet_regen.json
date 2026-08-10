@@ -1,0 +1,39 @@
+{
+  "schema_version": "employment_bullet_regen.v2",
+  "artifact_contract": "bounded_round_receipt",
+  "rounds": [
+    {
+      "regen_round": 0,
+      "batch_paths": 2,
+      "requested_batch_paths": 2,
+      "total_paths": 2,
+      "initial_path_count": 2,
+      "max_path_count": 4,
+      "adaptive_sc_enabled": true,
+      "batch_reason": "initial",
+      "gate": {
+        "ok": true,
+        "section_lane": "unify_bullets",
+        "final_bullet_count": 6,
+        "min_score_threshold": 0.72,
+        "slots_passing": [
+          "bul_unify_001",
+          "bul_unify_002",
+          "bul_unify_003",
+          "bul_unify_004",
+          "bul_unify_005",
+          "bul_unify_006"
+        ],
+        "slots_below_threshold": [],
+        "slots_missing": [],
+        "bullets_in_merged": 6,
+        "unique_source_fact_ids": [],
+        "unique_source_fact_count": 0,
+        "duplicate_source_fact_ids": [],
+        "slots_missing_source_fact_ids": [],
+        "proof_unique_source_fact_gate_active": false
+      },
+      "selection_mode": "claude_employment_top_n_pass"
+    }
+  ]
+}

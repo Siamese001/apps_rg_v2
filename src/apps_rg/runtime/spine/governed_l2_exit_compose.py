@@ -5,11 +5,11 @@ import os
 from dataclasses import dataclass
 from typing import Any, Optional
 
-from agentic_core.runtime.contracts.compiled_prompt_artifact import (
+from apps_rg.runtime.spine_contracts import (
     CompiledPromptArtifact,
 )
-from agentic_core.runtime.contracts.final_evidence_contract import FinalEvidenceContract
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg.runtime.spine_contracts import FinalEvidenceContract
+from apps_rg.runtime.spine_contracts import SealedL2Artifact
 
 GOVERNED_L2_EXIT_MODE_INTEGRATED = "integrated_spine_l2_exit"
 GOVERNED_EXIT_SPINE_MARKER = "governed_l2_exit:v1"

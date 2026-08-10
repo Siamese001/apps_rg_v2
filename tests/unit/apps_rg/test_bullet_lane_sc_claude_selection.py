@@ -946,6 +946,90 @@ def test_employment_pool_x1d_is_single_claude_judge(tmp_path) -> None:
     assert list(EMPLOYMENT_BULLET_JUDGE_PROVIDERS) == ["anthropic_claude"]
 
 
+def test_final_ey_materialization_reconciles_stale_duplicate_selector_gate(tmp_path) -> None:
+    from apps_rg.runtime.sections.role_episode_lane import (
+        _reconcile_final_materialized_selection_gate,
+    )
+
+    required = ("bul_ey_001", "bul_ey_002", "bul_ey_003")
+    (tmp_path / "bullet_pool_selection.json").write_text(
+        json.dumps(
+            {
+                "selections": [
+                    {"bullet_id": bid, "score": score, "passes": True}
+                    for bid, score in zip(required, (0.84, 0.83, 0.82), strict=True)
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    generation_meta = {
+        "selection_gate": {
+            "ok": False,
+            "duplicate_source_fact_ids": ["bul_ey_002"],
+        }
+    }
+    bullets = [
+        {"bullet_id": bid, "bullet_text": bid, "source_fact_ids": [bid]}
+        for bid in required
+    ]
+
+    final_gate = _reconcile_final_materialized_selection_gate(
+        artifact_dir=tmp_path,
+        section_id="ey_bullets",
+        bullets=bullets,
+        generation_meta=generation_meta,
+    )
+
+    assert final_gate is not None and final_gate["ok"] is True
+    assert final_gate["duplicate_source_fact_ids"] == []
+    assert generation_meta["producer_selection_gate"]["ok"] is False
+    assert generation_meta["selection_gate"]["ok"] is True
+    rows = employment_pool_x1d_judge_rows(
+        artifact_dir=tmp_path,
+        section_id="ey_bullets",
+        gen_meta=generation_meta,
+    )
+    assert rows[0]["pass"] is True
+
+
+def test_role_episode_normalization_uses_proof_fact_id_for_out_of_order_ey_rows() -> None:
+    from apps_rg.runtime.sections.role_episode_lane import _ROLE_LANES, _normalize_bullets
+
+    parsed = {
+        "bullets": [
+            {
+                "bullet_id": "b1",
+                "bullet_text": "Architected ERM operating models and auditable risk metrics.",
+                "source_fact_ids": ["bul_ey_003"],
+            },
+            {
+                "bullet_id": "b2",
+                "bullet_text": "Led CCAR stress testing and model-validation governance.",
+                "source_fact_ids": ["bul_ey_002"],
+            },
+            {
+                "bullet_id": "b3",
+                "bullet_text": "Led quantitative derivatives and liability hedge design.",
+                "source_fact_ids": ["bul_ey_001"],
+            },
+        ]
+    }
+
+    normalized = _normalize_bullets(
+        parsed,
+        cfg=_ROLE_LANES["ey_bullets"],
+        allowed=["bul_ey_001", "bul_ey_002", "bul_ey_003"],
+    )
+
+    assert [row["bullet_id"] for row in normalized] == [
+        "bul_ey_003",
+        "bul_ey_002",
+        "bul_ey_001",
+    ]
+    assert all(row["bullet_id"] == row["source_fact_ids"][0] for row in normalized)
+
+
 # ---------------------------------------------------------------------------
 # Bug:BulletPoolSelectorDualJsonObjects — regression coverage (2026-06-11)
 #
@@ -1010,6 +1094,20 @@ def test_parse_selections_recovers_from_fenced_dual_objects() -> None:
     doc = _parse_selections(fenced)
     assert isinstance(doc, dict)
     assert isinstance(doc.get("selections"), list) and len(doc["selections"]) == 5
+
+
+def test_parse_selections_repairs_quoted_path_index_assignment_key() -> None:
+    fenced = """```json
+{"selections":[{"category_label":"Partner-Led AI Solution Enablement","path_index=3","score":0.83,"passes":true,"rationale":"valid candidate"}]}
+```"""
+
+    doc = _parse_selections(fenced)
+
+    assert isinstance(doc, dict)
+    assert doc["selections"][0]["path_index"] == 3
+    assert doc["selector_parse_repairs"] == [
+        "path_index_assignment_key_to_integer_field:1"
+    ]
 
 
 def test_parse_selections_rubric_only_object_keeps_legacy_dict_result() -> None:

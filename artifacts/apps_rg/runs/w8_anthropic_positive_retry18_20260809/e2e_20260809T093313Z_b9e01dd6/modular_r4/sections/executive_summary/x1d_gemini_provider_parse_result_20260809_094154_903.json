@@ -1,0 +1,70 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.5,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Sentence 4 repeats the IBM-AWS alliance co-sell claim from Sentence 1 verbatim, causing redundant narrative synthesis."
+    ],
+    "cited_sentence_indexes": [
+      1,
+      4
+    ],
+    "remediation_suggestions": [
+      "Replace Sentence 4 with distinct evidence or aggregate the IBM-AWS alliance co-sell metric into S1 to eliminate sentence-level duplication."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "REPETITIVE_CLAIM"
+        ]
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "VERBATIM_SENTENCE_REPETITION"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "GATE_DISPLAY_OVERRIDE_PARITY_FAIL"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry18_20260809\\e2e_20260809T093313Z_b9e01dd6\\modular_r4\\sections\\executive_summary\\x1d_gemini_provider_response_raw_20260809_094154_903.json",
+  "original_model": null,
+  "fallback_model": null
+}

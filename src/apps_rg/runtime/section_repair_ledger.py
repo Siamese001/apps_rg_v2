@@ -167,8 +167,16 @@ def ledger_blocks_product_pass(ledger: dict[str, Any] | None) -> tuple[bool, str
     #   already-materialized executive_summary sentence; no visible prose is introduced.
     # - repair_exec_summary_thin_sentence_weave: deterministic phrase expansion of an already
     #   supported executive_summary sentence to satisfy structural weave density.
+    # - repair_exec_summary_mechanism_inventory_sentence: bounded lexical compaction of an
+    #   already-supported executive_summary sentence.  The repair cannot introduce facts,
+    #   reconciles the matching claim-ledger row, and the complete X2 suite runs afterward.
     # - repair_exec_summary_cross_fact_conflation_row: ledger-only compaction of over-dense
     #   executive_summary source_fact_ids to the direct proof for each already-written sentence.
+    # - repair_exec_summary_causal_multi_root_allocation_row: ledger-only clamp to the one
+    #   frozen graph path already expressed by a causal sentence.
+    # - repair_exec_summary_unallocated_metric_row: removes a numeric outcome that the frozen
+    #   allocation did not reserve by restoring the selected root's graph-authored claim text;
+    #   the complete X2 and model-backed judge chain runs on the replacement.
     # - repair_unify_bullet_seniority_tense: visible tense-only normalization on unify_bullets;
     #   source facts and claim semantics are unchanged, and full X2 still runs afterward.
     # - bullet_judge_feedback_reselection (W4.1/G14): judge-feedback pool reselection on the
@@ -182,7 +190,10 @@ def ledger_blocks_product_pass(ledger: dict[str, Any] | None) -> tuple[bool, str
             "repair_protected_unify_bullet_metrics",
             "repair_required_brushstroke_citation",
             "repair_exec_summary_thin_sentence_weave",
+            "repair_exec_summary_mechanism_inventory_sentence",
             "repair_exec_summary_cross_fact_conflation_row",
+            "repair_exec_summary_causal_multi_root_allocation_row",
+            "repair_exec_summary_unallocated_metric_row",
             "repair_unify_bullet_seniority_tense",
             "bullet_judge_feedback_reselection",
         }

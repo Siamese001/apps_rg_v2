@@ -10,6 +10,8 @@ from apps_rg.runtime.sections.section_authority_repairs import (
     apply_exec_summary_display_authority_repairs,
     prune_competencies_rigor_failing_terms,
     repair_exec_summary_cross_fact_conflation_rows,
+    repair_exec_summary_causal_multi_root_allocation_rows,
+    repair_exec_summary_unallocated_metric_rows,
     repair_exec_summary_mechanism_inventory_sentences,
     repair_exec_summary_thin_sentence_weave,
     repair_exec_summary_orphan_rows_with_unused_required_facts,
@@ -39,6 +41,233 @@ def test_strip_target_company_tailoring_removes_alignment_sentences() -> None:
     assert removed
     assert "acme corp" not in repaired.lower()
     assert "governed agentic ai" in repaired.lower()
+
+
+def test_retry10_graph_allocation_shape_repairs_before_x2() -> None:
+    """Replay the two executive-summary failures from W8 Retry 10."""
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        validate_claim_rows_against_resume_graph_allocation,
+    )
+    from apps_rg.runtime.sections.executive_summary_synthesis_contract import (
+        FACT_C0_DISPLAY_OVERRIDES,
+    )
+    from apps_rg.runtime.sections.executive_summary_voice_repair import (
+        finalize_executive_summary_coherence,
+    )
+    from apps_rg.runtime.validators.executive_summary_x2 import (
+        check_exec_summary_display_override_compliance,
+    )
+
+    roots = [
+        {
+            "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+            "domain": "AWS partnership, alliance co-sell, and joint GTM execution",
+            "linked_source_fact_ids": ["fact_partnerships_gtm_002"],
+            "linked_identity_fact_ids": ["fact_partnerships_gtm_002"],
+            "allowed_graph_evidence_ids": [
+                "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "fact_partnerships_gtm_002",
+                "metric_ibm_alliance_cosell_operating_cadence",
+                "metric_ibm_ai_driven_sales_frameworks",
+            ],
+        },
+        {
+            "fact_id": "reb_ibm_devsecops_release_resilience",
+            "role_episode_bundle_id": "reb_ibm_devsecops_release_resilience",
+            "claim_text": "Embedded release automation and security scanning into regulated modernization delivery paths",
+            "domain": "DevSecOps release resilience and governed delivery automation",
+            "linked_source_fact_ids": ["fact_engineering_platform_002"],
+            "linked_identity_fact_ids": ["fact_engineering_platform_002"],
+            "allowed_graph_evidence_ids": [
+                "reb_ibm_devsecops_release_resilience",
+                "fact_engineering_platform_002",
+                "metric_ibm_deployment_blueprint_repeatability",
+                "metric_ibm_release_gate_security_scanning_coverage",
+            ],
+        },
+        {
+            "fact_id": "reb_unify_platform_commercialization_leadership",
+            "role_episode_bundle_id": "reb_unify_platform_commercialization_leadership",
+            "claim_text": "Platform productization, IP-led revenue, margin expansion, team scale",
+            "domain": "Platform productization and commercialization",
+            "linked_source_fact_ids": ["fact_engineering_platform_006"],
+            "linked_identity_fact_ids": ["fact_engineering_platform_006"],
+            "allowed_graph_evidence_ids": [
+                "reb_unify_platform_commercialization_leadership",
+                "fact_engineering_platform_006",
+                "metric_unify_22m_ip_led_revenue",
+            ],
+        },
+    ]
+    assignments = [
+        {
+            "section_id": "executive_summary",
+            "claim_unit_id": "executive_summary:claim:01",
+            "root_id": "reb_unify_platform_commercialization_leadership",
+            "skill_id": "skill_agentic_platform_productization",
+            "fact_id": "fact_engineering_platform_006",
+            "metric_outcome_id": "metric_unify_22m_ip_led_revenue",
+            "metric_value": "22",
+            "metric_unit": "USD_M",
+            "root_bundle_theme": "Platform productization, IP-led revenue, margin expansion, team scale",
+            "root_claim_text": "Platform productization, IP-led revenue, margin expansion, team scale",
+            "root_claim_outcome": "Frame as platform commercialization leadership and $22M IP-led revenue.",
+            "counts_toward_global_uniqueness": True,
+        },
+        {
+            "section_id": "executive_summary",
+            "claim_unit_id": "executive_summary:claim:02",
+            "root_id": "reb_ibm_devsecops_release_resilience",
+            "skill_id": "skill_ibm_devsecops_pipeline_security",
+            "fact_id": "fact_engineering_platform_002",
+            "metric_outcome_id": "",
+            "metric_value": "",
+            "metric_unit": "",
+            "root_bundle_theme": "DevSecOps release resilience and governed delivery automation",
+            "root_claim_text": "Embedded release automation and security scanning into regulated modernization delivery paths",
+            "counts_toward_global_uniqueness": True,
+        },
+        {
+            "section_id": "executive_summary",
+            "claim_unit_id": "executive_summary:claim:03",
+            "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "skill_id": "skill_partner_cloud_vendor_joint_gtm",
+            "fact_id": "fact_partnerships_gtm_002",
+            "metric_outcome_id": "",
+            "metric_value": "",
+            "metric_unit": "",
+            "root_bundle_theme": "AWS partnership, alliance co-sell, and joint GTM execution",
+            "root_claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+            "counts_toward_global_uniqueness": True,
+        },
+    ]
+    sentences = [
+        "Alliance-led technology executive who sets operating direction for partner co-sell and platform productization, connecting cloud-market execution with IP-led growth.",
+        "From that commercial base, regulated modernization delivery anchors release automation and security scanning in resilient operating paths.",
+        "Against that delivery foundation, alliance operating cadence and AI-driven sales frameworks supported 20% joint revenue growth.",
+        "In parallel, repeatable deployment blueprints and release-gate security scanning coverage strengthen control across modernization delivery.",
+        "That operating model also enabled platform productization tied to $22M in IP-led revenue, with margin expansion and team scale reinforcing the commercial case.",
+        "Future partner-led growth can build on this platform discipline, extending secure delivery while increasing monetization of platform IP.",
+    ]
+    ledger_sources = [
+        ["reb_ibm_aws_alliance_partner_cosell_gtm", "reb_unify_platform_commercialization_leadership"],
+        ["reb_ibm_devsecops_release_resilience"],
+        ["metric_ibm_alliance_cosell_operating_cadence", "metric_ibm_ai_driven_sales_frameworks"],
+        ["metric_ibm_deployment_blueprint_repeatability", "metric_ibm_release_gate_security_scanning_coverage", "fact_engineering_platform_002"],
+        ["reb_unify_platform_commercialization_leadership", "metric_unify_22m_ip_led_revenue", "fact_engineering_platform_006"],
+        ["reb_ibm_aws_alliance_partner_cosell_gtm", "reb_ibm_devsecops_release_resilience", "reb_unify_platform_commercialization_leadership"],
+    ]
+    plan = {
+        "allocation_plan_digest": "retry10-plan",
+        "facts": roots,
+        "allocation_assignments": assignments,
+    }
+    parsed = {
+        "resume_display_text": " ".join(sentences),
+        "claim_ledger": [
+            {"claim_text": sentence, "source_fact_ids": source_ids}
+            for sentence, source_ids in zip(sentences, ledger_sources, strict=True)
+        ],
+        "selected_fact_plan": plan,
+        "change_log": [],
+    }
+    allowed = {
+        value
+        for root in roots
+        for value in root["allowed_graph_evidence_ids"]
+    }
+
+    causal_repairs = repair_exec_summary_causal_multi_root_allocation_rows(parsed)
+    assert causal_repairs
+    parsed, _ = finalize_executive_summary_coherence(
+        parsed,
+        selected_facts=roots,
+        allowed_fact_ids=allowed,
+        target_role="Manager of Applied AI Architecture, Partnerships",
+    )
+
+    override = FACT_C0_DISPLAY_OVERRIDES["fact_engineering_platform_002"]
+    assert override in parsed["resume_display_text"]
+    override_ok, override_reason = check_exec_summary_display_override_compliance(
+        parsed["resume_display_text"],
+        parsed["claim_ledger"],
+    )
+    assert override_ok, override_reason
+    failures = validate_claim_rows_against_resume_graph_allocation(
+        section_id="executive_summary",
+        claim_rows=parsed["claim_ledger"],
+        selected_fact_plan=plan,
+    )
+    assert failures == []
+
+
+def test_unallocated_alliance_metric_rehydrates_frozen_root_claim() -> None:
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        validate_claim_rows_against_resume_graph_allocation,
+    )
+
+    root_id = "reb_ibm_aws_alliance_partner_cosell_gtm"
+    fact_id = "fact_partnerships_gtm_002"
+    metric_id = "metric_ibm_20pct_joint_revenue_growth"
+    root_claim = (
+        "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities"
+    )
+    assignment = {
+        "section_id": "executive_summary",
+        "claim_unit_id": "executive_summary:claim:03",
+        "root_id": root_id,
+        "skill_id": "skill_partner_cloud_vendor_joint_gtm",
+        "fact_id": fact_id,
+        "metric_outcome_id": "",
+        "metric_value": "",
+        "metric_unit": "",
+        "root_bundle_theme": "AWS partnership, alliance co-sell, and joint GTM execution",
+        "root_claim_text": root_claim,
+        "counts_toward_global_uniqueness": True,
+    }
+    plan = {
+        "allocation_plan_digest": "retry11-plan",
+        "facts": [
+            {
+                "fact_id": root_id,
+                "role_episode_bundle_id": root_id,
+                "linked_source_fact_ids": [fact_id],
+                "allowed_graph_evidence_ids": [root_id, fact_id, metric_id],
+            }
+        ],
+        "allocation_assignments": [assignment],
+    }
+    parsed = {
+        "resume_display_text": (
+            "In parallel, alliance operating cadence supported 20% joint revenue growth, "
+            "linking partner execution to measurable commercial accountability."
+        ),
+        "claim_ledger": [
+            {
+                "claim_text": (
+                    "In parallel, alliance operating cadence supported 20% joint revenue growth, "
+                    "linking partner execution to measurable commercial accountability."
+                ),
+                "source_fact_ids": [metric_id],
+            }
+        ],
+        "selected_fact_plan": plan,
+        "change_log": [],
+    }
+
+    repairs = repair_exec_summary_unallocated_metric_rows(parsed)
+
+    assert repairs
+    assert parsed["resume_display_text"] == root_claim + "."
+    assert "20%" not in parsed["resume_display_text"]
+    assert parsed["claim_ledger"][0]["source_fact_ids"] == [root_id, fact_id]
+    assert validate_claim_rows_against_resume_graph_allocation(
+        section_id="executive_summary",
+        claim_rows=parsed["claim_ledger"],
+        selected_fact_plan=plan,
+    ) == []
 
 
 def test_repair_orphan_rows_materializes_unused_required_fact() -> None:
@@ -314,6 +543,87 @@ def test_repair_exec_summary_mechanism_inventory_handles_live_route_selection_se
     assert parsed["claim_ledger"][1]["claim_text"] in repaired_text
 
 
+def test_retry32_exec_summary_control_inventory_is_compacted_and_ledger_synced() -> None:
+    live_sentence = (
+        "In parallel, security gates, human override paths, and runtime proof-bundle lineage "
+        "bring policy, escalation, and evidence into the platform lifecycle."
+    )
+    first = "Technology executive links regulated modernization with governed platform architecture."
+    third = "Commercial operating discipline connects platform productization with enterprise growth."
+    text = f"{first} {live_sentence} {third}"
+    parsed = {
+        "resume_display_text": text,
+        "claim_ledger": [
+            {"claim": "s1", "claim_text": first, "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+            {
+                "claim": "s2",
+                "claim_text": live_sentence,
+                "source_fact_ids": [
+                    "skill_ibm_devsecops_pipeline_security",
+                    "skill_unify_agentic_human_override_escalation_paths",
+                    "skill_unify_agentic_runtime_proof_bundle_lineage",
+                ],
+            },
+            {"claim": "s3", "claim_text": third, "source_fact_ids": ["reb_unify_platform_commercialization_leadership"]},
+        ],
+        "change_log": [],
+    }
+
+    ok_before, _ = check_exec_summary_no_mechanism_inventory(text, parsed)
+    assert ok_before is False
+    repairs = repair_exec_summary_mechanism_inventory_sentences(parsed)
+
+    assert repairs
+    repaired_text = str(parsed["resume_display_text"])
+    assert "governed release controls and runtime proof lineage" in repaired_text
+    assert "security gates, human override paths" not in repaired_text
+    ok_after, reason_after = check_exec_summary_no_mechanism_inventory(repaired_text, parsed)
+    assert ok_after is True, reason_after
+    assert parsed["claim_ledger"][1]["claim_text"] in repaired_text
+
+
+def test_w8_patch_exec_summary_route_control_inventory_is_compacted_and_ledger_synced() -> None:
+    live_sentence = (
+        "Leads design of an agentic platform control plane spanning route policy dispatch, "
+        "replay key controls manifest lineage, and human override escalation paths so autonomous "
+        "execution stays bounded and explainable."
+    )
+    first = "Engineering executive unites governed agentic AI architecture with regulated delivery discipline."
+    third = "Commercial leadership converts platform productization into measurable enterprise growth."
+    text = f"{first} {live_sentence} {third}"
+    parsed = {
+        "resume_display_text": text,
+        "claim_ledger": [
+            {"claim": "s1", "claim_text": first, "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+            {
+                "claim": "s2",
+                "claim_text": live_sentence,
+                "source_fact_ids": [
+                    "skill_unify_agentic_l0_route_policy_dispatch",
+                    "skill_unify_agentic_replay_key_audit_manifest_design",
+                    "skill_unify_agentic_human_override_escalation_paths",
+                ],
+            },
+            {"claim": "s3", "claim_text": third, "source_fact_ids": ["metric_unify_22m_ip_led_revenue"]},
+        ],
+        "change_log": [],
+    }
+
+    ok_before, reason_before = check_exec_summary_no_mechanism_inventory(text, parsed)
+    assert ok_before is False
+    assert reason_before is not None and "mechanism_comma_list" in reason_before
+
+    repairs = repair_exec_summary_mechanism_inventory_sentences(parsed)
+
+    assert repairs
+    repaired_text = str(parsed["resume_display_text"])
+    assert "governed routing, auditable runtime lineage, and human escalation paths" in repaired_text
+    assert "route policy dispatch" not in repaired_text
+    ok_after, reason_after = check_exec_summary_no_mechanism_inventory(repaired_text, parsed)
+    assert ok_after is True, reason_after
+    assert parsed["claim_ledger"][1]["claim_text"] in repaired_text
+
+
 def test_repair_exec_summary_cross_fact_conflation_compacts_live_alliance_row() -> None:
     text = (
         "Enterprise technology executive aligning AWS modernization, governed agentic architecture, and hyperscaler co-sell into an applied-AI partnership model for regulated enterprises. "
@@ -523,16 +833,17 @@ def test_sanitize_ibm_meta_disclaimer():
     assert "without claiming" not in cleaned.lower()
 
 
-def test_sanitize_ibm_narrative_rewrites_forbidden_opener_and_adds_mechanism() -> None:
+def test_sanitize_ibm_narrative_does_not_rewrite_claim_substance() -> None:
     raw = (
         "Led enterprise-scale cloud modernization, decision-support analytics, and AWS alliance co-sell programs "
         "for regulated financial clients at IBM, establishing governed delivery discipline and reusable platform "
         "architecture that accelerated partner-led adoption and joint revenue expansion."
     )
     cleaned, changed = sanitize_ibm_narrative_display_text(raw)
-    assert changed is True
-    assert cleaned.lower().startswith("drove")
-    assert "runtime" in cleaned.lower()
+    assert changed is False
+    assert cleaned == raw
+    assert cleaned.lower().startswith("led")
+    assert "runtime" not in cleaned.lower()
     gates = run_ibm_narrative_x2_gates(
         narrative_sentence=cleaned,
         parsed_output={"narrative_sentence": cleaned, "jd_alignment": {"targeting_only": True}},

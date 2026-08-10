@@ -37,7 +37,7 @@ def _intent(**overrides) -> HistoricalIntentRecord:
         prompt_profile_hash="pph",
         model_profile_hash="mph",
         gate_profile_hash="gph",
-        x3_disposition="X3_ALLOW",
+        x3_disposition="X3D_ALLOW_FINISH",
         proof_eligible=True,
         cache_admissible=True,
         generated_at_utc="2026-01-01T00:00:00Z",

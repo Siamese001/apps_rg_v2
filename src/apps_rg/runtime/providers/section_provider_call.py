@@ -60,6 +60,7 @@ class _CompiledMessagesPrompt:
     compilation_hash: str
     request_id: str
     run_id: str
+    trace_id: str
     anthropic_payload: dict[str, Any] | None = None
     anthropic_cache_receipt_seed: dict[str, Any] | None = None
     anthropic_cache_strategy: str | None = None
@@ -118,6 +119,11 @@ def _compiled_prompt_from_payload(
         compilation_hash=str(provider_payload.get("prompt_hash") or ""),
         request_id=str(provider_payload.get("request_id") or ""),
         run_id=str(run_id or provider_payload.get("run_id") or ""),
+        trace_id=str(
+            provider_payload.get("trace_root")
+            or provider_payload.get("trace_id")
+            or ""
+        ),
         anthropic_payload=anthropic_payload,
         anthropic_cache_receipt_seed=anthropic_cache_receipt_seed,
         anthropic_cache_strategy=anthropic_cache_strategy,
@@ -327,11 +333,15 @@ def call_section_model_provider(
     claude_model: str | None = None
     openai_model: str | None = None
     if profile == ProviderProfile.EXTERNAL_CLAUDE:
-        claude_model = resolve_section_generation_model(sid or None)
+        claude_model = resolve_section_generation_model(
+            sid or None, provider_profile=profile
+        )
     elif profile == ProviderProfile.EXTERNAL_OPENAI:
         openai_model = external_openai_generation_model(section_id=sid or None)
     requested_model = claude_model or openai_model
-    reasoning_effort = resolve_section_generation_effort(sid or None)
+    reasoning_effort = resolve_section_generation_effort(
+        sid or None, provider_profile=profile
+    )
     anthropic_payload, anthropic_cache_seed, anthropic_cache_strategy = _resolve_anthropic_cache_payload(
         provider_payload,
         profile=profile,
@@ -444,6 +454,8 @@ def call_section_model_provider(
         run_id=compiled.run_id,
         stage="L2.section_generation",
         section_id=sid or None,
+        trace_id=compiled.trace_id,
+        app_id="apps_rg",
     ):
         result = build_section_provider_gateway(
             claude_model=claude_model,

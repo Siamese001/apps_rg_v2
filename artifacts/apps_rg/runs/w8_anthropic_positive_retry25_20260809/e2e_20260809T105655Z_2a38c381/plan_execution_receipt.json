@@ -1,0 +1,417 @@
+{
+  "authority_class": "OBSERVABILITY_ONLY_W0",
+  "contract_type": "PlanExecutionReceipt",
+  "emission": {
+    "emitter": "apps_rg.runtime.contracts.plan_execution_reconciliation",
+    "observation_only": true,
+    "schema_version": "apps_rg.plan_execution_reconciliation.v1",
+    "terminal_reason": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:unify_bullets:EXECUTED_X3_BLOCK; unify_narrative:upstream_not_finalized' schema_ok=False lane_ok=False",
+    "wave": "W1"
+  },
+  "execution_authority_assertions": {
+    "does_not_authorize_route_or_exit": true,
+    "does_not_execute_work_units": true,
+    "does_not_select_retries": true
+  },
+  "plan": {
+    "capsule_digest": "sha256:5bf98c011df8e52db46e351b2399279135715aa94ca16df6a5971efe46554001",
+    "planning_profile_digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+    "planning_profile_ref": "apps_rg/profiles/rg_planning_profile.yaml",
+    "planning_status": "READY"
+  },
+  "receipt_digest": "sha256:bcde627642c0c44d5d5c1fef143e30462fcaa83ba339dbcf8383f98179011afc",
+  "request_id": "req-0c9e37ee16f14c9fb98e169e844c35e9",
+  "run_id": "10f9f114-c4dc-46ca-88ae-9c32b2c7fe05",
+  "schema_version": "apps_rg.plan_execution_receipt.v1",
+  "summary": {
+    "all_planned_units_reconciled": true,
+    "by_disposition": {
+      "BLOCKED": 0,
+      "COMPLETED": 0,
+      "FAILED": 7,
+      "SKIPPED": 0
+    },
+    "failure_code_counts": {
+      "GENERATION_FAILED": 7
+    },
+    "planned_unit_count": 7,
+    "reconciled_unit_count": 7
+  },
+  "taxonomy_digest": "sha256:c4e38fa441cd43a3e06c4cd126d37cb385a06e8b56505b47266fa40b873b2509",
+  "taxonomy_ref": "apps_rg/runtime/contracts/plan_execution_failure_taxonomy.yaml",
+  "unit_observations": [
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "disposition": "FAILED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_certifications_block",
+        "support_target": "preserve_verbatim_certification_facts",
+        "unit_id": "certifications_block"
+      },
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 1.0,
+        "temperature": 0.15,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "locked_copy"
+      ],
+      "unit_id": "certifications_block"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "disposition": "FAILED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_competencies",
+        "support_target": "jd_anchor_coverage",
+        "unit_id": "competencies"
+      },
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 2.0,
+        "temperature": 0.38,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "competencies"
+      ],
+      "unit_id": "competencies"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "disposition": "FAILED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_education_block",
+        "support_target": "preserve_verbatim_education_facts",
+        "unit_id": "education_block"
+      },
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 1.0,
+        "temperature": 0.15,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "locked_copy"
+      ],
+      "unit_id": "education_block"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "disposition": "FAILED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_executive_summary",
+        "support_target": "source_backed_executive_positioning",
+        "unit_id": "executive_summary"
+      },
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "requested_controls": {
+        "reflexion_loops": 2.0,
+        "self_consistency_samples": 5.0,
+        "temperature": 0.42,
+        "tot_branches": 3.0,
+        "tot_depth": 2.0
+      },
+      "required_execution_lanes": [
+        "executive_summary"
+      ],
+      "unit_id": "executive_summary"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "disposition": "FAILED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_experience_block",
+        "support_target": "metric_preserving_experience",
+        "unit_id": "experience_block"
+      },
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "requested_controls": {
+        "reflexion_loops": 1.0,
+        "self_consistency_samples": 3.0,
+        "temperature": 0.32,
+        "tot_branches": 2.0,
+        "tot_depth": 2.0
+      },
+      "required_execution_lanes": [
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets",
+        "unify_narrative",
+        "ibm_narrative",
+        "insurtech_narrative",
+        "ey_narrative"
+      ],
+      "unit_id": "experience_block"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "disposition": "FAILED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_headline",
+        "support_target": "concise_role_positioning",
+        "unit_id": "headline"
+      },
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 1.0,
+        "temperature": 0.15,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "headline"
+      ],
+      "unit_id": "headline"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "disposition": "FAILED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_skills_block",
+        "support_target": "jd_keyword_and_truth_alignment",
+        "unit_id": "skills_block"
+      },
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 2.0,
+        "temperature": 0.38,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "competencies"
+      ],
+      "unit_id": "skills_block"
+    }
+  ],
+  "unit_outcomes": [
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "runtime_execution_witness.json"
+      ],
+      "disposition": "FAILED",
+      "failure_class": "GENERATION",
+      "failure_code": "GENERATION_FAILED",
+      "unit_id": "certifications_block",
+      "w2_replan_hint": "REPAIR_OR_RETRY_GENERATION"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "runtime_execution_witness.json"
+      ],
+      "disposition": "FAILED",
+      "failure_class": "GENERATION",
+      "failure_code": "GENERATION_FAILED",
+      "unit_id": "competencies",
+      "w2_replan_hint": "REPAIR_OR_RETRY_GENERATION"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "runtime_execution_witness.json"
+      ],
+      "disposition": "FAILED",
+      "failure_class": "GENERATION",
+      "failure_code": "GENERATION_FAILED",
+      "unit_id": "education_block",
+      "w2_replan_hint": "REPAIR_OR_RETRY_GENERATION"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "runtime_execution_witness.json"
+      ],
+      "disposition": "FAILED",
+      "failure_class": "GENERATION",
+      "failure_code": "GENERATION_FAILED",
+      "unit_id": "executive_summary",
+      "w2_replan_hint": "REPAIR_OR_RETRY_GENERATION"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "runtime_execution_witness.json"
+      ],
+      "disposition": "FAILED",
+      "failure_class": "GENERATION",
+      "failure_code": "GENERATION_FAILED",
+      "unit_id": "experience_block",
+      "w2_replan_hint": "REPAIR_OR_RETRY_GENERATION"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "runtime_execution_witness.json"
+      ],
+      "disposition": "FAILED",
+      "failure_class": "GENERATION",
+      "failure_code": "GENERATION_FAILED",
+      "unit_id": "headline",
+      "w2_replan_hint": "REPAIR_OR_RETRY_GENERATION"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "runtime_execution_witness.json"
+      ],
+      "disposition": "FAILED",
+      "failure_class": "GENERATION",
+      "failure_code": "GENERATION_FAILED",
+      "unit_id": "skills_block",
+      "w2_replan_hint": "REPAIR_OR_RETRY_GENERATION"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "artifact_hash": "sha256:5d0fbcbe5920c6826006d4d1ca8ab72d0528202b20fc0bd2deb67cca83ad6cf0",
+  "emitted_at": "2026-08-08T20:32:26Z",
+  "payload": {
+    "attempt_evidence_refs": [],
+    "attempt_evidence_status": "NOT_REPORTED_BY_L2",
+    "c0": {
+      "reason": "BYPASS_PRELOADED_CONTEXT",
+      "status": "BYPASSED_PRELOADED_CONTEXT",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.1",
+          "sub_stage_name": "Query Normalization"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.2",
+          "sub_stage_name": "Embedding Lookup"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.3",
+          "sub_stage_name": "D1 Exact Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.4",
+          "sub_stage_name": "D2 Semantic Cache Probe"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.5",
+          "sub_stage_name": "Retrieval Augmentation"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "reason": "BYPASS_PRELOADED_CONTEXT"
+          },
+          "status": "BYPASSED",
+          "sub_stage_id": "C0.6",
+          "sub_stage_name": "Grounding Context Assembly"
+        }
+      ]
+    },
+    "generation_provider_attempt_count": 0,
+    "judge_attempt_count": 0,
+    "l2": {
+      "executed": true,
+      "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:competencies:EXECUTED_X3A_DENY_REROUTE; unify_bullets:PHASE1_NO_RUN_DIR; ibm_bullets:PHASE1_NO_RUN_DIR; insurtech_bullets:PHASE1_NO_RUN_DIR; ey_bullets:PHASE1_NO_RUN_DIR; unify_narrative:PHASE1_NO_RUN_DIR; ibm_narrative:PHASE1_NO_RUN_DIR; insurtech_narrative:PHASE1_NO_RUN_DIR' schema_ok=False lane_ok=False",
+      "status": "FAIL",
+      "sub_stages": [
+        {
+          "duration_ms": 0.0,
+          "meta": {
+            "app_name": "apps_rg"
+          },
+          "status": "PASS",
+          "sub_stage_id": "E1",
+          "sub_stage_name": "Prep: Plan Decomposition"
+        },
+        {
+          "duration_ms": 0.006,
+          "meta": {},
+          "status": "PASS",
+          "sub_stage_id": "E2",
+          "sub_stage_name": "Valid: Pre-Execution Contract Check"
+        },
+        {
+          "duration_ms": 151802.928,
+          "meta": {
+            "fault": "L2_EXECUTION_ERROR:RuntimeError:FAILED_MODULAR_R4: decisive='FAIL' failure='fatal_lane_recipe_policy:competencies:EXECUTED_X3A_DENY_REROUTE; unify_bullets:PHASE1_NO_RUN_DIR; ibm_bullets:PHASE1_NO_RUN_DIR; insurtech_bullets:PHASE1_NO_RUN_DIR; ey_bullets:PHASE1_NO_RUN_DIR; unify_narrative:PHASE1_NO_RUN_DIR; ibm_narrative:PHASE1_NO_RUN_DIR; insurtech_narrative:PHASE1_NO_RUN_DIR' schema_ok=False lane_ok=False"
+          },
+          "status": "FAIL",
+          "sub_stage_id": "E3",
+          "sub_stage_name": "Exec: Tool Dispatch"
+        },
+        {
+          "duration_ms": 0.004,
+          "meta": {
+            "retry_attempted": false
+          },
+          "status": "NOT_APPLICABLE",
+          "sub_stage_id": "E4",
+          "sub_stage_name": "Heal: Retry / Recovery"
+        },
+        {
+          "duration_ms": 0.0,
+          "meta": {},
+          "status": "FAIL",
+          "sub_stage_id": "E5",
+          "sub_stage_name": "Seal: Output Assembly"
+        }
+      ]
+    },
+    "request_id": "req-0864147461964e0d885ae54fb60bffdc",
+    "route_id": "R4_SINGLE_ACTION",
+    "run_id": "a6f31982-1b87-450a-a648-cf1886f6c86f",
+    "schema_version": "agentic_core.runtime_execution_witness.v1",
+    "trace_root": "798a55f0-9388-4c53-a26e-dd18eaaaffb6",
+    "x1": {
+      "status": "EXECUTED",
+      "sub_stages": []
+    },
+    "x2": {
+      "disposition": "X3A",
+      "failed_gate_ids": [],
+      "reason_codes": [],
+      "status": "EXECUTED"
+    },
+    "x3": {
+      "disposition": "X3A",
+      "status": "EMITTED"
+    }
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:beedee7bca9909d075618256952681e7abb4717e48fbf249850d64a7d1ae4f0a"
+}

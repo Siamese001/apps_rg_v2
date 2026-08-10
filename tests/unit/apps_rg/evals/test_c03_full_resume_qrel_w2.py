@@ -7,6 +7,11 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_derived_clusters as derived_subject
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_w1c as w1c_subject
+from apps_rg.evals.owner_solo import c03_full_resume_qrel_w2 as subject
 from apps_rg.evals.owner_solo.c03_full_resume_qrel_w1c import (
     build_combined_registry,
 )
@@ -24,6 +29,12 @@ W6_RECEIPT = ROOT / (
     "artifacts/apps_rg/c03/graph_evidence_cluster_embeddings/"
     "wave6_cluster_vector_generation_receipt.json"
 )
+
+
+@pytest.fixture(autouse=True)
+def _algorithm_test_uses_explicit_non_authorizing_scope_override(monkeypatch) -> None:
+    for module in (derived_subject, w1c_subject, subject):
+        monkeypatch.setattr(module, "validate_full_resume_scope", lambda *_args, **_kwargs: [])
 
 
 def _model_manifest() -> dict[str, object]:

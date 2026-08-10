@@ -80,6 +80,32 @@ def build_active_model_manifest() -> tuple[dict[str, Any], ...]:
                 }
             )
 
+        backup_models = profile.get("anthropic_limit_backup_model_by_section")
+        backup_models = backup_models if isinstance(backup_models, dict) else {}
+        backup_efforts = profile.get("anthropic_limit_backup_effort_by_section")
+        backup_efforts = backup_efforts if isinstance(backup_efforts, dict) else {}
+        for section_id, model in backup_models.items():
+            rows.append(
+                {
+                    "app_id": "apps_rg",
+                    "role_type": "generator_backup",
+                    "role_id": f"anthropic_limit.{section_id}",
+                    "provider_key": provider_key,
+                    "model": str(model),
+                    "effort": str(backup_efforts.get(section_id) or ""),
+                    "endpoint": "responses",
+                    "structured_output_required": True,
+                    "owner": str(profile.get("pin_owner") or ""),
+                    "review_after": str(profile.get("pin_review_after") or ""),
+                    "proof_eligible": False,
+                    "source": (
+                        "apps_rg/config/provider_profiles.yaml:"
+                        f"profiles.{profile_key}."
+                        f"anthropic_limit_backup_model_by_section.{section_id}"
+                    ),
+                }
+            )
+
     judge_governance = profiles.get("judge_model_governance") or {}
     judge_limits = ((profiles.get("runtime_limits") or {}).get("judge") or {})
     judge_effort_by_provider = {
@@ -140,6 +166,32 @@ def build_active_model_manifest() -> tuple[dict[str, Any], ...]:
                 ),
             }
         )
+        backup = selector.get("anthropic_limit_backup") or {}
+        if isinstance(backup, dict) and backup:
+            backup_provider_key = str(backup.get("provider_key") or "")
+            rows.append(
+                {
+                    "app_id": "apps_rg",
+                    "role_type": "advisory_selector_backup",
+                    "role_id": f"anthropic_limit.{selector_role}",
+                    "provider_key": backup_provider_key,
+                    "model": str(backup.get("model") or ""),
+                    "effort": str(backup.get("reasoning_effort") or ""),
+                    "endpoint": (
+                        "anthropic_messages"
+                        if backup_provider_key == "anthropic_claude"
+                        else "chat_completions"
+                    ),
+                    "structured_output_required": True,
+                    "owner": str(selector.get("owner") or ""),
+                    "review_after": str(selector.get("review_after") or ""),
+                    "proof_eligible": False,
+                    "source": (
+                        "apps_rg/config/provider_profiles.yaml:"
+                        f"selector_models.{selector_role}.anthropic_limit_backup.model"
+                    ),
+                }
+            )
 
     for pin in research_model_manifest():
         rows.append(
@@ -302,15 +354,22 @@ def audit_model_pin_ownership() -> tuple[ModelPinOwnershipViolation, ...]:
                 )
             )
             resolved_capability = None
-        if resolved_capability and bool(row.get("proof_eligible")) != resolved_capability.proof_eligible:
+        if (
+            resolved_capability
+            and bool(row.get("proof_eligible"))
+            and not resolved_capability.proof_eligible
+        ):
             violations.append(
                 ModelPinOwnershipViolation(
                     "model_proof_role_mismatch",
-                    f"{identity!r} proof_eligible={row.get('proof_eligible')!r} but "
-                    f"catalog declares {resolved_capability.proof_eligible!r}",
+                    f"{identity!r} requires proof capability but catalog declares "
+                    f"proof_eligible={resolved_capability.proof_eligible!r}",
                 )
             )
-        if row.get("role_type") == "advisory_selector" and row.get("proof_eligible") is not False:
+        if row.get("role_type") in {
+            "advisory_selector",
+            "advisory_selector_backup",
+        } and row.get("proof_eligible") is not False:
             violations.append(
                 ModelPinOwnershipViolation(
                     "selector_proof_role_violation",

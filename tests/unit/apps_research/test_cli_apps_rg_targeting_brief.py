@@ -21,6 +21,7 @@ class _FakeRecord:
     support_coverage: float = 0.88
     hop_terminal_error: str = ""
     fec_run_context: dict | None = None
+    trace_id: str = ""
 
 
 _VALID_APPS_RG_BRIEF = (
@@ -58,7 +59,67 @@ _VALID_APPS_RG_BRIEF = (
 )
 
 
-def _sidecar_for(brief: str) -> dict:
+def _provider_evidence(pin, *, trace_id: str, suffix: str) -> dict:
+    receipt = {
+        "schema_version": "apps_research.provider_attempt_validation.v1",
+        "gateway_id": "apps_research.provider_gateway_v1",
+        "role": pin.role,
+        "provider": pin.provider,
+        "requested_model": pin.model,
+        "observed_model": pin.model,
+        "reasoning_effort": pin.reasoning_effort,
+        "attempt_id": f"attempt-{suffix}",
+        "logical_attempt_id": f"run:logical:{suffix}",
+        "transport_attempt_id": f"run:logical:{suffix}:transport:1",
+        "run_id": "run",
+        "trace_id": trace_id,
+        "request_digest": suffix * 64,
+        "provider_response_id": f"response-{suffix}",
+        "lifecycle": {
+            "local_dispatch_started": True,
+            "request_bytes_sent": False,
+            "response_headers_received": pin.provider == "google_gemini",
+            "first_byte_received": pin.provider == "google_gemini",
+            "sdk_response_returned": pin.provider == "external_openai",
+            "remote_outcome": "PROVIDER_RESPONDED",
+        },
+        "transport_response_received": True,
+        "response_schema_valid": True,
+        "model_pin_valid": True,
+        "application_output_valid": True,
+        "overall_success": True,
+        "terminal_status": "SUCCESS",
+        "validation_reason": "ALL_VALIDATIONS_PASSED",
+        "usage": {},
+    }
+    event = {
+        "schema_version": "apps.external_model_usage_event.v1",
+        "gateway_id": "apps_research.provider_gateway_v1",
+        "provider_role": pin.role,
+        "provider": pin.provider,
+        "requested_model": pin.model,
+        "observed_model": pin.model,
+        "request_digest": receipt["request_digest"],
+        "outcome": "SUCCESS",
+        "transport_response_received": True,
+        "response_schema_valid": True,
+        "model_pin_valid": True,
+        "application_output_valid": True,
+        "overall_success": True,
+        "attempt_id": receipt["attempt_id"],
+        "logical_attempt_id": receipt["logical_attempt_id"],
+        "transport_attempt_id": receipt["transport_attempt_id"],
+        "trace_id": trace_id,
+    }
+    event["event_digest"] = hashlib.sha256(
+        json.dumps(event, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    receipt["ledger_event_digest"] = event["event_digest"]
+    receipt["ledger_event"] = event
+    return receipt
+
+
+def _sidecar_for(brief: str, *, trace_id: str) -> dict:
     from apps_research.config.model_pins import (
         apps_rg_handoff_judge_pin,
         company_brief_generation_pin,
@@ -71,7 +132,7 @@ def _sidecar_for(brief: str) -> dict:
         "schema_version": "apps_research.apps_rg_handoff_x2_judge_receipt.v1",
         "gate_id": "X2_RESEARCH_SEMANTIC_GATE",
         "judge_name": judge_pin.provider_key,
-        "judge_provider": judge_pin.provider_key,
+        "judge_provider": judge_pin.provider,
         "judge_model_requested": judge_pin.model,
         "judge_model": judge_pin.model,
         "thinking_level": judge_pin.reasoning_effort,
@@ -82,6 +143,11 @@ def _sidecar_for(brief: str) -> dict:
         "score": 0.91,
         "verdict": "PASS",
         "provider_status": "MODEL_BACKED_PASS",
+        "provider_evidence": _provider_evidence(
+            judge_pin,
+            trace_id=trace_id,
+            suffix="b",
+        ),
     }
     return {
         "brief_text_sha256": hashlib.sha256(normalized.encode("utf-8")).hexdigest(),
@@ -90,6 +156,11 @@ def _sidecar_for(brief: str) -> dict:
         "generation_model": generation_pin.model,
         "generation_reasoning_effort": generation_pin.reasoning_effort,
         "generation_model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
+        "generation_provider_evidence": _provider_evidence(
+            generation_pin,
+            trace_id=trace_id,
+            suffix="a",
+        ),
         "provider_call_attempted": True,
         "handoff_eligible": True,
         "briefing_semantic_score": 0.91,
@@ -110,6 +181,9 @@ def _sidecar_for(brief: str) -> dict:
 
 def test_cli_jd_path_writes_fresh_apps_rg_briefing(monkeypatch, tmp_path: Path) -> None:
     from apps_research import __main__ as main_mod
+    from apps_model_telemetry.external_model_usage import (
+        current_external_model_usage_context,
+    )
 
     jd_path = tmp_path / "jd.txt"
     jd_path.write_text("Lead partner solution architecture for Claude.", encoding="utf-8")
@@ -119,6 +193,7 @@ def test_cli_jd_path_writes_fresh_apps_rg_briefing(monkeypatch, tmp_path: Path) 
 
     def _fake_run(request):
         captured["request"] = request
+        captured["usage_context"] = current_external_model_usage_context()
         return _FakeRecord(
             run_id="research-run-test",
             topic="Anthropic",
@@ -126,7 +201,10 @@ def test_cli_jd_path_writes_fresh_apps_rg_briefing(monkeypatch, tmp_path: Path) 
             fec_run_context={
                 "company_brief": {
                     "company": "Anthropic",
-                    "apps_rg_targeting_brief_sidecar": _sidecar_for(_VALID_APPS_RG_BRIEF),
+                    "apps_rg_targeting_brief_sidecar": _sidecar_for(
+                        _VALID_APPS_RG_BRIEF,
+                        trace_id="research-run-test",
+                    ),
                 }
             },
         )
@@ -148,6 +226,14 @@ def test_cli_jd_path_writes_fresh_apps_rg_briefing(monkeypatch, tmp_path: Path) 
 
     assert code == 0
     request = captured["request"]
+    assert captured["usage_context"] == {
+        "artifact_dir": str(runs_root),
+        "run_id": request.trace_id,
+        "stage": "L2.apps_research_company_brief",
+        "section_id": "",
+        "trace_id": request.trace_id,
+        "app_id": "apps_research",
+    }
     assert request.jd_context["output_format"] == "apps_rg_targeting_brief_v1"
     assert request.jd_context["synthesis_template"] == "apps_rg_targeting_brief_synthesis_v1"
     briefing = runs_root / "research-run-test" / "briefing.md"
@@ -190,7 +276,10 @@ def test_shared_targeting_writer_persists_producer_owned_bundle(tmp_path: Path) 
         company_brief_text=_VALID_APPS_RG_BRIEF,
         fec_run_context={
             "company_brief": {
-                "apps_rg_targeting_brief_sidecar": _sidecar_for(_VALID_APPS_RG_BRIEF),
+                "apps_rg_targeting_brief_sidecar": _sidecar_for(
+                    _VALID_APPS_RG_BRIEF,
+                    trace_id="research-run-shared-writer",
+                ),
             }
         },
     )
@@ -344,7 +433,10 @@ def test_cli_warms_searxng_before_research(monkeypatch, tmp_path: Path) -> None:
             fec_run_context={
                 "company_brief": {
                     "company": "Anthropic",
-                    "apps_rg_targeting_brief_sidecar": _sidecar_for(_VALID_APPS_RG_BRIEF),
+                    "apps_rg_targeting_brief_sidecar": _sidecar_for(
+                        _VALID_APPS_RG_BRIEF,
+                        trace_id="research-run-test",
+                    ),
                 }
             },
         )

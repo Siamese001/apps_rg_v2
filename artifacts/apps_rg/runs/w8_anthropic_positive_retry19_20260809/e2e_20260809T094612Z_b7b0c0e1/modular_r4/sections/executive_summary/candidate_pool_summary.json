@@ -1,0 +1,186 @@
+{
+  "schema": "executive_summary_candidate_pool_summary_v1",
+  "candidates": [
+    {
+      "candidate_id": "scratch",
+      "candidate_digest": "39e7579265972a8ff91bea59dfe804024eaf0521efefcedda6c8647f1ca6e101",
+      "publish_eligible": true,
+      "x2_all_pass": true,
+      "scores_freshness": "carried_forward",
+      "model_backed_scores_snapshot": {
+        "schema": "executive_summary_judge_score_snapshot_v1",
+        "providers": [
+          {
+            "provider_key": "gemini_pro",
+            "score": 3.5,
+            "normalized_score": 0.7,
+            "pass": false,
+            "provider_status": "MODEL_BACKED_FAIL",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          },
+          {
+            "provider_key": "openai_chatgpt",
+            "score": 4.5,
+            "normalized_score": 0.9,
+            "pass": true,
+            "provider_status": "MODEL_BACKED_PASS",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "candidate_id": "regen_cycle_1",
+      "candidate_digest": "950811dec37304a71ca5a91c6d4a7566f8991082be3c27afc99b96373bf2f9f7",
+      "publish_eligible": true,
+      "x2_all_pass": true,
+      "scores_freshness": "soft_failed_only",
+      "model_backed_scores_snapshot": {
+        "schema": "executive_summary_judge_score_snapshot_v1",
+        "providers": [
+          {
+            "provider_key": "gemini_pro",
+            "score": 4.5,
+            "normalized_score": 0.9,
+            "pass": true,
+            "provider_status": "MODEL_BACKED_PASS",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          },
+          {
+            "provider_key": "openai_chatgpt",
+            "score": 4.1,
+            "normalized_score": 0.82,
+            "pass": true,
+            "provider_status": "MODEL_BACKED_PASS",
+            "major_failed_dimensions": [
+              "deterministic_alignment"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "publish_eligible_ids": [
+    "scratch",
+    "regen_cycle_1"
+  ],
+  "full_panel_rescore": [
+    {
+      "candidate_id": "scratch",
+      "pre_rank_digest": "39e7579265972a8ff91bea59dfe804024eaf0521efefcedda6c8647f1ca6e101",
+      "full_panel_digest": "666f9804f42fa42120ff2269799cb8065ff4a2bd26a583782892c6caeeb189fa",
+      "rescore_receipt": {
+        "schema": "executive_summary_post_x2_x1d_refresh_v1",
+        "enabled": true,
+        "prior_scores": {
+          "gemini_pro": 4.5,
+          "openai_chatgpt": 4.1
+        },
+        "targeting_parity": {
+          "schema": "targeting_context_parity_v2",
+          "targeting_bundle_digest": "9cc9845831f9f8f53365f676409c6de149751cf1751be67f459e4bdf2a9fa705",
+          "generation_material_digest": "9cc9845831f9f8f53365f676409c6de149751cf1751be67f459e4bdf2a9fa705",
+          "judge_material_digest": "9cc9845831f9f8f53365f676409c6de149751cf1751be67f459e4bdf2a9fa705",
+          "generation_targeting_digest": "22c5289bc93fc948b579a27f9b021e35a620bd1186d5c347a509b3f57a7446ee",
+          "judge_targeting_digest": "22c5289bc93fc948b579a27f9b021e35a620bd1186d5c347a509b3f57a7446ee",
+          "targeting_parity_status": "match",
+          "targeting_binding_match": true,
+          "target_title": "Manager of Applied AI Architecture, Partnerships",
+          "target_company": "Anthropic",
+          "parity_match": true,
+          "bundle_matches_generation_material": true,
+          "generation_jd_chars": 152,
+          "generation_briefing_chars": 8006,
+          "judge_jd_chars": 152,
+          "judge_briefing_chars": 8006,
+          "substantive_jd_fit_certification_allowed": true
+        },
+        "refreshed_scores": {
+          "gemini_pro": 4.0,
+          "openai_chatgpt": 4.7
+        },
+        "gate_summary_gate_count": 86,
+        "judge_packet_post_x2_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\sections\\executive_summary\\executive_summary_judge_packet_post_x2.json"
+      },
+      "final_materialized_x2_all_pass": true,
+      "judge_certified": true
+    },
+    {
+      "candidate_id": "regen_cycle_1",
+      "pre_rank_digest": "950811dec37304a71ca5a91c6d4a7566f8991082be3c27afc99b96373bf2f9f7",
+      "full_panel_digest": "8ad2a9aa979dfd99dea62ed17ec87a0a6a6f475b9f9de931bbc7dd29d3cbf158",
+      "rescore_receipt": {
+        "schema": "executive_summary_post_x2_x1d_refresh_v1",
+        "enabled": true,
+        "prior_scores": {
+          "gemini_pro": 4.5,
+          "openai_chatgpt": 4.1
+        },
+        "targeting_parity": {
+          "schema": "targeting_context_parity_v2",
+          "targeting_bundle_digest": "9cc9845831f9f8f53365f676409c6de149751cf1751be67f459e4bdf2a9fa705",
+          "generation_material_digest": "9cc9845831f9f8f53365f676409c6de149751cf1751be67f459e4bdf2a9fa705",
+          "judge_material_digest": "9cc9845831f9f8f53365f676409c6de149751cf1751be67f459e4bdf2a9fa705",
+          "generation_targeting_digest": "22c5289bc93fc948b579a27f9b021e35a620bd1186d5c347a509b3f57a7446ee",
+          "judge_targeting_digest": "22c5289bc93fc948b579a27f9b021e35a620bd1186d5c347a509b3f57a7446ee",
+          "targeting_parity_status": "match",
+          "targeting_binding_match": true,
+          "target_title": "Manager of Applied AI Architecture, Partnerships",
+          "target_company": "Anthropic",
+          "parity_match": true,
+          "bundle_matches_generation_material": true,
+          "generation_jd_chars": 152,
+          "generation_briefing_chars": 8006,
+          "judge_jd_chars": 152,
+          "judge_briefing_chars": 8006,
+          "substantive_jd_fit_certification_allowed": true
+        },
+        "refreshed_scores": {
+          "gemini_pro": 4.2,
+          "openai_chatgpt": null
+        },
+        "gate_summary_gate_count": 86,
+        "judge_packet_post_x2_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry19_20260809\\e2e_20260809T094612Z_b7b0c0e1\\modular_r4\\sections\\executive_summary\\executive_summary_judge_packet_post_x2.json"
+      },
+      "final_materialized_x2_all_pass": true,
+      "judge_certified": true
+    }
+  ],
+  "publish_selected_snapshot_id": "regen_cycle_1",
+  "published_candidate_digest": "8ad2a9aa979dfd99dea62ed17ec87a0a6a6f475b9f9de931bbc7dd29d3cbf158",
+  "publish_reason": "argmax_full_panel_min_holistic",
+  "rank": {
+    "rank_comparison": [
+      {
+        "candidate_id": "scratch",
+        "candidate_digest": "666f9804f42fa42120ff2269799cb8065ff4a2bd26a583782892c6caeeb189fa",
+        "min_holistic": 4.0,
+        "sum_holistic": 8.7,
+        "major_dimension_fail_total": 2,
+        "scratch_tie_preference": 1
+      },
+      {
+        "candidate_id": "regen_cycle_1",
+        "candidate_digest": "8ad2a9aa979dfd99dea62ed17ec87a0a6a6f475b9f9de931bbc7dd29d3cbf158",
+        "min_holistic": 4.2,
+        "sum_holistic": 4.2,
+        "major_dimension_fail_total": 1,
+        "scratch_tie_preference": 0
+      }
+    ],
+    "winning_key": [
+      4.2,
+      4.2,
+      -1,
+      0
+    ]
+  },
+  "x2_publish_eligible": true,
+  "judge_certified": true
+}

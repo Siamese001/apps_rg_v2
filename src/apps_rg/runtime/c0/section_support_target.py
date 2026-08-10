@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any, Iterable
 
 from agentic_core.runtime.c0.evidence_metrics_extractor import SupportTarget
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import (
     SUPPORT_STATUS_PASS,
     SUPPORT_STATUS_WEAK_WITH_CAVEATS,
 )

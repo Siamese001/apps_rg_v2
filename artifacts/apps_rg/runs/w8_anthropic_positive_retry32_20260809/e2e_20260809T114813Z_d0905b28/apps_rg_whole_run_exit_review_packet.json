@@ -1,0 +1,615 @@
+{
+  "aggregated_from_lane_x3": [
+    {
+      "lane": "competencies",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "unify_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "ibm_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "insurtech_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "ey_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "unify_narrative",
+      "x3_code": "X3_BLOCK"
+    },
+    {
+      "lane": "ibm_narrative",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "insurtech_narrative",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "ey_narrative",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "executive_summary",
+      "x3_code": "X3_BLOCK"
+    },
+    {
+      "lane": "headline",
+      "x3_code": "X3_BLOCK"
+    }
+  ],
+  "block_reasons": [
+    "FINAL_RESUME_X2_FAIL"
+  ],
+  "blockers": [
+    "FINAL_RESUME_OUTPUT status=FAIL failed_gates=[final_resume_no_gap_markers]",
+    "final_resume_x2 deterministic gates not all_pass",
+    "lane unify_narrative: deterministic X2 failed [x2_no_companion_ngram_copy]",
+    "lane executive_summary: deterministic X2 failed [x2_exec_summary_no_mechanism_inventory]",
+    "lane headline: deterministic X2 failed [x2_headline_xyz_literal_grounding,x2_resume_graph_claim_binding]",
+    "UNREADABLE_JSON:modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json:FileNotFoundError",
+    "UNREADABLE_JSON:modular_r4/final_resume_assembly/x1d_full_resume_judge_outputs.json:FileNotFoundError"
+  ],
+  "decisive_reason": "STRUCTURAL_BLOCK: FINAL_RESUME_OUTPUT status=FAIL failed_gates=[final_resume_no_gap_markers]; final_resume_x2 deterministic gates not all_pass; lane unify_narrative: deterministic X2 failed [x2_no_companion_ngram_copy]; lane executive_summary: deterministic X2 failed [x2_exec_summary_no_mechanism_inventory]; lane headline: deterministic X2 failed [x2_headline_xyz_literal_grounding,x2_resume_graph_claim_binding]; SOURCE_BINDING_BLOCK: UNREADABLE_JSON:modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json:FileNotFoundError; UNREADABLE_JSON:modular_r4/final_resume_assembly/x1d_full_resume_judge_outputs.json:FileNotFoundError",
+  "deterministic_digest": "sha256:750ca287c38757c7adde09008be2cec2737850638d63499d0fc680922b36ea27",
+  "exactly_one_x3": true,
+  "exit_review_packet_ref": "apps_rg_whole_run_exit_review_packet.json",
+  "generated_at_utc": "2026-08-09T11:56:19.904085+00:00",
+  "identity": {
+    "blueprint_hash": "sha256:3cc01784d2e937acc4f0f01723828367d2f8a3c1267b8a97556f45f9cfc452dd",
+    "brief_sha256": "sha256:bfcac849585c9f4473717a8156459b9c96fa5d6d0d77ab29fe2bf764be3cadf1",
+    "child_run_id": "bridge:rg_research_bridge:f324d29c:4d67ec53-8ecf-4753-83a7-c6258258659c",
+    "consumer_app_id": "apps_rg",
+    "jd_sha256": "sha256:957c43a7df84e3c815b4b1e0284cb8c4132567f622d3124a21fcaeea979d4f01",
+    "parent_run_id": "91249a82-6986-4653-9ad3-00d801f73cca",
+    "policy_hash": "sha256:a68c413ed3c1a7161ef38cffbaa9f2baa8e98c5649fef39eda3eee51b057dac1",
+    "producer_app_id": "apps_research",
+    "request_id": "req-6ee32357fa3a479390800431ba07861c",
+    "schema_version": "apps_research_rg_run_identity.v1",
+    "target_company": "Anthropic",
+    "target_role": "Manager of Applied AI Architecture, Partnerships",
+    "tenant_id": "default",
+    "trace_root": "4d67ec53-8ecf-4753-83a7-c6258258659c"
+  },
+  "judge_reasons": [],
+  "lane_x3_reasons": [],
+  "producer_component": "apps_rg.runtime.whole_run_exit",
+  "review_reasons": [
+    "PRODUCT_R4_BYPASS_PRELOADED_CONTEXT"
+  ],
+  "schema_version": "apps_rg.whole_run_exit_review_packet.v1",
+  "signal_source_errors": [
+    "UNREADABLE_JSON:modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json:FileNotFoundError",
+    "UNREADABLE_JSON:modular_r4/final_resume_assembly/x1d_full_resume_judge_outputs.json:FileNotFoundError"
+  ],
+  "signals": {
+    "c0_evidence_item_count": 47,
+    "c0_support_status": "PASS",
+    "cross_app_leakage": false,
+    "direct_l4_write_bypass": false,
+    "duplicate_lane_ids": [],
+    "expected_lane_ids": [
+      "competencies",
+      "unify_bullets",
+      "ibm_bullets",
+      "insurtech_bullets",
+      "ey_bullets",
+      "unify_narrative",
+      "ibm_narrative",
+      "insurtech_narrative",
+      "ey_narrative",
+      "executive_summary",
+      "headline"
+    ],
+    "final_materialized_acceptance_failed_lanes": [],
+    "final_resume_exists": true,
+    "final_resume_json_valid": true,
+    "final_resume_output_failed_gate_ids": [
+      "final_resume_no_gap_markers"
+    ],
+    "final_resume_output_status": "FAIL",
+    "final_resume_x2_all_pass": false,
+    "grounding_required": true,
+    "judge_execution_incomplete_lanes": [],
+    "judge_quorum_satisfied": false,
+    "lane_rows": [
+      {
+        "lane": "competencies",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "unify_bullets",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "ibm_bullets",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "insurtech_bullets",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "ey_bullets",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "unify_narrative",
+        "product_quality_status": "FAIL",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 1,
+        "x2_failed_gate_ids": [
+          "x2_no_companion_ngram_copy"
+        ],
+        "x3_code": "X3_BLOCK"
+      },
+      {
+        "lane": "ibm_narrative",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "insurtech_narrative",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "ey_narrative",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "lane": "executive_summary",
+        "product_quality_status": "FAIL",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 1,
+        "x2_failed_gate_ids": [
+          "x2_exec_summary_no_mechanism_inventory"
+        ],
+        "x3_code": "X3_BLOCK"
+      },
+      {
+        "lane": "headline",
+        "product_quality_status": "FAIL",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 2,
+        "x2_failed_gate_ids": [
+          "x2_headline_xyz_literal_grounding",
+          "x2_resume_graph_claim_binding"
+        ],
+        "x3_code": "X3_BLOCK"
+      }
+    ],
+    "locked_sections_preserved": true,
+    "min_chroma_evidence_items": 11,
+    "mock_provider_pass": false,
+    "observed_lane_ids": [
+      "competencies",
+      "executive_summary",
+      "ey_bullets",
+      "ey_narrative",
+      "headline",
+      "ibm_bullets",
+      "ibm_narrative",
+      "insurtech_bullets",
+      "insurtech_narrative",
+      "unify_bullets",
+      "unify_narrative"
+    ],
+    "pa_consumed_c0": true,
+    "pa_evidence_data_only": true,
+    "pa_schema_bound": true,
+    "product_r4_bypass_documented": true,
+    "required_generated_sections_present": true,
+    "section_gates_overall": "BLOCKED",
+    "x1d_aggregate_present": false,
+    "x1d_overall": "BLOCKED",
+    "x1d_policy_valid": true,
+    "x2_unknown_lane": false
+  },
+  "source_bindings": [
+    {
+      "artifact_ref": "FINAL_RESUME_OUTPUT.json",
+      "byte_length": 11494,
+      "present": true,
+      "sha256": "sha256:34c6b62698d4abe4b1f60fd2489193b0bc2b7bd9f0ba93d0ad0f6f3998978d4b"
+    },
+    {
+      "artifact_ref": "full_run_section_status.json",
+      "byte_length": 23705,
+      "present": true,
+      "sha256": "sha256:291b3755460d2b6cbbc769a9ce0f9b535d8182693b8b20737e1167f9aa55722d"
+    },
+    {
+      "artifact_ref": "modular_r4/final_resume_assembly/final_resume.json",
+      "byte_length": 21758410,
+      "present": true,
+      "sha256": "sha256:71468d094296e272e350f3a968a39a20d48b157dc31e1607ca3df76482484571"
+    },
+    {
+      "artifact_ref": "modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "modular_r4/final_resume_assembly/x1d_full_resume_judge_outputs.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "modular_r4/sections/competencies/c0_metrics.json",
+      "byte_length": 1650,
+      "present": true,
+      "sha256": "sha256:a7bb17a930bc07fc47abcbe6369a7e75b61c372fc501265e24e3772b28b0d2f8"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/competencies/compiled_prompt_artifact.json",
+      "byte_length": 3183,
+      "present": true,
+      "sha256": "sha256:8880d4719943dea344fcd84fd10b7641bda20ae3a75c5829fc5ba1926c1f9812"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/competencies/c0_fec_compose_receipt.json",
+      "byte_length": 3231,
+      "present": true,
+      "sha256": "sha256:9a5a4ae66266c1bf9650f8a161d70ff65583efd7444ffbd5fdd2a9ebb36c381b"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/competencies/x2_gate_outputs.json",
+      "byte_length": 39613,
+      "present": true,
+      "sha256": "sha256:48ac0da43480f30055902bb549c27cf148051f40c755875c6f0bd16429d2cd55"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/competencies/x3_disposition.json",
+      "byte_length": 1795,
+      "present": true,
+      "sha256": "sha256:834880255348d38c8e74e7e4a60fc55e3f404ee23b23ef9a5b661b0a018853dc"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_bullets/c0_metrics.json",
+      "byte_length": 1409,
+      "present": true,
+      "sha256": "sha256:8b5a9ebefa8f456ebe679aa2ebb590f661bcd1adebb061ee2a77663259a757c1"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_bullets/compiled_prompt_artifact.json",
+      "byte_length": 1310,
+      "present": true,
+      "sha256": "sha256:d2da3dc0e01dd459296a9226a4f808c65dd145dbe13a590b56af0d1a65486614"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3232,
+      "present": true,
+      "sha256": "sha256:d8d7733168dfedb0a5d50a29eca82e9908f9567b02f54073329d8170c82c9555"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_bullets/x2_gate_outputs.json",
+      "byte_length": 35076,
+      "present": true,
+      "sha256": "sha256:a3af83665fc9e37a65b2003f0181ba05b318046bdf7773839b214dafc64b2b52"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_bullets/x3_disposition.json",
+      "byte_length": 1797,
+      "present": true,
+      "sha256": "sha256:e07f1252f9fcf79f843901ae544d06be8b24b56f20e57c0214a8245babcca80a"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_bullets/c0_metrics.json",
+      "byte_length": 1274,
+      "present": true,
+      "sha256": "sha256:695e955acd093402140ee2862020d08e3384c83dfbfe2e32e4513d0206505ad7"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_bullets/compiled_prompt_artifact.json",
+      "byte_length": 2938,
+      "present": true,
+      "sha256": "sha256:5c2a7b91f95f4001d620c8e71e2e8b5731a2d6f8d966f7489ae1fe42510e6a5a"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3230,
+      "present": true,
+      "sha256": "sha256:7714fdaf4b1473a826573d489689bfca308cb607b9d7b09dc402e0b08908bda0"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_bullets/x2_gate_outputs.json",
+      "byte_length": 27840,
+      "present": true,
+      "sha256": "sha256:a1bf5be4eaf18e2219f96b0dd6e683d56a0aaeab5d1dcec4e757ab1381f062fc"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_bullets/x3_disposition.json",
+      "byte_length": 1735,
+      "present": true,
+      "sha256": "sha256:99eea6c6bcf21b242d4a136a384eb3c22e09b85ee6546250c9f650fb4c287f5f"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_bullets/c0_metrics.json",
+      "byte_length": 968,
+      "present": true,
+      "sha256": "sha256:fc450ee390c1dcdc85f5c6a5b726ec5b81ed2c5c2603ccc2e09f6ce85cb8b8a0"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_bullets/compiled_prompt_artifact.json",
+      "byte_length": 1343,
+      "present": true,
+      "sha256": "sha256:1d3a3438214a45957719bbf26604e2835e2f660216581606f7b4c1bd11324f94"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3236,
+      "present": true,
+      "sha256": "sha256:50b195e1b642f5ade2748c0720a5e5b0d79b7025aa4335ea716b9343749938a4"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_bullets/x2_gate_outputs.json",
+      "byte_length": 5442,
+      "present": true,
+      "sha256": "sha256:b47f98b79758c710aab0c2b4564dcaf0fde48276b2aa65253df06b47e0ceb802"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_bullets/x3_disposition.json",
+      "byte_length": 1735,
+      "present": true,
+      "sha256": "sha256:7f21c0525e6591a65d712e52cb4d60e25342a64c53b7972f672ffb23d22766b8"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_bullets/c0_metrics.json",
+      "byte_length": 947,
+      "present": true,
+      "sha256": "sha256:315198b289a047e6251d94792e16e9b43e92346518cf4f898a92234b0cb3fbd6"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_bullets/compiled_prompt_artifact.json",
+      "byte_length": 1322,
+      "present": true,
+      "sha256": "sha256:412c19413dcaa319f86fe9520688694b54d9ad11ae04c1d9f89289129bd903b9"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3229,
+      "present": true,
+      "sha256": "sha256:c7fd7935b3a143bab2df36cb352d6d0cdea9cb7494b9c0cf05e7118420026aaa"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_bullets/x2_gate_outputs.json",
+      "byte_length": 5330,
+      "present": true,
+      "sha256": "sha256:0c82cb6a23d13deba565466ece24a578abb19a4c0a66a7c745f848d777b5863a"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_bullets/x3_disposition.json",
+      "byte_length": 1735,
+      "present": true,
+      "sha256": "sha256:7cd40fd9e47c4d04d4d8fd6263af3297e8b67206349cf7d7d59f8bf6e19c421b"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_narrative/c0_metrics.json",
+      "byte_length": 1585,
+      "present": true,
+      "sha256": "sha256:8dfd59a0156e923c8f5258d5b6c99d77b120c5794c278d364d8814000cb4e53e"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_narrative/compiled_prompt_artifact.json",
+      "byte_length": 1317,
+      "present": true,
+      "sha256": "sha256:97d65719030d9b153d341ab2b0a720add95a42b3e9de8bd02e97c85336991ec3"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3234,
+      "present": true,
+      "sha256": "sha256:bf982f6825cc2de70562dc8dd258ae86f3bbf9c7f490c9b1ae704f85326ca172"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_narrative/x2_gate_outputs.json",
+      "byte_length": 31406,
+      "present": true,
+      "sha256": "sha256:ee150b1bcd55fdcfc1982c15893305743f21decbf4bc9380d826082d036423e0"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/unify_narrative/x3_disposition.json",
+      "byte_length": 1873,
+      "present": true,
+      "sha256": "sha256:c2957ed9d51c0486ed66e624127103f7ed60d14ce28c19524ad0f190195f7a92"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_narrative/c0_metrics.json",
+      "byte_length": 1339,
+      "present": true,
+      "sha256": "sha256:20f6e034f292f8920e2311524f517154c453b5a55763e66ca79e7ba7659fd4b7"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_narrative/compiled_prompt_artifact.json",
+      "byte_length": 2876,
+      "present": true,
+      "sha256": "sha256:4ffbf36a1aa496bec266b4c61a54c4ff6386dbe3ddb3097f3762210e94ed82db"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3232,
+      "present": true,
+      "sha256": "sha256:a5d28044f7bf53378a669bdbc7fb5011f9a64ca0137a01f3f4e99bd0ac5c052f"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_narrative/x2_gate_outputs.json",
+      "byte_length": 30358,
+      "present": true,
+      "sha256": "sha256:83bff7cc26cb5dff795fef83be96a3f53b8278b704b5f6e4104d220437be70fb"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ibm_narrative/x3_disposition.json",
+      "byte_length": 1712,
+      "present": true,
+      "sha256": "sha256:30469cd10fae187bd77f9a14f6a884da612e97337c5c1a113129c8fe6da62caa"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_narrative/c0_metrics.json",
+      "byte_length": 1284,
+      "present": true,
+      "sha256": "sha256:158c2753667098d118c23c62b69c21f98887e267b49241252faa4c2b6669f2d2"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_narrative/compiled_prompt_artifact.json",
+      "byte_length": 1342,
+      "present": true,
+      "sha256": "sha256:a1d0215e8ebdf0b270631ddd79128571ab5c62ccf5b04b8fe264d1086e1a8a41"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3238,
+      "present": true,
+      "sha256": "sha256:09e444884b237a250cba8dc409b7c1ece79c821a56acb69528eb864ca275f938"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_narrative/x2_gate_outputs.json",
+      "byte_length": 4887,
+      "present": true,
+      "sha256": "sha256:b6370e48b168641cf6742f374ccd55271bb2fcb1110917fc544bc209099e99a9"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/insurtech_narrative/x3_disposition.json",
+      "byte_length": 1712,
+      "present": true,
+      "sha256": "sha256:64a0d6cf146bc8818b908aa18a1fe4d8e3b8b5020fd3769dd6c6b8cc01c159da"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_narrative/c0_metrics.json",
+      "byte_length": 1205,
+      "present": true,
+      "sha256": "sha256:14e9dd3e7df3b98d11fbca5133335ed3db4777debec00a07e6634e3521b7dca3"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_narrative/compiled_prompt_artifact.json",
+      "byte_length": 1321,
+      "present": true,
+      "sha256": "sha256:23322c67eaee2b90c09a34b5fe63ce2793724a51c10e3621a71e15d64d718f4b"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3231,
+      "present": true,
+      "sha256": "sha256:e70b1aba3a0c354453f5731ba3b909ae133e42c1cc86bd859cf1b5a418d9062a"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_narrative/x2_gate_outputs.json",
+      "byte_length": 4952,
+      "present": true,
+      "sha256": "sha256:927a21b1c10a73f8a210d51f50e0a77939494c687d5f14d9c278cec68b5d3f4b"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/ey_narrative/x3_disposition.json",
+      "byte_length": 1712,
+      "present": true,
+      "sha256": "sha256:a53d997a06aa372453aaabc2d05239b190804c348b7c850a5b6d9a860606534a"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/executive_summary/c0_metrics.json",
+      "byte_length": 1240,
+      "present": true,
+      "sha256": "sha256:22675d9b2699bed25fec346de175b8cc6db9bc0b1270eab71e5925a20b9cd48a"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/executive_summary/compiled_prompt_artifact.json",
+      "byte_length": 2370,
+      "present": true,
+      "sha256": "sha256:44da82cb1ca4256a1b1965bce2e90eb26542ed21c2a8e2d4fb74dd160d0abd3f"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/executive_summary/c0_fec_compose_receipt.json",
+      "byte_length": 3236,
+      "present": true,
+      "sha256": "sha256:722f76ce0373aa30881af1a8d0f2e993c0e7efdf0a6bd56b5b7506c1453dfef1"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/executive_summary/x2_gate_outputs.json",
+      "byte_length": 35429,
+      "present": true,
+      "sha256": "sha256:d002ae1d4b796550225bc2566fdc3d96076bde69118d07580df6b67a14072112"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/executive_summary/x3_disposition.json",
+      "byte_length": 1612,
+      "present": true,
+      "sha256": "sha256:ae66bfcacda71975bfb8367fc5211f161e757b51a493f5f165ba3db54a9e330c"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/headline/c0_metrics.json",
+      "byte_length": 1226,
+      "present": true,
+      "sha256": "sha256:baafa9b9b0c4178fd05870c763b8a44584a6fd9e3224badbf12c251db95a3bac"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/headline/compiled_prompt_artifact.json",
+      "byte_length": 1305,
+      "present": true,
+      "sha256": "sha256:6c1459bbcb8e342f740b7e0b6528bb5f4cd3aa4ab9cbc937f7bad35808c5a294"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/headline/c0_fec_compose_receipt.json",
+      "byte_length": 3227,
+      "present": true,
+      "sha256": "sha256:9849c19314d5c4c826159d3e3c778aafdd72934653de80c52cfa6f03d189f175"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/headline/x2_gate_outputs.json",
+      "byte_length": 42570,
+      "present": true,
+      "sha256": "sha256:c7c7730991589c66ad581fbc3b66ba60b83189a0f819dc7c8928f445263d6df3"
+    },
+    {
+      "artifact_ref": "modular_r4/sections/headline/x3_disposition.json",
+      "byte_length": 1849,
+      "present": true,
+      "sha256": "sha256:b44b1fa42ce25811392c9bf9cfba58f5ee4e7108126dd4d629553f8498efa55e"
+    }
+  ],
+  "status": "BLOCKED",
+  "unknown_never_pass": true,
+  "unknowns": [],
+  "warnings": [],
+  "x1_result_ref": "modular_r4/final_resume_assembly/x1d_full_resume_judge_outputs.json",
+  "x2_result_ref": "modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json",
+  "x3_disposition": "X3A_DENY_REROUTE"
+}

@@ -1,0 +1,108 @@
+IBM_NARRATIVE_OUTPUT:
+Operationalized AWS partner solution architecture across enterprise pursuits at IBM, establishing BI-backed decision discipline that made modernization delivery more repeatable.
+
+X1D_LLM_JUDGE_OUTPUTS:
+| Provider | Mode | Status | Score | Pass | Decisive Failure |
+|---|---|---|---:|---|---|
+| Google Gemini 3.6 Flash | MODEL_BACKED | MODEL_BACKED_PASS | 5.0 | True | False |
+
+X2_DETERMINISTIC_GATE_OUTPUTS:
+- x2_ibm_narrative_exactly_one_sentence: PASS
+- x2_ibm_narrative_exactly_one_sentence_mechanical: PASS
+- x2_ibm_narrative_forbidden_opener: PASS
+- x2_ibm_narrative_metric_cap: PASS
+- x2_ibm_narrative_bullet_overlap_threshold: PASS
+- x2_ibm_narrative_word_budget: PASS
+- x2_ibm_narrative_no_candidate_name_tokens: PASS
+- x2_ibm_narrative_no_meta_disclaimer_in_display: PASS
+- x2_ibm_narrative_source_supported: PASS
+- x2_claim_ledger_source_fact_ids_allow_list: PASS
+- x2_claim_ledger_claim_text_non_empty: PASS
+- x2_ibm_narrative_role_episode_bundles_in_proof_pool: PASS
+- x2_ibm_narrative_role_episode_bundle_id_required: PASS
+- x2_ibm_narrative_hold_metric_forbidden: PASS
+- x2_ibm_narrative_ibm_only_fact_scope: PASS
+- x2_no_unify_fact_leakage: PASS
+- x2_no_insurtech_fact_leakage: PASS
+- x2_no_ey_fact_leakage: PASS
+- x2_no_jd_only_claims: PASS
+- x2_ibm_narrative_weak_resume_jargon_phrases: PASS
+- x2_ibm_narrative_claim_theme_coverage: PASS
+- x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets: FAIL
+- x2_ibm_narrative_claim_ledger_clause_decomposition: PASS
+- x2_ibm_narrative_requires_finalized_bullets: PASS
+- x2_no_metric_repetition_unless_justified: PASS
+- x2_no_bullet_sentence_structure_copy: PASS
+- x2_no_five_bullet_roll_up_tone: PASS
+- x2_no_inline_source_tags: PASS
+- x2_no_first_person: PASS
+- x2_no_em_dash: PASS
+- x2_no_generic_filler: PASS
+- x2_no_unify_runtime_terms: PASS
+- x2_json_parse_valid: PASS
+- x2_provider_requested_attempted: PASS
+- x2_no_silent_mock_fallback: PASS
+- x2_x1d_required_judges_present: PASS
+- x2_x1d_schema_valid: PASS
+- x2_no_mock_or_plumbing_language_in_real_l2_output: PASS
+- x2_ibm_narrative_active_proof_pool_source_fact_ids: PASS
+- x2_section_input_usage_ledger_present: PASS
+- x2_jd_used_as_required_targeting_input: PASS
+- x2_briefing_used_as_required_context_input: PASS
+- x2_title_company_used_as_required_positioning_input: PASS
+- x2_no_non_evidence_inputs_as_claim_evidence: PASS
+- x2_no_non_evidence_inputs_in_source_fact_ids: PASS
+- x2_selected_fact_ids_only: PASS
+- x2_section_claims_supported_by_base_resume: PASS
+- x2_input_usage_accounting_consistent: PASS
+- x2_fec_subset_of_canonical_evidence_pool: PASS
+- x2_prompt_c0_ids_subset_of_fec: PASS
+- x2_claim_ledger_source_fact_ids_subset_of_fec: PASS
+- X2_BLOCK_ID_NAMESPACE_SPLIT: PASS
+- x2_active_pool_digest_matches_fec_digest: PASS
+- x2_narrative_seniority_floor: PASS
+- x2_narrative_no_consulting_language: PASS
+- x2_narrative_technical_specificity_floor: PASS
+- x2_narrative_not_bullet_recap: PASS
+- x2_narrative_upstream_graph_proof_required: PASS
+- x2_narrative_base_prose_ngram_overlap: PASS
+- x2_narrative_e0_ngram_overlap: PASS
+
+X3_DISPOSITION:
+{
+  "x3_code": "X3_BLOCK",
+  "decisive_reason": "X2 deterministic gate failure",
+  "review_reason": "",
+  "authorization_scope": "PLUMBING_ONLY",
+  "proceed_to_runtime": false,
+  "runtime_generation_status": "REAL_LLM",
+  "x1d_evaluator_mode": "MODEL_BACKED",
+  "product_quality_status": "FAIL",
+  "x2_failed_gates": [
+    "x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets"
+  ],
+  "blocked_judges": [],
+  "mocked_judges": [],
+  "soft_failed_judges": [],
+  "decisive_judge_failures": [],
+  "final_summary_hash": "6d98f382a20b6221",
+  "claim_ledger_hash": "61fbe6b555101b47",
+  "required_remediation": [
+    "Fix failed X2 gates: x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets",
+    "Product quality must be PASS, currently FAIL."
+  ],
+  "blocked_judge_detail_rows": [],
+  "model_backed_pass_provider_keys": [
+    "gemini_pro"
+  ],
+  "proof_eligible_allow_requires": "every_configured_x1d_judge_model_backed_pass",
+  "pass": false,
+  "disposition_authority": "lane",
+  "section_x3_authoritative": false,
+  "section_x3_mirror_only": true,
+  "spine_x3_claimed": false
+}
+
+L6_SHADOW_EVAL_PACKAGE:
+C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w1_live\e2e_20260808T214028Z_8eadd696\modular_r4\sections\ibm_narrative\real\patch_20260809_035000_bae4dc497654\l6_shadow_eval_package.json
+offline_only=true

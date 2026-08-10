@@ -291,6 +291,61 @@ def test_company_hint_plan_raises_for_unify_bullets() -> None:
         _graph_substrate_company_hint_plan(ledger, section_id="unify_bullets", hints=("unify",), limit=6)
 
 
+def test_normalizer_drops_graph_provenance_outside_each_slot_bound_source() -> None:
+    facts = [
+        {
+            "fact_id": bullet_id,
+            "candidate_fact_id": f"candidate_{index:03d}",
+        }
+        for index, bullet_id in enumerate(UNIFY_BULLET_IDS, start=1)
+    ]
+    allowed = {
+        value
+        for fact in facts
+        for value in (fact["fact_id"], fact["candidate_fact_id"])
+    } | {
+        "reb_unify_enterprise_adoption_revenue",
+        "skill_partner_customer_deal_support",
+        "metric_unify_cfo_aligned_adoption_motion_count",
+    }
+    parsed = {
+        "bullets": [
+            {
+                "bullet_id": fact["fact_id"],
+                "bullet_text": f"Owned governed platform delivery for slot {index}.",
+                "source_fact_ids": [
+                    fact["fact_id"],
+                    fact["candidate_fact_id"],
+                    "reb_unify_enterprise_adoption_revenue",
+                    "skill_partner_customer_deal_support",
+                    "metric_unify_cfo_aligned_adoption_motion_count",
+                ],
+            }
+            for index, fact in enumerate(facts, start=1)
+        ],
+        "claim_ledger": [],
+        "change_log": [],
+    }
+    out = normalize_unify_parsed_without_ledger_synthesis(
+        parsed,
+        {
+            "allowed_fact_ids": sorted(allowed),
+            "selected_fact_plan": {"section_id": "unify_bullets", "facts": facts},
+        },
+    )
+    assert out is not None
+    by_id = {row["bullet_id"]: row for row in out["bullets"]}
+    for fact in facts:
+        assert by_id[fact["fact_id"]]["source_fact_ids"] == [
+            fact["fact_id"],
+            fact["candidate_fact_id"],
+        ]
+    assert any(
+        row.get("operation") == "normalize_source_fact_ids_to_slot_bound_evidence"
+        for row in out["change_log"]
+    )
+
+
 def test_brown_allocation_not_legacy_six_pack() -> None:
     plan = _brown_allocate()
     assert plan["selection_method"] == TRACK_RANKED_SELECTION_METHOD
@@ -454,6 +509,12 @@ def test_unify_normalization_repairs_present_tense_ownership_for_seniority_floor
         ("Establish governed runtime controls.", "Established governed runtime controls."),
         ("Standardize the AI systems lifecycle.", "Standardized the AI systems lifecycle."),
         ("Architect distributed cloud infrastructure.", "Architected distributed cloud infrastructure."),
+        (
+            "Compressed the AI systems lifecycle from six months to three weeks by standardizing intake, "
+            "production readiness, monitoring, remediation, and exit disposition governance.",
+            "Accelerated the AI systems lifecycle from six months to three weeks by standardizing intake, "
+            "production readiness, monitoring, remediation, and exit disposition governance.",
+        ),
     ],
 )
 def test_unify_normalization_repairs_present_tense_executive_verbs(present: str, past: str) -> None:

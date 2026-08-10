@@ -1,0 +1,61 @@
+{
+  "attempt_count": 1,
+  "attempt_receipt_id": "attempt-c14bbb8bccfe4f9984a52bbc3b11a58e",
+  "authority_scope": "apps_rg_l2_envelope_adapter_receipts",
+  "canonical_l2_artifact_authority": false,
+  "decisive_reason_code": "E3_SECTION_OUTPUT_MISSING",
+  "determinism": {
+    "attempt_seed": "f525f193aecace4a40d56bd18fb8e048daacd6b5698a62d14b46eb3bdc44d1ef",
+    "blueprint_hash": "ea887054e91e1487f015c1ff6d834af55a2bb0ff2d416ae1a87e67a24e4257f5",
+    "input_hash": "5941955bd36669e264130de5bde037068ae597d13dbabddfdd75b128e42cfd6d",
+    "policy_hash": "bafee91ee86960cfdc581d692c349be017596d991829e2ec269383f6165b31ed",
+    "prompt_hash": "9ffbe24e247c6d8affeb8efd383a5d6be5cbf95830401b4f36aa38d554d4d03c",
+    "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:1144031050a890ca:33fbb7039ce653d7::v1"
+  },
+  "error_summary": "section L2 output artifact missing",
+  "execution_lane": "MODEL",
+  "generated_artifacts": [
+    "provider_request.json",
+    "provider_response.json"
+  ],
+  "latency_ms": 0.0,
+  "lineage": {
+    "ancestry_chain": [
+      "R3R4_MANAGED_WORKFLOW",
+      "wfm::apps_rg::resume_generation::v1"
+    ],
+    "parent_plan_id": "wfm::apps_rg::resume_generation::v1",
+    "parent_route_id": "R3R4_MANAGED_WORKFLOW",
+    "parent_step_id": "competencies",
+    "same_run_packet_family": "d49159a5-3df5-4250-9da0-4513a242ebe3"
+  },
+  "local_check_results": {
+    "artifact_bytes_match": true,
+    "grounded_output": false,
+    "l2_output_file_digest": "",
+    "l2_output_ref": "",
+    "model_or_tool_name": "claude-sonnet-5",
+    "provider_lane": "anthropic",
+    "provider_request_digest": "3d76b35d049046fe5b34069dad8623836a84024ba32f42b025664c601793166c",
+    "provider_request_ref": "provider_request.json",
+    "provider_response_digest": "f1043a5230a80bb4220f8471a635743da188cd2aff2ab2498b35560f8e3ae394",
+    "provider_response_ref": "provider_response.json",
+    "replay_key_matches": true,
+    "token_usage_observed": true,
+    "tokens_used": 3484
+  },
+  "output_digest": "28864c2908c4afa3706861766a30496a60c4850b7d947d08a6236407c1d18c22",
+  "proposed_state_diff": {
+    "payload": {},
+    "section_id": "competencies",
+    "section_output_ref": ""
+  },
+  "quarantined_payload": null,
+  "result_class": "FAIL_TERMINAL",
+  "return_code": 1,
+  "sealed_at": 647843.25,
+  "span_id": "section-l2-competencies",
+  "tokens_used": 3484,
+  "trace_id": "8bc5b71d-03ec-4c41-a003-6f4aad5b5b5d",
+  "validation_packet_id": "section-val-5941955bd36669e2"
+}

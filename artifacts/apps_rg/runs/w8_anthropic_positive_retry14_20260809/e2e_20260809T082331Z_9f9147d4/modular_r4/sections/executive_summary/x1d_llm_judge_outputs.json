@@ -1,0 +1,202 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_exec_summary",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry14_20260809\\e2e_20260809T082331Z_9f9147d4\\modular_r4\\sections\\executive_summary\\x1d_gemini_provider_response_raw_20260809_083209_464.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "4d218c3e5ef7a157",
+      "output_hash": "f3406604fe6ddff0",
+      "score": 5.0,
+      "score_scale": "0_to_5",
+      "normalized_score": 1.0,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "4d218c3e5ef7a157",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry14_20260809\\e2e_20260809T082331Z_9f9147d4\\modular_r4\\sections\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_exec_summary",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry14_20260809\\e2e_20260809T082331Z_9f9147d4\\modular_r4\\sections\\executive_summary\\x1d_openai_provider_response_raw_20260809_083233_246.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "4d218c3e5ef7a157",
+      "output_hash": "8cac019e5f485822",
+      "score": 4.2,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.8400000000000001,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Strong evidence-backed blend of alliance, platform, security, and commercial leadership.",
+        "S1 uses an indirect leadership formulation rather than a crisp executive identity.",
+        "S6 is credible but generic and largely recaps earlier themes.",
+        "Judge-packet display-override parity gate is false, limiting independent parity review."
+      ],
+      "cited_sentence_indexes": [
+        1,
+        6
+      ],
+      "remediation_suggestions": [
+        "Sharpen the direct leadership signal in S1.",
+        "Make S6 more distinctive and decisive without adding claims."
+      ],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": "4d218c3e5ef7a157",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\runs\\w8_anthropic_positive_retry14_20260809\\e2e_20260809T082331Z_9f9147d4\\modular_r4\\sections\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": false,
+          "severity": "minor",
+          "codes": [
+            "INDIRECT_LEADERSHIP_IDENTITY",
+            "GENERIC_FORWARD_CLOSE"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "84524aee2b0cbd5d7fde829eabf7fce2e051089bb1526e99fecaf391eb1af3df",
+  "graph_claim_binding_contract_digest": "b57d48d79d743bf2b8b88ff8a55eb0fe047484f39d10c96e64067c65af887d19",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

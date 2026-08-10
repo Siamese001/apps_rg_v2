@@ -1,0 +1,82 @@
+{
+"categories": [
+{
+"category_id": "ccb_runtime_governance",
+"display_label": "Runtime Governance & Fail-Closed Gates",
+"terms": [
+{"text": "fail-closed runtime gate design", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+{"text": "policy-bound execution control planes", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+{"text": "audit manifest and replay controls", "source_fact_id": "skill_unify_agentic_replay_key_audit_manifest_design", "source_fact_ids": ["skill_unify_agentic_replay_key_audit_manifest_design"]}
+]
+},
+{
+"category_id": "ccb_agentic_platforms",
+"display_label": "Agentic Route Policy & Dispatch Architecture",
+"terms": [
+{"text": "L0 route policy dispatch design", "source_fact_id": "skill_unify_agentic_l0_route_policy_dispatch", "source_fact_ids": ["skill_unify_agentic_l0_route_policy_dispatch"]},
+{"text": "multi-agent orchestration contracts", "source_fact_id": "skill_unify_agentic_multi_agent_orchestration_contracts", "source_fact_ids": ["skill_unify_agentic_multi_agent_orchestration_contracts"]},
+{"text": "human override escalation paths", "source_fact_id": "skill_unify_agentic_human_override_escalation_paths", "source_fact_ids": ["skill_unify_agentic_human_override_escalation_paths"]}
+]
+},
+{
+"category_id": "ccb_llmops_reliability",
+"display_label": "Runtime Proof Lineage & Delivery Resilience",
+"terms": [
+{"text": "runtime proof bundle lineage", "source_fact_id": "skill_unify_agentic_runtime_proof_bundle_lineage", "source_fact_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"]},
+{"text": "automated release pipeline resilience", "source_fact_id": "skill_ibm_automated_release_pipelines", "source_fact_ids": ["skill_ibm_automated_release_pipelines"]},
+{"text": "regulated modernization delivery controls", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]}
+]
+},
+{
+"category_id": "ccb_partner_applied_ai_architecture",
+"display_label": "Partner-Facing Applied AI Solution Architecture",
+"terms": [
+{"text": "partner pre-sales technical discovery", "source_fact_id": "skill_partner_pre_sales", "source_fact_ids": ["skill_partner_pre_sales", "reb_ibm_presales_solution_engineering"]},
+{"text": "joint solution development with partners", "source_fact_id": "skill_partner_joint_solution_development", "source_fact_ids": ["skill_partner_joint_solution_development"]},
+{"text": "partner-led AI solution enablement", "source_fact_id": "skill_partner_partner_led_ai_solutions", "source_fact_ids": ["skill_partner_partner_led_ai_solutions", "reb_unify_partner_channel_cosell"]}
+]
+},
+{
+"category_id": "ccb_alliance_gtm_governance",
+"display_label": "Hyperscaler Alliance Co-Sell Governance",
+"terms": [
+{"text": "IBM-AWS alliance co-sell motions", "source_fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]},
+{"text": "cloud vendor joint GTM execution", "source_fact_id": "skill_partner_cloud_vendor_joint_gtm", "source_fact_ids": ["skill_partner_cloud_vendor_joint_gtm"]},
+{"text": "hyperscaler alliance co-sell cadence", "source_fact_id": "skill_sr_w12_hyperscaler_alliance_co_sell", "source_fact_ids": ["skill_sr_w12_hyperscaler_alliance_co_sell"]}
+]
+},
+{
+"category_id": "ccb_customer_deal_governance",
+"display_label": "Customer Deal & Value Realization Controls",
+"terms": [
+{"text": "value-realization adoption checkpoints", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]},
+{"text": "presales delivery handoff governance", "source_fact_id": "skill_p2_gtm_presales_delivery_handoff", "source_fact_ids": ["skill_p2_gtm_presales_delivery_handoff"]},
+{"text": "partner customer deal support", "source_fact_id": "skill_partner_customer_deal_support", "source_fact_ids": ["skill_partner_customer_deal_support"]}
+]
+},
+{
+"category_id": "ccb_enterprise_negotiation_controls",
+"display_label": "Enterprise Negotiation & Quota Governance",
+"terms": [
+{"text": "quota-aligned pursuit ownership", "source_fact_id": "reb_ibm_revenue_sales_target_execution", "source_fact_ids": ["reb_ibm_revenue_sales_target_execution"]},
+{"text": "enterprise negotiation frameworks", "source_fact_id": "skill_partner_enterprise_negotiations", "source_fact_ids": ["skill_partner_enterprise_negotiations"]},
+{"text": "expansion readiness stakeholder alignment", "source_fact_id": "reb_ibm_customer_success_value_realization", "source_fact_ids": ["reb_ibm_customer_success_value_realization"]}
+]
+}
+],
+"selected_fact_plan": [
+{"section_id": "runtime_governance", "selection_method": "lens_biased", "required_fact_ids": ["fact_engineering_platform_001", "reb_unify_agentic_platform_architecture"]},
+{"section_id": "partner_architecture", "selection_method": "lens_biased", "required_fact_ids": ["skill_partner_pre_sales", "skill_partner_joint_solution_development"]}
+],
+"claim_ledger": [
+{"claim": "fail-closed runtime gate design", "source_fact_ids": ["fact_engineering_platform_001"]},
+{"claim": "agentic route policy dispatch", "source_fact_ids": ["skill_unify_agentic_l0_route_policy_dispatch"]},
+{"claim": "partner co-sell alliance motions", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]}
+],
+"jd_alignment": ["partner_applied_ai_architecture", "alliance_gtm_governance", "customer_deal_governance"],
+"excluded_jd_skills": ["team_hiring_management", "board_thought_partnership"],
+"removed_or_rewritten_terms": ["generic AI governance leadership"],
+"gap_notes": ["no direct people-management evidence in retained facts"],
+"change_log": ["biased categories toward runtime governance lens", "expanded four category labels beyond canonical set"],
+"self_check": ["3 terms per category verified", "all source_fact_ids from allowed list", "no markdown fences used"]
+}

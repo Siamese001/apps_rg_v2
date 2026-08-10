@@ -69,6 +69,7 @@ from apps_rg.runtime.reasoning.employment_bullet_pool import (
     REQUIRED_BULLET_IDS,
     build_employment_targeting_context,
     employment_pool_x1d_judge_rows,
+    evaluate_employment_selection_quality,
     is_employment_bullet_lane,
     is_employment_pool_generation,
 )
@@ -518,16 +519,30 @@ def _normalize_bullets(parsed: dict[str, Any], *, cfg: RoleEpisodeLaneConfig, al
             text = _sentence(text)
             if not text:
                 continue
+            source_fact_ids = _normalize_source_ids(
+                row.get("source_fact_ids"), allowed, idx
+            )
+            expected_ids = {
+                f"{cfg.bullet_prefix}_{slot + 1:03d}"
+                for slot in range(ROLE_EPISODE_FINAL_BULLET_COUNT)
+            }
+            source_bound_ids = [
+                fact_id for fact_id in source_fact_ids if fact_id in expected_ids
+            ]
+            canonical_id = (
+                source_bound_ids[0]
+                if len(set(source_bound_ids)) == 1
+                else f"{cfg.bullet_prefix}_{idx + 1:03d}"
+            )
             out.append(
                 {
-                    # Canonical slot id ALWAYS (W3, plan apps-rg-aig-remaining-lanes-closeout-d4e1f7):
-                    # the companion-finalization gate keys on bul_<employer>_NNN; trusting a
-                    # model-emitted id (e.g. "ins_b1") made narrative upstream acceptance
-                    # non-deterministic — InsurTech failed bullet_ids_mismatch while EY passed
-                    # only because its model happened to echo the canonical ids.
-                    "bullet_id": f"{cfg.bullet_prefix}_{idx + 1:03d}",
+                    # An exact proof-fact id is the slot authority. Positional
+                    # fallback remains for rows without a usable source id.
+                    # Position-only normalization mislabeled out-of-order EY
+                    # rows and created false cross-bullet duplicates.
+                    "bullet_id": canonical_id,
                     "bullet_text": text,
-                    "source_fact_ids": _normalize_source_ids(row.get("source_fact_ids"), allowed, idx),
+                    "source_fact_ids": source_fact_ids,
                 }
             )
     return out
@@ -964,6 +979,52 @@ def _materialize_bullet_generation(
         ),
     }
     return bullets, receipt
+
+
+def _reconcile_final_materialized_selection_gate(
+    *,
+    artifact_dir: Path,
+    section_id: str,
+    bullets: list[dict[str, Any]],
+    generation_meta: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Re-evaluate selector quality against the bullets that actually ship.
+
+    The selector gate is initially computed over the model-merged pool.  Some
+    graph-governed lanes then rehydrate the selected slots from frozen proof,
+    which can correct duplicate/mis-bound source ids.  X1D must grade that
+    final materialized object, while retaining the producer gate as audit
+    evidence; carrying the stale pre-materialization gate produced a false EY
+    selector failure even though all three Claude scores and final source ids
+    passed.
+    """
+
+    required = REQUIRED_BULLET_IDS.get(str(section_id or "").strip().lower())
+    selection_path = artifact_dir / "bullet_pool_selection.json"
+    if not required or not selection_path.is_file():
+        return None
+    try:
+        selection_doc = json.loads(selection_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    selections = [
+        dict(row)
+        for row in selection_doc.get("selections") or []
+        if isinstance(row, Mapping)
+    ] if isinstance(selection_doc, Mapping) else []
+    if not selections:
+        return None
+    final_gate = evaluate_employment_selection_quality(
+        section_lane=section_id,
+        required_bullet_ids=required,
+        selections=selections,
+        merged_parsed={"bullets": bullets},
+    ).to_dict()
+    producer_gate = dict(generation_meta.get("selection_gate") or {})
+    generation_meta["producer_selection_gate"] = producer_gate
+    generation_meta["final_materialized_selection_gate"] = final_gate
+    generation_meta["selection_gate"] = final_gate
+    return final_gate
 
 
 def _normalize_role_episode_bullet_pool_parsed(
@@ -1745,7 +1806,9 @@ def run_role_episode_lane_execution(
     prompt_text = _compiled_prompt(cfg, runtime_payload)
     prompt_hash = hashlib.sha256(prompt_text.encode("utf-8")).hexdigest()
     compiled_obj = _prompt_object(prompt_text, run_id=run_id, prompt_hash=prompt_hash)
-    compiled_obj.reasoning_effort = resolve_section_generation_effort(sid)
+    compiled_obj.reasoning_effort = resolve_section_generation_effort(
+        sid, provider_profile=str(args.provider)
+    )
     write_json(artifact_dir / "runtime_payload.json", runtime_payload)
     (artifact_dir / "compiled_prompt.txt").write_text(prompt_text + "\n", encoding="utf-8")
     write_json(
@@ -1855,6 +1918,12 @@ def run_role_episode_lane_execution(
             graph_packet_digest=pool.proof_pool_digest,
         )
         if generation_meta:
+            _reconcile_final_materialized_selection_gate(
+                artifact_dir=artifact_dir,
+                section_id=sid,
+                bullets=bullets,
+                generation_meta=generation_meta,
+            )
             generation_receipt.update(
                 {
                     "generation_mode": generation_meta.get("generation_mode"),
@@ -1862,6 +1931,10 @@ def run_role_episode_lane_execution(
                     "total_paths_executed": generation_meta.get("total_paths_executed"),
                     "regen_rounds_executed": generation_meta.get("regen_rounds_executed"),
                     "selection_gate": generation_meta.get("selection_gate"),
+                    "producer_selection_gate": generation_meta.get("producer_selection_gate"),
+                    "final_materialized_selection_gate": generation_meta.get(
+                        "final_materialized_selection_gate"
+                    ),
                     "selection_mode": generation_meta.get("selection_mode"),
                     "source_path_by_slot": generation_meta.get("source_path_by_slot"),
                 }

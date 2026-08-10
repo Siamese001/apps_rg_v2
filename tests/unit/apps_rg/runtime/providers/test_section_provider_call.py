@@ -128,7 +128,7 @@ def test_call_section_model_provider_threads_messages_and_overrides(monkeypatch)
     assert compiled.compilation_hash == "prompt-hash"
     assert compiled.request_id == "request-1"
     assert compiled.run_id == "explicit-run"
-    assert compiled.reasoning_effort == "high"
+    assert compiled.reasoning_effort == "low"
     assert [(b.role, b.content) for b in compiled.prompt_blocks] == [
         ("system", "System guard."),
         ("user", "Write one bullet."),

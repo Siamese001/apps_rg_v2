@@ -222,7 +222,7 @@ def test_default_targeting_caps_pass_full_brown_jd_and_briefing():
     assert meta.get("targeting_max_jd_chars") == TARGETING_NO_GAP_MAX_CHARS
     assert meta.get("targeting_max_briefing_chars") == TARGETING_NO_GAP_MAX_CHARS
     jd_out, br_out = extract_frozen_targeting_from_compiled_content(after)
-    assert "Skills & Experience to be Successful" in jd_out
+    assert "Skills &amp; Experience to be Successful" in jd_out
     assert "R26_0000001653" in jd_out
     assert len(jd_out) >= len(jd.strip()) - len(_CAP_NOTICE) - 4
     assert "integration" in br_out.lower()

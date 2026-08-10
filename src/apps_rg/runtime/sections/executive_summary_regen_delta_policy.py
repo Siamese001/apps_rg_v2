@@ -232,6 +232,10 @@ def resolve_delta_class(
         return DELTA_CLASS_EXECUTIVE_SIGNAL_AND_VOICE
 
     if not failed_dims:
+        if any(_synthesis_s6_thin_signal(j) for j in soft) and _regen_citations_exceed_s6_only(
+            soft
+        ):
+            return DELTA_CLASS_EXECUTIVE_SIGNAL_AND_VOICE
         if any(
             _holistic_below_operator_floor(j, floor) and _synthesis_s6_thin_signal(j) for j in soft
         ):

@@ -370,6 +370,83 @@ def normalize_targeting_brief_text(
     return _normalize_brief_lines(text, cfg=cfg)
 
 
+def fit_targeting_brief_to_budget(
+    text: str,
+    *,
+    profile: str = DEFAULT_BRIEFING_PROFILE,
+) -> str:
+    """Remove whole excess bullets while preserving section coverage.
+
+    This is a bounded fallback for a repaired model response that narrowly
+    misses the consumer character budget.  It never truncates prose in place,
+    never removes headers, and retains at least one bullet in every section.
+    The caller must still run the normal contract and semantic gates.
+    """
+
+    cfg = _resolve_profile(profile)
+    normalized = _normalize_brief_lines(text, cfg=cfg)
+    if len(normalized) <= cfg.max_total_chars:
+        return normalized
+
+    lines = normalized.splitlines()
+    section_id = -1
+    bullet_blocks: list[dict[str, int]] = []
+    index = 0
+    while index < len(lines):
+        stripped = lines[index].strip()
+        if _HEADER_RE.match(stripped):
+            section_id += 1
+            index += 1
+            continue
+        if lines[index].startswith("- "):
+            end = index + 1
+            while end < len(lines) and lines[end][:1].isspace() and lines[end].strip():
+                end += 1
+            bullet_blocks.append(
+                {
+                    "start": index,
+                    "end": end,
+                    "section": section_id,
+                    "size": len("\n".join(lines[index:end])),
+                }
+            )
+            index = end
+            continue
+        index += 1
+
+    remaining_by_section: dict[int, int] = {}
+    for block in bullet_blocks:
+        section = block["section"]
+        remaining_by_section[section] = remaining_by_section.get(section, 0) + 1
+    removed_starts: set[int] = set()
+
+    def render() -> str:
+        removed_lines = {
+            line_index
+            for block in bullet_blocks
+            if block["start"] in removed_starts
+            for line_index in range(block["start"], block["end"])
+        }
+        kept = [line for line_index, line in enumerate(lines) if line_index not in removed_lines]
+        return "\n".join(_squash_blank_lines(kept)).strip()
+
+    compacted = normalized
+    while len(compacted) > cfg.max_total_chars:
+        candidates = [
+            block
+            for block in bullet_blocks
+            if block["start"] not in removed_starts
+            and remaining_by_section.get(block["section"], 0) > 1
+        ]
+        if not candidates:
+            break
+        selected = max(candidates, key=lambda block: (block["size"], block["start"]))
+        removed_starts.add(selected["start"])
+        remaining_by_section[selected["section"]] -= 1
+        compacted = render()
+    return compacted
+
+
 def validate_targeting_brief_text(
     text: str,
     *,
@@ -739,6 +816,7 @@ __all__ = [
     "TargetingBriefValidation",
     "blocked_targeting_brief",
     "assess_targeting_brief_semantics",
+    "fit_targeting_brief_to_budget",
     "normalize_markdown_brief_text",
     "normalize_targeting_brief_text",
     "seal_targeting_brief",

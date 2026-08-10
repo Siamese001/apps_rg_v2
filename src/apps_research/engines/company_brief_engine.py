@@ -39,8 +39,10 @@ from apps_research.engines.query_decomposer import (  # noqa: F401
     decompose_coverage_families,
     describe_jd_retrieval_contract,
 )
-from apps_research.integrations.llm_client import create_openai_sync_client
-from apps_model_telemetry.external_model_usage import append_external_model_usage
+from apps_research.integrations.provider_gateway import (
+    AppsResearchProviderGatewayError,
+    invoke_openai_company_brief,
+)
 from apps_model_telemetry.token_budget_governor import TokenBudgetPolicy, estimate_input_tokens
 from apps_research.reasoning.adaptive_research_loop import (
     build_adaptive_research_revision,
@@ -177,45 +179,6 @@ def _emit_company_brief_marker(
     try:
         append_marker(payload, session_hint="apps_research.company_brief")
     except (OSError, PermissionError):
-        pass
-
-
-def _openai_usage_mapping(response: Any) -> Dict[str, Any] | None:
-    usage = getattr(response, "usage", None)
-    if isinstance(usage, dict):
-        return dict(usage)
-    dump = getattr(usage, "model_dump", None)
-    if callable(dump):
-        rendered = dump()
-        return dict(rendered) if isinstance(rendered, dict) else None
-    return None
-
-
-def _record_company_brief_model_usage(
-    *,
-    model: str,
-    prompt: str,
-    outcome: str,
-    usage: Dict[str, Any] | None = None,
-    response_id: str = "",
-) -> None:
-    """Emit an opt-in ledger event without retaining briefing text."""
-    try:
-        append_external_model_usage(
-            provider="openai",
-            model=model,
-            request_digest=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-            outcome=outcome,
-            provider_status="RESPONSE_RECEIVED" if outcome == "SUCCESS" else "ERROR",
-            usage=usage,
-            response_id=response_id,
-            stage="L2.apps_research_company_brief",
-            logical_attempt=1,
-            transport_attempt=1,
-        )
-    except OSError:
-        # Token telemetry is diagnostic and cannot replace the engine's
-        # explicit availability/grounding failure semantics.
         pass
 
 
@@ -1138,86 +1101,51 @@ class CompanyBriefEngine(BaseResearchEngine):
         or parse failure.
         """
         _enforce_company_brief_prompt_budget(prompt)
-        try:
-            client = create_openai_sync_client()
-        except Exception as exc:  # guardian: allow-broad-exception -- OpenAI client setup can fail for missing credentials or SDK issues
-            raise CompanyBriefUnavailableError(
-                f"{topic}: OpenAI client unavailable: {exc}"
-            ) from exc
-
         model_name = APPS_RESEARCH_BRIEF_MODEL
         started = time.time()
         try:
-            resp = client.chat.completions.create(
-                model=model_name,
+            result = invoke_openai_company_brief(
                 messages=[
                     {
                         "role": "system",
                         "content": (
-                            "You are a research analyst producing structured company briefs. "
-                            "Always answer with strict JSON matching the schema in the user prompt."
+                            "You are a research analyst producing structured company "
+                            "briefs. Always answer with strict JSON matching the schema "
+                            "in the user prompt."
                         ),
                     },
                     {"role": "user", "content": prompt},
                 ],
-                reasoning_effort=APPS_RESEARCH_BRIEF_REASONING_EFFORT,
                 max_completion_tokens=_resolved_gemini_max_output_tokens(),
+                application_validator=lambda text: self._parse_synthesis(
+                    text,
+                    topic=topic,
+                    jd_facets=jd_facets,
+                ),
             )
-        except Exception as exc:  # guardian: allow-broad-exception -- OpenAI SDK raises heterogeneous transport/API errors; fail closed
+        except AppsResearchProviderGatewayError as exc:
             self.logger.info("[CompanyBriefEngine] openai model=%s failed: %s", model_name, exc)
-            _record_company_brief_model_usage(
-                model=model_name,
-                prompt=prompt,
-                outcome=type(exc).__name__.upper(),
-            )
             _emit_company_brief_marker(
                 accepted=False,
                 model_used=model_name,
-                fallback_reason="openai_exception",
+                fallback_reason=str(
+                    exc.receipt.get("validation_reason") or "openai_exception"
+                ),
                 latency_ms=(time.time() - started) * 1000.0,
             )
             raise CompanyBriefUnavailableError(
                 f"{topic}: OpenAI synthesis failed for model={model_name}: {type(exc).__name__}: {exc}"
             ) from exc
-
-        _record_company_brief_model_usage(
-            model=str(getattr(resp, "model", "") or model_name),
-            prompt=prompt,
-            outcome="SUCCESS",
-            usage=_openai_usage_mapping(resp),
-            response_id=str(getattr(resp, "id", "") or ""),
-        )
-        text = ""
-        observed_model = str(getattr(resp, "model", "") or "").strip()
-        if not observed_model:
-            raise CompanyBriefUnavailableError(
-                f"{topic}: OpenAI synthesis response did not report its model identity"
-            )
+        observed_model = str(result.receipt["observed_model"])
         self._last_company_brief_generation_model_observed = observed_model
-        if getattr(resp, "choices", None):
-            try:
-                text = str(resp.choices[0].message.content or "").strip()
-            except (AttributeError, IndexError, TypeError, ValueError):
-                text = ""
-        if not text:
-            _emit_company_brief_marker(
-                accepted=False,
-                model_used=model_name,
-                fallback_reason="openai_empty_response",
-                latency_ms=(time.time() - started) * 1000.0,
-            )
-            raise CompanyBriefUnavailableError(
-                f"{topic}: OpenAI synthesis returned empty response for model={model_name}"
-            )
-
-        parsed = self._parse_synthesis(text, topic=topic, jd_facets=jd_facets)
+        self._last_company_brief_generation_provider_receipt = dict(result.receipt)
         _emit_company_brief_marker(
             accepted=True,
             model_used=observed_model,
             fallback_reason="none",
             latency_ms=(time.time() - started) * 1000.0,
         )
-        return parsed
+        return dict(result.output)
 
     def _synthesize_apps_rg_targeting_brief(
         self,
@@ -1247,6 +1175,7 @@ class CompanyBriefEngine(BaseResearchEngine):
         from apps_research.types.apps_rg_targeting_brief_contract import (  # noqa: PLC0415
             BriefStatus,
             assess_targeting_brief_semantics,
+            fit_targeting_brief_to_budget,
             normalize_targeting_brief_text,
             seal_targeting_brief,
         )
@@ -1318,6 +1247,10 @@ class CompanyBriefEngine(BaseResearchEngine):
                 repaired_normalized = self._drop_unsupported_named_leadership_claims(
                     repaired_normalized,
                     research_notes=research_notes,
+                )
+                repaired_normalized = fit_targeting_brief_to_budget(
+                    repaired_normalized,
+                    profile="apps_rg",
                 )
                 sealed = seal_targeting_brief(
                     repaired_normalized,
@@ -1488,6 +1421,7 @@ class CompanyBriefEngine(BaseResearchEngine):
             f"Gate reason: {gate_reason or 'none'}\n"
             f"Violations: {violation_text}\n\n"
             "Rules: preserve the same company and section structure; keep the metadata line; "
+            "target 4,000 to 6,500 total characters and never exceed the hard 8,000-character ceiling; "
             "do not restate JD responsibilities or copy any 4-word JD phrase; keep bullets one "
             "level deep; wrap every line to 240 characters or less; remove citations, links, "
             "placeholders, and code fences; do not name specific executives unless the exact "
@@ -1655,6 +1589,9 @@ class CompanyBriefEngine(BaseResearchEngine):
             "generation_model": model_name,
             "generation_reasoning_effort": APPS_RESEARCH_BRIEF_REASONING_EFFORT,
             "generation_model_observation_status": "OBSERVED_PROVIDER_RESPONSE",
+            "generation_provider_evidence": dict(
+                getattr(self, "_last_targeting_generation_provider_receipt", {}) or {}
+            ),
             "provider_call_attempted": True,
             "generation_token_budget": _resolved_gemini_max_output_tokens(),
             "judge_name": judge_name,
@@ -1754,72 +1691,35 @@ class CompanyBriefEngine(BaseResearchEngine):
 
     def _gemini_synthesize_plain(self, *, prompt: str) -> str:
         _enforce_company_brief_prompt_budget(prompt)
-        try:
-            client = create_openai_sync_client()
-        except Exception as exc:  # guardian: allow-broad-exception -- OpenAI client setup can fail for missing credentials or SDK issues
-            raise CompanyBriefUnavailableError(
-                f"targeting brief OpenAI client unavailable: {exc}"
-            ) from exc
-
         model_name = APPS_RESEARCH_BRIEF_MODEL
         try:
-            resp = client.chat.completions.create(
-                model=model_name,
+            result = invoke_openai_company_brief(
                 messages=[
                     {
                         "role": "system",
                         "content": (
-                            "You produce apps_rg targeting briefs only. "
-                            "Output plain markdown exactly as instructed. No JSON. No fences."
+                            "You produce apps_rg targeting briefs only. Output plain "
+                            "markdown exactly as instructed. No JSON. No fences."
                         ),
                     },
                     {"role": "user", "content": prompt},
                 ],
-                reasoning_effort=APPS_RESEARCH_BRIEF_REASONING_EFFORT,
                 max_completion_tokens=_resolved_gemini_max_output_tokens(),
+                application_validator=lambda text: text,
             )
-        except Exception as exc:  # guardian: allow-broad-exception -- OpenAI SDK raises heterogeneous transport/API errors; fail closed
+        except AppsResearchProviderGatewayError as exc:
             self.logger.info(
                 "[CompanyBriefEngine] targeting brief openai model=%s failed: %s",
                 model_name,
                 exc,
             )
-            _record_company_brief_model_usage(
-                model=model_name,
-                prompt=prompt,
-                outcome=type(exc).__name__.upper(),
-            )
             raise CompanyBriefUnavailableError(
                 f"targeting brief OpenAI synthesis failed for model={model_name}: {type(exc).__name__}: {exc}"
             ) from exc
-        _record_company_brief_model_usage(
-            model=str(getattr(resp, "model", "") or model_name),
-            prompt=prompt,
-            outcome="SUCCESS",
-            usage=_openai_usage_mapping(resp),
-            response_id=str(getattr(resp, "id", "") or ""),
-        )
-        observed_model = str(getattr(resp, "model", "") or "").strip()
-        if not observed_model:
-            raise CompanyBriefUnavailableError(
-                "targeting brief OpenAI synthesis response did not report its model identity"
-            )
+        observed_model = str(result.receipt["observed_model"])
         self._last_targeting_generation_model_observed = observed_model
-        if not getattr(resp, "choices", None):
-            raise CompanyBriefUnavailableError(
-                f"targeting brief OpenAI synthesis returned no choices for model={model_name}"
-            )
-        try:
-            text = (resp.choices[0].message.content or "").strip()
-        except (AttributeError, IndexError, TypeError, ValueError):
-            raise CompanyBriefUnavailableError(
-                f"targeting brief OpenAI synthesis returned malformed response for model={model_name}"
-            )
-        if not text:
-            raise CompanyBriefUnavailableError(
-                f"targeting brief OpenAI synthesis returned empty response for model={model_name}"
-            )
-        return text
+        self._last_targeting_generation_provider_receipt = dict(result.receipt)
+        return str(result.output)
 
     @staticmethod
     def _build_synthesis_prompt(

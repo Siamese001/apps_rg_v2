@@ -1,0 +1,350 @@
+{
+  "schema_version": "c03_graphrag_bound_v1",
+  "section_id": "executive_summary",
+  "generated_at_utc": "2026-08-09T09:25:54.572678+00:00",
+  "c03_graphrag_bound_status": "BOUND",
+  "source_authority": "augmented_skills_graph",
+  "graph_expansion_allowed": true,
+  "graph_expansion_refs": [
+    "ref:graph:digest:4411c7ba67f3d2a9"
+  ],
+  "graph_lineage_refs": [
+    "ref:graph:version:master_skills_arsenal_graph_v1",
+    "ref:graph:node_count:375",
+    "ref:graph:edge_count:2315",
+    "ref:graph:fact_lineage:reb_ibm_aws_alliance_partner_cosell_gtm",
+    "ref:graph:fact_lineage:reb_ibm_devsecops_release_resilience",
+    "ref:graph:fact_lineage:reb_ibm_offering_accelerator_management",
+    "ref:graph:fact_lineage:reb_ibm_presales_solution_engineering",
+    "ref:graph:fact_lineage:reb_insurtech_aws_guidewire_core_modernization",
+    "ref:graph:fact_lineage:reb_insurtech_regulated_aws_control_implementation",
+    "ref:graph:fact_lineage:reb_unify_agentic_platform_architecture",
+    "ref:graph:fact_lineage:reb_unify_distributed_ecosystem_engineering",
+    "ref:graph:fact_lineage:reb_unify_partner_channel_cosell",
+    "ref:graph:fact_lineage:reb_unify_runtime_reliability_governance"
+  ],
+  "graph_sig": "c85b1ccdc165b69b548a40ad17761dd5",
+  "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "graph_version": "master_skills_arsenal_graph_v1",
+  "evidence_items_count": 2,
+  "final_evidence_contract_snapshot": {
+    "schema_version": "final_evidence_contract_snapshot_v1",
+    "app_id": "apps_rg",
+    "source_authority": "augmented_skills_graph",
+    "support_status": "SUPPORTED",
+    "support_target_met": true,
+    "support_target_derivation": "graph_lane_v1",
+    "not_applicable_reason": "",
+    "graph_expansion_allowed": true,
+    "graph_expansion_refs": [
+      "ref:graph:digest:4411c7ba67f3d2a9"
+    ],
+    "graph_lineage_refs": [
+      "ref:graph:version:master_skills_arsenal_graph_v1",
+      "ref:graph:node_count:375",
+      "ref:graph:edge_count:2315",
+      "ref:graph:fact_lineage:reb_ibm_aws_alliance_partner_cosell_gtm",
+      "ref:graph:fact_lineage:reb_ibm_devsecops_release_resilience",
+      "ref:graph:fact_lineage:reb_ibm_offering_accelerator_management",
+      "ref:graph:fact_lineage:reb_ibm_presales_solution_engineering",
+      "ref:graph:fact_lineage:reb_insurtech_aws_guidewire_core_modernization",
+      "ref:graph:fact_lineage:reb_insurtech_regulated_aws_control_implementation",
+      "ref:graph:fact_lineage:reb_unify_agentic_platform_architecture",
+      "ref:graph:fact_lineage:reb_unify_distributed_ecosystem_engineering",
+      "ref:graph:fact_lineage:reb_unify_partner_channel_cosell",
+      "ref:graph:fact_lineage:reb_unify_runtime_reliability_governance"
+    ],
+    "graph_sig": "c85b1ccdc165b69b548a40ad17761dd5",
+    "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+    "graph_version": "master_skills_arsenal_graph_v1",
+    "evidence_items": [
+      {
+        "evidence_id": "evidence:graph:reb_ibm_aws_alliance_partner_cosell_gtm",
+        "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "source_class": "augmented_skills_graph",
+        "graph_node_ref": "node_fact_reb_ibm_aws_alliance_partner_cosell_gtm",
+        "authority": "augmented_skills_graph",
+        "claim_support_allowed": true,
+        "graph_hop_path": [
+          {
+            "edge_type": "career_track_contains_pillar",
+            "from": "track_data_tech_cloud_ml",
+            "to": "pillar_partner_gtm_alliances",
+            "note": "track-weighted pillar scope"
+          },
+          {
+            "edge_type": "skill_row_pillar_projection",
+            "from": "pillar_partner_gtm_alliances",
+            "to": "skill_partner_ibm_aws_alliance_joint_revenue",
+            "note": "ACTIVE skill_row pillar match (not causal)"
+          },
+          {
+            "edge_type": "skill_supported_by_fact",
+            "from": "skill_partner_ibm_aws_alliance_joint_revenue",
+            "to": "fact_partnerships_gtm_002",
+            "note": "graph edge skill_supported_by_fact"
+          },
+          {
+            "edge_type": "role_episode_bundle_linked_source_fact",
+            "from": "fact_partnerships_gtm_002",
+            "to": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "note": "selected role-episode linked_source_fact_ids binding"
+          }
+        ]
+      },
+      {
+        "evidence_id": "evidence:graph:reb_ibm_devsecops_release_resilience",
+        "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "source_class": "augmented_skills_graph",
+        "graph_node_ref": "node_fact_reb_ibm_devsecops_release_resilience",
+        "authority": "augmented_skills_graph",
+        "claim_support_allowed": true
+      }
+    ],
+    "evidence_collection_timestamp": "2026-08-09T09:25:54.572678+00:00",
+    "fec_shape_only": true,
+    "canonical_final_evidence_contract_emitted": false,
+    "recommended_artifact_name": "section_graph_binding_fec_snapshot.json",
+    "evidence_items_count": 2,
+    "graph_expansion_mode": "TRACK_WEIGHTED_MULTI_HOP",
+    "graph_hop_paths_count": 3,
+    "graph_hop_paths_count_semantics": "count of materialized track→pillar→skill→fact hop paths for allowed facts; not incident-edge ref cardinality"
+  },
+  "support_status": "SUPPORTED",
+  "support_target_met": true,
+  "support_target_derivation": "graph_lane_v1",
+  "binding_kind": "section_c03_graph_binding",
+  "binding_classification": "SECTION_GRAPH_CONTEXT_BINDING_NOT_PRODUCT_C0_3",
+  "is_full_c0_3_graphrag": false,
+  "has_route_bounds": false,
+  "has_acl_bounds": false,
+  "has_graph_lineage_refs": true,
+  "has_source_lineage_refs": true,
+  "records_support_status": true,
+  "section_local_graph_context_only": true,
+  "distinguishes_section_local_from_spine_c03": true,
+  "can_satisfy_integrated_product_proof": false,
+  "spine_lane_mode": "section_cli_modular",
+  "canonical_spine_chain_target": [
+    "U0",
+    "L1",
+    "L0",
+    "C0",
+    "PA",
+    "L2",
+    "Exit",
+    "UWG",
+    "L4",
+    "L6"
+  ],
+  "legacy_artifact_name": "c03_graphrag_bound.json",
+  "recommended_artifact_name": "section_graph_binding.json",
+  "canonical_contract_claims": {
+    "ValidatedRequest": false,
+    "L1PlanContract": false,
+    "RouteContract": false,
+    "FinalEvidenceContract": false,
+    "PromptEnvelope": false,
+    "CompiledPromptArtifact": false,
+    "L2ExecutionPacket": false,
+    "SealedL2Artifact": false,
+    "ExitDispositionReceipt": false,
+    "RuntimeExhaustBundle": false
+  },
+  "explicit_non_claims": [
+    "no claim of full canonical C0.2 dense retrieval unless Chroma/BGE dense path ran",
+    "no claim of full canonical C0.3 graph traverse unless RouteContract + ACL-bound traverse ran",
+    "no claim of canonical C0.5 FinalEvidenceContract unless spine FEC was emitted and consumed by spine PA",
+    "no claim of durable write unless UWG commit path executed",
+    "section runtime_exhaust_bundle.json is lane-local exhaust refs, not spine RuntimeExhaustBundle"
+  ],
+  "graph_expansion_mode": "TRACK_WEIGHTED_MULTI_HOP",
+  "graph_hop_paths_count_semantics": "count of materialized track→pillar→skill→fact hop paths for allowed facts; not incident-edge ref cardinality",
+  "graph_hop_bounds_policy_note": "graph_hop_bounds in native_c03_final_evidence.json is ACL policy max depth; exec-summary c03_graphrag_bound materializes TRACK_WEIGHTED_MULTI_HOP paths when pool resolves",
+  "graph_incident_edge_refs_count": 1,
+  "graph_hop_paths_count": 3,
+  "non_graph_evidence_items_count": 0,
+  "c03_sqlite_attach_status": "ATTACHED",
+  "c03_sqlite_context_status": "ATTACHED",
+  "c03_sqlite_attach_reason": "sqlite_context_bound",
+  "c03_sqlite_db_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-e2e-defect-remediation-w0\\artifacts\\apps_rg\\fact_inventory\\augmented_skills_graph.sqlite",
+  "c03_sqlite_graph_version": "master_skills_arsenal_graph_v1",
+  "c03_sqlite_graph_hash": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "c03_sqlite_context_receipt_path": "artifacts\\apps_rg\\runtime_proofs\\c03_graph_sqlite_context\\c03_graph_sqlite_context_20260809_092557_115946.json",
+  "c03_sqlite_proof_classification": "graph_context_routing_support_not_claim_proof",
+  "c03_sqlite_context_summary": {
+    "pillar_count": 8,
+    "skill_count": 40,
+    "bridge_edge_count": 8,
+    "fact_link_count": 0,
+    "excluded_node_count": 60,
+    "partner_architecture_candidate_count": 8
+  },
+  "authority_class": "GRAPH_TARGETING_NON_PROOF",
+  "proof_classification": "graph_context_routing_support_not_claim_proof",
+  "claim_support_allowed": false,
+  "graph_hop_paths_by_fact_id": {
+    "reb_ibm_aws_alliance_partner_cosell_gtm": [
+      {
+        "edge_type": "career_track_contains_pillar",
+        "from": "track_data_tech_cloud_ml",
+        "to": "pillar_partner_gtm_alliances",
+        "note": "track-weighted pillar scope"
+      },
+      {
+        "edge_type": "skill_row_pillar_projection",
+        "from": "pillar_partner_gtm_alliances",
+        "to": "skill_partner_ibm_aws_alliance_joint_revenue",
+        "note": "ACTIVE skill_row pillar match (not causal)"
+      },
+      {
+        "edge_type": "skill_supported_by_fact",
+        "from": "skill_partner_ibm_aws_alliance_joint_revenue",
+        "to": "fact_partnerships_gtm_002",
+        "note": "graph edge skill_supported_by_fact"
+      },
+      {
+        "edge_type": "role_episode_bundle_linked_source_fact",
+        "from": "fact_partnerships_gtm_002",
+        "to": "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "note": "selected role-episode linked_source_fact_ids binding"
+      }
+    ],
+    "reb_unify_agentic_platform_architecture": [
+      {
+        "edge_type": "career_track_contains_pillar",
+        "from": "track_genai_agentic",
+        "to": "pillar_agentic_ai_platforms",
+        "note": "track-weighted pillar scope"
+      },
+      {
+        "edge_type": "skill_row_pillar_projection",
+        "from": "pillar_agentic_ai_platforms",
+        "to": "skill_agentic_control_plane_design",
+        "note": "ACTIVE skill_row pillar match (not causal)"
+      },
+      {
+        "edge_type": "skill_supported_by_fact",
+        "from": "skill_agentic_control_plane_design",
+        "to": "fact_engineering_platform_001",
+        "note": "graph edge skill_supported_by_fact"
+      },
+      {
+        "edge_type": "role_episode_bundle_linked_source_fact",
+        "from": "fact_engineering_platform_001",
+        "to": "reb_unify_agentic_platform_architecture",
+        "note": "selected role-episode linked_source_fact_ids binding"
+      }
+    ],
+    "reb_unify_runtime_reliability_governance": [
+      {
+        "edge_type": "career_track_contains_pillar",
+        "from": "track_genai_agentic",
+        "to": "pillar_agentic_ai_platforms",
+        "note": "track-weighted pillar scope"
+      },
+      {
+        "edge_type": "skill_row_pillar_projection",
+        "from": "pillar_agentic_ai_platforms",
+        "to": "skill_bounded_fanout_and_retry_design",
+        "note": "ACTIVE skill_row pillar match (not causal)"
+      },
+      {
+        "edge_type": "skill_supported_by_fact",
+        "from": "skill_bounded_fanout_and_retry_design",
+        "to": "fact_engineering_platform_003",
+        "note": "graph edge skill_supported_by_fact"
+      },
+      {
+        "edge_type": "role_episode_bundle_linked_source_fact",
+        "from": "fact_engineering_platform_003",
+        "to": "reb_unify_runtime_reliability_governance",
+        "note": "selected role-episode linked_source_fact_ids binding"
+      }
+    ]
+  },
+  "graph_hop_paths_sample": [
+    [
+      {
+        "edge_type": "career_track_contains_pillar",
+        "from": "track_data_tech_cloud_ml",
+        "to": "pillar_partner_gtm_alliances",
+        "note": "track-weighted pillar scope"
+      },
+      {
+        "edge_type": "skill_row_pillar_projection",
+        "from": "pillar_partner_gtm_alliances",
+        "to": "skill_partner_ibm_aws_alliance_joint_revenue",
+        "note": "ACTIVE skill_row pillar match (not causal)"
+      },
+      {
+        "edge_type": "skill_supported_by_fact",
+        "from": "skill_partner_ibm_aws_alliance_joint_revenue",
+        "to": "fact_partnerships_gtm_002",
+        "note": "graph edge skill_supported_by_fact"
+      },
+      {
+        "edge_type": "role_episode_bundle_linked_source_fact",
+        "from": "fact_partnerships_gtm_002",
+        "to": "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "note": "selected role-episode linked_source_fact_ids binding"
+      }
+    ],
+    [
+      {
+        "edge_type": "career_track_contains_pillar",
+        "from": "track_genai_agentic",
+        "to": "pillar_agentic_ai_platforms",
+        "note": "track-weighted pillar scope"
+      },
+      {
+        "edge_type": "skill_row_pillar_projection",
+        "from": "pillar_agentic_ai_platforms",
+        "to": "skill_agentic_control_plane_design",
+        "note": "ACTIVE skill_row pillar match (not causal)"
+      },
+      {
+        "edge_type": "skill_supported_by_fact",
+        "from": "skill_agentic_control_plane_design",
+        "to": "fact_engineering_platform_001",
+        "note": "graph edge skill_supported_by_fact"
+      },
+      {
+        "edge_type": "role_episode_bundle_linked_source_fact",
+        "from": "fact_engineering_platform_001",
+        "to": "reb_unify_agentic_platform_architecture",
+        "note": "selected role-episode linked_source_fact_ids binding"
+      }
+    ],
+    [
+      {
+        "edge_type": "career_track_contains_pillar",
+        "from": "track_genai_agentic",
+        "to": "pillar_agentic_ai_platforms",
+        "note": "track-weighted pillar scope"
+      },
+      {
+        "edge_type": "skill_row_pillar_projection",
+        "from": "pillar_agentic_ai_platforms",
+        "to": "skill_bounded_fanout_and_retry_design",
+        "note": "ACTIVE skill_row pillar match (not causal)"
+      },
+      {
+        "edge_type": "skill_supported_by_fact",
+        "from": "skill_bounded_fanout_and_retry_design",
+        "to": "fact_engineering_platform_003",
+        "note": "graph edge skill_supported_by_fact"
+      },
+      {
+        "edge_type": "role_episode_bundle_linked_source_fact",
+        "from": "fact_engineering_platform_003",
+        "to": "reb_unify_runtime_reliability_governance",
+        "note": "selected role-episode linked_source_fact_ids binding"
+      }
+    ]
+  ],
+  "c03_graph_hop_paths_count": 3,
+  "paired_native_c03_ref": "native_c03_final_evidence.json"
+}

@@ -469,6 +469,41 @@ def _lane_artifact_index(
     }
     index: dict[str, Any] = {}
     for lane_dir in sorted(path for path in sections_root.iterdir() if path.is_dir()):
+        lane_identity: dict[str, str] = {}
+        package_entry = _artifact_index_entry(
+            (lane_dir / "l6_v40_shadow_eval_package.json").as_posix(),
+            artifact_dir,
+            manifest_by_ref,
+        )
+        closure_entry = _artifact_index_entry(
+            (lane_dir / "l6_observability_closure_receipt.json").as_posix(),
+            artifact_dir,
+            manifest_by_ref,
+        )
+        package_payload = package_entry.get("payload")
+        package_payload = (
+            dict(package_payload) if isinstance(package_payload, Mapping) else {}
+        )
+        closure_payload = closure_entry.get("payload")
+        closure_payload = (
+            dict(closure_payload) if isinstance(closure_payload, Mapping) else {}
+        )
+        candidate_identity = {
+            key: _as_text(package_payload.get(key)) for key in _IDENTITY_KEYS
+        }
+        lane_identity_valid = bool(
+            package_payload.get("section_id") == lane_dir.name
+            and all(candidate_identity.values())
+            and candidate_identity["parent_run_id"]
+            == _as_text(source_identity.get("parent_run_id"))
+            and closure_payload.get("observability_closure_status") == "PASS"
+            and all(
+                _as_text(closure_payload.get(key)) == value
+                for key, value in candidate_identity.items()
+            )
+        )
+        if lane_identity_valid:
+            lane_identity = candidate_identity
         pointer = next(
             (
                 contained
@@ -506,6 +541,11 @@ def _lane_artifact_index(
                     continue
                 entry = _artifact_index_entry(_as_text(ref), artifact_dir, manifest_by_ref)
                 if entry:
+                    if lane_identity:
+                        payload = entry.get("payload")
+                        payload = dict(payload) if isinstance(payload, Mapping) else {}
+                        payload["source_identity"] = dict(lane_identity)
+                        entry["payload"] = payload
                     index[f"{lane_dir.name}:{role}"] = entry
                     break
     return index
@@ -676,16 +716,40 @@ def _verified_preflight(
     }
     if continuation.get("schema_version") != "apps_rg.e2e_preflight.v1":
         errors.append("preflight_continuation_schema_mismatch")
+    continuation_identity = continuation.get("identity")
+    continuation_identity = (
+        dict(continuation_identity)
+        if isinstance(continuation_identity, Mapping)
+        else {}
+    )
+    identity_profile = _as_text(continuation.get("identity_profile"))
     if not (
         continuation.get("status") == "PASS"
-        and continuation.get("product_entry_eligible") is True
         and continuation.get("continuation_scope") == "APPS_RG_PRODUCT_ENTRY_ONCE"
         and continuation.get("signature_algorithm") == "HMAC-SHA256"
     ):
-        errors.append("preflight_continuation_not_product_eligible")
-    if continuation.get("identity") != identity:
-        errors.append("preflight_continuation_identity_mismatch")
-    if continuation.get("identity_sha256") != _payload_digest(identity):
+        errors.append("preflight_continuation_not_passed")
+    if identity_profile == "apps_research_rg_run_identity.v1":
+        if continuation.get("product_entry_eligible") is not True:
+            errors.append("preflight_continuation_not_product_eligible")
+        if continuation_identity != identity:
+            errors.append("preflight_continuation_identity_mismatch")
+    elif identity_profile == "legacy_e2e_run_only.v1":
+        # Fresh preflight necessarily precedes delegated research, so the
+        # producer child identity does not exist yet.  The immutable signed
+        # continuation is therefore run-root scoped; the later product-entry
+        # receipt supplies the canonical identity while byte-binding this
+        # continuation and its consume-once receipt.
+        expected_legacy_identity = {"e2e_run_id": root.name}
+        if continuation.get("product_entry_eligible") is not False:
+            errors.append("preflight_legacy_continuation_eligibility_invalid")
+        if continuation_identity != expected_legacy_identity:
+            errors.append("preflight_legacy_continuation_identity_mismatch")
+        if _as_text(continuation.get("e2e_run_id")) != root.name:
+            errors.append("preflight_legacy_continuation_run_id_mismatch")
+    else:
+        errors.append("preflight_continuation_identity_profile_invalid")
+    if continuation.get("identity_sha256") != _payload_digest(continuation_identity):
         errors.append("preflight_continuation_identity_digest_mismatch")
     if continuation.get("artifact_dir") != str(root):
         errors.append("preflight_continuation_artifact_dir_mismatch")

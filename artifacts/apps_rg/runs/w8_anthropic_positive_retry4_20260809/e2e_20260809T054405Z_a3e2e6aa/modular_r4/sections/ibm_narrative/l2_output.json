@@ -1,0 +1,141 @@
+{
+  "run_id": "ibm_narrative_20260809_055054",
+  "section_id": "ibm_narrative",
+  "runtime_generation_status": "REAL_LLM",
+  "product_quality_status": "FAIL",
+  "ibm_header": {
+    "employer": "IBM",
+    "title": "Partner",
+    "location": "Edgewater, NJ",
+    "start_date": "2017-04",
+    "end_date": "2022-10",
+    "is_current": false,
+    "fact_id": "exp_ibm_001"
+  },
+  "narrative_sentence": "Operationalized solution architecture and pipeline governance across regulated financial-services pursuits at IBM, using BI decision support to make executive qualification and partner-led enterprise pursuits more consistent across large modernization portfolios.",
+  "selected_fact_plan": {
+    "theme_families": [
+      "technical solution architecture",
+      "pipeline governance",
+      "BI decision support",
+      "executive qualification"
+    ],
+    "selected_bullet_roots": [
+      "bul_ibm_002",
+      "bul_ibm_003",
+      "bul_ibm_004"
+    ],
+    "mechanism": "BI"
+  },
+  "claim_ledger": [
+    {
+      "claim_text": "Operationalized solution architecture and pipeline governance across regulated financial-services pursuits at IBM, using BI decision support to make executive qualification and partner-led enterprise pursuits more consistent across large modernization portfolios",
+      "source_fact_ids": [
+        "bul_ibm_001",
+        "bul_ibm_002"
+      ]
+    }
+  ],
+  "jd_alignment": {
+    "briefing_used_as_proof": false,
+    "jd_used_as_proof": false,
+    "selected_briefing_themes": [
+      "repeatable partner-led technical motions",
+      "reference patterns and partner enablement",
+      "enterprise architecture and cross-functional execution"
+    ],
+    "selected_jd_themes": [
+      "strategic technical partnership",
+      "partner-led pre-sales engagements",
+      "joint solution development",
+      "customer deal support"
+    ],
+    "targeting_only": true,
+    "targeting_rationale": "The thesis emphasizes partner-facing architecture, executive qualification, reusable operating discipline, and enterprise pursuit governance because those themes align with the target role while remaining grounded in IBM evidence."
+  },
+  "gap_notes": [
+    "The narrative does not claim direct experience with Anthropic products, frontier-model deployment, or formal team-management scope.",
+    "No unsupported revenue figure or product-specific AI claim is introduced."
+  ],
+  "change_log": [
+    "Synthesized the accepted IBM bullets into one role thesis centered on architecture, BI decision support, and pursuit governance.",
+    "Narrative evidence is bound to reb_ibm_data_modeling_bi_decision_support, reb_ibm_presales_solution_engineering, and reb_ibm_revenue_sales_target_execution role episode bundles.",
+    {
+      "operation": "align_ibm_narrative_claim_ledger_to_bul_ibm",
+      "reason": "graph_skills_authority_bul_ibm_x2_binding"
+    },
+    {
+      "operation": "decompose_ibm_narrative_claim_ledger_by_clause",
+      "reason": "clause_level_bul_ibm_theme_binding"
+    }
+  ],
+  "self_check": {
+    "exactly_one_sentence": true,
+    "ibm_anchor_count": 1,
+    "begins_with_past_tense_action_verb": true,
+    "within_word_limit": true,
+    "within_character_limit": true,
+    "mechanism_present": "BI",
+    "metrics_repeated": false,
+    "identity_omitted": true,
+    "targeting_used_as_proof": false
+  },
+  "prompt_id": "ibm_position_narrative_dispatch_v1",
+  "prompt_hash": "69a03c5363a7cb9c",
+  "section_prompt_adapter": true,
+  "apps_rg_prompt_template_ref": "apps_rg/prompt_assembly/templates/ibm_position_narrative_v1.yaml",
+  "compiler_template_id": "strategic_tailor_v1",
+  "input_payload_hash": "3ae413be11ee10c0",
+  "judge_preflight_blocked": false,
+  "text_claim_coverage": {
+    "sentences": [
+      {
+        "sentence_index": 1,
+        "sentence_text": "Operationalized solution architecture and pipeline governance across regulated financial-services pursuits at IBM, using BI decision support to make executive qualification and partner-led enterprise pursuits more consistent across large modernization portfolios.",
+        "material_claims": [
+          {
+            "claim_text": "Operationalized solution architecture and pipeline governance across regulated financial-services pursuits at IBM, using BI decision support to make executive qualification and partner-led enterprise pursuits more consistent across large modernization portfolios",
+            "source_fact_ids": [
+              "bul_ibm_001",
+              "bul_ibm_002"
+            ],
+            "support_status": "SUPPORTED",
+            "reason": "Mapped from claim_ledger."
+          }
+        ],
+        "sentence_pass": true
+      }
+    ],
+    "overall_pass": true
+  },
+  "product_quality_reason": "X2 failed gates: ['x2_ibm_narrative_claim_theme_coverage', 'x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets']",
+  "section_repair_ledger": "section_repair_ledger.json",
+  "authoritative_attempt_number": 1,
+  "authoritative_l2_source": "initial_llm",
+  "judge_required_for_proof": true,
+  "judge_tier": "STANDARD_REASONING",
+  "proof_eligible": false,
+  "generation_runtime_status": "REAL_LLM",
+  "mocked_provider_selected": false,
+  "proof_scope": "plumbing_only",
+  "proof_status": "NOT_PROOF_ELIGIBLE",
+  "authorization_scope": "PLUMBING_ONLY",
+  "test_only_mock_provider": false,
+  "runtime_certification": false,
+  "x1d_runtime_status": "MODEL_BACKED",
+  "judge_proof_eligible": false,
+  "required_judge_rows_missing": false,
+  "provider_proof_eligible": false,
+  "test_only_mock_judges": false,
+  "offline_contract_stub_used": false,
+  "artifact_namespace_class": "NON_PROOF_PLUMBING",
+  "runtime_generation_status_class": "REAL_LLM",
+  "allow_non_allow_exit_zero_cli": false,
+  "allow_test_mock_judges_hatch": false,
+  "proof_closeout_note": "",
+  "generation_class": "real_llm",
+  "judge_class": "model_backed",
+  "proof_class": "plumbing_only",
+  "certification_class": "runtime_slice_review",
+  "decisive_accounting_label": "FAIL"
+}

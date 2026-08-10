@@ -13,7 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Final
@@ -56,7 +56,6 @@ from apps_rg.runtime.section_cli_defaults import (
 )
 from apps_rg.runtime.section_execution_plan import BULLET_LANES, NARRATIVE_LANES
 from apps_rg.runtime.section_judge_policy import REQUIRED_JUDGE_PROVIDER_KEYS
-from apps_rg.runtime.section_lane_temperature import default_temperature_for_section
 from apps_rg.runtime.sections_root_manifest import (
     emit_sections_root_manifest,
     log_sections_manifest_write_failed,
@@ -243,9 +242,6 @@ def _phase1_materialize_lane_run_dir(
             lane_provider=lane_provider,
         )
     except FileNotFoundError as exc:  # guardian: allow-return-none-swallow -- P2 burndown: fail-soft optional boundary
-        lane_exec_status[lane] = f"{lane_exec_status.get(lane, '')}|missing_pointer:{exc}".strip(
-            "|"
-        )
         dispatch = lane_dispatch_results.get(lane) or {}
         blocker = _derive_pre_run_blocker(dispatch)
         emit_integrated_lane_pre_run_failure(
@@ -256,6 +252,15 @@ def _phase1_materialize_lane_run_dir(
             blocker=blocker,
             dispatch_result=dispatch,
             lane_exec_status=str(lane_exec_status.get(lane) or ""),
+            downstream_consequences=[
+                {
+                    "stage": "PHASE1_LANE_MATERIALIZATION",
+                    "operation": "resolve_latest_lane_run_dir",
+                    "code": "LANE_RUN_POINTER_NOT_FOUND",
+                    "exception_class": type(exc).__name__,
+                    "exception_message": str(exc),
+                }
+            ],
         )
         return None
 
@@ -467,6 +472,7 @@ class ModularResumeInputPackage:
     jd_text: str | None = None
     briefing_text: str | None = None
     rg_output_fixture_path: Path | None = None
+    canonical_run_identity: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -820,6 +826,7 @@ def run_modular_resume_generation(
             )
             from apps_rg.runtime.orchestration.section_lane_executor import (
                 LaneExecutionContext,
+                run_lane_in_context,
             )
 
             _parallel_phase1 = phase1_parallel_enabled(
@@ -862,11 +869,8 @@ def run_modular_resume_generation(
                             "upstream_lane": upstream_lane,
                             "exit_status": "error",
                         }
-                try:
-                    result = run_canonical_apps_rg_from_cli_primitives(**kwargs)
-                    return dict(result) if isinstance(result, dict) else {}
-                except Exception as exc:  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
-                    return {"fault": "exception", "error": str(exc), "exit_status": "error"}
+                result = run_canonical_apps_rg_from_cli_primitives(**kwargs)
+                return dict(result) if isinstance(result, dict) else {}
 
             def _phase1_dependency_ready(lane: str) -> tuple[bool, str]:
                 """Require a certified companion-bullet receipt before a narrative runs.
@@ -900,6 +904,9 @@ def run_modular_resume_generation(
                 lane_x1d_judges=_lane_x1d_judges,
                 lane_mock_judges=lane_mock_j_for_phase1,
                 lane_allow_non_allow_exit_zero=_phase1_allow_exit,
+                integrated_artifact_dir=str(art),
+                run_id=str(run_id),
+                canonical_run_identity=dict(input_package.canonical_run_identity),
             )
 
             if _parallel_phase1:
@@ -979,39 +986,22 @@ def run_modular_resume_generation(
                             }
                             lane_exec_status[lane] = f"pre_run_blocked:{PRE_RUN_UPSTREAM_NOT_FINALIZED_BLOCKER}"
                             continue
-                    try:
-                        result = run_canonical_apps_rg_from_cli_primitives(
-                            target_company=tc,
-                            target_role=tr,
-                            jd="",
-                            job_description_ref=jd_ref,
-                            job_description_text=jd_txt,
-                            manual_brief=br_dispatch,
-                            resume_path="",
-                            source_resume_text="",
-                            generation_mode="strategic_tailor",
-                            artifact_dir="",
-                            section=lane,
-                            lane_provider=_lane_provider_for_lane(lane),
-                            lane_provider_resolution_source=_lane_provider_source_for_lane(lane),
-                        lane_temperature=default_temperature_for_section(lane),
-                        lane_x1d_judges=_lane_x1d_judges(lane),
-                        lane_mock_judges=lane_mock_j_for_phase1,
-                        lane_allow_non_allow_exit_zero=_phase1_allow_exit,
+                    outcome = run_lane_in_context(
+                        _lane_ctx,
+                        lane,
+                        dispatch_fn=_phase1_dispatch_one_lane,
                     )
-                        lane_dispatch_results[lane] = dict(result) if isinstance(result, dict) else {}
-                        lane_exec_status[lane] = _phase1_lane_dispatch_status(lane_dispatch_results[lane])
-                        if product_fail_closed_runtime() and phase1_dispatch_hard_failed(
-                            lane_dispatch_results[lane]
-                        ):
-                            phase1_aborted = True
-                            phase1_abort_reason = f"dispatch_failed:{lane}:{lane_exec_status[lane]}"
-                    except Exception as exc:  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
-                        lane_exec_status[lane] = f"error:{exc!s}"
-                        lane_dispatch_results[lane] = {"fault": "exception", "error": str(exc)}
-                        if product_fail_closed_runtime():
-                            phase1_aborted = True
-                            phase1_abort_reason = f"dispatch_exception:{lane}:{exc!s}"
+                    lane_dispatch_results[lane] = dict(outcome.dispatch_result)
+                    lane_exec_status[lane] = (
+                        outcome.exec_status
+                        if outcome.exec_status.startswith("error:")
+                        else _phase1_lane_dispatch_status(lane_dispatch_results[lane])
+                    )
+                    if product_fail_closed_runtime() and phase1_dispatch_hard_failed(
+                        lane_dispatch_results[lane]
+                    ):
+                        phase1_aborted = True
+                        phase1_abort_reason = f"dispatch_failed:{lane}:{lane_exec_status[lane]}"
             _product_fail_closed = product_fail_closed_runtime()
             for lane in GENERATED_LANES:
                 run_dir = _phase1_materialize_lane_run_dir(

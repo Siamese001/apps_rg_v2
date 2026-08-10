@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 from dataclasses import dataclass
@@ -25,6 +26,17 @@ COMPETENCIES_REGEN_EXTRA_PATHS: Final[int] = 4
 
 DEFAULT_COMPETENCIES_MIN_SELECTION_SCORE: Final[float] = 0.72
 DEFAULT_COMPETENCIES_HIGH_SIGNAL_SELECTION_SCORE: Final[float] = 0.84
+MIN_COMPETENCIES_SUPPORTED_TERM_RATIO: Final[float] = 1.0 / 3.0
+REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY: Final[dict[str, str]] = {
+    "agentic_platform": "ccb_agentic_platforms",
+    "runtime_governance": "ccb_runtime_governance",
+    "retrieval_context": "ccb_retrieval_context_engineering",
+    "llmops": "ccb_llmops_reliability",
+    "distributed_infra": "ccb_distributed_systems_engineering",
+    "productization": "ccb_platform_productization",
+    "partner_architecture": "ccb_partner_applied_ai_architecture",
+    "engineering_leadership": "ccb_engineering_leadership",
+}
 # W6: closeout-mode regen cap when APPS_RG_E2E_CLOSEOUT_MODE=1 and no explicit regen-round env.
 DEFAULT_COMPETENCIES_CLOSEOUT_MAX_REGEN_ROUNDS: Final[int] = 1
 
@@ -53,6 +65,11 @@ class CompetenciesSelectionGate:
     categories_below_threshold: tuple[str, ...]
     categories_missing: tuple[str, ...]
     categories_in_merged: int
+    bundle_ids_missing: tuple[str, ...]
+    duplicate_bundle_ids: tuple[str, ...]
+    taxonomy_category_ids_missing: tuple[str, ...]
+    duplicate_taxonomy_category_ids: tuple[str, ...]
+    missing_capability_families: tuple[str, ...]
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -66,6 +83,11 @@ class CompetenciesSelectionGate:
             "categories_below_threshold": list(self.categories_below_threshold),
             "categories_missing": list(self.categories_missing),
             "categories_in_merged": self.categories_in_merged,
+            "bundle_ids_missing": list(self.bundle_ids_missing),
+            "duplicate_bundle_ids": list(self.duplicate_bundle_ids),
+            "taxonomy_category_ids_missing": list(self.taxonomy_category_ids_missing),
+            "duplicate_taxonomy_category_ids": list(self.duplicate_taxonomy_category_ids),
+            "missing_capability_families": list(self.missing_capability_families),
         }
 
 
@@ -184,6 +206,76 @@ def build_competencies_targeting_context(
     for sid in pp.get("c03_selected_skill_ids") or []:
         if str(sid).strip():
             skill_ids.add(str(sid).strip())
+    packet = (
+        pp.get("competency_capability_section_packet")
+        or runtime_payload.get("competency_capability_section_packet")
+        or {}
+    )
+    selected_plan = runtime_payload.get("selected_fact_plan") or {}
+    from apps_rg.runtime.sections.competency_capability_evidence import (
+        _plan_fact_ids_for_bundle,
+        visible_graph_surface_taxonomy_for_bundle,
+    )
+
+    records_by_id = {
+        str(row.get("competency_bundle_id") or "").strip(): row
+        for row in packet.get("competency_bundles") or []
+        if isinstance(row, dict) and str(row.get("competency_bundle_id") or "").strip()
+    }
+    governed_required_candidates: list[dict[str, Any]] = []
+    for family, bundle_id in REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY.items():
+        record = records_by_id.get(bundle_id)
+        if not isinstance(record, dict):
+            continue
+        taxonomy_id, taxonomy_label = visible_graph_surface_taxonomy_for_bundle(
+            bundle_id,
+            record=record,
+        )
+        fact_ids = _plan_fact_ids_for_bundle(
+            record,
+            selected_graph_evidence_plan=selected_plan,
+            allowed_fact_ids=allowed,
+        )
+        graph_skill_ids = [
+            str(value).strip()
+            for value in record.get("graph_skill_node_ids") or []
+            if str(value).strip()
+        ]
+        terms = []
+        for phrase in record.get("vocabulary_anchors") or []:
+            text = str(phrase or "").strip()
+            if not text:
+                continue
+            term = {
+                "text": text,
+                "term": text,
+                "source_fact_ids": list(fact_ids),
+                "source_skill_ids": list(graph_skill_ids),
+                "graph_skill_node_ids": list(graph_skill_ids),
+                "support_class": "GOVERNED_COMPETENCY_BUNDLE_CANDIDATE",
+                "proof_source": "competency_bundle_governed_selector_baseline",
+            }
+            if fact_ids:
+                term["source_fact_id"] = fact_ids[0]
+            terms.append(term)
+        governed_required_candidates.append(
+            {
+                "category_id": taxonomy_id,
+                "category_label": str(
+                    record.get("display_label_candidate") or taxonomy_label
+                ).strip(),
+                "resume_display_label": str(
+                    record.get("display_label_candidate") or taxonomy_label
+                ).strip(),
+                "competency_bundle_id": bundle_id,
+                "capability_family": str(record.get("capability_family") or family),
+                "graph_skill_node_ids": graph_skill_ids,
+                "source_fact_ids": list(fact_ids),
+                "terms": terms,
+                "candidate_origin": "governed_required_bundle_baseline",
+            }
+        )
+
     return {
         "target_title": runtime_payload.get("target_title"),
         "target_company": runtime_payload.get("target_company"),
@@ -205,7 +297,9 @@ def build_competencies_targeting_context(
         "high_signal_selection_score": high_signal_competencies_selection_score(),
         "selection_model": "graph_8x8_v1",
         "allowed_fact_ids_count": len(allowed),
+        "allowed_fact_ids": sorted(allowed),
         "allowed_skill_ids": sorted(skill_ids),
+        "governed_required_bundle_candidates": governed_required_candidates,
     }
 
 
@@ -231,7 +325,13 @@ def _category_by_label(parsed: dict[str, Any], label: str) -> dict[str, Any] | N
         for row in parsed.get(key) or []:
             if not isinstance(row, dict):
                 continue
-            if str(row.get("category_label") or "").strip().lower() == norm:
+            if str(
+                row.get("category_label")
+                or row.get("display_label")
+                or row.get("resume_display_label")
+                or row.get("category")
+                or ""
+            ).strip().lower() == norm:
                 return row
     return None
 
@@ -265,6 +365,22 @@ def _heuristic_category_score(
     return base
 
 
+def competencies_candidate_support_score(
+    category: dict[str, Any],
+    *,
+    allowed_fact_ids: set[str],
+    allowed_skill_ids: set[str],
+    resume_support_blob_lower: str = "",
+) -> float:
+    """Public evidence-support score for governed selector completion rows."""
+    return _heuristic_category_score(
+        category,
+        allowed_fact_ids=allowed_fact_ids,
+        allowed_skill_ids=allowed_skill_ids,
+        resume_support_blob_lower=resume_support_blob_lower,
+    )
+
+
 def _collect_category_candidates(
     paths: list[Any],
     selections: list[dict[str, Any]],
@@ -294,7 +410,13 @@ def _collect_category_candidates(
         for cat in (path.parsed.get("competencies") or path.parsed.get("categories") or []):
             if not isinstance(cat, dict):
                 continue
-            label = str(cat.get("category_label") or "").strip()
+            label = str(
+                cat.get("category_label")
+                or cat.get("display_label")
+                or cat.get("resume_display_label")
+                or cat.get("category")
+                or ""
+            ).strip()
             if not label:
                 continue
             key = label.lower()
@@ -372,7 +494,13 @@ def _all_category_candidate_rows(paths: list[Any]) -> list[tuple[str, int, dict[
         for cat in parsed.get("competencies") or parsed.get("categories") or []:
             if not isinstance(cat, dict):
                 continue
-            label = str(cat.get("category_label") or "").strip()
+            label = str(
+                cat.get("category_label")
+                or cat.get("display_label")
+                or cat.get("resume_display_label")
+                or cat.get("category")
+                or ""
+            ).strip()
             if not label:
                 continue
             rows.append((label, path_idx, dict(cat)))
@@ -443,7 +571,7 @@ def build_competencies_rejected_neighbor_audit(
             reason = "selector_marked_failed"
         elif selector_score is not None and selector_score < threshold:
             reason = "below_selector_threshold"
-        elif heuristic_score < 0.34 and allowed_fact_ids:
+        elif heuristic_score < MIN_COMPETENCIES_SUPPORTED_TERM_RATIO and allowed_fact_ids:
             reason = "unsupported_by_allowed_graph_evidence"
         elif label_key in selected_labels:
             reason = "duplicate_label_lower_score"
@@ -536,7 +664,13 @@ def merge_competencies_graph_pool_top_eight(
     ]
     if passing_sel:
         ranked = []
-        for sel in passing_sel:
+        seen_bundle_ids: set[str] = set()
+        seen_taxonomy_ids: set[str] = set()
+        from apps_rg.runtime.sections.competency_capability_evidence import (
+            visible_graph_surface_taxonomy_for_bundle,
+        )
+
+        for sel in sorted(passing_sel, key=_selection_row_score, reverse=True):
             label = str(sel.get("category_label") or "").strip()
             if not label:
                 continue
@@ -545,6 +679,17 @@ def merge_competencies_graph_pool_top_eight(
             cat = _category_by_label(path.parsed or {}, label) if path and path.parsed else None
             if cat is None:
                 continue
+            bundle_id = str(cat.get("competency_bundle_id") or "").strip()
+            taxonomy_id, _ = visible_graph_surface_taxonomy_for_bundle(bundle_id)
+            if (
+                not bundle_id
+                or not taxonomy_id
+                or bundle_id in seen_bundle_ids
+                or taxonomy_id in seen_taxonomy_ids
+            ):
+                continue
+            seen_bundle_ids.add(bundle_id)
+            seen_taxonomy_ids.add(taxonomy_id)
             ranked.append((_selection_row_score(sel), label.lower(), path_idx, dict(cat)))
         ranked.sort(key=lambda t: (-t[0], t[1]))
     else:
@@ -559,7 +704,15 @@ def merge_competencies_graph_pool_top_eight(
             ranked.append((max(best[0], h_score), key, best[1], best[2]))
         ranked.sort(key=lambda t: (-t[0], t[1]))
 
-    target_count = _adaptive_emit_count(ranked)
+    # In provider-backed selection, the selector's distinct passing rows are
+    # the requested 6-8 shape.  Recomputing that count from the number of
+    # high-score rows silently truncated valid lower-scoring family coverage
+    # (notably Retrieval/Context) back to six.
+    target_count = (
+        min(COMPETENCIES_MAX_CATEGORY_COUNT, len(ranked))
+        if passing_sel
+        else _adaptive_emit_count(ranked)
+    )
     comps_out: list[dict[str, Any]] = []
     source_map: dict[str, int] = {}
     for score, key, path_idx, cat in ranked:
@@ -573,19 +726,34 @@ def merge_competencies_graph_pool_top_eight(
             allowed_skill_ids=allowed_skill_ids,
             resume_support_blob_lower=resume_support_blob_lower,
         )
-        if h_score < 0.34 and allowed_fact_ids:
+        if h_score < MIN_COMPETENCIES_SUPPORTED_TERM_RATIO and allowed_fact_ids:
             continue
-        label = str(cat.get("category_label") or "").strip()
+        label = str(
+            cat.get("category_label")
+            or cat.get("display_label")
+            or cat.get("resume_display_label")
+            or cat.get("category")
+            or ""
+        ).strip()
         cat_out = dict(cat)
         cat_out.setdefault("selection_score", round(float(score), 4))
         comps_out.append(cat_out)
         source_map[label.lower()] = path_idx
 
-    if len(comps_out) < min(target_count, COMPETENCIES_MIN_CATEGORY_COUNT):
+    fallback_target = target_count if passing_sel else min(
+        target_count, COMPETENCIES_MIN_CATEGORY_COUNT
+    )
+    if len(comps_out) < fallback_target:
         for _score, key, path_idx, cat in ranked:
-            if len(comps_out) >= min(target_count, COMPETENCIES_MIN_CATEGORY_COUNT):
+            if len(comps_out) >= fallback_target:
                 break
-            label = str(cat.get("category_label") or "").strip()
+            label = str(
+                cat.get("category_label")
+                or cat.get("display_label")
+                or cat.get("resume_display_label")
+                or cat.get("category")
+                or ""
+            ).strip()
             if not label or label.lower() in source_map:
                 continue
             cat_out = dict(cat)
@@ -594,12 +762,20 @@ def merge_competencies_graph_pool_top_eight(
             source_map[label.lower()] = path_idx
 
     merged = dict(anchor)
-    merged["competencies"] = comps_out[:target_count]
+    selected_categories = comps_out[:target_count]
+    # ``base_parsed`` is an anchor path and can carry its own canonical V3
+    # ``categories`` surface.  The selector merge previously replaced only the
+    # legacy ``competencies`` mirror, leaving those stale anchor categories in
+    # place.  The next V3 synchronization correctly treats ``categories`` as
+    # canonical and therefore erased the selector-authorized bundle/taxonomy
+    # identities.  Commit the selector result atomically to both mirrors.
+    merged["categories"] = copy.deepcopy(selected_categories)
+    merged["competencies"] = copy.deepcopy(selected_categories)
     merged["adaptive_category_policy"] = {
         "min_category_count": COMPETENCIES_MIN_CATEGORY_COUNT,
         "max_category_count": COMPETENCIES_MAX_CATEGORY_COUNT,
         "candidate_category_count": COMPETENCIES_CANDIDATE_CATEGORY_COUNT,
-        "selected_category_count": len(comps_out[:target_count]),
+        "selected_category_count": len(selected_categories),
         "high_signal_selection_score": high_signal_competencies_selection_score(),
     }
     if paths and paths[0].parsed and paths[0].parsed.get("claim_ledger"):
@@ -636,6 +812,49 @@ def evaluate_competencies_selection_quality(
         if isinstance(c, dict) and str(c.get("category_label") or "").strip()
     }
 
+    from collections import Counter
+    from apps_rg.runtime.sections.competency_capability_evidence import (
+        visible_graph_surface_taxonomy_for_bundle,
+    )
+
+    merged_rows = [c for c in comps if isinstance(c, dict)]
+    bundle_ids = [str(c.get("competency_bundle_id") or "").strip() for c in merged_rows]
+    taxonomy_ids = [
+        visible_graph_surface_taxonomy_for_bundle(bundle_id)[0] if bundle_id else ""
+        for bundle_id in bundle_ids
+    ]
+    bundle_ids_missing = tuple(
+        str(c.get("category_label") or "") for c, bid in zip(merged_rows, bundle_ids, strict=True) if not bid
+    )
+    taxonomy_ids_missing = tuple(
+        str(c.get("category_label") or "")
+        for c, taxonomy_id in zip(merged_rows, taxonomy_ids, strict=True)
+        if not taxonomy_id
+    )
+    duplicate_bundle_ids = tuple(
+        sorted(bundle_id for bundle_id, count in Counter(bundle_ids).items() if bundle_id and count > 1)
+    )
+    duplicate_taxonomy_ids = tuple(
+        sorted(taxonomy_id for taxonomy_id, count in Counter(taxonomy_ids).items() if taxonomy_id and count > 1)
+    )
+
+    # The visible-surface enrichment stage replaces each selected category's
+    # provider terms with the governed anchors for its single bundle. Text in
+    # one category therefore cannot stand in for a different bundle family.
+    # The old union of text matches and bundle identities let six rows claim
+    # all eight families, only to lose two families after enrichment. Require
+    # the exact governed bundle for every family at the selector boundary.
+    covered_families = {
+        family
+        for family, required_bundle_id in REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY.items()
+        if required_bundle_id in bundle_ids
+    }
+    missing_capability_families = tuple(
+        family
+        for family in REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY
+        if family not in covered_families
+    )
+
     for lab in sorted(merged_labels):
         sel = by_label.get(lab)
         if sel is None or not _selection_row_passes(sel):
@@ -647,7 +866,20 @@ def evaluate_competencies_selection_quality(
         else:
             passing.append(lab)
 
-    ok = min_final <= comps_n <= max_final and len(passing) == comps_n and not below and not missing
+    identity_ok = not (
+        bundle_ids_missing
+        or taxonomy_ids_missing
+        or duplicate_bundle_ids
+        or duplicate_taxonomy_ids
+    )
+    ok = (
+        min_final <= comps_n <= max_final
+        and len(passing) == comps_n
+        and not below
+        and not missing
+        and identity_ok
+        and not missing_capability_families
+    )
     return CompetenciesSelectionGate(
         ok=ok,
         section_lane="competencies",
@@ -659,6 +891,11 @@ def evaluate_competencies_selection_quality(
         categories_below_threshold=tuple(below),
         categories_missing=tuple(missing),
         categories_in_merged=comps_n,
+        bundle_ids_missing=bundle_ids_missing,
+        duplicate_bundle_ids=duplicate_bundle_ids,
+        taxonomy_category_ids_missing=taxonomy_ids_missing,
+        duplicate_taxonomy_category_ids=duplicate_taxonomy_ids,
+        missing_capability_families=missing_capability_families,
     )
 
 
@@ -685,12 +922,14 @@ __all__ = [
     "COMPETENCIES_MAX_SC_PATH_COUNT",
     "COMPETENCIES_MIN_CATEGORY_COUNT",
     "COMPETENCIES_REGEN_EXTRA_PATHS",
+    "REQUIRED_COMPETENCY_BUNDLE_BY_FAMILY",
     "COMPETENCIES_SC_PATH_COUNT",
     "DEFAULT_COMPETENCIES_HIGH_SIGNAL_SELECTION_SCORE",
     "DEFAULT_COMPETENCIES_INITIAL_SC_PATH_COUNT",
     "CompetenciesSelectionGate",
     "build_competencies_rejected_neighbor_audit",
     "build_competencies_targeting_context",
+    "competencies_candidate_support_score",
     "competencies_initial_sc_path_count",
     "competencies_max_sc_path_count",
     "competencies_regen_extra_path_count",

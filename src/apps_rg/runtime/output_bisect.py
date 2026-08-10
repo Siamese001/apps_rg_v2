@@ -110,18 +110,49 @@ def _candidate_for_call(lane: Path, call_id: str) -> dict[str, Any]:
 
 def _x2_rows(lane: Path | None) -> list[dict[str, Any]]:
     doc = _load_json(lane / "x2_gate_outputs.json") if lane is not None else {}
+    if lane is not None and not doc:
+        doc = _load_json(lane / "final_resume_x2_gate_outputs.json")
     rows = doc.get("gates")
     return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
 
 
 def _judge_rows(lane: Path | None) -> list[dict[str, Any]]:
     doc = _load_json(lane / "x1d_llm_judge_outputs.json") if lane is not None else {}
+    if lane is not None and not doc:
+        doc = _load_json(lane / "x1d_full_resume_judge_outputs.json")
     rows = doc.get("judges")
     return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
 
 
 def _x3(lane: Path | None) -> dict[str, Any]:
-    return _load_json(lane / "x3_disposition.json") if lane is not None else {}
+    if lane is None:
+        return {}
+    x3 = _load_json(lane / "x3_disposition.json")
+    if x3:
+        return x3
+    review = _load_json(lane / "full_resume_llm_coherence_review.json")
+    if not review:
+        return {}
+    passed = review.get("full_resume_coherence_pass") is True
+    return {
+        "x3_code": "X3_ALLOW" if passed else "X3_REVIEW_AGGREGATION",
+        "pass": passed,
+        "final_summary_hash": review.get("final_resume_hash"),
+        "x1d_evaluator_mode": review.get("aggregation_method"),
+        "x2_failed_gates": [] if passed else ["x2_full_resume_llm_coherence_aggregation"],
+        "decisive_reason": review.get("decisive_reason"),
+        "derived_from": "full_resume_llm_coherence_review.json",
+    }
+
+
+def _is_final_aggregation_lane(lane: Path | None) -> bool:
+    return bool(
+        lane is not None
+        and (
+            lane.name == "final_resume_assembly"
+            or (lane / "full_resume_llm_coherence_review.json").is_file()
+        )
+    )
 
 
 def _attempt_timeline(run_label: str, lane: Path | None) -> list[dict[str, Any]]:
@@ -153,29 +184,41 @@ def _attempt_timeline(run_label: str, lane: Path | None) -> list[dict[str, Any]]
         ]
 
     timeline: list[dict[str, Any]] = []
+    aggregation_lane = _is_final_aggregation_lane(lane)
     regen = _load_json(lane / "synthesis_regen_receipt.json")
     repair = _load_json(lane / "section_repair_ledger.json")
     x2_rows = _x2_rows(lane)
     judges = _judge_rows(lane)
     x3 = _x3(lane)
-    initial = _candidate_from_file(lane / "raw_model_output.txt")
+    initial_path = lane / ("final_resume.json" if aggregation_lane else "raw_model_output.txt")
+    initial = _candidate_from_file(initial_path)
     initial_defects = _split_reasons(regen.get("reject_reason"))
     timeline.append(
         {
             "run": run_label,
             "sequence": 1,
-            "phase": "initial_generation",
+            "phase": "assembly_input" if aggregation_lane else "initial_generation",
             "attempt": 0,
             "candidate_digest": initial["digest"],
             "word_count": initial["word_count"],
-            "trigger_or_input": "; ".join(initial_defects) or "initial candidate",
-            "repair_or_action": "dispatch provider generation",
+            "trigger_or_input": (
+                "accepted section snapshots"
+                if aggregation_lane
+                else "; ".join(initial_defects) or "initial candidate"
+            ),
+            "repair_or_action": (
+                "assemble accepted X3 section outputs"
+                if aggregation_lane
+                else "dispatch provider generation"
+            ),
             "gate_scope": "PRE_X2_SYNTHESIS_SHAPE" if initial_defects else "FULL_X2",
             "gate_result": "FAIL" if initial_defects else "PASS_OR_NOT_TRIGGERED",
             "failed_gate_ids": initial_defects,
             "judge_result": "NOT_REACHED_PRE_X2" if initial_defects else "PENDING",
             "disposition": "REPAIR_TRIGGERED" if initial_defects else "ADVANCED_TO_X2",
-            "acceptance_scope": "INITIAL_CANDIDATE",
+            "acceptance_scope": (
+                "ASSEMBLED_RESUME_CANDIDATE" if aggregation_lane else "INITIAL_CANDIDATE"
+            ),
             "evidence_ref": initial["evidence_ref"],
             "complete": bool(initial["present"]),
         }
@@ -260,23 +303,43 @@ def _attempt_timeline(run_label: str, lane: Path | None) -> list[dict[str, Any]]
         )
 
     failed_x2 = [str(row.get("gate_id") or "") for row in x2_rows if row.get("pass") is not True]
+    final_candidate_path = lane / (
+        "final_resume.json" if aggregation_lane else "resume_display_text.txt"
+    )
+    final_x2_path = lane / (
+        "final_resume_x2_gate_outputs.json" if aggregation_lane else "x2_gate_outputs.json"
+    )
     timeline.append(
         {
             "run": run_label,
             "sequence": len(timeline) + 1,
             "phase": "final_x2",
             "attempt": repair.get("authoritative_attempt_number") or 1,
-            "candidate_digest": _candidate_from_file(lane / "resume_display_text.txt")["digest"],
-            "word_count": _candidate_from_file(lane / "resume_display_text.txt")["word_count"],
-            "trigger_or_input": "all deterministic product gates",
-            "repair_or_action": "evaluate full X2 gate set",
-            "gate_scope": "FULL_X2",
+            "candidate_digest": _candidate_from_file(final_candidate_path)["digest"],
+            "word_count": _candidate_from_file(final_candidate_path)["word_count"],
+            "trigger_or_input": (
+                "structural and aggregate coherence gates"
+                if aggregation_lane
+                else "all deterministic product gates"
+            ),
+            "repair_or_action": (
+                "evaluate final resume release gates"
+                if aggregation_lane
+                else "evaluate full X2 gate set"
+            ),
+            "gate_scope": "FINAL_RESUME_X2" if aggregation_lane else "FULL_X2",
             "gate_result": "FAIL" if failed_x2 else "PASS",
             "failed_gate_ids": failed_x2,
-            "judge_result": "NOT_REACHED_X2_FAILED" if failed_x2 else "ADVANCED_TO_JUDGES",
+            "judge_result": (
+                "JUDGES_EVALUATED"
+                if aggregation_lane and judges
+                else "NOT_REACHED_X2_FAILED"
+                if failed_x2
+                else "ADVANCED_TO_JUDGES"
+            ),
             "disposition": "BLOCKED" if failed_x2 else "ADVANCED",
             "acceptance_scope": "PRODUCT_GATE",
-            "evidence_ref": str(lane / "x2_gate_outputs.json"),
+            "evidence_ref": str(final_x2_path),
             "complete": bool(x2_rows),
         }
     )
@@ -301,7 +364,15 @@ def _attempt_timeline(run_label: str, lane: Path | None) -> list[dict[str, Any]]
                     "judge_result": f"{score}/{threshold} {judge.get('provider_status') or ''}".strip(),
                     "disposition": "JUDGE_PASS" if judge.get("pass") is True else "JUDGE_FAIL",
                     "acceptance_scope": "MODEL_BACKED_GRADE",
-                    "evidence_ref": str(judge.get("raw_response_ref") or lane / "x1d_llm_judge_outputs.json"),
+                    "evidence_ref": str(
+                        judge.get("raw_response_ref")
+                        or lane
+                        / (
+                            "x1d_full_resume_judge_outputs.json"
+                            if aggregation_lane
+                            else "x1d_llm_judge_outputs.json"
+                        )
+                    ),
                     "complete": bool(judge.get("judge_id") and score is not None and threshold is not None),
                 }
             )
@@ -343,7 +414,14 @@ def _attempt_timeline(run_label: str, lane: Path | None) -> list[dict[str, Any]]
                 "judge_result": "JUDGES_NOT_REACHED" if failed_x2 else "EVIDENCE_NOT_RECORDED",
                 "disposition": "PRE_JUDGE_BLOCK" if failed_x2 else "EVIDENCE_GAP",
                 "acceptance_scope": "NOT_APPLICABLE",
-                "evidence_ref": str(lane / "x1d_llm_judge_outputs.json"),
+                "evidence_ref": str(
+                    lane
+                    / (
+                        "x1d_full_resume_judge_outputs.json"
+                        if aggregation_lane
+                        else "x1d_llm_judge_outputs.json"
+                    )
+                ),
                 "complete": bool(failed_x2),
             }
         )
@@ -364,7 +442,14 @@ def _attempt_timeline(run_label: str, lane: Path | None) -> list[dict[str, Any]]
             "judge_result": str(x3.get("x1d_evaluator_mode") or ""),
             "disposition": str(x3.get("x3_code") or "NOT_OBSERVED"),
             "acceptance_scope": "PRODUCT_AUTHORIZATION",
-            "evidence_ref": str(lane / "x3_disposition.json"),
+            "evidence_ref": str(
+                lane
+                / (
+                    "full_resume_llm_coherence_review.json"
+                    if aggregation_lane
+                    else "x3_disposition.json"
+                )
+            ),
             "complete": bool(x3.get("x3_code")),
         }
     )
@@ -763,10 +848,26 @@ def _layperson_explanation(
     current_x2 = next((row for row in current_timeline if row.get("phase") == "final_x2"), {})
     current_judges = next((row for row in current_timeline if row.get("phase") == "judge_panel"), {})
     if section_id == "final_resume_aggregation":
+        aggregation_judges = [
+            row for row in current_timeline if row.get("phase") == "judge_panel"
+        ]
+        panel = "; ".join(
+            f"{row.get('attempt')} {row.get('judge_result')}"
+            for row in aggregation_judges
+        ) or "no aggregate judge evidence was recorded"
+        failed_findings = [
+            str(row.get("trigger_or_input") or "").strip()
+            for row in aggregation_judges
+            if row.get("gate_result") == "FAIL"
+            and str(row.get("trigger_or_input") or "").strip()
+        ]
         return [
-            f"{prior_identity} authorized final assembly because every required section, including the executive summary, had already cleared its product checks.",
-            "The current final assembly did not fail as an independent writing attempt; it was blocked downstream because the executive summary never became eligible for assembly.",
-            "No aggregation retry or aggregation judge could repair that upstream section failure, so the underlying executive-summary retry and X2 evidence remains the controlling root cause.",
+            "Every required section reached X3_ALLOW, so the current run assembled a complete resume candidate and advanced it to the whole-resume coherence panel.",
+            f"The aggregate panel ran and recorded {panel}; the required two-of-two model-backed quorum was not met.",
+            (
+                "The controlling product defect is aggregate coherence, not upstream section eligibility: "
+                + ("; ".join(failed_findings) if failed_findings else "the failed aggregate gate is recorded in the final-resume review artifact.")
+            ),
         ]
     ingress = next((row for row in lineage if row.get("stage") == "u0_ingress"), {})
     ingress_sentence = (
@@ -814,16 +915,50 @@ def build_section_output_bisect(
     first_observed = next((row for row in lineage if not row.get("match")), {})
     first_causal = next((row for row in lineage if row.get("classification") == "CAUSAL"), {})
     if section_id == "final_resume_aggregation":
+        failed_judges = [
+            row
+            for row in current_timeline
+            if row.get("phase") == "judge_panel" and row.get("gate_result") == "FAIL"
+        ]
+        failed_summary = "; ".join(
+            str(row.get("trigger_or_input") or "").strip()
+            for row in failed_judges
+            if str(row.get("trigger_or_input") or "").strip()
+        )
         first_causal = {
             "order": 0,
-            "stage": "upstream_section_authorization",
+            "stage": "aggregate_coherence_quorum",
             "classification": "CAUSAL",
-            "reason": "Final assembly was blocked because the executive summary never reached product authorization.",
+            "reason": (
+                "Final assembly completed, but the whole-resume model-backed judge quorum failed"
+                + (f": {failed_summary}" if failed_summary else ".")
+            ),
         }
     baseline_commit = str(baseline_revision.get("git_commit") or "")
     current_commit = str(current_revision.get("git_commit") or "")
     bindings: list[dict[str, Any]] = []
-    if not baseline_available:
+    if section_id == "final_resume_aggregation":
+        bindings = [
+            {
+                "role": "final resume aggregation and judge quorum",
+                "file": "apps_rg/runtime/assembly/full_resume_llm_coherence.py",
+                "symbol": "emit_full_resume_llm_coherence_review",
+                "baseline_symbol_hash": "",
+                "current_symbol_hash": "",
+                "changed_between_revisions": False,
+                "status": "CURRENT_RUN_EVIDENCE_ISOLATED",
+            },
+            {
+                "role": "final resume release gate",
+                "file": "apps_rg/runtime/assembly/final_resume_x2.py",
+                "symbol": "gate_x2_full_resume_llm_coherence_aggregation",
+                "baseline_symbol_hash": "",
+                "current_symbol_hash": "",
+                "changed_between_revisions": False,
+                "status": "CURRENT_RUN_EVIDENCE_ISOLATED",
+            },
+        ]
+    elif not baseline_available:
         bindings = [
             {
                 "role": "revision comparison",
@@ -877,6 +1012,8 @@ def build_section_output_bisect(
     code_status = (
         "CODE_CAUSE_NOT_ISOLATED"
         if any(row.get("status") == "CODE_CAUSE_NOT_ISOLATED" for row in bindings)
+        else "AGGREGATE_GATE_ISOLATED"
+        if section_id == "final_resume_aggregation"
         else "NOT_APPLICABLE_NO_PRIOR_BASELINE"
         if not baseline_available
         else "DOWNSTREAM_CAUSE_REQUIRES_SECTION_BISECT"
@@ -937,6 +1074,27 @@ def build_section_output_bisect(
                 ),
             },
         }
+    elif section_id == "final_resume_aggregation":
+        failed_judges = [
+            row
+            for row in current_timeline
+            if row.get("phase") == "judge_panel" and row.get("gate_result") == "FAIL"
+        ]
+        underlying_root_cause = {
+            "aggregate_coherence_root_cause": {
+                "status": "ISOLATED_TO_AGGREGATE_JUDGE",
+                "conclusion": (
+                    "All required section outputs were assembled; final authorization failed because "
+                    "the model-backed whole-resume panel did not reach its required quorum."
+                ),
+                "failed_judge_findings": [
+                    str(row.get("trigger_or_input") or "") for row in failed_judges
+                ],
+                "evidence_refs": [
+                    str(row.get("evidence_ref") or "") for row in failed_judges
+                ],
+            }
+        }
     else:
         underlying_root_cause = {
             "downstream_root_cause": {
@@ -952,6 +1110,8 @@ def build_section_output_bisect(
         "scope": (
             "FULL_CAUSAL_BISECT"
             if baseline_available and section_id == "executive_summary"
+            else "CURRENT_RUN_AGGREGATE_BISECT"
+            if section_id == "final_resume_aggregation"
             else "NO_PRIOR_BASELINE"
             if not baseline_available
             else "DOWNSTREAM_SECTION_BISECT"

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.runtime.contracts.runtime_customization_package import (
+from apps_rg.runtime.spine_contracts import (
     PackageValidationReceipt,
     RuntimeCustomizationPackage,
 )

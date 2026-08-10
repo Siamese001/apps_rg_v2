@@ -1,0 +1,63 @@
+{
+  "artifact_hash": "sha256:d3ed2c2909cd2a60048621ab7d2baae563e6cc7dc5ab350407d67695e68dd0ed",
+  "emitted_at": "2026-08-09T12:33:16Z",
+  "payload": {
+    "chain_kind": "R4_SINGLE_ACTION",
+    "emitted_at_utc": "2026-08-09T12:33:16Z",
+    "execution_form": "R4_SINGLE_ACTION",
+    "l2_execution_status": "EXECUTED",
+    "l2_fault": "",
+    "l2_recipe_executed": true,
+    "l2_recipe_run_report_ref": "",
+    "l2_sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.006,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 822063.537,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.008,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "BYPASSED",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "no_l2_execution_assertion": false,
+    "request_id": "req-39fdcd23991c43bcbc582595289ba5ba",
+    "route_id": "R4_SINGLE_ACTION",
+    "run_id": "27d8a800-35c5-40f0-be6b-050f1d155faa",
+    "trace_root": "fac02c15-42bf-4cc0-aff5-943789ba1692"
+  },
+  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:bef87729e51e779ff988f4134f9fa4807b6ad2cdea9d79bd355eecb2712cb028"
+}
