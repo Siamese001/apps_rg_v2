@@ -160,28 +160,39 @@ def _build_spine_retrieve_receipt(
 ) -> dict[str, Any]:
     dense_ran = bool(getattr(fec, "dense_search_refs", None))
     sparse_refs = list(getattr(fec, "sparse_search_refs", None) or ())
+    audit_refs = list(getattr(fec, "audit_refs", None) or ())
+    obligation_reconciliation_refs = [
+        ref
+        for ref in audit_refs
+        if str(ref).startswith(
+            (
+                "l1_v2_evidence_obligation_ledger:",
+                "l1_evidence_obligation_receipt_digest:",
+                "l1_evidence_obligation_receipt_ref:",
+            )
+        )
+    ]
     return {
         "schema_version": "section_spine_c0_retrieve_receipt_v2",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "section_id": section_id,
         "stop_as_evidence_gap_policy": STOP_AS_EVIDENCE_GAP,
         "spine_binding": (
-            "apps_rg.runtime.bindings.c0_planned_binding."
-            "c0_retrieve_apps_rg_planned"
+            "apps_rg.runtime.bindings.c0_planned_binding.c0_retrieve_apps_rg_planned"
         ),
-        "cert_ref": getattr(fec, "l5_certification_ref", None)
-        or APPS_RG_C0_CERT_REF,
+        "cert_ref": getattr(fec, "l5_certification_ref", None) or APPS_RG_C0_CERT_REF,
         "support_status": fec.support_status,
         "not_applicable_reason": getattr(fec, "not_applicable_reason", "") or "",
         "final_evidence_digest": getattr(fec, "final_evidence_digest", "") or "",
         "retrieval_plan_ref": getattr(fec, "retrieval_plan_ref", "") or "",
-        "audit_refs": list(getattr(fec, "audit_refs", None) or ()),
+        "audit_refs": audit_refs,
+        "l1_v2_evidence_obligation_reconciliation_refs": (
+            obligation_reconciliation_refs
+        ),
         "evidence_item_count": len(fec.evidence_items or ()),
         "dense_search_refs": list(getattr(fec, "dense_search_refs", None) or ()),
         "sparse_search_refs": sparse_refs,
-        "graph_expansion_refs": list(
-            getattr(fec, "graph_expansion_refs", None) or ()
-        ),
+        "graph_expansion_refs": list(getattr(fec, "graph_expansion_refs", None) or ()),
         "graph_lane_na_ref": graph_lane_ref,
         "canonical_c0_2_dense_claimed": dense_ran,
         "canonical_c0_3_graph_claimed": graph_lane_ref != C0_GRAPH_LANE_NA_REF,
@@ -273,9 +284,7 @@ def apply_spine_c03_overlay_to_bridge_doc(
         out["apps_rg_c03_skills_graph_used"] = True
     pa = dict(out.get("pa_proof_authority_metadata") or {})
     pa["core_c03_graph_rag_used"] = core_live
-    pa["spine_c0_retrieve_receipt_ref"] = (
-        "section_spine_c0_retrieve_receipt.json"
-    )
+    pa["spine_c0_retrieve_receipt_ref"] = "section_spine_c0_retrieve_receipt.json"
     out["pa_proof_authority_metadata"] = pa
     snap = dict(out.get("final_evidence_contract_snapshot") or {})
     if spine_exp:
@@ -317,9 +326,7 @@ def merge_spine_fec_into_bridge_doc(
         "evidence_items": items,
         "dense_search_refs": list(getattr(fec, "dense_search_refs", None) or ()),
         "sparse_search_refs": list(getattr(fec, "sparse_search_refs", None) or ()),
-        "graph_expansion_refs": list(
-            getattr(fec, "graph_expansion_refs", None) or ()
-        ),
+        "graph_expansion_refs": list(getattr(fec, "graph_expansion_refs", None) or ()),
     }
 
     spine_exp = list(getattr(fec, "graph_expansion_refs", None) or ())
@@ -336,15 +343,13 @@ def merge_spine_fec_into_bridge_doc(
             "final_evidence_contract_snapshot": snap,
             "spine_c0_retrieve_receipt": spine.receipt,
             "producer_stage": "spine_c0_retrieve_apps_rg",
-            "fec_bridge_mode": out.get("fec_bridge_mode")
-            or "spine_c0_fec_compose",
+            "fec_bridge_mode": out.get("fec_bridge_mode") or "spine_c0_fec_compose",
             "canonical_c0_2_claimed": dense_ran,
             "canonical_c0_3_claimed": bool(
                 spine.receipt.get("canonical_c0_3_graph_claimed")
                 or (
                     spine.fec.graph_expansion_refs
-                    and str(spine.fec.graph_expansion_refs[0])
-                    != C0_GRAPH_LANE_NA_REF
+                    and str(spine.fec.graph_expansion_refs[0]) != C0_GRAPH_LANE_NA_REF
                 )
             ),
             "canonical_c0_5_claimed": True,

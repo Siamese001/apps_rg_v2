@@ -1,8 +1,8 @@
 # L1 Cognition and Reasoning Roadmap
 
-Status: Waves 0-1 implemented and verified; Waves 2-6 remain proposed.
+Status: Waves 0-2 implemented and verified; Waves 3-6 remain proposed.
 
-Branch baseline: local `main` at `4d27ad271bab47e69914c36e86ed7134f03aa5fb`
+Branch baseline: local `main` at `52499a771d086b0b63c99916a0c4360ecb286ed5`
 
 ## Decision
 
@@ -34,7 +34,7 @@ actually applied.
 | Cognition controls are requests, not execution proof. | Each `cognition_plan` row sets `controls_applied=False` and `ADVISORY_ONLY_UNTIL_L2_RECEIPT`; singleton provider transports can ignore ToT/reflection knobs. | Raising self-consistency, ToT, or reflection values now would make the plan look stronger without demonstrating stronger execution. |
 | Replanning classifies failures without a structured cause ledger. | W1 produces per-unit observations and W2 maps frozen failure codes to the next owner. | The next plan cannot distinguish an input defect, missing source, failed retrieval, unmet requirement, unsupported control, or generation defect precisely enough to learn safely. |
 
-Current focused regression baseline: `55 passed, 1 skipped` across the L1
+Current focused regression baseline: `68 passed, 1 skipped` across the L1
 capsule, JD obligation, reconciliation, and failure-aware replan suites. A real
 non-product L1 invocation produced `READY`, seven work units, fourteen generic
 dependency edges, three obligations (two critical mapped and one critical
@@ -203,12 +203,23 @@ Exit criteria:
 
 Owner: apps_rg C0 owner.
 
+Implementation: `l1_evidence_obligation_receipt.py` now builds a C0-owned,
+digest-bound sidecar from the verified v2 ledger. Every L1 obligation receives
+exactly one C0 disposition. C0 considers only requirement-bound, C0 candidate
+evidence; generic retrieved material remains `INSUFFICIENT`, while inline JD
+targeting is always excluded. `c0_binding.py` attaches the ledger and receipt
+digests (and, when an artifact directory is supplied, the canonical relative
+receipt reference) to compatible FEC audit references. The planned C0 boundary
+independently rebuilds the sidecar and rejects a hash-only v2 lineage claim.
+This remains comparison/shadow evidence: it neither changes C0 support gating
+nor grants L1 evidence authority.
+
 Primary files:
 
 - `src/apps_rg/runtime/bindings/c0_planned_binding.py`
 - `src/apps_rg/runtime/bindings/c0_binding.py`
 - `src/apps_rg/runtime/spine/section_c0_retrieve.py`
-- New `l1_evidence_obligation_receipt` contract and tests.
+- `src/apps_rg/runtime/contracts/l1_evidence_obligation_receipt.py` and tests.
 
 1. Have the planned C0 boundary read and validate the v2 evidence-obligation
    ledger rather than only include its digest in `retrieval_plan_ref`.

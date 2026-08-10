@@ -16,6 +16,12 @@ from apps_rg.runtime.bindings.c0_binding import C0EvidenceGapError, c0_retrieve_
 from apps_rg.runtime.bindings.l1_planning_capsule import (
     extract_verified_planning_capsule,
 )
+from apps_rg.runtime.bindings.l1_planning_capsule_v2 import (
+    extract_verified_planning_capsule_v2,
+)
+from apps_rg.runtime.contracts.l1_evidence_obligation_receipt import (
+    build_l1_evidence_obligation_receipt,
+)
 
 
 def c0_retrieve_apps_rg_planned(
@@ -54,6 +60,31 @@ def c0_retrieve_apps_rg_planned(
         raise C0EvidenceGapError(
             "C0 completed without an L1 capsule audit reference on FinalEvidenceContract"
         )
+    v2_capsule, _v2_verification = extract_verified_planning_capsule_v2(
+        l1_plan, required=False
+    )
+    if v2_capsule:
+        obligation_receipt = build_l1_evidence_obligation_receipt(
+            capsule=v2_capsule,
+            request_id=str(getattr(fec, "request_id", "") or ""),
+            run_id=str(getattr(fec, "run_id", "") or ""),
+            trace_id=str(getattr(fec, "trace_id", "") or ""),
+            final_evidence_digest=str(getattr(fec, "final_evidence_digest", "") or ""),
+            evidence_items=tuple(getattr(fec, "evidence_items", None) or ()),
+        )
+        ledger_digest = str(v2_capsule["evidence_obligation_ledger"]["ledger_digest"])
+        if "l1_v2_evidence_obligation_ledger:" + ledger_digest not in audit_refs:
+            raise C0EvidenceGapError(
+                "C0 completed without the verified L1 v2 evidence-obligation ledger audit reference"
+            )
+        if (
+            "l1_evidence_obligation_receipt_digest:"
+            + str(obligation_receipt["receipt_digest"])
+            not in audit_refs
+        ):
+            raise C0EvidenceGapError(
+                "C0 completed without exact L1 v2 evidence-obligation reconciliation"
+            )
     return fec
 
 
