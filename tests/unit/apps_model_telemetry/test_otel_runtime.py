@@ -3,14 +3,24 @@ from __future__ import annotations
 import json
 
 from apps_model_telemetry.otel_runtime import (
+    LEGACY_OTEL_ENDPOINT_ENVS,
+    OTEL_ENDPOINT_ENV,
     capture_collector_snapshot,
     configure_live_otel,
     verify_live_collector_receipt,
 )
 
 
+def _clear_exporter_endpoint(monkeypatch) -> None:
+    """Model an unconfigured process under the canonical OTel contract."""
+
+    monkeypatch.delenv(OTEL_ENDPOINT_ENV, raising=False)
+    for legacy_name in LEGACY_OTEL_ENDPOINT_ENVS:
+        monkeypatch.delenv(legacy_name, raising=False)
+
+
 def test_live_otel_refuses_an_implicit_noop_provider(monkeypatch) -> None:
-    monkeypatch.delenv("APPS_OTEL_EXPORTER_OTLP_ENDPOINT", raising=False)
+    _clear_exporter_endpoint(monkeypatch)
 
     status = configure_live_otel(service_name="test")
 
@@ -67,7 +77,7 @@ def test_snapshot_reader_accepts_append_only_collector_documents(monkeypatch, tm
 
 
 def test_collector_preflight_blocks_without_a_runtime_exporter(monkeypatch, tmp_path) -> None:
-    monkeypatch.delenv("APPS_OTEL_EXPORT_ACTIVE", raising=False)
+    _clear_exporter_endpoint(monkeypatch)
 
     receipt = verify_live_collector_receipt(artifact_dir=tmp_path)
 
