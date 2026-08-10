@@ -50,7 +50,7 @@ _LANES = (
     "ey_narrative",
 )
 _FROZEN_W0_BASELINE_DIGEST = (
-    "sha256:49d64ae9437c8571e915ec20d29ef4f22827f231bc87d613247bbc35b041432b"
+    "sha256:6345bcf3569b8502ce51ccdc94ca2e49f385bc4192bf27f8a6cc58cec4c78016"
 )
 
 

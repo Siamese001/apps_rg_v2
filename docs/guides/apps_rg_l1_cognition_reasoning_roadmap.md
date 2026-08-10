@@ -1,8 +1,8 @@
 # L1 Cognition and Reasoning Roadmap
 
-Status: Waves 0-4 implemented and verified; Waves 5-6 remain proposed.
+Status: Waves 0-5 implemented and verified; Wave 6 remains proposed.
 
-Branch baseline: local `main` at `1687a1deb956561cf049f8bc1f620c09dc3add15`
+Branch baseline: local `main` at `8d7432fdb6c485f48a520cb4bc813cd8683d7e68`
 
 ## Decision
 
@@ -325,6 +325,17 @@ scheduling authority has moved into L1.
 ### Wave 5 — Make replan feedback diagnostic and bounded
 
 Owner: apps_rg.
+
+Implementation: W5 retains the legacy W2 decision for compatibility and adds
+an app-local v2 diagnostic/replan pair. The diagnostic receipt validates the
+same taxonomy as W1, then binds the verified L1 v2 capsule, C0 obligation
+sidecar, W1/W3 reconciliation, and W4 L3 schedule. It records only observed
+causes: an unbound C0 receipt, unresolved C0 obligation, missing required
+control proof, provider/transport fault, unmet validation predecessor, or an
+open U0 decision-ledger uncertainty. The v2 delta names only requirement IDs
+affected by those diagnostics. Two advisory revisions are the maximum; an
+unchanged diagnostic fingerprint or exhausted depth escalates to the named
+resolver without automatic retry, reroute, generation, or Exit authorization.
 
 Primary files:
 
