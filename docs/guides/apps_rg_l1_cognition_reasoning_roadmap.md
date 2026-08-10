@@ -1,6 +1,7 @@
 # L1 Cognition and Reasoning Roadmap
 
-Status: Waves 0-5 implemented and verified; Wave 6 remains proposed.
+Status: Waves 0-5 implemented and verified; Wave 6 technical comparison and
+review-readiness are implemented. Human review and promotion remain pending.
 
 Branch baseline: local `main` at `8d7432fdb6c485f48a520cb4bc813cd8683d7e68`
 
@@ -361,6 +362,22 @@ affected scope; repeated failure cannot create an automatic retry loop.
 
 Owner: evaluation owner with named human reviewers for ambiguous cases.
 
+Technical implementation:
+
+- `apps_rg/evals/fixtures/l1_v2_comparison_development_corpus.v1.json` freezes
+  four digest-bound synthetic development cases. The companion protected-holdout
+  commitment contains only opaque source digests for stale-brief,
+  conflicting-constraint, and absent-candidate-evidence cases; development
+  access is denied.
+- `apps_rg.evals.l1_v2_comparison` deterministically compares v1 and v2 on the
+  development corpus, records C0 obligation reconciliation and proxy-only
+  broad-mapping metrics, and emits no raw source payloads.
+- The review packet has ambiguity-focused prompts but no reviewer identities,
+  labels, scores, grades, adjudications, or approvals. Promotion readiness is
+  always `NOT_AUTHORIZED` until an external protected-holdout result,
+  adjudicated human review, runtime cost/latency evidence, and a signed
+  promotion decision are supplied by their respective authorities.
+
 1. Freeze a source-bound fixture corpus covering straightforward, compound,
    cross-cutting, unknown, stale-brief, conflicting-constraint, and absent
    candidate-evidence cases. Split development fixtures from a protected holdout.
@@ -374,9 +391,11 @@ Owner: evaluation owner with named human reviewers for ambiguous cases.
    fail-closed enforcement in product-visible runs. Passing technical tests and
    shadow metrics are not production authorization.
 
-Exit criteria: protected-holdout gains meet predeclared thresholds without a
-material false-targeting or latency regression, and named human/release
-authority has approved promotion.
+Technical W6 exit: the source-bound development comparator, opaque holdout
+commitment, review intake, and blocked readiness receipt validate
+deterministically. Promotion exit remains blocked until protected-holdout gains
+meet predeclared thresholds without material false-targeting or latency
+regression, and named human/release authority has approved promotion.
 
 ## Cross-wave safeguards and sequencing
 
