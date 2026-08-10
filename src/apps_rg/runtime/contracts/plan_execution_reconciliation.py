@@ -9,6 +9,7 @@ non-completed outcome rather than being inferred as success.
 from __future__ import annotations
 
 import copy
+import json
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Final
@@ -19,11 +20,19 @@ from apps_rg.runtime.contracts.plan_execution_receipt import (
     receipt_digest,
     validate_plan_execution_receipt,
 )
+from apps_rg.runtime.contracts.reasoning_control_execution_receipt import (
+    ReasoningControlExecutionReceiptError,
+    build_reasoning_control_execution_receipt,
+    l2_observations_from_lane_records,
+    receipt_digest as control_execution_receipt_digest,
+    validate_reasoning_control_execution_receipt,
+    write_reasoning_control_execution_receipt,
+)
 from apps_rg.runtime.dispatch import spine_stage_receipts as sr
 
 
 PLAN_EXECUTION_RECONCILIATION_SCHEMA_VERSION: Final[str] = (
-    "apps_rg.plan_execution_reconciliation.v1"
+    "apps_rg.plan_execution_reconciliation.v2"
 )
 PLAN_EXECUTION_EMITTER: Final[str] = "apps_rg.runtime.contracts.plan_execution_reconciliation"
 
@@ -63,6 +72,8 @@ _LOCKED_COPY_UNITS: Final[frozenset[str]] = frozenset(
 _LOCKED_COPY_MANIFEST: Final[str] = "modular_r4/locked_copy/locked_copy_manifest.json"
 _SECTION_CALLS: Final[str] = "modular_r4/section_provider_calls.json"
 _RUNTIME_WITNESS: Final[str] = "runtime_execution_witness.json"
+_CONTROL_RECEIPT_DIR: Final[str] = "reasoning_control_execution"
+_C0_OBLIGATION_RECEIPT: Final[str] = "l1_evidence_obligation_receipt.json"
 
 
 class PlanExecutionReconciliationError(ValueError):
@@ -89,6 +100,64 @@ def _relative_file_ref(artifact_dir: Path, value: Any) -> str:
     if not absolute.is_file():
         return ""
     return candidate.as_posix()
+
+
+def _read_json_mapping(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return dict(value) if isinstance(value, Mapping) else {}
+
+
+def _control_receipt_ref(unit_id: str) -> str:
+    safe_unit = "".join(
+        character if character.isalnum() or character in {"-", "_"} else "_"
+        for character in unit_id
+    ).strip("_")
+    if not safe_unit:
+        raise PlanExecutionReconciliationError("unit_id cannot form a receipt path")
+    return f"{_CONTROL_RECEIPT_DIR}/{safe_unit}.json"
+
+
+def _lane_records_by_lane(
+    artifact_dir: Path,
+) -> tuple[dict[str, list[Mapping[str, Any]]], str]:
+    calls_ref = _relative_file_ref(artifact_dir, _SECTION_CALLS)
+    if not calls_ref:
+        return {}, "l2_section_provider_calls:absent"
+    document = _read_json_mapping(artifact_dir / calls_ref)
+    rows = document.get("records")
+    if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
+        return {}, calls_ref
+    by_lane: dict[str, list[Mapping[str, Any]]] = {}
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        lane = str(row.get("section_lane") or row.get("lane") or "").strip()
+        if lane:
+            by_lane.setdefault(lane, []).append(row)
+    return by_lane, calls_ref
+
+
+def _c0_obligation_refs_by_unit(artifact_dir: Path) -> dict[str, list[str]]:
+    receipt_ref = _relative_file_ref(artifact_dir, _C0_OBLIGATION_RECEIPT)
+    if not receipt_ref:
+        return {}
+    receipt = _read_json_mapping(artifact_dir / receipt_ref)
+    entries = receipt.get("obligation_dispositions")
+    if not isinstance(entries, Sequence) or isinstance(entries, (str, bytes)):
+        return {}
+    refs_by_unit: dict[str, list[str]] = {}
+    for entry in entries:
+        if not isinstance(entry, Mapping):
+            continue
+        unit_id = str(entry.get("target_unit_id") or "").strip()
+        if unit_id:
+            refs_by_unit.setdefault(unit_id, []).append(receipt_ref)
+    return {
+        unit_id: sorted(set(refs)) for unit_id, refs in sorted(refs_by_unit.items())
+    }
 
 
 def _capsule_unit_maps(
@@ -166,6 +235,74 @@ def _artifact_refs_for_unit(
     return tuple(lane_refs[lane] for lane in required if lane in lane_refs), required
 
 
+def _control_execution_receipt_for_unit(
+    *,
+    plan_capsule: Mapping[str, Any],
+    unit_id: str,
+    required_lanes: Sequence[str],
+    lane_records: Mapping[str, Sequence[Mapping[str, Any]]],
+    lane_record_ref: str,
+    c0_obligation_receipt_refs: Sequence[str],
+    supplied_receipts: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    supplied = supplied_receipts.get(unit_id)
+    if supplied is not None:
+        try:
+            validate_reasoning_control_execution_receipt(
+                supplied,
+                plan_capsule=plan_capsule,
+            )
+        except ReasoningControlExecutionReceiptError as exc:
+            raise PlanExecutionReconciliationError(
+                f"W3 supplied control receipt is invalid for {unit_id}: {exc}"
+            ) from exc
+        return copy.deepcopy(dict(supplied))
+
+    cognition_rows = plan_capsule.get("cognition_plan") or ()
+    cognition = next(
+        (
+            row
+            for row in cognition_rows
+            if isinstance(row, Mapping) and str(row.get("unit_id") or "") == unit_id
+        ),
+        None,
+    )
+    if not isinstance(cognition, Mapping):
+        raise PlanExecutionReconciliationError(
+            f"W3 L1 cognition plan is missing unit {unit_id!r}"
+        )
+    requested_controls = _mapping(cognition.get("requested_controls"))
+    if not requested_controls:
+        raise PlanExecutionReconciliationError(
+            f"W3 L1 requested controls are missing for {unit_id!r}"
+        )
+    unit_records = [
+        record for lane in required_lanes for record in lane_records.get(str(lane), ())
+    ]
+    observed = l2_observations_from_lane_records(
+        requested_controls=requested_controls,
+        lane_records=unit_records,
+        lane_record_ref=lane_record_ref,
+    )
+    try:
+        return build_reasoning_control_execution_receipt(
+            plan_capsule=plan_capsule,
+            unit_id=unit_id,
+            emitter_stage=str(observed["emitter_stage"]),
+            provider_profiles=observed["provider_profiles"],
+            model_ids=observed["model_ids"],
+            candidate_count=int(observed["candidate_count"]),
+            selection_method=str(observed["selection_method"]),
+            execution_receipt_ref=_control_receipt_ref(unit_id),
+            observed_controls=observed["observed_controls"],
+            c0_obligation_receipt_refs=c0_obligation_receipt_refs,
+        )
+    except ReasoningControlExecutionReceiptError as exc:
+        raise PlanExecutionReconciliationError(
+            f"W3 control execution receipt could not be built for {unit_id}: {exc}"
+        ) from exc
+
+
 def _execution_state(execution_witness: Mapping[str, Any] | None) -> tuple[bool, str]:
     witness = _mapping(execution_witness)
     l2 = _mapping(witness.get("l2"))
@@ -181,12 +318,15 @@ def _outcome_for_observation(
     l2_fault: str,
     required_lanes: Sequence[str],
     artifact_refs: Sequence[str],
+    quality_certification_eligible: bool,
 ) -> tuple[str, bool, str]:
     if planning_status != "READY":
         return "BLOCKED", False, "L1_PLAN_BLOCKED"
     if not l2_executed:
         return "SKIPPED", False, "POLICY_BLOCKED"
     if required_lanes and len(artifact_refs) == len(required_lanes):
+        if not quality_certification_eligible:
+            return "BLOCKED", True, "REQUIRED_CONTROL_EXECUTION_ABSENT"
         return "COMPLETED", True, ""
     if l2_fault:
         return "FAILED", True, "GENERATION_FAILED"
@@ -199,6 +339,7 @@ def _unit_observations(
     artifact_dir: Path,
     execution_witness: Mapping[str, Any] | None,
     l2_result: Any,
+    control_execution_receipts: Mapping[str, Mapping[str, Any]] | None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     units, evidence_by_unit, cognition_by_unit = _capsule_unit_maps(plan_capsule)
     planning_status = str(plan_capsule.get("planning_status") or "").strip().upper()
@@ -206,6 +347,13 @@ def _unit_observations(
     lane_refs = _lane_output_refs(l2_result, artifact_dir)
     witness_ref = _relative_file_ref(artifact_dir, _RUNTIME_WITNESS)
     calls_ref = _relative_file_ref(artifact_dir, _SECTION_CALLS)
+    lane_records, lane_record_ref = _lane_records_by_lane(artifact_dir)
+    c0_refs_by_unit = _c0_obligation_refs_by_unit(artifact_dir)
+    supplied_receipts = {
+        str(unit_id): receipt
+        for unit_id, receipt in (control_execution_receipts or {}).items()
+        if isinstance(receipt, Mapping)
+    }
     outcomes: list[dict[str, Any]] = []
     observations: list[dict[str, Any]] = []
 
@@ -215,14 +363,28 @@ def _unit_observations(
             lane_refs=lane_refs,
             artifact_dir=artifact_dir,
         )
+        control_receipt = _control_execution_receipt_for_unit(
+            plan_capsule=plan_capsule,
+            unit_id=unit_id,
+            required_lanes=required_lanes,
+            lane_records=lane_records,
+            lane_record_ref=lane_record_ref,
+            c0_obligation_receipt_refs=c0_refs_by_unit.get(unit_id, ()),
+            supplied_receipts=supplied_receipts,
+        )
+        quality = _mapping(control_receipt.get("quality_certification"))
+        quality_eligible = quality.get("eligible") is True
         disposition, attempted, failure_code = _outcome_for_observation(
             planning_status=planning_status,
             l2_executed=l2_executed,
             l2_fault=l2_fault,
             required_lanes=required_lanes,
             artifact_refs=artifact_refs,
+            quality_certification_eligible=quality_eligible,
         )
-        actual_attempt_refs = [ref for ref in (witness_ref, calls_ref) if ref] if l2_executed else []
+        actual_attempt_refs = (
+            [ref for ref in (witness_ref, calls_ref) if ref] if l2_executed else []
+        )
         outcomes.append(
             {
                 "unit_id": unit_id,
@@ -230,7 +392,7 @@ def _unit_observations(
                 "attempted": attempted,
                 "failure_code": failure_code,
                 "artifact_refs": list(artifact_refs),
-                "control_receipt_refs": [witness_ref] if witness_ref else [],
+                "control_receipt_refs": [str(control_receipt["execution_receipt_ref"])],
             }
         )
         observations.append(
@@ -240,6 +402,20 @@ def _unit_observations(
                 "evidence_plan": copy.deepcopy(dict(evidence_by_unit[unit_id])),
                 "requested_controls": copy.deepcopy(
                     _mapping(cognition_by_unit[unit_id]).get("requested_controls") or {}
+                ),
+                "reasoning_control_execution_receipt": control_receipt,
+                "reasoning_control_execution_receipt_ref": str(
+                    control_receipt["execution_receipt_ref"]
+                ),
+                "reasoning_control_execution_receipt_digest": str(
+                    control_receipt["receipt_digest"]
+                ),
+                "l2_l3_applied_controls": list(
+                    control_receipt["l2_l3_applied_controls"]
+                ),
+                "quality_certification_eligible": quality_eligible,
+                "c0_obligation_receipt_refs": list(
+                    control_receipt["c0_obligation_receipt_refs"]
                 ),
                 "required_execution_lanes": list(required_lanes),
                 "observed_lane_artifacts": {
@@ -264,6 +440,7 @@ def build_plan_execution_reconciliation(
     artifact_dir: Path,
     execution_witness: Mapping[str, Any] | None = None,
     l2_result: Any = None,
+    control_execution_receipts: Mapping[str, Mapping[str, Any]] | None = None,
     terminal_reason: str = "",
 ) -> dict[str, Any]:
     """Build the W1 whole-run reconciliation without changing execution state."""
@@ -274,6 +451,7 @@ def build_plan_execution_reconciliation(
         artifact_dir=artifact_dir,
         execution_witness=execution_witness,
         l2_result=l2_result,
+        control_execution_receipts=control_execution_receipts,
     )
     receipt = build_plan_execution_receipt(
         request_id=request_id,
@@ -287,6 +465,7 @@ def build_plan_execution_reconciliation(
         "emitter": PLAN_EXECUTION_EMITTER,
         "terminal_reason": str(terminal_reason or "").strip(),
         "observation_only": True,
+        "w3_control_reconciliation": True,
     }
     receipt["unit_observations"] = observations
     receipt["receipt_digest"] = receipt_digest(receipt)
@@ -307,11 +486,14 @@ def validate_plan_execution_reconciliation(receipt: Mapping[str, Any]) -> None:
         or emission.get("wave") != "W1"
         or emission.get("emitter") != PLAN_EXECUTION_EMITTER
         or emission.get("observation_only") is not True
+        or emission.get("w3_control_reconciliation") is not True
     ):
         raise PlanExecutionReconciliationError("W1 emission metadata is invalid")
     observations = receipt.get("unit_observations")
     if not isinstance(observations, Sequence) or isinstance(observations, (str, bytes)):
-        raise PlanExecutionReconciliationError("W1 unit observations must be a sequence")
+        raise PlanExecutionReconciliationError(
+            "W1 unit observations must be a sequence"
+        )
     outcomes = {
         str(row.get("unit_id") or ""): row
         for row in receipt.get("unit_outcomes") or ()
@@ -320,21 +502,109 @@ def validate_plan_execution_reconciliation(receipt: Mapping[str, Any]) -> None:
     observed_ids: set[str] = set()
     for observation in observations:
         if not isinstance(observation, Mapping):
-            raise PlanExecutionReconciliationError("W1 unit observation must be a mapping")
+            raise PlanExecutionReconciliationError(
+                "W1 unit observation must be a mapping"
+            )
         unit_id = str(observation.get("unit_id") or "").strip()
         if not unit_id or unit_id in observed_ids or unit_id not in outcomes:
-            raise PlanExecutionReconciliationError("W1 unit observation coverage is invalid")
+            raise PlanExecutionReconciliationError(
+                "W1 unit observation coverage is invalid"
+            )
         observed_ids.add(unit_id)
         if not isinstance(observation.get("planned_inputs"), Sequence) or isinstance(
             observation.get("planned_inputs"), (str, bytes)
         ):
-            raise PlanExecutionReconciliationError("W1 planned_inputs must be a sequence")
+            raise PlanExecutionReconciliationError(
+                "W1 planned_inputs must be a sequence"
+            )
         evidence_plan = observation.get("evidence_plan")
-        if not isinstance(evidence_plan, Mapping) or evidence_plan.get("unit_id") != unit_id:
-            raise PlanExecutionReconciliationError("W1 evidence plan binding is invalid")
+        if (
+            not isinstance(evidence_plan, Mapping)
+            or evidence_plan.get("unit_id") != unit_id
+        ):
+            raise PlanExecutionReconciliationError(
+                "W1 evidence plan binding is invalid"
+            )
         if not isinstance(observation.get("requested_controls"), Mapping):
-            raise PlanExecutionReconciliationError("W1 requested controls must be a mapping")
-        for field in ("required_execution_lanes", "actual_attempt_refs", "artifact_refs"):
+            raise PlanExecutionReconciliationError(
+                "W1 requested controls must be a mapping"
+            )
+        control_receipt = observation.get("reasoning_control_execution_receipt")
+        if not isinstance(control_receipt, Mapping):
+            raise PlanExecutionReconciliationError("W3 control receipt is required")
+        if control_receipt.get("receipt_digest") != control_execution_receipt_digest(
+            control_receipt
+        ):
+            raise PlanExecutionReconciliationError(
+                "W3 control receipt digest is invalid"
+            )
+        if (
+            control_receipt.get("plan_capsule_digest")
+            != receipt["plan"].get("capsule_digest")
+            or control_receipt.get("unit_id") != unit_id
+        ):
+            raise PlanExecutionReconciliationError(
+                "W3 control receipt is not plan-bound"
+            )
+        if observation.get(
+            "reasoning_control_execution_receipt_ref"
+        ) != control_receipt.get("execution_receipt_ref") or observation.get(
+            "reasoning_control_execution_receipt_digest"
+        ) != control_receipt.get("receipt_digest"):
+            raise PlanExecutionReconciliationError(
+                "W3 control receipt reference is invalid"
+            )
+        control_rows = control_receipt.get("control_observations")
+        if not isinstance(control_rows, Sequence) or isinstance(
+            control_rows, (str, bytes)
+        ):
+            raise PlanExecutionReconciliationError(
+                "W3 control observations are invalid"
+            )
+        controls_by_name = {
+            str(row.get("control_name") or ""): row
+            for row in control_rows
+            if isinstance(row, Mapping)
+        }
+        requested_controls = _mapping(observation.get("requested_controls"))
+        if set(controls_by_name) != set(requested_controls) or any(
+            controls_by_name[name].get("requested_value") != value
+            for name, value in requested_controls.items()
+        ):
+            raise PlanExecutionReconciliationError(
+                "W3 control receipt does not cover requested controls exactly"
+            )
+        applied_controls = [
+            str(row.get("control_name") or "")
+            for row in control_rows
+            if isinstance(row, Mapping)
+            and row.get("execution_status") in {"APPLIED", "ADAPTED"}
+        ]
+        if observation.get("l2_l3_applied_controls") != applied_controls:
+            raise PlanExecutionReconciliationError(
+                "W3 applied control summary is invalid"
+            )
+        quality = _mapping(control_receipt.get("quality_certification"))
+        if observation.get("quality_certification_eligible") is not quality.get(
+            "eligible"
+        ):
+            raise PlanExecutionReconciliationError(
+                "W3 quality certification summary is invalid"
+            )
+        c0_refs = observation.get("c0_obligation_receipt_refs")
+        if not isinstance(c0_refs, Sequence) or isinstance(c0_refs, (str, bytes)):
+            raise PlanExecutionReconciliationError("W3 C0 receipt refs are invalid")
+        if list(c0_refs) != list(
+            control_receipt.get("c0_obligation_receipt_refs") or []
+        ):
+            raise PlanExecutionReconciliationError(
+                "W3 C0 receipt refs do not reconcile"
+            )
+        for field in (
+            "required_execution_lanes",
+            "actual_attempt_refs",
+            "artifact_refs",
+        ):
             value = observation.get(field)
             if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
                 raise PlanExecutionReconciliationError(f"W1 {field} must be a sequence")
@@ -342,16 +612,35 @@ def validate_plan_execution_reconciliation(receipt: Mapping[str, Any]) -> None:
         if (
             observation.get("disposition") != expected.get("disposition")
             or observation.get("attempted") is not expected.get("attempted")
-            or list(observation.get("artifact_refs") or []) != list(expected.get("artifact_refs") or [])
+            or list(observation.get("artifact_refs") or [])
+            != list(expected.get("artifact_refs") or [])
         ):
-            raise PlanExecutionReconciliationError("W1 observation does not match its terminal outcome")
+            raise PlanExecutionReconciliationError(
+                "W1 observation does not match its terminal outcome"
+            )
         required = list(observation.get("required_execution_lanes") or [])
         observed = _mapping(observation.get("observed_lane_artifacts"))
-        if any(str(lane) not in observed for lane in required if str(lane) != "locked_copy"):
+        if any(
+            str(lane) not in observed for lane in required if str(lane) != "locked_copy"
+        ):
             if expected.get("disposition") == "COMPLETED":
-                raise PlanExecutionReconciliationError("completed W1 unit is missing a required lane artifact")
+                raise PlanExecutionReconciliationError(
+                    "completed W1 unit is missing a required lane artifact"
+                )
+        if expected.get("disposition") == "COMPLETED" and not quality.get("eligible"):
+            raise PlanExecutionReconciliationError(
+                "completed W1 unit lacks required control execution proof"
+            )
+        if list(expected.get("control_receipt_refs") or []) != [
+            str(control_receipt.get("execution_receipt_ref") or "")
+        ]:
+            raise PlanExecutionReconciliationError(
+                "W3 control receipt outcome binding is invalid"
+            )
     if observed_ids != set(outcomes):
-        raise PlanExecutionReconciliationError("W1 observations omit planned execution outcomes")
+        raise PlanExecutionReconciliationError(
+            "W1 observations omit planned execution outcomes"
+        )
 
 
 def emit_plan_execution_reconciliation(**kwargs: Any) -> Path:
@@ -359,6 +648,15 @@ def emit_plan_execution_reconciliation(**kwargs: Any) -> Path:
 
     artifact_dir = Path(kwargs["artifact_dir"])
     receipt = build_plan_execution_reconciliation(**kwargs)
+    plan_capsule = kwargs["plan_capsule"]
+    for observation in receipt["unit_observations"]:
+        control_receipt = observation["reasoning_control_execution_receipt"]
+        output_ref = str(control_receipt["execution_receipt_ref"])
+        write_reasoning_control_execution_receipt(
+            output_path=artifact_dir / output_ref,
+            receipt=control_receipt,
+            plan_capsule=plan_capsule,
+        )
     path = artifact_dir / sr.FILENAME_PLAN_EXECUTION_RECEIPT
     sr.write_stage_receipt(path, receipt)
     return path

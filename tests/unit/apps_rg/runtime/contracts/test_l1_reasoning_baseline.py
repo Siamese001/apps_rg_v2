@@ -50,7 +50,7 @@ _LANES = (
     "ey_narrative",
 )
 _FROZEN_W0_BASELINE_DIGEST = (
-    "sha256:e8354c4b153fedeeeb5fc86af2dc1e48fff840fd030f980f4c272c4543d63a62"
+    "sha256:49d64ae9437c8571e915ec20d29ef4f22827f231bc87d613247bbc35b041432b"
 )
 
 
@@ -190,7 +190,7 @@ def test_w0_baseline_captures_all_existing_stage_observations(
         is True
     )
     assert baseline["stage_observations"]["w2"]["replan_status"] == (
-        "NO_ACTIONABLE_REPLAN"
+        "REPLAN_PROPOSED"
     )
     validate_l1_reasoning_baseline(baseline)
     compare_l1_reasoning_baseline(baseline, capsule=capsule)

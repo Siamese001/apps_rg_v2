@@ -48,6 +48,36 @@ def profile_to_requested_kw(p: SectionReasoningProfile) -> dict[str, Any]:
     }
 
 
+def control_semantics_for_requested_controls(
+    requested_controls: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Declare which requested controls need an L2/L3 receipt for certification.
+
+    This is planning intent, not a transport capability claim. L2/L3 alone
+    report whether the transport supported and actually applied a control.
+    """
+
+    semantics: dict[str, dict[str, Any]] = {}
+    for control_name, requested_value in sorted(requested_controls.items()):
+        numeric_value = (
+            float(requested_value)
+            if isinstance(requested_value, (int, float))
+            and not isinstance(requested_value, bool)
+            else 0.0
+        )
+        required_for_certification = (
+            control_name in {"tot_branches", "tot_depth", "self_consistency_samples"}
+            and numeric_value > 1.0
+        ) or (control_name == "reflexion_loops" and numeric_value > 0.0)
+        semantics[control_name] = {
+            "requested": requested_value,
+            "required_for_certification": required_for_certification,
+            "transport_supported": "L2_OR_L3_MUST_OBSERVE",
+            "receipt_required": True,
+        }
+    return semantics
+
+
 # --- Tier presets (frozen defaults).
 _T0_LOCKED = SectionReasoningProfile(
     tier=ReasoningIntensityTier.T0_LOCKED_FACT,
@@ -206,6 +236,7 @@ def executive_summary_must_dominate_lesser_sections() -> None:
 __all__ = [
     "ReasoningIntensityTier",
     "SectionReasoningProfile",
+    "control_semantics_for_requested_controls",
     "executive_summary_must_dominate_lesser_sections",
     "profile_to_requested_kw",
     "section_reasoning_profile",

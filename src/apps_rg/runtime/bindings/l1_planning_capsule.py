@@ -20,6 +20,7 @@ import yaml
 from apps_rg.repository_layout import resolve_apps_rg_path
 from apps_rg.runtime.bindings.u0_profile_manifest import repo_root
 from apps_rg.runtime.reasoning.section_reasoning_intensity import (
+    control_semantics_for_requested_controls,
     profile_to_requested_kw,
     section_reasoning_profile,
 )
@@ -1130,6 +1131,7 @@ def _cognition_plan(work_units: Sequence[Mapping[str, Any]]) -> list[dict[str, A
                 "tier": profile.tier.value,
                 "variance_class": str(unit.get("variance_class") or ""),
                 "requested_controls": requested,
+                "control_semantics": control_semantics_for_requested_controls(requested),
                 "self_consistency_intent": float(profile.self_consistency_samples),
                 "reflexion_intent": float(profile.reflexion_loops),
                 "controls_applied": False,
