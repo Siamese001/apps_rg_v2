@@ -57,6 +57,18 @@ _FORBIDDEN_AUTHORITY_KEYS = frozenset(
 )
 _VALID_COVERAGE_STATUSES = frozenset({"MAPPED", "ESCALATED", "UNMAPPED"})
 _VALID_PLANNING_STATUSES = frozenset({"READY", "BLOCKED"})
+_VALID_WORK_DAG_RELATIONS = frozenset(
+    {
+        "REQUIRES_INPUT",
+        "REQUIRES_TARGETING",
+        "REQUIRES_EVIDENCE",
+        "REQUIRES_VALIDATION",
+        "MERGE_AFTER",
+    }
+)
+_VALID_WORK_DAG_NODE_TYPES = frozenset(
+    {"U0_INPUT", "REQUIREMENT", "WORK_UNIT", "VALIDATION", "MERGE"}
+)
 
 
 class L1PlanningV2IntegrityError(ValueError):
@@ -613,6 +625,17 @@ def _work_dag(
                 },
             ]
         )
+    if len(work_unit_ids) > 1:
+        merge_node = "merge:final_resume"
+        nodes.append({"node_id": merge_node, "node_type": "MERGE"})
+        edges.extend(
+            {
+                "from": f"validation:{unit_id}",
+                "to": merge_node,
+                "relation": "MERGE_AFTER",
+            }
+            for unit_id in work_unit_ids
+        )
     nodes.sort(key=lambda row: row["node_id"])
     edges.sort(key=lambda row: (row["from"], row["to"], row["relation"]))
     dag = {
@@ -960,6 +983,16 @@ def _verify_work_dag(dag: Any) -> None:
         or len(set(node_ids)) != len(node_ids)
     ):
         raise L1PlanningV2IntegrityError("v2 work DAG node IDs are invalid")
+    node_types = {
+        str(row.get("node_id") or ""): str(row.get("node_type") or "")
+        for row in nodes
+        if isinstance(row, Mapping)
+    }
+    if (
+        len(node_types) != len(nodes)
+        or any(node_type not in _VALID_WORK_DAG_NODE_TYPES for node_type in node_types.values())
+    ):
+        raise L1PlanningV2IntegrityError("v2 work DAG node types are invalid")
     inbound = {node_id: 0 for node_id in node_ids}
     outbound = {node_id: 0 for node_id in node_ids}
     adjacency = {node_id: [] for node_id in node_ids}
@@ -971,11 +1004,44 @@ def _verify_work_dag(dag: Any) -> None:
         target = str(edge.get("to") or "")
         relation = str(edge.get("relation") or "")
         key = (source, target, relation)
+        endpoint_is_valid = False
+        if source in node_types and target in node_types:
+            endpoint_is_valid = (
+                (
+                    relation == "REQUIRES_INPUT"
+                    and source == "u0:validated_jd"
+                    and node_types[target] == "REQUIREMENT"
+                )
+                or (
+                    relation == "REQUIRES_TARGETING"
+                    and node_types[source] == "REQUIREMENT"
+                    and node_types[target] == "WORK_UNIT"
+                )
+                or (
+                    relation == "REQUIRES_EVIDENCE"
+                    and source == "u0:validated_resume"
+                    and node_types[target] == "WORK_UNIT"
+                )
+                or (
+                    relation == "REQUIRES_VALIDATION"
+                    and node_types[source] == "WORK_UNIT"
+                    and node_types[target] == "VALIDATION"
+                    and target == f"validation:{source.removeprefix('unit:')}"
+                )
+                or (
+                    relation == "MERGE_AFTER"
+                    and node_types[source] == "VALIDATION"
+                    and target == "merge:final_resume"
+                    and node_types[target] == "MERGE"
+                )
+            )
         if (
             source not in adjacency
             or target not in adjacency
             or source == target
             or key in seen_edges
+            or relation not in _VALID_WORK_DAG_RELATIONS
+            or not endpoint_is_valid
         ):
             raise L1PlanningV2IntegrityError("v2 work DAG edge is invalid")
         seen_edges.add(key)
@@ -987,6 +1053,7 @@ def _verify_work_dag(dag: Any) -> None:
         node_id
         for node_id in node_ids
         if node_id.startswith("validation:")
+        or node_id.startswith("merge:")
         or (node_id.startswith("requirement:") and outbound[node_id] == 0)
     }
     for node_id in node_ids:
