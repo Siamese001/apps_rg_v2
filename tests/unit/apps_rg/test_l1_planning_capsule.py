@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -54,7 +55,9 @@ def _profile_manifest() -> dict[str, str]:
     }
 
 
-def _app_payload(*, generation_mode: str = "strategic_tailor", section_id: str = "") -> dict[str, Any]:
+def _app_payload(
+    *, generation_mode: str = "strategic_tailor", section_id: str = ""
+) -> dict[str, Any]:
     constraints: dict[str, Any] = {}
     task_spec: dict[str, Any] = {
         "generation_mode": generation_mode,
@@ -98,7 +101,9 @@ def _app_payload(*, generation_mode: str = "strategic_tailor", section_id: str =
     }
 
 
-def _validated(*, generation_mode: str = "strategic_tailor", section_id: str = "") -> ValidatedRequest:
+def _validated(
+    *, generation_mode: str = "strategic_tailor", section_id: str = ""
+) -> ValidatedRequest:
     return ValidatedRequest(
         request_id=f"req-{generation_mode}-{section_id or 'all'}",
         run_id="run-l1-capsule",
@@ -110,7 +115,9 @@ def _validated(*, generation_mode: str = "strategic_tailor", section_id: str = "
         tenant_id="tenant-l1",
         replay_key="replay-l1-capsule",
         l5_certification_ref="test:valid:w6",
-        app_payload=_app_payload(generation_mode=generation_mode, section_id=section_id),
+        app_payload=_app_payload(
+            generation_mode=generation_mode, section_id=section_id
+        ),
     )
 
 
@@ -214,12 +221,18 @@ def test_l1_binding_and_capsule_do_not_import_downstream_authority_modules() -> 
                 imports.extend(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom):
                 imports.append(node.module or "")
-        offenders = [name for name in imports if any(part in name for part in forbidden)]
+        offenders = [
+            name for name in imports if any(part in name for part in forbidden)
+        ]
         assert offenders == []
 
 
-@pytest.mark.parametrize("mode", ["strategic_tailor", "tailor_existing", "generate_scratch"])
-def test_l1_capsule_full_resume_modes_emit_work_units_and_completion_criteria(mode: str) -> None:
+@pytest.mark.parametrize(
+    "mode", ["strategic_tailor", "tailor_existing", "generate_scratch"]
+)
+def test_l1_capsule_full_resume_modes_emit_work_units_and_completion_criteria(
+    mode: str,
+) -> None:
     plan = l1_plan_apps_rg(_validated(generation_mode=mode))
     capsule = plan.task_spec["apps_rg_planning_capsule"]
 
@@ -265,6 +278,7 @@ def test_l0_route_receipt_references_l1_capsule_digest() -> None:
 
 def test_c0_receipt_references_l1_evidence_plan_when_supplied(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setenv("APPS_RG_TEST_HARNESS", "1")
     monkeypatch.setenv("APPS_RG_C0_DENSE_SPARSE_MANDATORY", "0")
@@ -274,12 +288,40 @@ def test_c0_receipt_references_l1_evidence_plan_when_supplied(
     plan = l1_plan_apps_rg(vr)
     route = l0_route_apps_rg(plan)
 
-    fec = c0_retrieve_apps_rg(route, vr, chroma_path=None, l1_plan=plan)
+    fec = c0_retrieve_apps_rg(
+        route,
+        vr,
+        chroma_path=None,
+        l1_plan=plan,
+        obligation_receipt_artifact_dir=tmp_path,
+    )
 
     assert fec.retrieval_plan_ref.startswith("l1_evidence_plan:")
     assert plan.task_spec["apps_rg_planning_capsule_ref"][:24] in fec.retrieval_plan_ref
     assert any(ref.startswith("l1_capsule_digest:") for ref in fec.audit_refs)
     assert any(ref.startswith("l1_evidence_plan_digest:") for ref in fec.audit_refs)
+    v2_capsule = plan.task_spec["apps_rg_planning_v2_capsule"]
+    ledger_ref = "l1_v2_evidence_obligation_ledger:" + str(
+        v2_capsule["evidence_obligation_ledger"]["ledger_digest"]
+    )
+    receipt_path = tmp_path / "l1_evidence_obligation_receipt.json"
+    assert ledger_ref in fec.audit_refs
+    assert receipt_path.is_file()
+    persisted = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert (
+        "l1_evidence_obligation_receipt_digest:" + persisted["receipt_digest"]
+        in fec.audit_refs
+    )
+    assert persisted["coverage"]["planned_obligation_count"] == len(
+        v2_capsule["evidence_obligation_ledger"]["obligations"]
+    )
+    assert {
+        row["support_disposition"] for row in persisted["obligation_dispositions"]
+    } == {"INSUFFICIENT"}
+    assert all(
+        row["jd_targeting_is_not_candidate_evidence"]
+        for row in persisted["obligation_dispositions"]
+    )
 
 
 def test_pa_component_hash_map_references_l1_capsule_and_prompt_plan(

@@ -13,7 +13,7 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from apps_rg.runtime.spine_contracts import ValidatedRequest
 from apps_rg.runtime.spine_contracts import (
@@ -63,7 +63,9 @@ from apps_rg.runtime.bindings.c0_evidence_trace_map import (
 APPS_RG_C0_CERT_REF = "apps_rg::c0::resume_generation::v1"
 
 # Phase-1 C0 dense lane — explicit receipts (AG-4 / operator clarity).
-C0_DENSE_NA_NO_PERSIST = "c0_dense_lane_not_active_no_CHROMA_PERSIST_DIR_or_chroma_path_parameter"
+C0_DENSE_NA_NO_PERSIST = (
+    "c0_dense_lane_not_active_no_CHROMA_PERSIST_DIR_or_chroma_path_parameter"
+)
 C0_SPARSE_LANE_NA_REF = "ref:sparse:NOT_APPLICABLE:no_bm25_operator_lane_phase1"
 C0_GRAPH_LANE_NA_REF = "ref:graph:NOT_APPLICABLE:graphrag_deferred_phase1"
 C0_METADATA_FILTER_REF = "ref:metadata:chroma_where:apps_rg_fact_vectors:v1"
@@ -110,14 +112,18 @@ def _resolve_spine_graph_expansion_refs(
 
     try:
         gr = maybe_run_graph_rag(route, merged_items)
-    except Exception as exc:  # guardian: allow-broad-exception -- fail-soft spine graph lane
+    except (
+        Exception
+    ) as exc:  # guardian: allow-broad-exception -- fail-soft spine graph lane
         _logger.warning("spine maybe_run_graph_rag failed: %s", exc)
         gr = None
 
     refs: list[str] = []
     if gr is not None and gr.executed and gr.pool is not None:
         for nb in gr.pool.accepted_graph_neighbors:
-            nid = str(getattr(nb, "neighbor_id", "") or getattr(nb, "node_id", "") or "").strip()
+            nid = str(
+                getattr(nb, "neighbor_id", "") or getattr(nb, "node_id", "") or ""
+            ).strip()
             if nid:
                 refs.append(f"ref:graph:node:{nid}")
         manifest = getattr(gr.pool, "graph_traversal_manifest", None)
@@ -166,7 +172,9 @@ def _get_embedding_runtime() -> Any:
     )
     from apps_rg.runtime.bge_embedding import get_bge_runtime_for_settings
 
-    settings = resolve_apps_rg_embedding_settings(chroma_persist_dir=_chroma_persist_dir_active())
+    settings = resolve_apps_rg_embedding_settings(
+        chroma_persist_dir=_chroma_persist_dir_active()
+    )
     assert_dense_retrieval_allowed(settings)
     return get_bge_runtime_for_settings(settings)
 
@@ -205,7 +213,8 @@ def _evidence_source_class(item: Any) -> str:
 
 def _provisional_digest(items: list[EvidenceItem]) -> str:
     lines = sorted(
-        f"{getattr(i, 'source', '')}|{hashlib.sha256(i.content.encode('utf-8')).hexdigest()[:24]}" for i in items
+        f"{getattr(i, 'source', '')}|{hashlib.sha256(i.content.encode('utf-8')).hexdigest()[:24]}"
+        for i in items
     )
     return hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()
 
@@ -232,18 +241,32 @@ def _build_section_evidence_trace(
     them — no behavior change to retrieval.
     """
     del timestamp_iso  # reserved for future receipt alignment
-    resume_text = str((app_payload.get("resume_payload") or {}).get("resume_text") or "")
+    resume_text = str(
+        (app_payload.get("resume_payload") or {}).get("resume_text") or ""
+    )
     jd_text = str((app_payload.get("jd_payload") or {}).get("jd_text") or "")
-    sr_hash = hashlib.sha256(resume_text.encode("utf-8")).hexdigest()[:32] if resume_text else ""
+    sr_hash = (
+        hashlib.sha256(resume_text.encode("utf-8")).hexdigest()[:32]
+        if resume_text
+        else ""
+    )
     jd_h = hashlib.sha256(jd_text.encode("utf-8")).hexdigest()[:32] if jd_text else ""
     briefing_digest: str = str(
-        (app_payload.get("briefing") or {}).get("briefing_digest", "") or app_payload.get("briefing_digest", "") or ""
+        (app_payload.get("briefing") or {}).get("briefing_digest", "")
+        or app_payload.get("briefing_digest", "")
+        or ""
     )
     briefing_h = briefing_digest[:32] if briefing_digest else ""
-    refs = tuple(str(getattr(it, "evidence_id", "") or it.source) for it in section_dense_items)
-    hashes = tuple(str(getattr(it, "chunk_digest", "") or "") for it in section_dense_items)
+    refs = tuple(
+        str(getattr(it, "evidence_id", "") or it.source) for it in section_dense_items
+    )
+    hashes = tuple(
+        str(getattr(it, "chunk_digest", "") or "") for it in section_dense_items
+    )
     classes = tuple(_evidence_source_class(it) for it in section_dense_items)
-    statuses = [getattr(it, "support_status", STATUS_UNKNOWN) for it in section_dense_items]
+    statuses = [
+        getattr(it, "support_status", STATUS_UNKNOWN) for it in section_dense_items
+    ]
     if SUPPORT_STATUS_PASS in statuses:
         sup: str = SUPPORT_STATUS_PASS
     elif statuses:
@@ -269,7 +292,9 @@ def _build_section_evidence_trace(
         retrieval_score=0.0,
         raw_dense_hit_count=int(raw_dense_hit_count),
         post_filter_survivor_count=(
-            len(section_dense_items) if post_filter_survivor_count is None else int(post_filter_survivor_count)
+            len(section_dense_items)
+            if post_filter_survivor_count is None
+            else int(post_filter_survivor_count)
         ),
         applied_where_filter=applied_where_filter,
         similarity_threshold=float(similarity_threshold),
@@ -313,7 +338,9 @@ try:
     _NORMATIVE_SOURCE_CLASSES: tuple[str, ...] = _get_normative()
     if not _NORMATIVE_SOURCE_CLASSES:
         _NORMATIVE_SOURCE_CLASSES = _NORMATIVE_SOURCE_CLASSES_HARDCODED
-except Exception:  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
+except (
+    Exception
+):  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
     _NORMATIVE_SOURCE_CLASSES = _NORMATIVE_SOURCE_CLASSES_HARDCODED
 
 
@@ -387,6 +414,7 @@ def c0_retrieve_apps_rg(
     *,
     trace_map_out: list[AppsRgEvidenceTraceMap] | None = None,
     l1_plan: Any | None = None,
+    obligation_receipt_artifact_dir: str | Path | None = None,
     **kwargs: Any,
 ) -> FinalEvidenceContract:
     """C0 retrieval for apps_rg — inline JD/resume + optional ``fact_vectors`` dense lane."""
@@ -409,7 +437,9 @@ def c0_retrieve_apps_rg(
         s = str(p).strip()
         return s or None
 
-    effective_chroma = _norm_path(chroma_path) or _norm_path(os.environ.get("CHROMA_PERSIST_DIR"))
+    effective_chroma = _norm_path(chroma_path) or _norm_path(
+        os.environ.get("CHROMA_PERSIST_DIR")
+    )
 
     from apps_rg.runtime.c0_mandatory_policy import apps_rg_c0_dense_sparse_mandatory
 
@@ -424,22 +454,25 @@ def c0_retrieve_apps_rg(
             write_embedding_settings_receipt,
         )
 
-        emb_settings = resolve_apps_rg_embedding_settings(chroma_persist_dir=effective_chroma)
+        emb_settings = resolve_apps_rg_embedding_settings(
+            chroma_persist_dir=effective_chroma
+        )
         if emb_settings.route_result == "FAIL_CLOSED":
             raise C0EvidenceGapError(emb_settings.decisive_reason)
         _art_hint = os.environ.get("APPS_RG_ARTIFACT_DIR", "").strip()
         if _art_hint:
             try:
                 write_embedding_settings_receipt(_art_hint, emb_settings)
-            except (
-                OSError
-            ):  # guardian: allow-silent-swallow -- P2 burndown: receipt write is best-effort on C0 preflight
+            except OSError:  # guardian: allow-silent-swallow -- P2 burndown: receipt write is best-effort on C0 preflight
                 pass
         if not emb_settings.embeddings_enabled:
             raise C0EvidenceGapError(
                 "Chroma path is configured (parameter or CHROMA_PERSIST_DIR) but EMBEDDING_ENABLED is not true. Set EMBEDDING_ENABLED=true and APPS_RG_EMBEDDING_MODEL_PATH to a local BGE directory for dense retrieval, or unset CHROMA_PERSIST_DIR for file-only C0."
             )
-        if emb_settings.embedding_required and not emb_settings.embedding_model_resolved:
+        if (
+            emb_settings.embedding_required
+            and not emb_settings.embedding_model_resolved
+        ):
             raise C0EvidenceGapError(emb_settings.decisive_reason)
 
     if not merged_items and validated_request is not None:
@@ -458,7 +491,9 @@ def c0_retrieve_apps_rg(
             source_owner_or_authority: str,
         ) -> EvidenceItem:
             chunk_digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
-            evidence_digest = hashlib.sha256(f"{source}:{source_ref}:{chunk_digest}".encode("utf-8")).hexdigest()
+            evidence_digest = hashlib.sha256(
+                f"{source}:{source_ref}:{chunk_digest}".encode("utf-8")
+            ).hexdigest()
             return EvidenceItem(
                 source=source,
                 content=content,
@@ -480,7 +515,9 @@ def c0_retrieve_apps_rg(
                 freshness_status=STATUS_NOT_APPLICABLE,
                 acl_status=STATUS_NOT_APPLICABLE,
                 contradiction_status=STATUS_NOT_APPLICABLE,
-                not_applicable_reason=("inline app payload context is not external retrieval proof"),
+                not_applicable_reason=(
+                    "inline app payload context is not external retrieval proof"
+                ),
             )
 
         app_payload = getattr(validated_request, "app_payload", None) or {}
@@ -530,14 +567,18 @@ def c0_retrieve_apps_rg(
                 get_precomputed_embeddings_collection_for_query,
             )
 
-            fv_col = get_precomputed_embeddings_collection_for_query(client, "fact_vectors")
+            fv_col = get_precomputed_embeddings_collection_for_query(
+                client, "fact_vectors"
+            )
             app_payload = getattr(validated_request, "app_payload", None) or {}
-            extra, sec_verdicts, _, sec_sparse_refs, sec_score_profile, sec_traces = _perform_bounded_section_retrieval(
-                effective_chroma,
-                app_payload,
-                evidence_digest or _provisional_digest(merged_items),
-                ts,
-                chroma_collection=fv_col,
+            extra, sec_verdicts, _, sec_sparse_refs, sec_score_profile, sec_traces = (
+                _perform_bounded_section_retrieval(
+                    effective_chroma,
+                    app_payload,
+                    evidence_digest or _provisional_digest(merged_items),
+                    ts,
+                    chroma_collection=fv_col,
+                )
             )
             section_traces_for_run.extend(sec_traces)
             section_gate_verdicts.extend(sec_verdicts)
@@ -557,7 +598,9 @@ def c0_retrieve_apps_rg(
             )
 
             if product_fail_closed_runtime():
-                raise C0EvidenceGapError(f"C0.2 dense lane failed on product path: {exc}") from exc
+                raise C0EvidenceGapError(
+                    f"C0.2 dense lane failed on product path: {exc}"
+                ) from exc
             _logger.warning("Chroma fact_vectors retrieval failed: %s", exc)
             chroma_retrieved = False
             dense_search_refs.append(f"dense:error:{exc.__class__.__name__}")
@@ -630,8 +673,12 @@ def c0_retrieve_apps_rg(
         gate_family="C0_G_BRIEF_BYPASS",
         evaluated_stage="C0",
         result=VERDICT_NOT_APPLICABLE if not manual_brief_path else VERDICT_UNKNOWN,
-        not_applicable_reason="No manual brief path provided" if not manual_brief_path else None,
-        unknown_reason="Manual brief evaluation not performed" if manual_brief_path else None,
+        not_applicable_reason="No manual brief path provided"
+        if not manual_brief_path
+        else None,
+        unknown_reason="Manual brief evaluation not performed"
+        if manual_brief_path
+        else None,
         evaluated_at=ts,
         evidence_digest=digest,
     )
@@ -652,11 +699,19 @@ def c0_retrieve_apps_rg(
         # Dense lane configured or attempted but produced no fact_vectors hits — never UNKNOWN.
         final_support_status = SUPPORT_STATUS_EMPTY
 
-    request_id = getattr(route, "request_id", "") or getattr(validated_request, "request_id", "")
+    request_id = getattr(route, "request_id", "") or getattr(
+        validated_request, "request_id", ""
+    )
     run_id = getattr(route, "run_id", "") or getattr(validated_request, "run_id", "")
-    app_id = getattr(route, "app_id", "") or getattr(validated_request, "app_id", "apps_rg")
-    trace_id = getattr(route, "trace_id", "") or getattr(validated_request, "trace_id", "")
-    tenant_id = getattr(route, "tenant_id", "") or getattr(validated_request, "tenant_id", "apps_rg")
+    app_id = getattr(route, "app_id", "") or getattr(
+        validated_request, "app_id", "apps_rg"
+    )
+    trace_id = getattr(route, "trace_id", "") or getattr(
+        validated_request, "trace_id", ""
+    )
+    tenant_id = getattr(route, "tenant_id", "") or getattr(
+        validated_request, "tenant_id", "apps_rg"
+    )
     l5_cert_ref = (
         getattr(route, "l5_certification_ref", None)
         or getattr(validated_request, "l5_certification_ref", None)
@@ -683,11 +738,15 @@ def c0_retrieve_apps_rg(
 
     evidence_strata: tuple[tuple[str, tuple[str, ...]], ...] = tuple()
     if chroma_lane_items:
-        eids = tuple(str(getattr(it, "evidence_id", "") or it.source) for it in chroma_lane_items)
+        eids = tuple(
+            str(getattr(it, "evidence_id", "") or it.source) for it in chroma_lane_items
+        )
         evidence_strata = (("CANONICAL", eids),)
 
     query_vec_ref = C0_QUERY_VEC_REF_BGE if chroma_dense_lane_completed else ""
-    metadata_filter_refs: tuple[str, ...] = (C0_METADATA_FILTER_REF,) if chroma_dense_lane_completed else tuple()
+    metadata_filter_refs: tuple[str, ...] = (
+        (C0_METADATA_FILTER_REF,) if chroma_dense_lane_completed else tuple()
+    )
     sparse_search_refs: tuple[str, ...] = _resolve_fec_sparse_search_refs(
         section_profile,
         sparse_receipt_refs,
@@ -698,18 +757,25 @@ def c0_retrieve_apps_rg(
 
     if _c02_mandatory():
         if not chroma_dense_lane_completed:
-            raise C0EvidenceGapError("C0.2 dense lane mandatory but fact_vectors dense retrieval did not complete")
+            raise C0EvidenceGapError(
+                "C0.2 dense lane mandatory but fact_vectors dense retrieval did not complete"
+            )
         if section_profile.any_sparse_enabled():
             if C0_SPARSE_LANE_NA_REF in sparse_search_refs:
-                raise C0EvidenceGapError("C0.2 sparse lane mandatory but sparse profile disabled")
+                raise C0EvidenceGapError(
+                    "C0.2 sparse lane mandatory but sparse profile disabled"
+                )
             if any("UNAVAILABLE" in ref for ref in sparse_search_refs):
                 raise C0EvidenceGapError(
-                    "C0.2 sparse lane mandatory but BM25/sparse index unavailable: " + ",".join(sparse_search_refs[:3])
+                    "C0.2 sparse lane mandatory but BM25/sparse index unavailable: "
+                    + ",".join(sparse_search_refs[:3])
                 )
         gate_verdicts.append(
             _build_gate_verdict(
                 gate_id="G_C02_DENSE",
-                support_status=SUPPORT_STATUS_PASS if chroma_dense_lane_completed else SUPPORT_STATUS_BLOCKED,
+                support_status=SUPPORT_STATUS_PASS
+                if chroma_dense_lane_completed
+                else SUPPORT_STATUS_BLOCKED,
                 evidence_digest=digest,
                 timestamp_iso=ts,
                 result_mapping=result_mapping,
@@ -721,14 +787,18 @@ def c0_retrieve_apps_rg(
         gate_verdicts.append(
             _build_gate_verdict(
                 gate_id="G_C02_SPARSE",
-                support_status=SUPPORT_STATUS_PASS if sparse_pass else SUPPORT_STATUS_BLOCKED,
+                support_status=SUPPORT_STATUS_PASS
+                if sparse_pass
+                else SUPPORT_STATUS_BLOCKED,
                 evidence_digest=digest,
                 timestamp_iso=ts,
                 result_mapping=result_mapping,
             )
         )
     graph_expansion_refs = _resolve_spine_graph_expansion_refs(route, merged_items)
-    support_score_profile: tuple[tuple[str, float], ...] = tuple(support_score_profile_rows)
+    support_score_profile: tuple[tuple[str, float], ...] = tuple(
+        support_score_profile_rows
+    )
 
     retrieval_quality_span = _emit_retrieval_quality_span(
         evidence_items=merged_items,
@@ -740,7 +810,11 @@ def c0_retrieve_apps_rg(
         trace_id=trace_id,
         run_id=run_id,
     )
-    otel_span_refs = tuple([retrieval_quality_span["span_ref"]]) if retrieval_quality_span else tuple()
+    otel_span_refs = (
+        tuple([retrieval_quality_span["span_ref"]])
+        if retrieval_quality_span
+        else tuple()
+    )
 
     if trace_map_out is not None:
         trace_sink = AppsRgEvidenceTraceMap(
@@ -752,7 +826,19 @@ def c0_retrieve_apps_rg(
             trace_sink.add_trace(st)
         trace_map_out.append(trace_sink)
 
-    l1_retrieval_plan_ref, l1_audit_refs = _l1_evidence_plan_receipts(l1_plan)
+    l1_retrieval_plan_ref, l1_audit_refs = _l1_evidence_plan_receipts(
+        l1_plan,
+        evidence_items=merged_items,
+        request_id=request_id,
+        run_id=run_id,
+        trace_id=trace_id,
+        final_evidence_digest=digest,
+        obligation_receipt_artifact_dir=(
+            obligation_receipt_artifact_dir
+            or os.environ.get("APPS_RG_ARTIFACT_DIR", "").strip()
+            or None
+        ),
+    )
 
     return FinalEvidenceContract(
         request_id=request_id,
@@ -787,14 +873,25 @@ def c0_retrieve_apps_rg(
     )
 
 
-def _l1_evidence_plan_receipts(l1_plan: Any | None) -> tuple[str, tuple[str, ...]]:
+def _l1_evidence_plan_receipts(
+    l1_plan: Any | None,
+    *,
+    evidence_items: Sequence[Any] = (),
+    request_id: str = "",
+    run_id: str = "",
+    trace_id: str = "",
+    final_evidence_digest: str = "",
+    obligation_receipt_artifact_dir: str | Path | None = None,
+) -> tuple[str, tuple[str, ...]]:
     if l1_plan is None:
         return "", ()
     task_spec = dict(getattr(l1_plan, "task_spec", None) or {})
     support_expectation = dict(getattr(l1_plan, "support_expectation", None) or {})
     capsule = task_spec.get("apps_rg_planning_capsule")
     capsule_ref = str(
-        task_spec.get("apps_rg_planning_capsule_ref") or support_expectation.get("apps_rg_evidence_plan_ref") or ""
+        task_spec.get("apps_rg_planning_capsule_ref")
+        or support_expectation.get("apps_rg_evidence_plan_ref")
+        or ""
     ).strip()
     evidence_plan: Any = []
     if isinstance(capsule, Mapping):
@@ -802,20 +899,62 @@ def _l1_evidence_plan_receipts(l1_plan: Any | None) -> tuple[str, tuple[str, ...
         evidence_plan = capsule.get("evidence_plan", [])
     if not capsule_ref and not evidence_plan:
         return "", ()
-    canonical = json.dumps(evidence_plan, sort_keys=True, separators=(",", ":"), default=str)
+    canonical = json.dumps(
+        evidence_plan, sort_keys=True, separators=(",", ":"), default=str
+    )
     digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     ref = f"l1_evidence_plan:{digest[:16]}"
     if capsule_ref:
         ref = f"{ref}:capsule:{capsule_ref[:24]}"
-    audit_refs = tuple(
+    audit_refs = [
         ref
         for ref in (
             f"l1_capsule_digest:{capsule_ref[:24]}" if capsule_ref else "",
             f"l1_evidence_plan_digest:{digest[:24]}",
         )
         if ref
+    ]
+
+    from apps_rg.runtime.bindings.l1_planning_capsule_v2 import (
+        extract_verified_planning_capsule_v2,
     )
-    return ref, audit_refs
+
+    v2_capsule, _v2_verification = extract_verified_planning_capsule_v2(
+        l1_plan, required=False
+    )
+    if not v2_capsule:
+        return ref, tuple(audit_refs)
+    from apps_rg.runtime.contracts.l1_evidence_obligation_receipt import (
+        build_l1_evidence_obligation_receipt,
+        emit_l1_evidence_obligation_receipt,
+    )
+
+    obligation_receipt = build_l1_evidence_obligation_receipt(
+        capsule=v2_capsule,
+        request_id=request_id,
+        run_id=run_id,
+        trace_id=trace_id,
+        final_evidence_digest=final_evidence_digest,
+        evidence_items=evidence_items,
+    )
+    ledger = v2_capsule["evidence_obligation_ledger"]
+    audit_refs.extend(
+        (
+            f"l1_v2_evidence_obligation_ledger:{ledger['ledger_digest']}",
+            "l1_evidence_obligation_receipt_digest:"
+            f"{obligation_receipt['receipt_digest']}",
+        )
+    )
+    if obligation_receipt_artifact_dir:
+        emit_l1_evidence_obligation_receipt(
+            artifact_dir=Path(obligation_receipt_artifact_dir),
+            receipt=obligation_receipt,
+            capsule=v2_capsule,
+        )
+        audit_refs.append(
+            "l1_evidence_obligation_receipt_ref:l1_evidence_obligation_receipt.json"
+        )
+    return ref, tuple(audit_refs)
 
 
 # =============================================================================
@@ -864,15 +1003,24 @@ def _emit_retrieval_quality_span(
         excluded_count = sum(
             1
             for item in evidence_items
-            if getattr(item, "metadata_score", 0.0) == 0.0 and getattr(item, "dense_score", 0.0) > 0.0
+            if getattr(item, "metadata_score", 0.0) == 0.0
+            and getattr(item, "dense_score", 0.0) > 0.0
         )
 
-        metadata_filter_hits = sum(1 for item in evidence_items if getattr(item, "metadata_score", 0.0) > 0.0)
+        metadata_filter_hits = sum(
+            1 for item in evidence_items if getattr(item, "metadata_score", 0.0) > 0.0
+        )
 
-        dense_hits = sum(1 for item in evidence_items if getattr(item, "source_type", "") == "fact_vectors")
+        dense_hits = sum(
+            1
+            for item in evidence_items
+            if getattr(item, "source_type", "") == "fact_vectors"
+        )
 
         section_retrieval_hits = sum(
-            1 for item in evidence_items if getattr(item, "retrieval_run_ref", "") == "c0_section_retrieval:v1"
+            1
+            for item in evidence_items
+            if getattr(item, "retrieval_run_ref", "") == "c0_section_retrieval:v1"
         )
 
         # Gate verdict count
@@ -898,7 +1046,9 @@ def _emit_retrieval_quality_span(
         }
 
         # Generate span ref (deterministic for replay)
-        span_ref = f"span:c0:retrieval_quality:{trace_id}:{run_id}:{evidence_digest[:16]}"
+        span_ref = (
+            f"span:c0:retrieval_quality:{trace_id}:{run_id}:{evidence_digest[:16]}"
+        )
 
         return {
             "span_ref": span_ref,
@@ -993,7 +1143,9 @@ class SectionRetrievalProfile:
             return class_path
         # Fallback to module-relative path
         module_dir = Path(__file__).parent.parent.parent  # apps_rg/
-        return module_dir / "config" / "domain_contract" / "section_retrieval_profile.yaml"
+        return (
+            module_dir / "config" / "domain_contract" / "section_retrieval_profile.yaml"
+        )
 
     def _load_profile(self) -> None:
         """Load profile from YAML."""
@@ -1022,15 +1174,21 @@ class SectionRetrievalProfile:
 
     @property
     def max_total_items(self) -> int:
-        return self._config.get("global_constraints", {}).get("max_total_evidence_items", 15)
+        return self._config.get("global_constraints", {}).get(
+            "max_total_evidence_items", 15
+        )
 
     @property
     def max_sections(self) -> int:
-        return self._config.get("global_constraints", {}).get("max_sections_to_query", 5)
+        return self._config.get("global_constraints", {}).get(
+            "max_sections_to_query", 5
+        )
 
     @property
     def max_query_budget(self) -> int:
-        return self._config.get("global_constraints", {}).get("max_query_budget_ms", 5000)
+        return self._config.get("global_constraints", {}).get(
+            "max_query_budget_ms", 5000
+        )
 
     def get_sections(self) -> list[dict[str, Any]]:
         """Get configured sections."""
@@ -1111,7 +1269,9 @@ class SectionRetrievalProfile:
                 return value
         return None
 
-    def build_query_for_section(self, section: dict[str, Any], app_payload: dict[str, Any]) -> str | None:
+    def build_query_for_section(
+        self, section: dict[str, Any], app_payload: dict[str, Any]
+    ) -> str | None:
         """Build query text for a section from app_payload."""
         query_fields = section.get("query_fields", [])
         fallback_queries = section.get("fallback_queries", [])
@@ -1150,7 +1310,11 @@ def _chunk_id_from_evidence_item(item: EvidenceItem) -> str:
 
 def _evidence_item_to_hybrid(item: EvidenceItem) -> HybridSearchResult:
     chunk_id = _chunk_id_from_evidence_item(item)
-    dense = float(getattr(item, "dense_score", 0.0) or getattr(item, "confidence_score", 0.0) or 0.0)
+    dense = float(
+        getattr(item, "dense_score", 0.0)
+        or getattr(item, "confidence_score", 0.0)
+        or 0.0
+    )
     lexical = float(getattr(item, "bm25_score", 0.0) or 0.0)
     return HybridSearchResult(
         chunk_id=chunk_id,
@@ -1174,8 +1338,14 @@ def _apply_hybrid_scores_to_evidence_item(
         methods.append("dense")
     if row.lexical_score > 0.0:
         methods.append("sparse")
-    retrieval_method = ",".join(methods) if methods else getattr(item, "retrieval_method", "dense")
-    dense = float(row.vector_score if row.vector_score > 0.0 else getattr(item, "dense_score", 0.0))
+    retrieval_method = (
+        ",".join(methods) if methods else getattr(item, "retrieval_method", "dense")
+    )
+    dense = float(
+        row.vector_score
+        if row.vector_score > 0.0
+        else getattr(item, "dense_score", 0.0)
+    )
     lexical = float(row.lexical_score)
     return EvidenceItem(
         source=item.source,
@@ -1208,7 +1378,10 @@ def _merge_section_dense_sparse_items(
     merge_policy: str,
     timestamp_iso: str,
 ) -> list[EvidenceItem]:
-    if sparse_outcome.status != SparseLexicalLaneStatus.OK or not sparse_outcome.hybrid_rows:
+    if (
+        sparse_outcome.status != SparseLexicalLaneStatus.OK
+        or not sparse_outcome.hybrid_rows
+    ):
         return list(dense_items)
     dense_hybrid = [_evidence_item_to_hybrid(it) for it in dense_items]
     sparse_rows = list(sparse_outcome.hybrid_rows)
@@ -1224,7 +1397,11 @@ def _merge_section_dense_sparse_items(
     for row in merged_rows:
         base = by_chunk.get(row.chunk_id)
         if base is not None:
-            out.append(_apply_hybrid_scores_to_evidence_item(base, row, timestamp_iso=timestamp_iso))
+            out.append(
+                _apply_hybrid_scores_to_evidence_item(
+                    base, row, timestamp_iso=timestamp_iso
+                )
+            )
         elif row.lexical_score > 0.0:
             out.append(
                 EvidenceItem(
@@ -1233,11 +1410,15 @@ def _merge_section_dense_sparse_items(
                     source_type="fact_vectors",
                     evidence_id=f"sparse:{row.chunk_id}",
                     citation_anchor=f"urn:chunk:{row.chunk_id}",
-                    chunk_digest=hashlib.sha256(row.content.encode("utf-8")).hexdigest()[:32],
+                    chunk_digest=hashlib.sha256(
+                        row.content.encode("utf-8")
+                    ).hexdigest()[:32],
                     dense_score=float(row.vector_score),
                     bm25_score=float(row.lexical_score),
                     confidence_score=float(max(row.vector_score, row.lexical_score)),
-                    retrieval_method="sparse" if row.vector_score <= 0.0 else "dense,sparse",
+                    retrieval_method="sparse"
+                    if row.vector_score <= 0.0
+                    else "dense,sparse",
                     retrieval_run_ref="c0_section_sparse:v1",  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
                     retrieval_timestamp=timestamp_iso,
                     allowed_prompt_slot=ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY,
@@ -1256,13 +1437,19 @@ def _run_section_sparse_lane(
     sparse_cfg = profile.section_sparse_config(section)
     if not sparse_cfg.get("sparse_enabled"):
         return None
-    query_text = profile.build_lexical_query_for_section(section, app_payload, sparse_cfg)
+    query_text = profile.build_lexical_query_for_section(
+        section, app_payload, sparse_cfg
+    )
     coll_ref = str(sparse_cfg.get("sparse_collection_ref") or profile.collection_name)
-    lane_id = str(sparse_cfg.get("sparse_lane_id") or section.get("section_id", "section"))
+    lane_id = str(
+        sparse_cfg.get("sparse_lane_id") or section.get("section_id", "section")
+    )
     meta_filter: dict[str, Any] | None = None
     req = section.get("required_metadata_filters") or {}
     if isinstance(req, dict) and req:
-        meta_filter = {str(k): v for k, v in req.items() if not isinstance(v, (dict, list))}
+        meta_filter = {
+            str(k): v for k, v in req.items() if not isinstance(v, (dict, list))
+        }
     allow = section.get("source_class_allowlist") or profile.allowed_source_classes
     if allow and len(allow) == 1:
         meta_filter = dict(meta_filter or {})
@@ -1277,7 +1464,9 @@ def _run_section_sparse_lane(
     return query_apps_rg_sparse_lexical_lane(spec)
 
 
-def _metadata_match_for_chunk(meta: dict[str, Any], app_payload: dict[str, Any]) -> float:
+def _metadata_match_for_chunk(
+    meta: dict[str, Any], app_payload: dict[str, Any]
+) -> float:
     """Lightweight JD↔chunk metadata overlap score for observability (0..1)."""
     if not app_payload:
         return 0.0
@@ -1386,7 +1575,11 @@ def _perform_bounded_section_retrieval(
     sections = profile.get_sections()
     if section_id_filter:
         canonical = profile.resolve_section_id(section_id_filter)
-        sections = [s for s in sections if str(s.get("section_id") or "") in (section_id_filter, canonical)]
+        sections = [
+            s
+            for s in sections
+            if str(s.get("section_id") or "") in (section_id_filter, canonical)
+        ]
         if not sections:
             verdict = GateVerdict(
                 gate_id="G_SECTION_RETRIEVAL",
@@ -1424,9 +1617,7 @@ def _perform_bounded_section_retrieval(
     else:
         query_vectors = []
 
-    for (section, query), qemb in zip(
-        prepared_sections, query_vectors, strict=True
-    ):
+    for (section, query), qemb in zip(prepared_sections, query_vectors, strict=True):
         if budget.sections_budget_exhausted or budget.budget_exhausted:
             break
 
@@ -1456,7 +1647,7 @@ def _perform_bounded_section_retrieval(
                         {"app": "apps_rg"},
                         {"source_class": {"$in": allow}},
                     ],
-            }
+                }
 
             nk = int(section.get("dense_top_k", section.get("max_k", 3)))
             result = collection.query(
@@ -1466,7 +1657,11 @@ def _perform_bounded_section_retrieval(
             )  # guardian: allow-broad-exception -- P2 burndown: fail-soft optional boundary
 
             # G8: raw dense hits (post-where, pre exact-match), applied filter, embedding dim.
-            _raw_hit_count = len(result["ids"][0]) if result and result.get("ids") and result["ids"] else 0
+            _raw_hit_count = (
+                len(result["ids"][0])
+                if result and result.get("ids") and result["ids"]
+                else 0
+            )
             try:
                 _where_filter_str = json.dumps(where, sort_keys=True, default=str)
             except (TypeError, ValueError):
@@ -1478,7 +1673,9 @@ def _perform_bounded_section_retrieval(
             # if THAT matches, the JD/section metadata filter removed all candidates — fall back to
             # the broader group and name the reason rather than reporting a falsely empty section.
             _filter_removed_all = False
-            _broad_where = {"$and": [{"app": "apps_rg"}, {"source_class": {"$in": allow}}]}
+            _broad_where = {
+                "$and": [{"app": "apps_rg"}, {"source_class": {"$in": allow}}]
+            }
             _narrow_empty = not (result and result.get("ids") and result["ids"][0])
             if _narrow_empty and where != _broad_where:
                 broad_result = collection.query(
@@ -1491,7 +1688,8 @@ def _perform_bounded_section_retrieval(
                     result = broad_result
                     _raw_hit_count = len(broad_result["ids"][0])
                     _where_filter_str = (
-                        json.dumps(_broad_where, sort_keys=True, default=str) + " (G7_fallback_from_section_filter)"
+                        json.dumps(_broad_where, sort_keys=True, default=str)
+                        + " (G7_fallback_from_section_filter)"
                     )
 
             section_dense_items: list[EvidenceItem] = []
@@ -1500,14 +1698,27 @@ def _perform_bounded_section_retrieval(
                     if budget.budget_exhausted:
                         break
 
-                    metadata = result.get("metadatas", [[{}]])[0][i] if result.get("metadatas") else {}
-                    document = result.get("documents", [[""]])[0][i] if result.get("documents") else ""
-                    distance = result.get("distances", [[0.0]])[0][i] if result.get("distances") else 0.0
+                    metadata = (
+                        result.get("metadatas", [[{}]])[0][i]
+                        if result.get("metadatas")
+                        else {}
+                    )
+                    document = (
+                        result.get("documents", [[""]])[0][i]
+                        if result.get("documents")
+                        else ""
+                    )
+                    distance = (
+                        result.get("distances", [[0.0]])[0][i]
+                        if result.get("distances")
+                        else 0.0
+                    )
                     dense = max(0.0, 1.0 - float(distance))
                     sc = str(metadata.get("source_class", "candidate_profile"))
                     anchor = str(metadata.get("citation_anchor", "") or "")
                     digest = str(
-                        metadata.get("chunk_digest", "") or hashlib.sha256(document.encode("utf-8")).hexdigest()[:32]
+                        metadata.get("chunk_digest", "")
+                        or hashlib.sha256(document.encode("utf-8")).hexdigest()[:32]
                     )
                     meta_score = _metadata_match_for_chunk(metadata, app_payload)
 
@@ -1516,7 +1727,11 @@ def _perform_bounded_section_retrieval(
                         content=document,
                         source_type="fact_vectors",
                         evidence_id=f"chroma:{doc_id}",
-                        source_id=str(metadata.get("source_document_id") or metadata.get("source_id") or doc_id),
+                        source_id=str(
+                            metadata.get("source_document_id")
+                            or metadata.get("source_id")
+                            or doc_id
+                        ),
                         source_version=str(metadata.get("source_version_hash") or ""),
                         citation_anchor=anchor,
                         chunk_digest=digest,
@@ -1529,13 +1744,19 @@ def _perform_bounded_section_retrieval(
                         query_vec_ref="c0:bge-m3:query",
                         retrieval_method="dense",
                         retrieval_run_ref="c0_section_retrieval:v1",
-                        freshness_status=str(metadata.get("freshness_status") or "FRESH"),
-                        support_status=SUPPORT_STATUS_PASS if anchor else STATUS_UNKNOWN,
+                        freshness_status=str(
+                            metadata.get("freshness_status") or "FRESH"
+                        ),
+                        support_status=SUPPORT_STATUS_PASS
+                        if anchor
+                        else STATUS_UNKNOWN,
                     )
                     section_dense_items.append(item)
                     budget = budget.record_retrieval(1)
 
-            sparse_outcome = _run_section_sparse_lane(section, app_payload, profile, metadata_profile)
+            sparse_outcome = _run_section_sparse_lane(
+                section, app_payload, profile, metadata_profile
+            )
             if sparse_outcome is not None:
                 sparse_receipt_refs.append(sparse_outcome.receipt_ref)
                 sparse_cfg = profile.section_sparse_config(section)
@@ -1547,7 +1768,11 @@ def _perform_bounded_section_retrieval(
                     timestamp_iso=timestamp_iso,
                 )
                 if sparse_outcome.status == SparseLexicalLaneStatus.OK:
-                    lex_scores = [float(it.bm25_score) for it in section_dense_items if it.bm25_score > 0.0]
+                    lex_scores = [
+                        float(it.bm25_score)
+                        for it in section_dense_items
+                        if it.bm25_score > 0.0
+                    ]
                     if lex_scores:
                         support_score_profile.append(
                             (
@@ -1555,7 +1780,11 @@ def _perform_bounded_section_retrieval(
                                 sum(lex_scores) / len(lex_scores),
                             )
                         )
-                dense_scores = [float(it.dense_score) for it in section_dense_items if it.dense_score > 0.0]
+                dense_scores = [
+                    float(it.dense_score)
+                    for it in section_dense_items
+                    if it.dense_score > 0.0
+                ]
                 if dense_scores:
                     support_score_profile.append(
                         (
@@ -1564,38 +1793,60 @@ def _perform_bounded_section_retrieval(
                         )
                     )
 
-            exact_fields = profile.section_sparse_config(section).get("exact_match_fields") or []
+            exact_fields = (
+                profile.section_sparse_config(section).get("exact_match_fields") or []
+            )
             if exact_fields and section_dense_items:
-                exact_phrases = [_payload_dotget(app_payload, str(field_path)) for field_path in exact_fields]
-                exact_phrases = [p for p in exact_phrases if isinstance(p, str) and p.strip()]
+                exact_phrases = [
+                    _payload_dotget(app_payload, str(field_path))
+                    for field_path in exact_fields
+                ]
+                exact_phrases = [
+                    p for p in exact_phrases if isinstance(p, str) and p.strip()
+                ]
                 if exact_phrases:
                     rebuilt: list[EvidenceItem] = []
                     for it in section_dense_items:
                         rm = getattr(it, "retrieval_method", "") or ""
-                        if any(phrase in it.content for phrase in exact_phrases) and "exact" not in rm:
+                        if (
+                            any(phrase in it.content for phrase in exact_phrases)
+                            and "exact" not in rm
+                        ):
                             rm = f"{rm},exact" if rm else "exact"
                             rebuilt.append(
                                 EvidenceItem(
                                     source=it.source,
                                     content=it.content,
-                                    source_type=getattr(it, "source_type", "fact_vectors"),
+                                    source_type=getattr(
+                                        it, "source_type", "fact_vectors"
+                                    ),
                                     evidence_id=getattr(it, "evidence_id", ""),
                                     source_id=getattr(it, "source_id", ""),
                                     source_version=getattr(it, "source_version", ""),
                                     citation_anchor=getattr(it, "citation_anchor", ""),
                                     chunk_digest=getattr(it, "chunk_digest", ""),
-                                    confidence_score=getattr(it, "confidence_score", 0.0),
+                                    confidence_score=getattr(
+                                        it, "confidence_score", 0.0
+                                    ),
                                     dense_score=getattr(it, "dense_score", 0.0),
                                     bm25_score=getattr(it, "bm25_score", 0.0),
                                     metadata_score=getattr(it, "metadata_score", 0.0),
-                                    retrieval_timestamp=getattr(it, "retrieval_timestamp", timestamp_iso),
+                                    retrieval_timestamp=getattr(
+                                        it, "retrieval_timestamp", timestamp_iso
+                                    ),
                                     allowed_prompt_slot=ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY,
                                     fact_vec_ref=getattr(it, "fact_vec_ref", ""),
                                     query_vec_ref=getattr(it, "query_vec_ref", ""),
                                     retrieval_method=rm,
-                                    retrieval_run_ref=getattr(it, "retrieval_run_ref", ""),
-                                    freshness_status=getattr(it, "freshness_status", STATUS_UNKNOWN),
-                                    support_status=getattr(it, "support_status", STATUS_UNKNOWN),
+                                    retrieval_run_ref=getattr(
+                                        it, "retrieval_run_ref", ""
+                                    ),
+                                    freshness_status=getattr(
+                                        it, "freshness_status", STATUS_UNKNOWN
+                                    ),
+                                    support_status=getattr(
+                                        it, "support_status", STATUS_UNKNOWN
+                                    ),
                                 )
                             )
                         else:
@@ -1613,7 +1864,10 @@ def _perform_bounded_section_retrieval(
                     post_filter_survivor_count=len(section_dense_items),
                     applied_where_filter=_where_filter_str,
                     similarity_threshold=min(
-                        (float(getattr(it, "dense_score", 0.0)) for it in section_dense_items),
+                        (
+                            float(getattr(it, "dense_score", 0.0))
+                            for it in section_dense_items
+                        ),
                         default=0.0,
                     ),
                     embedding_model_id=_embedding_model_id,
@@ -1728,9 +1982,21 @@ def _query_fact_vectors_for_section(
                 if budget.budget_exhausted:
                     break
 
-                metadata = result.get("metadatas", [[{}]])[0][i] if result.get("metadatas") else {}
-                document = result.get("documents", [[""]])[0][i] if result.get("documents") else ""
-                distance = result.get("distances", [[0.0]])[0][i] if result.get("distances") else 0.0
+                metadata = (
+                    result.get("metadatas", [[{}]])[0][i]
+                    if result.get("metadatas")
+                    else {}
+                )
+                document = (
+                    result.get("documents", [[""]])[0][i]
+                    if result.get("documents")
+                    else ""
+                )
+                distance = (
+                    result.get("distances", [[0.0]])[0][i]
+                    if result.get("distances")
+                    else 0.0
+                )
                 dense_score = max(0.0, 1.0 - float(distance))
                 meta_score = _metadata_match_for_chunk(metadata, app_payload or {})
 
@@ -1741,7 +2007,8 @@ def _query_fact_vectors_for_section(
                     confidence_score=dense_score,
                     dense_score=dense_score,
                     metadata_score=meta_score,
-                    retrieval_timestamp=timestamp_iso or datetime.now(timezone.utc).isoformat(),
+                    retrieval_timestamp=timestamp_iso
+                    or datetime.now(timezone.utc).isoformat(),
                     allowed_prompt_slot=ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY,
                 )
                 items.append(item)
@@ -2020,7 +2287,9 @@ class DeterministicClaimChecker:
     ) -> ClaimCheckResult:
         """Check if certification claim matches evidence."""
         for evidence in evidence_list:
-            result = self.profile.check_metadata_match(evidence, "certification", claim_value)
+            result = self.profile.check_metadata_match(
+                evidence, "certification", claim_value
+            )
             if result.matched:
                 return ClaimCheckResult(
                     verified=True,
@@ -2152,7 +2421,9 @@ def _compute_support_status(
     if not evidence_items:
         return SUPPORT_STATUS_EMPTY
     req = required_source_classes or frozenset(_NORMATIVE_SOURCE_CLASSES)
-    found = {_evidence_source_class(e) for e in evidence_items if _evidence_source_class(e)}
+    found = {
+        _evidence_source_class(e) for e in evidence_items if _evidence_source_class(e)
+    }
     missing = req - found
     if not missing:
         return SUPPORT_STATUS_PASS

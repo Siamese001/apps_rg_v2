@@ -6,6 +6,7 @@ P0 closure tests for apps_rg L1 planning integrity, readiness, and C0 wiring.
 from __future__ import annotations
 
 import ast
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
@@ -33,6 +34,9 @@ from apps_rg.runtime.bindings.l1_planning_capsule import (
     stable_capsule_digest,
     verify_apps_rg_l1_planning_capsule,
 )
+from apps_rg.runtime.contracts.l1_evidence_obligation_receipt import (
+    build_l1_evidence_obligation_receipt,
+)
 from apps_rg.runtime.bindings.pa_planned_binding import pa_compose_apps_rg_planned
 from apps_rg.runtime.bindings.u0_profile_manifest import (
     l1_planning_profile_digest,
@@ -52,9 +56,7 @@ def _auth() -> AuthorityValidationReceipt:
 def _profile_manifest() -> dict[str, str]:
     return {
         "l1_planning_profile_ref": l1_planning_profile_ref(),
-        "l1_planning_profile_digest": l1_planning_profile_digest(
-            allow_missing=False
-        ),
+        "l1_planning_profile_digest": l1_planning_profile_digest(allow_missing=False),
         "manifest_digest": "f" * 64,
     }
 
@@ -151,7 +153,9 @@ def test_capsule_and_contract_projections_are_recursively_immutable() -> None:
         capsule["completion_criteria"].append("tampered")
 
 
-def test_contract_rejects_tampered_capsule_even_when_declared_ref_is_unchanged() -> None:
+def test_contract_rejects_tampered_capsule_even_when_declared_ref_is_unchanged() -> (
+    None
+):
     good = l1_plan_apps_rg(_validated())
     tampered = _thaw(good.task_spec["apps_rg_planning_capsule"])
     tampered["intent_frame"]["target_role"] = "Tampered Role"
@@ -184,12 +188,23 @@ def test_capsule_verifier_rechecks_exact_profile_bytes() -> None:
     tampered["planning_prior_refs"][0]["digest"] = "0" * 64
     tampered["capsule_digest"] = stable_capsule_digest(tampered)
 
-    with pytest.raises(PlanningCapsuleIntegrityError, match="planning prior ref/digest"):
+    with pytest.raises(
+        PlanningCapsuleIntegrityError, match="planning prior ref/digest"
+    ):
         verify_apps_rg_l1_planning_capsule(tampered)
 
 
 def _planned_fec(plan: L1PlanContract) -> FinalEvidenceContract:
     capsule_ref = str(plan.task_spec["apps_rg_planning_capsule_ref"])
+    v2_capsule = plan.task_spec["apps_rg_planning_v2_capsule"]
+    obligation_receipt = build_l1_evidence_obligation_receipt(
+        capsule=v2_capsule,
+        request_id=plan.request_id,
+        run_id=plan.run_id,
+        trace_id=plan.trace_id,
+        final_evidence_digest="d" * 64,
+        evidence_items=(),
+    )
     return FinalEvidenceContract(
         request_id=plan.request_id,
         run_id=plan.run_id,
@@ -200,7 +215,13 @@ def _planned_fec(plan: L1PlanContract) -> FinalEvidenceContract:
         support_target_met=True,
         final_evidence_digest="d" * 64,
         retrieval_plan_ref=f"l1_evidence_plan:1234567890abcdef:capsule:{capsule_ref[:24]}",
-        audit_refs=(f"l1_capsule_digest:{capsule_ref[:24]}",),
+        audit_refs=(
+            f"l1_capsule_digest:{capsule_ref[:24]}",
+            "l1_v2_evidence_obligation_ledger:"
+            f"{v2_capsule['evidence_obligation_ledger']['ledger_digest']}",
+            "l1_evidence_obligation_receipt_digest:"
+            f"{obligation_receipt['receipt_digest']}",
+        ),
     )
 
 
@@ -259,6 +280,31 @@ def test_planned_c0_wrapper_rejects_missing_capsule_lineage(
         _fake_c0,
     )
     with pytest.raises(C0EvidenceGapError, match="retrieval_plan_ref"):
+        c0_retrieve_apps_rg_planned(route, _validated(), l1_plan=plan)
+
+
+def test_planned_c0_wrapper_rejects_hash_only_v2_obligation_coverage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    plan = l1_plan_apps_rg(_validated())
+    route = l0_route_apps_rg(plan)
+
+    def _fake_c0(*_args, **_kwargs):
+        fec = _planned_fec(plan)
+        return replace(
+            fec,
+            audit_refs=tuple(
+                ref
+                for ref in fec.audit_refs
+                if not ref.startswith("l1_evidence_obligation_receipt_digest:")
+            ),
+        )
+
+    monkeypatch.setattr(
+        "apps_rg.runtime.bindings.c0_planned_binding.c0_retrieve_apps_rg",
+        _fake_c0,
+    )
+    with pytest.raises(C0EvidenceGapError, match="evidence-obligation reconciliation"):
         c0_retrieve_apps_rg_planned(route, _validated(), l1_plan=plan)
 
 
@@ -323,8 +369,7 @@ def test_l0_route_digest_and_signature_bind_the_exact_capsule(
     first_capsule_digest = first_plan.task_spec["apps_rg_planning_capsule_ref"]
     assert f"l1_capsule_digest:{first_capsule_digest}" in first_route.snapshot_refs
     assert any(
-        ref.startswith("l1_plan_binding_digest:")
-        for ref in first_route.snapshot_refs
+        ref.startswith("l1_plan_binding_digest:") for ref in first_route.snapshot_refs
     )
 
 
@@ -371,9 +416,7 @@ def test_reference_backed_cli_inputs_satisfy_l1_presence_checks() -> None:
         )
     )
     capsule = plan.task_spec["apps_rg_planning_capsule"]
-    codes = {
-        entry["code"] for entry in capsule["ambiguity_register"]["entries"]
-    }
+    codes = {entry["code"] for entry in capsule["ambiguity_register"]["entries"]}
 
     assert "JOB_DESCRIPTION_EMPTY" not in codes
     assert "SOURCE_RESUME_EMPTY" not in codes
@@ -391,9 +434,7 @@ def test_generate_scratch_does_not_block_only_because_source_resume_is_empty(
         )
     )
     capsule = plan.task_spec["apps_rg_planning_capsule"]
-    codes = {
-        entry["code"] for entry in capsule["ambiguity_register"]["entries"]
-    }
+    codes = {entry["code"] for entry in capsule["ambiguity_register"]["entries"]}
 
     assert "SOURCE_RESUME_EMPTY" not in codes
     assert capsule["planning_status"] == "READY"
@@ -421,8 +462,10 @@ def _find_call(tree: ast.AST, function_name: str) -> ast.Call:
         if not isinstance(node, ast.Call):
             continue
         func = node.func
-        name = func.id if isinstance(func, ast.Name) else (
-            func.attr if isinstance(func, ast.Attribute) else ""
+        name = (
+            func.id
+            if isinstance(func, ast.Name)
+            else (func.attr if isinstance(func, ast.Attribute) else "")
         )
         if name == function_name:
             return node
@@ -449,9 +492,7 @@ def test_canonical_ag2_threads_plan_into_verified_c0_boundary() -> None:
 
 
 def test_section_spine_threads_front_plan_into_verified_c0_boundary() -> None:
-    path = resolve_apps_rg_path(
-        REPO_ROOT, "runtime", "spine", "section_c0_retrieve.py"
-    )
+    path = resolve_apps_rg_path(REPO_ROOT, "runtime", "spine", "section_c0_retrieve.py")
     source = path.read_text(encoding="utf-8")
     tree = ast.parse(source)
     call = _find_call(tree, "c0_retrieve_apps_rg")
