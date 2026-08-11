@@ -109,6 +109,37 @@ def finalize_deferred_section_l6_after_core(
     if not isinstance(runtime_payload, dict):
         raise RuntimeError("deferred L6 runtime payload is not an object")
     section_id = str(runtime_payload.get("section_id") or artifact_dir.name).strip()
+    product_certification_path = artifact_dir / "product_certification_receipt.json"
+    try:
+        product_certification = json.loads(
+            product_certification_path.read_text(encoding="utf-8")
+        )
+    except (OSError, json.JSONDecodeError, TypeError):
+        product_certification = {}
+    if (
+        isinstance(product_certification, dict)
+        and product_certification.get("product_certification") == "NOT_CLAIMED"
+        and product_certification.get("required_chain_complete") is True
+        and product_certification.get("proof_eligible") is False
+    ):
+        # A governed X2/X3 denial is an expected non-product terminal state.
+        # It has no L5 product certificate to project and must not turn into a
+        # lane exception merely because section-level L6 was deferred while
+        # the nested core callback was active.
+        atomic_write_json(
+            deferred,
+            {
+                "schema_version": "apps_rg.l6_deferred_until_core_certification.v1",
+                "status": "NOT_APPLICABLE_NON_PRODUCT",
+                "section_id": section_id,
+                "run_id": str(runtime_payload.get("run_id") or ""),
+                "reason": "SECTION_NOT_PRODUCT_CERTIFIED",
+                "resume_boundary": "not_applicable_non_product",
+                "product_certification_ref": product_certification_path.name,
+                "current_run_mutated": False,
+            },
+        )
+        return {}
     from apps_rg.runtime.spine.l6_shadow_eval_runner import (
         emit_l5_certification_receipt_from_core,
         maybe_run_l6_v40_shadow_eval_for_section,

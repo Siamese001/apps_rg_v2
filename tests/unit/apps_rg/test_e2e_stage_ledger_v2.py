@@ -715,6 +715,66 @@ def test_whole_run_helper_seals_governed_pre_x3_failure(
     assert report.terminal_stage == "TERMINAL_NON_PRODUCT"
 
 
+def test_non_product_terminalization_binds_the_final_exit_packet(tmp_path: Path) -> None:
+    """A later Exit rewrite must be detected instead of silently trusting a stale seal."""
+
+    from apps_rg.runtime.e2e_stage_ledger import (
+        ReceiptDerivedE2EStageLedger,
+        verify_e2e_stage_ledger,
+    )
+    from apps_rg.runtime.orchestration.r3r4_whole_run_orchestration import (
+        _seal_pending_non_product_stage_ledger,
+    )
+
+    identity = _identity()
+    ledger = ReceiptDerivedE2EStageLedger.create(
+        artifact_dir=tmp_path,
+        identity=identity,
+    )
+    for sequence, stage_id in enumerate(
+        ("FRESH_PREFLIGHT", "APPS_RG_U0", "APPS_RG_L1", "APPS_RG_L0")
+    ):
+        receipt = _write_receipt(
+            tmp_path,
+            sequence=sequence,
+            stage_id=stage_id,
+            identity=identity,
+        )
+        ledger.record_from_receipt(
+            stage_id=stage_id,
+            receipt_ref=receipt,
+            next_stage_id="APPS_RG_U0" if stage_id == "FRESH_PREFLIGHT" else None,
+        )
+
+    exit_packet = tmp_path / "apps_rg_whole_run_exit_review_packet.json"
+    _write_json(
+        exit_packet,
+        {
+            "schema_version": "apps_rg.whole_run_exit_review_packet.v1",
+            "identity": identity,
+            "status": "BLOCKED",
+            "x3_disposition": "X3A_DENY_REROUTE",
+            "signals": {},
+        },
+    )
+    _write_json(tmp_path / "runtime_execution_witness.json", {"identity": identity})
+    _write_json(tmp_path / "terminal_ret_packet.json", {"identity": identity})
+    _write_json(tmp_path / "prompt_assembly_bypass_receipt.json", {"status": "PASS"})
+
+    _seal_pending_non_product_stage_ledger(
+        artifact_dir=tmp_path,
+        product_ledger=ledger,
+        identity=identity,
+    )
+    assert verify_e2e_stage_ledger(ledger.path).valid is True
+
+    _write_json(exit_packet, {"status": "BLOCKED", "rewritten_after_closeout": True})
+    report = verify_e2e_stage_ledger(ledger.path)
+
+    assert report.valid is False
+    assert "artifact_binding_digest_mismatch:APPS_RG_C0:apps_rg_whole_run_exit_review_packet.json" in report.errors
+
+
 def test_ambiguous_first_stage_failure_auto_routes_non_product(tmp_path: Path) -> None:
     from apps_rg.runtime.e2e_stage_ledger import (
         ReceiptDerivedE2EStageLedger,

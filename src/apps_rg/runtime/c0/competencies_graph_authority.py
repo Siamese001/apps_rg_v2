@@ -203,7 +203,7 @@ _ALLOCATION_VISIBLE_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
     (
         "reb_unify_agentic_platform_architecture",
         "skill_unify_agentic_runtime_proof_bundle_lineage",
-    ): "Runtime agent-output proof lineage for platforms",
+    ): "Runtime proof-bundle lineage for platforms",
     (
         "reb_unify_agentic_platform_architecture",
         "skill_unify_agentic_multi_agent_orchestration_contracts",

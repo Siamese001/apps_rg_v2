@@ -38,6 +38,10 @@ from apps_rg.runtime.validators.competencies_quality_x2 import (
     _build_traversal_sufficiency_receipt,
     _role_axis_coverage,
 )
+from apps_rg.runtime.validators.competencies_x2 import (
+    find_bullet_restatement_term,
+    run_competencies_x2_gates,
+)
 from apps_rg.runtime.sections.competencies_rigor import (
     check_competencies_keyword_repetition_limit,
     check_competencies_visible_terms_svp_agentic_richness,
@@ -74,6 +78,71 @@ def test_anthropic_alliance_allocation_has_bound_compact_surface() -> None:
 
     assert phrase == "AWS alliance joint architecture leadership"
     assert source == "graph_authority_surface_composition"
+
+
+def test_runtime_proof_allocation_avoids_deterministic_x2_self_block() -> None:
+    assignment = {
+        "root_id": "reb_unify_agentic_platform_architecture",
+        "skill_id": "skill_unify_agentic_runtime_proof_bundle_lineage",
+        "root_bundle_theme": "SVP Engineering agentic AI platform control-plane architecture",
+        "root_claim_scope": "Runtime proof-bundle lineage for governed execution.",
+        "skill_label": "Runtime proof-bundle lineage",
+        "source_refs": [],
+    }
+    selected_plan = {
+        "facts": [
+            {
+                "fact_id": "fact_engineering_platform_001",
+                "role_episode_bundle_id": "reb_unify_agentic_platform_architecture",
+                "domain": assignment["root_bundle_theme"],
+                "claim_text": assignment["root_bundle_theme"],
+            }
+        ],
+        "graph_candidate_decision_ledger": [],
+    }
+
+    phrase, source = _allocation_surface_phrase(assignment, selected_plan=selected_plan)
+    categories = [
+        {
+            "terms": [
+                {"text": phrase},
+                {"text": "agentic workflow routing across enterprise systems"},
+                {"text": "Agentic platform route-policy dispatch architecture"},
+                {"text": "production reliability lifecycle for agentic workflows"},
+            ]
+        }
+    ]
+
+    assert phrase == "Runtime proof-bundle lineage for platforms"
+    assert source == "graph_authority_surface_composition"
+    assert check_competencies_keyword_repetition_limit(categories) == (True, None)
+    assert find_bullet_restatement_term(
+        categories,
+        ["svp engineering agentic ai platform control-plane architecture"],
+    ) is None
+    gates = run_competencies_x2_gates(
+        competencies=categories,
+        parsed_output={
+            "competencies": categories,
+            "selected_fact_plan": {"selected_fact_ids": ["fact_engineering_platform_001"]},
+        },
+        claim_ledger=[],
+        jd_text="",
+        bullet_texts_lower=["svp engineering agentic ai platform control-plane architecture"],
+        resume_support_blob="agentic workflow runtime platform architecture proof bundle lineage",
+        allowed_fact_ids={"fact_engineering_platform_001"},
+        runtime_generation_status="REAL_LLM",
+    )
+    assert all(
+        gate.pass_
+        for gate in gates
+        if gate.gate_id
+        in {
+            "x2_competencies_keyword_repetition_limit",
+            "x2_no_bullet_outcome_restatement",
+            "x2_no_keyword_stuffing",
+        }
+    )
 
 
 def _write_json(path: Path, value: object) -> None:

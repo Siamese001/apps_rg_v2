@@ -2054,6 +2054,7 @@ def run_whole_run_with_route_governance(
     result_fault = result.fault
     product_authority_error = ""
     non_product_terminal_refs: dict[str, str] = {}
+    pending_non_product_terminalization = False
     if product_stage_ledger is not None and pre_uwg_eligible:
         from apps_rg.runtime.product_stage_authority import (
             emit_product_eligibility_authority_receipt,
@@ -2107,20 +2108,9 @@ def run_whole_run_with_route_governance(
             pre_uwg_eligible = False
             product_authority_error = f"{type(exc).__name__}:{exc}"
             result_fault = "PRODUCT_E2E_RECEIPT_AUTHORITY_FAILED"
-    if product_stage_ledger is not None and not pre_uwg_eligible:
-        try:
-            non_product_terminal_refs = _seal_pending_non_product_stage_ledger(
-                artifact_dir=art,
-                product_ledger=product_stage_ledger,
-                identity=dict(raw_request["canonical_run_identity"]),
-            )
-        except Exception as exc:  # guardian: preserve the primary product failure
-            terminal_error = f"{type(exc).__name__}:{exc}"
-            product_authority_error = (
-                f"{product_authority_error};{terminal_error}"
-                if product_authority_error
-                else terminal_error
-            )
+    pending_non_product_terminalization = (
+        product_stage_ledger is not None and not pre_uwg_eligible
+    )
     if pre_uwg_eligible and require_fresh_preflight:
         from apps_rg.runtime.post_x3_completion import complete_apps_rg_post_x3
 
@@ -2415,6 +2405,25 @@ def run_whole_run_with_route_governance(
             )
         payload["x3_disposition"] = effective_x3
         payload["completion_disposition"] = effective_x3
+    if pending_non_product_terminalization:
+        try:
+            # Failure closeout can write the final, gap-marked output and
+            # re-derive Exit.  Bind that final packet before the receipt-derived
+            # non-product ledger is sealed; otherwise the ledger intentionally
+            # detects its own stale source digest on the next validation pass.
+            non_product_terminal_refs = _seal_pending_non_product_stage_ledger(
+                artifact_dir=art,
+                product_ledger=product_stage_ledger,
+                identity=dict(raw_request["canonical_run_identity"]),
+            )
+            payload.update(non_product_terminal_refs)
+        except Exception as exc:  # guardian: preserve the primary product failure
+            terminal_error = f"{type(exc).__name__}:{exc}"
+            product_authority_error = (
+                f"{product_authority_error};{terminal_error}"
+                if product_authority_error
+                else terminal_error
+            )
     if immutable_product_authorized:
         # Mandatory closeout is post-boundary.  It may make the pipeline
         # incomplete, but it cannot revoke a UWG-closed current-run product.

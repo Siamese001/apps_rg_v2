@@ -23,6 +23,7 @@ from apps_rg.runtime.section_l2_lane_integration import (
 from apps_rg.runtime.section_l2_spine_receipt import SEALED_L2_ARTIFACT
 from apps_rg.runtime.section_runtime_exhaust_lane_integration import (
     core_runtime_callback_scope,
+    finalize_deferred_section_l6_after_core,
     finalize_section_runtime_exhaust_before_l6,
     gate_section_l6_shadow_after_exhaust,
 )
@@ -179,3 +180,37 @@ def test_nested_core_defers_l6_until_lane_product_certification(tmp_path: Path):
     )
     assert deferred["status"] == "DEFERRED"
     assert not (tmp_path / "l6_v40_shadow_eval_package.json").exists()
+
+
+def test_non_product_deferred_l6_is_terminal_without_l5_projection(tmp_path: Path):
+    _write_json(
+        tmp_path / "runtime_payload.json",
+        {"section_id": "competencies", "run_id": "lane-denied"},
+    )
+    _write_json(
+        tmp_path / "l6_deferred_until_core_certification.json",
+        {
+            "schema_version": "apps_rg.l6_deferred_until_core_certification.v1",
+            "status": "DEFERRED",
+        },
+    )
+    _write_json(
+        tmp_path / "product_certification_receipt.json",
+        {
+            "product_certification": "NOT_CLAIMED",
+            "required_chain_complete": True,
+            "proof_eligible": False,
+        },
+    )
+
+    paths = finalize_deferred_section_l6_after_core(tmp_path, repo_root=REPO)
+
+    deferred = json.loads(
+        (tmp_path / "l6_deferred_until_core_certification.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert paths == {}
+    assert deferred["status"] == "NOT_APPLICABLE_NON_PRODUCT"
+    assert deferred["reason"] == "SECTION_NOT_PRODUCT_CERTIFIED"
+    assert not (tmp_path / "l5_certification_receipt.json").exists()
