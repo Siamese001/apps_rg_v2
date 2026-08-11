@@ -174,6 +174,9 @@ def ledger_blocks_product_pass(ledger: dict[str, Any] | None) -> tuple[bool, str
     #   executive_summary source_fact_ids to the direct proof for each already-written sentence.
     # - repair_exec_summary_causal_multi_root_allocation_row: ledger-only clamp to the one
     #   frozen graph path already expressed by a causal sentence.
+    # - repair_exec_summary_causal_multi_metric_row: removes the unrelated side of a
+    #   ``while``/``whereas``-joined causal claim, but only when the retained clause has one
+    #   exact metric reserved by one frozen graph allocation; the complete X2 suite runs after.
     # - repair_exec_summary_unallocated_metric_row: removes a numeric outcome that the frozen
     #   allocation did not reserve by restoring the selected root's graph-authored claim text;
     #   the complete X2 and model-backed judge chain runs on the replacement.
@@ -193,6 +196,7 @@ def ledger_blocks_product_pass(ledger: dict[str, Any] | None) -> tuple[bool, str
             "repair_exec_summary_mechanism_inventory_sentence",
             "repair_exec_summary_cross_fact_conflation_row",
             "repair_exec_summary_causal_multi_root_allocation_row",
+            "repair_exec_summary_causal_multi_metric_row",
             "repair_exec_summary_unallocated_metric_row",
             "repair_unify_bullet_seniority_tense",
             "bullet_judge_feedback_reselection",

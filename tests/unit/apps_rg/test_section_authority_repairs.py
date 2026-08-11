@@ -10,6 +10,7 @@ from apps_rg.runtime.sections.section_authority_repairs import (
     apply_exec_summary_display_authority_repairs,
     prune_competencies_rigor_failing_terms,
     repair_exec_summary_cross_fact_conflation_rows,
+    repair_exec_summary_causal_multi_metric_rows,
     repair_exec_summary_causal_multi_root_allocation_rows,
     repair_exec_summary_unallocated_metric_rows,
     repair_exec_summary_mechanism_inventory_sentences,
@@ -201,6 +202,134 @@ def test_retry10_graph_allocation_shape_repairs_before_x2() -> None:
         selected_fact_plan=plan,
     )
     assert failures == []
+
+
+def test_r4_causal_multi_metric_repair_keeps_only_reserved_metric_path() -> None:
+    """Replay r4's final executive-summary failure without another model call."""
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        validate_claim_rows_against_resume_graph_allocation,
+    )
+
+    unify_root = "reb_unify_platform_commercialization_leadership"
+    ibm_delivery_root = "reb_ibm_devsecops_release_resilience"
+    ibm_alliance_root = "reb_ibm_aws_alliance_partner_cosell_gtm"
+    unify_fact = "fact_engineering_platform_006"
+    ibm_delivery_fact = "fact_engineering_platform_002"
+    ibm_alliance_fact = "fact_partnerships_gtm_002"
+    unify_metric = "metric_unify_22m_ip_led_revenue"
+    ibm_metric = "metric_ibm_20pct_joint_revenue_growth"
+    plan = {
+        "allocation_plan_digest": "r4-captured-plan",
+        "facts": [
+            {
+                "fact_id": unify_root,
+                "role_episode_bundle_id": unify_root,
+                "linked_source_fact_ids": [unify_fact],
+                "allowed_graph_evidence_ids": [unify_root, unify_fact, unify_metric],
+            },
+            {
+                "fact_id": ibm_delivery_root,
+                "role_episode_bundle_id": ibm_delivery_root,
+                "linked_source_fact_ids": [ibm_delivery_fact],
+                "allowed_graph_evidence_ids": [ibm_delivery_root, ibm_delivery_fact],
+            },
+            {
+                "fact_id": ibm_alliance_root,
+                "role_episode_bundle_id": ibm_alliance_root,
+                "linked_source_fact_ids": [ibm_alliance_fact],
+                "allowed_graph_evidence_ids": [
+                    ibm_alliance_root,
+                    ibm_alliance_fact,
+                    ibm_metric,
+                ],
+            },
+        ],
+        "allocation_assignments": [
+            {
+                "section_id": "executive_summary",
+                "claim_unit_id": "executive_summary:claim:01",
+                "root_id": unify_root,
+                "fact_id": unify_fact,
+                "metric_outcome_id": unify_metric,
+                "metric_value": "22",
+                "metric_unit": "USD_M",
+                "root_claim_text": "Platform productization, IP-led revenue, margin expansion, team scale",
+                "counts_toward_global_uniqueness": True,
+            },
+            {
+                "section_id": "executive_summary",
+                "claim_unit_id": "executive_summary:claim:02",
+                "root_id": ibm_delivery_root,
+                "fact_id": ibm_delivery_fact,
+                "metric_outcome_id": "",
+                "metric_value": "",
+                "metric_unit": "",
+                "root_claim_text": "Embedded release automation and security scanning into regulated modernization delivery paths",
+                "counts_toward_global_uniqueness": True,
+            },
+            {
+                "section_id": "executive_summary",
+                "claim_unit_id": "executive_summary:claim:03",
+                "root_id": ibm_alliance_root,
+                "fact_id": ibm_alliance_fact,
+                "metric_outcome_id": "",
+                "metric_value": "",
+                "metric_unit": "",
+                "root_claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+                "counts_toward_global_uniqueness": True,
+            },
+        ],
+    }
+    broken_sentence = (
+        "That operating foundation also drove 20% joint revenue growth across the IBM-AWS "
+        "alliance, while platform productization work elsewhere generated $22M in IP-led revenue."
+    )
+    parsed = {
+        "resume_display_text": " ".join(
+            [
+                "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities.",
+                "Embedded release automation and security scanning into regulated modernization delivery paths.",
+                broken_sentence,
+            ]
+        ),
+        "claim_ledger": [
+            {
+                "claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities.",
+                "source_fact_ids": [ibm_alliance_root, ibm_alliance_fact],
+            },
+            {
+                "claim_text": "Embedded release automation and security scanning into regulated modernization delivery paths.",
+                "source_fact_ids": [ibm_delivery_root, ibm_delivery_fact],
+            },
+            {
+                "claim_text": (
+                    "20% joint revenue growth across the IBM-AWS alliance and $22M in "
+                    "IP-led revenue from platform productization"
+                ),
+                "source_fact_ids": [ibm_metric, unify_metric],
+            },
+        ],
+        "selected_fact_plan": plan,
+        "change_log": [],
+    }
+
+    repairs = repair_exec_summary_causal_multi_metric_rows(parsed)
+
+    assert len(repairs) == 1
+    assert parsed["claim_ledger"][2]["claim_text"] == (
+        "Platform productization work elsewhere generated $22M in IP-led revenue."
+    )
+    assert "20%" not in parsed["resume_display_text"]
+    assert parsed["claim_ledger"][2]["source_fact_ids"] == [
+        unify_root,
+        unify_fact,
+        unify_metric,
+    ]
+    assert validate_claim_rows_against_resume_graph_allocation(
+        section_id="executive_summary",
+        claim_rows=parsed["claim_ledger"],
+        selected_fact_plan=plan,
+    ) == []
 
 
 def test_unallocated_alliance_metric_rehydrates_frozen_root_claim() -> None:

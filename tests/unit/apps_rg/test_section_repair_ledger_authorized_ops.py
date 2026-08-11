@@ -141,6 +141,11 @@ def test_graph_allocation_repairs_are_authorized() -> None:
             ),
             (
                 KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_causal_multi_metric_row",
+                True,
+            ),
+            (
+                KIND_DETERMINISTIC_REWRITE,
                 "repair_exec_summary_unallocated_metric_row",
                 True,
             ),
@@ -245,6 +250,11 @@ def test_all_authorized_ops_together_do_not_block() -> None:
             (
                 KIND_DETERMINISTIC_REWRITE,
                 "repair_exec_summary_causal_multi_root_allocation_row",
+                True,
+            ),
+            (
+                KIND_DETERMINISTIC_REWRITE,
+                "repair_exec_summary_causal_multi_metric_row",
                 True,
             ),
             (

@@ -653,6 +653,148 @@ def repair_exec_summary_causal_multi_root_allocation_rows(
     return repairs
 
 
+def repair_exec_summary_causal_multi_metric_rows(
+    parsed: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Keep one frozen metric path when a causal row renders two unrelated outcomes.
+
+    The graph binder deliberately rejects a visible claim which joins two metrics
+    from different roots.  Attribution-only repair cannot make that claim true:
+    the rendered text still contains both metrics.  This narrow materialization
+    repair is allowed only when a ``while``/``whereas`` clause isolates exactly
+    one metric that is reserved by exactly one selected graph assignment.  It
+    preserves that clause, removes the unrelated clause, and aligns the claim
+    ledger to the retained frozen path.  Ambiguous sentence shapes are left for
+    the normal bounded regeneration path.
+    """
+    if not isinstance(parsed, dict):
+        return []
+    text = str(parsed.get("resume_display_text") or "").strip()
+    plan = parsed.get("selected_fact_plan")
+    ledger = parsed.get("claim_ledger")
+    if not text or not isinstance(plan, dict) or not isinstance(ledger, list):
+        return []
+    sentences = [sentence for sentence in split_sentences(text) if str(sentence).strip()]
+    if len(sentences) != len(ledger):
+        return []
+
+    from apps_rg.runtime.c0.resume_graph_allocation import extract_exact_metric_value_unit
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        _CAUSAL_RE,
+        _VISIBLE_METRIC_RE,
+        _assignment_aliases,
+        _fact_aliases_by_root,
+        _select_assignments_for_claim,
+    )
+
+    assignments = [
+        dict(row)
+        for row in plan.get("allocation_assignments") or []
+        if isinstance(row, dict)
+        and str(row.get("section_id") or "") == "executive_summary"
+    ]
+    if not assignments:
+        return []
+    aliases_by_root = _fact_aliases_by_root(plan)
+    aliases = {
+        str(row.get("claim_unit_id") or ""): _assignment_aliases(
+            row,
+            aliases_by_root=aliases_by_root,
+        )
+        for row in assignments
+    }
+
+    repairs: list[dict[str, Any]] = []
+    for index, raw_row in enumerate(ledger):
+        if not isinstance(raw_row, dict):
+            continue
+        claim_text = str(raw_row.get("claim_text") or raw_row.get("claim") or "").strip()
+        display_sentence = sentences[index]
+        if not (_CAUSAL_RE.search(claim_text) or _CAUSAL_RE.search(display_sentence)):
+            continue
+        visible_metrics = list(_VISIBLE_METRIC_RE.finditer(display_sentence))
+        if len(visible_metrics) < 2:
+            continue
+        selected, _ = _select_assignments_for_claim(
+            raw_row,
+            section_id="executive_summary",
+            assignments=assignments,
+            aliases=aliases,
+        )
+        metric_assignments = [
+            assignment
+            for assignment in selected
+            if str(assignment.get("metric_outcome_id") or "").strip()
+            and str(assignment.get("metric_value") or "").strip()
+            and str(assignment.get("metric_unit") or "").strip()
+        ]
+        if len(metric_assignments) != 1:
+            continue
+        chosen = metric_assignments[0]
+        chosen_signature = (
+            str(chosen.get("metric_value") or ""),
+            str(chosen.get("metric_unit") or ""),
+        )
+        matching_metrics = [
+            match
+            for match in visible_metrics
+            if extract_exact_metric_value_unit(match.group(0)) == chosen_signature
+        ]
+        if len(matching_metrics) != 1:
+            continue
+
+        # A conjunction is only safe to collapse when it creates a clean,
+        # complete clause containing the one graph-reserved metric.
+        clauses = re.split(r"\s*,?\s+\b(?:while|whereas)\b\s+", display_sentence, maxsplit=1)
+        if len(clauses) != 2:
+            continue
+        candidate_clauses = [
+            clause.strip()
+            for clause in clauses
+            if len(_VISIBLE_METRIC_RE.findall(clause)) == 1
+            and extract_exact_metric_value_unit(clause) == chosen_signature
+        ]
+        if len(candidate_clauses) != 1:
+            continue
+        replacement = candidate_clauses[0]
+        if replacement and replacement[0].islower():
+            replacement = replacement[0].upper() + replacement[1:]
+        if replacement and replacement[-1] not in ".!?":
+            replacement += "."
+        if not replacement:
+            continue
+
+        root_id = str(chosen.get("root_id") or "").strip()
+        fact_id = str(chosen.get("fact_id") or "").strip()
+        metric_id = str(chosen.get("metric_outcome_id") or "").strip()
+        source_fact_ids = [value for value in (root_id, fact_id, metric_id) if value]
+        if not source_fact_ids:
+            continue
+        sentences[index] = replacement
+        raw_row["claim"] = replacement[:80]
+        raw_row["claim_text"] = replacement
+        raw_row["source_fact_ids"] = list(dict.fromkeys(source_fact_ids))
+        repairs.append(
+            {
+                "operation": "repair_exec_summary_causal_multi_metric_row",
+                "reason": (
+                    f"claim_{index + 1}_retained_reserved_metric_path:"
+                    f"{chosen.get('claim_unit_id')}"
+                ),
+                "sentence_index": index + 1,
+                "retained_metric_outcome_id": metric_id,
+                "source_fact_ids": raw_row["source_fact_ids"],
+            }
+        )
+
+    if repairs:
+        parsed["resume_display_text"] = " ".join(sentences).strip()
+        change_log = list(parsed.get("change_log") or [])
+        change_log.extend(repairs)
+        parsed["change_log"] = change_log
+    return repairs
+
+
 def repair_exec_summary_unallocated_metric_rows(
     parsed: dict[str, Any],
 ) -> list[dict[str, Any]]:
@@ -984,6 +1126,20 @@ def apply_exec_summary_display_authority_repairs(
             reason=str(_conflation_repairs[0].get("reason") or "")[:240],
             replaced_l2=True,
         )
+    _multi_metric_repairs = repair_exec_summary_causal_multi_metric_rows(parsed)
+    if _multi_metric_repairs and artifact_dir is not None:
+        from apps_rg.runtime.section_repair_ledger import (
+            KIND_DETERMINISTIC_REWRITE,
+            record_repair,
+        )
+
+        record_repair(
+            artifact_dir,
+            kind=KIND_DETERMINISTIC_REWRITE,
+            operation="repair_exec_summary_causal_multi_metric_row",
+            reason=str(_multi_metric_repairs[0].get("reason") or "")[:240],
+            replaced_l2=True,
+        )
     _metric_allocation_repairs = repair_exec_summary_unallocated_metric_rows(parsed)
     if _metric_allocation_repairs and artifact_dir is not None:
         from apps_rg.runtime.section_repair_ledger import (
@@ -1215,7 +1371,10 @@ __all__ = [
     "apply_exec_summary_display_authority_repairs",
     "prune_competencies_rigor_failing_terms",
     "repair_exec_summary_cross_fact_conflation_rows",
+    "repair_exec_summary_causal_multi_metric_rows",
+    "repair_exec_summary_causal_multi_root_allocation_rows",
     "repair_exec_summary_mechanism_inventory_sentences",
+    "repair_exec_summary_unallocated_metric_rows",
     "repair_exec_summary_thin_sentence_weave",
     "repair_required_brushstroke_citations_from_materialized_sentences",
     "sanitize_ibm_narrative_display_text",
