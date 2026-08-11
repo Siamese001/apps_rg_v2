@@ -1254,6 +1254,7 @@ def aggregate_patched_run(
     build_ok = False
     merged_err = "patch_merge_not_attempted"
     lane_load_errors: dict[str, str] = {}
+    final_output_contract: dict[str, Any] = {}
 
     if len(lane_run_dirs) == len(GENERATED_LANES):
         rollup_blob = build_modular_lane_rollup(repo, lane_run_dirs)
@@ -1402,7 +1403,27 @@ def aggregate_patched_run(
             persist_json_product_outputs(art, generated_resume=gen_resume)
             rep = verify_full_resume_artifact_bundle(art)
             merge_manifest_after_artifact_gate(art, shape_rep=rep)
-            artifact_gate_status = "verified"
+            # Patch aggregation creates a new final-resume snapshot.  A prior
+            # failed run may still contain a stale FINAL_RESUME_OUTPUT/DOCX
+            # contract, so presence alone cannot authorize this patched
+            # product. Re-render and validate both outputs from this run's
+            # current final_resume.json before evaluating eligibility.
+            from apps_rg.runtime.final_resume_outputs import (
+                emit_final_resume_product_outputs,
+            )
+
+            final_output_contract = emit_final_resume_product_outputs(
+                art,
+                repo_root=repo,
+                required=True,
+            )
+            if final_output_contract.get("status") != "PASS":
+                failed = list(final_output_contract.get("failed_gate_ids") or [])
+                raise RuntimeError(
+                    "FAILED_PATCH_FINAL_OUTPUT_CONTRACT:"
+                    + (",".join(str(value) for value in failed) or "unknown")
+                )
+            artifact_gate_status = "verified_with_current_final_outputs"
         except RuntimeError as exc:
             decisive = "FAIL"
             failure = str(exc)
@@ -1473,6 +1494,7 @@ def aggregate_patched_run(
         "rg_output_merge_receipt_rel": rg_output_merge_receipt_rel,
         "final_schema_valid": final_schema_valid,
         "artifact_gate_status": artifact_gate_status,
+        "final_output_contract": final_output_contract,
         "recipe_lane_policy": recipe_lane_policy,
         "full_success_eligibility": eligibility,
         "lane_provider_global_override": str(lane_provider or ""),

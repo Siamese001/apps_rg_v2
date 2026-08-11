@@ -146,6 +146,33 @@ def test_final_resume_outputs_preserve_base_facts_and_docx_order(tmp_path: Path)
     assert gate_ids["final_resume_docx_certifications_copied_from_base"] is True
 
 
+def test_final_resume_outputs_replace_stale_failed_contract(tmp_path: Path) -> None:
+    """A later deterministic assembly must replace, not trust, old output verdicts."""
+    _write_final_resume(tmp_path)
+    (tmp_path / "apps_rg_output_manifest.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "apps_rg_output_manifest.v1",
+                "docx_output_required": True,
+                "docx_verified": False,
+                "required_artifacts": {"docx_verified": False},
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / FINAL_RESUME_OUTPUT_JSON).write_text(
+        json.dumps({"status": "FAIL", "failed_gate_ids": ["final_resume_no_gap_markers"]}),
+        encoding="utf-8",
+    )
+
+    contract = emit_final_resume_product_outputs(tmp_path, repo_root=tmp_path, required=True)
+
+    assert contract["status"] == "PASS"
+    manifest = json.loads((tmp_path / "apps_rg_output_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["docx_verified"] is True
+    assert manifest["required_artifacts"]["docx_verified"] is True
+
+
 def test_final_resume_outputs_synthesize_required_failed_run_package(tmp_path: Path) -> None:
     contract = emit_final_resume_product_outputs(tmp_path, repo_root=tmp_path, required=True)
 
