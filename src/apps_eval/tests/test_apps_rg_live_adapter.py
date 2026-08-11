@@ -389,6 +389,36 @@ def test_apps_rg_live_runner_requires_existing_sealed_source_root(tmp_path: Path
         )
 
 
+def test_normalization_bootstraps_shared_apps_rg_env_before_preflight(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    from apps_eval.adapters import apps_rg as subject
+
+    artifact_dir = tmp_path / "run"
+    outputs = artifact_dir / "outputs"
+    outputs.mkdir(parents=True)
+    (outputs / "generated_resume.json").write_text(
+        '{"sections":{"summary":"verified"}}',
+        encoding="utf-8",
+    )
+    emit_verified_current_run_evidence(artifact_dir, monkeypatch)
+    calls: list[bool] = []
+    monkeypatch.setattr(
+        subject,
+        "_bootstrap_apps_rg_env_for_live_replay",
+        lambda: calls.append(True),
+    )
+
+    subject.normalize_existing_apps_rg_run_snapshot(
+        scenario_id="current-run",
+        result={"x3_disposition": "X3D_ALLOW_FINISH"},
+        artifact_dir=artifact_dir,
+    )
+
+    assert calls == [True]
+
+
 def test_lane_artifact_index_binds_lane_scoped_identity(tmp_path: Path) -> None:
     from apps_eval.adapters import apps_rg as subject
 

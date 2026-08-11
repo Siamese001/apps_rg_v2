@@ -8,6 +8,7 @@ import hashlib
 import hmac
 import json
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
@@ -75,6 +76,28 @@ _ROUTE_HMAC_VERIFIER_KEYRING_SCHEMA = "apps_rg.route_hmac_verifier_keyring.v1"
 
 def _as_text(value: Any) -> str:
     return str(value or "").strip()
+
+
+def _bootstrap_apps_rg_env_for_live_replay() -> None:
+    """Load the shared Apps RG dotenv before reopening signed run evidence.
+
+    Apps Eval normally imports this adapter directly, so importing ``apps_rg``
+    is not guaranteed to have run its package-level dotenv bootstrap.  That
+    made a valid replay depend on an operator manually exporting the route
+    HMAC material even when the shared Apps RG dotenv already contained it.
+    This is credential loading only; the adapter remains read-only and does
+    not dispatch a provider.  Pytest intentionally retains fully isolated
+    process environments.
+    """
+
+    if "pytest" in sys.modules or os.environ.get("APPS_RG_TEST_HARNESS"):
+        return
+    try:
+        from apps_rg.runtime.env_bootstrap import bootstrap_apps_rg_env
+
+        bootstrap_apps_rg_env()
+    except Exception:  # noqa: BLE001 - evidence verification fails closed below.
+        return
 
 
 def _json_object(path: Path) -> dict[str, Any]:
@@ -879,6 +902,7 @@ def _normalize_live_snapshot(
     artifact_dir: Path,
     preflight: dict[str, Any],
 ) -> AppOutputSnapshot:
+    _bootstrap_apps_rg_env_for_live_replay()
     source_manifest_before = build_source_artifact_manifest(artifact_dir)
     source_digest_before = source_artifact_manifest_digest(source_manifest_before)
     (
