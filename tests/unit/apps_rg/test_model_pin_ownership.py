@@ -148,11 +148,28 @@ def test_shared_catalog_has_capabilities_not_role_aliases() -> None:
     assert catalog["models"]["gpt-5.6-sol"]["provider"] == "openai"
 
 
-def test_removed_local_generator_has_zero_repository_matches() -> None:
+def test_removed_local_generator_has_zero_executable_code_matches() -> None:
+    """Do not let opaque, immutable runtime evidence masquerade as code.
+
+    Historical provider payloads are intentionally retained beneath
+    ``artifacts/`` and can contain arbitrary model-generated text.  The
+    regression gate is about executable Python paths, so scanning the whole
+    repository turns an unrelated saved response into a false code failure.
+    """
     forbidden_terms = ("q" + "wen", "local_" + "generator_stub")
     for term in forbidden_terms:
         result = subprocess.run(
-            ["rg", "-n", "-i", term, str(_REPO_ROOT), "--glob", "!.git/**"],
+            [
+                "rg",
+                "-n",
+                "-i",
+                term,
+                str(_REPO_ROOT / "src"),
+                str(_REPO_ROOT / "tools"),
+                str(_REPO_ROOT / "tests"),
+                "--glob",
+                "*.py",
+            ],
             capture_output=True,
             text=True,
             check=False,
