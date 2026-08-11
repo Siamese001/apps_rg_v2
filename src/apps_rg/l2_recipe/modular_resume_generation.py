@@ -690,16 +690,22 @@ def run_modular_resume_generation(
         resume_graph_allocation_digest = str(
             resume_graph_bundle["allocation_plan"].get("allocation_plan_digest") or ""
         )
-        # W6 is human/offline release authority, not a post-hoc quality hint.
-        # Validate and bind it before any lane or aggregate judge can be charged.
-        from apps_rg.runtime.c0.resume_graph_w6_release_authority import (
-            require_w6_release_authority,
-        )
+        resume_graph_w6_release_evidence: dict[str, Any] = {}
+        from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
 
-        resume_graph_w6_release_evidence = require_w6_release_authority(
-            repo_root=repo,
-            artifact_dir=art,
-        )
+        if product_fail_closed_runtime():
+            # W6 is human/offline release authority, not a post-hoc quality
+            # hint. Validate and bind it before any lane or aggregate judge can
+            # be charged on the product path. Fixture/test paths retain their
+            # declared non-product semantics.
+            from apps_rg.runtime.c0.resume_graph_w6_release_authority import (
+                require_w6_release_authority,
+            )
+
+            resume_graph_w6_release_evidence = require_w6_release_authority(
+                repo_root=repo,
+                artifact_dir=art,
+            )
         if graph_skill_embedding_candidates is not None:
             lane_embedding_allowlists = build_lane_embedding_allowlists(
                 allocation_plan=resume_graph_bundle["allocation_plan"],
@@ -1078,9 +1084,10 @@ def run_modular_resume_generation(
                 rollup_blob["resume_graph_allocation_refs"] = dict(
                     resume_graph_allocation_refs
                 )
-                rollup_blob["resume_graph_w6_release_evidence"] = dict(
-                    resume_graph_w6_release_evidence
-                )
+                if resume_graph_w6_release_evidence:
+                    rollup_blob["resume_graph_w6_release_evidence"] = dict(
+                        resume_graph_w6_release_evidence
+                    )
                 rollup_blob["graph_skill_embeddings_required"] = (
                     graph_skill_embedding_required
                 )

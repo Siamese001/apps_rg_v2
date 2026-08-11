@@ -189,6 +189,10 @@ def _whole_resume_graph_rollup_authority(
     if isinstance(prior_w6, dict):
         authority["resume_graph_w6_release_evidence"] = dict(prior_w6)
     else:
+        from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
+
+        if not product_fail_closed_runtime():
+            return authority
         # A patched run must not get as far as aggregate coherence judging if
         # the original run lacked the mandatory W6 release evidence. The
         # helper only validates a pre-existing human/offline receipt.
@@ -1600,7 +1604,9 @@ def execute_patch_run(
     # aggregation rollup binding below; calling it here is deliberately early
     # so an absent human/offline W6 authority cannot spend a replacement lane
     # or aggregate-judge request.
-    if _whole_resume_graph_digest_for_run(plan.run_dir):
+    from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
+
+    if product_fail_closed_runtime() and _whole_resume_graph_digest_for_run(plan.run_dir):
         _whole_resume_graph_rollup_authority(repo=plan.repo, run_dir=plan.run_dir)
 
     saved_env = {
