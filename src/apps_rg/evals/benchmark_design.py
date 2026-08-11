@@ -25,6 +25,18 @@ SLICE_DIMENSIONS = (
     "binding_challenge",
     "protected_risk_slice",
 )
+CASE_IDENTITY_DIGEST_FIELDS = (
+    "source_bundle_digest",
+    "source_family_digest",
+    "profile_digest",
+    "job_description_digest",
+    "target_request_digest",
+    "research_handoff_digest",
+    "baseline_output_digest",
+    "expected_output_digest",
+    "prompt_configuration_digest",
+    "runtime_configuration_digest",
+)
 
 
 def canonical_digest(value: Any) -> str:
@@ -96,9 +108,7 @@ def _case_errors(case: Any, lanes: set[str]) -> list[str]:
         return ["BENCHMARK_CASE_NOT_OBJECT"]
     required_fields = (
         "case_id",
-        "source_bundle_digest",
-        "target_request_digest",
-        "expected_output_digest",
+        *CASE_IDENTITY_DIGEST_FIELDS,
         "role_family",
         "employer",
         "target_profile",
@@ -108,6 +118,12 @@ def _case_errors(case: Any, lanes: set[str]) -> list[str]:
         for field in required_fields
         if not str(case.get(field) or "").strip()
     ]
+    for field in CASE_IDENTITY_DIGEST_FIELDS:
+        digest = case.get(field)
+        if not isinstance(digest, str) or not digest.startswith("sha256:") or len(
+            digest
+        ) != 71 or any(character not in "0123456789abcdef" for character in digest[7:]):
+            errors.append(f"BENCHMARK_CASE_{field.upper()}_INVALID")
     case_lanes = case.get("lanes")
     if not isinstance(case_lanes, list) or not case_lanes:
         errors.append("BENCHMARK_CASE_LANES_INVALID")
@@ -128,6 +144,11 @@ def _case_errors(case: Any, lanes: set[str]) -> list[str]:
     research = case.get("apps_research_u0")
     if not isinstance(research, Mapping):
         errors.append("BENCHMARK_CASE_APPS_RESEARCH_U0_MISSING")
+    elif (
+        _research_status(research) == "PASS"
+        and research.get("receipt_digest") != case.get("research_handoff_digest")
+    ):
+        errors.append("BENCHMARK_CASE_RESEARCH_HANDOFF_DIGEST_MISMATCH")
     return errors
 
 
@@ -161,7 +182,12 @@ def validate_benchmark_manifest(path: Path = DEFAULT_MANIFEST_PATH) -> dict[str,
     lane_counts = {lane: 0 for lane in lanes}
     slice_counts: dict[str, dict[str, int]] = {dimension: {} for dimension in SLICE_DIMENSIONS}
     source_digests: set[str] = set()
+    source_family_digests: set[str] = set()
+    profile_digests: set[str] = set()
+    job_description_digests: set[str] = set()
     request_digests: set[str] = set()
+    research_digests: set[str] = set()
+    baseline_output_digests: set[str] = set()
     output_digests: set[str] = set()
     case_ids: set[str] = set()
     not_measured: set[str] = set()
@@ -175,7 +201,24 @@ def validate_benchmark_manifest(path: Path = DEFAULT_MANIFEST_PATH) -> dict[str,
         case_ids.add(case_id)
         for field, observed, error in (
             ("source_bundle_digest", source_digests, "BENCHMARK_SOURCE_BUNDLE_DUPLICATE"),
+            ("source_family_digest", source_family_digests, "BENCHMARK_SOURCE_FAMILY_DUPLICATE"),
+            ("profile_digest", profile_digests, "BENCHMARK_PROFILE_DUPLICATE"),
+            (
+                "job_description_digest",
+                job_description_digests,
+                "BENCHMARK_JOB_DESCRIPTION_DUPLICATE",
+            ),
             ("target_request_digest", request_digests, "BENCHMARK_TARGET_REQUEST_DUPLICATE"),
+            (
+                "research_handoff_digest",
+                research_digests,
+                "BENCHMARK_RESEARCH_HANDOFF_DUPLICATE",
+            ),
+            (
+                "baseline_output_digest",
+                baseline_output_digests,
+                "BENCHMARK_BASELINE_OUTPUT_DUPLICATE",
+            ),
             ("expected_output_digest", output_digests, "BENCHMARK_EXPECTED_OUTPUT_DUPLICATE"),
         ):
             digest = str(case.get(field) or "")

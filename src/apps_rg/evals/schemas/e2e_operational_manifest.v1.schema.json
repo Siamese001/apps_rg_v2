@@ -24,12 +24,13 @@
   "$defs": {
     "attempt": {
       "type": "object", "additionalProperties": false,
-      "required": ["attempt_id", "input_digest", "apps_research_to_u0", "runtime", "status", "stage_ledger", "failed_stage", "failure_code", "lanes", "operational", "document", "guardrails"],
+      "required": ["attempt_id", "input_digest", "apps_research_to_u0", "runtime", "status", "stage_ledger", "failed_stage", "failure_code", "abstained_stage", "abstention_code", "lanes", "operational", "document", "guardrails"],
       "properties": {
         "attempt_id": {"type": "string", "minLength": 1}, "input_digest": {"type": "string", "minLength": 1},
         "apps_research_to_u0": {"$ref": "#/$defs/handoff"}, "runtime": {"$ref": "#/$defs/runtime"},
-        "status": {"enum": ["COMPLETE", "FAILED"]}, "stage_ledger": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "status": {"enum": ["COMPLETE", "FAILED", "ABSTAINED"]}, "stage_ledger": {"type": "array", "minItems": 1, "items": {"type": "string"}},
         "failed_stage": {"type": ["string", "null"]}, "failure_code": {"type": ["string", "null"]},
+        "abstained_stage": {"type": ["string", "null"]}, "abstention_code": {"type": ["string", "null"]},
         "lanes": {"type": "array", "items": {"$ref": "#/$defs/lane"}}, "operational": {"$ref": "#/$defs/operational"},
         "document": {"$ref": "#/$defs/document"}, "guardrails": {"$ref": "#/$defs/guardrails"}
       }

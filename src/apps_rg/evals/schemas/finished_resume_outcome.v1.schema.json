@@ -44,7 +44,7 @@
     "evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "pair_count", "primary_review_count", "adjudication_count", "external_authority_receipt_sha256", "completed_review_receipt_digest", "utility_effect", "utility_ci_lower", "candidate_preference_count", "baseline_preference_count", "dimension_ci_lowers", "synthetic_grades_created"],
+      "required": ["status", "pair_count", "primary_review_count", "adjudication_count", "external_authority_receipt_sha256", "completed_review_receipt_digest", "utility_effect", "utility_ci_lower", "candidate_preference_count", "baseline_preference_count", "dimension_ci_lowers", "blind_review_ledger_path", "blind_review_ledger_file_sha256", "synthetic_grades_created"],
       "properties": {
         "status": {"enum": ["PENDING", "COMPLETE"]},
         "pair_count": {"type": "integer", "minimum": 0},
@@ -60,6 +60,8 @@
           "type": "object",
           "additionalProperties": {"type": "number"}
         },
+        "blind_review_ledger_path": {"type": "string"},
+        "blind_review_ledger_file_sha256": {"type": "string"},
         "synthetic_grades_created": {"const": false}
       }
     }

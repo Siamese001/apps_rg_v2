@@ -111,6 +111,23 @@ def _entry_errors(entry: Any) -> list[str]:
     return errors
 
 
+def _payload_authority_errors(payload: Mapping[str, Any], tier: str) -> list[str]:
+    if tier not in AUTHORITY_TIERS:
+        return ["RECEIPT_AUTHORITY_INVALID"]
+    authority = payload.get("authority")
+    if not isinstance(authority, Mapping):
+        return ["RECEIPT_PAYLOAD_AUTHORITY_MISSING"]
+    required_field = {
+        "technical_validation": "technical_validation",
+        "human_qualified": "human_qualified",
+        "release_authorized": "release_authorized",
+        "production_authorized": "production_authorized",
+    }[tier]
+    if authority.get(required_field) is not True:
+        return ["RECEIPT_PAYLOAD_AUTHORITY_INSUFFICIENT"]
+    return []
+
+
 def _read_entry(entry: Mapping[str, Any], *, catalog_root: Path) -> dict[str, Any]:
     result = {
         "entry_id": str(entry.get("entry_id") or ""),
@@ -170,6 +187,12 @@ def _read_entry(entry: Mapping[str, Any], *, catalog_root: Path) -> dict[str, An
             and regression.get("verdict") in {"pass", "not_compared"}
             else "FAIL"
         )
+        return result
+    authority_errors = _payload_authority_errors(
+        payload, str(entry.get("authority_tier") or "")
+    )
+    if authority_errors:
+        result["reasons"] = authority_errors
         return result
     status = payload.get("status")
     if status not in {"PASS", "FAIL", "UNKNOWN", "NOT_MEASURED"}:

@@ -40,6 +40,12 @@ def _authoritative_entry(
         {
             "schema_version": "fixture.authoritative_receipt.v1",
             "status": status,
+            "authority": {
+                "technical_validation": True,
+                "human_qualified": True,
+                "release_authorized": False,
+                "production_authorized": False,
+            },
         },
     )
     return {
@@ -182,6 +188,36 @@ def test_duplicate_stale_and_incompatible_receipts_are_blocked(tmp_path: Path) -
     )
     assert incompatible_summary["status"] == "BLOCKED"
     assert "AUTHORITATIVE_RECEIPT_SCOPE_INCOMPATIBLE" in incompatible_summary[
+        "blocking_reasons"
+    ]
+
+
+def test_catalog_cannot_relabel_a_technical_p1_or_p2_receipt_as_human_qualified(
+    tmp_path: Path,
+) -> None:
+    entries = [_authoritative_entry(tmp_path, kind) for kind in REQUIRED_RECEIPT_KINDS]
+    p1_entry = next(entry for entry in entries if entry["receipt_kind"] == "P1")
+    source = tmp_path / "P1.json"
+    _write_json(
+        source,
+        {
+            "schema_version": "fixture.authoritative_receipt.v1",
+            "status": "PASS",
+            "authority": {
+                "technical_validation": True,
+                "human_qualified": False,
+                "release_authorized": False,
+                "production_authorized": False,
+            },
+        },
+    )
+    p1_entry["expected_file_sha256"] = file_sha256(source)
+    catalog = _write_catalog(tmp_path, entries)
+
+    summary = build_qualification_summary(catalog)
+
+    assert summary["status"] == "BLOCKED"
+    assert "RECEIPT_PAYLOAD_AUTHORITY_INSUFFICIENT" in summary[
         "blocking_reasons"
     ]
 

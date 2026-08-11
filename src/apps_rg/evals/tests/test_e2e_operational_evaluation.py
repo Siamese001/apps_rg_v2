@@ -19,15 +19,20 @@ SCHEMA_PATH = EVALS_ROOT / "schemas" / "e2e_operational_manifest.v1.schema.json"
 
 def _attempt(identifier: str, cache_mode: str, status: str = "COMPLETE") -> dict[str, object]:
     complete = status == "COMPLETE"
+    failed = status == "FAILED"
+    abstained = status == "ABSTAINED"
+    terminal_stage = "U0"
     return {
         "attempt_id": identifier,
         "input_digest": f"sha256:input-{identifier}",
         "apps_research_to_u0": {"observed": True, "valid": True, "status": "PASS", "receipt_digest": f"sha256:handoff-{identifier}"},
         "runtime": {"provider": "provider", "model": "model", "configuration_digest": "sha256:runtime", "cache_mode": cache_mode},
         "status": status,
-        "stage_ledger": list(STAGES if complete else STAGES[:2]),
-        "failed_stage": None if complete else "U0",
-        "failure_code": None if complete else "U0_PROVIDER_TIMEOUT",
+        "stage_ledger": list(STAGES if complete else STAGES[: STAGES.index(terminal_stage) + 1]),
+        "failed_stage": terminal_stage if failed else None,
+        "failure_code": "U0_PROVIDER_TIMEOUT" if failed else None,
+        "abstained_stage": terminal_stage if abstained else None,
+        "abstention_code": "U0_INSUFFICIENT_EVIDENCE" if abstained else None,
         "lanes": [{"lane_id": lane, "status": "COMPLETE", "artifact_digest": f"sha256:{identifier}-{lane}"} for lane in runtime_lanes()] if complete else [],
         "operational": {"latency_ms": 100.0, "token_count": 1000, "provider_cost": 0.1, "retry_count": 0, "provider_error_count": 0},
         "document": {
@@ -77,6 +82,8 @@ def test_complete_source_bound_attempts_pass_technical_operational_contract(tmp_
     result = validate_e2e_operational_manifest(path)
     assert result["status"] == "PASS"
     assert result["operational_metrics"]["completion_rate"] == 1.0
+    assert result["operational_metrics"]["token_count_total"] == 6000.0
+    assert result["operational_metrics"]["retry_count_total"] == 0.0
     assert result["authority"]["release_authorizing"] is False
 
 
@@ -92,6 +99,42 @@ def test_failed_attempts_are_retained_in_completion_denominator(tmp_path: Path) 
     assert result["operational_metrics"]["attempt_count"] == 7
     assert result["operational_metrics"]["failed_attempt_count"] == 1
     assert result["operational_metrics"]["completion_rate"] == 6 / 7
+    assert result["operational_metrics"]["failed_stage_distribution"] == {"U0": 1}
+
+
+def test_abstained_attempts_are_retained_in_completion_denominator(tmp_path: Path) -> None:
+    manifest = _manifest()
+    attempts = manifest["attempts"]
+    assert isinstance(attempts, list)
+    attempts.append(_attempt("warm-abstained", "WARM", "ABSTAINED"))
+    path = tmp_path / "abstained.json"
+    _write(path, manifest)
+
+    result = validate_e2e_operational_manifest(path)
+
+    assert result["status"] == "PASS"
+    assert result["operational_metrics"]["eligible_attempt_count"] == 7
+    assert result["operational_metrics"]["abstained_attempt_count"] == 1
+    assert result["operational_metrics"]["completion_rate"] == 6 / 7
+    assert result["operational_metrics"]["abstained_stage_distribution"] == {
+        "U0": 1
+    }
+
+
+def test_abstained_attempt_requires_explicit_terminal_cause(tmp_path: Path) -> None:
+    manifest = _manifest()
+    attempts = manifest["attempts"]
+    assert isinstance(attempts, list)
+    abstained = _attempt("warm-abstained", "WARM", "ABSTAINED")
+    abstained["abstention_code"] = None
+    attempts.append(abstained)
+    path = tmp_path / "invalid-abstained.json"
+    _write(path, manifest)
+
+    result = validate_e2e_operational_manifest(path)
+
+    assert result["status"] == "BLOCKED"
+    assert "P2_ABSTAINED_ATTEMPT_CAUSE_INVALID" in result["blocking_reasons"]
 
 
 def test_invalid_handoff_and_critical_document_or_privacy_fail_closed(tmp_path: Path) -> None:

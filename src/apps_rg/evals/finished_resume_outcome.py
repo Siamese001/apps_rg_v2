@@ -5,8 +5,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping, Sequence
+
+from apps_rg.evals.whole_resume.p1_blind_utility import (
+    file_sha256 as review_ledger_file_sha256,
+    validate_p1_blind_review_ledger,
+)
 
 
 OUTCOME_VERSION = "apps_rg.finished_resume_outcome.v1"
@@ -44,6 +50,87 @@ def _load_outcome(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError("outcome manifest must be a JSON object")
     return value
+
+
+def _valid_digest(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == len("sha256:") + 64
+        and value.startswith("sha256:")
+        and all(character in "0123456789abcdef" for character in value[7:])
+    )
+
+
+def _review_ledger_errors(
+    evidence: Mapping[str, Any], *, outcome_path: Path
+) -> tuple[list[str], dict[str, Any]]:
+    reference = evidence.get("blind_review_ledger_path")
+    expected_file_digest = evidence.get("blind_review_ledger_file_sha256")
+    if not isinstance(reference, str) or not reference or not _valid_digest(
+        expected_file_digest
+    ):
+        return ["P1_BLIND_REVIEW_LEDGER_REFERENCE_REQUIRED"], {}
+    relative_path = Path(reference)
+    if relative_path.is_absolute():
+        return ["P1_BLIND_REVIEW_LEDGER_PATH_INVALID"], {}
+    root = outcome_path.parent.resolve()
+    ledger_path = (root / relative_path).resolve()
+    try:
+        ledger_path.relative_to(root)
+    except ValueError:
+        return ["P1_BLIND_REVIEW_LEDGER_PATH_INVALID"], {}
+    if ledger_path.is_symlink():
+        return ["P1_BLIND_REVIEW_LEDGER_SYMLINK_FORBIDDEN"], {}
+    try:
+        actual_file_digest = review_ledger_file_sha256(ledger_path)
+    except OSError:
+        return ["P1_BLIND_REVIEW_LEDGER_UNREADABLE"], {}
+    if actual_file_digest != expected_file_digest:
+        return ["P1_BLIND_REVIEW_LEDGER_STALE_OR_TAMPERED"], {}
+    ledger = validate_p1_blind_review_ledger(ledger_path)
+    if ledger.get("status") != "PASS":
+        return ["P1_BLIND_REVIEW_LEDGER_NOT_COMPLETE"], ledger
+    errors: list[str] = []
+    if evidence.get("completed_review_receipt_digest") != ledger.get("record_digest"):
+        errors.append("P1_COMPLETED_REVIEW_RECEIPT_MISMATCH")
+    for evidence_field, ledger_field, reason in (
+        ("pair_count", "pair_count", "P1_PAIR_DENOMINATOR_LEDGER_MISMATCH"),
+        (
+            "primary_review_count",
+            "primary_review_count",
+            "P1_PRIMARY_REVIEW_QUORUM_LEDGER_MISMATCH",
+        ),
+        (
+            "adjudication_count",
+            "adjudication_count",
+            "P1_ADJUDICATION_QUORUM_LEDGER_MISMATCH",
+        ),
+        (
+            "candidate_preference_count",
+            "candidate_preference_count",
+            "P1_CANDIDATE_PREFERENCE_LEDGER_MISMATCH",
+        ),
+        (
+            "baseline_preference_count",
+            "baseline_preference_count",
+            "P1_BASELINE_PREFERENCE_LEDGER_MISMATCH",
+        ),
+    ):
+        if evidence.get(evidence_field) != ledger.get(ledger_field):
+            errors.append(reason)
+    effect = evidence.get("utility_effect")
+    ledger_effect = ledger.get("candidate_preference_margin")
+    if (
+        isinstance(effect, (int, float))
+        and not isinstance(effect, bool)
+        and isinstance(ledger_effect, (int, float))
+        and not isinstance(ledger_effect, bool)
+        and not math.isclose(float(effect), float(ledger_effect), rel_tol=0.0, abs_tol=1e-12)
+    ):
+        errors.append("P1_UTILITY_EFFECT_LEDGER_MISMATCH")
+    if ledger.get("candidate_material_regression_count") not in (0, None):
+        errors.append("P1_BLIND_REVIEW_MATERIAL_REGRESSION")
+    return errors, ledger
 
 
 def validate_finished_resume_outcome(
@@ -112,6 +199,8 @@ def validate_finished_resume_outcome(
                 "candidate_preference_count",
                 "baseline_preference_count",
                 "dimension_ci_lowers",
+                "blind_review_ledger_path",
+                "blind_review_ledger_file_sha256",
             )
         ):
             blocking.add("P1_PENDING_EVIDENCE_MUST_BE_EMPTY")
@@ -128,9 +217,11 @@ def validate_finished_resume_outcome(
             blocking.add("P1_PRIMARY_REVIEW_QUORUM_INVALID")
         if not isinstance(adjudication_count, int) or adjudication_count != pair_count:
             blocking.add("P1_ADJUDICATION_QUORUM_INVALID")
-        if not str(evidence.get("external_authority_receipt_sha256") or "") or not str(
-            evidence.get("completed_review_receipt_digest") or ""
-        ):
+        review_ledger_errors, _ = _review_ledger_errors(
+            evidence, outcome_path=path
+        )
+        blocking.update(review_ledger_errors)
+        if not _valid_digest(evidence.get("external_authority_receipt_sha256")):
             not_measured.add("P1_EXTERNAL_HUMAN_AUTHORITY_RECEIPT_MISSING")
         effect = evidence.get("utility_effect")
         ci_lower = evidence.get("utility_ci_lower")

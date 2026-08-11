@@ -117,5 +117,26 @@ def test_false_pass_bound_and_synthetic_labels_fail_closed(tmp_path: Path) -> No
     ]
 
 
+def test_p1_and_p2_assemblers_cannot_escape_evaluator_validity_coverage(
+    tmp_path: Path,
+) -> None:
+    registry = _registry()
+    cards = registry["cards"]
+    assert isinstance(cards, list)
+    registry["cards"] = [
+        card
+        for card in cards
+        if isinstance(card, dict)
+        and card.get("grader_id") != "P2_PIPELINE_ATTEMPT_LEDGER"
+    ]
+    path = tmp_path / "missing-p2-assembler.json"
+    _write(path, registry)
+
+    result = validate_evaluator_registry(path)
+
+    assert result["status"] == "BLOCKED"
+    assert "EVALUATOR_REGISTRY_COVERAGE_INVALID" in result["blocking_reasons"]
+
+
 def test_wilson_bound_is_conservative_for_zero_observed_false_passes() -> None:
     assert wilson_upper_bound(errors=0, observations=400, confidence_level=0.95) > 0

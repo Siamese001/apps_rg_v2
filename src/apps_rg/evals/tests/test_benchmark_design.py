@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -17,22 +18,33 @@ EVALS_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = EVALS_ROOT / "schemas" / "benchmark_case_manifest.v1.schema.json"
 
 
+def _digest(value: str) -> str:
+    return "sha256:" + hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
 def _research_receipt(index: int) -> dict[str, object]:
     return {
         "schema_version": "apps_rg.apps_research_handoff_validation_receipt.v2",
         "observed": True,
         "valid": True,
         "status": "PASS",
-        "receipt_digest": f"sha256:research-{index}",
+        "receipt_digest": _digest(f"research-{index}"),
     }
 
 
 def _case(index: int, lane: str) -> dict[str, object]:
     return {
         "case_id": f"calibration-{index}",
-        "source_bundle_digest": f"sha256:source-{index}",
-        "target_request_digest": f"sha256:request-{index}",
-        "expected_output_digest": f"sha256:output-{index}",
+        "source_bundle_digest": _digest(f"source-{index}"),
+        "source_family_digest": _digest(f"source-family-{index}"),
+        "profile_digest": _digest(f"profile-{index}"),
+        "job_description_digest": _digest(f"job-description-{index}"),
+        "target_request_digest": _digest(f"request-{index}"),
+        "research_handoff_digest": _digest(f"research-{index}"),
+        "baseline_output_digest": _digest(f"baseline-{index}"),
+        "expected_output_digest": _digest(f"output-{index}"),
+        "prompt_configuration_digest": _digest("prompt-config"),
+        "runtime_configuration_digest": _digest("runtime-config"),
         "lanes": [lane],
         "role_family": "executive_leadership" if index % 2 else "technical_leadership",
         "employer": f"employer-{index}",
@@ -146,6 +158,26 @@ def test_duplicate_requests_and_exposed_holdout_identities_fail_closed(tmp_path:
     exposed_summary = validate_benchmark_manifest(exposed_path)
     assert exposed_summary["status"] == "BLOCKED"
     assert "HOLDOUT_IDENTITIES_EXPOSED_TO_DEVELOPMENT" in exposed_summary[
+        "blocking_reasons"
+    ]
+
+
+def test_source_profile_job_and_research_identities_are_complete_and_distinct(
+    tmp_path: Path,
+) -> None:
+    duplicate = _manifest()
+    cases = duplicate["calibration_cases"]
+    assert isinstance(cases, list)
+    cases[1]["profile_digest"] = cases[0]["profile_digest"]
+    cases[2]["research_handoff_digest"] = _digest("different-research")
+    path = tmp_path / "identity-errors.json"
+    _write_manifest(path, duplicate)
+
+    result = validate_benchmark_manifest(path)
+
+    assert result["status"] == "BLOCKED"
+    assert "BENCHMARK_PROFILE_DUPLICATE" in result["blocking_reasons"]
+    assert "BENCHMARK_CASE_RESEARCH_HANDOFF_DIGEST_MISMATCH" in result[
         "blocking_reasons"
     ]
 

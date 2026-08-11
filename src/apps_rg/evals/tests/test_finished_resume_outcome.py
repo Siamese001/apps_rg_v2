@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -10,6 +11,14 @@ from apps_rg.evals.finished_resume_outcome import (
     GUARDRAIL_DIMENSIONS,
     runtime_lanes,
     validate_finished_resume_outcome,
+)
+from apps_rg.evals.whole_resume.p1_blind_utility import (
+    LEDGER_VERSION,
+    P1_DIMENSIONS,
+    canonical_digest as review_canonical_digest,
+    current_source_identity,
+    file_sha256 as review_file_sha256,
+    validate_p1_blind_review_ledger,
 )
 
 
@@ -47,6 +56,8 @@ def _outcome() -> dict[str, object]:
             "dimension_ci_lowers": {
                 dimension: -0.05 for dimension in GUARDRAIL_DIMENSIONS
             },
+            "blind_review_ledger_path": "",
+            "blind_review_ledger_file_sha256": "",
             "synthetic_grades_created": False,
         },
         "owner_solo_status": "PRESENT_COMPLEMENTARY",
@@ -55,6 +66,126 @@ def _outcome() -> dict[str, object]:
 
 def _write(path: Path, payload: dict[str, object]) -> None:
     path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+
+
+def _digest(value: str) -> str:
+    return "sha256:" + hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _sealed_review(payload: dict[str, object]) -> dict[str, object]:
+    payload["record_digest"] = review_canonical_digest(payload)
+    return payload
+
+
+def _review_ledger_pair(pair_id: str, preference: str) -> dict[str, object]:
+    packet_digest = _digest(f"packet-{pair_id}")
+    reviews = [
+        _sealed_review(
+            {
+                "review_id": f"{pair_id}-review-a",
+                "reviewer_identity_digest": _digest(f"reviewer-a-{pair_id}"),
+                "submitted_at": "2026-08-11T12:00:00+00:00",
+                "review_packet_digest": packet_digest,
+                "blind_preference": "A",
+                "rationale": "Independent blinded review rationale.",
+                "source_locator": f"packet://{pair_id}/review-a",
+                "independent_review": True,
+            }
+        ),
+        _sealed_review(
+            {
+                "review_id": f"{pair_id}-review-b",
+                "reviewer_identity_digest": _digest(f"reviewer-b-{pair_id}"),
+                "submitted_at": "2026-08-11T12:05:00+00:00",
+                "review_packet_digest": packet_digest,
+                "blind_preference": "B",
+                "rationale": "Independent blinded review rationale.",
+                "source_locator": f"packet://{pair_id}/review-b",
+                "independent_review": True,
+            }
+        ),
+    ]
+    adjudication = _sealed_review(
+        {
+            "adjudication_id": f"{pair_id}-adjudication",
+            "adjudicator_identity_digest": _digest(f"adjudicator-{pair_id}"),
+            "submitted_at": "2026-08-11T13:00:00+00:00",
+            "review_packet_digest": packet_digest,
+            "primary_review_ids": [review["review_id"] for review in reviews],
+            "primary_review_record_digests": [
+                review["record_digest"] for review in reviews
+            ],
+            "resolved_preference": preference,
+            "candidate_material_regression": False,
+            "dimension_deltas": {dimension: 0.1 for dimension in P1_DIMENSIONS},
+            "rationale": "Independent adjudication rationale.",
+            "source_locator": f"packet://{pair_id}/adjudication",
+        }
+    )
+    return {
+        "pair_id": pair_id,
+        "source_attempt_id": f"attempt-{pair_id}",
+        "source_attempt_record_digest": _digest(f"attempt-{pair_id}"),
+        "input_digest": _digest(f"input-{pair_id}"),
+        "baseline_output_digest": _digest(f"baseline-{pair_id}"),
+        "candidate_output_digest": _digest(f"candidate-{pair_id}"),
+        "review_packet_digest": packet_digest,
+        "slice_values": {
+            "role_family": "strategy",
+            "target_company": "target",
+            "document_format": "pdf-docx",
+        },
+        "primary_reviews": reviews,
+        "adjudication": adjudication,
+    }
+
+
+def _complete_outcome(
+    tmp_path: Path, preferences: tuple[str, ...] = ("CANDIDATE", "CANDIDATE", "BASELINE")
+) -> dict[str, object]:
+    pair_ids = [f"pair-{index}" for index in range(len(preferences))]
+    ledger = {
+        "schema_version": LEDGER_VERSION,
+        "evaluation_id": "p1-outcome-test-ledger",
+        "source_identity": current_source_identity(),
+        "cohort": {
+            "status": "FROZEN",
+            "cohort_id": "p1-test-cohort",
+            "data_split": "calibration",
+            "frozen_pair_ids": pair_ids,
+            "frozen_pair_ids_digest": review_canonical_digest(pair_ids),
+            "baseline_policy_digest": _digest("baseline-policy"),
+            "blind_mapping_receipt_digest": _digest("blind-map"),
+        },
+        "synthetic_grades_created": False,
+        "pairs": [
+            _review_ledger_pair(pair_id, preference)
+            for pair_id, preference in zip(pair_ids, preferences)
+        ],
+    }
+    ledger_path = tmp_path / "review-ledger.json"
+    _write(ledger_path, ledger)
+    ledger_summary = validate_p1_blind_review_ledger(ledger_path)
+    assert ledger_summary["status"] == "PASS"
+    outcome = _outcome()
+    evidence = outcome["p1_evidence"]
+    assert isinstance(evidence, dict)
+    evidence["pair_count"] = ledger_summary["pair_count"]
+    evidence["primary_review_count"] = ledger_summary["primary_review_count"]
+    evidence["adjudication_count"] = ledger_summary["adjudication_count"]
+    evidence["external_authority_receipt_sha256"] = _digest("human-authority")
+    evidence["completed_review_receipt_digest"] = ledger_summary["record_digest"]
+    evidence["utility_effect"] = ledger_summary["candidate_preference_margin"]
+    evidence["utility_ci_lower"] = 0.01
+    evidence["candidate_preference_count"] = ledger_summary[
+        "candidate_preference_count"
+    ]
+    evidence["baseline_preference_count"] = ledger_summary[
+        "baseline_preference_count"
+    ]
+    evidence["blind_review_ledger_path"] = ledger_path.name
+    evidence["blind_review_ledger_file_sha256"] = review_file_sha256(ledger_path)
+    return outcome
 
 
 def test_schema_is_valid_and_tracked_p1_outcome_is_not_measured() -> None:
@@ -74,7 +205,7 @@ def test_schema_is_valid_and_tracked_p1_outcome_is_not_measured() -> None:
 
 def test_complete_summary_must_cover_all_lanes_and_strictly_pass_p1(tmp_path: Path) -> None:
     path = tmp_path / "p1.json"
-    _write(path, _outcome())
+    _write(path, _complete_outcome(tmp_path))
 
     result = validate_finished_resume_outcome(path)
 
@@ -87,13 +218,9 @@ def test_complete_summary_must_cover_all_lanes_and_strictly_pass_p1(tmp_path: Pa
 def test_tie_and_noninferiority_regression_fail_p1_without_becoming_authority(
     tmp_path: Path,
 ) -> None:
-    tie = _outcome()
+    tie = _complete_outcome(tmp_path, ("CANDIDATE", "BASELINE", "TIE"))
     evidence = tie["p1_evidence"]
     assert isinstance(evidence, dict)
-    evidence["utility_effect"] = 0.0
-    evidence["utility_ci_lower"] = 0.0
-    evidence["candidate_preference_count"] = 4
-    evidence["baseline_preference_count"] = 4
     path = tmp_path / "tie.json"
     _write(path, tie)
 
@@ -103,7 +230,7 @@ def test_tie_and_noninferiority_regression_fail_p1_without_becoming_authority(
         "failure_reasons"
     ]
 
-    regression = _outcome()
+    regression = _complete_outcome(tmp_path)
     regression_evidence = regression["p1_evidence"]
     assert isinstance(regression_evidence, dict)
     dimensions = regression_evidence["dimension_ci_lowers"]
@@ -119,7 +246,7 @@ def test_tie_and_noninferiority_regression_fail_p1_without_becoming_authority(
 
 
 def test_synthetic_grades_or_wrong_lane_coverage_block_w4(tmp_path: Path) -> None:
-    synthetic = _outcome()
+    synthetic = _complete_outcome(tmp_path)
     evidence = synthetic["p1_evidence"]
     assert isinstance(evidence, dict)
     evidence["synthetic_grades_created"] = True
@@ -129,7 +256,7 @@ def test_synthetic_grades_or_wrong_lane_coverage_block_w4(tmp_path: Path) -> Non
     assert synthetic_result["status"] == "BLOCKED"
     assert "P1_SYNTHETIC_GRADES_FORBIDDEN" in synthetic_result["blocking_reasons"]
 
-    incomplete = _outcome()
+    incomplete = _complete_outcome(tmp_path)
     lanes = incomplete["required_lanes"]
     assert isinstance(lanes, list)
     lanes.pop()
@@ -138,3 +265,21 @@ def test_synthetic_grades_or_wrong_lane_coverage_block_w4(tmp_path: Path) -> Non
     incomplete_result = validate_finished_resume_outcome(incomplete_path)
     assert incomplete_result["status"] == "BLOCKED"
     assert "P1_ALL_RUNTIME_LANES_REQUIRED" in incomplete_result["blocking_reasons"]
+
+
+def test_aggregate_p1_counts_must_match_the_source_bound_blind_review_ledger(
+    tmp_path: Path,
+) -> None:
+    outcome = _complete_outcome(tmp_path)
+    evidence = outcome["p1_evidence"]
+    assert isinstance(evidence, dict)
+    evidence["candidate_preference_count"] = 99
+    path = tmp_path / "mismatched-ledger.json"
+    _write(path, outcome)
+
+    result = validate_finished_resume_outcome(path)
+
+    assert result["status"] == "BLOCKED"
+    assert "P1_CANDIDATE_PREFERENCE_LEDGER_MISMATCH" in result[
+        "blocking_reasons"
+    ]
