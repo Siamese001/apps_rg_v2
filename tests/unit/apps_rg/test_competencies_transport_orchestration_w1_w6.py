@@ -346,6 +346,61 @@ def test_w3_no_hardcoded_60s_selector_timeout():
 # --------------------------------------------------------------------------------------------------
 # W4 — per-path progress receipts
 # --------------------------------------------------------------------------------------------------
+def test_live_path_cap_prevents_explicit_and_appended_path_fanout(tmp_path, monkeypatch):
+    import apps_rg.runtime.reasoning.bullet_lane_self_consistency as scmod
+    from apps_rg.runtime.providers.provider_contract import ProviderResult
+
+    monkeypatch.setenv("APPS_RG_SELF_CONSISTENCY_PATH_CAP", "1")
+    monkeypatch.setenv("APPS_RG_COMPETENCIES_SC_PARALLEL", "0")
+    calls: list[float | None] = []
+
+    def fake_call(
+        _profile,
+        _payload,
+        *,
+        artifact_dir=None,
+        run_id=None,
+        temperature_override=None,
+        token_budget=None,
+    ):
+        calls.append(temperature_override)
+        return ProviderResult(
+            provider_requested="external_claude",
+            provider_attempted=True,
+            provider_available=True,
+            exact_provider_error=None,
+            runtime_generation_status="REAL_LLM",
+            model="m",
+            raw_model_output='{"competencies":[],"claim_ledger":[]}',
+            provider_response={},
+        )
+
+    monkeypatch.setattr(scmod, "call_section_model_provider", fake_call)
+    common = {
+        "section_lane": "competencies",
+        "provider_payload": {"messages": [{"role": "user", "content": "x"}]},
+        "parse_model_json": lambda raw: (json.loads(raw), ""),
+        "artifact_dir": tmp_path,
+        "run_id": "run-live-cap",
+    }
+
+    initial, _ = scmod.run_provider_self_consistency_paths(
+        **common,
+        path_count=4,
+    )
+    appended, last = scmod.run_provider_self_consistency_paths(
+        **common,
+        path_count=4,
+        path_index_start=1,
+        append_artifacts=True,
+    )
+
+    assert len(initial) == 1
+    assert appended == []
+    assert last is None
+    assert len(calls) == 1
+
+
 def test_w4_progress_receipt_written_before_first_path_completes(tmp_path, monkeypatch):
     import apps_rg.runtime.reasoning.bullet_lane_self_consistency as scmod
     from apps_rg.runtime.providers.provider_contract import ProviderResult

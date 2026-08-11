@@ -271,6 +271,22 @@ def test_self_consistency_path_count_for_competencies() -> None:
     assert self_consistency_path_count("competencies") == 4
 
 
+def test_live_path_cap_bounds_every_lane(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("APPS_RG_SELF_CONSISTENCY_PATH_CAP", "1")
+
+    for lane in (
+        "competencies",
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets",
+        "unify_narrative",
+        "executive_summary",
+    ):
+        assert self_consistency_path_count(lane) == 1
+        assert max_sc_path_count_for_lane(lane) == 1
+
+
 def test_employment_bullet_path_counts() -> None:
     # Variance-class alignment (2026-06): wider Unify/IBM lanes start at 2 and adapt
     # to 4 only if selector slot coverage or min score fails; role-episode lanes stay 2.

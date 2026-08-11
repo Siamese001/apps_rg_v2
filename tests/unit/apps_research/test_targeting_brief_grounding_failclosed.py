@@ -287,6 +287,25 @@ def test_apps_rg_x2_judge_retries_transient_service_unavailable_once() -> None:
     assert x2_judge_receipt_passes(receipt)
 
 
+def test_apps_rg_x2_judge_live_cap_stops_retryable_failure(monkeypatch) -> None:
+    monkeypatch.setenv("APPS_RG_HANDOFF_X2_MAX_ATTEMPTS", "1")
+    judge = _FlakySerializationJudge()
+
+    receipt = run_apps_rg_handoff_x2_judge(
+        brief_text=_VALID_MD,
+        jd_text="Lead partner architecture.",
+        research_notes="Acme has verified partner motion.",
+        source_register=[{"family": "overview", "has_content": True}],
+        judge=judge,
+    )
+
+    assert judge.calls == 1
+    assert receipt["status"] == "FAIL"
+    assert receipt["attempt_count"] == 1
+    assert receipt["retry_count"] == 0
+    assert receipt["retryable_provider_error"] is True
+
+
 def test_apps_rg_x2_judge_does_not_retry_semantic_fail() -> None:
     judge = _SemanticFailJudge()
 

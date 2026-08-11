@@ -32,7 +32,6 @@ from apps_rg.runtime.reasoning.competencies_graph_pool import (
     COMPETENCIES_MIN_CATEGORY_COUNT,
     e2e_closeout_mode_active,
     evaluate_competencies_selection_quality,
-    competencies_max_sc_path_count,
     high_signal_competencies_selection_score,
     max_competencies_regen_rounds,
     min_competencies_selection_score,
@@ -508,7 +507,7 @@ def _generate_competencies_graph_pool_lane(
     # answer "did it die on a generation path or on the selector?" without console guessing.
     phase_timings: list[dict[str, Any]] = []
     stop_reason = ""
-    max_paths = competencies_max_sc_path_count()
+    max_paths = max_sc_path_count_for_lane(section_lane)
 
     while True:
         requested_batch = (

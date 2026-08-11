@@ -84,6 +84,20 @@ _RETRYABLE_JUDGE_TRANSPORT_MARKERS = (
     "temporarily unavailable",
     "gateway timeout",
 )
+
+
+def _apps_rg_handoff_x2_max_attempts() -> int:
+    """Allow a bounded live validation to fail closed without a second judge call."""
+
+    raw = os.environ.get("APPS_RG_HANDOFF_X2_MAX_ATTEMPTS", "").strip()
+    if not raw:
+        return APPS_RG_HANDOFF_X2_MAX_ATTEMPTS
+    try:
+        return max(1, min(APPS_RG_HANDOFF_X2_MAX_ATTEMPTS, int(raw)))
+    except ValueError:
+        return APPS_RG_HANDOFF_X2_MAX_ATTEMPTS
+
+
 _APPS_RG_TARGETING_X2_PROMPT_VERSION = "apps_research.apps_rg_targeting_x2.v2"
 _TARGETING_BRIEF_ADVERSARIAL_DIRECTIVE_PATTERNS = (
     re.compile(
@@ -590,13 +604,14 @@ def run_apps_rg_handoff_x2_judge(
     response = None
     attempt = 0
     retryable_error = False
-    for attempt in range(1, APPS_RG_HANDOFF_X2_MAX_ATTEMPTS + 1):
+    max_attempts = _apps_rg_handoff_x2_max_attempts()
+    for attempt in range(1, max_attempts + 1):
         try:
             response = resolved_judge.judge(dimension, context)
             break
         except (GraderError, TimeoutError, KeyError, ValueError, RuntimeError, OSError) as exc:
             retryable_error = _retryable_judge_serialization_error(exc)
-            if retryable_error and attempt < APPS_RG_HANDOFF_X2_MAX_ATTEMPTS:
+            if retryable_error and attempt < max_attempts:
                 continue
             return {
                 **base,

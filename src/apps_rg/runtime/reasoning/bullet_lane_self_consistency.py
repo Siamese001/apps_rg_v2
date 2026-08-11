@@ -26,6 +26,7 @@ from apps_rg.runtime.reasoning.employment_bullet_pool import (
     adaptive_sc_enabled_for_lane,
     max_sc_path_count_for_lane,
     sc_path_count_for_lane,
+    self_consistency_path_cap,
 )
 from apps_rg.runtime.reasoning.section_reasoning_intensity import (
     profile_to_requested_kw,
@@ -385,7 +386,16 @@ def run_provider_self_consistency_paths(
     """Run N completions at staggered temperatures; return all paths + last provider result."""
     prof_kw = profile_to_requested_kw(section_reasoning_profile(section_lane))
     base = float(base_temperature if base_temperature is not None else prof_kw["temperature"])
-    n_paths = path_count if path_count is not None else self_consistency_path_count(section_lane)
+    requested_paths = (
+        path_count if path_count is not None else self_consistency_path_count(section_lane)
+    )
+    n_paths = max(1, int(requested_paths))
+    cap = self_consistency_path_cap()
+    if cap is not None:
+        remaining = cap - max(0, int(path_index_start))
+        if remaining <= 0:
+            return [], None
+        n_paths = min(n_paths, remaining)
     temps = temperature_ladder(base, n_paths, bounds=temperature_bounds)
 
     paths: list[SelfConsistencyPath] = []

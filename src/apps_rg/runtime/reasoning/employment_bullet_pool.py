@@ -15,6 +15,7 @@ from apps_rg.runtime.judges.employment_bullet_judge_rubric import (
 from apps_rg.runtime.reasoning.competencies_graph_pool import (
     COMPETENCIES_SC_PATH_COUNT,
     competencies_initial_sc_path_count,
+    competencies_max_sc_path_count,
 )
 from apps_rg.runtime.section_execution_plan import (
     BULLET_LANES,
@@ -122,22 +123,43 @@ def is_employment_bullet_lane(section_lane: str) -> bool:
     return str(section_lane or "").strip().lower() in EMPLOYMENT_BULLET_LANES
 
 
+def self_consistency_path_cap() -> int | None:
+    """Optional operator ceiling across every provider self-consistency lane."""
+
+    raw = os.environ.get("APPS_RG_SELF_CONSISTENCY_PATH_CAP", "").strip()
+    if not raw:
+        return None
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return None
+
+
+def _apply_self_consistency_path_cap(requested: int) -> int:
+    cap = self_consistency_path_cap()
+    return min(requested, cap) if cap is not None else requested
+
+
 def sc_path_count_for_lane(section_lane: str) -> int:
     lane = str(section_lane or "").strip().lower()
     if lane in SC_PATH_COUNT_BY_LANE:
-        return SC_PATH_COUNT_BY_LANE[lane]
-    if lane == "competencies":
-        return competencies_initial_sc_path_count()
-    from apps_rg.runtime.reasoning.section_reasoning_intensity import (
-        profile_to_requested_kw,
-        section_reasoning_profile,
-    )
+        requested = SC_PATH_COUNT_BY_LANE[lane]
+    elif lane == "competencies":
+        requested = competencies_initial_sc_path_count()
+    else:
+        from apps_rg.runtime.reasoning.section_reasoning_intensity import (
+            profile_to_requested_kw,
+            section_reasoning_profile,
+        )
 
-    raw = profile_to_requested_kw(section_reasoning_profile(lane)).get("self_consistency_samples", 1.0)
-    try:
-        return max(1, int(float(raw)))
-    except (TypeError, ValueError):
-        return 1
+        raw = profile_to_requested_kw(section_reasoning_profile(lane)).get(
+            "self_consistency_samples", 1.0
+        )
+        try:
+            requested = max(1, int(float(raw)))
+        except (TypeError, ValueError):
+            requested = 1
+    return _apply_self_consistency_path_cap(requested)
 
 
 def adaptive_sc_enabled_for_lane(section_lane: str) -> bool:
@@ -148,8 +170,12 @@ def adaptive_sc_enabled_for_lane(section_lane: str) -> bool:
 def max_sc_path_count_for_lane(section_lane: str) -> int:
     lane = str(section_lane or "").strip().lower()
     if lane in MAX_SC_PATH_COUNT_BY_LANE:
-        return MAX_SC_PATH_COUNT_BY_LANE[lane]
-    return sc_path_count_for_lane(lane)
+        requested = MAX_SC_PATH_COUNT_BY_LANE[lane]
+    elif lane == "competencies":
+        requested = competencies_max_sc_path_count()
+    else:
+        requested = sc_path_count_for_lane(lane)
+    return _apply_self_consistency_path_cap(requested)
 
 
 def regen_extra_path_count_for_lane(section_lane: str) -> int:
