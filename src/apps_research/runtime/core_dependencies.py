@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from agentic_core.config.model_catalog import (
+from apps_rg.runtime.apps_runtime_compat import (
     BGE_M3_EMBEDDING_DIMENSION,
     BGE_M3_MODEL_ID,
 )
 
 try:
-    from agentic_core.mixins.embedding_mixin import EmbeddingMixin
+    from apps_rg.mixins.embedding_mixin import EmbeddingMixin
 except ImportError:
 
     class EmbeddingMixin:  # type: ignore[no-redef]
@@ -16,7 +16,7 @@ except ImportError:
 
 
 try:
-    from agentic_core.mixins.semantic_cache_mixin import SemanticCacheMixin
+    from apps_rg.mixins.semantic_cache_mixin import SemanticCacheMixin
 except ImportError:  # guardian: allow-silent-swallow -- optional dependency
 
     class SemanticCacheMixin:  # type: ignore[no-redef]
@@ -26,7 +26,7 @@ except ImportError:  # guardian: allow-silent-swallow -- optional dependency
 def resolve_embedding_device() -> str:
     """Resolve the core-owned default only after app-level overrides."""
 
-    from agentic_core.embeddings.bge_runtime import _resolve_device
+    from apps_rg.embeddings.bge_runtime import _resolve_device
 
     return _resolve_device()
 

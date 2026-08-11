@@ -53,8 +53,8 @@ def test_third_party_normalization_keeps_redis_pending_behavioral_reachability(t
         },
     )
     (tmp_path / "apps_rg").mkdir()
-    (tmp_path / "agentic_core" / "cache").mkdir(parents=True)
-    (tmp_path / "agentic_core" / "cache" / "redis_cache_client.py").write_text("import redis\n", encoding="utf-8")
+    (tmp_path / "apps_rg" / "cache").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "apps_rg" / "cache" / "redis_cache_client.py").write_text("import redis\n", encoding="utf-8")
 
     reconciliation = third_party_package_reconciliation(tmp_path)
     redis = next(row for row in reconciliation["records"] if row["package_root"] == "redis")
@@ -64,8 +64,7 @@ def test_third_party_normalization_keeps_redis_pending_behavioral_reachability(t
     assert redis["target_dependency_decision"] == "UNDECIDED_PENDING_BEHAVIORAL_REACHABILITY"
     assert redis["complete_first_import_chain"] == [
         "apps_rg.__main__",
-        "agentic_core.L2_execution.utils.write_gateway",
-        "agentic_core.__init__",
-        "agentic_core.cache.redis_cache_client",
+        "apps_rg.runtime.orchestration.canonical_dispatch",
+        "apps_rg.cache.redis_cache_client",
         "redis",
     ]

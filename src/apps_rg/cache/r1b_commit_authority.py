@@ -91,7 +91,7 @@ def compute_r1b_commit_request_signature(
     l5_packet_digest: str = "",
     l5_verification_digest: str = "",
 ) -> str:
-    from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
+    from apps_rg.runtime.local_state import compute_deterministic_digest
 
     return compute_deterministic_digest(
         {

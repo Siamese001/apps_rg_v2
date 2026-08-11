@@ -1,0 +1,248 @@
+{
+  "section_id": "headline",
+  "run_id": "headline_20260811_101951",
+  "gate_id": "x2_resume_graph_claim_binding",
+  "trigger_arm": "graph_claim_binding",
+  "trigger": {
+    "required_families": [
+      "runtime_governance",
+      "regulated_ai_systems"
+    ],
+    "specificity_floor": 2,
+    "families_matched_pre": {
+      "governance_signal": [
+        "runtime_governance",
+        "regulated_ai_systems"
+      ],
+      "specificity_floor": [
+        "runtime_governance",
+        "regulated_ai_systems",
+        "partner_applied_ai_architecture"
+      ],
+      "narrowing_labels": [],
+      "segments_missing_executive_abstraction": [],
+      "literal_grounding": {
+        "segments": [
+          {
+            "segment": "Alliance Co-Sell Modernization",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_devsecops_release_resilience"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [
+                  "alliance",
+                  "co-sell"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_devsecops_release_resilience",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "alliance",
+              "co-sell"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Regulated Modernization Delivery",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_devsecops_release_resilience"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_devsecops_release_resilience",
+                "shared_tokens": [
+                  "regulated"
+                ],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "regulated"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Runtime Security Governance",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_devsecops_release_resilience"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_devsecops_release_resilience",
+                "shared_tokens": [
+                  "security"
+                ],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "security"
+            ],
+            "majority_grounded": true
+          }
+        ],
+        "checked": 3
+      },
+      "resume_native_clarity": {
+        "pass": true,
+        "shape_valid": true,
+        "opaque_segments": [],
+        "semantic_overlap_issues": [],
+        "segment_observations": [
+          {
+            "segment": "Alliance Co-Sell Modernization",
+            "word_count": 3,
+            "familiar_positioning_phrases": [],
+            "pass": true
+          },
+          {
+            "segment": "Regulated Modernization Delivery",
+            "word_count": 3,
+            "familiar_positioning_phrases": [],
+            "pass": true
+          },
+          {
+            "segment": "Runtime Security Governance",
+            "word_count": 3,
+            "familiar_positioning_phrases": [],
+            "pass": true
+          }
+        ]
+      },
+      "resume_graph_claim_binding": {
+        "gate_id": "x2_resume_graph_claim_binding",
+        "gate_type": "deterministic_graph_authority_pre_x2",
+        "pass": false,
+        "observed_value": {
+          "allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+          "claim_count": 3,
+          "allocation_assignment_count": 3,
+          "failure_reasons": [
+            "orphan_allocation_claim_units:headline:skill:03"
+          ]
+        },
+        "threshold": {
+          "binding_failures": 0,
+          "orphan_allocations": 0
+        },
+        "failure_reason": "resume_graph_claim_binding_failed",
+        "evidence_ref": "selected_fact_plan.json#allocation_assignments"
+      },
+      "unbound_graph_allocations": [
+        {
+          "claim_unit_id": "headline:skill:03",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "skill_id": "skill_partner_partner_led_ai_solutions",
+          "root_claim_text": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+          "root_claim_outcome": "Frame as AI partnerships / co-sell channel leadership; metrics only from graph-selected Unify facts (fact_partnerships_gtm_001, fact_sales_accounts_004/005)."
+        }
+      ]
+    },
+    "headline_pre": "SVP Engineering | Alliance Co-Sell Modernization | Regulated Modernization Delivery | Runtime Security Governance"
+  },
+  "attempted": true,
+  "regen_call_made": true,
+  "accepted": false,
+  "headline_post": "SVP Engineering | Alliance Co-Sell Modernization | Regulated Modernization Delivery | Runtime Security Governance",
+  "families_matched_post": {
+    "governance_signal": [],
+    "specificity_floor": [],
+    "narrowing_labels": [],
+    "segments_missing_executive_abstraction": [],
+    "literal_grounding": {},
+    "resume_native_clarity": {},
+    "resume_graph_claim_binding": {}
+  },
+  "rejected_reason": "graph_claim_binding_still_missing",
+  "bounded": {
+    "max_attempts": 3,
+    "attempts_used": 3
+  },
+  "env_kill_switch_state": "unset",
+  "attempts": [
+    {
+      "attempt": 1,
+      "headline": "SVP Engineering | Co-Sell Channel Alliance | Regulated Modernization Delivery | Runtime Security Governance",
+      "trigger_arm": "graph_claim_binding",
+      "trigger_reason": "x2_resume_graph_claim_binding:orphan_allocation",
+      "rejected_reason": "graph_claim_binding_still_missing",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_claude",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "claude-sonnet-5",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_1.json"
+      }
+    },
+    {
+      "attempt": 2,
+      "headline": "SVP Engineering | Alliance Co-Sell Execution | Regulated Modernization Delivery | Runtime Security Governance",
+      "trigger_arm": "graph_claim_binding",
+      "trigger_reason": "x2_resume_graph_claim_binding:orphan_allocation",
+      "rejected_reason": "graph_claim_binding_still_missing",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_claude",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "claude-sonnet-5",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_2.json"
+      }
+    },
+    {
+      "attempt": 3,
+      "headline": "SVP Engineering | Partner Alliance GTM | Regulated Modernization Delivery | Runtime Security Governance",
+      "trigger_arm": "graph_claim_binding",
+      "trigger_reason": "x2_resume_graph_claim_binding:orphan_allocation",
+      "rejected_reason": "graph_claim_binding_still_missing",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_claude",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "claude-sonnet-5",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_3.json"
+      }
+    }
+  ],
+  "regen_provider_result": {
+    "runtime_generation_status": "REAL_LLM",
+    "provider_requested": "external_claude",
+    "provider_attempted": true,
+    "provider_available": true,
+    "model": "claude-sonnet-5",
+    "exact_provider_error": "",
+    "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_3.json"
+  },
+  "regen_provider_response_ref": "headline_content_signal_repair_provider_response_attempt_3.json"
+}

@@ -161,7 +161,7 @@ def _emit_lane_dir(repo_root: Path, lane_key: str) -> dict[str, str]:
         json.dumps(
             {
                 "producer_component": (
-                    "agentic_core.runtime.entrypoints."
+                    "apps_rg.runtime.entrypoints."
                     "integrated_single_action_spine_run"
                 ),
                 "artifact_hash": _digest(core_payload),

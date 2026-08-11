@@ -52,7 +52,7 @@ def record_blocked_direct_r1b_write(
     run_id: str | None = None,
 ) -> dict[str, Any]:
     """Emit a UWG blocked-direct-write receipt (proof fixture helper)."""
-    from agentic_core.L4_state.uwg.durable_write_gateway import DurableWriteGateway
+    from apps_rg.runtime.local_state import DurableWriteGateway
 
     gw = DurableWriteGateway()
     receipt = gw.reject_direct_write(

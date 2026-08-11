@@ -10,8 +10,8 @@ from typing import Any
 import pytest
 import yaml
 
-from agentic_core.L0_routing.u0_intake_validator import AuthorityValidationReceipt
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
+from apps_rg_runtime.L0_routing.u0_intake_validator import AuthorityValidationReceipt
+from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
 
 from apps_rg.repository_layout import apps_rg_package_root, repository_root, resolve_apps_rg_path
 from apps_rg.runtime.bindings.briefing_u0_signals import BriefingMissingError

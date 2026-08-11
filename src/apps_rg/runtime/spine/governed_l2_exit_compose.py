@@ -177,8 +177,8 @@ def governed_exit_finalize_integrated(
     approved_judge_calibration_baseline_ref: str = "",
     app_domain_store: Any = None,
 ) -> GovernedIntegratedExitBundle:
-    """Integrated Exit — apps_rg gates + ExitEvalPipeline + RuntimeExhaustBundle."""
-    from agentic_core.L3_orchestration.exit_eval.v6.pipeline import ExitEvalPipeline
+    """Integrated Exit — Apps RG gates, disposition adapter, and exhaust bundle."""
+    from apps_rg.runtime.local_exit import ExitEvalPipeline
     from apps_rg.runtime.bindings.exit_binding import (
         _exit_finalize_apps_rg_impl,
         build_exhaust_bundle_from_exit,

@@ -12,7 +12,7 @@
     - "calibration://apps_rg/executive_positioning/pending-human-semantic-v1"
   judge_policies:
     "rg::executive_positioning_judge::v1":
-      judge_implementation_ref: "agentic_core.runtime.judges.resume_judges.executive_positioning:ExecutivePositioningJudge"
+      judge_implementation_ref: "apps_rg.runtime.judges.resume_judges.executive_positioning:ExecutivePositioningJudge"
       provider_profile_ref: "openai_chatgpt"
       rubric_path: "apps_rg/config/domain_contract/judges/executive_positioning_rubric.txt"
       informational_only: true

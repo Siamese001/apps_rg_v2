@@ -252,14 +252,14 @@ def build_ge_w3_commit_bundle(
 ) -> tuple[Any, list[Any], Any, Any]:
     """Build the canonical UWG request and one graph-candidate StateDiff."""
 
-    from agentic_core.L4_state.contracts.records import (
+    from apps_rg.runtime.local_state import (
         CommitRequest,
         ReadSurfaceRefreshPlan,
         RollbackPlan,
         StateDiff,
         stamp_digest,
     )
-    from agentic_core.L4_state.uwg.durable_write_gateway import compute_state_diffs_digest
+    from apps_rg.runtime.local_state import compute_state_diffs_digest
 
     version_id = _text(candidate_version["version_id"])
     parent_digest = _text((candidate_version.get("parent_graph") or {}).get("payload_sha256"))
@@ -346,7 +346,7 @@ def build_ge_w3_commit_bundle(
 
 
 def _durable_write_gateway_base() -> type:
-    from agentic_core.L4_state.uwg.durable_write_gateway import DurableWriteGateway
+    from apps_rg.runtime.local_state import DurableWriteGateway
 
     return DurableWriteGateway
 

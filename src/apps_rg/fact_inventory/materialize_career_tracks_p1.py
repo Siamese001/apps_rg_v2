@@ -3,7 +3,7 @@
 Operator taxonomy SSOT: docs/reports/apps_rg/career_track_taxonomy_operator_confirmed.json
 Employment SSOT: apps_rg/resume/base/amit_ayer_base_resume_v1.json
 
-Does not modify competencies runtime or agentic_core.
+Does not modify competencies runtime or apps_rg.
 """
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Canonical apps_rg section judge policy matrix (apps_rg only; no agentic_core)."""
+"""Canonical apps_rg section judge policy matrix (apps_rg only; no apps_rg)."""
 
 from __future__ import annotations
 

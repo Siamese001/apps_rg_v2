@@ -1,0 +1,160 @@
+{
+  "schema_version": "c02_fact_vectors_ingest_v1",
+  "section_id": "ey_narrative",
+  "chroma_path": "C:/Git/Agentic-Workflow-FRESH/data/cache/chromadb",
+  "run_id": "ey_narrative_f8f8f97271dc",
+  "promotion_mode": "inline",
+  "staged_at_utc": "2026-08-11T10:06:03.854049+00:00",
+  "attempted": true,
+  "upserted_count": 3,
+  "skipped_count": 0,
+  "skipped": [],
+  "status": "PASS",
+  "reason": "staged_and_promoted",
+  "operations": {
+    "extract": 3
+  },
+  "routed_to_semantic_cache": 0,
+  "rejected_ungrounded": 0,
+  "staged_count": 3,
+  "promotion": {
+    "schema_version": "fact_vector_promotion_v2",
+    "staging_collection": "fact_vectors_staging",
+    "live_collection": "fact_vectors",
+    "promotion_run_id": "fact_vector_promotion:2026-08-11T10:06:03.892632Z",
+    "promotion_mode": "inline",
+    "promoted_at_utc": "2026-08-11T10:06:03.892632+00:00",
+    "promotion_score_floor": 0.48,
+    "run_id": "ey_narrative_f8f8f97271dc",
+    "x3_code": "",
+    "require_x3_allow": false,
+    "selected_ids": [],
+    "missing_selected_ids": [],
+    "staged_count": 24,
+    "considered_count": 3,
+    "other_run_count": 21,
+    "promoted_count": 3,
+    "held_count": 0,
+    "rejected_count": 0,
+    "promoted": [
+      {
+        "id": "apps_rg:fv:reb_ey_capital_optimization_solvency",
+        "promotion_score": 1.0
+      },
+      {
+        "id": "apps_rg:fv:reb_ey_ccar_capital_liquidity_stress_testing",
+        "promotion_score": 1.0
+      },
+      {
+        "id": "apps_rg:fv:reb_ey_erm_risk_governance",
+        "promotion_score": 1.0
+      }
+    ],
+    "held": [],
+    "rejected": [],
+    "sparse_synced": true,
+    "dense_count": 63,
+    "sparse_doc_count": 63,
+    "sparse_sync_reason": "incremental_upsert_ok",
+    "hitl_required": false,
+    "status": "PASS",
+    "reason": "promoted_ok_sparse_parity",
+    "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vector_promotion_receipt.json",
+    "source_x3_code": "",
+    "x3_finish_code_normalized": "",
+    "uwg": {
+      "schema_version": "apps_rg.fact_vectors_uwg_promotion.v1",
+      "target_surface": "l4.apps_rg.fact_vectors",
+      "status": "ADMITTED",
+      "reason": "",
+      "commit_request_id": "cr:apps-rg-fact-vectors:7343d4b9a215baa1",
+      "state_diff_refs": [
+        "sd:apps-rg-fact-vectors:7343d4b9a215baa1"
+      ],
+      "uwg_commit_receipt_id": "c029ea05-a3f9-43e9-822d-55f9820bafed",
+      "blocked_commit_receipt_id": "",
+      "blocked_reason_codes": [],
+      "refresh_receipt_count": 1,
+      "artifacts": {
+        "commit_request": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vectors_uwg\\commit_request.json",
+        "state_diff": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vectors_uwg\\state_diff.json",
+        "rollback_plan": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vectors_uwg\\rollback_plan.json",
+        "read_surface_refresh_plan": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vectors_uwg\\read_surface_refresh_plan.json",
+        "refresh_receipts": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vectors_uwg\\uwg_refresh_receipts.json",
+        "uwg_commit_receipt": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vectors_uwg\\uwg_commit_receipt.json"
+      }
+    },
+    "hold_annotation": {
+      "status": "NOT_APPLICABLE",
+      "row_count": 0,
+      "error_type": "",
+      "error": ""
+    },
+    "live_projection": {
+      "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+      "projection_surface": "chromadb.fact_vectors",
+      "target_l4_surface": "l4.apps_rg.fact_vectors",
+      "retrieval_mode": "live_id_get",
+      "dense_count_before": 60,
+      "dense_count_after": 63,
+      "promoted_ids": [
+        "apps_rg:fv:reb_ey_capital_optimization_solvency",
+        "apps_rg:fv:reb_ey_ccar_capital_liquidity_stress_testing",
+        "apps_rg:fv:reb_ey_erm_risk_governance"
+      ],
+      "retrieved_ids": [
+        "apps_rg:fv:reb_ey_capital_optimization_solvency",
+        "apps_rg:fv:reb_ey_ccar_capital_liquidity_stress_testing",
+        "apps_rg:fv:reb_ey_erm_risk_governance"
+      ],
+      "missing_ids": [],
+      "status": "PASS",
+      "reason": "all_promoted_ids_retrieved",
+      "retrieved_count": 3
+    },
+    "retrieval_proof": {
+      "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+      "projection_surface": "chromadb.fact_vectors",
+      "target_l4_surface": "l4.apps_rg.fact_vectors",
+      "retrieval_mode": "live_id_get",
+      "dense_count_before": 60,
+      "dense_count_after": 63,
+      "promoted_ids": [
+        "apps_rg:fv:reb_ey_capital_optimization_solvency",
+        "apps_rg:fv:reb_ey_ccar_capital_liquidity_stress_testing",
+        "apps_rg:fv:reb_ey_erm_risk_governance"
+      ],
+      "retrieved_ids": [
+        "apps_rg:fv:reb_ey_capital_optimization_solvency",
+        "apps_rg:fv:reb_ey_ccar_capital_liquidity_stress_testing",
+        "apps_rg:fv:reb_ey_erm_risk_governance"
+      ],
+      "missing_ids": [],
+      "status": "PASS",
+      "reason": "all_promoted_ids_retrieved",
+      "retrieved_count": 3
+    },
+    "l7_auditability": {
+      "uwg_required_before_live_chroma_projection": true,
+      "target_l4_surface": "l4.apps_rg.fact_vectors",
+      "staging_collection": "fact_vectors_staging",
+      "live_collection": "fact_vectors",
+      "x3_required": false,
+      "x3_code": "",
+      "x3_gate_code": "",
+      "uwg_status": "ADMITTED",
+      "live_projection_status": "PASS",
+      "retrieval_proof_status": "PASS"
+    },
+    "uwg_witness": {
+      "ledger": "router_l4_uwg",
+      "event_kind": "route_decision",
+      "event_id": "",
+      "decision_id": "fact_vector_promotion_321dfbdc23f2",
+      "selected": "commit",
+      "promotion_receipt_digest": "321dfbdc23f23456ab0e3d3c419e796a2458e4491f592955dbc180ecc2b2c793",
+      "promotion_receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ey_narrative\\fact_vector_promotion_receipt.json",
+      "witness_status": "FAIL_SOFT"
+    }
+  }
+}

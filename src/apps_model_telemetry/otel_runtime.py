@@ -259,7 +259,7 @@ def configure_otel_runtime(
         resource=Resource.create(
             {
                 "service.name": service_name,
-                "apps.telemetry.consumers": "apps_research,apps_rg,agentic_core",
+                "apps.telemetry.consumers": "apps_research,apps_rg,apps_rg",
             }
         )
     )
@@ -303,7 +303,7 @@ def _write_runtime_receipt(
             "endpoint_source": environment.endpoint_source,
             "collector_source": environment.collector_source,
             "legacy_translations": list(environment.translations),
-            "consumers": ["apps_research", "apps_rg", "agentic_core"],
+            "consumers": ["apps_research", "apps_rg", "apps_rg"],
         },
     )
 

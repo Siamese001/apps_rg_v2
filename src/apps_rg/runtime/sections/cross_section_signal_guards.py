@@ -3,7 +3,7 @@
 Small, local helpers reused by headline, unify_bullets, and unify_narrative
 bundle-consumption X2 gates. These deliberately reuse the existing vocab/threshold
 constants from narrative_quality_x2 / bullet_ngram_overlap_x2 rather than redefining
-them, to avoid drift. No agentic_core dependency.
+them, to avoid drift. No apps_rg dependency.
 
 Authority model recap (enforced upstream, surfaced here as detectors only):
 - graph skills + linked source facts + role episode bundles = content/proof authority

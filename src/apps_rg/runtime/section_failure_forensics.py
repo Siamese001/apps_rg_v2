@@ -546,7 +546,7 @@ def _revision_metadata(run_dir: Path | None, repo_root: Path) -> dict[str, Any]:
     docs = [
         _load_json(run_dir / name)
         for name in (
-            "agentic_core_spine_proof.json",
+            "apps_rg_spine_proof.json",
             "runtime_identity_envelope.json",
             "r4_run_manifest.json",
             "APPS_RG_MANDATORY_RUN_OUTPUT.json",

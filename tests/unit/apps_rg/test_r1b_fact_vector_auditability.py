@@ -143,7 +143,7 @@ def test_fact_vector_promotion_receipt_has_uwg_and_live_retrieval_proof(
     tmp_path: Path,
 ) -> None:
     import apps_rg.runtime.chroma_precomputed_collection as cpc
-    from agentic_core.L4_state.uwg.durable_write_gateway import reset_default_gateway
+    from apps_rg_runtime.L4_state.uwg.durable_write_gateway import reset_default_gateway
     from apps_rg.runtime.c0.chroma_persistent_client import (
         ensure_apps_rg_chroma_client,
         reset_apps_rg_chroma_client_cache_for_tests,

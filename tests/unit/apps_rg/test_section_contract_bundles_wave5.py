@@ -76,5 +76,5 @@ def test_section_and_full_paths_share_core_contract_vocabulary() -> None:
         "FinalEvidenceContract"
     )
     assert spine_contracts.X3Disposition.__module__ == (
-        "agentic_core.runtime.contracts.x3_disposition"
+        "apps_rg_runtime.runtime.contracts.x3_disposition"
     )

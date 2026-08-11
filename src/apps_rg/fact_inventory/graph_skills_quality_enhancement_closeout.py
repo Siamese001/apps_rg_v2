@@ -469,7 +469,7 @@ def build_closeout(repo_root: Path, *, git_commit: str = "unknown") -> dict[str,
         "claims_ci_ratchet_active": bool(w7.get("workflow_path")),
         "claims_nightly_soak_green": False,
         "claims_dynamic_graphrag_traverse": False,
-        "claims_agentic_core_changed": False,
+        "claims_apps_rg_changed": False,
         "claims_c03_unified_pipeline_bound": False,
         "live_x3_allow_lane_count": live_count,
         "phase_gate_g_w10": {

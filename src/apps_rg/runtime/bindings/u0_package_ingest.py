@@ -248,7 +248,7 @@ def default_package_ref() -> str:
     return _PACKAGE_RELPATH
 
 
-def ingest_apps_rg_runtime_package(
+def ingest_apps_rg_package(
     *,
     app_id: str = "apps_rg",
     task_class: str = APPS_RG_TASK_CLASS,
@@ -439,5 +439,5 @@ __all__ = [
     "U0PackageValidationError",
     "assert_package_files_on_disk",
     "default_package_ref",
-    "ingest_apps_rg_runtime_package",
+    "ingest_apps_rg_package",
 ]

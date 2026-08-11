@@ -761,7 +761,7 @@ def evaluate_resume_package(
         "metadata_confirmation": {
             "registry_changes_in_this_packaging_task": False,
             "v1_prompt_edits_in_this_packaging_task": False,
-            "agentic_core_edits_in_this_packaging_task": False,
+            "apps_rg_edits_in_this_packaging_task": False,
         },
         "l6_shadow_handoff_audit": {
             "per_lane": {

@@ -298,6 +298,12 @@ def compile_headline_prompt(
         assembly,
         section_id="headline",
         companion_u_tier=tier,
+        l1_cognitive_advisory=runtime_payload.get("l1_cognitive_advisory"),
+        l1_cognitive_plan=runtime_payload.get("l1_cognitive_v3_plan"),
+        l1_cognitive_revision=runtime_payload.get("l1_cognitive_revision"),
+        l1_cognitive_revision_advisory=runtime_payload.get(
+            "l1_cognitive_revision_advisory"
+        ),
     )
     ids = sorted(str(x) for x in (runtime_payload.get("allowed_fact_ids") or []))
     pp_meta, _fec = resolve_pa_proof_authority_for_compile(runtime_payload)

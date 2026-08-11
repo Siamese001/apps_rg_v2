@@ -1,4 +1,4 @@
-"""Section L2 handoff receipt — core L2_MUST / L2_MUST_NOT validation surface (W8 follow-up)."""
+"""Section L2 handoff receipt — Apps RG L2 validation surface (W8 follow-up)."""
 from __future__ import annotations
 
 import json
@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from agentic_core.prompt_governance.prompt_assembly import (
+from apps_rg.runtime.local_prompt import (
     L2_MUST,
     L2_MUST_NOT,
     validate_l2_handoff,
@@ -55,7 +55,7 @@ def build_section_l2_handoff_receipt(
         "schema_version": "apps_rg_l2_handoff_receipt_v1",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "section_id": section_id,
-        "contract_surface": "agentic_core.prompt_governance.prompt_assembly.l2_handoff",
+        "contract_surface": "apps_rg.runtime.local_prompt.l2_handoff",
         "l2_must": list(L2_MUST),
         "l2_must_not": list(L2_MUST_NOT),
         "validation": asdict(validation),

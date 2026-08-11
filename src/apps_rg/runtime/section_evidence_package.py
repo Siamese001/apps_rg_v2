@@ -1,6 +1,6 @@
 """Section run evidence package — refs-only linkage to core spine artifacts (W1–W4).
 
-Does not emit agentic_core L7 artifacts, 99 RuntimeProofBundle, or UWG/Chroma writes.
+Does not emit apps_rg L7 artifacts, 99 RuntimeProofBundle, or UWG/Chroma writes.
 """
 from __future__ import annotations
 
@@ -71,17 +71,17 @@ _CORRELATION_METHOD_PAYLOAD = "section_runtime_payload_correlation_id"
 _CORRELATION_METHOD_ANCESTOR_CLI = "modular_r4_ancestor_cli_run_dir"
 
 _L7_PRODUCER_HINTS: dict[str, str] = {
-    "agentic_core_how_trace.json": "agentic_core.L7_auditability.how_trace.how_trace_builder",
-    "agentic_core_l7_route_family_coverage.json": (
-        "agentic_core.L7_auditability.coverage.route_family_l7_coverage"
+    "apps_rg_how_trace.json": "apps_rg.L7_auditability.how_trace.how_trace_builder",
+    "apps_rg_l7_route_family_coverage.json": (
+        "apps_rg.L7_auditability.coverage.route_family_l7_coverage"
     ),
-    "agentic_core_spine_proof.json": "agentic_core.runtime.artifacts.spine_proof_bundle",
+    "apps_rg_spine_proof.json": "apps_rg.runtime.artifacts.spine_proof_bundle",
     "integrated_runtime_artifact_manifest.json": (
-        "agentic_core.runtime.artifacts.integrated_runtime_emitter"
+        "apps_rg.runtime.artifacts.integrated_runtime_emitter"
     ),
-    "runtime_trace_snapshot.json": "agentic_core.runtime.artifacts.integrated_runtime_emitter",
+    "runtime_trace_snapshot.json": "apps_rg.runtime.artifacts.integrated_runtime_emitter",
     "runtime_gate_verdict_bundle.json": (
-        "agentic_core.runtime.entrypoints.integrated_safe_reuse_run"
+        "apps_rg.runtime.entrypoints.integrated_safe_reuse_run"
     ),
 }
 
@@ -518,9 +518,9 @@ def build_verified_external_refs_for_integrated(
                 artifact_name=filename,
                 source_path=_repo_rel(repo_root, source),
                 local_path=None,
-                source_owner_layer="agentic_core",
+                source_owner_layer="apps_rg",
                 owner_class=owner,
-                producer_module=_L7_PRODUCER_HINTS.get(filename, "agentic_core.integrated_runtime"),
+                producer_module=_L7_PRODUCER_HINTS.get(filename, "apps_rg.integrated_runtime"),
                 sha256=_sha256_file(source),
                 trust_status="trusted" if trusted else "untrusted",
                 trust_reason=reason,
@@ -560,9 +560,9 @@ def build_certification_reference_hints(repo_root: Path) -> list[dict[str, Any]]
     if not uwg_dir.is_dir():
         return hints
     for name, owner, layer in (
-        ("commit_request.json", OWNER_CORE_UWG_WRITE_ADMISSION, "agentic_core"),
-        ("uwg_commit_receipt.json", OWNER_CORE_UWG_WRITE_ADMISSION, "agentic_core"),
-        ("uwg_refresh_receipts.json", OWNER_CORE_L4_DURABLE_STATE, "agentic_core"),
+        ("commit_request.json", OWNER_CORE_UWG_WRITE_ADMISSION, "apps_rg"),
+        ("uwg_commit_receipt.json", OWNER_CORE_UWG_WRITE_ADMISSION, "apps_rg"),
+        ("uwg_refresh_receipts.json", OWNER_CORE_L4_DURABLE_STATE, "apps_rg"),
     ):
         p = uwg_dir / name
         if not p.is_file():
@@ -575,7 +575,7 @@ def build_certification_reference_hints(repo_root: Path) -> list[dict[str, Any]]
                 local_path=None,
                 source_owner_layer=layer,
                 owner_class=owner,
-                producer_module="agentic_core.runtime.entrypoints.integrated_uwg_commit_run",
+                producer_module="apps_rg.runtime.entrypoints.integrated_uwg_commit_run",
                 sha256=_sha256_file(p),
                 trust_status="reference_only",
                 trust_reason="certification_fixture_not_section_run_correlated",
@@ -712,7 +712,7 @@ def _coverage_for_subphase(
             OWNER_NOT_APPLICABLE,
             owner_class=OWNER_DESIGN_ONLY,
             notes=(
-                "C0.7 is real agentic_core observability subphase (docs/tests); "
+                "C0.7 is real apps_rg observability subphase (docs/tests); "
                 "not emitted as section-run artifact — alias/drift if claimed via apps shim"
             ),
         )
@@ -799,10 +799,10 @@ def _coverage_for_subphase(
         return row(OWNER_MISSING, notes="00C G01-G29 GateVerdict mesh not in section run")
 
     if sid == "L7":
-        local_how = _present_local(artifact_dir, "agentic_core_how_trace.json")
-        ext_how = refs_by_name.get("agentic_core_how_trace.json")
+        local_how = _present_local(artifact_dir, "apps_rg_how_trace.json")
+        ext_how = refs_by_name.get("apps_rg_how_trace.json")
         if local_how:
-            return row("PRESENT", evidence_ref="agentic_core_how_trace.json", owner_class=OWNER_CORE_L7_PROJECTION)
+            return row("PRESENT", evidence_ref="apps_rg_how_trace.json", owner_class=OWNER_CORE_L7_PROJECTION)
         if ext_how and ext_how.get("trust_status") == "trusted":
             return row(
                 REF_KIND_VERIFIED_EXTERNAL,
@@ -1159,11 +1159,11 @@ def sync_binding_manifest_with_correlation(
     artifact_classifications = dict(doc.get("artifact_classifications") or {})
     l7_artifact_refs = dict(doc.get("l7_artifact_refs") or {})
     l7_emitted_flags = {
-        "agentic_core_how_trace.json": bool(doc.get("l7_how_trace_emitted")),
-        "agentic_core_l7_route_family_coverage.json": bool(
+        "apps_rg_how_trace.json": bool(doc.get("l7_how_trace_emitted")),
+        "apps_rg_l7_route_family_coverage.json": bool(
             doc.get("l7_route_family_coverage_emitted")
         ),
-        "agentic_core_spine_proof.json": bool(doc.get("l7_spine_proof_emitted")),
+        "apps_rg_spine_proof.json": bool(doc.get("l7_spine_proof_emitted")),
     }
     for ref in verified_external_refs:
         fname = str(ref.get("artifact_name") or "")
@@ -1183,11 +1183,11 @@ def sync_binding_manifest_with_correlation(
     doc["design_law_owner_classifications"] = design_law_owner
     doc["artifact_classifications"] = artifact_classifications
     doc["l7_artifact_refs"] = l7_artifact_refs
-    doc["l7_how_trace_emitted"] = l7_emitted_flags["agentic_core_how_trace.json"]
+    doc["l7_how_trace_emitted"] = l7_emitted_flags["apps_rg_how_trace.json"]
     doc["l7_route_family_coverage_emitted"] = l7_emitted_flags[
-        "agentic_core_l7_route_family_coverage.json"
+        "apps_rg_l7_route_family_coverage.json"
     ]
-    doc["l7_spine_proof_emitted"] = l7_emitted_flags["agentic_core_spine_proof.json"]
+    doc["l7_spine_proof_emitted"] = l7_emitted_flags["apps_rg_spine_proof.json"]
     from apps_rg.runtime.section_l7_binding_manifest import DEFAULT_MISSING_L7_SURFACES
 
     missing_l7: list[str] = []

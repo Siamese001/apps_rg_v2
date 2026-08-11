@@ -1,0 +1,2046 @@
+{
+  "contract": {
+    "ambiguity_register": {
+      "blocks_progress": false,
+      "entries": [],
+      "generation_mode": "strategic_tailor",
+      "hitl_hint": "none",
+      "max_severity": "none",
+      "register_digest": "sha256:a3209d2011f06d0b0efce1f22cb7601a16d4bfcfa9024cf5080abdbd22c0258b",
+      "register_id": "amb-a3209d2011f06d0b",
+      "schema_version": "apps_rg_ambiguity_register_v2"
+    },
+    "app_id": "apps_rg",
+    "apps_research_call_required": false,
+    "audit_refs": [
+      "l1_capsule_digest:sha256:204bc952c206f218475dc66fbb355f8f94015a7816efe3a139aa653df5d0c437",
+      "l1_v2_capsule_digest:sha256:d02cffa7a32130434beeb7f26464ce33a024e44a3babbddc0b5c44c6bb9d04d5",
+      "l1_v2_evidence_obligation_ledger:sha256:d530f242b6f0901d02d0e44ab1d065db77b9ff3df943c08276b7012534da5ccd",
+      "l1_v2_work_dag:sha256:0d47cd68674eb3608aa31f1f93277789701ffb64efb21e84d652d822ee5b9e37",
+      "l1_cognitive_treatment_arm:l1_cognitive_v3",
+      "l1_cognitive_treatment_digest:sha256:376ec8b0ab4bbc423a286169da47d0cc04bb105b19493c6c2b001203d0bb8b97",
+      "l1_planning_profile_digest:b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+      "l1_validation_receipt:l1val-7d6b8e48-1561029d5b9f8a9a",
+      "l1_cognitive_v3_plan_digest:sha256:caf86be831c537f1a6aaddcdbfe34c0a9e109957a1d4bc32f37c3e501b3ce8bd",
+      "l1_cognitive_v3_critique:sha256:10b40ee4ee0f6ed98b739ec777ee0ac12a646fa8bd8b3d0f7a5a39260a9aecdf"
+    ],
+    "candidate_generation_expected_hint": true,
+    "gate_verdict_refs": [],
+    "grounding_required": true,
+    "judge_eval_expectation_refs": [],
+    "l5_certification_ref": "test:valid:w6",
+    "merge_required_hint": true,
+    "model_generation_required": true,
+    "multiple_work_units_hint": true,
+    "non_authority_assertion": {
+      "no_c0_import": true,
+      "no_evidence_retrieval": true,
+      "no_model_call": true,
+      "no_pa_assembly": true
+    },
+    "otel_span_refs": [],
+    "output_expectation": {
+      "apps_rg_cognitive_v3_critique_ref": "sha256:10b40ee4ee0f6ed98b739ec777ee0ac12a646fa8bd8b3d0f7a5a39260a9aecdf",
+      "apps_rg_completion_criteria_ref": "sha256:204bc952c206f218475dc66fbb355f8f94015a7816efe3a139aa653df5d0c437",
+      "apps_rg_l1_cognitive_treatment_ref": "sha256:376ec8b0ab4bbc423a286169da47d0cc04bb105b19493c6c2b001203d0bb8b97",
+      "apps_rg_v2_work_dag_ref": "sha256:0d47cd68674eb3608aa31f1f93277789701ffb64efb21e84d652d822ee5b9e37",
+      "fact_checked_required": true,
+      "formats": [
+        "json"
+      ],
+      "provenance_required": true
+    },
+    "per_unit_quality_selection_hint": true,
+    "planning_prior_refs": [
+      "apps_rg/profiles/rg_planning_profile.yaml"
+    ],
+    "planning_timestamp": "",
+    "policy_refs": {
+      "agent_spec_ref": "apps_rg/config/specs/agent_spec.resume_generation.v1.0.0.yaml",
+      "hitl_policy_ref": "apps_rg/config/hitl_trigger_policy.yaml",
+      "l0_policy_ref": "apps_rg/config/l0_policy.yaml",
+      "l5_governance_profile_ref": "apps_rg/profiles/rg_l5_governance_profile.yaml",
+      "manifest_digest": "a31e2bd1493543031b997e04e2b5bf13ec6b67358fb82671bfe292362b91c48c",
+      "prompt_registry_ref": "apps_rg/prompt_assembly/templates/registry.v1.yaml",
+      "thresholds_ref": "apps_rg/config/rg_thresholds.yaml"
+    },
+    "posture": {
+      "external_call": false,
+      "hitl_required": false,
+      "posture_class": "read_only",
+      "read_only": true,
+      "write_intent": false
+    },
+    "profile_manifest_digest": "162a4a3cbbb81a2ed074359d553f0b9a17d1a06ac56dbd89c57b1208a9965625",
+    "prompt_bom_refs": [
+      "apps_rg/prompt_assembly/templates/registry.v1.yaml"
+    ],
+    "query_spec": {
+      "jd_hash": "b7312c750abe8c77daad1acc1e2d6d0c784464473f1dde81eccce604ac518f16",
+      "jd_targeting_mode": "RUN_SPECIFIC",
+      "resume_hash": "33acc0ea1ff22073f218bb0bfe3520f09636cee50e6f2c2bfacbb6ac80975f48",
+      "target": {
+        "company": "Lincoln Financial Group",
+        "level": "EXECUTIVE",
+        "role": "SVP IT Strategy & AI Enablement"
+      }
+    },
+    "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:33acc0ea1ff22073:b7312c750abe8c77::v1",
+    "request_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+    "required_capabilities": [
+      "ingress_validation",
+      "evidence_collection",
+      "model_generation"
+    ],
+    "route_hints": {
+      "authority_class": "ADVISORY_ONLY",
+      "candidate_selection_needed_hint": "true",
+      "execution_shape_hint": "multi_work_unit_managed_candidate",
+      "grounding_needed_hint": "true",
+      "hitl_posture": "none",
+      "hitl_risk_hint": "none",
+      "merge_needed_hint": "true",
+      "multi_work_unit_hint": "true"
+    },
+    "route_profile_ref": "apps_rg/config/domain_contract/route_profiles.yaml",
+    "run_id": "12c624e2-a501-469b-b316-48b34ee040e6",
+    "schema_version": "W6.0",
+    "signature": "",
+    "snapshot_refs": [],
+    "support_expectation": {
+      "apps_rg_evidence_plan_ref": "sha256:204bc952c206f218475dc66fbb355f8f94015a7816efe3a139aa653df5d0c437",
+      "apps_rg_v2_evidence_obligation_ledger_ref": "sha256:d530f242b6f0901d02d0e44ab1d065db77b9ff3df943c08276b7012534da5ccd",
+      "fact_checked_required": true,
+      "min_ats": 70,
+      "min_quality": 0.75,
+      "per_bullet_required": true,
+      "provenance_required": true,
+      "source_quote_required": true,
+      "word_max": 1200,
+      "word_min": 400
+    },
+    "target_level": "EXECUTIVE",
+    "task_plan": [
+      "validate_ingress",
+      "load_profiles",
+      "collect_evidence",
+      "generate_resume",
+      "assemble_output",
+      "exit_eval"
+    ],
+    "task_shape": "strategic_tailor",
+    "task_spec": {
+      "apps_rg_cognitive_v3_plan": {
+        "alternative_plan_ledger": {
+          "authority_class": "PLANNING_ADVISORY_ONLY",
+          "decisions": [
+            {
+              "alternative_option_id": "",
+              "decision": "ESCALATED",
+              "decision_id": "l1decide-38b3e34f5101ed15",
+              "primary_option_id": "l1opt-af583a69f49747f4",
+              "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "requirement_id": "l1cogreq-cc977d643bdd4039",
+              "risk": "SEMANTIC_REVIEW_REQUIRED"
+            },
+            {
+              "alternative_option_id": "l1opt-6a0940084e9b44f4",
+              "decision": "MAPPED",
+              "decision_id": "l1decide-3a119044c5e9a6cb",
+              "primary_option_id": "l1opt-9d510b17a0ee8de8",
+              "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+              "requirement_id": "l1cogreq-6f24a7c03a0016da",
+              "risk": "COUNTEREVIDENCE_REQUIRED"
+            },
+            {
+              "alternative_option_id": "",
+              "decision": "ESCALATED",
+              "decision_id": "l1decide-65bae19ad1e09b50",
+              "primary_option_id": "l1opt-346d933f129da8b5",
+              "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+              "risk": "SEMANTIC_REVIEW_REQUIRED"
+            },
+            {
+              "alternative_option_id": "l1opt-9aba86d3cd7db300",
+              "decision": "MAPPED",
+              "decision_id": "l1decide-661c76903f72e25e",
+              "primary_option_id": "l1opt-fe24da4cb512995a",
+              "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+              "requirement_id": "l1cogreq-331c12158135fd54",
+              "risk": "COUNTEREVIDENCE_REQUIRED"
+            },
+            {
+              "alternative_option_id": "",
+              "decision": "ESCALATED",
+              "decision_id": "l1decide-d64f71a8490cf03d",
+              "primary_option_id": "l1opt-0cfc43f39ae38450",
+              "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "requirement_id": "l1cogreq-e5c58d436de16289",
+              "risk": "SEMANTIC_REVIEW_REQUIRED"
+            }
+          ],
+          "ledger_digest": "sha256:ec64c9eadc536b43b72acfc8ac5f3e402da39f9921a75017f02c7e755ba7802a",
+          "schema_version": "apps_rg.l1_alternative_plan_ledger.v1"
+        },
+        "app_scope": "APPS_RG_V2_ONLY",
+        "atomic_requirement_graph": {
+          "authority_class": "PLANNING_ADVISORY_ONLY",
+          "graph_digest": "sha256:9b19f597b3d644e6658e5f7439cca402e07d08565e0ff61aa208b1c0db3597ea",
+          "relations": [],
+          "requirements": [
+            {
+              "classification_rule_id": "domain",
+              "coverage_status": "MAPPED",
+              "criticality": "STANDARD",
+              "escalation_reason": "",
+              "extraction_confidence": "MEDIUM",
+              "modality": "NEUTRAL",
+              "ordinal": 1,
+              "parent_requirement_id": "l1req-8e74f12460de8962",
+              "qualifiers": [],
+              "requirement_id": "l1cogreq-331c12158135fd54",
+              "requirement_type": "DOMAIN",
+              "source_span": {
+                "end_offset": 199,
+                "source_field": "job_description_text",
+                "span_digest": "sha256:0a9cffb550e04ceb0fae4017b7f2d7bd90ca42c999d2f4d0ff022ee979fe148a",
+                "start_offset": 131,
+                "text_digest": "sha256:e90e2d6fb2cc4b18746396c0603676d02c6a3c542c71362c9c5f07b21ca0f66a"
+              },
+              "target_unit_ids": [
+                "competencies"
+              ]
+            },
+            {
+              "classification_rule_id": "scope_scale",
+              "coverage_status": "MAPPED",
+              "criticality": "STANDARD",
+              "escalation_reason": "",
+              "extraction_confidence": "HIGH",
+              "modality": "NEUTRAL",
+              "ordinal": 1,
+              "parent_requirement_id": "l1req-6bea010c6877ce53",
+              "qualifiers": [],
+              "requirement_id": "l1cogreq-6f24a7c03a0016da",
+              "requirement_type": "SCOPE_SCALE",
+              "source_span": {
+                "end_offset": 128,
+                "source_field": "job_description_text",
+                "span_digest": "sha256:c21f7346a4d4b37420ae5d77db4fe9a75ddd26f4bd3bd6e8f7c70c91c12efc2b",
+                "start_offset": 65,
+                "text_digest": "sha256:80837936262740845b953088b1340f3bf7f26b525acd5bb92a7fccc98b05af6c"
+              },
+              "target_unit_ids": [
+                "experience_block"
+              ]
+            },
+            {
+              "classification_rule_id": "unknown",
+              "coverage_status": "ESCALATED",
+              "criticality": "CRITICAL",
+              "escalation_reason": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "extraction_confidence": "LOW",
+              "modality": "NEUTRAL",
+              "ordinal": 1,
+              "parent_requirement_id": "l1req-5fafa111b24894be",
+              "qualifiers": [],
+              "requirement_id": "l1cogreq-cc977d643bdd4039",
+              "requirement_type": "UNKNOWN",
+              "source_span": {
+                "end_offset": 270,
+                "source_field": "job_description_text",
+                "span_digest": "sha256:fb8b9ab645188821d7e606151a1a48ff8c2b1670d6e22c48269d1fb863d86fc1",
+                "start_offset": 202,
+                "text_digest": "sha256:e55aca4f65fafd4c40294e3dd4140773bf3be3b2600eb698584b693eab15c9af"
+              },
+              "target_unit_ids": []
+            },
+            {
+              "classification_rule_id": "generic_hard_requirement_requires_semantic_review",
+              "coverage_status": "ESCALATED",
+              "criticality": "CRITICAL",
+              "escalation_reason": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "extraction_confidence": "LOW",
+              "modality": "MUST",
+              "ordinal": 1,
+              "parent_requirement_id": "l1req-ca0352f00c903e97",
+              "qualifiers": [],
+              "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+              "requirement_type": "UNKNOWN",
+              "source_span": {
+                "end_offset": 62,
+                "source_field": "job_description_text",
+                "span_digest": "sha256:3011ccfcce55acf796828f3355529202a34406788a816fdd5bd121c7dabdd919",
+                "start_offset": 44,
+                "text_digest": "sha256:c333fc601b87b1ae140196411645eaee12ce5225062d108c6aff14957d0084d8"
+              },
+              "target_unit_ids": []
+            },
+            {
+              "classification_rule_id": "unknown",
+              "coverage_status": "ESCALATED",
+              "criticality": "CRITICAL",
+              "escalation_reason": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "extraction_confidence": "LOW",
+              "modality": "NEUTRAL",
+              "ordinal": 1,
+              "parent_requirement_id": "l1req-870edfb692d2e17a",
+              "qualifiers": [],
+              "requirement_id": "l1cogreq-e5c58d436de16289",
+              "requirement_type": "UNKNOWN",
+              "source_span": {
+                "end_offset": 347,
+                "source_field": "job_description_text",
+                "span_digest": "sha256:41cc66822b088e4618bc696866124af413cc7801d6d4b9126a4ba9d02c095190",
+                "start_offset": 273,
+                "text_digest": "sha256:186369ea709eb1ab4e6dca3b2609387c9d2a47d868ad1a8461a3158dad3ac8fc"
+              },
+              "target_unit_ids": []
+            }
+          ],
+          "schema_version": "apps_rg.l1_atomic_requirement_graph.v1"
+        },
+        "authority_class": "PLANNING_ADVISORY_ONLY",
+        "critique_ledger": {
+          "assertions": {
+            "alternative_ledger_digest": "sha256:ec64c9eadc536b43b72acfc8ac5f3e402da39f9921a75017f02c7e755ba7802a",
+            "does_not_create_candidate_evidence": true,
+            "does_not_resolve_conflicts": true,
+            "does_not_select_route": true
+          },
+          "authority_class": "PLANNING_ADVISORY_ONLY",
+          "finding_count": 3,
+          "findings": [
+            {
+              "code": "CRITICAL_REQUIREMENT_NOT_PRECISELY_TARGETED",
+              "failed_invariant": "CRITICAL_REQUIREMENT_HAS_DEFENSIBLE_OPTION",
+              "finding_id": "l1crit-563c1cd3454dc4db",
+              "requirement_id": "l1cogreq-cc977d643bdd4039",
+              "resolver": "HUMAN",
+              "severity": "HIGH"
+            },
+            {
+              "code": "CRITICAL_REQUIREMENT_NOT_PRECISELY_TARGETED",
+              "failed_invariant": "CRITICAL_REQUIREMENT_HAS_DEFENSIBLE_OPTION",
+              "finding_id": "l1crit-75342291ed25b564",
+              "requirement_id": "l1cogreq-e5c58d436de16289",
+              "resolver": "HUMAN",
+              "severity": "HIGH"
+            },
+            {
+              "code": "CRITICAL_REQUIREMENT_NOT_PRECISELY_TARGETED",
+              "failed_invariant": "CRITICAL_REQUIREMENT_HAS_DEFENSIBLE_OPTION",
+              "finding_id": "l1crit-c73813cc4ef80d73",
+              "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+              "resolver": "HUMAN",
+              "severity": "HIGH"
+            }
+          ],
+          "ledger_digest": "sha256:10b40ee4ee0f6ed98b739ec777ee0ac12a646fa8bd8b3d0f7a5a39260a9aecdf",
+          "schema_version": "apps_rg.l1_critique_ledger.v1"
+        },
+        "feasibility_graph": {
+          "authority_class": "PLANNING_ADVISORY_ONLY",
+          "graph_digest": "sha256:2e1eb6beb121d0c65ebf8a973dd217854c4fc31683bbc3fe6bdef27d850cad96",
+          "options": [
+            {
+              "counterevidence_check_required": false,
+              "coverage_status": "ESCALATED",
+              "option_id": "l1opt-0cfc43f39ae38450",
+              "option_kind": "ESCALATE",
+              "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "required_source_shape": [],
+              "requirement_id": "l1cogreq-e5c58d436de16289",
+              "work_unit_id": ""
+            },
+            {
+              "counterevidence_check_required": false,
+              "coverage_status": "ESCALATED",
+              "option_id": "l1opt-346d933f129da8b5",
+              "option_kind": "ESCALATE",
+              "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "required_source_shape": [],
+              "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+              "work_unit_id": ""
+            },
+            {
+              "counterevidence_check_required": false,
+              "coverage_status": "ESCALATED",
+              "option_id": "l1opt-6a0940084e9b44f4",
+              "option_kind": "ESCALATE",
+              "rationale": "ALTERNATIVE_SAFE_PATH",
+              "required_source_shape": [],
+              "requirement_id": "l1cogreq-6f24a7c03a0016da",
+              "work_unit_id": ""
+            },
+            {
+              "counterevidence_check_required": false,
+              "coverage_status": "ESCALATED",
+              "option_id": "l1opt-9aba86d3cd7db300",
+              "option_kind": "ESCALATE",
+              "rationale": "ALTERNATIVE_SAFE_PATH",
+              "required_source_shape": [],
+              "requirement_id": "l1cogreq-331c12158135fd54",
+              "work_unit_id": ""
+            },
+            {
+              "counterevidence_check_required": true,
+              "coverage_status": "MAPPED",
+              "option_id": "l1opt-9d510b17a0ee8de8",
+              "option_kind": "TARGET_WORK_UNIT",
+              "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+              "required_source_shape": [
+                "candidate_support",
+                "candidate_counterevidence"
+              ],
+              "requirement_id": "l1cogreq-6f24a7c03a0016da",
+              "work_unit_id": "experience_block"
+            },
+            {
+              "counterevidence_check_required": false,
+              "coverage_status": "ESCALATED",
+              "option_id": "l1opt-af583a69f49747f4",
+              "option_kind": "ESCALATE",
+              "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+              "required_source_shape": [],
+              "requirement_id": "l1cogreq-cc977d643bdd4039",
+              "work_unit_id": ""
+            },
+            {
+              "counterevidence_check_required": true,
+              "coverage_status": "MAPPED",
+              "option_id": "l1opt-fe24da4cb512995a",
+              "option_kind": "TARGET_WORK_UNIT",
+              "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+              "required_source_shape": [
+                "candidate_support",
+                "candidate_counterevidence"
+              ],
+              "requirement_id": "l1cogreq-331c12158135fd54",
+              "work_unit_id": "competencies"
+            }
+          ],
+          "schema_version": "apps_rg.l1_feasibility_graph.v1"
+        },
+        "goal_constraint_frame": {
+          "authority_class": "PLANNING_ADVISORY_ONLY",
+          "conflict_constraint_keys": [],
+          "definition_of_done": {
+            "all_critical_requirements_targeted_or_escalated": true,
+            "candidate_evidence_claims_forbidden": true,
+            "downstream_authority_required": true
+          },
+          "generation_mode": "strategic_tailor",
+          "goal_frame_id": "l1goal-ee707837ee277340",
+          "hard_constraint_keys": [
+            "_l1_cognitive_treatment_arm",
+            "briefing_text",
+            "source_channel"
+          ],
+          "requested_artifact": "resume_generation",
+          "target_level": "EXECUTIVE",
+          "target_role_digest": "sha256:b34ff67ef4578a08cfa8e81dd7016fd4de987e583f79a600200aa55af0ff4d3d"
+        },
+        "plan_digest": "sha256:caf86be831c537f1a6aaddcdbfe34c0a9e109957a1d4bc32f37c3e501b3ce8bd",
+        "planning_priors": [
+          {
+            "authority_class": "PLANNING_PRIOR_ONLY",
+            "digest": "ee164e9e2233d0a4865ebecc552879cc79500c2c08a1baf0cda119f25cefcff4",
+            "ref": "apps_rg/profiles/rg_l1_requirement_taxonomy.v1.json"
+          },
+          {
+            "authority_class": "PLANNING_PRIOR_ONLY",
+            "digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+            "ref": "apps_rg/profiles/rg_planning_profile.yaml"
+          }
+        ],
+        "planning_status": "BLOCKED",
+        "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:33acc0ea1ff22073:b7312c750abe8c77::v1",
+        "request_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+        "run_id": "12c624e2-a501-469b-b316-48b34ee040e6",
+        "schema_version": "apps_rg.l1_cognitive_plan.v3",
+        "trace_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+        "v2_parent": {
+          "capsule_digest": "sha256:d02cffa7a32130434beeb7f26464ce33a024e44a3babbddc0b5c44c6bb9d04d5",
+          "schema_version": "apps_rg_l1_planning_capsule.v2"
+        },
+        "validation": {
+          "no_candidate_evidence_claim": true,
+          "no_evidence_retrieval": true,
+          "no_l4_write": true,
+          "no_model_call": true,
+          "no_prompt_assembly": true,
+          "no_route_selection": true,
+          "no_tool_call": true,
+          "u0_payload_only": true
+        }
+      },
+      "apps_rg_cognitive_v3_plan_ref": "sha256:caf86be831c537f1a6aaddcdbfe34c0a9e109957a1d4bc32f37c3e501b3ce8bd",
+      "apps_rg_cognitive_v3_status": "BLOCKED",
+      "apps_rg_planning_capsule": {
+        "ambiguity_register": {
+          "blocks_progress": false,
+          "entries": [],
+          "generation_mode": "strategic_tailor",
+          "hitl_hint": "none",
+          "max_severity": "none",
+          "register_digest": "sha256:a3209d2011f06d0b0efce1f22cb7601a16d4bfcfa9024cf5080abdbd22c0258b",
+          "register_id": "amb-a3209d2011f06d0b",
+          "schema_version": "apps_rg_ambiguity_register_v2"
+        },
+        "authority_class": "PLANNING_ADVISORY_ONLY",
+        "capsule_digest": "sha256:204bc952c206f218475dc66fbb355f8f94015a7816efe3a139aa653df5d0c437",
+        "cognition_plan": [
+          {
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION",
+            "control_semantics": {
+              "reflexion_loops": {
+                "receipt_required": true,
+                "requested": 2.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "self_consistency_samples": {
+                "receipt_required": true,
+                "requested": 5.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "temperature": {
+                "receipt_required": true,
+                "requested": 0.42,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_branches": {
+                "receipt_required": true,
+                "requested": 3.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_depth": {
+                "receipt_required": true,
+                "requested": 2.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              }
+            },
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "reflexion_intent": 2.0,
+            "requested_controls": {
+              "reflexion_loops": 2.0,
+              "self_consistency_samples": 5.0,
+              "temperature": 0.42,
+              "tot_branches": 3.0,
+              "tot_depth": 2.0
+            },
+            "self_consistency_intent": 5.0,
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "tier": "T3_CRITICAL_SECTION",
+            "unit_id": "executive_summary",
+            "variance_class": "generation_variance"
+          },
+          {
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION",
+            "control_semantics": {
+              "reflexion_loops": {
+                "receipt_required": true,
+                "requested": 0.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "self_consistency_samples": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "temperature": {
+                "receipt_required": true,
+                "requested": 0.15,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_branches": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_depth": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              }
+            },
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "reflexion_intent": 0.0,
+            "requested_controls": {
+              "reflexion_loops": 0.0,
+              "self_consistency_samples": 1.0,
+              "temperature": 0.15,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0
+            },
+            "self_consistency_intent": 1.0,
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "tier": "T0_LOCKED_FACT",
+            "unit_id": "headline",
+            "variance_class": "deterministic_guard"
+          },
+          {
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION",
+            "control_semantics": {
+              "reflexion_loops": {
+                "receipt_required": true,
+                "requested": 0.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "self_consistency_samples": {
+                "receipt_required": true,
+                "requested": 2.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "temperature": {
+                "receipt_required": true,
+                "requested": 0.38,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_branches": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_depth": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              }
+            },
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "reflexion_intent": 0.0,
+            "requested_controls": {
+              "reflexion_loops": 0.0,
+              "self_consistency_samples": 2.0,
+              "temperature": 0.38,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0
+            },
+            "self_consistency_intent": 2.0,
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "tier": "T2_QUALITY_SECTION",
+            "unit_id": "competencies",
+            "variance_class": "anchor_coverage"
+          },
+          {
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION",
+            "control_semantics": {
+              "reflexion_loops": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "self_consistency_samples": {
+                "receipt_required": true,
+                "requested": 3.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "temperature": {
+                "receipt_required": true,
+                "requested": 0.32,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_branches": {
+                "receipt_required": true,
+                "requested": 2.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_depth": {
+                "receipt_required": true,
+                "requested": 2.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              }
+            },
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "reflexion_intent": 1.0,
+            "requested_controls": {
+              "reflexion_loops": 1.0,
+              "self_consistency_samples": 3.0,
+              "temperature": 0.32,
+              "tot_branches": 2.0,
+              "tot_depth": 2.0
+            },
+            "self_consistency_intent": 3.0,
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "tier": "T2_QUALITY_SECTION",
+            "unit_id": "experience_block",
+            "variance_class": "evidence_support"
+          },
+          {
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION",
+            "control_semantics": {
+              "reflexion_loops": {
+                "receipt_required": true,
+                "requested": 0.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "self_consistency_samples": {
+                "receipt_required": true,
+                "requested": 2.0,
+                "required_for_certification": true,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "temperature": {
+                "receipt_required": true,
+                "requested": 0.38,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_branches": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_depth": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              }
+            },
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "reflexion_intent": 0.0,
+            "requested_controls": {
+              "reflexion_loops": 0.0,
+              "self_consistency_samples": 2.0,
+              "temperature": 0.38,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0
+            },
+            "self_consistency_intent": 2.0,
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "tier": "T2_QUALITY_SECTION",
+            "unit_id": "skills_block",
+            "variance_class": "anchor_coverage"
+          },
+          {
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION",
+            "control_semantics": {
+              "reflexion_loops": {
+                "receipt_required": true,
+                "requested": 0.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "self_consistency_samples": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "temperature": {
+                "receipt_required": true,
+                "requested": 0.15,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_branches": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_depth": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              }
+            },
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "reflexion_intent": 0.0,
+            "requested_controls": {
+              "reflexion_loops": 0.0,
+              "self_consistency_samples": 1.0,
+              "temperature": 0.15,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0
+            },
+            "self_consistency_intent": 1.0,
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "tier": "T0_LOCKED_FACT",
+            "unit_id": "education_block",
+            "variance_class": "deterministic_guard"
+          },
+          {
+            "authority_class": "L2_OR_L3_MUST_PROVE_EXECUTION",
+            "control_semantics": {
+              "reflexion_loops": {
+                "receipt_required": true,
+                "requested": 0.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "self_consistency_samples": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "temperature": {
+                "receipt_required": true,
+                "requested": 0.15,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_branches": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              },
+              "tot_depth": {
+                "receipt_required": true,
+                "requested": 1.0,
+                "required_for_certification": false,
+                "transport_supported": "L2_OR_L3_MUST_OBSERVE"
+              }
+            },
+            "controls_applied": false,
+            "execution_provability": "ADVISORY_ONLY_UNTIL_L2_RECEIPT",
+            "reflexion_intent": 0.0,
+            "requested_controls": {
+              "reflexion_loops": 0.0,
+              "self_consistency_samples": 1.0,
+              "temperature": 0.15,
+              "tot_branches": 1.0,
+              "tot_depth": 1.0
+            },
+            "self_consistency_intent": 1.0,
+            "singleton_transport_policy": "do_not_mark_applied_without_runner_receipt",
+            "tier": "T0_LOCKED_FACT",
+            "unit_id": "certifications_block",
+            "variance_class": "deterministic_guard"
+          }
+        ],
+        "completion_criteria": [
+          "all_generated_factual_claims_have_provenance_anchors",
+          "output_satisfies_requested_formats",
+          "role_alignment_meets_threshold",
+          "unsupported_claims_blocked_or_marked_insufficient"
+        ],
+        "dependency_sketch": [
+          {
+            "from": "role_analysis",
+            "relation": "SUPPORTS",
+            "to": "executive_summary"
+          },
+          {
+            "from": "source_resume_facts",
+            "relation": "GROUNDS",
+            "to": "executive_summary"
+          },
+          {
+            "from": "role_analysis",
+            "relation": "SUPPORTS",
+            "to": "headline"
+          },
+          {
+            "from": "source_resume_facts",
+            "relation": "GROUNDS",
+            "to": "headline"
+          },
+          {
+            "from": "role_analysis",
+            "relation": "SUPPORTS",
+            "to": "competencies"
+          },
+          {
+            "from": "source_resume_facts",
+            "relation": "GROUNDS",
+            "to": "competencies"
+          },
+          {
+            "from": "role_analysis",
+            "relation": "SUPPORTS",
+            "to": "experience_block"
+          },
+          {
+            "from": "source_resume_facts",
+            "relation": "GROUNDS",
+            "to": "experience_block"
+          },
+          {
+            "from": "role_analysis",
+            "relation": "SUPPORTS",
+            "to": "skills_block"
+          },
+          {
+            "from": "source_resume_facts",
+            "relation": "GROUNDS",
+            "to": "skills_block"
+          },
+          {
+            "from": "role_analysis",
+            "relation": "SUPPORTS",
+            "to": "education_block"
+          },
+          {
+            "from": "source_resume_facts",
+            "relation": "GROUNDS",
+            "to": "education_block"
+          },
+          {
+            "from": "role_analysis",
+            "relation": "SUPPORTS",
+            "to": "certifications_block"
+          },
+          {
+            "from": "source_resume_facts",
+            "relation": "GROUNDS",
+            "to": "certifications_block"
+          }
+        ],
+        "evidence_plan": [
+          {
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "contradiction_scan_expected": true,
+            "jd_obligation_ids": [
+              "jdob-ae10aeae2241696d"
+            ],
+            "jd_obligation_targeting_only": true,
+            "query_intent": "collect_support_for_executive_summary",
+            "support_target": "source_backed_executive_positioning",
+            "unit_id": "executive_summary"
+          },
+          {
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "contradiction_scan_expected": true,
+            "jd_obligation_ids": [
+              "jdob-ae10aeae2241696d"
+            ],
+            "jd_obligation_targeting_only": true,
+            "query_intent": "collect_support_for_headline",
+            "support_target": "concise_role_positioning",
+            "unit_id": "headline"
+          },
+          {
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "contradiction_scan_expected": true,
+            "jd_obligation_ids": [
+              "jdob-66935f45e267edd2"
+            ],
+            "jd_obligation_targeting_only": true,
+            "query_intent": "collect_support_for_competencies",
+            "support_target": "jd_anchor_coverage",
+            "unit_id": "competencies"
+          },
+          {
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "contradiction_scan_expected": true,
+            "jd_obligation_ids": [
+              "jdob-66935f45e267edd2",
+              "jdob-ae10aeae2241696d"
+            ],
+            "jd_obligation_targeting_only": true,
+            "query_intent": "collect_support_for_experience_block",
+            "support_target": "metric_preserving_experience",
+            "unit_id": "experience_block"
+          },
+          {
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "contradiction_scan_expected": true,
+            "jd_obligation_ids": [
+              "jdob-66935f45e267edd2"
+            ],
+            "jd_obligation_targeting_only": true,
+            "query_intent": "collect_support_for_skills_block",
+            "support_target": "jd_keyword_and_truth_alignment",
+            "unit_id": "skills_block"
+          },
+          {
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "contradiction_scan_expected": true,
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true,
+            "query_intent": "collect_support_for_education_block",
+            "support_target": "preserve_verbatim_education_facts",
+            "unit_id": "education_block"
+          },
+          {
+            "allowed_source_classes": [
+              "source_resume",
+              "job_description",
+              "approved_research_brief",
+              "candidate_profile"
+            ],
+            "authority_class": "C0_EXECUTES_RETRIEVAL",
+            "contradiction_scan_expected": true,
+            "jd_obligation_ids": [],
+            "jd_obligation_targeting_only": true,
+            "query_intent": "collect_support_for_certifications_block",
+            "support_target": "preserve_verbatim_certification_facts",
+            "unit_id": "certifications_block"
+          }
+        ],
+        "intent_frame": {
+          "assumptions": [],
+          "deliverable": "targeted_resume",
+          "excluded_authority_claims": [
+            "route_selection",
+            "evidence_retrieval",
+            "prompt_assembly",
+            "model_execution",
+            "tool_execution",
+            "l4_write"
+          ],
+          "generation_mode": "strategic_tailor",
+          "target_company": "Lincoln Financial Group",
+          "target_level": "EXECUTIVE",
+          "target_role": "SVP IT Strategy & AI Enablement",
+          "task_class": "resume_generation"
+        },
+        "jd_obligation_plan": {
+          "authority_class": "L1_TARGETING_ADVISORY_ONLY",
+          "coverage": {
+            "all_critical_obligations_resolved": true,
+            "critical_count": 1,
+            "critical_escalated_count": 1,
+            "critical_mapped_count": 0,
+            "obligation_count": 5
+          },
+          "extraction_status": "EXTRACTED",
+          "obligation_plan_digest": "sha256:ed21b65d7b5a56f49b3b48c75fc2506f4d2390843aa0e7f69f3b60b6fd583223",
+          "obligations": [
+            {
+              "coverage_status": "ESCALATED",
+              "criticality": "CRITICAL",
+              "escalation_reason": "HITL_OR_UPSTREAM_EVIDENCE_REVIEW_REQUIRED",
+              "mapped_unit_ids": [],
+              "obligation_id": "jdob-1ec13a2f9d6883f7",
+              "obligation_text": "Required emphasis:",
+              "source_kind": "REQUIREMENT"
+            },
+            {
+              "coverage_status": "MAPPED",
+              "criticality": "STANDARD",
+              "escalation_reason": "",
+              "mapped_unit_ids": [
+                "experience_block",
+                "competencies",
+                "skills_block"
+              ],
+              "obligation_id": "jdob-66935f45e267edd2",
+              "obligation_text": "Enterprise IT strategy, portfolio governance, and AI enablement",
+              "source_kind": "JD_STATEMENT"
+            },
+            {
+              "coverage_status": "MAPPED",
+              "criticality": "STANDARD",
+              "escalation_reason": "",
+              "mapped_unit_ids": [
+                "headline",
+                "executive_summary",
+                "experience_block"
+              ],
+              "obligation_id": "jdob-ae10aeae2241696d",
+              "obligation_text": "Cloud/data platform modernization for regulated insurer environments",
+              "source_kind": "JD_STATEMENT"
+            },
+            {
+              "coverage_status": "UNMAPPED",
+              "criticality": "STANDARD",
+              "escalation_reason": "",
+              "mapped_unit_ids": [],
+              "obligation_id": "jdob-ce74d638dae13568",
+              "obligation_text": "Reference architecture and delivery governance across business units",
+              "source_kind": "JD_STATEMENT"
+            },
+            {
+              "coverage_status": "UNMAPPED",
+              "criticality": "STANDARD",
+              "escalation_reason": "",
+              "mapped_unit_ids": [],
+              "obligation_id": "jdob-0560678fc779c24e",
+              "obligation_text": "FSA/actuarial credibility without burying credentials in early-career only",
+              "source_kind": "JD_STATEMENT"
+            }
+          ],
+          "schema_version": "apps_rg.jd_obligation_plan.v1",
+          "source_binding": {
+            "inline_text_digest": "sha256:9eb74fa99466fbc49e2b8282fbe8ce090a90f034cdb1f2eb07685f17fa1346de",
+            "inline_text_present": true,
+            "jd_hash": "b7312c750abe8c77daad1acc1e2d6d0c784464473f1dde81eccce604ac518f16",
+            "source_class": "U0_VALIDATED_JD_PAYLOAD"
+          },
+          "validation": {
+            "jd_is_targeting_input_not_candidate_evidence": true,
+            "no_claim_generation": true,
+            "no_evidence_retrieval": true,
+            "no_execution_path_selection": true
+          }
+        },
+        "planning_prior_refs": [
+          {
+            "authority_class": "PLANNING_PRIOR_ONLY",
+            "digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+            "ref": "apps_rg/profiles/rg_planning_profile.yaml"
+          }
+        ],
+        "planning_status": "READY",
+        "prompt_plan": [
+          {
+            "authority_class": "PA_ASSEMBLES_PROMPT",
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "provenance_slots_required": true,
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "unit_id": "executive_summary"
+          },
+          {
+            "authority_class": "PA_ASSEMBLES_PROMPT",
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "provenance_slots_required": true,
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "unit_id": "headline"
+          },
+          {
+            "authority_class": "PA_ASSEMBLES_PROMPT",
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "provenance_slots_required": true,
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "unit_id": "competencies"
+          },
+          {
+            "authority_class": "PA_ASSEMBLES_PROMPT",
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "provenance_slots_required": true,
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "unit_id": "experience_block"
+          },
+          {
+            "authority_class": "PA_ASSEMBLES_PROMPT",
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "provenance_slots_required": true,
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "unit_id": "skills_block"
+          },
+          {
+            "authority_class": "PA_ASSEMBLES_PROMPT",
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "provenance_slots_required": true,
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "unit_id": "education_block"
+          },
+          {
+            "authority_class": "PA_ASSEMBLES_PROMPT",
+            "prompt_bom_refs": [
+              "apps_rg/prompt_assembly/prompt_bom.yaml"
+            ],
+            "provenance_slots_required": true,
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "unit_id": "certifications_block"
+          }
+        ],
+        "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:33acc0ea1ff22073:b7312c750abe8c77::v1",
+        "request_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+        "route_feature_hints": {
+          "authority_class": "ADVISORY_ONLY",
+          "candidate_selection_needed": true,
+          "grounding_needed": true,
+          "hitl_risk_hint": "none",
+          "merge_needed": true,
+          "multi_work_unit": true
+        },
+        "run_id": "12c624e2-a501-469b-b316-48b34ee040e6",
+        "schema_version": "apps_rg_l1_planning_capsule.v1",
+        "trace_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+        "validation": {
+          "no_evidence_retrieval": true,
+          "no_l4_write": true,
+          "no_model_call": true,
+          "no_prompt_assembly": true,
+          "no_route_selection": true,
+          "no_tool_call": true,
+          "profile_ref_digest_bound": true
+        },
+        "work_units": [
+          {
+            "criticality": "T3_CRITICAL_SECTION",
+            "output_contract_ref": "apps_rg::output_contract::executive_summary",
+            "quality_floor_ref": "apps_rg::quality_floor::T3_CRITICAL_SECTION",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "support_target": "source_backed_executive_positioning",
+            "unit_id": "executive_summary",
+            "unit_type": "narrative_section",
+            "variance_class": "generation_variance"
+          },
+          {
+            "criticality": "T0_LOCKED_FACT",
+            "output_contract_ref": "apps_rg::output_contract::headline",
+            "quality_floor_ref": "apps_rg::quality_floor::T0_LOCKED_FACT",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "support_target": "concise_role_positioning",
+            "unit_id": "headline",
+            "unit_type": "locked_or_low_variance_section",
+            "variance_class": "deterministic_guard"
+          },
+          {
+            "criticality": "T2_QUALITY_SECTION",
+            "output_contract_ref": "apps_rg::output_contract::competencies",
+            "quality_floor_ref": "apps_rg::quality_floor::T2_QUALITY_SECTION",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "support_target": "jd_anchor_coverage",
+            "unit_id": "competencies",
+            "unit_type": "skills_section",
+            "variance_class": "anchor_coverage"
+          },
+          {
+            "criticality": "T2_QUALITY_SECTION",
+            "output_contract_ref": "apps_rg::output_contract::experience_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T2_QUALITY_SECTION",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "M0",
+              "U0",
+              "R0"
+            ],
+            "support_target": "metric_preserving_experience",
+            "unit_id": "experience_block",
+            "unit_type": "evidence_heavy_section",
+            "variance_class": "evidence_support"
+          },
+          {
+            "criticality": "T2_QUALITY_SECTION",
+            "output_contract_ref": "apps_rg::output_contract::skills_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T2_QUALITY_SECTION",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "support_target": "jd_keyword_and_truth_alignment",
+            "unit_id": "skills_block",
+            "unit_type": "skills_section",
+            "variance_class": "anchor_coverage"
+          },
+          {
+            "criticality": "T0_LOCKED_FACT",
+            "output_contract_ref": "apps_rg::output_contract::education_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T0_LOCKED_FACT",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "support_target": "preserve_verbatim_education_facts",
+            "unit_id": "education_block",
+            "unit_type": "locked_fact_section",
+            "variance_class": "deterministic_guard"
+          },
+          {
+            "criticality": "T0_LOCKED_FACT",
+            "output_contract_ref": "apps_rg::output_contract::certifications_block",
+            "quality_floor_ref": "apps_rg::quality_floor::T0_LOCKED_FACT",
+            "required_inputs": [
+              "jd_hash",
+              "resume_hash"
+            ],
+            "required_slots": [
+              "S0",
+              "D0",
+              "I0",
+              "C0",
+              "U0",
+              "R0"
+            ],
+            "support_target": "preserve_verbatim_certification_facts",
+            "unit_id": "certifications_block",
+            "unit_type": "locked_fact_section",
+            "variance_class": "deterministic_guard"
+          }
+        ]
+      },
+      "apps_rg_planning_capsule_ref": "sha256:204bc952c206f218475dc66fbb355f8f94015a7816efe3a139aa653df5d0c437",
+      "apps_rg_planning_status": "READY",
+      "apps_rg_planning_v2_capsule": {
+        "authority_class": "PLANNING_ADVISORY_ONLY",
+        "capsule_digest": "sha256:d02cffa7a32130434beeb7f26464ce33a024e44a3babbddc0b5c44c6bb9d04d5",
+        "decision_ledger": {
+          "authority_class": "L1_ADVISORY_ONLY",
+          "decisions": [
+            {
+              "affected_requirement_ids": [
+                "l1req-6bea010c6877ce53"
+              ],
+              "blocking_policy": "REVIEW",
+              "code": "COMPOUND_REQUIREMENT",
+              "decision_digest": "sha256:25f865ba9dd9ed83707abd5d92eb3f22d739efe688529e03eaefab213121b509",
+              "decision_id": "l1dec-25f865ba9dd9ed83",
+              "permitted_resolver": "HUMAN",
+              "resolution_evidence_shape": [
+                "segmentation_decision"
+              ],
+              "severity": "MEDIUM",
+              "status": "OPEN"
+            },
+            {
+              "affected_requirement_ids": [
+                "l1req-ca0352f00c903e97"
+              ],
+              "blocking_policy": "REVIEW",
+              "code": "CRITICAL_TARGETING_ESCALATION",
+              "decision_digest": "sha256:3ca9f58201f73cfd234400ef1603e04ca29b4125b83931b860dd4e49594a8f08",
+              "decision_id": "l1dec-3ca9f58201f73cfd",
+              "permitted_resolver": "HUMAN",
+              "resolution_evidence_shape": [
+                "target_unit_decision"
+              ],
+              "severity": "HIGH",
+              "status": "OPEN"
+            },
+            {
+              "affected_requirement_ids": [
+                "l1req-870edfb692d2e17a"
+              ],
+              "blocking_policy": "REVIEW",
+              "code": "CRITICAL_TARGETING_ESCALATION",
+              "decision_digest": "sha256:4090013b99560685b4731a030707db80b08158000180ef709f33a7725ad55ce5",
+              "decision_id": "l1dec-4090013b99560685",
+              "permitted_resolver": "HUMAN",
+              "resolution_evidence_shape": [
+                "target_unit_decision"
+              ],
+              "severity": "HIGH",
+              "status": "OPEN"
+            },
+            {
+              "affected_requirement_ids": [
+                "l1req-5fafa111b24894be"
+              ],
+              "blocking_policy": "REVIEW",
+              "code": "UNKNOWN_REQUIREMENT_TYPE",
+              "decision_digest": "sha256:5885123cecc981b0bf570db954e39c7f4f54ed2cbe53f57108dd4ff5835cd0fe",
+              "decision_id": "l1dec-5885123cecc981b0",
+              "permitted_resolver": "HUMAN",
+              "resolution_evidence_shape": [
+                "requirement_type_decision"
+              ],
+              "severity": "HIGH",
+              "status": "OPEN"
+            },
+            {
+              "affected_requirement_ids": [
+                "l1req-870edfb692d2e17a"
+              ],
+              "blocking_policy": "REVIEW",
+              "code": "UNKNOWN_REQUIREMENT_TYPE",
+              "decision_digest": "sha256:b10fe7eb80efdafdd0eaaf99f23965b611069afa4a2c12b3ed60b2bb84e2b7ae",
+              "decision_id": "l1dec-b10fe7eb80efdafd",
+              "permitted_resolver": "HUMAN",
+              "resolution_evidence_shape": [
+                "requirement_type_decision"
+              ],
+              "severity": "HIGH",
+              "status": "OPEN"
+            },
+            {
+              "affected_requirement_ids": [
+                "l1req-5fafa111b24894be"
+              ],
+              "blocking_policy": "REVIEW",
+              "code": "CRITICAL_TARGETING_ESCALATION",
+              "decision_digest": "sha256:d244d8741bacffe17bc161da6a3b89e90ee88f59edd2bb6b8a05799400868d31",
+              "decision_id": "l1dec-d244d8741bacffe1",
+              "permitted_resolver": "HUMAN",
+              "resolution_evidence_shape": [
+                "target_unit_decision"
+              ],
+              "severity": "HIGH",
+              "status": "OPEN"
+            },
+            {
+              "affected_requirement_ids": [
+                "l1req-5fafa111b24894be"
+              ],
+              "blocking_policy": "REVIEW",
+              "code": "COMPOUND_REQUIREMENT",
+              "decision_digest": "sha256:e5d5ab4c7c3644d7cc7ce02a358e399e11f8f66c6349014ea370f567dae71ac7",
+              "decision_id": "l1dec-e5d5ab4c7c3644d7",
+              "permitted_resolver": "HUMAN",
+              "resolution_evidence_shape": [
+                "segmentation_decision"
+              ],
+              "severity": "HIGH",
+              "status": "OPEN"
+            }
+          ],
+          "ledger_digest": "sha256:163aef6168329e9ab5b4cb6ede7e7ccde36fcd6c90f75ff08d8d775f4417b26f",
+          "schema_version": "apps_rg.l1_decision_ledger.v2"
+        },
+        "evidence_obligation_ledger": {
+          "authority_class": "L1_RETRIEVAL_INTENT_ADVISORY_ONLY",
+          "ledger_digest": "sha256:d530f242b6f0901d02d0e44ab1d065db77b9ff3df943c08276b7012534da5ccd",
+          "obligations": [
+            {
+              "authority_class": "C0_MUST_DECIDE_EVIDENCE",
+              "contradiction_scan_required": true,
+              "obligation_digest": "sha256:f2dc581d4faedb60038497ea4e575581ff3507c021928767a99ffb8a37ffc896",
+              "obligation_id": "l1obl-f2dc581d4faedb60",
+              "optional_source_classes": [
+                "approved_research_brief"
+              ],
+              "required_source_classes": [
+                "source_resume",
+                "candidate_profile"
+              ],
+              "requirement_id": "l1req-6bea010c6877ce53",
+              "source_roles": [
+                "candidate_support",
+                "candidate_counterevidence",
+                "JD_targeting"
+              ],
+              "target_unit_id": "experience_block",
+              "targeting_only": true
+            },
+            {
+              "authority_class": "C0_MUST_DECIDE_EVIDENCE",
+              "contradiction_scan_required": true,
+              "obligation_digest": "sha256:f8cd6a23aa50410c568e976fec19a467bfb4dd84dd34705edf10a9b698d7d1df",
+              "obligation_id": "l1obl-f8cd6a23aa50410c",
+              "optional_source_classes": [
+                "approved_research_brief"
+              ],
+              "required_source_classes": [
+                "source_resume",
+                "candidate_profile"
+              ],
+              "requirement_id": "l1req-8e74f12460de8962",
+              "source_roles": [
+                "candidate_support",
+                "candidate_counterevidence",
+                "JD_targeting"
+              ],
+              "target_unit_id": "competencies",
+              "targeting_only": true
+            }
+          ],
+          "schema_version": "apps_rg.l1_evidence_obligation_ledger.v2"
+        },
+        "planning_prior_refs": [
+          {
+            "authority_class": "PLANNING_PRIOR_ONLY",
+            "digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+            "ref": "apps_rg/profiles/rg_planning_profile.yaml"
+          },
+          {
+            "authority_class": "PLANNING_PRIOR_ONLY",
+            "digest": "ee164e9e2233d0a4865ebecc552879cc79500c2c08a1baf0cda119f25cefcff4",
+            "ref": "apps_rg/profiles/rg_l1_requirement_taxonomy.v1.json"
+          }
+        ],
+        "planning_status": "READY",
+        "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:33acc0ea1ff22073:b7312c750abe8c77::v1",
+        "request_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+        "requirements": [
+          {
+            "classification_rule_id": "hard_requirement_unspecified",
+            "compound": false,
+            "coverage_status": "ESCALATED",
+            "criticality": "CRITICAL",
+            "escalation_reason": "HITL_OR_UPSTREAM_REQUIREMENT_REVIEW_REQUIRED",
+            "extraction_confidence": "LOW",
+            "modality": "MUST",
+            "normalized_requirement_digest": "sha256:c333fc601b87b1ae140196411645eaee12ce5225062d108c6aff14957d0084d8",
+            "ordinal": 1,
+            "qualifiers": [],
+            "requirement_id": "l1req-ca0352f00c903e97",
+            "requirement_type": "HARD_REQUIREMENT",
+            "source_kind": "JD_STATEMENT",
+            "source_span": {
+              "end_line": 3,
+              "end_offset": 62,
+              "source_field": "job_description_text",
+              "span_digest": "sha256:0b58d99d74c76c4999920355735af4735fe536c373227113f727e8fc0cb59333",
+              "start_line": 3,
+              "start_offset": 44,
+              "text_digest": "sha256:c333fc601b87b1ae140196411645eaee12ce5225062d108c6aff14957d0084d8"
+            },
+            "target_unit_ids": []
+          },
+          {
+            "classification_rule_id": "scope_scale",
+            "compound": true,
+            "coverage_status": "MAPPED",
+            "criticality": "STANDARD",
+            "escalation_reason": "",
+            "extraction_confidence": "HIGH",
+            "modality": "NEUTRAL",
+            "normalized_requirement_digest": "sha256:80837936262740845b953088b1340f3bf7f26b525acd5bb92a7fccc98b05af6c",
+            "ordinal": 2,
+            "qualifiers": [],
+            "requirement_id": "l1req-6bea010c6877ce53",
+            "requirement_type": "SCOPE_SCALE",
+            "source_kind": "JD_STATEMENT",
+            "source_span": {
+              "end_line": 4,
+              "end_offset": 128,
+              "source_field": "job_description_text",
+              "span_digest": "sha256:35b278c1a8e380bbb83a80c0d1637f6f54356ea7b9bbf525035aef3d48dacc50",
+              "start_line": 4,
+              "start_offset": 63,
+              "text_digest": "sha256:80837936262740845b953088b1340f3bf7f26b525acd5bb92a7fccc98b05af6c"
+            },
+            "target_unit_ids": [
+              "experience_block"
+            ]
+          },
+          {
+            "classification_rule_id": "domain",
+            "compound": false,
+            "coverage_status": "MAPPED",
+            "criticality": "STANDARD",
+            "escalation_reason": "",
+            "extraction_confidence": "MEDIUM",
+            "modality": "NEUTRAL",
+            "normalized_requirement_digest": "sha256:e90e2d6fb2cc4b18746396c0603676d02c6a3c542c71362c9c5f07b21ca0f66a",
+            "ordinal": 3,
+            "qualifiers": [],
+            "requirement_id": "l1req-8e74f12460de8962",
+            "requirement_type": "DOMAIN",
+            "source_kind": "JD_STATEMENT",
+            "source_span": {
+              "end_line": 5,
+              "end_offset": 199,
+              "source_field": "job_description_text",
+              "span_digest": "sha256:300522382f4975c53d97ec51285c4094481c08e80e19c2550517e6bb647a31b9",
+              "start_line": 5,
+              "start_offset": 129,
+              "text_digest": "sha256:e90e2d6fb2cc4b18746396c0603676d02c6a3c542c71362c9c5f07b21ca0f66a"
+            },
+            "target_unit_ids": [
+              "competencies"
+            ]
+          },
+          {
+            "classification_rule_id": "unknown",
+            "compound": true,
+            "coverage_status": "ESCALATED",
+            "criticality": "CRITICAL",
+            "escalation_reason": "HITL_OR_UPSTREAM_REQUIREMENT_REVIEW_REQUIRED",
+            "extraction_confidence": "LOW",
+            "modality": "NEUTRAL",
+            "normalized_requirement_digest": "sha256:e55aca4f65fafd4c40294e3dd4140773bf3be3b2600eb698584b693eab15c9af",
+            "ordinal": 4,
+            "qualifiers": [],
+            "requirement_id": "l1req-5fafa111b24894be",
+            "requirement_type": "UNKNOWN",
+            "source_kind": "JD_STATEMENT",
+            "source_span": {
+              "end_line": 6,
+              "end_offset": 270,
+              "source_field": "job_description_text",
+              "span_digest": "sha256:5a69e6016ef7772692981eb3de210eeed6b2c0d0c8f4efbe4b2fd9951b208947",
+              "start_line": 6,
+              "start_offset": 200,
+              "text_digest": "sha256:e55aca4f65fafd4c40294e3dd4140773bf3be3b2600eb698584b693eab15c9af"
+            },
+            "target_unit_ids": []
+          },
+          {
+            "classification_rule_id": "unknown",
+            "compound": false,
+            "coverage_status": "ESCALATED",
+            "criticality": "CRITICAL",
+            "escalation_reason": "HITL_OR_UPSTREAM_REQUIREMENT_REVIEW_REQUIRED",
+            "extraction_confidence": "LOW",
+            "modality": "NEUTRAL",
+            "normalized_requirement_digest": "sha256:186369ea709eb1ab4e6dca3b2609387c9d2a47d868ad1a8461a3158dad3ac8fc",
+            "ordinal": 5,
+            "qualifiers": [],
+            "requirement_id": "l1req-870edfb692d2e17a",
+            "requirement_type": "UNKNOWN",
+            "source_kind": "JD_STATEMENT",
+            "source_span": {
+              "end_line": 7,
+              "end_offset": 347,
+              "source_field": "job_description_text",
+              "span_digest": "sha256:6d022d8b04f1dc11ed637f0afb47cb7dff5f296325cd7f2f35eb6bc12d0be201",
+              "start_line": 7,
+              "start_offset": 271,
+              "text_digest": "sha256:186369ea709eb1ab4e6dca3b2609387c9d2a47d868ad1a8461a3158dad3ac8fc"
+            },
+            "target_unit_ids": []
+          }
+        ],
+        "run_id": "12c624e2-a501-469b-b316-48b34ee040e6",
+        "schema_version": "apps_rg_l1_planning_capsule.v2",
+        "source_binding": {
+          "inline_jd_available": true,
+          "inline_jd_digest": "sha256:a55651914275fce3b0896ec12078f076b9bdeff3437cefd4050005b924710b91",
+          "jd_hash": "b7312c750abe8c77daad1acc1e2d6d0c784464473f1dde81eccce604ac518f16",
+          "source_class": "U0_VALIDATED_JD_PAYLOAD"
+        },
+        "trace_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+        "validation": {
+          "no_candidate_evidence_claim": true,
+          "no_evidence_retrieval": true,
+          "no_l4_write": true,
+          "no_model_call": true,
+          "no_prompt_assembly": true,
+          "no_route_selection": true,
+          "no_tool_call": true,
+          "profile_and_taxonomy_digest_bound": true,
+          "u0_payload_only": true
+        },
+        "work_dag": {
+          "authority_class": "L1_SCHEDULING_ADVISORY_ONLY",
+          "dag_digest": "sha256:0d47cd68674eb3608aa31f1f93277789701ffb64efb21e84d652d822ee5b9e37",
+          "edges": [
+            {
+              "from": "requirement:l1req-6bea010c6877ce53",
+              "relation": "REQUIRES_TARGETING",
+              "to": "unit:experience_block"
+            },
+            {
+              "from": "requirement:l1req-8e74f12460de8962",
+              "relation": "REQUIRES_TARGETING",
+              "to": "unit:competencies"
+            },
+            {
+              "from": "u0:validated_jd",
+              "relation": "REQUIRES_INPUT",
+              "to": "requirement:l1req-5fafa111b24894be"
+            },
+            {
+              "from": "u0:validated_jd",
+              "relation": "REQUIRES_INPUT",
+              "to": "requirement:l1req-6bea010c6877ce53"
+            },
+            {
+              "from": "u0:validated_jd",
+              "relation": "REQUIRES_INPUT",
+              "to": "requirement:l1req-870edfb692d2e17a"
+            },
+            {
+              "from": "u0:validated_jd",
+              "relation": "REQUIRES_INPUT",
+              "to": "requirement:l1req-8e74f12460de8962"
+            },
+            {
+              "from": "u0:validated_jd",
+              "relation": "REQUIRES_INPUT",
+              "to": "requirement:l1req-ca0352f00c903e97"
+            },
+            {
+              "from": "u0:validated_resume",
+              "relation": "REQUIRES_EVIDENCE",
+              "to": "unit:certifications_block"
+            },
+            {
+              "from": "u0:validated_resume",
+              "relation": "REQUIRES_EVIDENCE",
+              "to": "unit:competencies"
+            },
+            {
+              "from": "u0:validated_resume",
+              "relation": "REQUIRES_EVIDENCE",
+              "to": "unit:education_block"
+            },
+            {
+              "from": "u0:validated_resume",
+              "relation": "REQUIRES_EVIDENCE",
+              "to": "unit:executive_summary"
+            },
+            {
+              "from": "u0:validated_resume",
+              "relation": "REQUIRES_EVIDENCE",
+              "to": "unit:experience_block"
+            },
+            {
+              "from": "u0:validated_resume",
+              "relation": "REQUIRES_EVIDENCE",
+              "to": "unit:headline"
+            },
+            {
+              "from": "u0:validated_resume",
+              "relation": "REQUIRES_EVIDENCE",
+              "to": "unit:skills_block"
+            },
+            {
+              "from": "unit:certifications_block",
+              "relation": "REQUIRES_VALIDATION",
+              "to": "validation:certifications_block"
+            },
+            {
+              "from": "unit:competencies",
+              "relation": "REQUIRES_VALIDATION",
+              "to": "validation:competencies"
+            },
+            {
+              "from": "unit:education_block",
+              "relation": "REQUIRES_VALIDATION",
+              "to": "validation:education_block"
+            },
+            {
+              "from": "unit:executive_summary",
+              "relation": "REQUIRES_VALIDATION",
+              "to": "validation:executive_summary"
+            },
+            {
+              "from": "unit:experience_block",
+              "relation": "REQUIRES_VALIDATION",
+              "to": "validation:experience_block"
+            },
+            {
+              "from": "unit:headline",
+              "relation": "REQUIRES_VALIDATION",
+              "to": "validation:headline"
+            },
+            {
+              "from": "unit:skills_block",
+              "relation": "REQUIRES_VALIDATION",
+              "to": "validation:skills_block"
+            },
+            {
+              "from": "validation:certifications_block",
+              "relation": "MERGE_AFTER",
+              "to": "merge:final_resume"
+            },
+            {
+              "from": "validation:competencies",
+              "relation": "MERGE_AFTER",
+              "to": "merge:final_resume"
+            },
+            {
+              "from": "validation:education_block",
+              "relation": "MERGE_AFTER",
+              "to": "merge:final_resume"
+            },
+            {
+              "from": "validation:executive_summary",
+              "relation": "MERGE_AFTER",
+              "to": "merge:final_resume"
+            },
+            {
+              "from": "validation:experience_block",
+              "relation": "MERGE_AFTER",
+              "to": "merge:final_resume"
+            },
+            {
+              "from": "validation:headline",
+              "relation": "MERGE_AFTER",
+              "to": "merge:final_resume"
+            },
+            {
+              "from": "validation:skills_block",
+              "relation": "MERGE_AFTER",
+              "to": "merge:final_resume"
+            }
+          ],
+          "nodes": [
+            {
+              "node_id": "merge:final_resume",
+              "node_type": "MERGE"
+            },
+            {
+              "node_id": "requirement:l1req-5fafa111b24894be",
+              "node_type": "REQUIREMENT"
+            },
+            {
+              "node_id": "requirement:l1req-6bea010c6877ce53",
+              "node_type": "REQUIREMENT"
+            },
+            {
+              "node_id": "requirement:l1req-870edfb692d2e17a",
+              "node_type": "REQUIREMENT"
+            },
+            {
+              "node_id": "requirement:l1req-8e74f12460de8962",
+              "node_type": "REQUIREMENT"
+            },
+            {
+              "node_id": "requirement:l1req-ca0352f00c903e97",
+              "node_type": "REQUIREMENT"
+            },
+            {
+              "node_id": "u0:validated_jd",
+              "node_type": "U0_INPUT"
+            },
+            {
+              "node_id": "u0:validated_resume",
+              "node_type": "U0_INPUT"
+            },
+            {
+              "node_id": "unit:certifications_block",
+              "node_type": "WORK_UNIT"
+            },
+            {
+              "node_id": "unit:competencies",
+              "node_type": "WORK_UNIT"
+            },
+            {
+              "node_id": "unit:education_block",
+              "node_type": "WORK_UNIT"
+            },
+            {
+              "node_id": "unit:executive_summary",
+              "node_type": "WORK_UNIT"
+            },
+            {
+              "node_id": "unit:experience_block",
+              "node_type": "WORK_UNIT"
+            },
+            {
+              "node_id": "unit:headline",
+              "node_type": "WORK_UNIT"
+            },
+            {
+              "node_id": "unit:skills_block",
+              "node_type": "WORK_UNIT"
+            },
+            {
+              "node_id": "validation:certifications_block",
+              "node_type": "VALIDATION"
+            },
+            {
+              "node_id": "validation:competencies",
+              "node_type": "VALIDATION"
+            },
+            {
+              "node_id": "validation:education_block",
+              "node_type": "VALIDATION"
+            },
+            {
+              "node_id": "validation:executive_summary",
+              "node_type": "VALIDATION"
+            },
+            {
+              "node_id": "validation:experience_block",
+              "node_type": "VALIDATION"
+            },
+            {
+              "node_id": "validation:headline",
+              "node_type": "VALIDATION"
+            },
+            {
+              "node_id": "validation:skills_block",
+              "node_type": "VALIDATION"
+            }
+          ],
+          "schema_version": "apps_rg.l1_work_dag.v2"
+        },
+        "work_unit_ids": [
+          "executive_summary",
+          "headline",
+          "competencies",
+          "experience_block",
+          "skills_block",
+          "education_block",
+          "certifications_block"
+        ]
+      },
+      "apps_rg_planning_v2_capsule_ref": "sha256:d02cffa7a32130434beeb7f26464ce33a024e44a3babbddc0b5c44c6bb9d04d5",
+      "apps_rg_planning_v2_status": "READY",
+      "capability_requirements": [
+        "needs_strong_narrative",
+        "needs_long_context"
+      ],
+      "generation_mode": "strategic_tailor",
+      "l1_cognitive_treatment": {
+        "app_scope": "APPS_RG_V2_ONLY",
+        "arm": "l1_cognitive_v3",
+        "assignment_origin": "U0_VALIDATED_INGRESS",
+        "authority_class": "EXPERIMENT_ASSIGNMENT_ONLY",
+        "automatic_promotion": false,
+        "schema_version": "apps_rg.l1_cognitive_treatment.v1",
+        "treatment_digest": "sha256:376ec8b0ab4bbc423a286169da47d0cc04bb105b19493c6c2b001203d0bb8b97",
+        "v3_cognitive_plan_enabled": true
+      },
+      "task_class": "resume_generation"
+    },
+    "tenant_id": "",
+    "trace_id": "7d6b8e48-cc0d-41be-98fe-a50fa999e181",
+    "validation_receipt_id": "l1val-7d6b8e48-1561029d5b9f8a9a",
+    "work_shape": "full_resume_generation",
+    "write_authority_present": false
+  },
+  "non_product_evaluation_only": true,
+  "schema_version": "apps_rg.l1_plan_contract.v1",
+  "status": "PASS"
+}

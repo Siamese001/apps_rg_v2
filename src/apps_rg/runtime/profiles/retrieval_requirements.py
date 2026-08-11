@@ -1,7 +1,7 @@
 """apps_rg retrieval requirements profile loader.
 
 W1: apps_rg owns the required_source_classes declaration.
-This module must NOT import from agentic_core.
+This module must NOT import from apps_rg.
 
 Plan: apps-rg-retrieval-metrics-ownership-and-c0-evidence-plan W1
 """

@@ -1,4 +1,4 @@
-"""W3 execution-path classification — child plan ``apps-rg-agentic-core-boundary-remediation-child-f8e3c1``.
+"""W3 execution-path classification — child plan ``apps-rg-runtime-boundary-remediation-child-f8e3c1``.
 
 Buckets match wave W3 acceptance (exact strings for manifests and static checks):
 
@@ -13,7 +13,7 @@ Import-time ``validate_bucket`` is a cheap guard against typos or unlabeled surf
 
 from __future__ import annotations
 
-PLAN_SLUG = "apps-rg-agentic-core-boundary-remediation-child-f8e3c1"
+PLAN_SLUG = "apps-rg-runtime-boundary-remediation-child-f8e3c1"
 
 BUCKET_GOVERNED_PA_L2_EXIT = "governed_pa_l2_exit"
 BUCKET_TEST_DEV_ONLY = "test_dev_only"

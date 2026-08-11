@@ -1,42 +1,19 @@
-"""Route-neutral spine entrypoint — old R4 module path deleted; cache preflight enforced."""
+"""App-owned route-neutral spine entrypoint; cache preflight is enforced."""
 from __future__ import annotations
 
 import importlib
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
-def _isolate_agentic_l2_cache(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-) -> None:
-    import agentic_core.L4_state.cache.gptcache_client as cache_module
-    from agentic_core.L4_state.contracts.vector_cache_layout import VectorCacheLayout
-
-    monkeypatch.setattr(
-        cache_module,
-        "VECTOR_CACHE_LAYOUT",
-        VectorCacheLayout(base_dir=tmp_path / "l2_cache"),
-    )
-    monkeypatch.setenv("CHROMA_PERSIST_DIR", str(tmp_path / "chroma"))
-
-
-def test_old_r4_module_not_importable() -> None:
-    with pytest.raises(ModuleNotFoundError):
-        importlib.import_module(
-            "agentic_core.runtime.entrypoints.integrated_r4_deterministic_pipeline_run"
-        )
-
-
-def test_new_spine_module_importable() -> None:
+def test_app_owned_spine_module_importable() -> None:
     mod = importlib.import_module(
-        "agentic_core.runtime.entrypoints.integrated_single_action_spine_run"
+        "apps_rg.runtime.orchestration.app_single_action_spine"
     )
-    assert hasattr(mod, "run_integrated_single_action_spine")
+    assert hasattr(mod, "run_apps_rg_single_action_spine")
     assert mod.ROUTE_FAMILY == "R4_SINGLE_ACTION"
 
 
@@ -44,8 +21,8 @@ def test_apps_rg_production_requires_cache_preflight_evidence(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    _isolate_agentic_l2_cache(monkeypatch, tmp_path)
-    from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+    del monkeypatch
+    from apps_rg.runtime.orchestration.integrated_spine_runner import (
         run_integrated_single_action_spine,
     )
 
@@ -61,27 +38,23 @@ def test_direct_spine_without_cache_fails_product_proof(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    _isolate_agentic_l2_cache(monkeypatch, tmp_path)
-    from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+    del monkeypatch
+    from apps_rg.runtime.orchestration.integrated_spine_runner import (
         run_integrated_single_action_spine,
     )
     from apps_rg.runtime.integrated_product_proof_gate import validate_integrated_product_proof
 
-    with patch(
-        "agentic_core.runtime.l2_recipe_resolver.resolve_l2_recipe"
-    ) as mock_resolve:
-        mock_resolve.return_value = MagicMock(return_value={"status": "ok"})
-        run_integrated_single_action_spine(
-            raw_request={
-                "jd_payload": {"title": "Role", "description": "desc"},
-                "jd_hash": "a",
-                "brief_hash": "b",
-                "resume_hash": "c",
-            },
-            app_name="apps_rg",
-            artifact_dir=tmp_path,
-            _test_mode=True,
-        )
+    run_integrated_single_action_spine(
+        raw_request={
+            "jd_payload": {"title": "Role", "description": "desc"},
+            "jd_hash": "a",
+            "brief_hash": "b",
+            "resume_hash": "c",
+        },
+        app_name="apps_rg",
+        artifact_dir=tmp_path,
+        _test_mode=True,
+    )
 
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
@@ -184,18 +157,18 @@ def test_section_path_invokes_integrated_spine_with_section_scope(
     tmp_path: Path,
 ) -> None:
     import apps_rg.runtime.orchestration.canonical_dispatch as cd
-    from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+    from apps_rg.runtime.orchestration.app_single_action_spine import (
+        AppsRgSingleActionSpineRunResult,
         ROUTE_ID,
-        SingleActionSpineRunResult,
     )
 
     calls: list[dict] = []
 
     def _fake_spine(**kwargs):  # noqa: ANN003
         calls.append(kwargs)
-        return SingleActionSpineRunResult(
-            run_id="core-run-section",
-            request_id="core-req-section",
+        return AppsRgSingleActionSpineRunResult(
+            run_id="apps-rg-run-section",
+            request_id="apps-rg-req-section",
             route_id=ROUTE_ID,
             x3_disposition="EXIT_OK",
             terminal_r5=False,
@@ -212,10 +185,11 @@ def test_section_path_invokes_integrated_spine_with_section_scope(
                     }
                 ]
             },
+            execution_witness={},
         )
 
     monkeypatch.setattr(
-        "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+        "apps_rg.runtime.orchestration.integrated_spine_runner.run_integrated_single_action_spine",
         _fake_spine,
     )
     monkeypatch.setattr(cd, "_apps_rg_u0_runtime_package_fields", lambda: {})
@@ -239,15 +213,15 @@ def test_section_path_uses_nested_section_x3_block_not_wrapper_exit_ok(
     tmp_path: Path,
 ) -> None:
     import apps_rg.runtime.orchestration.canonical_dispatch as cd
-    from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+    from apps_rg.runtime.orchestration.app_single_action_spine import (
+        AppsRgSingleActionSpineRunResult,
         ROUTE_ID,
-        SingleActionSpineRunResult,
     )
 
     def _fake_spine(**kwargs):  # noqa: ANN003
-        return SingleActionSpineRunResult(
-            run_id="core-run-section",
-            request_id="core-req-section",
+        return AppsRgSingleActionSpineRunResult(
+            run_id="apps-rg-run-section",
+            request_id="apps-rg-req-section",
             route_id=ROUTE_ID,
             x3_disposition="EXIT_OK",
             terminal_r5=False,
@@ -267,10 +241,11 @@ def test_section_path_uses_nested_section_x3_block_not_wrapper_exit_ok(
                     }
                 ]
             },
+            execution_witness={},
         )
 
     monkeypatch.setattr(
-        "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+        "apps_rg.runtime.orchestration.integrated_spine_runner.run_integrated_single_action_spine",
         _fake_spine,
     )
     monkeypatch.setattr(cd, "_apps_rg_u0_runtime_package_fields", lambda: {})

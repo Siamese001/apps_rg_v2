@@ -42,7 +42,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Verify the locked apps_rg GPU embedding control: Python, dependency "
-            "closure, wheel payloads, external core revision, GPU, CUDA, offline "
+            "closure, wheel payloads, Apps RG source revision, GPU, CUDA, offline "
             "policy, and pinned BGE-M3 bytes."
         )
     )
@@ -98,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
         "issues": receipt["issues"],
         "python": receipt["observations"]["python"],
         "cuda": receipt["observations"]["cuda"],
-        "agentic_core": receipt["observations"]["agentic_core"],
+        "apps_rg_source": receipt["observations"]["apps_rg_source"],
         "model": receipt["observations"]["model"],
         "scope": receipt["scope"],
     }

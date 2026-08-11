@@ -22,7 +22,7 @@ _log = logging.getLogger("apps_research")
 def _adg_bootstrap() -> None:
     """Run optional ADG bootstrap without making package import fragile."""
     try:
-        module = importlib.import_module("agentic_core.adg.applications.execute_ssot_integration")
+        module = importlib.import_module("apps_rg.runtime.apps_runtime_compat")
         build_pre_run_report = module.build_pre_run_report
     except (ImportError, AttributeError):
         return
@@ -94,7 +94,7 @@ def _parse_product_argv(argv: list[str]):
 
     parser = argparse.ArgumentParser(
         prog="python -m apps_research",
-        description="apps_research via agentic_core spine (U0-bound AppRuntimeProfile)",
+        description="apps_research via apps_rg spine (U0-bound AppRuntimeProfile)",
     )
     parser.add_argument(
         "--topic",
@@ -334,7 +334,7 @@ def _write_research_artifacts(record, request) -> Path:
 def _run_profile_spine(argv: list[str]) -> int:
     """Run apps_research via U0-bound AppRuntimeProfile (Bundle C canonical path).
 
-    Sequences profile.u0 → l1 → l0 → c0 → pa → l2 → exit through agentic_core
+    Sequences profile.u0 → l1 → l0 → c0 → pa → l2 → exit through apps_rg
     bindings. No dispatch callable and no GovernedResearchRun U0 bypass.
     """
     args = _parse_product_argv(argv)

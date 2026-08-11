@@ -93,24 +93,24 @@ def _contract(repo_root: Path) -> tuple[list[dict[str, str]], str]:
     return normalized, _digest(value)
 
 
-def _external_runtime_probe(root: Path) -> CompatibilityProbeResult:
+def _app_runtime_independence_probe(root: Path) -> CompatibilityProbeResult:
     from apps_rg.runtime.standalone_dependency_posture import (
-        EXTERNAL_RUNTIME_BOUND,
-        STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME,
-        validate_standalone_runtime_dependency_receipt,
+        APP_RUNTIME_INDEPENDENT,
+        APP_RUNTIME_INDEPENDENCE_RECEIPT_FILENAME,
+        validate_app_runtime_independence_receipt,
     )
 
-    path = root / STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME
+    path = root / APP_RUNTIME_INDEPENDENCE_RECEIPT_FILENAME
     try:
         receipt = _load_json(path)
-        validate_standalone_runtime_dependency_receipt(receipt)
-        errors = () if receipt.get("status") == EXTERNAL_RUNTIME_BOUND else (
+        validate_app_runtime_independence_receipt(receipt)
+        errors = () if receipt.get("status") == APP_RUNTIME_INDEPENDENT else (
             f"runtime_status:{receipt.get('status') or 'MISSING'}",
         )
     except Exception as exc:  # fail-closed diagnostic boundary
         errors = (f"{type(exc).__name__}:{exc}",)
     return CompatibilityProbeResult(
-        "EXTERNAL_CORE_RUNTIME_BINDING", not errors, errors, (path.name,)
+        "APP_RUNTIME_INDEPENDENCE", not errors, errors, (path.name,)
     )
 
 
@@ -232,7 +232,7 @@ def _terminal_manifest_probe(root: Path) -> CompatibilityProbeResult:
 
 def default_probes() -> dict[str, Probe]:
     return {
-        "EXTERNAL_CORE_RUNTIME_BINDING": _external_runtime_probe,
+        "APP_RUNTIME_INDEPENDENCE": _app_runtime_independence_probe,
         "APPS_RESEARCH_HANDOFF_CONSUMER_RECEIPT": _research_handoff_probe,
         "CORE_RUNTIME_AUTHORITY": _core_authority_probe,
         "RECEIPT_DERIVED_STAGE_LEDGER": _stage_ledger_probe,

@@ -5,10 +5,7 @@ from __future__ import annotations
 import json
 import hashlib
 import inspect
-import os
 from pathlib import Path
-import subprocess
-import sys
 from unittest.mock import patch
 
 
@@ -127,47 +124,26 @@ def test_executive_summary_l7_packaging_uses_checkout_not_package_src_root() -> 
     assert finalize.call_args.kwargs["repo_root"] != REPO_ROOT / "src"
 
 
-def test_core_write_gateway_resolution_survives_shared_core_callback_cycle(
-    tmp_path: Path,
-) -> None:
-    """The app boundary must finish importing before shared-core callbacks occur."""
+def test_apps_rg_write_gateway_is_local_and_atomic(tmp_path: Path) -> None:
+    """Artifact writes need no external callback or package bootstrap."""
 
-    package = tmp_path / "agentic_core"
-    l2_execution = package / "L2_execution"
-    utilities = l2_execution / "utils"
-    utilities.mkdir(parents=True)
-    (package / "__init__.py").write_text(
-        "from apps_rg.runtime.core_io import write_gateway\n",
-        encoding="utf-8",
-    )
-    (l2_execution / "__init__.py").write_text("", encoding="utf-8")
-    (utilities / "__init__.py").write_text("", encoding="utf-8")
-    (utilities / "write_gateway.py").write_text(
-        "sentinel = 'resolved-after-callback'\n",
-        encoding="utf-8",
-    )
-    environment = dict(os.environ)
-    environment["PYTHONPATH"] = os.pathsep.join(
-        (str(tmp_path), str(REPO_ROOT / "src"))
-    )
-    code = (
-        "import sys\n"
-        "from apps_rg.runtime.core_io import write_gateway\n"
-        "assert 'agentic_core.L2_execution.utils.write_gateway' not in sys.modules\n"
-        "assert write_gateway.sentinel == 'resolved-after-callback'\n"
-    )
+    from apps_rg.runtime.core_io import write_gateway
 
-    completed = subprocess.run(
-        [sys.executable, "-c", code],
-        cwd=tmp_path,
-        env=environment,
-        capture_output=True,
-        text=True,
-        timeout=30,
-        check=False,
-    )
+    target = tmp_path / "receipts" / "result.json"
+    write_gateway.write_text(target, "before", encoding="utf-8")
+    assert target.read_text(encoding="utf-8") == "before"
 
-    assert completed.returncode == 0, completed.stderr
+    write_gateway.write_json_atomic(target, {"status": "PASS", "count": 1})
+    assert json.loads(target.read_text(encoding="utf-8")) == {
+        "count": 1,
+        "status": "PASS",
+    }
+
+    copied = tmp_path / "copy" / "result.json"
+    write_gateway.copy_file(target, copied)
+    assert copied.read_bytes() == target.read_bytes()
+    write_gateway.remove_file(copied)
+    assert not copied.exists()
 
 
 def test_missing_pointer_is_downstream_consequence_not_primary_fault(

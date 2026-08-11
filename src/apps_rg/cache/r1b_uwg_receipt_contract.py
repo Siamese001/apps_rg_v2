@@ -167,7 +167,7 @@ def _validate_l5_packet_evidence(commit_request: Any) -> tuple[list[str], list[s
 
 
 def _expected_commit_request_signature(commit_request: Any) -> str:
-    from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
+    from apps_rg.runtime.local_state import compute_deterministic_digest
 
     refs = _l5_ref_map(commit_request)
     return compute_deterministic_digest(
@@ -375,7 +375,7 @@ def document_r1b_uwg_core_receipt_gaps() -> dict[str, Any]:
             "audit_refs",
         ],
         "apps_rg_sidecar_path": "durable/uwg_admitted/intents/<record_id>.json#governance_receipt",
-        "agentic_core_edit_required_for_full_parity": False,
+        "external_runtime_edit_required_for_full_parity": False,
     }
 
 

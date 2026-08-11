@@ -6,7 +6,7 @@ policy lookup by section and bullet ordinal.
 Hard boundaries:
 - No generation behavior.
 - No model calls.
-- No PA, C0, L2, or agentic_core imports.
+- No PA, C0, L2, or apps_rg imports.
 - Fails closed on unknown section or missing profile.
 
 See: artifacts/governance/apps_rg_resume_shipping_s2_section_treatment_matrix.md

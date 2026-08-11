@@ -37,7 +37,7 @@ def _passing_observations(contract: dict) -> dict:
         }
         for name, binding in contract["critical_distributions"].items()
     }
-    core = contract["agentic_core"]
+    source = contract["apps_rg_source"]
     gpu = contract["gpu"]
     runtime = contract["embedding_runtime"]
     model = contract["model"]
@@ -51,14 +51,10 @@ def _passing_observations(contract: dict) -> dict:
         "locked_packages": locked,
         "installed_locked_packages": dict(locked),
         "critical_distributions": critical,
-        "agentic_core": {
+        "apps_rg_source": {
             "available": True,
-            "distribution_version": core["distribution_version"],
-            "repository_url": core["repository_url"],
-            "revision": core["revision"],
-            "tree_sha": core["tree_sha"],
-            "module_relative_path": core["module_relative_path"],
-            "tracked_or_untracked_module_changes": [],
+            "source_relative_path": source["source_relative_path"],
+            "tracked_or_untracked_source_changes": [],
         },
         "cuda": {
             "available": True,
@@ -95,7 +91,6 @@ def test_contract_binds_lock_runtime_model_and_direct_hashed_torch_wheel() -> No
     )
     assert contract["install"]["torch_wheel_url"] in lock
     assert f"#sha256={contract['install']['torch_wheel_sha256']}" in lock
-    assert f"@{contract['agentic_core']['revision']}#egg=agentic-workflow" in lock
     assert contract["embedding_runtime"]["network_allowed"] is False
     assert contract["embedding_runtime"]["fallback_allowed"] is False
 
@@ -140,14 +135,16 @@ def test_contract_rejects_lock_digest_drift(tmp_path: Path) -> None:
             "CRITICAL_DISTRIBUTION_PAYLOAD_SHA256::torch",
         ),
         (
-            lambda value: value["agentic_core"].__setitem__("revision", "0" * 40),
-            "AGENTIC_CORE_REVISION_MISMATCH",
+            lambda value: value["apps_rg_source"].__setitem__(
+                "source_relative_path", "src/apps_rg/not_init.py"
+            ),
+            "APP_SOURCE_SOURCE_RELATIVE_PATH_MISMATCH",
         ),
         (
-            lambda value: value["agentic_core"].__setitem__(
-                "tracked_or_untracked_module_changes", [" M agentic_core/x.py"]
+            lambda value: value["apps_rg_source"].__setitem__(
+                "tracked_or_untracked_source_changes", [" M src/apps_rg/x.py"]
             ),
-            "AGENTIC_CORE_MODULE_TREE_DIRTY",
+            "APP_SOURCE_TREE_DIRTY",
         ),
         (
             lambda value: value["cuda"].__setitem__("torch_arch_list", ["sm_90"]),

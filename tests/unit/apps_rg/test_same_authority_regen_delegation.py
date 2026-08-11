@@ -1,21 +1,17 @@
-"""W3: apps_rg executive_summary delegates prescriptive regen to core runner."""
+"""W3: apps_rg executive_summary uses its bounded same-authority runner."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock
 
-import pytest
-
-from agentic_core.L2_execution.regen.prompt_lock import PROMPT_LOCK_GENERIC
+from apps_rg.runtime.sections.executive_summary_regen_support import PROMPT_LOCK_GENERIC
 from apps_rg.runtime.sections.executive_summary_judge_remediation import (
     build_judge_remediation_prescriptive_delta_message,
     collect_judge_remediation_delta_lines,
     retry_provider_for_judge_remediation,
 )
 from apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge import (
-    build_incremental_repair_contract,
     messages_to_prompt_messages,
 )
 
@@ -35,7 +31,7 @@ def _soft_judge() -> dict:
     }
 
 
-def test_prescriptive_delta_uses_core_prompt_lock_not_apps_duplicate() -> None:
+def test_prescriptive_delta_uses_app_prompt_lock() -> None:
     msg = build_judge_remediation_prescriptive_delta_message(
         x1d_judges=[_soft_judge()],
         unused_fact_ids=[],
@@ -77,7 +73,7 @@ def test_messages_to_prompt_messages_extracts_system_and_user() -> None:
 def test_retry_provider_delegates_to_core_runner(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN", "1")
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_PRESCRIPTIVE_DELTA", "1")
-    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_CORE_SAME_AUTHORITY_REGEN", "1")
+    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_SAME_AUTHORITY_REGEN", "1")
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_LEGACY_BLOCK", "0")
 
     (tmp_path / "compiled_prompt_artifact.json").write_text(
@@ -105,7 +101,7 @@ def test_retry_provider_delegates_to_core_runner(tmp_path: Path, monkeypatch) ->
 
     def _fake_run(**kwargs):
         contract = kwargs["contract"]
-        from agentic_core.L2_execution.regen import SameAuthorityRegenRunner
+        from apps_rg.runtime.sections.executive_summary_local_regen import SameAuthorityRegenRunner
 
         def _gen(msgs: list[dict[str, str]]) -> dict[str, object]:
             return {
@@ -133,7 +129,7 @@ def test_retry_provider_delegates_to_core_runner(tmp_path: Path, monkeypatch) ->
         )
 
     monkeypatch.setattr(
-        "apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge.run_core_same_authority_regen",
+        "apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge.run_apps_rg_same_authority_regen",
         _fake_run,
     )
 
@@ -151,7 +147,7 @@ def test_retry_provider_delegates_to_core_runner(tmp_path: Path, monkeypatch) ->
         run_id="run-1",
         max_attempts=1,
     )
-    assert receipt.get("regen_engine") == "core.SameAuthorityRegenRunner"
+    assert receipt.get("regen_engine") == "apps_rg.SameAuthorityRegenRunner"
     assert receipt.get("accepted") is True
     assert "Revised" in str(new_parsed.get("resume_display_text") or "")
     assert (tmp_path / "same_authority_regen_receipt.json").is_file()

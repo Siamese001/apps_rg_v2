@@ -1,0 +1,68 @@
+{
+  "app_scope": "APPS_RG_V2_ONLY",
+  "authority": {
+    "automatic_promotion": false,
+    "human_qualified": false,
+    "production_authorizing": false,
+    "release_authorizing": false,
+    "technical_validation": true
+  },
+  "authority_class": "TECHNICAL_PAIRED_EXECUTION_ONLY",
+  "experiment": {
+    "candidate_treatment_id": "l1_cognitive_v3",
+    "control_treatment_id": "l1_v2_control",
+    "experiment_id": "apps_rg_l1_cognitive_v3_vs_v2",
+    "protocol_digest": "sha256:b7915a32e26f145bed2f5498457b43f7d79361ac514fbc4921160a1a1d6bf58f"
+  },
+  "outcomes": {
+    "P1": {
+      "reason_codes": [
+        "BLINDED_HUMAN_REVIEW_REQUIRED"
+      ],
+      "status": "NOT_MEASURED"
+    },
+    "P2": {
+      "reason_codes": [
+        "FROZEN_DENOMINATOR_AND_HUMAN_REVIEW_REQUIRED"
+      ],
+      "status": "NOT_MEASURED"
+    }
+  },
+  "pairs": [
+    {
+      "candidate": {
+        "c0_outcome_set_digest": "sha256:0578a73ab9da3fa53eeb17fdf829cad5a5d0cef14c54ac26babf4e886368ed57",
+        "compiled_prompt_digest": "sha256:9802d3a732b460be127c43c6f47251ef880eba17468a0827a01ed8cde613a0cd",
+        "completion_status": "FAIL",
+        "l1_cognitive_advisory_digest": "sha256:d5cf98e4eee4d1b45d816117ad31c1010c580f2c33da7b212cff0439549884a8",
+        "l1_cognitive_plan_digest": "sha256:89d6d44210be56f5e24381c0603905944f9d70033eba81ecc31d0b4d2089016f",
+        "l1_cognitive_revision_set_digest": "sha256:b30aa5d422b22e7b503437bcb93f81a3c7012921fd21634967283192ada32900",
+        "l1_cognitive_treatment_execution_digest": "sha256:80227e76bc6111aeae83c2141f91da5fd500581675e655fd78e175109b231a45",
+        "output_digest": "sha256:73a1acda6f4c86fb677a032cf789b4c63426f6c162cc4c44a3e82a72420a0667",
+        "run_id": "candidate_attempt_005",
+        "run_ref": "candidate_attempt_005"
+      },
+      "control": {
+        "compiled_prompt_digest": "sha256:b489dfabea07f76f48218017296a84e860ce3c5836bf098d6a7573a678142b30",
+        "completion_status": "FAIL",
+        "l1_cognitive_treatment_execution_digest": "sha256:e50d524174a8f4ac4e6ff41a110044ebfd6cc9c2cf7f8d14c222ab7e4fbae469",
+        "l1_v2_capsule_digest": "sha256:1604aa6225b099be63354d81cb8123eac10bc63dc99d830da25cb4a2df6f15ad",
+        "output_digest": "sha256:3cb026786f0ee39fa34c91a43c185cf555207b5a99911688b2c18f7289d04bbd",
+        "run_id": "control_attempt_002",
+        "run_ref": "control_attempt_002"
+      },
+      "frozen_input_digest": "sha256:413105df9755eb24aa8718da850b5e5bc0465cce4c909069d7ec0cb584d20de6",
+      "pair_id": "20260811_pair_002_control_002_candidate_005",
+      "provider_model_config_digest": "sha256:4f6c4ecdd0d797e2afa26518b0ff50b14afb7d932cb52a94f5481f979592c8a3",
+      "tool_config_digest": "sha256:ae6088ed2681686b1201e7b4b01cd4a5a03f3e0a0885de5390f94bd2f6c8b43f"
+    }
+  ],
+  "receipt_digest": "sha256:13a016c10150fde872c4607340416e8b0cbdddee01a4a2997b5112e3b75e3f0a",
+  "schema_version": "apps_rg.l1_cognitive_paired_shadow_receipt.v1",
+  "summary": {
+    "all_attempts_preserved": true,
+    "attempt_count": 1,
+    "candidate_c0_outcome_before_pa_required": true,
+    "completed_pair_count": 0
+  }
+}

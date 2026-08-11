@@ -446,12 +446,12 @@ def test_pending_source_not_in_svp_external_eligible(ledger: dict) -> None:
     assert not pending_ids & set(proj.external_eligible_skill_ids)
 
 
-def test_agentic_core_diff_empty() -> None:
+def test_apps_rg_runtime_diff_empty() -> None:
     import os
     import subprocess
 
     result = subprocess.run(
-        ["git", "diff", "HEAD", "--", "agentic_core"],
+        ["git", "diff", "HEAD", "--", "apps_rg_runtime"],
         cwd=REPO,
         capture_output=True,
         text=True,
@@ -459,5 +459,5 @@ def test_agentic_core_diff_empty() -> None:
     )
     assert result.returncode == 0
     if result.stdout.strip() and os.environ.get("CI") != "true":
-        pytest.skip("agentic_core has local diff vs HEAD; assert on clean CI tree")
+        pytest.skip("apps_rg_runtime has local diff vs HEAD; assert on clean CI tree")
     assert result.stdout.strip() == ""

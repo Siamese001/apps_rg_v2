@@ -40,11 +40,11 @@ R4_SECTION_GRAIN_RUNTIME_BOUND: Final[bool] = True
 R4_MODULAR_PROOF_RUN_ID: Final[str] = R4_RECORDED_MODULAR_PROOF_RUN_ID
 
 CANONICAL_INTEGRATED_PRODUCT_ENTRY_IMPORT = (
-    "agentic_core.runtime.entry.apps_rg_dispatch.dispatch_apps_rg_run"
+    "apps_rg.runtime.entry.apps_rg_dispatch.dispatch_apps_rg_run"
 )
 CANONICAL_CLI_MODULE = "apps_rg.__main__:main"
 
-# Offline / lane-based orchestration (no agentic_core R4); modular PROVIDER_MODEL by lane.
+# Offline / lane-based orchestration (no apps_rg R4); modular PROVIDER_MODEL by lane.
 MODULAR_SECTION_ORCHESTRATOR_MODULE = "tests.helpers.offline_lane_orchestration"
 
 __all__ = [

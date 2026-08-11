@@ -625,7 +625,7 @@ blocked = [
     or item.startswith("openai.")
     or item == "anthropic"
     or item.startswith("anthropic.")
-    or item.startswith("agentic_core.L4_state")
+    or item.startswith("apps_rg_runtime.L4_state")
 ]
 assert blocked == []
 print(json.dumps({"stdlib_only": True}))

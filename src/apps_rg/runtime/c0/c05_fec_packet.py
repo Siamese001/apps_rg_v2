@@ -1,4 +1,4 @@
-"""C0.5 — freeze FinalEvidenceContract for PA (governed agentic_core type only)."""
+"""C0.5 — freeze the Apps RG final evidence contract for PA."""
 
 from __future__ import annotations
 
@@ -75,8 +75,7 @@ def build_c05_final_evidence_contract(
     product_hybrid: dict[str, Any] | None = None,
 ) -> tuple[FinalEvidenceContract, dict[str, Any]]:
     """Build section FEC — apps_rg evidence room is default authority; hybrid via profile only."""
-    # Keep the binding dependency lazy so agentic-core route discovery can
-    # import the C0 evidence room while ``c0_binding`` initializes.
+    # Keep the binding dependency lazy while the C0 evidence room initializes.
     from apps_rg.runtime.bindings.c0_binding import (
         APPS_RG_C0_CERT_REF,
         _provisional_digest,

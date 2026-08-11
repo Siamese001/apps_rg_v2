@@ -10,28 +10,28 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-import agentic_core
+import apps_rg
 import pytest
 
 REPO = Path(__file__).resolve().parents[2]
-if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+if not Path(apps_rg.__file__).resolve().is_relative_to(REPO):
     pytest.skip(
-        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        "apps_rg resolves outside the standalone checkout; this integration is not isolated",
         allow_module_level=True,
     )
 
-from agentic_core.runtime.contracts.apps_research_runtime_package import (
+from apps_research.runtime.app_contracts import (
     RuntimeCustomizationPackage,
     PackageValidationReceipt,
     TaskClass,
     UnknownPackageFieldError,
     PackageDigestMismatchError,
 )
-from agentic_core.runtime.entry.u0_apps_research_binding_v2 import (
+from apps_research.runtime.u0.binding import (
     u0_validate_apps_research_v2,
     AppsResearchU0ValidationError,
 )
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+from apps_research.runtime.app_contracts import (
     RequestEnvelope,
     AppsRgIngressPayload,
 )
@@ -302,7 +302,7 @@ class TestPackageSchemaCompliance:
         """Declarative YAML package file exists."""
         from pathlib import Path
         
-        yaml_path = Path("apps_research/config/domain_contract/runtime_customization_package.company_brief.v1.yaml")
+        yaml_path = Path("src/apps_research/config/domain_contract/runtime_customization_package.company_brief.v1.yaml")
         assert yaml_path.exists(), "YAML package file should exist"
 
 

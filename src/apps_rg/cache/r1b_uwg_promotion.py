@@ -206,7 +206,7 @@ def build_r1b_promotion_candidate(
 
 
 def _digest_file(path: Path) -> str:
-    from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
+    from apps_rg.runtime.local_state import compute_deterministic_digest
 
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -216,7 +216,7 @@ def _digest_file(path: Path) -> str:
 
 
 def _state_diffs_digest(state_diffs: list[Any]) -> str:
-    from agentic_core.L4_state.uwg.durable_write_gateway import (
+    from apps_rg.runtime.local_state import (
         compute_state_diffs_digest,
     )
 
@@ -231,7 +231,7 @@ def _commit_request_signature(
     l5_packet_digest: str,
     l5_verification_digest: str,
 ) -> str:
-    from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
+    from apps_rg.runtime.local_state import compute_deterministic_digest
 
     return compute_deterministic_digest(
         {
@@ -258,7 +258,7 @@ def build_r1b_commit_bundle(
     candidate: R1BCachePromotionCandidate,
 ) -> tuple[Any, list[Any], Any, Any]:
     """Build CommitRequest + StateDiffs; validation decides admission."""
-    from agentic_core.L4_state.contracts.records import (
+    from apps_rg.runtime.local_state import (
         CommitRequest,
         ReadSurfaceRefreshPlan,
         RollbackPlan,
@@ -653,7 +653,7 @@ def _write_fixture_mirror(store: Any, candidate: R1BCachePromotionCandidate) -> 
 
 
 def _durable_write_gateway_base() -> type:
-    from agentic_core.L4_state.uwg.durable_write_gateway import DurableWriteGateway
+    from apps_rg.runtime.local_state import DurableWriteGateway
 
     return DurableWriteGateway
 

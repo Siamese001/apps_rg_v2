@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from agentic_core.L4_state.contracts import (
+from apps_rg_runtime.L4_state.contracts import (
     AppDomainContractRecord,
     AppInputContractRecord,
     AppOutputSchemaRecord,
@@ -12,24 +12,24 @@ from agentic_core.L4_state.contracts import (
     TaskClassEntry,
     UnknownAppContractError,
 )
-from agentic_core.L4_state.uwg import (
+from apps_rg_runtime.L4_state.uwg import (
     AppDomainContractBundle,
     DurableWriteGateway,
     register_judge_calibration_baseline,
 )
-from agentic_core.L6_observability.shadow_eval import (
+from apps_rg_runtime.L6_observability.shadow_eval import (
     GovernanceBaseline,
     run_6c,
     run_6d,
     run_proposal,
 )
-from agentic_core.L6_observability.shadow_eval.spearman_calibration import (
+from apps_rg_runtime.L6_observability.shadow_eval.spearman_calibration import (
     CalibrationContext,
     CalibrationMode,
     CalibrationSample,
     SpearmanCalibrationProfile,
 )
-from agentic_core.runtime.exhaust.runtime_exhaust_bundle import (
+from apps_rg_runtime.runtime.exhaust.runtime_exhaust_bundle import (
     build_runtime_exhaust_bundle,
 )
 from apps_rg.runtime.bindings.exit_binding import (

@@ -1,0 +1,74 @@
+{
+  "schema_version": "employment_bullet_regen.v2",
+  "artifact_contract": "bounded_round_receipt",
+  "rounds": [
+    {
+      "regen_round": 0,
+      "batch_paths": 2,
+      "requested_batch_paths": 2,
+      "total_paths": 2,
+      "initial_path_count": 2,
+      "max_path_count": 2,
+      "adaptive_sc_enabled": false,
+      "batch_reason": "initial",
+      "gate": {
+        "ok": false,
+        "section_lane": "ey_bullets",
+        "final_bullet_count": 3,
+        "min_score_threshold": 0.72,
+        "slots_passing": [],
+        "slots_below_threshold": [],
+        "slots_missing": [
+          "bul_ey_001",
+          "bul_ey_002",
+          "bul_ey_003"
+        ],
+        "bullets_in_merged": 3,
+        "unique_source_fact_ids": [
+          "bul_ey_001",
+          "bul_ey_002",
+          "bul_ey_003"
+        ],
+        "unique_source_fact_count": 3,
+        "duplicate_source_fact_ids": [],
+        "slots_missing_source_fact_ids": [],
+        "proof_unique_source_fact_gate_active": true
+      },
+      "selection_mode": "anthropic_claude_employment_top_n_pass"
+    },
+    {
+      "regen_round": 1,
+      "batch_paths": 3,
+      "requested_batch_paths": 3,
+      "total_paths": 5,
+      "initial_path_count": 2,
+      "max_path_count": 2,
+      "adaptive_sc_enabled": false,
+      "batch_reason": "regen",
+      "gate": {
+        "ok": true,
+        "section_lane": "ey_bullets",
+        "final_bullet_count": 3,
+        "min_score_threshold": 0.72,
+        "slots_passing": [
+          "bul_ey_001",
+          "bul_ey_002",
+          "bul_ey_003"
+        ],
+        "slots_below_threshold": [],
+        "slots_missing": [],
+        "bullets_in_merged": 3,
+        "unique_source_fact_ids": [
+          "bul_ey_001",
+          "bul_ey_002",
+          "bul_ey_003"
+        ],
+        "unique_source_fact_count": 3,
+        "duplicate_source_fact_ids": [],
+        "slots_missing_source_fact_ids": [],
+        "proof_unique_source_fact_gate_active": true
+      },
+      "selection_mode": "anthropic_claude_employment_top_n_pass"
+    }
+  ]
+}

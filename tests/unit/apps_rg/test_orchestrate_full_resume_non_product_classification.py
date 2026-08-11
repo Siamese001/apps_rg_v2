@@ -20,7 +20,7 @@ def test_orchestrator_stamp_fields() -> None:
     assert stamp["fort_knox_certification"] == "NOT_CLAIMED"
     assert stamp["integrated_r4_invoked"] is False
     claims = " ".join(stamp["explicit_non_claims"]).lower()
-    assert "exit x3" in claims or "agentic_core" in claims
+    assert "exit x3" in claims or "apps_rg_runtime" in claims
 
 
 def test_orchestrate_module_documents_non_product() -> None:

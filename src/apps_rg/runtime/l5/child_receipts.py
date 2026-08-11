@@ -7,9 +7,7 @@ import json
 from dataclasses import replace
 from typing import Any, Mapping
 
-from agentic_core.L5_safety.contracts.l5_certification_contracts import (
-    ChildCertifierReceipt,
-)
+from apps_rg.runtime.local_l5 import ChildCertifierReceipt
 
 from apps_rg.runtime.l5.governance_profile import AppsRgL5GovernanceProfile
 from apps_rg.runtime.l5.hitl_reclearance import (

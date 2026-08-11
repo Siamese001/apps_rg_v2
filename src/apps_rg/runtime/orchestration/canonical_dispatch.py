@@ -1,10 +1,10 @@
 """Canonical apps_rg product dispatch — CLI primitives → R4 integrated spine.
 
-``dispatch_apps_rg_run`` in ``agentic_core.runtime.entry.apps_rg_dispatch`` delegates
+``dispatch_apps_rg_run`` in ``apps_rg.runtime.entry.apps_rg_dispatch`` delegates
 here so core stays a thin surface and app-owned orchestration holds request shaping.
 
 On success, the R4 entrypoint emits L7 artifacts under ``artifact_dir`` (e.g.
-``agentic_core_how_trace.json``).
+``apps_rg_how_trace.json``).
 """
 from __future__ import annotations
 
@@ -140,10 +140,10 @@ def _sha16(text: str) -> str:
 def _apps_rg_u0_runtime_package_fields() -> dict[str, Any]:
     """Resolve app-owned U0 runtime package fields for the core spine request."""
     from apps_rg.runtime.bindings.u0_package_ingest import (
-        ingest_apps_rg_runtime_package,
+        ingest_apps_rg_package,
     )
 
-    pkg = ingest_apps_rg_runtime_package(
+    pkg = ingest_apps_rg_package(
         app_id="apps_rg",
         task_class="resume_generation",
         request_context={},
@@ -432,7 +432,7 @@ def run_canonical_full_resume_from_cli_primitives(
         correlation_id=rid or None,
     )
 
-    l7_path = art / "agentic_core_how_trace.json"
+    l7_path = art / "apps_rg_how_trace.json"
     l7_ok = bool(result.fault == "" and l7_path.is_file())
     exec_summary_block = executive_summary_certification_block(art)
     exec_summary_blocked = bool(exec_summary_block.get("blocked"))

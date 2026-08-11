@@ -1,0 +1,66 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.2,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Bullet 5 (bul_ibm_005) repeats the exact wording of bullet 2 (bul_ibm_002), violating cross-bullet outcome diversity."
+    ],
+    "cited_sentence_indexes": [
+      2,
+      5
+    ],
+    "remediation_suggestions": [
+      "Differentiate bul_ibm_005 to cover a distinct IBM outcome from the allowed fact packet rather than repeating bul_ibm_002."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_BULLET_CONTENT"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\ibm_bullets\\x1d_gemini_provider_response_raw_20260811_104348_027.json",
+  "original_model": null,
+  "fallback_model": null
+}

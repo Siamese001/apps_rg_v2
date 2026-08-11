@@ -1,0 +1,56 @@
+{
+  "receipt_version": 1,
+  "section_id": "ibm_bullets",
+  "run_id": "ibm_bullets_20260811_100308",
+  "fired": false,
+  "outcome": "not_fired",
+  "kill_switch": {
+    "env": "APPS_RG_BULLET_RESELECTION_DISABLE",
+    "disabled": false
+  },
+  "trigger": {
+    "x2_all_pass_pre": false,
+    "trigger_arm": "soft_fail",
+    "rows": [
+      {
+        "judge_id": "x1d_gemini_pro_ibm_bullets",
+        "provider_key": "gemini_pro",
+        "judge_role": null,
+        "score": 3.5,
+        "threshold": 4.0,
+        "normalized_score": 0.7,
+        "normalized_threshold": 0.8,
+        "decisive_failure": false
+      },
+      {
+        "judge_id": "x1d_gemini_pro_ibm_bullets",
+        "provider_key": "gemini_pro",
+        "judge_role": null,
+        "score": 3.0,
+        "threshold": 4.0,
+        "normalized_score": 0.6,
+        "normalized_threshold": 0.8,
+        "decisive_failure": false
+      }
+    ]
+  },
+  "slot_resolution_method": "",
+  "slots": [],
+  "x2": {
+    "failed_before": [
+      "x2_ibm_cross_bullet_semantic_overlap_zero"
+    ],
+    "failed_after": null
+  },
+  "rejudge": {
+    "provider_keys": [],
+    "dropped_non_required_keys": [],
+    "scores_before": {},
+    "scores_after": {},
+    "decisive_after": null,
+    "pass_after": null
+  },
+  "attempt": 1,
+  "max_attempts": 1,
+  "slots_without_alternate": []
+}

@@ -38,7 +38,7 @@ def test_culprit_path_includes_execution_orchestrator() -> None:
     assert "execution_orchestrator" in chain
     assert "gptcache_client" in chain
     callers = {c["caller"] for c in PROMOTE_TO_LONG_TERM_CALLERS}
-    assert "agentic_core/L0_routing/reasoning/execution_orchestrator.py" in callers
+    assert "apps_rg_runtime/L0_routing/reasoning/execution_orchestrator.py" in callers
 
 
 def test_semantic_cache_slots_all_explicit(tmp_path: Path) -> None:

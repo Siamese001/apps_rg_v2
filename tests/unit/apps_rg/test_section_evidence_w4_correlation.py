@@ -20,18 +20,18 @@ from apps_rg.runtime.section_l7_binding_manifest import build_section_l7_binding
 
 
 def _write_trusted_l7_fixture(cli_dir: Path) -> None:
-    (cli_dir / "agentic_core_how_trace.json").write_text(
+    (cli_dir / "apps_rg_how_trace.json").write_text(
         json.dumps(
             {
                 "evidence_plane": "L7_AUDITABILITY",
-                "runtime_subject": "agentic_core",
+                "runtime_subject": "apps_rg_runtime",
                 "schema_version": "1.1",
             }
         )
         + "\n",
         encoding="utf-8",
     )
-    (cli_dir / "agentic_core_l7_route_family_coverage.json").write_text(
+    (cli_dir / "apps_rg_l7_route_family_coverage.json").write_text(
         json.dumps(
             {
                 "evidence_plane": "L7_AUDITABILITY",
@@ -41,9 +41,9 @@ def _write_trusted_l7_fixture(cli_dir: Path) -> None:
         + "\n",
         encoding="utf-8",
     )
-    (cli_dir / "agentic_core_spine_proof.json").write_text(
+    (cli_dir / "apps_rg_spine_proof.json").write_text(
         json.dumps(
-            {"runtime_subject": "agentic_core", "proof_schema_version": "1.0.0"}
+            {"runtime_subject": "apps_rg_runtime", "proof_schema_version": "1.0.0"}
         )
         + "\n",
         encoding="utf-8",
@@ -53,7 +53,7 @@ def _write_trusted_l7_fixture(cli_dir: Path) -> None:
         encoding="utf-8",
     )
     (cli_dir / "runtime_trace_snapshot.json").write_text(
-        json.dumps({"producer_component": "agentic_core.runtime.emit"}) + "\n",
+        json.dumps({"producer_component": "apps_rg_runtime.runtime.emit"}) + "\n",
         encoding="utf-8",
     )
     (cli_dir / "RUN_BUNDLE_INDEX.json").write_text(

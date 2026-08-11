@@ -1,6 +1,6 @@
 """apps-test-model: LAW."""
 
-from agentic_core.L5_safety.certification.l5_packet_producer import L5PacketProducer
+from apps_rg.runtime.local_l5 import L5PacketProducer
 
 from apps_rg.runtime.l5.child_receipts import build_child_certifier_receipts
 from apps_rg.runtime.l5.governance_profile import load_l5_governance_profile

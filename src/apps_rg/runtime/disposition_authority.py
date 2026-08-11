@@ -156,7 +156,7 @@ def resolve_lane_x3_from_artifact_refs(
         valid = bool(
             code
             and doc.get("producer_component")
-            == "agentic_core.runtime.entrypoints.integrated_single_action_spine_run"
+            == "apps_rg.runtime.entrypoints.integrated_single_action_spine_run"
             and doc.get("artifact_hash") == _canonical_digest(payload)
         )
         if valid:

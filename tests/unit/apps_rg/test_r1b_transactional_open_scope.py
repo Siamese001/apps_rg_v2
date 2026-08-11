@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import apps_rg.cache.r1b_chroma_read_surface_projection as chroma_projection
-from agentic_core.L4_state.storage.sqlite_backend import SQLiteL4Backend
+from apps_rg_runtime.L4_state.storage.sqlite_backend import SQLiteL4Backend
 from apps_rg.cache.r1b_strict_gateway import R1BStrictUWGGateway
 from apps_rg.cache.r1b_transactional_promotion import promote_r1b_transactionally
 from apps_rg.cache.r1b_uwg_promotion import build_r1b_promotion_candidate

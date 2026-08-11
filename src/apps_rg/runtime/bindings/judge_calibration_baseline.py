@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from agentic_core.L4_state.contracts.app_domain import (
+from apps_rg.runtime.local_state import (
     ApprovedJudgeCalibrationBaseline,
 )
-from agentic_core.L4_state.contracts.records import stamp_digest
+from apps_rg.runtime.local_state import stamp_digest
 
 APPS_RG_EXEC_POSITIONING_CALIBRATION_IDENTITY = {
     "app_id": "apps_rg",

@@ -247,16 +247,15 @@ def _upsert_governed_chroma(
     intent_payload: Mapping[str, Any] | None = None,
     chunk_payloads_by_id: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    from agentic_core.L4_state.utils.client.chroma_client import chromadb_module as chromadb
-
     persist_dir.mkdir(parents=True, exist_ok=True)
+    from apps_rg.runtime.c0.chroma_persistent_client import ensure_apps_rg_chroma_client
     from apps_rg.runtime.chroma_precomputed_collection import (
         get_precomputed_embeddings_collection,
     )
     from apps_rg.runtime.embedding_settings import apply_apps_rg_embedding_env_guards
 
     apply_apps_rg_embedding_env_guards(chroma_persist_dir=str(persist_dir))
-    client = chromadb.PersistentClient(path=str(persist_dir))
+    client = ensure_apps_rg_chroma_client(str(persist_dir))
     collection = get_precomputed_embeddings_collection(
         client,
         CHROMA_COLLECTION_NAME,

@@ -14,7 +14,7 @@ BOUNDARY (enforced by test suite):
 - Missing/UNKNOWN support or exit checks are NOT treated as PASS.
 - Does not import: section_agentic_pipeline, write_section_to_semantic_cache,
   l6_shadow_learning, fact_vectors, openai, anthropic, external model, httpx,
-  pa_binding, c0_binding, l2_binding, agentic_core.
+  pa_binding, c0_binding, l2_binding, apps_rg.
 
 FORBIDDEN IMPORTS (enforced by boundary guard tests):
 - section_agentic_pipeline
@@ -24,7 +24,7 @@ FORBIDDEN IMPORTS (enforced by boundary guard tests):
 - openai / anthropic / PROVIDER_MODEL / external model
 - requests.post / httpx
 - pa_binding / l2_binding / c0_binding
-- agentic_core
+- apps_rg
 
 Only stdlib + pathlib + json + dataclasses + datetime + hashlib + re allowed.
 """

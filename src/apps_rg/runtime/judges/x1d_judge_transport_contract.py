@@ -202,12 +202,12 @@ def audit_system_prompt_anchor_parity() -> list[TransportViolation]:
 
 
 def audit_json_output_lock_all_providers() -> list[TransportViolation]:
-    """Delegates to agentic_core panel transport preflight (replaces inspect.getsource)."""
+    """Delegates to apps_rg panel transport preflight (replaces inspect.getsource)."""
     return _core_preflight_codes("json_output_lock_mismatch")
 
 
 def audit_truncation_guard_all_providers() -> list[TransportViolation]:
-    """Delegates to agentic_core panel transport preflight (replaces module-level string grep)."""
+    """Delegates to apps_rg panel transport preflight (replaces module-level string grep)."""
     return _core_preflight_codes("truncation_stop_reason")
 
 

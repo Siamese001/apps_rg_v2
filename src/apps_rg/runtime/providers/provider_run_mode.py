@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
-from agentic_core.runtime.providers.provider_types import ProviderKind, ProviderProfile
+from apps_rg.runtime.local_provider import ProviderKind, ProviderProfile
 
 from apps_rg.l2_recipe.resume_generation_contract import (
     MODE_DIAGNOSTIC,

@@ -42,7 +42,9 @@ def _canonical_json(value: Any) -> str:
 
 
 def _sha256(value: Any) -> str:
-    return "sha256:" + hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+    return (
+        "sha256:" + hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+    )
 
 
 def _required_string(value: Any, *, field: str) -> str:
@@ -119,6 +121,12 @@ def load_development_corpus(path: Path | None = None) -> dict[str, Any]:
     return value
 
 
+def validate_l1_cognitive_development_corpus(corpus: Mapping[str, Any]) -> None:
+    """Validate an in-memory development corpus without creating a fixture file."""
+
+    _validate_corpus(corpus)
+
+
 def _case_result(case: Mapping[str, Any]) -> dict[str, Any]:
     fixture = _fixture_input(case)
     fixture_id = str(fixture["fixture_id"])
@@ -138,7 +146,9 @@ def _case_result(case: Mapping[str, Any]) -> dict[str, Any]:
     expectations = fixture["expectations"]
     requirements = list(graph["requirements"])
     relations = list(graph["relations"])
-    critique_codes = {str(row.get("code") or "") for row in plan["critique_ledger"]["findings"]}
+    critique_codes = {
+        str(row.get("code") or "") for row in plan["critique_ledger"]["findings"]
+    }
     checks = {
         "minimum_atomic_requirement_count": len(requirements)
         >= int(expectations.get("minimum_atomic_requirement_count") or 0),
@@ -210,4 +220,5 @@ __all__ = [
     "fixture_input_digest",
     "load_development_corpus",
     "run_l1_cognitive_technical_qa",
+    "validate_l1_cognitive_development_corpus",
 ]

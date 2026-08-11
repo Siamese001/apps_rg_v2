@@ -1,4 +1,4 @@
-"""Code-based X2 aggregation for bullet sections (apps_rg-only; no agentic_core).
+"""Code-based X2 aggregation for bullet sections (apps_rg-only; no apps_rg).
 
 Per the section-orchestration redesign: after the deterministic hard validator (X2 gates) and the
 ONE composite LLM judge run, a deterministic aggregation step combines them into a section-level

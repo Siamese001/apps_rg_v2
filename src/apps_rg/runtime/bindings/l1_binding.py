@@ -22,6 +22,10 @@ from apps_rg.runtime.bindings.l1_planning_capsule_v2 import (
 from apps_rg.runtime.bindings.l1_cognitive_planner_v3 import (
     build_l1_cognitive_plan_v3,
 )
+from apps_rg.runtime.bindings.l1_cognitive_treatment import (
+    L1_COGNITIVE_V3_CANDIDATE_ARM,
+    treatment_from_task_spec,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -53,6 +57,8 @@ def l1_plan_apps_rg(validated_request: ValidatedRequest) -> L1PlanContract:
     }
 
     task_spec = dict(app_payload.get("task_spec") or {})
+    l1_cognitive_treatment = treatment_from_task_spec(task_spec)
+    task_spec["l1_cognitive_treatment"] = l1_cognitive_treatment
     query_spec = dict(app_payload.get("query_spec") or {})
     support_expectation = dict(app_payload.get("support_expectation") or {})
     output_expectation = dict(app_payload.get("output_expectation") or {})
@@ -120,15 +126,17 @@ def l1_plan_apps_rg(validated_request: ValidatedRequest) -> L1PlanContract:
         planning_profile_ref=planning_profile_ref,
         planning_profile_digest=planning_digest,
     )
-    cognitive_v3_plan = build_l1_cognitive_plan_v3(
-        app_payload=app_payload,
-        request_id=validated_request.request_id,
-        run_id=validated_request.run_id,
-        trace_id=validated_request.trace_id,
-        replay_key=replay_key,
-        planning_profile_ref=planning_profile_ref,
-        planning_profile_digest=planning_digest,
-    )
+    cognitive_v3_plan: Mapping[str, Any] | None = None
+    if l1_cognitive_treatment["arm"] == L1_COGNITIVE_V3_CANDIDATE_ARM:
+        cognitive_v3_plan = build_l1_cognitive_plan_v3(
+            app_payload=app_payload,
+            request_id=validated_request.request_id,
+            run_id=validated_request.run_id,
+            trace_id=validated_request.trace_id,
+            replay_key=replay_key,
+            planning_profile_ref=planning_profile_ref,
+            planning_profile_digest=planning_digest,
+        )
 
     from apps_rg.runtime.bindings.l1_plan_evidence import build_validation_receipt_id
 
@@ -145,18 +153,23 @@ def l1_plan_apps_rg(validated_request: ValidatedRequest) -> L1PlanContract:
     task_spec["apps_rg_planning_v2_capsule_ref"] = v2_capsule["capsule_digest"]
     task_spec["apps_rg_planning_v2_capsule"] = v2_capsule
     task_spec["apps_rg_planning_v2_status"] = v2_capsule["planning_status"]
-    task_spec["apps_rg_cognitive_v3_plan_ref"] = cognitive_v3_plan["plan_digest"]
-    task_spec["apps_rg_cognitive_v3_plan"] = cognitive_v3_plan
-    task_spec["apps_rg_cognitive_v3_status"] = cognitive_v3_plan["planning_status"]
+    if cognitive_v3_plan is not None:
+        task_spec["apps_rg_cognitive_v3_plan_ref"] = cognitive_v3_plan["plan_digest"]
+        task_spec["apps_rg_cognitive_v3_plan"] = cognitive_v3_plan
+        task_spec["apps_rg_cognitive_v3_status"] = cognitive_v3_plan["planning_status"]
     support_expectation["apps_rg_evidence_plan_ref"] = capsule["capsule_digest"]
     support_expectation["apps_rg_v2_evidence_obligation_ledger_ref"] = v2_capsule[
         "evidence_obligation_ledger"
     ]["ledger_digest"]
     output_expectation["apps_rg_completion_criteria_ref"] = capsule["capsule_digest"]
     output_expectation["apps_rg_v2_work_dag_ref"] = v2_capsule["work_dag"]["dag_digest"]
-    output_expectation["apps_rg_cognitive_v3_critique_ref"] = cognitive_v3_plan[
-        "critique_ledger"
-    ]["ledger_digest"]
+    output_expectation["apps_rg_l1_cognitive_treatment_ref"] = (
+        l1_cognitive_treatment["treatment_digest"]
+    )
+    if cognitive_v3_plan is not None:
+        output_expectation["apps_rg_cognitive_v3_critique_ref"] = cognitive_v3_plan[
+            "critique_ledger"
+        ]["ledger_digest"]
     ambiguity_register = capsule["ambiguity_register"]
 
     route_hints = _build_advisory_route_hints(
@@ -203,12 +216,19 @@ def l1_plan_apps_rg(validated_request: ValidatedRequest) -> L1PlanContract:
         "l1_v2_evidence_obligation_ledger:"
         f"{v2_capsule['evidence_obligation_ledger']['ledger_digest']}",
         f"l1_v2_work_dag:{v2_capsule['work_dag']['dag_digest']}",
-        f"l1_cognitive_v3_plan_digest:{cognitive_v3_plan['plan_digest']}",
-        "l1_cognitive_v3_critique:"
-        f"{cognitive_v3_plan['critique_ledger']['ledger_digest']}",
+        "l1_cognitive_treatment_arm:"
+        f"{l1_cognitive_treatment['arm']}",
+        "l1_cognitive_treatment_digest:"
+        f"{l1_cognitive_treatment['treatment_digest']}",
         f"l1_planning_profile_digest:{planning_digest}",
         f"l1_validation_receipt:{validation_receipt_id}",
     )
+    if cognitive_v3_plan is not None:
+        audit_refs += (
+            f"l1_cognitive_v3_plan_digest:{cognitive_v3_plan['plan_digest']}",
+            "l1_cognitive_v3_critique:"
+            f"{cognitive_v3_plan['critique_ledger']['ledger_digest']}",
+        )
 
     return L1PlanContract(
         request_id=validated_request.request_id,

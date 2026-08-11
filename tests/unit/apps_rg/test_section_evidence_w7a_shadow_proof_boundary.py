@@ -71,7 +71,7 @@ def test_package_rollup_non_claims_w7a() -> None:
     stamp = package_rollup_non_product_stamp(package_x3_allow=True)
     claims = " ".join(stamp["explicit_non_claims"]).lower()
     assert "integrated r4" in claims
-    assert "exit x3" in claims or "agentic_core" in claims
+    assert "exit x3" in claims or "apps_rg_runtime" in claims
     assert "99" in claims
     assert "product certification" in claims
 

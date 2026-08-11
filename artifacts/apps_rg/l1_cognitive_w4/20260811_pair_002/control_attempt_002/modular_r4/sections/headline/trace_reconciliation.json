@@ -1,0 +1,199 @@
+{
+  "generated_at_utc": "2026-08-11T10:21:34.914897+00:00",
+  "local_artifact_refs": {
+    "commit_request.json": null,
+    "exit_review_packet.json": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/headline/exit_review_packet.json",
+    "l6_v40_shadow_eval_package.json": null,
+    "provider_response.json": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/headline/provider_response.json",
+    "state_commit_receipt.json": null,
+    "uwg_block_receipt.json": null,
+    "uwg_commit_receipt.json": null,
+    "uwg_validation_receipt.json": null,
+    "x1d_llm_judge_outputs.json": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/headline/x1d_llm_judge_outputs.json",
+    "x2_gate_outputs.json": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/headline/x2_gate_outputs.json",
+    "x3_disposition.json": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/headline/x3_disposition.json"
+  },
+  "local_json_load_issues": [],
+  "local_provider_attempt_span_count": 1,
+  "local_provider_attempt_span_source": "provider_response.provider_attempt_spans",
+  "local_provider_attempt_timing_summary": {
+    "accepted_output_model": "claude-sonnet-5",
+    "accepted_output_provider": "external_claude",
+    "attempted_count": 1,
+    "fallback_attempt_count": 0,
+    "fallback_attempted": false,
+    "models": [
+      "claude-sonnet-5"
+    ],
+    "providers": [
+      "external_claude"
+    ],
+    "runtime_generation_statuses": [
+      "REAL_LLM"
+    ],
+    "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+    "span_count": 1,
+    "total_duration_seconds": 28.61705
+  },
+  "otel_provider_attempt_span_count": 0,
+  "otel_snapshot_available": false,
+  "otel_snapshot_ref": "provided_unavailable",
+  "otel_span_count": 0,
+  "producer": "apps_rg.runtime.observability.trace_reconciliation",
+  "require_otel_for_live": false,
+  "row_export_digest": "sha256:33a7c09766860d2b68f0eca2a5a7e8ec43b6d38c8ce94bb842151ae78c78d9a3",
+  "row_export_ref": "trace_reconciliation_rows.jsonl",
+  "rows": [
+    {
+      "check_id": "otel_snapshot.available",
+      "expected_value": "bounded OTel trace snapshot or explicit unavailable receipt",
+      "future_run_only": true,
+      "observed_value": {
+        "snapshot_ref": "provided_unavailable",
+        "span_count": 0
+      },
+      "reason": "OTel snapshot unavailable; local receipts remain authoritative",
+      "row_id": "01c2b0c87b08cfb789eb",
+      "run_id": "headline_20260811_101951",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "headline",
+      "severity": "WARN",
+      "source_refs": {
+        "otel_snapshot_ref": "provided_unavailable"
+      },
+      "stage_id": "L7",
+      "verdict": "WARN"
+    },
+    {
+      "check_id": "l7_provider_attempts.local_receipts",
+      "expected_value": "apps_rg_provider_attempt_timing_summary_v1",
+      "future_run_only": true,
+      "observed_value": {
+        "accepted_output_model": "claude-sonnet-5",
+        "accepted_output_provider": "external_claude",
+        "attempted_count": 1,
+        "fallback_attempt_count": 0,
+        "fallback_attempted": false,
+        "models": [
+          "claude-sonnet-5"
+        ],
+        "providers": [
+          "external_claude"
+        ],
+        "runtime_generation_statuses": [
+          "REAL_LLM"
+        ],
+        "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+        "span_count": 1,
+        "total_duration_seconds": 28.61705
+      },
+      "reason": "local provider-attempt receipts present",
+      "row_id": "d423e7f219a47b3d40d4",
+      "run_id": "headline_20260811_101951",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "headline",
+      "severity": "WARN",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "PASS"
+    },
+    {
+      "check_id": "l7_provider_attempts.otel_mirror",
+      "expected_value": "same provider attempt identity/order",
+      "future_run_only": true,
+      "observed_value": {
+        "local_provider_keys": [
+          [
+            "1",
+            "external_claude",
+            "claude-sonnet-5"
+          ]
+        ],
+        "otel_provider_keys": []
+      },
+      "reason": "OTel unavailable; provider-attempt mirror could not be checked",
+      "row_id": "bcd37f7fefa19a0e9076",
+      "run_id": "headline_20260811_101951",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "headline",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "WARN"
+    },
+    {
+      "check_id": "l7_provider_attempts.timing_drift",
+      "expected_value": "<=0.25s duration drift when both sides expose timing",
+      "future_run_only": true,
+      "observed_value": [],
+      "reason": "provider-attempt timing drift not observed or not applicable",
+      "row_id": "ac5c0fab86958cb6a3a0",
+      "run_id": "headline_20260811_101951",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "headline",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "NOT_APPLICABLE"
+    },
+    {
+      "check_id": "x3_disposition.otel_mirror",
+      "expected_value": "local X3 code present in OTel span attributes",
+      "future_run_only": true,
+      "observed_value": {
+        "local_x3": "X3_BLOCK_FINAL_MATERIALIZED_ACCEPTANCE",
+        "otel_x3_values": []
+      },
+      "reason": "OTel unavailable; X3 span mirror could not be checked",
+      "row_id": "2fa44aa5dafc481075b4",
+      "run_id": "headline_20260811_101951",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "headline",
+      "severity": "MAJOR",
+      "source_refs": {
+        "x3_disposition_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/headline/x3_disposition.json"
+      },
+      "stage_id": "X3",
+      "verdict": "WARN"
+    },
+    {
+      "check_id": "uwg_handoff.otel_mirror",
+      "expected_value": "UWG local receipt plus optional mirrored OTel span",
+      "future_run_only": true,
+      "observed_value": {
+        "uwg_local_refs": {},
+        "uwg_otel_spans": []
+      },
+      "reason": "no UWG refs in this artifact directory",
+      "row_id": "14f4ea29599e2700952f",
+      "run_id": "headline_20260811_101951",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "headline",
+      "severity": "WARN",
+      "source_refs": {},
+      "stage_id": "UWG",
+      "verdict": "NOT_APPLICABLE"
+    }
+  ],
+  "rows_digest": "sha256:33a7c09766860d2b68f0eca2a5a7e8ec43b6d38c8ce94bb842151ae78c78d9a3",
+  "run_id": "headline_20260811_101951",
+  "schema_version": "apps_rg.trace_reconciliation.v1",
+  "section_id": "headline",
+  "summary": {
+    "current_run_mutation_assertion": false,
+    "fail_count": 0,
+    "future_run_only": true,
+    "not_applicable_count": 2,
+    "proof_authority": "local_receipts",
+    "row_count": 6,
+    "warn_count": 3
+  },
+  "trace_root": "",
+  "trace_verdict": "TRACE_UNAVAILABLE"
+}

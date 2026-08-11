@@ -9,23 +9,23 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock
 
-import agentic_core
+import apps_rg
 import pytest
 
 REPO = Path(__file__).resolve().parents[2]
-if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+if not Path(apps_rg.__file__).resolve().is_relative_to(REPO):
     pytest.skip(
-        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        "apps_rg resolves outside the standalone checkout; this integration is not isolated",
         allow_module_level=True,
     )
 
-from agentic_core.runtime.entry.u0_apps_research_binding_v2 import (
+from apps_research.runtime.u0.binding import (
     u0_validate_apps_research_v2,
     AppsResearchU0ValidationError,
     AutoInjectionContext,
     RuntimeCustomizationPackage,
 )
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+from apps_research.runtime.app_contracts import (
     RequestEnvelope,
     AppsRgIngressPayload,
 )

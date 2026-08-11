@@ -11,9 +11,9 @@ from typing import Any
 
 import pytest
 
-from agentic_core.L0_routing.u0_intake_validator import AuthorityValidationReceipt
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg_runtime.L0_routing.u0_intake_validator import AuthorityValidationReceipt
+from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
+from apps_rg_runtime.runtime.contracts.final_evidence_contract import (
     EvidenceItem,
     FinalEvidenceContract,
     SUPPORT_STATUS_PASS,

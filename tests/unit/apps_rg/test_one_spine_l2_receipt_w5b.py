@@ -16,6 +16,10 @@ from apps_rg.runtime.section_l2_lane_integration import (
     finalize_section_l2_after_output,
     prepare_section_l2_before_provider,
 )
+from apps_rg.runtime.contracts.l1_cognitive_output_disposition import (
+    L1_COGNITIVE_OUTPUT_DISPOSITION_ARTIFACT,
+    L1_COGNITIVE_OUTPUT_PROJECTION_ARTIFACT,
+)
 from apps_rg.runtime.section_l2_spine_receipt import (
     L2_EXECUTION_PACKET_ARTIFACT,
     L2_SPINE_RECEIPT_ARTIFACT,
@@ -136,6 +140,19 @@ def test_prepare_finalize_emits_l2_artifacts(tmp_path: Path, section_id: str):
     _write_json(tmp_path / "x2_gate_outputs.json", [])
     _write_json(tmp_path / "x3_disposition.json", {"x3_code": "ALLOW"})
     finalize_section_l2_after_output(tmp_path, section_id, payload)
+    cognitive_disposition = json.loads(
+        (tmp_path / L1_COGNITIVE_OUTPUT_DISPOSITION_ARTIFACT).read_text(
+            encoding="utf-8"
+        )
+    )
+    assert cognitive_disposition["status"] == "NOT_APPLICABLE"
+    assert cognitive_disposition["blocks_finalization"] is False
+    cognitive_projection = json.loads(
+        (tmp_path / L1_COGNITIVE_OUTPUT_PROJECTION_ARTIFACT).read_text(
+            encoding="utf-8"
+        )
+    )
+    assert cognitive_projection["status"] == "NOT_APPLICABLE"
     sealed = json.loads((tmp_path / SEALED_L2_ARTIFACT).read_text(encoding="utf-8"))
     assert sealed["contract_type"] == "SealedL2Artifact"
     assert sealed["sovereign_execution_receipt"] == f"l2_packet:{pkt['packet_digest']}"

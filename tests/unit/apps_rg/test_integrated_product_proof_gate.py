@@ -179,18 +179,18 @@ def test_ci_lane_dev_harness_fails(tmp_path: Path):
 
 def test_missing_how_trace_fails(tmp_path: Path):
     _copy_r4_fixture(tmp_path)
-    (tmp_path / "agentic_core_how_trace.json").unlink()
+    (tmp_path / "apps_rg_how_trace.json").unlink()
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
-    assert "agentic_core_how_trace.json" in result.required_artifacts_missing
+    assert "apps_rg_how_trace.json" in result.required_artifacts_missing
 
 
 def test_missing_spine_proof_fails(tmp_path: Path):
     _copy_r4_fixture(tmp_path)
-    (tmp_path / "agentic_core_spine_proof.json").unlink()
+    (tmp_path / "apps_rg_spine_proof.json").unlink()
     result = validate_integrated_product_proof(tmp_path)
     assert result.status == "FAIL"
-    assert "agentic_core_spine_proof.json" in result.required_artifacts_missing
+    assert "apps_rg_spine_proof.json" in result.required_artifacts_missing
 
 
 def test_package_x3_without_exit_x3_fails(tmp_path: Path):

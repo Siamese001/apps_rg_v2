@@ -1,0 +1,63 @@
+{
+  "artifact_hash": "sha256:9d7051bd79af31a204dfaca77c34631e5c9d46ec3aeca98724de5b21602f138b",
+  "payload": {
+    "executed": true,
+    "fault": "L2_EXECUTION_ERROR:L2AuthorityError:V0_IDENTITY_CHAIN_MISMATCH: tenant_id must be non-empty and identical across U0, L0, and PA: ('', '', '')",
+    "producer_adapter": "apps_rg.core_runtime_producer_adapter.v1",
+    "request_id": "req-9eefca3bea9245418d112d85e3425b65",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "e89c7ba6-7926-49c6-9edd-75aaa2742ac6",
+    "schema_version": "apps_rg.core_l2_sealed_projection.v1",
+    "source_witness_ref": "runtime_execution_witness.json",
+    "source_witness_sha256": "sha256:6e430a034593b9841208803ba9b3a7c46955001ef3d59a5292916679d07360c0",
+    "status": "FAIL",
+    "sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.007,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 5203.818,
+        "meta": {
+          "fault": "L2_EXECUTION_ERROR:L2AuthorityError:V0_IDENTITY_CHAIN_MISMATCH: tenant_id must be non-empty and identical across U0, L0, and PA: ('', '', '')"
+        },
+        "status": "FAIL",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.005,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "FAIL",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "trace_root": "trace-315421256de24ac28a89bd65a765eda6"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.core_runtime_producer_adapter",
+  "producer_function_or_class": "_write_l2_sealed_projection",
+  "producer_module": "core_runtime_producer_adapter",
+  "upstream_artifact_ref": "sha256:6e430a034593b9841208803ba9b3a7c46955001ef3d59a5292916679d07360c0"
+}

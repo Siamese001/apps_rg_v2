@@ -252,7 +252,7 @@ def test_eval_package_seal_reopens_every_bound_artifact(tmp_path: Path) -> None:
     assert "eval_package_seal_artifact_digest_mismatch:scorecard_rows" in errors
 
 
-def test_minimal_core_namespace_keeps_provider_and_uwg_modules_out(
+def test_local_shadow_replay_keeps_provider_and_uwg_modules_out(
     tmp_path: Path,
 ) -> None:
     code = r'''
@@ -268,94 +268,23 @@ assert spec is not None and spec.loader is not None
 replay = importlib.util.module_from_spec(spec)
 sys.modules[module_name] = replay
 spec.loader.exec_module(replay)
-replay._install_minimal_agentic_core_namespace()
-from apps_eval.contracts.models import CompletedEvalRecord, RegressionSummary, Scorecard
-from apps_eval.l6_shadow_bridge import emit_completed_eval_l6_shadow_bridge
-
-digest = "sha256:" + "2" * 64
-row = {
-    "suite_id": "apps_rg.current.resume_generation",
-    "scenario_id": "replay",
-    "app_id": "apps_rg",
-    "row_id": "row-headline",
-    "microstep_id": "headline.X1D.judge_result.pass",
-    "stage_id": "X1D",
-    "component_id": "apps_rg.generated_lane",
-    "subcomponent_id": "lane_x1d_judge_panel",
-    "verdict": "FAIL",
-    "score": 0.0,
-    "severity": "BLOCK",
-    "required": True,
-    "run_id": "record",
-    "lane_id": "headline",
-    "gate_id": "x1d",
-    "artifact_role": "lane_x1d_llm_judge_outputs",
-    "artifact_ref": "source/x1d_llm_judge_outputs.json",
-    "evidence_ref": "source/x1d_llm_judge_outputs.json",
-    "evidence_digest": digest,
-    "parent_run_id": "parent",
-    "child_run_id": "child",
-    "section_attempt_id": "attempt",
-    "eval_record_id": "record",
-    "runtime_exhaust_bundle_id": "source-rxb",
-    "microstep_contract_digest": digest,
-    "registry_digest": digest,
-    "snapshot_digest": digest,
-}
-record = CompletedEvalRecord(
-    record_id="record",
-    created_at="1970-01-01T00:00:00Z",
-    suite_id="apps_rg.current.resume_generation",
-    app_id="apps_rg",
-    mode="current_snapshot",
-    deterministic_only=True,
-    scenario_results=[],
-    scorecard=Scorecard(
-        suite_id="apps_rg.current.resume_generation",
-        app_id="apps_rg",
-        scenario_count=1,
-        finding_count=1,
-        passed_findings=0,
-        failed_findings=1,
-        block_failures=1,
-        score=0.0,
-        verdict="fail",
-        scorecard_rows=[row],
-        coverage_summary={"release_blocked": True},
-    ),
-    regression=RegressionSummary(compared=False),
-    artifact_paths={"scorecard_rows": "scorecard_rows.jsonl"},
-    rubric_ids=[],
-    eval_execution_complete=True,
-    eval_verdict="fail",
-    release_blocked=True,
-    parent_run_id="parent",
-    child_run_id="child",
-    section_attempt_id="attempt",
-    eval_record_id="record",
-    runtime_exhaust_bundle_id="source-rxb",
-    microstep_contract_digest=digest,
-    registry_digest=digest,
-    snapshot_digest=digest,
-)
+record = type("Record", (), {"record_id": "record"})()
 root = Path(sys.argv[1])
-paths = emit_completed_eval_l6_shadow_bridge(
+paths = replay._emit_projection_bridge(
     record,
     root,
     eval_record_path="eval_record.json",
     l6_handoff_path="l6_handoff.json",
-    deterministic_replay=True,
 )
 first = {
     key: hashlib.sha256(Path(value).read_bytes()).hexdigest()
     for key, value in paths.items()
 }
-paths = emit_completed_eval_l6_shadow_bridge(
+paths = replay._emit_projection_bridge(
     record,
     root,
     eval_record_path="eval_record.json",
     l6_handoff_path="l6_handoff.json",
-    deterministic_replay=True,
 )
 second = {
     key: hashlib.sha256(Path(value).read_bytes()).hexdigest()
@@ -364,7 +293,6 @@ second = {
 assert first == second
 assert "openai" not in sys.modules
 assert "anthropic" not in sys.modules
-assert "agentic_core.L2_execution.utils.write_gateway" not in sys.modules
 bridge = json.loads(Path(paths["l6_shadow_bridge"]).read_text(encoding="utf-8"))
 assert bridge["deterministic_replay"] is True
 assert bridge["projection_consistency_only"] is True

@@ -34,7 +34,7 @@ X2_GATE_OUTPUTS_ARTIFACT = "x2_gate_outputs.json"
 X1D_JUDGE_OUTPUTS_ARTIFACT = "x1d_llm_judge_outputs.json"
 LANE_X3_MIRROR_AUTHORITY_SCOPE = "apps_rg_lane_x3_mirror_not_core_exit_authority"
 APP_X2_QUALITY_AUTHORITY_SCOPE = "apps_rg_section_product_quality_not_core_exit_matrix"
-CORE_EXIT_AUTHORITY_SCOPE = "agentic_core_exit_disposition_receipt"
+CORE_EXIT_AUTHORITY_SCOPE = "apps_rg_exit_disposition_receipt"
 
 OBSERVED_CHAIN_WITH_EXIT_RECEIPTS: tuple[str, ...] = (
     "CLI",
@@ -288,7 +288,7 @@ def build_exit_disposition_receipt_for_section(
         "x3_disposition": x3_single,
         "x3_code": str(x3_single.get("x3_code") or "UNKNOWN"),
         "canonical_exit_claimed": False,
-        "canonical_exit_authority": "agentic_core_x3_disposition_receipt",
+        "canonical_exit_authority": "apps_rg_x3_disposition_receipt",
         "canonical_exit_authority_ref": CORE_X3_DISPOSITION_RECEIPT_ARTIFACT,
         "canonical_exit_authority_scope": CORE_EXIT_AUTHORITY_SCOPE,
         "durable_commit_occurred": False,

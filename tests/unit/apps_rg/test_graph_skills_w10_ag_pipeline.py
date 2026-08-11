@@ -1,4 +1,4 @@
-"""W10-AG stress/contract — unified C0.3 spine bind (apps_rg → agentic_core)."""
+"""W10-AG stress/contract — unified C0.3 spine bind (apps_rg → apps_rg_runtime)."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,15 +6,15 @@ from pathlib import Path
 import pytest
 
 from apps_rg.repository_layout import resolve_apps_rg_path
-from agentic_core.L0_routing.c0_retrieval.c0_3_enhanced.adapter_registry import (
+from apps_rg_runtime.L0_routing.c0_retrieval.c0_3_enhanced.adapter_registry import (
     AdapterResolutionStatus,
     resolve_graph_adapter,
 )
-from agentic_core.L0_routing.c0_retrieval.c0_3_enhanced.contracts import (
+from apps_rg_runtime.L0_routing.c0_retrieval.c0_3_enhanced.contracts import (
     AnchorCandidate,
     AnchorType,
 )
-from agentic_core.runtime.contracts.route_contract import GraphTraversePolicy, RouteContract
+from apps_rg_runtime.runtime.contracts.route_contract import GraphTraversePolicy, RouteContract
 from apps_rg.integrations.c0_graph_adapter import (
     AppsRgGraphAdapter,
     build_rg_graph_traverse_input,
@@ -83,7 +83,7 @@ def test_adapter_resolves_known_fact_anchor() -> None:
 
 
 def test_maybe_run_graph_rag_stress_with_live_route() -> None:
-    from agentic_core.runtime.c0.c0_3_graph_rag_executor import maybe_run_graph_rag
+    from apps_rg_runtime.runtime.c0.c0_3_graph_rag_executor import maybe_run_graph_rag
 
     policy = GraphTraversePolicy(
         graph_expansion_allowed=True,

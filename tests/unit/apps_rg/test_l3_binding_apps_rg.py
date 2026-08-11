@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from agentic_core.runtime.contracts.final_evidence_contract import FinalEvidenceContract
-from agentic_core.runtime.contracts.route_contract import RouteContract
+from apps_rg_runtime.runtime.contracts.final_evidence_contract import FinalEvidenceContract
+from apps_rg_runtime.runtime.contracts.route_contract import RouteContract
 
 from apps_rg.runtime.bindings.l3_binding import l3_orchestrate_apps_rg
 

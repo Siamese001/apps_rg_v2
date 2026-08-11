@@ -1,4 +1,4 @@
-"""Triggered bullet adjudicator (apps_rg-only; no agentic_core).
+"""Triggered bullet adjudicator (apps_rg-only; no apps_rg).
 
 Design per the section-orchestration redesign (2026-06-06): bullet sections use a deterministic
 hard validator + ONE batched composite LLM judge + an OPTIONAL adjudicator. The adjudicator is

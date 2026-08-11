@@ -1,0 +1,346 @@
+{
+  "alternative_plan_ledger": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "decisions": [
+      {
+        "alternative_option_id": "",
+        "decision": "ESCALATED",
+        "decision_id": "l1decide-38b3e34f5101ed15",
+        "primary_option_id": "l1opt-af583a69f49747f4",
+        "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "requirement_id": "l1cogreq-cc977d643bdd4039",
+        "risk": "SEMANTIC_REVIEW_REQUIRED"
+      },
+      {
+        "alternative_option_id": "l1opt-6a0940084e9b44f4",
+        "decision": "MAPPED",
+        "decision_id": "l1decide-3a119044c5e9a6cb",
+        "primary_option_id": "l1opt-9d510b17a0ee8de8",
+        "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+        "requirement_id": "l1cogreq-6f24a7c03a0016da",
+        "risk": "COUNTEREVIDENCE_REQUIRED"
+      },
+      {
+        "alternative_option_id": "",
+        "decision": "ESCALATED",
+        "decision_id": "l1decide-65bae19ad1e09b50",
+        "primary_option_id": "l1opt-346d933f129da8b5",
+        "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+        "risk": "SEMANTIC_REVIEW_REQUIRED"
+      },
+      {
+        "alternative_option_id": "l1opt-9aba86d3cd7db300",
+        "decision": "MAPPED",
+        "decision_id": "l1decide-661c76903f72e25e",
+        "primary_option_id": "l1opt-fe24da4cb512995a",
+        "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+        "requirement_id": "l1cogreq-331c12158135fd54",
+        "risk": "COUNTEREVIDENCE_REQUIRED"
+      },
+      {
+        "alternative_option_id": "",
+        "decision": "ESCALATED",
+        "decision_id": "l1decide-d64f71a8490cf03d",
+        "primary_option_id": "l1opt-0cfc43f39ae38450",
+        "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "requirement_id": "l1cogreq-e5c58d436de16289",
+        "risk": "SEMANTIC_REVIEW_REQUIRED"
+      }
+    ],
+    "ledger_digest": "sha256:ec64c9eadc536b43b72acfc8ac5f3e402da39f9921a75017f02c7e755ba7802a",
+    "schema_version": "apps_rg.l1_alternative_plan_ledger.v1"
+  },
+  "app_scope": "APPS_RG_V2_ONLY",
+  "atomic_requirement_graph": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "graph_digest": "sha256:9b19f597b3d644e6658e5f7439cca402e07d08565e0ff61aa208b1c0db3597ea",
+    "relations": [],
+    "requirements": [
+      {
+        "classification_rule_id": "domain",
+        "coverage_status": "MAPPED",
+        "criticality": "STANDARD",
+        "escalation_reason": "",
+        "extraction_confidence": "MEDIUM",
+        "modality": "NEUTRAL",
+        "ordinal": 1,
+        "parent_requirement_id": "l1req-8e74f12460de8962",
+        "qualifiers": [],
+        "requirement_id": "l1cogreq-331c12158135fd54",
+        "requirement_type": "DOMAIN",
+        "source_span": {
+          "end_offset": 199,
+          "source_field": "job_description_text",
+          "span_digest": "sha256:0a9cffb550e04ceb0fae4017b7f2d7bd90ca42c999d2f4d0ff022ee979fe148a",
+          "start_offset": 131,
+          "text_digest": "sha256:e90e2d6fb2cc4b18746396c0603676d02c6a3c542c71362c9c5f07b21ca0f66a"
+        },
+        "target_unit_ids": [
+          "competencies"
+        ]
+      },
+      {
+        "classification_rule_id": "scope_scale",
+        "coverage_status": "MAPPED",
+        "criticality": "STANDARD",
+        "escalation_reason": "",
+        "extraction_confidence": "HIGH",
+        "modality": "NEUTRAL",
+        "ordinal": 1,
+        "parent_requirement_id": "l1req-6bea010c6877ce53",
+        "qualifiers": [],
+        "requirement_id": "l1cogreq-6f24a7c03a0016da",
+        "requirement_type": "SCOPE_SCALE",
+        "source_span": {
+          "end_offset": 128,
+          "source_field": "job_description_text",
+          "span_digest": "sha256:c21f7346a4d4b37420ae5d77db4fe9a75ddd26f4bd3bd6e8f7c70c91c12efc2b",
+          "start_offset": 65,
+          "text_digest": "sha256:80837936262740845b953088b1340f3bf7f26b525acd5bb92a7fccc98b05af6c"
+        },
+        "target_unit_ids": [
+          "experience_block"
+        ]
+      },
+      {
+        "classification_rule_id": "unknown",
+        "coverage_status": "ESCALATED",
+        "criticality": "CRITICAL",
+        "escalation_reason": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "extraction_confidence": "LOW",
+        "modality": "NEUTRAL",
+        "ordinal": 1,
+        "parent_requirement_id": "l1req-5fafa111b24894be",
+        "qualifiers": [],
+        "requirement_id": "l1cogreq-cc977d643bdd4039",
+        "requirement_type": "UNKNOWN",
+        "source_span": {
+          "end_offset": 270,
+          "source_field": "job_description_text",
+          "span_digest": "sha256:fb8b9ab645188821d7e606151a1a48ff8c2b1670d6e22c48269d1fb863d86fc1",
+          "start_offset": 202,
+          "text_digest": "sha256:e55aca4f65fafd4c40294e3dd4140773bf3be3b2600eb698584b693eab15c9af"
+        },
+        "target_unit_ids": []
+      },
+      {
+        "classification_rule_id": "generic_hard_requirement_requires_semantic_review",
+        "coverage_status": "ESCALATED",
+        "criticality": "CRITICAL",
+        "escalation_reason": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "extraction_confidence": "LOW",
+        "modality": "MUST",
+        "ordinal": 1,
+        "parent_requirement_id": "l1req-ca0352f00c903e97",
+        "qualifiers": [],
+        "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+        "requirement_type": "UNKNOWN",
+        "source_span": {
+          "end_offset": 62,
+          "source_field": "job_description_text",
+          "span_digest": "sha256:3011ccfcce55acf796828f3355529202a34406788a816fdd5bd121c7dabdd919",
+          "start_offset": 44,
+          "text_digest": "sha256:c333fc601b87b1ae140196411645eaee12ce5225062d108c6aff14957d0084d8"
+        },
+        "target_unit_ids": []
+      },
+      {
+        "classification_rule_id": "unknown",
+        "coverage_status": "ESCALATED",
+        "criticality": "CRITICAL",
+        "escalation_reason": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "extraction_confidence": "LOW",
+        "modality": "NEUTRAL",
+        "ordinal": 1,
+        "parent_requirement_id": "l1req-870edfb692d2e17a",
+        "qualifiers": [],
+        "requirement_id": "l1cogreq-e5c58d436de16289",
+        "requirement_type": "UNKNOWN",
+        "source_span": {
+          "end_offset": 347,
+          "source_field": "job_description_text",
+          "span_digest": "sha256:41cc66822b088e4618bc696866124af413cc7801d6d4b9126a4ba9d02c095190",
+          "start_offset": 273,
+          "text_digest": "sha256:186369ea709eb1ab4e6dca3b2609387c9d2a47d868ad1a8461a3158dad3ac8fc"
+        },
+        "target_unit_ids": []
+      }
+    ],
+    "schema_version": "apps_rg.l1_atomic_requirement_graph.v1"
+  },
+  "authority_class": "PLANNING_ADVISORY_ONLY",
+  "critique_ledger": {
+    "assertions": {
+      "alternative_ledger_digest": "sha256:ec64c9eadc536b43b72acfc8ac5f3e402da39f9921a75017f02c7e755ba7802a",
+      "does_not_create_candidate_evidence": true,
+      "does_not_resolve_conflicts": true,
+      "does_not_select_route": true
+    },
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "finding_count": 3,
+    "findings": [
+      {
+        "code": "CRITICAL_REQUIREMENT_NOT_PRECISELY_TARGETED",
+        "failed_invariant": "CRITICAL_REQUIREMENT_HAS_DEFENSIBLE_OPTION",
+        "finding_id": "l1crit-563c1cd3454dc4db",
+        "requirement_id": "l1cogreq-cc977d643bdd4039",
+        "resolver": "HUMAN",
+        "severity": "HIGH"
+      },
+      {
+        "code": "CRITICAL_REQUIREMENT_NOT_PRECISELY_TARGETED",
+        "failed_invariant": "CRITICAL_REQUIREMENT_HAS_DEFENSIBLE_OPTION",
+        "finding_id": "l1crit-75342291ed25b564",
+        "requirement_id": "l1cogreq-e5c58d436de16289",
+        "resolver": "HUMAN",
+        "severity": "HIGH"
+      },
+      {
+        "code": "CRITICAL_REQUIREMENT_NOT_PRECISELY_TARGETED",
+        "failed_invariant": "CRITICAL_REQUIREMENT_HAS_DEFENSIBLE_OPTION",
+        "finding_id": "l1crit-c73813cc4ef80d73",
+        "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+        "resolver": "HUMAN",
+        "severity": "HIGH"
+      }
+    ],
+    "ledger_digest": "sha256:10b40ee4ee0f6ed98b739ec777ee0ac12a646fa8bd8b3d0f7a5a39260a9aecdf",
+    "schema_version": "apps_rg.l1_critique_ledger.v1"
+  },
+  "feasibility_graph": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "graph_digest": "sha256:2e1eb6beb121d0c65ebf8a973dd217854c4fc31683bbc3fe6bdef27d850cad96",
+    "options": [
+      {
+        "counterevidence_check_required": false,
+        "coverage_status": "ESCALATED",
+        "option_id": "l1opt-0cfc43f39ae38450",
+        "option_kind": "ESCALATE",
+        "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "required_source_shape": [],
+        "requirement_id": "l1cogreq-e5c58d436de16289",
+        "work_unit_id": ""
+      },
+      {
+        "counterevidence_check_required": false,
+        "coverage_status": "ESCALATED",
+        "option_id": "l1opt-346d933f129da8b5",
+        "option_kind": "ESCALATE",
+        "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "required_source_shape": [],
+        "requirement_id": "l1cogreq-dbc9d02f380bfff7",
+        "work_unit_id": ""
+      },
+      {
+        "counterevidence_check_required": false,
+        "coverage_status": "ESCALATED",
+        "option_id": "l1opt-6a0940084e9b44f4",
+        "option_kind": "ESCALATE",
+        "rationale": "ALTERNATIVE_SAFE_PATH",
+        "required_source_shape": [],
+        "requirement_id": "l1cogreq-6f24a7c03a0016da",
+        "work_unit_id": ""
+      },
+      {
+        "counterevidence_check_required": false,
+        "coverage_status": "ESCALATED",
+        "option_id": "l1opt-9aba86d3cd7db300",
+        "option_kind": "ESCALATE",
+        "rationale": "ALTERNATIVE_SAFE_PATH",
+        "required_source_shape": [],
+        "requirement_id": "l1cogreq-331c12158135fd54",
+        "work_unit_id": ""
+      },
+      {
+        "counterevidence_check_required": true,
+        "coverage_status": "MAPPED",
+        "option_id": "l1opt-9d510b17a0ee8de8",
+        "option_kind": "TARGET_WORK_UNIT",
+        "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+        "required_source_shape": [
+          "candidate_support",
+          "candidate_counterevidence"
+        ],
+        "requirement_id": "l1cogreq-6f24a7c03a0016da",
+        "work_unit_id": "experience_block"
+      },
+      {
+        "counterevidence_check_required": false,
+        "coverage_status": "ESCALATED",
+        "option_id": "l1opt-af583a69f49747f4",
+        "option_kind": "ESCALATE",
+        "rationale": "UNKNOWN_SEMANTICS_REVIEW_REQUIRED",
+        "required_source_shape": [],
+        "requirement_id": "l1cogreq-cc977d643bdd4039",
+        "work_unit_id": ""
+      },
+      {
+        "counterevidence_check_required": true,
+        "coverage_status": "MAPPED",
+        "option_id": "l1opt-fe24da4cb512995a",
+        "option_kind": "TARGET_WORK_UNIT",
+        "rationale": "TYPE_AND_QUALIFIER_COMPATIBLE_TARGET",
+        "required_source_shape": [
+          "candidate_support",
+          "candidate_counterevidence"
+        ],
+        "requirement_id": "l1cogreq-331c12158135fd54",
+        "work_unit_id": "competencies"
+      }
+    ],
+    "schema_version": "apps_rg.l1_feasibility_graph.v1"
+  },
+  "goal_constraint_frame": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "conflict_constraint_keys": [],
+    "definition_of_done": {
+      "all_critical_requirements_targeted_or_escalated": true,
+      "candidate_evidence_claims_forbidden": true,
+      "downstream_authority_required": true
+    },
+    "generation_mode": "strategic_tailor",
+    "goal_frame_id": "l1goal-ee707837ee277340",
+    "hard_constraint_keys": [
+      "_l1_cognitive_treatment_arm",
+      "briefing_text",
+      "source_channel"
+    ],
+    "requested_artifact": "resume_generation",
+    "target_level": "EXECUTIVE",
+    "target_role_digest": "sha256:b34ff67ef4578a08cfa8e81dd7016fd4de987e583f79a600200aa55af0ff4d3d"
+  },
+  "plan_digest": "sha256:78ab0337ef9ca12a2ebf3d2e225bb46171ee88bdf02ff602bbf9970b2665ade9",
+  "planning_priors": [
+    {
+      "authority_class": "PLANNING_PRIOR_ONLY",
+      "digest": "ee164e9e2233d0a4865ebecc552879cc79500c2c08a1baf0cda119f25cefcff4",
+      "ref": "apps_rg/profiles/rg_l1_requirement_taxonomy.v1.json"
+    },
+    {
+      "authority_class": "PLANNING_PRIOR_ONLY",
+      "digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+      "ref": "apps_rg/profiles/rg_planning_profile.yaml"
+    }
+  ],
+  "planning_status": "BLOCKED",
+  "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:33acc0ea1ff22073:b7312c750abe8c77::v1",
+  "request_id": "636b9acf-e5c9-40b1-bc4b-dc5ddd29e433",
+  "run_id": "f61e16b9-c104-4df8-a8d1-86b24259ea52",
+  "schema_version": "apps_rg.l1_cognitive_plan.v3",
+  "trace_id": "636b9acf-e5c9-40b1-bc4b-dc5ddd29e433",
+  "v2_parent": {
+    "capsule_digest": "sha256:40f5313ad3135f27ecd4b9d2691f3d352d46bb7e2419b93d06dcdd3da2632423",
+    "schema_version": "apps_rg_l1_planning_capsule.v2"
+  },
+  "validation": {
+    "no_candidate_evidence_claim": true,
+    "no_evidence_retrieval": true,
+    "no_l4_write": true,
+    "no_model_call": true,
+    "no_prompt_assembly": true,
+    "no_route_selection": true,
+    "no_tool_call": true,
+    "u0_payload_only": true
+  }
+}

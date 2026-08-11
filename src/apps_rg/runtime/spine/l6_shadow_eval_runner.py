@@ -16,16 +16,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.L6_observability.shadow_eval.adapters import (
+from apps_rg.runtime.local_l6 import (
     from_section_artifacts,
     validate_v40_shadow_exhaust,
-)
-from agentic_core.L6_observability.shadow_eval.pipeline import (
     L6PipelineState,
     run_6a,
     run_observer,
+    write_span_artifacts,
 )
-from agentic_core.L6_observability.shadow_eval.span_export import write_span_artifacts
 from apps_rg.runtime.observability.trace_reconciliation import (
     L6_TRACE_OBSERVABILITY_SUMMARY_ARTIFACT,
     TRACE_RECONCILIATION_ARTIFACT,

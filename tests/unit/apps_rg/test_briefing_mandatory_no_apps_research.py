@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from agentic_core.L0_routing.u0_intake_validator import AuthorityValidationReceipt
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
+from apps_rg_runtime.L0_routing.u0_intake_validator import AuthorityValidationReceipt
+from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
 
 from apps_rg.runtime.bindings.briefing_u0_signals import BriefingMissingError
 from apps_rg.runtime.bindings.l1_binding import l1_plan_apps_rg

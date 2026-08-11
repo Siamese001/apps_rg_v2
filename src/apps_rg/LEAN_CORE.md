@@ -17,14 +17,14 @@ This document establishes the architectural binding law for apps_rg as part of t
 
 ### BAD BINDING (Deprecated)
 ```
-apps_rg is hard-wired to agentic_core imports and concrete implementation internals.
+apps_rg is hard-wired to apps_rg imports and concrete implementation internals.
 ```
 
 ### GOOD BINDING (Target)
 ```
 apps_rg is bound to the spine contract.
 
-agentic_core is one runtime implementation of the spine.
+apps_rg is one runtime implementation of the spine.
 apps_rg speaks the spine contract cleanly.
 apps_rg does not become a sub-platform or reimplement the spine.
 ```
@@ -33,9 +33,9 @@ apps_rg does not become a sub-platform or reimplement the spine.
 
 ## Binding Law
 
-### 1. apps_rg binds to spine contracts, not agentic_core implementation.
+### 1. apps_rg binds to spine contracts, not apps_rg implementation.
 
-All production imports of spine functionality must route through `apps_rg.runtime.spine_contracts`. Concrete agentic_core runtime internals are **FORBIDDEN** in production code.
+All production imports of spine functionality must route through `apps_rg.runtime.spine_contracts`. Concrete apps_rg runtime internals are **FORBIDDEN** in production code.
 
 **Allowed:**
 ```python
@@ -44,17 +44,17 @@ from apps_rg.runtime.spine_contracts import ValidatedRequest, RouteContract
 
 **Forbidden:**
 ```python
-from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import ...
-from agentic_core.runtime.judges.panel import ...
-from agentic_core.L2_execution import ...
+from apps_rg.runtime.entrypoints.integrated_single_action_spine_run import ...
+from apps_rg.runtime.judges.panel import ...
+from apps_rg.L2_execution import ...
 ```
 
 **Temporary Exception:**
-- `apps_rg/runtime/spine_contracts.py` may re-export existing contract classes while contracts still live under agentic_core.
+- `apps_rg/runtime/spine_contracts.py` may re-export existing contract classes while contracts still live under apps_rg.
 - No other apps_rg production module may import those contract classes directly.
 
 **Long-term Target:**
-Neutral shared contract package (e.g., `apps_shared/spine_contracts` or `agentic_spine_contracts`) that both apps_rg and agentic_core depend on.
+Neutral shared contract package (e.g., `apps_shared/spine_contracts` or `agentic_spine_contracts`) that both apps_rg and apps_rg depend on.
 
 ---
 
@@ -243,7 +243,7 @@ export APPS_RG_ENABLE_R1B_SEMANTIC_CACHE=1
 
 ### 16. Contract-symbol verification before facade creation.
 
-- All symbols in `spine_contracts.py` must be verified to exist in `agentic_core/runtime/contracts`
+- All symbols in `spine_contracts.py` must be verified to exist in `apps_rg/runtime/contracts`
 - Inventory generated before facade creation via `tools/apps_rg/inventory_contract_symbols.py`
 - Symbol inventory stored at `artifacts/apps_rg/contract_symbol_inventory.json`
 - Unverified symbols deferred until core addition or proper definition
@@ -264,7 +264,7 @@ export APPS_RG_ENABLE_R1B_SEMANTIC_CACHE=1
 
 ### apps_rg does NOT OWN (Core Spine)
 
-- Concrete agentic_core execution engines
+- Concrete apps_rg execution engines
 - Core route engines
 - Core L2 executors
 - Core Exit pipelines
@@ -282,15 +282,15 @@ export APPS_RG_ENABLE_R1B_SEMANTIC_CACHE=1
 | From | To | Status |
 |------|-----|--------|
 | `apps_rg/*` | `apps_rg.runtime.spine_contracts` | ALLOWED |
-| `apps_rg/*` | `agentic_core.runtime.contracts.*` | TEMPORARY (via facade only) |
-| `apps_rg/*` | `agentic_core.runtime.entrypoints.*` | **FORBIDDEN** |
-| `apps_rg/*` | `agentic_core.runtime.entry.*` | **FORBIDDEN** |
-| `apps_rg/*` | `agentic_core.L0_routing.*` | **FORBIDDEN** |
-| `apps_rg/*` | `agentic_core.L1_cognition.*` | **FORBIDDEN** |
-| `apps_rg/*` | `agentic_core.L2_execution.*` | **FORBIDDEN** |
-| `apps_rg/*` | `agentic_core.runtime.exit.*` | **FORBIDDEN** |
-| `apps_rg/*` | `agentic_core.runtime.judges.*` | **FORBIDDEN** (except via panel port) |
-| `apps_rg/*` | `agentic_core.runtime.l6.*` | **FORBIDDEN** |
+| `apps_rg/*` | `apps_rg.runtime.contracts.*` | TEMPORARY (via facade only) |
+| `apps_rg/*` | `apps_rg.runtime.entrypoints.*` | **FORBIDDEN** |
+| `apps_rg/*` | `apps_rg.runtime.entry.*` | **FORBIDDEN** |
+| `apps_rg/*` | `apps_rg.L0_routing.*` | **FORBIDDEN** |
+| `apps_rg/*` | `apps_rg.L1_cognition.*` | **FORBIDDEN** |
+| `apps_rg/*` | `apps_rg.L2_execution.*` | **FORBIDDEN** |
+| `apps_rg/*` | `apps_rg.runtime.exit.*` | **FORBIDDEN** |
+| `apps_rg/*` | `apps_rg.runtime.judges.*` | **FORBIDDEN** (except via panel port) |
+| `apps_rg/*` | `apps_rg.runtime.l6.*` | **FORBIDDEN** |
 | `apps_rg/integrations/apps_research_bridge.py` | governed Apps Research facade | **ALLOWED** |
 | all other `apps_rg/*` | `apps_research.*` | **FORBIDDEN** |
 
@@ -306,7 +306,7 @@ Tests may import directly for mocking and integration testing, but should prefer
 
 ### test_apps_rg_spine_contract_binding.py
 
-**Purpose:** Verify apps_rg production code has zero forbidden concrete agentic_core imports
+**Purpose:** Verify apps_rg production code has zero forbidden concrete apps_rg imports
 
 **Trigger:** Every PR touching `apps_rg/`
 
@@ -316,14 +316,14 @@ Tests may import directly for mocking and integration testing, but should prefer
 - Fails if any forbidden import pattern matches
 
 **Forbidden Patterns:**
-- `agentic_core.runtime.entrypoints`
-- `agentic_core.runtime.entry`
-- `agentic_core.L0_routing`
-- `agentic_core.L1_cognition`
-- `agentic_core.L2_execution`
-- `agentic_core.runtime.exit`
-- `agentic_core.runtime.judges` (concrete)
-- `agentic_core.runtime.l6`
+- `apps_rg.runtime.entrypoints`
+- `apps_rg.runtime.entry`
+- `apps_rg.L0_routing`
+- `apps_rg.L1_cognition`
+- `apps_rg.L2_execution`
+- `apps_rg.runtime.exit`
+- `apps_rg.runtime.judges` (concrete)
+- `apps_rg.runtime.l6`
 
 **Exemptions:**
 - `apps_rg/runtime/spine_contracts.py` (the facade itself)
@@ -332,8 +332,8 @@ Tests may import directly for mocking and integration testing, but should prefer
 
 **Failure Message:**
 ```
-Forbidden concrete agentic_core imports detected:
-  - apps_rg/runtime/orchestration.py: from agentic_core.runtime.entrypoints import ...
+Forbidden concrete apps_rg imports detected:
+  - apps_rg/runtime/orchestration.py: from apps_rg.runtime.entrypoints import ...
 
 All production imports must route through apps_rg/runtime/spine_contracts.py
 ```
@@ -345,17 +345,17 @@ All production imports must route through apps_rg/runtime/spine_contracts.py
 ## Evolution Path
 
 ### Phase 1: Facade (Current)
-- `spine_contracts.py` re-exports from `agentic_core.runtime.contracts`
+- `spine_contracts.py` re-exports from `apps_rg.runtime.contracts`
 - `ports.py` defines Protocol interfaces
 - CI enforces import boundary
 
 ### Phase 2: Contract Package
-- Extract `agentic_core.runtime.contracts` to `agentic_spine_contracts`
-- Both `apps_rg` and `agentic_core` depend on `agentic_spine_contracts`
+- Extract `apps_rg.runtime.contracts` to `agentic_spine_contracts`
+- Both `apps_rg` and `apps_rg` depend on `agentic_spine_contracts`
 - Facade becomes pass-through or removed
 
 ### Phase 3: Runtime Port Injection
-- `agentic_core` implements `SpineRuntimePort`, `ProviderGatewayPort`, etc.
+- `apps_rg` implements `SpineRuntimePort`, `ProviderGatewayPort`, etc.
 - `apps_rg` receives port implementations via dependency injection
 - No direct imports of concrete implementations
 
@@ -370,7 +370,7 @@ All production imports must route through apps_rg/runtime/spine_contracts.py
 python -m pytest tests/architecture/test_apps_rg_spine_contract_binding.py -v
 
 # Find current violations (before fix)
-grep -r "from agentic_core.runtime" apps_rg --include="*.py" | grep -v test | grep -v spine_contracts
+grep -r "from apps_rg.runtime" apps_rg --include="*.py" | grep -v test | grep -v spine_contracts
 ```
 
 ### Remediation Process

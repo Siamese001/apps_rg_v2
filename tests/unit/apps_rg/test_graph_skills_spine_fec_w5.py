@@ -39,7 +39,7 @@ def _patch_spine_c0(monkeypatch: pytest.MonkeyPatch) -> None:
         "APPS_RG_SECTION_FINAL_GRAPH_EVIDENCE_CONTRACTS",
     ):
         monkeypatch.delenv(name, raising=False)
-    from agentic_core.runtime.contracts.final_evidence_contract import (
+    from apps_rg_runtime.runtime.contracts.final_evidence_contract import (
         FinalEvidenceContract,
         SUPPORT_STATUS_PASS,
     )

@@ -31,8 +31,8 @@ PROMPT_PROFILE_PATH = (
     / "domain_contract"
     / "prompt_profile.company_brief.v1.yaml"
 )
-AGENTIC_CORE_STANDALONE_SKIP = pytest.mark.skip(
-    reason="standalone boundary: agentic_core is excluded from the apps_rg_v2 source baseline"
+APP_RUNTIME_STANDALONE_SKIP = pytest.mark.skip(
+    reason="standalone boundary: apps_rg is excluded from the apps_rg_v2 source baseline"
 )
 
 
@@ -134,10 +134,10 @@ class TestTemplateResolution:
 class TestCanonicalSlotOrder:
     """Verify canonical slot order S0-D0-I0-E0-C0-M0-U0-H0-R0."""
 
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_preserves_canonical_slot_order(self):
         """PA must assemble slots in canonical order."""
-        from agentic_core.prompt_governance.pa_package_driven_binding import CANONICAL_SLOT_ORDER
+        from apps_rg.prompt_governance.pa_package_driven_binding import CANONICAL_SLOT_ORDER
         
         expected_order = [
             "S0_system",
@@ -215,10 +215,10 @@ class TestOutputSchemaBinding:
 class TestArtifactEmission:
     """Verify PA emits required artifacts."""
 
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_emits_compiled_prompt_artifact(self):
         """PA must emit CompiledPromptArtifact."""
-        from agentic_core.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
+        from apps_rg.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
         
         # Verify dataclass structure
         fields = [f.name for f in CompiledPromptArtifact.__dataclass_fields__.values()]
@@ -231,34 +231,34 @@ class TestArtifactEmission:
         assert "system_preamble" in fields
         assert "user_instruction" in fields
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_emits_prompt_hash(self):
         """CompiledPromptArtifact must include compilation_hash."""
-        from agentic_core.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
+        from apps_rg.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
         
         fields = [f.name for f in CompiledPromptArtifact.__dataclass_fields__.values()]
         assert "compilation_hash" in fields
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_emits_component_hash_map(self):
         """CompiledPromptArtifact must include component_hash_map."""
-        from agentic_core.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
+        from apps_rg.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
         
         fields = [f.name for f in CompiledPromptArtifact.__dataclass_fields__.values()]
         assert "component_hash_map" in fields
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_emits_slot_lineage_map(self):
         """CompiledPromptArtifact must include slot_lineage_map."""
-        from agentic_core.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
+        from apps_rg.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
         
         fields = [f.name for f in CompiledPromptArtifact.__dataclass_fields__.values()]
         assert "slot_lineage_map" in fields
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_emits_replay_manifest_ref(self):
         """CompiledPromptArtifact must include replay_manifest_ref."""
-        from agentic_core.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
+        from apps_rg.prompt_governance.pa_package_driven_binding import CompiledPromptArtifact
         
         fields = [f.name for f in CompiledPromptArtifact.__dataclass_fields__.values()]
         assert "replay_manifest_ref" in fields
@@ -267,11 +267,11 @@ class TestArtifactEmission:
 class TestPAnAuthorityBoundaries:
     """Verify PA has no retrieve/execute/write authority."""
 
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_never_retrieves(self):
         """PA must never retrieve evidence."""
         import inspect
-        from agentic_core.prompt_governance import pa_package_driven_binding
+        from apps_rg.prompt_governance import pa_package_driven_binding
         
         source = inspect.getsource(pa_package_driven_binding)
         
@@ -286,11 +286,11 @@ class TestPAnAuthorityBoundaries:
         for term in forbidden:
             assert term not in source.lower(), f"PA must not retrieve: {term}"
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_never_executes(self):
         """PA must never execute LLM calls."""
         import inspect
-        from agentic_core.prompt_governance import pa_package_driven_binding
+        from apps_rg.prompt_governance import pa_package_driven_binding
         
         source = inspect.getsource(pa_package_driven_binding)
         
@@ -298,11 +298,11 @@ class TestPAnAuthorityBoundaries:
         for term in forbidden:
             assert term not in source.lower(), f"PA must not execute: {term}"
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_never_calls_provider(self):
         """PA must never call provider APIs."""
         import inspect
-        from agentic_core.prompt_governance import pa_package_driven_binding
+        from apps_rg.prompt_governance import pa_package_driven_binding
         
         source = inspect.getsource(pa_package_driven_binding)
         
@@ -310,11 +310,11 @@ class TestPAnAuthorityBoundaries:
         for term in forbidden:
             assert term not in source.lower(), f"PA must not call provider: {term}"
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_never_writes_cache(self):
         """PA must never write to cache."""
         import inspect
-        from agentic_core.prompt_governance import pa_package_driven_binding
+        from apps_rg.prompt_governance import pa_package_driven_binding
         
         source = inspect.getsource(pa_package_driven_binding)
         
@@ -322,11 +322,11 @@ class TestPAnAuthorityBoundaries:
         for term in forbidden:
             assert term not in source.lower(), f"PA must not write cache: {term}"
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_pa_never_writes_l4(self):
         """PA must never write to L4 state."""
         import inspect
-        from agentic_core.prompt_governance import pa_package_driven_binding
+        from apps_rg.prompt_governance import pa_package_driven_binding
         
         source = inspect.getsource(pa_package_driven_binding)
         
@@ -345,11 +345,11 @@ class TestPAnAuthorityBoundaries:
 class TestNoAppsResearchHardcodingInCore:
     """Verify no apps_research prompt logic in core."""
 
-    @AGENTIC_CORE_STANDALONE_SKIP
-    def test_w5_no_apps_research_prompt_names_hardcoded_in_agentic_core(self):
+    @APP_RUNTIME_STANDALONE_SKIP
+    def test_w5_no_apps_research_prompt_names_hardcoded_in_apps_rg(self):
         """Generic PA must not hardcode apps_research template names."""
         repo_root = Path(__file__).parent.parent.parent
-        generic_pa = repo_root / "agentic_core/prompt_governance/pa_package_driven_binding.py"
+        generic_pa = repo_root / "apps_rg/prompt_governance/pa_package_driven_binding.py"
         
         content = generic_pa.read_text()
         
@@ -362,11 +362,11 @@ class TestNoAppsResearchHardcodingInCore:
         for term in forbidden:
             assert term not in content, f"Generic PA hardcodes apps_research: {term}"
     
-    @AGENTIC_CORE_STANDALONE_SKIP
-    def test_w5_no_company_brief_prompt_logic_hardcoded_in_agentic_core(self):
+    @APP_RUNTIME_STANDALONE_SKIP
+    def test_w5_no_company_brief_prompt_logic_hardcoded_in_apps_rg(self):
         """Generic PA must not hardcode company_brief logic."""
         repo_root = Path(__file__).parent.parent.parent
-        generic_pa = repo_root / "agentic_core/prompt_governance/pa_package_driven_binding.py"
+        generic_pa = repo_root / "apps_rg/prompt_governance/pa_package_driven_binding.py"
         
         content = generic_pa.read_text()
         
@@ -379,11 +379,11 @@ class TestNoAppsResearchHardcodingInCore:
         for term in forbidden:
             assert term not in content, f"Generic PA hardcodes company_brief: {term}"
     
-    @AGENTIC_CORE_STANDALONE_SKIP
+    @APP_RUNTIME_STANDALONE_SKIP
     def test_w5_apps_research_pa_adapter_is_thin_only(self):
         """apps_research PA adapter must only delegate."""
         repo_root = Path(__file__).parent.parent.parent
-        adapter_path = repo_root / "agentic_core/prompt_governance/apps_research_pa_binding.py"
+        adapter_path = repo_root / "apps_rg/prompt_governance/apps_research_pa_binding.py"
         
         content = adapter_path.read_text()
         

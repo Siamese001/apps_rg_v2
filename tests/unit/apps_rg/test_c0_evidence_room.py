@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg.runtime.spine_contracts import (
     ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY,
     EvidenceItem,
     FinalEvidenceContract,
@@ -607,7 +607,7 @@ def test_c06_skips_retry_when_first_c05_packet_has_full_direct_coverage() -> Non
     assert receipt["pass"] is True
 
 
-def test_agentic_core_binding_import() -> None:
+def test_app_owned_c0_binding_import() -> None:
     from apps_rg.runtime.bindings.c0_binding import c0_retrieve_apps_rg as spine_c0
 
     from apps_rg.runtime.bindings.c0_binding import c0_retrieve_apps_rg as apps_c0

@@ -196,7 +196,7 @@ def fetch_c02_evidence_atoms(
 
 
 def c02_atom_to_evidence_item(atom: C02Atom, *, timestamp_iso: str) -> Any:
-    """Convert C0.2 atom to agentic_core EvidenceItem (data-only)."""
+    """Convert a C0.2 atom to an Apps RG evidence item (data-only)."""
     from apps_rg.runtime.spine_contracts import (
         ALLOWED_PROMPT_SLOT_C0_EVIDENCE_DATA_ONLY,
         EvidenceItem,

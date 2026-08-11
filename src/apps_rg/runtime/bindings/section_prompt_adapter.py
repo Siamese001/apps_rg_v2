@@ -27,6 +27,17 @@ from apps_rg.prompt_assembly.contracts import (
     PromptAssemblyError,
     PromptAssemblyInput,
 )
+from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+    L1CognitiveConsumptionError,
+    cognitive_advisory_prompt_lines,
+    cognitive_revision_advisory_prompt_lines,
+    validate_l1_cognitive_consumer_advisory_from_cognitive_plan,
+    validate_l1_cognitive_revision_advisory,
+)
+from apps_rg.runtime.bindings.l1_cognitive_planner_v3 import (
+    L1CognitivePlanError,
+    validate_l1_cognitive_revision_v3,
+)
 
 
 @dataclass(frozen=True)
@@ -66,6 +77,10 @@ def compile_section_prompt(
     *,
     section_id: str,
     companion_u_tier: str | None = None,
+    l1_cognitive_advisory: Mapping[str, Any] | None = None,
+    l1_cognitive_plan: Mapping[str, Any] | None = None,
+    l1_cognitive_revision: Mapping[str, Any] | None = None,
+    l1_cognitive_revision_advisory: Mapping[str, Any] | None = None,
 ) -> SectionCompiledPrompt:
     """Validate ``section_id`` against its stub contract and compile ``assembly_input``.
 
@@ -118,6 +133,85 @@ def compile_section_prompt(
             "</U_TIER_COMPANION_CONTEXT>\n\n"
         )
         assembly_input = replace(assembly_input, u0_user_task=fence + assembly_input.u0_user_task)
+
+    if (l1_cognitive_advisory is None) != (l1_cognitive_plan is None):
+        raise PromptAssemblyError(
+            code="L1_COGNITIVE_BINDING_INCOMPLETE",
+            message=(
+                "L1 cognitive advisory and source plan must be supplied together "
+                "when either is present"
+            ),
+            context={"section_id": section_id},
+        )
+    if l1_cognitive_advisory is not None and l1_cognitive_plan is not None:
+        try:
+            validate_l1_cognitive_consumer_advisory_from_cognitive_plan(
+                l1_cognitive_advisory,
+                cognitive_plan=l1_cognitive_plan,
+            )
+            advisory_lines = cognitive_advisory_prompt_lines(
+                l1_cognitive_advisory,
+                section_id=section_id,
+            )
+        except L1CognitiveConsumptionError as exc:
+            raise PromptAssemblyError(
+                code="L1_COGNITIVE_BINDING_INVALID",
+                message="L1 cognitive advisory is not source-bound to its plan",
+                context={"section_id": section_id},
+            ) from exc
+        if advisory_lines:
+            advisory_block = "<L1_COGNITIVE_ADVISORY>\n" + "\n".join(
+                advisory_lines
+            ) + "\n</L1_COGNITIVE_ADVISORY>\n\n"
+            assembly_input = replace(
+                assembly_input,
+                u0_user_task=advisory_block + assembly_input.u0_user_task,
+            )
+
+    if (l1_cognitive_revision is None) != (l1_cognitive_revision_advisory is None):
+        raise PromptAssemblyError(
+            code="L1_COGNITIVE_REVISION_BINDING_INCOMPLETE",
+            message=(
+                "L1 cognitive revision and revision advisory must be supplied together "
+                "when either is present"
+            ),
+            context={"section_id": section_id},
+        )
+    if l1_cognitive_revision is not None:
+        if l1_cognitive_plan is None or l1_cognitive_advisory is None:
+            raise PromptAssemblyError(
+                code="L1_COGNITIVE_REVISION_BINDING_INCOMPLETE",
+                message="L1 cognitive revision requires the verified cognitive plan and advisory",
+                context={"section_id": section_id},
+            )
+        try:
+            validate_l1_cognitive_revision_v3(
+                l1_cognitive_revision,
+                plan=l1_cognitive_plan,
+            )
+            validate_l1_cognitive_revision_advisory(
+                l1_cognitive_revision_advisory,
+                cognitive_plan=l1_cognitive_plan,
+                revision=l1_cognitive_revision,
+            )
+            revision_lines = cognitive_revision_advisory_prompt_lines(
+                l1_cognitive_revision_advisory,
+                section_id=section_id,
+            )
+        except (L1CognitiveConsumptionError, L1CognitivePlanError) as exc:
+            raise PromptAssemblyError(
+                code="L1_COGNITIVE_REVISION_BINDING_INVALID",
+                message="L1 cognitive C0 revision is not source-bound to its plan",
+                context={"section_id": section_id},
+            ) from exc
+        if revision_lines:
+            revision_block = "<L1_COGNITIVE_C0_REVISION>\n" + "\n".join(
+                revision_lines
+            ) + "\n</L1_COGNITIVE_C0_REVISION>\n\n"
+            assembly_input = replace(
+                assembly_input,
+                u0_user_task=revision_block + assembly_input.u0_user_task,
+            )
 
     artifact = compile_prompt(assembly_input, base_path=_APPS_RG_ROOT / "prompt_assembly")
     apps_rg_ref = str(contract.get("apps_rg_prompt_template_ref") or "")

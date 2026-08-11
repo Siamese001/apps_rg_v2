@@ -65,7 +65,7 @@ def test_graph_lane_support_target_requires_proof_pool_prefix() -> None:
         evidence_item_count=1,
     )
     assert met is True
-    from agentic_core.runtime.c0.evidence_metrics_extractor import _compute_target_met
+    from apps_rg_runtime.runtime.c0.evidence_metrics_extractor import _compute_target_met
 
     assert _compute_target_met(sources, target) is True
 

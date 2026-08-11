@@ -2,9 +2,9 @@
 
 | Artifact | Path | Status |
 |---|---|---|
-| **HOW trace** | `C:\Git\Agentic-Workflow-FRESH-worktrees\codex-apps-rg-source-refreeze\artifacts\apps_rg\runs\source_c03_s2_s2r1_20260720_r5\e2e_20260720T091431Z_6710b35d\agentic_core_how_trace.json` | `PRESENT` |
-| **Route-family coverage** | `C:\Git\Agentic-Workflow-FRESH-worktrees\codex-apps-rg-source-refreeze\artifacts\apps_rg\runs\source_c03_s2_s2r1_20260720_r5\e2e_20260720T091431Z_6710b35d\agentic_core_l7_route_family_coverage.json` | `PRESENT` |
-| **Spine proof** | `C:\Git\Agentic-Workflow-FRESH-worktrees\codex-apps-rg-source-refreeze\artifacts\apps_rg\runs\source_c03_s2_s2r1_20260720_r5\e2e_20260720T091431Z_6710b35d\agentic_core_spine_proof.json` | `PRESENT` |
+| **HOW trace** | `C:\Git\Agentic-Workflow-FRESH-worktrees\codex-apps-rg-source-refreeze\artifacts\apps_rg\runs\source_c03_s2_s2r1_20260720_r5\e2e_20260720T091431Z_6710b35d\apps_rg_how_trace.json` | `PRESENT` |
+| **Route-family coverage** | `C:\Git\Agentic-Workflow-FRESH-worktrees\codex-apps-rg-source-refreeze\artifacts\apps_rg\runs\source_c03_s2_s2r1_20260720_r5\e2e_20260720T091431Z_6710b35d\apps_rg_l7_route_family_coverage.json` | `PRESENT` |
+| **Spine proof** | `C:\Git\Agentic-Workflow-FRESH-worktrees\codex-apps-rg-source-refreeze\artifacts\apps_rg\runs\source_c03_s2_s2r1_20260720_r5\e2e_20260720T091431Z_6710b35d\apps_rg_spine_proof.json` | `PRESENT` |
 
 | Signal | Value |
 |---|---|

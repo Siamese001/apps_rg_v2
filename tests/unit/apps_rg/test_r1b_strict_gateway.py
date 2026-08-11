@@ -7,18 +7,18 @@ from dataclasses import replace
 import pytest
 
 pytest.importorskip(
-    "tests.unit.agentic_core.L4_state.uwg_acceptance.test_uwg_validation_fail_closed",
-    reason="the agentic_core UWG acceptance harness is outside the standalone test boundary",
+    "tests.unit.apps_rg_runtime.L4_state.uwg_acceptance.test_uwg_validation_fail_closed",
+    reason="the apps_rg_runtime UWG acceptance harness is outside the standalone test boundary",
 )
 
-from agentic_core.L4_state.contracts.records import stamp_digest
+from apps_rg_runtime.L4_state.contracts.records import stamp_digest
 from apps_rg.cache.r1b_commit_authority import compute_r1b_commit_request_signature
 from apps_rg.cache.r1b_strict_gateway import (
     R1BStrictUWGGateway,
     get_r1b_strict_gateway,
     reset_r1b_strict_gateway,
 )
-from tests.unit.agentic_core.L4_state.uwg_acceptance.test_uwg_validation_fail_closed import (
+from tests.unit.apps_rg_runtime.L4_state.uwg_acceptance.test_uwg_validation_fail_closed import (
     _bundle,
 )
 

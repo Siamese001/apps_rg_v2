@@ -1128,7 +1128,7 @@ def test_whole_run_success_requires_post_x3_uwg_eval_l6(
             json.dumps({"chain_kind": "R4_SINGLE_ACTION", "route_family": "R4_SINGLE_ACTION"}),
             encoding="utf-8",
         )
-        (art / "agentic_core_how_trace.json").write_text("{}", encoding="utf-8")
+        (art / "apps_rg_how_trace.json").write_text("{}", encoding="utf-8")
         return _FakeResult()
 
     post_x3_calls: list[Path] = []

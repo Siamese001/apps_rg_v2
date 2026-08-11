@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from tests.helpers import apps_rg_model_pins as pins
 
-from agentic_core.knowledge.retrieval.anthropic_cache_control import min_cacheable_chars
+from apps_rg.runtime.local_provider import min_cacheable_chars
 from apps_rg.runtime.providers.provider_gateway import ProviderProfile
 from apps_rg.runtime.providers.section_provider_call import _resolve_anthropic_cache_payload
 

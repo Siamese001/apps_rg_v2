@@ -12,9 +12,9 @@ from apps_rg.runtime.non_product_proof_stamp import (
     CONTRACT_TEST_PROOF_CLASSIFICATION,
 )
 
-_AGENTIC_CORE_UNTRACKED_ONLY = "PRE_EXISTING_UNTRACKED_AGENTIC_CORE_PATH"
-_AGENTIC_CORE_TRACKED_ONLY = "TRACKED_AGENTIC_CORE_WORKING_TREE_CHANGES"
-_AGENTIC_CORE_MIXED = "TRACKED_AND_UNTRACKED_AGENTIC_CORE_CHANGES"
+_APP_RUNTIME_UNTRACKED_ONLY = "PRE_EXISTING_UNTRACKED_APP_RUNTIME_PATH"
+_APP_RUNTIME_TRACKED_ONLY = "TRACKED_APP_RUNTIME_WORKING_TREE_CHANGES"
+_APP_RUNTIME_MIXED = "TRACKED_AND_UNTRACKED_APP_RUNTIME_CHANGES"
 
 
 def run_git_cmd(
@@ -34,7 +34,7 @@ def run_git_cmd(
     )
 
 
-def classify_agentic_core_porcelain_lines(lines: list[str]) -> dict[str, Any]:
+def classify_apps_rg_porcelain_lines(lines: list[str]) -> dict[str, Any]:
     trimmed = [line.rstrip("\r") for line in lines if line.strip()]
     tracked = False
     untracked = False
@@ -57,29 +57,29 @@ def classify_agentic_core_porcelain_lines(lines: list[str]) -> dict[str, Any]:
     if not dirty:
         reason = ""
     elif untracked and not tracked:
-        reason = _AGENTIC_CORE_UNTRACKED_ONLY
+        reason = _APP_RUNTIME_UNTRACKED_ONLY
     elif tracked and untracked:
-        reason = _AGENTIC_CORE_MIXED
+        reason = _APP_RUNTIME_MIXED
     else:
-        reason = _AGENTIC_CORE_TRACKED_ONLY
+        reason = _APP_RUNTIME_TRACKED_ONLY
 
     return {
-        "agentic_core_modified": dirty,
-        "agentic_core_dirty_reason": reason,
-        "agentic_core_dirty_paths": sorted({path for path in raw_paths if path}),
+        "apps_rg_modified": dirty,
+        "apps_rg_dirty_reason": reason,
+        "apps_rg_dirty_paths": sorted({path for path in raw_paths if path}),
     }
 
 
 def finalize_boundary_no_bypass(artifact: dict[str, Any], repo: Path) -> None:
     raw = run_git_cmd(
-        ["git", "status", "--porcelain=v1", "--", "agentic_core"], cwd=repo
+        ["git", "status", "--porcelain=v1", "--", "apps_rg"], cwd=repo
     )
-    classification = classify_agentic_core_porcelain_lines(
+    classification = classify_apps_rg_porcelain_lines(
         (raw.stdout or "").splitlines()
     )
     boundary = artifact.setdefault("boundary_no_bypass", {})
     boundary.update(classification)
-    boundary["agentic_core_modified_by_this_task"] = False
+    boundary["apps_rg_modified_by_this_task"] = False
     boundary.setdefault("new_app_literals_in_core", False)
     boundary.setdefault("direct_l2_chroma_bypass", False)
     boundary.setdefault("direct_l4_write_bypass", False)

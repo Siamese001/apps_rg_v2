@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -28,7 +27,7 @@ def _soft_judge() -> dict:
 def _regen_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN", "1")
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_PRESCRIPTIVE_DELTA", "1")
-    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_CORE_SAME_AUTHORITY_REGEN", "1")
+    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_SAME_AUTHORITY_REGEN", "1")
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_LEGACY_BLOCK", "0")
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_MAX_ATTEMPTS", "2")
     (tmp_path / "compiled_prompt_artifact.json").write_text(
@@ -66,7 +65,7 @@ def test_retry_provider_cycle2_uses_incremental_anchor_parsed(
 
     def _fake_run(**kwargs):
         captured["contract"] = kwargs["contract"]
-        from agentic_core.L2_execution.regen import SameAuthorityRegenRunner
+        from apps_rg.runtime.sections.executive_summary_local_regen import SameAuthorityRegenRunner
 
         contract = kwargs["contract"]
 
@@ -90,7 +89,7 @@ def test_retry_provider_cycle2_uses_incremental_anchor_parsed(
         )
 
     monkeypatch.setattr(
-        "apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge.run_core_same_authority_regen",
+        "apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge.run_apps_rg_same_authority_regen",
         _fake_run,
     )
 

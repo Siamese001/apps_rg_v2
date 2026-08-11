@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from agentic_core.L2_execution.regen.prompt_lock import format_regen_delta_user_turn
+from apps_rg_runtime.L2_execution.regen.prompt_lock import format_regen_delta_user_turn
 from apps_rg.runtime.sections.executive_summary_judge_remediation import (
     REGEN_DELTA_SECTION_ORDER,
     _flatten_delta_sections,

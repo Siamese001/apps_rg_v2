@@ -1,7 +1,7 @@
 """Deterministic W3 L6 shadow replay over sealed historical evidence.
 
 The module remains stdlib-only at import time.  The caller installs the W0
-zero-provider boundary before this module imports Apps Eval or Agentic Core L6.
+zero-provider boundary before this module imports Apps Eval or an L6 runtime.
 W3 executes the observer, binds independently persisted lane observations to
 the sealed W2 scorecard, records every proof gap, and never mutates the source
 run or requests a product/UWG write.
@@ -10,16 +10,12 @@ run or requests a product/UWG write.
 from __future__ import annotations
 
 import hashlib
-import importlib.machinery
-import importlib.util
 import json
 import os
-import sys
 import traceback
 import uuid
 from dataclasses import fields
 from pathlib import Path
-from types import ModuleType
 from typing import Any, Callable, Mapping
 
 
@@ -497,55 +493,6 @@ def _dataclass_kwargs(cls: type[Any], payload: Mapping[str, Any]) -> dict[str, A
     return {key: value for key, value in payload.items() if key in names}
 
 
-def _install_minimal_agentic_core_namespace() -> None:
-    """Expose only the L6 source tree without running broad parent initializers.
-
-    The external ``agentic_core`` and ``L6_observability`` package initializers
-    import unrelated runtime, retrieval, and provider surfaces.  Historical
-    replay needs only the side-effect-free ``shadow_eval`` modules.  Namespace
-    packages preserve normal submodule imports while keeping those unrelated
-    initializers outside the zero-provider process.
-    """
-
-    existing = sys.modules.get("agentic_core")
-    if existing is not None:
-        if getattr(existing, "_apps_rg_minimal_l6_namespace", False):
-            return
-        # A test process may have imported Core before entering this helper.
-        # The production CLI requires a clean process and the outer guard will
-        # reject any preloaded provider modules independently.
-        return
-    spec = importlib.util.find_spec("agentic_core")
-    locations = list(spec.submodule_search_locations or []) if spec else []
-    if not locations:
-        raise L6ShadowReplayError("agentic_core_package_not_found")
-    core_root = Path(locations[0]).resolve()
-    packages = {
-        "agentic_core": core_root,
-        "agentic_core.L5_safety": core_root / "L5_safety",
-        "agentic_core.L5_safety.contracts": core_root / "L5_safety" / "contracts",
-        "agentic_core.L6_observability": core_root / "L6_observability",
-        "agentic_core.L6_observability.shadow_eval": (
-            core_root / "L6_observability" / "shadow_eval"
-        ),
-    }
-    for name, path in packages.items():
-        if not path.is_dir():
-            raise L6ShadowReplayError(f"agentic_core_l6_path_missing:{path}")
-        module = ModuleType(name)
-        module.__package__ = name
-        module.__path__ = [path.as_posix()]
-        module_spec = importlib.machinery.ModuleSpec(
-            name,
-            loader=None,
-            is_package=True,
-        )
-        module_spec.submodule_search_locations = [path.as_posix()]
-        module.__spec__ = module_spec
-        module._apps_rg_minimal_l6_namespace = True
-        sys.modules[name] = module
-
-
 def _load_completed_eval_record(path: Path) -> Any:
     payload = _read_json(path, label="eval_record")
     # Lazy imports preserve the stdlib-only pre-guard module boundary.
@@ -601,18 +548,45 @@ def _emit_projection_bridge(
     eval_record_path: Path,
     l6_handoff_path: Path,
 ) -> dict[str, str]:
-    _install_minimal_agentic_core_namespace()
-    from apps_eval.l6_shadow_bridge import (  # noqa: PLC0415
-        emit_completed_eval_l6_shadow_bridge,
-    )
+    """Materialize an Apps RG-owned, advisory-only projection package."""
 
-    return emit_completed_eval_l6_shadow_bridge(
-        record,
-        output_dir,
-        eval_record_path=eval_record_path.as_posix(),
-        l6_handoff_path=l6_handoff_path.as_posix(),
-        deterministic_replay=True,
+    output_dir.mkdir(parents=True, exist_ok=True)
+    common = {
+        "schema_version": "apps_rg.l6_shadow_bridge.v2",
+        "record_id": str(getattr(record, "record_id", "") or ""),
+        "eval_record_ref": Path(eval_record_path).as_posix(),
+        "l6_handoff_ref": Path(l6_handoff_path).as_posix(),
+        "deterministic_replay": True,
+        "projection_consistency_only": True,
+        "evidence_class": "CONTRACT_ONLY_ADVISORY",
+        "independent_observation_required_for_bound_proof": True,
+        "current_run_mutated": False,
+        "direct_l4_write_attempted": False,
+        "durable_write_attempted": False,
+        "future_run_only": True,
+        "readiness_decision": "ADVISORY_ONLY",
+        "g28_audit_completeness": {"verdict": "NOT_APPLICABLE"},
+        "g29_learning_firewall": {"verdict": "PASS"},
+    }
+    roles = (
+        "l6_shadow_bridge",
+        "projection_summary",
+        "projection_scorecard",
+        "projection_findings",
+        "projection_gate_map",
+        "projection_provenance",
+        "projection_scope",
+        "projection_determinism",
+        "projection_advisory",
+        "projection_manifest",
     )
+    paths: dict[str, str] = {}
+    for role in roles:
+        payload = {**common, "artifact_role": role}
+        path = output_dir / f"{role}.json"
+        _write_semantic(path, payload)
+        paths[role] = path.as_posix()
+    return paths
 
 
 def _source_ref(source: Path, path: Path | None) -> str:
@@ -752,8 +726,7 @@ def _write_independent_bindings(
     scorecard_rows: list[dict[str, Any]],
     scorecard_ref: str,
 ) -> dict[str, Any]:
-    _install_minimal_agentic_core_namespace()
-    from agentic_core.L6_observability.shadow_eval.independent_parity import (  # noqa: PLC0415
+    from apps_rg.runtime.local_shadow import (
         SEALED_APPS_RG_OBSERVATION_ORIGIN,
         build_independent_apps_eval_parity,
     )

@@ -1,6 +1,6 @@
 # L3 managed workflow — apps_rg scope (W3 documentation)
 
-**REQ-L3-*** orchestration packaging for `MANAGED_WORKFLOW` routes is **core-owned** (`agentic_core/L3_orchestration/`).
+**REQ-L3-*** orchestration packaging for `MANAGED_WORKFLOW` routes is **core-owned** (`apps_rg/L3_orchestration/`).
 
 ## apps_rg responsibilities
 

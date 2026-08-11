@@ -1,8 +1,8 @@
-"""Section lane → agentic_core L7 binding manifest (refs only; no L7 artifact emission).
+"""Section lane → apps_rg L7 binding manifest (refs only; no L7 artifact emission).
 
 Emits ``section_l7_binding_manifest.json`` after modular section runs. Classifies
 on-disk artifacts and records which core L7 surfaces are present, missing, or
-untrusted — without writing duplicate ``agentic_core_how_trace.json`` / spine proof files.
+untrusted — without writing duplicate ``apps_rg_how_trace.json`` / spine proof files.
 """
 from __future__ import annotations
 
@@ -35,17 +35,17 @@ CLASS_NOT_APPLICABLE = "NOT_APPLICABLE"
 CLASS_CORE_L7_UNTRUSTED = "DRIFT"
 
 DEFAULT_MISSING_L7_SURFACES: tuple[str, ...] = (
-    "agentic_core_how_trace.json",
-    "agentic_core_l7_route_family_coverage.json",
-    "agentic_core_spine_proof.json",
+    "apps_rg_how_trace.json",
+    "apps_rg_l7_route_family_coverage.json",
+    "apps_rg_spine_proof.json",
     "integrated_runtime_artifact_manifest.json",
 )
 
 DEFAULT_MISSING_99_SURFACES: tuple[str, ...] = CORE_99_DESIGN_ONLY_ARTIFACTS
 
 DEFAULT_EXPLICIT_NON_CLAIMS: tuple[str, ...] = (
-    "section_l7_binding_manifest is not agentic_core_how_trace",
-    "section_l7_binding_manifest is not agentic_core_spine_proof",
+    "section_l7_binding_manifest is not apps_rg_how_trace",
+    "section_l7_binding_manifest is not apps_rg_spine_proof",
     "section_l7_binding_manifest is not 99 RuntimeProofBundle",
     "apps_rg X2 gates are not 00C GateVerdicts",
     "apps_rg section_runtime_proof_bundle is not core 99 RuntimeProofBundle",
@@ -89,17 +89,17 @@ def _producer_component(doc: Mapping[str, Any]) -> str:
 
 
 def assess_l7_how_trace_trust(doc: Mapping[str, Any]) -> tuple[bool, str]:
-    """Return (trusted, reason). Trusted only for agentic_core L7 HOW trace shape."""
+    """Return (trusted, reason). Trusted only for apps_rg L7 HOW trace shape."""
     if not doc:
         return False, "absent"
     pay = _payload(doc)
     if (
         pay.get("evidence_plane") == "L7_AUDITABILITY"
-        and pay.get("runtime_subject") == "agentic_core"
+        and pay.get("runtime_subject") == "apps_rg"
         and pay.get("schema_version")
     ):
         return True, "l7_how_trace_shape"
-    if _producer_component(doc).startswith("agentic_core."):
+    if _producer_component(doc).startswith("apps_rg."):
         return True, "integrated_runtime_envelope"
     return False, "untrusted_or_non_l7_shape"
 
@@ -112,7 +112,7 @@ def assess_l7_route_family_coverage_trust(doc: Mapping[str, Any]) -> tuple[bool,
         "ROUTE_FAMILY_COVERAGE_MATRIX"
     ):
         return True, "l7_route_family_matrix"
-    if _producer_component(doc).startswith("agentic_core."):
+    if _producer_component(doc).startswith("apps_rg."):
         return True, "integrated_runtime_envelope"
     return False, "untrusted_or_non_l7_shape"
 
@@ -122,15 +122,15 @@ def assess_l7_spine_proof_trust(doc: Mapping[str, Any]) -> tuple[bool, str]:
         return False, "absent"
     pay = _payload(doc)
     body = pay if pay.get("proof_schema_version") else doc
-    if body.get("runtime_subject") != "agentic_core" and not body.get("proof_schema_version"):
-        if doc.get("runtime_subject") != "agentic_core" and not doc.get("proof_schema_version"):
+    if body.get("runtime_subject") != "apps_rg" and not body.get("proof_schema_version"):
+        if doc.get("runtime_subject") != "apps_rg" and not doc.get("proof_schema_version"):
             return False, "missing_proof_schema_version_and_runtime_subject"
     subject = str(body.get("runtime_subject") or doc.get("runtime_subject") or "")
-    if subject and subject != "agentic_core":
+    if subject and subject != "apps_rg":
         return False, f"unexpected_runtime_subject={subject}"
     if not (body.get("proof_schema_version") or doc.get("proof_schema_version")):
         return False, "missing_proof_schema_version"
-    if _producer_component(doc).startswith("agentic_core."):
+    if _producer_component(doc).startswith("apps_rg."):
         return True, "integrated_runtime_envelope"
     if body.get("proof_schema_version") or doc.get("proof_schema_version"):
         return True, "spine_proof_schema"
@@ -145,7 +145,7 @@ def assess_integrated_manifest_trust(doc: Mapping[str, Any]) -> tuple[bool, str]
     pay = _payload(doc)
     if pay.get("integrated_runtime_entrypoint_used") is True:
         return True, "integrated_runtime_manifest_payload"
-    if _producer_component(doc).startswith("agentic_core."):
+    if _producer_component(doc).startswith("apps_rg."):
         return True, "integrated_runtime_envelope"
     return False, "untrusted_or_non_integrated_manifest"
 
@@ -153,7 +153,7 @@ def assess_integrated_manifest_trust(doc: Mapping[str, Any]) -> tuple[bool, str]
 def assess_runtime_trace_snapshot_trust(doc: Mapping[str, Any]) -> tuple[bool, str]:
     if not doc:
         return False, "absent"
-    if _producer_component(doc).startswith("agentic_core."):
+    if _producer_component(doc).startswith("apps_rg."):
         return True, "integrated_runtime_envelope"
     pay = _payload(doc)
     if pay.get("schema_version", "").startswith("runtime_trace_snapshot"):
@@ -164,7 +164,7 @@ def assess_runtime_trace_snapshot_trust(doc: Mapping[str, Any]) -> tuple[bool, s
 def assess_runtime_gate_verdict_bundle_trust(doc: Mapping[str, Any]) -> tuple[bool, str]:
     if not doc:
         return False, "absent"
-    if _producer_component(doc).startswith("agentic_core."):
+    if _producer_component(doc).startswith("apps_rg."):
         return True, "integrated_runtime_envelope"
     pay = _payload(doc)
     if pay.get("schema_version", "").startswith("runtime_gate_verdict"):
@@ -173,9 +173,9 @@ def assess_runtime_gate_verdict_bundle_trust(doc: Mapping[str, Any]) -> tuple[bo
 
 
 _L7_TRUST_ASSESSORS: dict[str, Any] = {
-    "agentic_core_how_trace.json": assess_l7_how_trace_trust,
-    "agentic_core_l7_route_family_coverage.json": assess_l7_route_family_coverage_trust,
-    "agentic_core_spine_proof.json": assess_l7_spine_proof_trust,
+    "apps_rg_how_trace.json": assess_l7_how_trace_trust,
+    "apps_rg_l7_route_family_coverage.json": assess_l7_route_family_coverage_trust,
+    "apps_rg_spine_proof.json": assess_l7_spine_proof_trust,
     "integrated_runtime_artifact_manifest.json": assess_integrated_manifest_trust,
     "runtime_trace_snapshot.json": assess_runtime_trace_snapshot_trust,
     "runtime_gate_verdict_bundle.json": assess_runtime_gate_verdict_bundle_trust,
@@ -345,9 +345,9 @@ def build_section_l7_binding_manifest(
     artifact_classifications: dict[str, str] = {}
     design_law_owner: dict[str, str] = {}
     l7_emitted_flags = {
-        "agentic_core_how_trace.json": False,
-        "agentic_core_l7_route_family_coverage.json": False,
-        "agentic_core_spine_proof.json": False,
+        "apps_rg_how_trace.json": False,
+        "apps_rg_l7_route_family_coverage.json": False,
+        "apps_rg_spine_proof.json": False,
     }
 
     for filename in L7_CORE_ARTIFACTS:
@@ -463,9 +463,9 @@ def build_section_l7_binding_manifest(
         missing_99 = [n for n in missing_99 if n != "runtime_proof_bundle.json"]
 
     primary_l7 = (
-        l7_emitted_flags["agentic_core_how_trace.json"]
-        and l7_emitted_flags["agentic_core_l7_route_family_coverage.json"]
-        and l7_emitted_flags["agentic_core_spine_proof.json"]
+        l7_emitted_flags["apps_rg_how_trace.json"]
+        and l7_emitted_flags["apps_rg_l7_route_family_coverage.json"]
+        and l7_emitted_flags["apps_rg_spine_proof.json"]
     )
     integrated_l7_invoked = primary_l7 and not l7_untrusted
 
@@ -532,11 +532,11 @@ def build_section_l7_binding_manifest(
         "correlation_method": corr.correlation_method,
         "correlation_missing_reason": corr.correlation_missing_reason,
         "integrated_l7_invoked": integrated_l7_invoked,
-        "l7_how_trace_emitted": l7_emitted_flags["agentic_core_how_trace.json"],
+        "l7_how_trace_emitted": l7_emitted_flags["apps_rg_how_trace.json"],
         "l7_route_family_coverage_emitted": l7_emitted_flags[
-            "agentic_core_l7_route_family_coverage.json"
+            "apps_rg_l7_route_family_coverage.json"
         ],
-        "l7_spine_proof_emitted": l7_emitted_flags["agentic_core_spine_proof.json"],
+        "l7_spine_proof_emitted": l7_emitted_flags["apps_rg_spine_proof.json"],
         "runtime_proof_bundle_99_emitted": runtime_proof_bundle_99_emitted,
         "l7_artifact_refs": l7_artifact_refs,
         "apps_rg_domain_artifact_refs": apps_rg_domain_refs,

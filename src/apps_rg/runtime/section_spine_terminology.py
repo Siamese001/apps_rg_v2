@@ -99,7 +99,7 @@ SECTION_LANE_MISSING_CANONICAL_CONTRACTS: tuple[str, ...] = CANONICAL_CONTRACT_T
 INPUT_AUTHORITY_GRAPH_SUBSTRATE_LINE = (
     "- CLAIM SUPPORT POOL (AUGMENTED SKILLS GRAPH): section graph context binding — "
     "static master_skills_arsenal ledger incident-edge expansion (graph_expansion_mode=incident_edge_v1); "
-    "not full agentic_core C0.3 GraphRAG traverse — "
+    "not full apps_rg C0.3 GraphRAG traverse — "
     "sole substrate for factual claims; candidate_fact_ledger rows are lineage substrate only"
 )
 
@@ -112,7 +112,7 @@ C03_RECEIPT_FIELD_GLOSSARY: dict[str, str] = {
     ),
     "is_full_c0_3_graphrag": "True only when binding_classification is FULL_C0_3_GRAPHRAG_BINDING.",
     "canonical_c0_3_claimed": "Must stay false on section CLI unless spine traverse proof exists.",
-    "core_c03_graph_rag_used": "Spine agentic_core GraphRAG; false for apps_rg native binding.",
+    "core_c03_graph_rag_used": "Spine apps_rg GraphRAG; false for apps_rg native binding.",
     "graph_expansion_mode": (
         "incident_edge_v1 = edges touching selected facts; multi_hop_v1 = BFS hop paths (competencies-style)."
     ),
@@ -148,7 +148,7 @@ def is_spine_final_evidence_contract(doc: Mapping[str, Any] | None) -> bool:
     if ct == "FinalEvidenceContract":
         return True
     prod = str(doc.get("producer_stage") or doc.get("producer") or "").strip().lower()
-    if prod in {"c0", "c0_retrieve", "agentic_core.c0"}:
+    if prod in {"c0", "c0_retrieve", "apps_rg.c0"}:
         return True
     return False
 

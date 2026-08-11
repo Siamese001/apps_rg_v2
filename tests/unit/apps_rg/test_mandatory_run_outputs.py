@@ -205,7 +205,7 @@ def test_section_failure_forensics_marks_dirty_successful_baseline(
         {"result_summary": {"exit_status": "success", "outcome_authorized": True}},
     )
     _write_json(baseline / "worktree_status.json", {"worktree_dirty": True})
-    _write_json(baseline / "agentic_core_spine_proof.json", {"git_commit": "c" * 40})
+    _write_json(baseline / "apps_rg_spine_proof.json", {"git_commit": "c" * 40})
     (baseline_lane / "headline_output.txt").write_text("SVP AI Partnerships\n", encoding="utf-8")
     _write_json(baseline_lane / "x3_disposition.json", {"x3_code": "X3_ALLOW", "pass": True})
     _pin_baseline(monkeypatch, tmp_path, baseline)
@@ -222,7 +222,7 @@ def test_section_failure_forensics_marks_dirty_successful_baseline(
         run / "x2_gate_outputs.json",
         {"gates": [{"gate_id": "x2_headline_vendor_terms_proof_only", "pass": False}]},
     )
-    _write_json(run / "agentic_core_spine_proof.json", {"git_commit": "d" * 40})
+    _write_json(run / "apps_rg_spine_proof.json", {"git_commit": "d" * 40})
 
     emitted = emit_mandatory_run_outputs(
         run,
@@ -253,7 +253,7 @@ def test_section_failure_forensics_binds_output_and_revision_to_prior_run(
         {"target_company": "Anthropic", "target_role": "Partnerships"},
     )
     _write_json(
-        baseline / "agentic_core_spine_proof.json",
+        baseline / "apps_rg_spine_proof.json",
         {
             "payload": {
                 "git_commit": "a" * 40,
@@ -288,7 +288,7 @@ def test_section_failure_forensics_binds_output_and_revision_to_prior_run(
         {"target_company": "Anthropic", "target_role": "Partnerships"},
     )
     _write_json(
-        run / "agentic_core_spine_proof.json",
+        run / "apps_rg_spine_proof.json",
         {"payload": {"git_commit": "b" * 40, "git_commit_subject": "Current local commit"}},
     )
     section = {

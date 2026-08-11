@@ -1,0 +1,65 @@
+{
+  "artifact_hash": "sha256:6ced02d5de7f59226f413867250ed4ce2d6e66a59335b77a6fdc4934517d01fc",
+  "emitted_at": "2026-08-11T09:45:42Z",
+  "payload": {
+    "chain_kind": "R4_SINGLE_ACTION",
+    "emitted_at_utc": "2026-08-11T09:45:42Z",
+    "execution_form": "R4_SINGLE_ACTION",
+    "l2_execution_status": "EXECUTED",
+    "l2_fault": "L2_EXECUTION_ERROR:SectionFrontSpinePreconditionError:whole-run canonical ValidatedRequest is unavailable: cannot read ValidatedRequest contract C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_001\\candidate_attempt_003\\apps_rg_u0_validated_request.json: [Errno 2] No such file or directory: 'C:\\\\Git\\\\apps_rg_v2-worktrees\\\\codex-l1-cognitive-causal-loop-w1\\\\artifacts\\\\apps_rg\\\\l1_cognitive_w4\\\\20260811_pair_001\\\\candidate_attempt_003\\\\apps_rg_u0_validated_request.json'",
+    "l2_recipe_executed": true,
+    "l2_recipe_run_report_ref": "",
+    "l2_sub_stages": [
+      {
+        "duration_ms": 0.0,
+        "meta": {
+          "app_name": "apps_rg"
+        },
+        "status": "PASS",
+        "sub_stage_id": "E1",
+        "sub_stage_name": "Prep: Plan Decomposition"
+      },
+      {
+        "duration_ms": 0.007,
+        "meta": {},
+        "status": "PASS",
+        "sub_stage_id": "E2",
+        "sub_stage_name": "Valid: Pre-Execution Contract Check"
+      },
+      {
+        "duration_ms": 22.366,
+        "meta": {
+          "fault": "L2_EXECUTION_ERROR:SectionFrontSpinePreconditionError:whole-run canonical ValidatedRequest is unavailable: cannot read ValidatedRequest contract C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_001\\candidate_attempt_003\\apps_rg_u0_validated_request.json: [Errno 2] No such file or directory: 'C:\\\\Git\\\\apps_rg_v2-worktrees\\\\codex-l1-cognitive-causal-loop-w1\\\\artifacts\\\\apps_rg\\\\l1_cognitive_w4\\\\20260811_pair_001\\\\candidate_attempt_003\\\\apps_rg_u0_validated_request.json'"
+        },
+        "status": "FAIL",
+        "sub_stage_id": "E3",
+        "sub_stage_name": "Exec: Tool Dispatch"
+      },
+      {
+        "duration_ms": 0.006,
+        "meta": {
+          "retry_attempted": false
+        },
+        "status": "NOT_APPLICABLE",
+        "sub_stage_id": "E4",
+        "sub_stage_name": "Heal: Retry / Recovery"
+      },
+      {
+        "duration_ms": 0.0,
+        "meta": {},
+        "status": "FAIL",
+        "sub_stage_id": "E5",
+        "sub_stage_name": "Seal: Output Assembly"
+      }
+    ],
+    "no_l2_execution_assertion": false,
+    "request_id": "req-e5ee5b87c664461aa9d8142f67adadd2",
+    "route_id": "apps_rg.resume_generation_v1",
+    "run_id": "62c9fc98-9e92-446d-a601-3a356d74243c",
+    "trace_root": "trace-cf1bb5d1bbff433f9ee5711b10cee841"
+  },
+  "producer_component": "apps_rg.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_function_or_class": "run_integrated_single_action_spine",
+  "producer_module": "integrated_single_action_spine_run",
+  "upstream_artifact_ref": "sha256:bef87729e51e779ff988f4134f9fa4807b6ad2cdea9d79bd355eecb2712cb028"
+}

@@ -168,7 +168,7 @@ def test_end_to_end_proof_pool_nonempty_for_all_four_lanes() -> None:
     from types import SimpleNamespace
 
     pytest.importorskip(
-        "agentic_core.runtime.contracts.apps_rg_ingress_payload",
+        "apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload",
         reason="standalone checkout omits the external Agentic Workflow contract runtime",
     )
     from apps_rg.runtime.c0.section_proof_loader import load_section_proof_for_lane

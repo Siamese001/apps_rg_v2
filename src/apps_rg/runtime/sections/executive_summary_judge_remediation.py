@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 from pathlib import Path
 from typing import Any
@@ -13,7 +12,6 @@ from apps_rg.runtime.sections.executive_summary_repair_policy import (
     judge_regen_max_attempts,
     judge_regen_prescriptive_delta_enabled,
     judge_regeneration_enabled,
-    judge_safe_prefilter_enabled,
     post_regen_judge_rescore_mode,
     post_x2_judge_refresh_enabled,
     POST_REGEN_JUDGE_RESCORE_FULL_PANEL,
@@ -1062,25 +1060,26 @@ def retry_provider_for_judge_remediation(
         "apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge"
     )
     build_incremental_repair_contract = _regen_bridge.build_incremental_repair_contract
-    run_core_same_authority_regen = _regen_bridge.run_core_same_authority_regen
+    run_apps_rg_same_authority_regen = _regen_bridge.run_apps_rg_same_authority_regen
     from apps_rg.runtime.sections.executive_summary_repair_policy import (
-        judge_regen_core_runner_enabled,
-        judge_regen_max_attempts,
+        judge_regen_same_authority_runner_enabled,
     )
 
-    use_core_runner = (
+    use_same_authority_runner = (
         judge_regen_prescriptive_delta_enabled()
         and not judge_regen_legacy_remediation_block_enabled()
-        and judge_regen_core_runner_enabled()
+        and judge_regen_same_authority_runner_enabled()
     )
     receipt["regen_engine"] = (
-        "core.SameAuthorityRegenRunner" if use_core_runner else "apps_rg.thread_append"
+        "apps_rg.SameAuthorityRegenRunner"
+        if use_same_authority_runner
+        else "apps_rg.thread_append"
     )
-    # Reserve one extra iteration when core runner may refuse (e.g. delta_token_budget_exceeded).
-    _loop_cap = _attempt_cap + 1 if use_core_runner else _attempt_cap
+    # Reserve one extra iteration when the bounded runner refuses a delta.
+    _loop_cap = _attempt_cap + 1 if use_same_authority_runner else _attempt_cap
 
     for attempt in range(_loop_cap):
-        if use_core_runner and attempt == 0:
+        if use_same_authority_runner and attempt == 0:
             contract = build_incremental_repair_contract(
                 messages=thread_messages,
                 provider_payload=provider_payload,
@@ -1101,23 +1100,23 @@ def retry_provider_for_judge_remediation(
                 prior_attempt_resume_display_text=anchor_text,
                 prior_cycle_judges=prior_cycle_judges,
             )
-            regen_text, core_receipt, _sar, _chat_msgs = run_core_same_authority_regen(
+            regen_text, same_authority_receipt, _sar, _chat_msgs = run_apps_rg_same_authority_regen(
                 messages=thread_messages,
                 provider_payload=provider_payload,
                 contract=contract,
                 artifact_dir=artifact_dir,
                 run_id=run_id,
             )
-            receipt["core_same_authority_regen"] = core_receipt
+            receipt["same_authority_regen"] = same_authority_receipt
             attempt_record: dict[str, Any] = {
                 "attempt": attempt + 1,
-                "engine": "core.SameAuthorityRegenRunner",
-                "accepted": bool(core_receipt.get("accepted")),
+                "engine": "apps_rg.SameAuthorityRegenRunner",
+                "accepted": bool(same_authority_receipt.get("accepted")),
             }
-            if not core_receipt.get("accepted"):
-                attempt_record["skipped"] = core_receipt.get("refusal") or "refused"
+            if not same_authority_receipt.get("accepted"):
+                attempt_record["skipped"] = same_authority_receipt.get("refusal") or "refused"
                 receipt["attempts"].append(attempt_record)
-                receipt["core_runner_fallback"] = "apps_rg.thread_append"
+                receipt["same_authority_runner_fallback"] = "apps_rg.thread_append"
                 continue
             new_raw = regen_text
             new_parsed, new_err = parse_model_json(new_raw)
@@ -1141,7 +1140,7 @@ def retry_provider_for_judge_remediation(
                 break
             attempt_record["parse_error"] = new_err
             receipt["attempts"].append(attempt_record)
-            receipt["core_runner_fallback"] = "apps_rg.thread_append"
+            receipt["same_authority_runner_fallback"] = "apps_rg.thread_append"
             continue
 
         repair_user = build_judge_remediation_user_message(
@@ -1396,8 +1395,6 @@ def repair_judge_regen_after_x2_fail(
 
     new_parsed = normalize_executive_summary_llm_output(new_parsed, selected_fact_plan)
     prune_exec_summary_claim_ledger_orphans(new_parsed, allowed_fact_ids)
-    from apps_rg.runtime.sections.executive_summary_voice_repair import apply_voice_repair_to_parsed
-
     from apps_rg.runtime.sections.executive_summary_judge_regen_loop import (
         prepare_parsed_after_judge_regen,
     )

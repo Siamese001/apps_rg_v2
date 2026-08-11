@@ -21,15 +21,15 @@
       "runtime_execution_witness.json",
       "runtime_exhaust_bundle.json",
       "runtime_trace_snapshot.json",
-      "agentic_core_how_trace.json",
-      "agentic_core_l7_route_family_coverage.json",
+      "apps_rg_how_trace.json",
+      "apps_rg_l7_route_family_coverage.json",
       "integrated_runtime_artifact_manifest.json",
       "no_harness_stamp_receipt.json",
-      "agentic_core_spine_proof.json"
+      "apps_rg_spine_proof.json"
     ],
     "artifact_hashes": {
-      "agentic_core_how_trace.json": "sha256:7844e16a10c8d7510c35b1df34c420ccc02a8630bbd0493d67b0bebed7350cee",
-      "agentic_core_l7_route_family_coverage.json": "sha256:907ca85b4b2ea1f1160f2a5ea3d5458ac05d30d5bcaeee9092f42bcdcd0cc07f",
+      "apps_rg_how_trace.json": "sha256:7844e16a10c8d7510c35b1df34c420ccc02a8630bbd0493d67b0bebed7350cee",
+      "apps_rg_l7_route_family_coverage.json": "sha256:907ca85b4b2ea1f1160f2a5ea3d5458ac05d30d5bcaeee9092f42bcdcd0cc07f",
       "c0_bypass_receipt.json": "sha256:999ab5980c1f4338806db6bbcbafc1f114df18242f3f8c75b88286ab41e40805",
       "exit_review_packet.json": "sha256:cf5566ddc84689cda7699215bd5623ba03562c6fd48cf6be154ef2dca0b15bbe",
       "integrated_runtime_entrypoint_invocation.json": "sha256:a2b4351c6af87eede1c7377025cd36a4594452f8704f7e27041af8cbf712adca",
@@ -127,34 +127,34 @@
         "upstream": "runtime_exhaust_bundle.json"
       },
       {
-        "filename": "agentic_core_how_trace.json",
+        "filename": "apps_rg_how_trace.json",
         "upstream": "runtime_trace_snapshot.json"
       },
       {
-        "filename": "agentic_core_l7_route_family_coverage.json",
-        "upstream": "agentic_core_how_trace.json"
+        "filename": "apps_rg_l7_route_family_coverage.json",
+        "upstream": "apps_rg_how_trace.json"
       },
       {
         "filename": "integrated_runtime_artifact_manifest.json",
-        "upstream": "agentic_core_l7_route_family_coverage.json"
+        "upstream": "apps_rg_l7_route_family_coverage.json"
       },
       {
         "filename": "no_harness_stamp_receipt.json",
         "upstream": "integrated_runtime_artifact_manifest.json"
       },
       {
-        "filename": "agentic_core_spine_proof.json",
+        "filename": "apps_rg_spine_proof.json",
         "upstream": "no_harness_stamp_receipt.json"
       }
     ],
     "deterministic_proof_stage_used": false,
-    "entry_point": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+    "entry_point": "apps_rg.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
     "generation_provider_attempt_count": 0,
-    "how_trace_ref": "artifact://agentic_core_how_trace.json",
+    "how_trace_ref": "artifact://apps_rg_how_trace.json",
     "how_trace_sha256": "sha256:7844e16a10c8d7510c35b1df34c420ccc02a8630bbd0493d67b0bebed7350cee",
     "integrated_runtime_entrypoint_used": true,
     "invocation_id": "256b2067-aa18-44d1-89f7-c212ee64cb65",
-    "l7_route_family_coverage_ref": "artifact://agentic_core_l7_route_family_coverage.json",
+    "l7_route_family_coverage_ref": "artifact://apps_rg_l7_route_family_coverage.json",
     "l7_route_family_coverage_sha256": "sha256:907ca85b4b2ea1f1160f2a5ea3d5458ac05d30d5bcaeee9092f42bcdcd0cc07f",
     "llm_judge_invocation_count": 0,
     "observability_status": {
@@ -166,7 +166,7 @@
       "provider_bootstrap_status": "disabled_env_unset"
     },
     "primary_veto_mode": "",
-    "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+    "producer_component": "apps_rg.runtime.entrypoints.integrated_single_action_spine_run",
     "proof_only_stage_names": [],
     "safe_reuse_allow": false,
     "veto_counters": {
@@ -188,7 +188,7 @@
     "veto_timeout_ms": 0,
     "x3_disposition": "X3A"
   },
-  "producer_component": "agentic_core.runtime.entrypoints.integrated_single_action_spine_run",
+  "producer_component": "apps_rg.runtime.entrypoints.integrated_single_action_spine_run",
   "producer_function_or_class": "run_integrated_single_action_spine",
   "producer_module": "integrated_single_action_spine_run",
   "upstream_artifact_ref": "sha256:907ca85b4b2ea1f1160f2a5ea3d5458ac05d30d5bcaeee9092f42bcdcd0cc07f"

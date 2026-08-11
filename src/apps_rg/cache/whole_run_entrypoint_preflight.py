@@ -32,7 +32,7 @@ ENTRYPOINT_TEST_WHOLE_RUN_HARNESS = (
 ENTRYPOINT_CANONICAL_DISPATCH = (
     "apps_rg.runtime.orchestration.canonical_dispatch.run_canonical_apps_rg_from_cli_primitives"
 )
-ENTRYPOINT_DISPATCH_APPS_RG_RUN = "agentic_core.runtime.entry.apps_rg_dispatch.dispatch_apps_rg_run"
+ENTRYPOINT_DISPATCH_APPS_RG_RUN = "apps_rg.runtime.entry.apps_rg_dispatch.dispatch_apps_rg_run"
 ENTRYPOINT_ENVELOPE_DISPATCH = "apps_rg.runtime.dispatch.apps_rg_dispatch.apps_rg_dispatch"
 
 

@@ -22,7 +22,7 @@ from apps_rg.runtime.jd_resolution import JdSource, resolve_jd_for_lanes
 
 def test_u0_jd_targeting_mode_run_specific(tmp_path):
     """u0_validate_apps_rg sets jd_targeting_mode=RUN_SPECIFIC when run inputs are present."""
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+    from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import (
         AppsRgIngressPayload,
         RequestEnvelope,
     )
@@ -46,7 +46,7 @@ def test_u0_jd_targeting_mode_run_specific(tmp_path):
 
 def test_u0_rejects_missing_jd_even_with_briefing(tmp_path):
     """U0 must fail closed when JD is missing, even if a briefing ref is present."""
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+    from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import (
         AppsRgIngressPayload,
         RequestEnvelope,
     )
@@ -68,7 +68,7 @@ def test_u0_rejects_missing_jd_even_with_briefing(tmp_path):
 
 def test_u0_rejects_missing_briefing_even_with_jd():
     """U0 must fail closed when briefing is missing, even if JD text is present."""
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+    from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import (
         AppsRgIngressPayload,
         RequestEnvelope,
     )
@@ -87,7 +87,7 @@ def test_u0_rejects_missing_briefing_even_with_jd():
 
 def test_u0_rejects_default_ssot_refs():
     """U0 must reject the committed default JD and briefing refs even when present."""
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+    from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import (
         AppsRgIngressPayload,
         RequestEnvelope,
     )

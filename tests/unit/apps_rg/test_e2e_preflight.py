@@ -311,7 +311,7 @@ def test_external_runtime_dependency_failure_is_receipted_and_skips_runtime_and_
     calls: list[str] = []
     invalid_contract = tmp_path / "invalid-runtime-contract.json"
     invalid_contract.write_text("{}\n", encoding="utf-8")
-    dependency_receipt = posture.verify_external_agentic_core_runtime(
+    dependency_receipt = posture.verify_external_apps_rg_runtime_runtime(
         repo_root=tmp_path,
         contract_path=invalid_contract,
     )

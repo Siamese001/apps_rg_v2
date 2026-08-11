@@ -4,7 +4,7 @@ Implements the contract surface exercised by ``tests/_apps_contract/test_apps_rg
 
 Plan: apps-rg-l2-v4-envelope-adoption-e9f2b1 (W2–W7).
 
-**W3:** ``governed_pa_l2_exit`` — uses ``agentic_core`` ``ProviderGateway`` under envelope stages.
+**W3:** ``governed_pa_l2_exit`` uses the Apps RG ``ProviderGateway`` under envelope stages.
 """
 from __future__ import annotations
 
@@ -19,8 +19,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Optional
 
-from agentic_core.runtime.providers.provider_gateway import ProviderGateway
-from agentic_core.runtime.providers.provider_types import ProviderModeBlockedError
+from apps_rg.runtime.local_provider import ProviderGateway, ProviderModeBlockedError
+from apps_rg.runtime.local_l5 import EgressCertificationReceipt
 
 from apps_rg.l2_recipe.raw_text_json_unwrap import try_unwrap_raw_text_to_resume
 from apps_rg.runtime.sections.executive_summary_context_limits import (
@@ -500,7 +500,7 @@ def _resolve_l2_envelope_provider_mode() -> Any:
 
     External keys: ``live``, ``external``, ``all`` map to ``live_allowed``.
     """
-    from agentic_core.runtime.providers.provider_types import ProviderMode
+    from apps_rg.runtime.local_provider import ProviderMode
 
     if os.environ.get("APPS_RG_L2_FORCE_STUB", "").strip() == "1":
         return ProviderMode.STUB_ONLY
@@ -515,7 +515,7 @@ def _resolve_l2_envelope_provider_mode() -> Any:
 def _provider_profile_for_cpa(
     cpa: Any, *, provider_mode: Any, run_mode: ProviderRunMode
 ) -> Any:
-    from agentic_core.runtime.providers.provider_types import (
+    from apps_rg.runtime.local_provider import (
         ProviderKind,
         ProviderMode,
         ProviderProfile,
@@ -727,7 +727,7 @@ def _execute_approved_work_order(
         ExecutionLane,
         ResultClass,
     )
-    from agentic_core.runtime.providers.provider_types import (
+    from apps_rg.runtime.local_provider import (
         ProviderKind,
         ProviderRequest,
     )
@@ -1347,10 +1347,6 @@ def _seal_l2_artifact(
     l5_egress_receipt_refs: tuple[str, ...] = ()
     l5_egress_receipt_digests: tuple[str, ...] = ()
     if isinstance(lcr, dict):
-        from agentic_core.L5_safety.contracts.l5_certification_contracts import (
-            EgressCertificationReceipt,
-        )
-
         raw_receipts = tuple(lcr.get("l5_egress_receipts") or ())
         parsed_receipts: list[EgressCertificationReceipt] = []
         for raw in raw_receipts:
@@ -1375,7 +1371,7 @@ def _seal_l2_artifact(
 
     audit_refs: list[str] = [
         "authority_scope:apps_rg_l2_envelope_adapter_receipts",
-        "canonical_l2_artifact_authority:agentic_core_runtime_sealed_l2_artifact",
+        "canonical_l2_artifact_authority:apps_rg_sealed_l2_artifact",
         f"attempt:{getattr(attempt_receipt, 'attempt_receipt_id', '')}",
         f"prep:{getattr(prep_output, 'prep_receipt_id', '')}",
         f"validation:{getattr(validation_output, 'validation_packet_id', '')}",

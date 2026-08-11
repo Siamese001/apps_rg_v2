@@ -50,13 +50,13 @@ def test_manifest_modular_lane_missing_l7(tmp_path: Path) -> None:
     assert doc["integrated_l7_invoked"] is False
     assert doc["l7_how_trace_emitted"] is False
     assert doc["runtime_proof_bundle_99_emitted"] is False
-    assert doc["artifact_classifications"]["agentic_core_how_trace.json"] == CLASS_CORE_L7_MISSING
+    assert doc["artifact_classifications"]["apps_rg_how_trace.json"] == CLASS_CORE_L7_MISSING
     assert doc["artifact_classifications"]["x2_gate_outputs.json"] == CLASS_APPS_RG_DOMAIN
     assert doc["artifact_classifications"]["validated_request.json"] == CLASS_APPS_RG_SHIM
     assert doc["artifact_classifications"]["section_runtime_proof_bundle.json"] == CLASS_APPS_RG_SHIM
     assert doc["artifact_classifications"]["runtime_gate_verdict_bundle.json"] == CLASS_NOT_APPLICABLE
     assert doc["design_law_owner_classifications"]["x2_gate_outputs.json"] == "APP_DOMAIN_EVIDENCE"
-    assert "section_l7_binding_manifest is not agentic_core_how_trace" in doc["explicit_non_claims"]
+    assert "section_l7_binding_manifest is not apps_rg_runtime_how_trace" in doc["explicit_non_claims"]
 
 
 def test_x2_not_classified_as_gate_verdict(tmp_path: Path) -> None:
@@ -167,14 +167,14 @@ def test_section_runtime_proof_bundle_not_99(tmp_path: Path) -> None:
 def test_fake_spine_proof_marked_untrusted(tmp_path: Path) -> None:
     ad = tmp_path / "run"
     ad.mkdir()
-    _touch(ad, "agentic_core_spine_proof.json", {"success": True, "certified": True})
+    _touch(ad, "apps_rg_spine_proof.json", {"success": True, "certified": True})
     doc = build_section_l7_binding_manifest(
         repo_root=tmp_path,
         artifact_dir=ad,
         section_id="executive_summary",
         run_id="r1",
     )
-    assert doc["artifact_classifications"]["agentic_core_spine_proof.json"] == CLASS_CORE_L7_UNTRUSTED
+    assert doc["artifact_classifications"]["apps_rg_spine_proof.json"] == CLASS_CORE_L7_UNTRUSTED
     assert doc["l7_spine_proof_emitted"] is False
     assert doc["l7_untrusted_artifacts"]
     assert doc["proof_classification"] == "SECTION_MODULAR_L7_UNTRUSTED_ARTIFACTS_PRESENT"
@@ -185,20 +185,20 @@ def test_trusted_spine_proof_from_certification_fixture(tmp_path: Path) -> None:
     fixture = (
         Path(__file__).resolve().parents[3]
         / "certification"
-        / "agentic_core"
+        / "apps_rg_runtime"
         / "integrated_runtime"
         / "r4_latest"
-        / "agentic_core_spine_proof.json"
+        / "apps_rg_spine_proof.json"
     )
     if not fixture.is_file():
         pytest.skip("certification spine proof fixture missing")
     ad = tmp_path / "run"
     ad.mkdir()
-    (ad / "agentic_core_spine_proof.json").write_text(
+    (ad / "apps_rg_spine_proof.json").write_text(
         fixture.read_text(encoding="utf-8"),
         encoding="utf-8",
     )
-    doc = json.loads((ad / "agentic_core_spine_proof.json").read_text(encoding="utf-8"))
+    doc = json.loads((ad / "apps_rg_spine_proof.json").read_text(encoding="utf-8"))
     trusted, _ = assess_l7_spine_proof_trust(doc)
     assert trusted is True
     manifest = build_section_l7_binding_manifest(
@@ -207,14 +207,14 @@ def test_trusted_spine_proof_from_certification_fixture(tmp_path: Path) -> None:
         section_id="executive_summary",
         run_id="r1",
     )
-    assert manifest["artifact_classifications"]["agentic_core_spine_proof.json"] == CLASS_CORE_L7_REF
+    assert manifest["artifact_classifications"]["apps_rg_spine_proof.json"] == CLASS_CORE_L7_REF
     assert manifest["l7_spine_proof_emitted"] is True
 
 
 def test_trusted_how_trace_shape() -> None:
     doc = {
         "schema_version": "1.0",
-        "runtime_subject": "agentic_core",
+        "runtime_subject": "apps_rg_runtime",
         "evidence_plane": "L7_AUDITABILITY",
         "stages": [],
     }

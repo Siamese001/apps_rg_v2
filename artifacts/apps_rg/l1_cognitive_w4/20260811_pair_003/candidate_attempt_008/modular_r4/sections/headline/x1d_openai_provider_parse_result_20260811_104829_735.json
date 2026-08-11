@@ -1,0 +1,79 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 2.7,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "S1 repeats “Alliance” across two semantically overlapping segments.",
+      "S1 relies on stilted three-noun stacks that sound machine-generated.",
+      "S1 overweights alliance positioning and weakens the SVP engineering signal.",
+      "S1 would not clear a skeptical Head of Talent Acquisition screen."
+    ],
+    "cited_sentence_indexes": [
+      1
+    ],
+    "remediation_suggestions": [
+      "Differentiate the three positioning signals.",
+      "Use more natural, resume-native phrasing.",
+      "Strengthen the senior engineering and platform identity."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "ENGINEERING_SIGNAL_DILUTED",
+          "TA_SCREEN_FAIL"
+        ]
+      },
+      "resume_voice": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MACHINE_GENERATED_CADENCE",
+          "STILTED_NOUN_STACKS"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "REDUNDANT_ALLIANCE_TERM"
+        ]
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "SEMANTIC_OVERLAP",
+          "INCOHERENT_POSITIONING"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\headline\\x1d_openai_provider_response_raw_20260811_104829_727.json",
+  "original_model": null,
+  "fallback_model": null
+}

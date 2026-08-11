@@ -464,33 +464,32 @@ def run_fresh_e2e_preflight(
     if not failure_code and dependency_check is not None:
         try:
             from apps_rg.runtime.standalone_dependency_posture import (
-                EXTERNAL_RUNTIME_BOUND,
-                STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME,
-                validate_standalone_runtime_dependency_receipt,
-                write_standalone_runtime_dependency_receipt,
+                APP_RUNTIME_INDEPENDENT,
+                APP_RUNTIME_INDEPENDENCE_RECEIPT_FILENAME,
+                validate_app_runtime_independence_receipt,
+                write_app_runtime_independence_receipt,
             )
 
             raw_dependency = dependency_check()
             dependency_receipt = (
                 raw_dependency if isinstance(raw_dependency, dict) else {}
             )
-            validate_standalone_runtime_dependency_receipt(dependency_receipt)
+            validate_app_runtime_independence_receipt(dependency_receipt)
             dependency_receipt_ref = str(
-                write_standalone_runtime_dependency_receipt(
+                write_app_runtime_independence_receipt(
                     artifact_dir=root,
                     receipt=dependency_receipt,
                 )
             )
-            if dependency_receipt.get("status") != EXTERNAL_RUNTIME_BOUND:
-                failure_code = "EXTERNAL_RUNTIME_DEPENDENCY_PREFLIGHT_FAILED"
+            if dependency_receipt.get("status") != APP_RUNTIME_INDEPENDENT:
+                failure_code = "APP_RUNTIME_INDEPENDENCE_PREFLIGHT_FAILED"
                 failure_detail = (
-                    "External agentic_core runtime did not match its approved "
-                    "commit, package tree, cleanliness, and module contract."
+                    "Apps RG runtime-independence receipt did not pass validation."
                 )
         except Exception as exc:
-            failure_code = "EXTERNAL_RUNTIME_DEPENDENCY_PREFLIGHT_FAILED"
+            failure_code = "APP_RUNTIME_INDEPENDENCE_PREFLIGHT_FAILED"
             failure_detail = _redact_error(exc, env)
-            candidate = root / STANDALONE_RUNTIME_DEPENDENCY_RECEIPT_FILENAME
+            candidate = root / APP_RUNTIME_INDEPENDENCE_RECEIPT_FILENAME
             if candidate.is_file():
                 dependency_receipt_ref = str(candidate)
     if not failure_code and runtime_check is not None:

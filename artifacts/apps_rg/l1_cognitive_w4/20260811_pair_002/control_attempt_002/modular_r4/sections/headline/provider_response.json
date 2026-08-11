@@ -1,0 +1,177 @@
+{
+  "provider_requested": "external_claude",
+  "provider_attempted": true,
+  "provider_available": true,
+  "exact_provider_error": null,
+  "runtime_generation_status": "REAL_LLM",
+  "model": "claude-sonnet-5",
+  "raw_model_output": "{\n  \"headline_line\": \"SVP Engineering | Alliance Co-Sell Modernization | Regulated Modernization Delivery | Runtime Security Governance\",\n  \"selected_fact_plan\": {\n    \"section_id\": \"headline\",\n    \"selection_method\": \"selected_graph_evidence_plan_headline\",\n    \"required_fact_ids\": [\"reb_ibm_aws_alliance_partner_cosell_gtm\", \"reb_ibm_devsecops_release_resilience\"]\n  },\n  \"claim_ledger\": [\n    {\n      \"claim_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities\",\n      \"source_fact_ids\": [\"reb_ibm_aws_alliance_partner_cosell_gtm\"]\n    },\n    {\n      \"claim_text\": \"Embedded release automation and security scanning into regulated modernization delivery paths\",\n      \"source_fact_ids\": [\"reb_ibm_devsecops_release_resilience\"]\n    }\n  ],\n  \"jd_alignment\": {\n    \"targeting_only\": true,\n    \"jd_used_as_proof\": false,\n    \"briefing_used_as_proof\": false,\n    \"companion_used_as_proof\": false,\n    \"selected_theme\": \"alliance co-sell modernization, regulated delivery, runtime security governance\",\n    \"anti_stuffing_check\": \"JD/title/briefing used only to prioritize which fact-supported themes to foreground; no JD phrases lifted verbatim into segments\"\n  },\n  \"gap_notes\": [\n    \"No fact in the allowed pool literally supports a distinct fourth non-partner theme beyond the two devsecops-derived segments, so both regulated-delivery and runtime-governance segments draw on the same devsecops fact using different literal nouns to avoid family overlap.\"\n  ],\n  \"change_log\": [\n    \"Selected alliance co-sell, regulated modernization delivery, and runtime security governance as three non-overlapping themes\",\n    \"Extracted literal nouns (alliance, co-sell, modernization, regulated, delivery, security, release) directly from cited claim_text\",\n    \"Confirmed only one segment uses partner/alliance family per distinctness rule\",\n    \"Verified governance and runtime signals both present per PRODUCT_SHAPE hard gates\",\n    \"Word count self-check: 11 words total, within 10-13 range\"\n  ],\n  \"self_check\": {\n    \"fixed_prefix\": true,\n    \"segment_count\": 4,\n    \"separator_count\": 3,\n    \"word_count\": 11,\n    \"word_count_in_range\": true,\n    \"no_metrics\": true,\n    \"no_company_names\": true,\n    \"no_employer_names\": true,\n    \"no_jd_phrase_lift\": true,\n    \"base_identity_preserved\": true,\n    \"jd_used_as_targeting_only\": true\n  }\n}",
+  "provider_response": {
+    "provider_profile": "external_claude",
+    "model": "claude-sonnet-5",
+    "request_digest": "c591293500795cff9d4446914abe0394304ce86a97cc6a6011c2d81d2b2ae152",
+    "effective_timeout_seconds": 90.0,
+    "transport_timing": {
+      "started_at": "2026-08-11T10:19:52.846149+00:00",
+      "first_byte_after_s": 1.438,
+      "last_progress_after_s": 28.61,
+      "completed_after_s": 28.61,
+      "chunk_count": 24,
+      "read_iterations": 24,
+      "raw_output_chars": 2383,
+      "stream": true
+    },
+    "transport_response": {
+      "text": "{\n  \"headline_line\": \"SVP Engineering | Alliance Co-Sell Modernization | Regulated Modernization Delivery | Runtime Security Governance\",\n  \"selected_fact_plan\": {\n    \"section_id\": \"headline\",\n    \"selection_method\": \"selected_graph_evidence_plan_headline\",\n    \"required_fact_ids\": [\"reb_ibm_aws_alliance_partner_cosell_gtm\", \"reb_ibm_devsecops_release_resilience\"]\n  },\n  \"claim_ledger\": [\n    {\n      \"claim_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities\",\n      \"source_fact_ids\": [\"reb_ibm_aws_alliance_partner_cosell_gtm\"]\n    },\n    {\n      \"claim_text\": \"Embedded release automation and security scanning into regulated modernization delivery paths\",\n      \"source_fact_ids\": [\"reb_ibm_devsecops_release_resilience\"]\n    }\n  ],\n  \"jd_alignment\": {\n    \"targeting_only\": true,\n    \"jd_used_as_proof\": false,\n    \"briefing_used_as_proof\": false,\n    \"companion_used_as_proof\": false,\n    \"selected_theme\": \"alliance co-sell modernization, regulated delivery, runtime security governance\",\n    \"anti_stuffing_check\": \"JD/title/briefing used only to prioritize which fact-supported themes to foreground; no JD phrases lifted verbatim into segments\"\n  },\n  \"gap_notes\": [\n    \"No fact in the allowed pool literally supports a distinct fourth non-partner theme beyond the two devsecops-derived segments, so both regulated-delivery and runtime-governance segments draw on the same devsecops fact using different literal nouns to avoid family overlap.\"\n  ],\n  \"change_log\": [\n    \"Selected alliance co-sell, regulated modernization delivery, and runtime security governance as three non-overlapping themes\",\n    \"Extracted literal nouns (alliance, co-sell, modernization, regulated, delivery, security, release) directly from cited claim_text\",\n    \"Confirmed only one segment uses partner/alliance family per distinctness rule\",\n    \"Verified governance and runtime signals both present per PRODUCT_SHAPE hard gates\",\n    \"Word count self-check: 11 words total, within 10-13 range\"\n  ],\n  \"self_check\": {\n    \"fixed_prefix\": true,\n    \"segment_count\": 4,\n    \"separator_count\": 3,\n    \"word_count\": 11,\n    \"word_count_in_range\": true,\n    \"no_metrics\": true,\n    \"no_company_names\": true,\n    \"no_employer_names\": true,\n    \"no_jd_phrase_lift\": true,\n    \"base_identity_preserved\": true,\n    \"jd_used_as_targeting_only\": true\n  }\n}",
+      "model": "claude-sonnet-5",
+      "transport_timing": {
+        "started_at": "2026-08-11T10:19:52.846149+00:00",
+        "first_byte_after_s": 1.438,
+        "last_progress_after_s": 28.61,
+        "completed_after_s": 28.61,
+        "chunk_count": 24,
+        "read_iterations": 24,
+        "raw_output_chars": 2383,
+        "stream": true
+      },
+      "raw_response": {
+        "model": "claude-sonnet-5",
+        "usage": {
+          "input_tokens": 13349,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "output_tokens": 2971,
+          "service_tier": "standard",
+          "inference_geo": "global",
+          "output_tokens_details": {
+            "thinking_tokens": 2019
+          }
+        },
+        "stop_reason": "end_turn",
+        "stop_details": null,
+        "stream": true,
+        "transport_timing": {
+          "started_at": "2026-08-11T10:19:52.846149+00:00",
+          "first_byte_after_s": 1.438,
+          "last_progress_after_s": 28.61,
+          "completed_after_s": 28.61,
+          "chunk_count": 24,
+          "read_iterations": 24,
+          "raw_output_chars": 2383,
+          "stream": true
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"headline_line\": \"SVP Engineering | Alliance Co-Sell Modernization | Regulated Modernization Delivery | Runtime Security Governance\",\n  \"selected_fact_plan\": {\n    \"section_id\": \"headline\",\n    \"selection_method\": \"selected_graph_evidence_plan_headline\",\n    \"required_fact_ids\": [\"reb_ibm_aws_alliance_partner_cosell_gtm\", \"reb_ibm_devsecops_release_resilience\"]\n  },\n  \"claim_ledger\": [\n    {\n      \"claim_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities\",\n      \"source_fact_ids\": [\"reb_ibm_aws_alliance_partner_cosell_gtm\"]\n    },\n    {\n      \"claim_text\": \"Embedded release automation and security scanning into regulated modernization delivery paths\",\n      \"source_fact_ids\": [\"reb_ibm_devsecops_release_resilience\"]\n    }\n  ],\n  \"jd_alignment\": {\n    \"targeting_only\": true,\n    \"jd_used_as_proof\": false,\n    \"briefing_used_as_proof\": false,\n    \"companion_used_as_proof\": false,\n    \"selected_theme\": \"alliance co-sell modernization, regulated delivery, runtime security governance\",\n    \"anti_stuffing_check\": \"JD/title/briefing used only to prioritize which fact-supported themes to foreground; no JD phrases lifted verbatim into segments\"\n  },\n  \"gap_notes\": [\n    \"No fact in the allowed pool literally supports a distinct fourth non-partner theme beyond the two devsecops-derived segments, so both regulated-delivery and runtime-governance segments draw on the same devsecops fact using different literal nouns to avoid family overlap.\"\n  ],\n  \"change_log\": [\n    \"Selected alliance co-sell, regulated modernization delivery, and runtime security governance as three non-overlapping themes\",\n    \"Extracted literal nouns (alliance, co-sell, modernization, regulated, delivery, security, release) directly from cited claim_text\",\n    \"Confirmed only one segment uses partner/alliance family per distinctness rule\",\n    \"Verified governance and runtime signals both present per PRODUCT_SHAPE hard gates\",\n    \"Word count self-check: 11 words total, within 10-13 range\"\n  ],\n  \"self_check\": {\n    \"fixed_prefix\": true,\n    \"segment_count\": 4,\n    \"separator_count\": 3,\n    \"word_count\": 11,\n    \"word_count_in_range\": true,\n    \"no_metrics\": true,\n    \"no_company_names\": true,\n    \"no_employer_names\": true,\n    \"no_jd_phrase_lift\": true,\n    \"base_identity_preserved\": true,\n    \"jd_used_as_targeting_only\": true\n  }\n}"
+          }
+        ]
+      }
+    },
+    "anthropic_cache_receipt_seed": null,
+    "reasoning_effort": "low",
+    "attempt_started_at_utc": "2026-08-11T10:19:52.842535+00:00",
+    "attempt_completed_at_utc": "2026-08-11T10:20:21.459585+00:00",
+    "provider_attempt_spans": [
+      {
+        "schema_version": "apps_rg_provider_attempt_span_v1",
+        "span_kind": "provider_attempt",
+        "attempt_kind": "requested",
+        "attempt_index": 1,
+        "provider": "external_claude",
+        "model": "claude-sonnet-5",
+        "provider_attempted": true,
+        "provider_available": true,
+        "runtime_generation_status": "REAL_LLM",
+        "started_at_utc": "2026-08-11T10:19:52.842535+00:00",
+        "completed_at_utc": "2026-08-11T10:20:21.459585+00:00",
+        "duration_seconds": 28.61705,
+        "exact_provider_error": null,
+        "timeout_seconds": 90.0,
+        "token_budget": 4000,
+        "temperature": 0.55,
+        "request_digest": "c591293500795cff9d4446914abe0394304ce86a97cc6a6011c2d81d2b2ae152",
+        "transport_timing": {
+          "started_at": "2026-08-11T10:19:52.846149+00:00",
+          "first_byte_after_s": 1.438,
+          "last_progress_after_s": 28.61,
+          "completed_after_s": 28.61,
+          "chunk_count": 24,
+          "read_iterations": 24,
+          "raw_output_chars": 2383,
+          "stream": true
+        }
+      }
+    ],
+    "provider_attempt_timing_summary": {
+      "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+      "span_count": 1,
+      "attempted_count": 1,
+      "fallback_attempt_count": 0,
+      "fallback_attempted": false,
+      "providers": [
+        "external_claude"
+      ],
+      "models": [
+        "claude-sonnet-5"
+      ],
+      "runtime_generation_statuses": [
+        "REAL_LLM"
+      ],
+      "total_duration_seconds": 28.61705,
+      "accepted_output_provider": "external_claude",
+      "accepted_output_model": "claude-sonnet-5"
+    },
+    "logical_attempt": 1,
+    "transport_attempt": 1,
+    "transport_attempt_ids": [
+      "attempt-728a44cd86c54b9ea339e69d9a7ca3c1"
+    ],
+    "provider_cache_receipt": {
+      "provider": "external_claude",
+      "model": "claude-sonnet-5",
+      "section_id": "headline",
+      "cache_enabled": false,
+      "cache_strategy": "disabled",
+      "stable_prefix_hash": "",
+      "c0_prefix_hash": "",
+      "volatile_tail_hash": "",
+      "cache_marker_count": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_creation_input_tokens": null,
+      "cache_read_input_tokens": null,
+      "cache_hit_ratio": null,
+      "estimated_uncached_input_tokens": null,
+      "estimated_cached_input_tokens": null,
+      "cache_savings_estimate_source": "not_estimated_cache_disabled"
+    }
+  },
+  "prompt_cache_receipt": {
+    "provider": "external_claude",
+    "model": "claude-sonnet-5",
+    "section_id": "headline",
+    "cache_enabled": false,
+    "cache_strategy": "disabled",
+    "stable_prefix_hash": "",
+    "c0_prefix_hash": "",
+    "volatile_tail_hash": "",
+    "cache_marker_count": 0,
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_creation_input_tokens": null,
+    "cache_read_input_tokens": null,
+    "cache_hit_ratio": null,
+    "estimated_uncached_input_tokens": null,
+    "estimated_cached_input_tokens": null,
+    "cache_savings_estimate_source": "not_estimated_cache_disabled"
+  },
+  "reasoning_execution_receipt": null,
+  "stub": false,
+  "apps_rg_provider_preflight_blocked": false,
+  "apps_rg_last_probe_snapshot": null
+}

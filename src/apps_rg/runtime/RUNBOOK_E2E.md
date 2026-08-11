@@ -81,4 +81,4 @@ Prints a suggested **canonical** `python -m apps_rg` command. Does not read or w
 
 ## Maintainer boundaries
 
-Generated lane behavior, X1D/X2/X3, L6, DOCX internals, registry, and `agentic_core` are out of scope for this runbook. This document covers **how to invoke canonical entrypoints only**.
+Generated lane behavior, X1D/X2/X3, L6, DOCX internals, registry, and `apps_rg` are out of scope for this runbook. This document covers **how to invoke canonical entrypoints only**.

@@ -8,7 +8,7 @@ Covers acceptance criteria for the IBM-only graph promotion + role-episode packa
 - HOLD / DO NOT PROMOTE metrics are not present in promoted skill facts or linked graph metrics.
 - Archive prose is not embedded in allowed_phrases.
 - Config gate for graph_expansion_allowed is BLOCKED_FOR_CONFIG_ENABLEMENT.
-- No agentic_core diff (import-time assertion).
+- No apps_rg_runtime diff (import-time assertion).
 """
 from __future__ import annotations
 
@@ -545,20 +545,20 @@ class TestConfigGate:
 
 
 # ---------------------------------------------------------------------------
-# No agentic_core diff guard
+# No Apps RG runtime diff guard
 # ---------------------------------------------------------------------------
 
-class TestNoAgenticCoreDiff:
-    def test_ibm_graph_role_episode_registry_not_in_agentic_core(self) -> None:
-        """Registry module must live in apps_rg, not agentic_core."""
+class TestNoAppsRgRuntimeDiff:
+    def test_ibm_graph_role_episode_registry_not_in_apps_rg_runtime(self) -> None:
+        """Registry module must live in apps_rg, not apps_rg_runtime."""
         from apps_rg.runtime.sections import ibm_graph_role_episode_registry as reg
         module_path = Path(reg.__file__).resolve()
-        agentic_core = REPO / "agentic_core"
-        assert not str(module_path).startswith(str(agentic_core)), (
-            f"ibm_graph_role_episode_registry is inside agentic_core: {module_path}"
+        apps_rg_runtime = REPO / "apps_rg_runtime"
+        assert not str(module_path).startswith(str(apps_rg_runtime)), (
+            f"ibm_graph_role_episode_registry is inside apps_rg_runtime: {module_path}"
         )
 
-    def test_ibm_role_episode_bundles_not_in_agentic_core(self) -> None:
-        assert not str(BUNDLES_PATH).startswith(str(REPO / "agentic_core")), (
-            f"ibm_role_episode_bundles.json is inside agentic_core: {BUNDLES_PATH}"
+    def test_ibm_role_episode_bundles_not_in_apps_rg_runtime(self) -> None:
+        assert not str(BUNDLES_PATH).startswith(str(REPO / "apps_rg_runtime")), (
+            f"ibm_role_episode_bundles.json is inside apps_rg_runtime: {BUNDLES_PATH}"
         )

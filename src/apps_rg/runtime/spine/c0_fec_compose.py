@@ -26,7 +26,7 @@ FEC_BRIDGE_ARTIFACT = "final_evidence_contract.json"
 FEC_BRIDGE_RECEIPT = "c0_fec_compose_receipt.json"
 FEC_BRIDGE_MODE_SECTION = "spine_c0_fec_compose"
 FEC_BRIDGE_AUTHORITY_SCOPE = "apps_rg_c0_fec_bridge_shape_only_not_canonical_fec"
-CANONICAL_FEC_AUTHORITY_SCOPE = "agentic_core_runtime_final_evidence_contract"
+CANONICAL_FEC_AUTHORITY_SCOPE = "apps_rg_final_evidence_contract"
 # Legacy receipt/compiled-prompt alias (W4/W5 tests, one-spine certification).
 FEC_BRIDGE_MODE_LEGACY = "section_fec_bridge"
 _ACCEPTED_FEC_BRIDGE_MODES = frozenset({FEC_BRIDGE_MODE_SECTION, FEC_BRIDGE_MODE_LEGACY})
@@ -567,6 +567,92 @@ def resolve_pa_proof_authority_for_compile(
     )
 
 
+def _attach_l1_cognitive_c0_revision(
+    *,
+    artifact_dir: Path,
+    front_spine: SectionFrontSpineBridge,
+    runtime_payload: dict[str, Any],
+    c0_required: bool,
+) -> None:
+    """Attach one C0-bound L1 revision before the section PA prompt is compiled.
+
+    The original L1 projection governs broad coverage.  Once C0 has completed,
+    this second, narrower projection prevents the same provider attempt from
+    turning failed evidence obligations into claims.  It is not a retry and it
+    does not alter retrieval, route, or execution authority.
+    """
+
+    from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+        build_l1_cognitive_revision_advisory,
+        extract_l1_cognitive_plan,
+    )
+    from apps_rg.runtime.bindings.l1_planning_capsule_v2 import (
+        extract_verified_planning_capsule_v2,
+    )
+    from apps_rg.runtime.contracts.l1_cognitive_c0_outcome_receipt import (
+        build_l1_cognitive_revision_from_c0_outcome,
+    )
+    from apps_rg.runtime.dispatch import spine_stage_receipts as sr
+
+    cognitive_plan = extract_l1_cognitive_plan(front_spine.l1_plan, required=False)
+    if cognitive_plan is None:
+        return
+    obligation_path = artifact_dir / sr.FILENAME_L1_EVIDENCE_OBLIGATION_RECEIPT
+    outcome_path = artifact_dir / sr.FILENAME_L1_COGNITIVE_C0_OUTCOME_RECEIPT
+    if not obligation_path.is_file() or not outcome_path.is_file():
+        if c0_required:
+            raise SectionFecBridgePreconditionError(
+                "C0 completed without the L1 cognitive outcome receipts required "
+                "for the v3 treatment"
+            )
+        return
+    try:
+        obligation_receipt = json.loads(obligation_path.read_text(encoding="utf-8"))
+        outcome_receipt = json.loads(outcome_path.read_text(encoding="utf-8"))
+        if not isinstance(obligation_receipt, dict) or not isinstance(outcome_receipt, dict):
+            raise ValueError("C0 cognitive outcome inputs are not objects")
+        v2_capsule, _verification = extract_verified_planning_capsule_v2(
+            front_spine.l1_plan,
+            required=True,
+        )
+        revision = build_l1_cognitive_revision_from_c0_outcome(
+            cognitive_plan=cognitive_plan,
+            outcome_receipt=outcome_receipt,
+            outcome_receipt_ref=sr.FILENAME_L1_COGNITIVE_C0_OUTCOME_RECEIPT,
+            v2_capsule=v2_capsule,
+            c0_obligation_receipt=obligation_receipt,
+        )
+        revision_advisory = build_l1_cognitive_revision_advisory(
+            cognitive_plan=cognitive_plan,
+            revision=revision,
+            c0_outcome_receipt_digest=str(outcome_receipt["receipt_digest"]),
+        )
+    except (KeyError, OSError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise SectionFecBridgePreconditionError(
+            "L1 cognitive C0 revision could not be source-bound"
+        ) from exc
+    sr.write_stage_receipt(
+        artifact_dir / sr.FILENAME_L1_COGNITIVE_REVISION,
+        revision,
+    )
+    sr.write_stage_receipt(
+        artifact_dir / sr.FILENAME_L1_COGNITIVE_REVISION_ADVISORY,
+        revision_advisory,
+    )
+    runtime_payload["l1_cognitive_revision"] = revision
+    runtime_payload["l1_cognitive_revision_advisory"] = revision_advisory
+    runtime_payload["l1_cognitive_revision_ref"] = sr.FILENAME_L1_COGNITIVE_REVISION
+    runtime_payload["l1_cognitive_revision_advisory_ref"] = (
+        sr.FILENAME_L1_COGNITIVE_REVISION_ADVISORY
+    )
+    runtime_payload["l1_cognitive_revision_outcome_ref"] = (
+        sr.FILENAME_L1_COGNITIVE_C0_OUTCOME_RECEIPT
+    )
+    runtime_payload["l1_cognitive_c0_outcome_receipt_digest"] = str(
+        outcome_receipt["receipt_digest"]
+    )
+
+
 def wire_spine_c0_fec_for_section(
     *,
     artifact_dir: Path,
@@ -602,6 +688,25 @@ def wire_spine_c0_fec_for_section(
 
     assert_canonical_product_section_env(section_id)
     runtime_payload["artifact_dir"] = str(Path(artifact_dir).resolve())
+    from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+        build_l1_cognitive_consumer_advisory,
+        extract_l1_cognitive_plan,
+    )
+
+    cognitive_plan = extract_l1_cognitive_plan(front_spine.l1_plan, required=False)
+    if cognitive_plan is not None:
+        cognitive_advisory = build_l1_cognitive_consumer_advisory(front_spine.l1_plan)
+        if cognitive_advisory is None:
+            raise SectionFecBridgePreconditionError(
+                "L1 cognitive plan did not produce a consumer advisory"
+            )
+        # The v3 plan has no raw JD text.  Retaining it with the advisory lets PA
+        # revalidate source binding before it changes a provider-visible prompt.
+        runtime_payload["l1_cognitive_v3_plan"] = cognitive_plan
+        runtime_payload["l1_cognitive_advisory"] = cognitive_advisory
+        runtime_payload["l1_cognitive_advisory_ref"] = (
+            "l1_plan_contract.json#task_spec.apps_rg_cognitive_v3_plan"
+        )
     if section_c0_evidence_room_enabled(section_id):
         bridge = run_section_c0_evidence_room(
             artifact_dir=artifact_dir,
@@ -638,6 +743,7 @@ def wire_spine_c0_fec_for_section(
         spine_res = invoke_section_spine_c0_retrieve(
             front_spine=front_spine,
             section_id=section_id,
+            artifact_dir=artifact_dir,
             assert_grounding=False,
         )
         write_spine_c0_retrieve_receipt(artifact_dir, spine_res.receipt)
@@ -688,6 +794,12 @@ def wire_spine_c0_fec_for_section(
                 section_id=section_id,
             )
 
+    _attach_l1_cognitive_c0_revision(
+        artifact_dir=artifact_dir,
+        front_spine=front_spine,
+        runtime_payload=runtime_payload,
+        c0_required=section_spine_c0_retrieve_required(front_spine),
+    )
     runtime_payload["section_fec_bridge"] = bridge.bridge_doc
     runtime_payload["fec_bridge_ref"] = FEC_BRIDGE_ARTIFACT
     runtime_payload["final_evidence_contract_ref"] = FEC_BRIDGE_ARTIFACT
@@ -740,6 +852,12 @@ def pa_consumption_receipt_fields(runtime_payload: dict[str, Any]) -> dict[str, 
     via_fec = isinstance(bridge, dict) and bool(bridge)
     proof_pool_metadata = runtime_payload.get("proof_pool_metadata")
     pp = proof_pool_metadata if isinstance(proof_pool_metadata, dict) else {}
+    cognitive_plan = runtime_payload.get("l1_cognitive_v3_plan")
+    cognitive_advisory = runtime_payload.get("l1_cognitive_advisory")
+    cognitive_revision = runtime_payload.get("l1_cognitive_revision")
+    cognitive_revision_advisory = runtime_payload.get(
+        "l1_cognitive_revision_advisory"
+    )
 
     def allocation_field(key: str) -> Any:
         if key in pp:
@@ -818,6 +936,40 @@ def pa_consumption_receipt_fields(runtime_payload: dict[str, Any]) -> dict[str, 
         ),
         "durable_graph_state_mutated": bool(
             allocation_field("durable_graph_state_mutated")
+        ),
+        # These are execution-observation bindings only.  C0 still controls
+        # evidence and the revision remains non-retrying planning advisory.
+        "l1_cognitive_plan_digest": (
+            str(cognitive_plan.get("plan_digest") or "")
+            if isinstance(cognitive_plan, dict)
+            else ""
+        ),
+        "l1_cognitive_advisory_digest": (
+            str(cognitive_advisory.get("advisory_digest") or "")
+            if isinstance(cognitive_advisory, dict)
+            else ""
+        ),
+        "l1_cognitive_revision_ref": str(
+            runtime_payload.get("l1_cognitive_revision_ref") or ""
+        ),
+        "l1_cognitive_revision_digest": (
+            str(cognitive_revision.get("revision_digest") or "")
+            if isinstance(cognitive_revision, dict)
+            else ""
+        ),
+        "l1_cognitive_revision_advisory_digest": (
+            str(cognitive_revision_advisory.get("advisory_digest") or "")
+            if isinstance(cognitive_revision_advisory, dict)
+            else ""
+        ),
+        "l1_cognitive_revision_advisory_ref": str(
+            runtime_payload.get("l1_cognitive_revision_advisory_ref") or ""
+        ),
+        "l1_cognitive_c0_outcome_receipt_digest": str(
+            runtime_payload.get("l1_cognitive_c0_outcome_receipt_digest") or ""
+        ),
+        "l1_cognitive_revision_outcome_ref": str(
+            runtime_payload.get("l1_cognitive_revision_outcome_ref") or ""
         ),
     }
 

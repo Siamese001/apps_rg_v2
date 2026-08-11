@@ -28,7 +28,7 @@ from apps_rg.fact_inventory.track_weighted_graph_expansion import (
     TRACK_NODE_IDS,
     TrackWeightedExpansionContractError,
     build_track_weighted_expansion,
-    capture_agentic_core_isolation,
+    capture_apps_rg_isolation,
     infer_projection_role_family_key,
 )
 
@@ -314,8 +314,8 @@ def build_p1_w5_track_balanced_sections(
     validate_track_balanced_executive_summary(exec_proj)
     validate_competencies_grouped_by_track(comp_proj)
 
-    isolation = capture_agentic_core_isolation(repo_root=root)
-    p1_w5_touched = any(p.startswith("agentic_core/") for p in P1_W5_FILE_PREFIXES)
+    isolation = capture_apps_rg_isolation(repo_root=root)
+    p1_w5_touched = any(p.startswith("apps_rg/") for p in P1_W5_FILE_PREFIXES)
     isolation["p1_w5_changed_file_prefixes"] = list(P1_W5_FILE_PREFIXES)
     isolation["touched_by_this_wave"] = p1_w5_touched
 
@@ -324,7 +324,7 @@ def build_p1_w5_track_balanced_sections(
         "executive_summary_projection": exec_proj,
         "competencies_projection": comp_proj,
         "p1_w4_closeout": closeout,
-        "agentic_core_isolation": isolation,
+        "apps_rg_isolation": isolation,
     }
 
 
@@ -372,7 +372,7 @@ def write_p1_w5_receipts(
         "p1_w4_closeout_receipt_ref": P1_W4_CLOSEOUT_RECEIPT_REF,
         "p1_w4_non_graph_evidence_items_count": c03.get("non_graph_evidence_items_count"),
         "p1_w4_graph_hop_paths_count": c03.get("c03_graph_hop_paths_count"),
-        "agentic_core_isolation": built["agentic_core_isolation"],
+        "apps_rg_isolation": built["apps_rg_isolation"],
     }
     assert_skills_not_broad_ledger_authority(payload)
 

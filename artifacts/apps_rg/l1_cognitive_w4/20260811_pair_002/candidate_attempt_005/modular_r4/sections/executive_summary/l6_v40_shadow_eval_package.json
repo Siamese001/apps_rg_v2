@@ -1,0 +1,180 @@
+{
+  "alignment_source": "contract_only_pseudo_rows",
+  "apps_eval_rows_bound": false,
+  "child_run_id": "exec_summary_20260811_100620",
+  "current_run_mutation_assertion": false,
+  "current_run_x3_mutation_assertion": false,
+  "direct_l4_write_assertion": false,
+  "durable_write_assertion": false,
+  "eval_binding_status": "PENDING",
+  "evidence_class": "CONTRACT_ONLY_ADVISORY",
+  "future_run_only_assertion": true,
+  "g28_audit_completeness": {
+    "assertion_results": {
+      "exit_disposition_ref": true,
+      "l5_certification_ref": true,
+      "policy_hash": true,
+      "replay_key": true,
+      "route_contract_ref": true,
+      "sealed_artifacts": true,
+      "source_lineage_or_normalized_records": true,
+      "trace_root": false
+    },
+    "deterministic_digest": "882f56fdf3a627e6c5899f63c9b934a6eb8455b88780d8861a1c571b10c101f4",
+    "forbidden_attempts": [],
+    "gate_id": "G28_AUDIT_COMPLETENESS",
+    "gate_name": "L6 G28 audit completeness",
+    "gate_receipt_id": "g28-a7a1e95c39974052930fb6714e52a67d",
+    "missing_refs": [
+      "trace_root"
+    ],
+    "notes": "UNKNOWN is fail-closed; sentinel L5 certification is missing evidence.",
+    "present_refs": [
+      "exit_disposition_ref",
+      "policy_hash",
+      "replay_key",
+      "route_contract_ref",
+      "l5_certification_ref",
+      "source_lineage_or_normalized_records",
+      "sealed_artifacts"
+    ],
+    "reason_codes": [
+      "MISSING_TRACE_ROOT"
+    ],
+    "required_refs": [
+      "trace_root",
+      "exit_disposition_ref",
+      "policy_hash",
+      "replay_key",
+      "route_contract_ref",
+      "l5_certification_ref",
+      "source_lineage_or_normalized_records",
+      "sealed_artifacts"
+    ],
+    "runtime_exhaust_bundle_id": "rxb-8ef91923806a49809b321d7a69e2a375",
+    "verdict": "FAIL"
+  },
+  "g29_learning_firewall": {
+    "assertion_results": {
+      "no_bus_u_publish_attempt": true,
+      "no_current_run_mutation_attempt": true,
+      "no_current_run_x3_mutation": true,
+      "no_direct_prompt_policy_patch": true,
+      "no_l4_write_attempt": true,
+      "observer_isolation_clean": true,
+      "observer_no_bus_u_publish_assertion": true,
+      "observer_no_l4_write_assertion": true,
+      "observer_no_live_feedback_assertion": true
+    },
+    "deterministic_digest": "8cb17a9cc5c80d393435049da942f6ec89166e8911b781befa69d8bbaba3433b",
+    "forbidden_attempts": [],
+    "gate_id": "G29_LEARNING_FIREWALL",
+    "gate_name": "L6 G29 learning firewall",
+    "gate_receipt_id": "g29-4b870d25e16b4e159e07ad8da3fbea5a",
+    "missing_refs": [],
+    "notes": "L6 proposals remain inert and future-run only; UWG is the durable write path.",
+    "present_refs": [
+      "no_current_run_mutation_attempt",
+      "no_l4_write_attempt",
+      "no_bus_u_publish_attempt",
+      "no_current_run_x3_mutation",
+      "no_direct_prompt_policy_patch",
+      "observer_isolation_clean",
+      "observer_no_l4_write_assertion",
+      "observer_no_bus_u_publish_assertion",
+      "observer_no_live_feedback_assertion"
+    ],
+    "reason_codes": [],
+    "required_refs": [
+      "no_current_run_mutation_attempt",
+      "no_l4_write_attempt",
+      "no_bus_u_publish_attempt",
+      "no_current_run_x3_mutation",
+      "no_direct_prompt_policy_patch",
+      "observer_isolation_clean",
+      "observer_no_l4_write_assertion",
+      "observer_no_bus_u_publish_assertion",
+      "observer_no_live_feedback_assertion"
+    ],
+    "runtime_exhaust_bundle_id": "rxb-8ef91923806a49809b321d7a69e2a375",
+    "verdict": "PASS"
+  },
+  "grain_parity_status": "WARN",
+  "ingest_gap_report": {
+    "gap_codes": [
+      "TRACE_LINK_MISSING",
+      "U0",
+      "L1"
+    ],
+    "gap_report_id": "gap-a38bc8aecd8c465e83ee354f7fb75579",
+    "impossible_order_flags": [],
+    "missing_evidence_refs": [],
+    "notes": "",
+    "orphan_artifact_refs": [],
+    "repair_required": true,
+    "runtime_exhaust_bundle_id": "rxb-8ef91923806a49809b321d7a69e2a375"
+  },
+  "input_refs": {
+    "artifact_dir": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary",
+    "exit_disposition_receipt": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/exit_disposition_receipt.json",
+    "runtime_exhaust_bundle": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/runtime_exhaust_bundle.json",
+    "trace_reconciliation": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/trace_reconciliation.json"
+  },
+  "l5_certification_receipt_digest": "sha256:a54549a32c5f4f166993c9e6ac0cecde83eea5c771b024481e58fee6fb7ee0b1",
+  "l5_certification_receipt_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l5_certification_receipt.json",
+  "l5_certification_valid": true,
+  "l6_apps_eval_alignment_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_apps_eval_alignment.json",
+  "l6_apps_eval_grain_parity_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_apps_eval_grain_parity.json",
+  "l6_microstep_coverage_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_microstep_coverage.json",
+  "l6_microstep_future_run_proposals_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_microstep_future_run_proposals.json",
+  "l6_microstep_observations_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_microstep_observations.jsonl",
+  "l6_microstep_patterns_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_microstep_patterns.json",
+  "l6_microstep_rca_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_microstep_rca.json",
+  "l6_observability_closure_receipt_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_observability_closure_receipt.json",
+  "l6_trace_observability_summary_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_trace_observability_summary.json",
+  "microstep_contract_digest": "sha256:d18a9dd3b8c318ec496ac2dd37021a9ce800166b11ee629064b4aa314ddaa1a5",
+  "parent_run_id": "",
+  "readiness_decision": "NON_EVALUABLE_PACKET",
+  "readiness_receipt": {
+    "artifact_integrity_status": "PRESENT",
+    "deterministic_digest": "f3b261b75762c8bfd5b77eff479b261c6e86667b9486d11ef08f6b0f5b28666e",
+    "eval_readiness_receipt_id": "ready-9c6abfe1a6f349278fe2a78bd6f0184b",
+    "evaluator_input_status": "PRESENT",
+    "excluded_from_learning_until": "indefinite",
+    "g28_audit_completeness_receipt_ref": "g28-a7a1e95c39974052930fb6714e52a67d",
+    "g29_learning_firewall_receipt_ref": "g29-4b870d25e16b4e159e07ad8da3fbea5a",
+    "l5_certification_status": "PRESENT",
+    "missing_evidence_map_ref": null,
+    "observer_receipt_id": "observer-38754f9545f04e31b10bb0d5b2962d50",
+    "policy_hash_status": "PRESENT",
+    "prompt_hash_status": "PRESENT",
+    "readiness_decision": "NON_EVALUABLE_PACKET",
+    "reason_codes": [
+      "trace_root"
+    ],
+    "replay_key_status": "PRESENT",
+    "route_contract_status": "PRESENT",
+    "runtime_exhaust_bundle_id": "rxb-8ef91923806a49809b321d7a69e2a375",
+    "sealed_artifacts_status": "PRESENT",
+    "source_lineage_or_records_status": "PRESENT",
+    "source_lineage_status": "PRESENT",
+    "terminal_status_status": "PRESENT",
+    "trace_completeness_status": "MISSING"
+  },
+  "registry_digest": "sha256:d18a9dd3b8c318ec496ac2dd37021a9ce800166b11ee629064b4aa314ddaa1a5",
+  "runtime_exhaust_bundle_digest": "sha256:54a4e7b01a2bd5eceafb567ec92ab7a29cb6428bd7d295551faf72ed2702e960",
+  "runtime_exhaust_bundle_id": "rxb-8ef91923806a49809b321d7a69e2a375",
+  "schema_version": "apps_rg.l6_v40_shadow_eval.v2",
+  "section_attempt_id": "executive_summary:exec_summary_20260811_100620:attempt:1",
+  "section_id": "executive_summary",
+  "span_export_jsonl_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_v40_shadow_eval_spans.jsonl",
+  "span_export_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/l6_v40_shadow_eval_spans.json",
+  "trace_reconciliation_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/trace_reconciliation.json",
+  "trace_reconciliation_rows_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/executive_summary/trace_reconciliation_rows.jsonl",
+  "v40_gap_codes": [
+    "MISSING_PARENT_RUN_ID",
+    "MISSING_SESSION_ID",
+    "MISSING_TRACE_ROOT"
+  ],
+  "valid_v40_shadow_exhaust": false
+}

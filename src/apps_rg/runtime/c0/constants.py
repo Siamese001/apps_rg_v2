@@ -59,7 +59,7 @@ FORBIDDEN_PROOF_SOURCE_TYPES = frozenset(
 )
 
 # Import-light C0 authority modules must not import ``fact_vector_readiness``:
-# that runtime surface owns agentic-core adapters and creates a C0 discovery
+# the application-owned runtime surface owns C0 adapters and creates a discovery
 # cycle when graph expansion is imported during core reachability checks.
 # Keep this immutable authority set explicit and parity-tested against the
 # orchestration lane registry.

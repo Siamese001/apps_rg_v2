@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L6_system_learning.span_contracts import APPS_RG_SPINE_SPAN_CHECKLIST
+from apps_rg.runtime.local_l6 import APPS_RG_SPINE_SPAN_CHECKLIST
 
 SPINE_SPAN_RECEIPT = "spine_span_emit_receipt.jsonl"
 SPINE_SPAN_COVERAGE_RECEIPT = "spine_span_coverage_receipt.json"
@@ -127,8 +127,6 @@ def _try_otel_span(
 
 def audit_spine_span_emit_sites() -> dict[str, object]:
     """Static emit-site audit for CI (W4)."""
-    from agentic_core.L6_system_learning.span_contracts import APPS_RG_SPINE_SPAN_CHECKLIST
-
     repo = Path(__file__).resolve().parents[3]
     rows: list[dict[str, object]] = []
     for item in APPS_RG_SPINE_SPAN_CHECKLIST:

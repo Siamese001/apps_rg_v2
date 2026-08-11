@@ -86,6 +86,30 @@ def _aggregate_x3_for_outcome(raw_x3: str | None, *, outcome: bool) -> str:
     return str(raw_x3 or "")
 
 
+def _whole_run_exit_identity(
+    *, raw_request: dict[str, Any], validated_request: Any
+) -> dict[str, Any]:
+    """Return product identity when present, otherwise a labelled non-product projection.
+
+    A compatibility/evaluation invocation intentionally has no Apps Research
+    producer identity.  Its exit packet must still bind to the exact validated
+    request, but it must not invent or masquerade as product identity.
+    """
+
+    candidate = raw_request.get("canonical_run_identity")
+    if isinstance(candidate, dict) and candidate:
+        return dict(candidate)
+    return {
+        "identity_class": "APPS_RG_NON_PRODUCT_VALIDATED_REQUEST",
+        "app_id": str(getattr(validated_request, "app_id", "apps_rg") or "apps_rg"),
+        "request_id": str(getattr(validated_request, "request_id", "") or ""),
+        "run_id": str(getattr(validated_request, "run_id", "") or ""),
+        "trace_id": str(getattr(validated_request, "trace_id", "") or ""),
+        "tenant_id": str(getattr(validated_request, "tenant_id", "") or ""),
+        "product_authorizing": False,
+    }
+
+
 def _default_artifact_dir(explicit: str) -> Path:
     if str(explicit).strip():
         return Path(explicit)
@@ -205,6 +229,7 @@ def _build_cli_ingress_envelope(
     resume_path: str,
     source_resume_text: str,
     generation_mode: str,
+    l1_cognitive_treatment_arm: str,
     auto_research_internal: bool,
     research_via: str | None,
     validated_input_bundle_ref: str = "",
@@ -241,6 +266,9 @@ def _build_cli_ingress_envelope(
         "source_resume_text": source_resume_text,
         "generation_mode": generation_mode,
         "task_spec": {"generation_mode": generation_mode},
+        "user_constraints": {
+            "_l1_cognitive_treatment_arm": l1_cognitive_treatment_arm,
+        },
         "transport": "ui",
         "source_channel": "apps_rg_cli",
         "auto_research_internal": auto_research_internal,
@@ -1202,6 +1230,7 @@ def run_whole_run_with_route_governance(
     resume_path: str = "",
     source_resume_text: str = "",
     generation_mode: str = "strategic_tailor",
+    l1_cognitive_treatment_arm: str = "l1_v2_control",
     artifact_dir: str = "",
     auto_research_internal: bool = True,
     research_via: str | None = None,
@@ -1235,6 +1264,7 @@ def run_whole_run_with_route_governance(
         resume_path=resume_path,
         source_resume_text=source_resume_text,
         generation_mode=generation_mode,
+        l1_cognitive_treatment_arm=l1_cognitive_treatment_arm,
         auto_research_internal=auto_research_internal,
         research_via=research_via,
         validated_input_bundle_ref=validated_input_bundle_ref,
@@ -1540,6 +1570,40 @@ def run_whole_run_with_route_governance(
         raise ProductE2EAuthorityError("L1 planning capsule is required for W1 reconciliation")
     l1_capsule_path = art / sr.FILENAME_L1_PLANNING_CAPSULE
     sr.write_stage_receipt(l1_capsule_path, l1_capsule)
+    l1_v2_capsule = (
+        l1_task_spec.get("apps_rg_planning_v2_capsule")
+        if isinstance(l1_task_spec, dict)
+        else None
+    )
+    if not isinstance(l1_v2_capsule, dict):
+        raise ProductE2EAuthorityError("L1 v2 planning capsule is required for W4 pairing")
+    sr.write_stage_receipt(
+        art / sr.FILENAME_L1_PLANNING_V2_CAPSULE,
+        l1_v2_capsule,
+    )
+    l1_treatment = (
+        l1_task_spec.get("l1_cognitive_treatment")
+        if isinstance(l1_task_spec, dict)
+        else None
+    )
+    if not isinstance(l1_treatment, dict):
+        raise ProductE2EAuthorityError("L1 cognitive treatment is required for W4 pairing")
+    sr.write_stage_receipt(
+        art / sr.FILENAME_L1_COGNITIVE_TREATMENT,
+        l1_treatment,
+    )
+    l1_cognitive_plan = (
+        l1_task_spec.get("apps_rg_cognitive_v3_plan")
+        if isinstance(l1_task_spec, dict)
+        else None
+    )
+    if l1_cognitive_plan is not None:
+        if not isinstance(l1_cognitive_plan, dict):
+            raise ProductE2EAuthorityError("L1 cognitive plan is malformed")
+        sr.write_stage_receipt(
+            art / sr.FILENAME_L1_COGNITIVE_PLAN,
+            l1_cognitive_plan,
+        )
 
     def emit_plan_execution_artifacts(
         *,
@@ -1935,6 +1999,17 @@ def run_whole_run_with_route_governance(
             "execution_route_id": DRAFT_LEG_ROUTE_FAMILY,
         },
     )
+    # This app-local receipt observes the actual section artifacts after the
+    # runner returns.  A missing C0-to-PA chain remains BLOCKED evidence; it is
+    # never inferred from the L1 plan or used to alter the runner's outcome.
+    from apps_rg.runtime.contracts.l1_cognitive_treatment_execution import (
+        emit_l1_cognitive_treatment_execution_receipt,
+    )
+
+    emit_l1_cognitive_treatment_execution_receipt(
+        run_root=art,
+        l1_plan=l1_plan,
+    )
     execution_witness = dict(getattr(result, "execution_witness", {}) or {})
     plan_execution_artifacts = emit_plan_execution_artifacts(
         execution_witness=execution_witness,
@@ -2029,9 +2104,13 @@ def run_whole_run_with_route_governance(
 
     from apps_rg.runtime.whole_run_exit import emit_whole_run_exit_review_packet
 
+    whole_run_exit_identity = _whole_run_exit_identity(
+        raw_request=raw_request,
+        validated_request=validated_request,
+    )
     whole_run_exit = emit_whole_run_exit_review_packet(
         artifact_dir=art,
-        identity=dict(raw_request["canonical_run_identity"]),
+        identity=whole_run_exit_identity,
     )
     exec_summary_block = executive_summary_certification_block(art)
     exec_summary_blocked = bool(exec_summary_block.get("blocked"))
@@ -2356,7 +2435,7 @@ def run_whole_run_with_route_governance(
         "plan_execution_receipt": plan_execution_receipt,
         "plan_replan_decision": plan_replan_decision,
         "research_delegation_executed": research_ran,
-        "l7_how_trace_emitted": bool(result.fault == "" and (art / "agentic_core_how_trace.json").is_file()),
+        "l7_how_trace_emitted": bool(result.fault == "" and (art / "apps_rg_how_trace.json").is_file()),
         "terminal_r5": result.terminal_r5,
         "executive_summary_certification_block": exec_summary_block,
         "post_x3_completion": post_x3_completion,
@@ -2397,7 +2476,7 @@ def run_whole_run_with_route_governance(
         # and is never rewritten here.
         whole_run_exit = emit_whole_run_exit_review_packet(
             artifact_dir=art,
-            identity=dict(raw_request["canonical_run_identity"]),
+            identity=whole_run_exit_identity,
         )
         if not exec_summary_blocked:
             effective_x3 = str(

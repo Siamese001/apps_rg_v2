@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
+from apps_rg.runtime.local_state import compute_deterministic_digest
 from apps_rg.cache.r1b_constants import (
     R1B_STORAGE_SUBSYSTEM,
     R1B_UWG_TARGET_SURFACE,

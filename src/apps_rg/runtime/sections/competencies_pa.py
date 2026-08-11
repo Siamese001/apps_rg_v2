@@ -401,6 +401,12 @@ def compile_competencies_prompt(
         assembly,
         section_id="competencies",
         companion_u_tier=tier,
+        l1_cognitive_advisory=runtime_payload.get("l1_cognitive_advisory"),
+        l1_cognitive_plan=runtime_payload.get("l1_cognitive_v3_plan"),
+        l1_cognitive_revision=runtime_payload.get("l1_cognitive_revision"),
+        l1_cognitive_revision_advisory=runtime_payload.get(
+            "l1_cognitive_revision_advisory"
+        ),
     )
     return finalize_section_compiled_with_proof_pool(compiled, runtime_payload=runtime_payload)
 

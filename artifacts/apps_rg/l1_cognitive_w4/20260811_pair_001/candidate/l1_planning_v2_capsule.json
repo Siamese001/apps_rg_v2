@@ -1,0 +1,257 @@
+{
+  "authority_class": "PLANNING_ADVISORY_ONLY",
+  "capsule_digest": "sha256:99dbbd758d0e7301682285fdc49b655e804f1711ad2208dd015a1f23b812fa10",
+  "decision_ledger": {
+    "authority_class": "L1_ADVISORY_ONLY",
+    "decisions": [
+      {
+        "affected_requirement_ids": [],
+        "blocking_policy": "BLOCK",
+        "code": "JD_TEXT_NOT_AVAILABLE_FOR_V2",
+        "decision_digest": "sha256:e6dcdca6fed345689edd89c10b0394c86320092b2455e8d075b1d4cbd5b3dd68",
+        "decision_id": "l1dec-e6dcdca6fed34568",
+        "permitted_resolver": "U0",
+        "resolution_evidence_shape": [
+          "validated_jd_text_digest"
+        ],
+        "severity": "HIGH",
+        "status": "OPEN"
+      }
+    ],
+    "ledger_digest": "sha256:e54e41d0d40110d315494dc0a670feeee1d89ca2ea78142385db3f1911c8f2c3",
+    "schema_version": "apps_rg.l1_decision_ledger.v2"
+  },
+  "evidence_obligation_ledger": {
+    "authority_class": "L1_RETRIEVAL_INTENT_ADVISORY_ONLY",
+    "ledger_digest": "sha256:9e9d053d0baf4a9b8393037fab4d9e357f827ca937abfd6282aaa8c986f77191",
+    "obligations": [],
+    "schema_version": "apps_rg.l1_evidence_obligation_ledger.v2"
+  },
+  "planning_prior_refs": [
+    {
+      "authority_class": "PLANNING_PRIOR_ONLY",
+      "digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+      "ref": "apps_rg/profiles/rg_planning_profile.yaml"
+    },
+    {
+      "authority_class": "PLANNING_PRIOR_ONLY",
+      "digest": "ee164e9e2233d0a4865ebecc552879cc79500c2c08a1baf0cda119f25cefcff4",
+      "ref": "apps_rg/profiles/rg_l1_requirement_taxonomy.v1.json"
+    }
+  ],
+  "planning_status": "BLOCKED",
+  "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:0671515221ec86aa:95ba6fa39b055869::v1",
+  "request_id": "req-e2f8728e2ab0474999e44a7cfa2ad2b1",
+  "requirements": [],
+  "run_id": "d1a01a43-fc6d-425c-bbb3-f919bc2335bd",
+  "schema_version": "apps_rg_l1_planning_capsule.v2",
+  "source_binding": {
+    "inline_jd_available": false,
+    "inline_jd_digest": "",
+    "jd_hash": "95ba6fa39b0558698b9da1fadd3e5e0a5bdfb691d4306f0a45588c3274fce378",
+    "source_class": "U0_VALIDATED_JD_PAYLOAD"
+  },
+  "trace_id": "45014cff-083e-424f-afea-8b11e68ce58d",
+  "validation": {
+    "no_candidate_evidence_claim": true,
+    "no_evidence_retrieval": true,
+    "no_l4_write": true,
+    "no_model_call": true,
+    "no_prompt_assembly": true,
+    "no_route_selection": true,
+    "no_tool_call": true,
+    "profile_and_taxonomy_digest_bound": true,
+    "u0_payload_only": true
+  },
+  "work_dag": {
+    "authority_class": "L1_SCHEDULING_ADVISORY_ONLY",
+    "dag_digest": "sha256:37c20f1ed28cbb7dfca260e78868b34c8db90f37c3d14d537e878429ba16ca3a",
+    "edges": [
+      {
+        "from": "u0:validated_resume",
+        "relation": "REQUIRES_EVIDENCE",
+        "to": "unit:certifications_block"
+      },
+      {
+        "from": "u0:validated_resume",
+        "relation": "REQUIRES_EVIDENCE",
+        "to": "unit:competencies"
+      },
+      {
+        "from": "u0:validated_resume",
+        "relation": "REQUIRES_EVIDENCE",
+        "to": "unit:education_block"
+      },
+      {
+        "from": "u0:validated_resume",
+        "relation": "REQUIRES_EVIDENCE",
+        "to": "unit:executive_summary"
+      },
+      {
+        "from": "u0:validated_resume",
+        "relation": "REQUIRES_EVIDENCE",
+        "to": "unit:experience_block"
+      },
+      {
+        "from": "u0:validated_resume",
+        "relation": "REQUIRES_EVIDENCE",
+        "to": "unit:headline"
+      },
+      {
+        "from": "u0:validated_resume",
+        "relation": "REQUIRES_EVIDENCE",
+        "to": "unit:skills_block"
+      },
+      {
+        "from": "unit:certifications_block",
+        "relation": "REQUIRES_VALIDATION",
+        "to": "validation:certifications_block"
+      },
+      {
+        "from": "unit:competencies",
+        "relation": "REQUIRES_VALIDATION",
+        "to": "validation:competencies"
+      },
+      {
+        "from": "unit:education_block",
+        "relation": "REQUIRES_VALIDATION",
+        "to": "validation:education_block"
+      },
+      {
+        "from": "unit:executive_summary",
+        "relation": "REQUIRES_VALIDATION",
+        "to": "validation:executive_summary"
+      },
+      {
+        "from": "unit:experience_block",
+        "relation": "REQUIRES_VALIDATION",
+        "to": "validation:experience_block"
+      },
+      {
+        "from": "unit:headline",
+        "relation": "REQUIRES_VALIDATION",
+        "to": "validation:headline"
+      },
+      {
+        "from": "unit:skills_block",
+        "relation": "REQUIRES_VALIDATION",
+        "to": "validation:skills_block"
+      },
+      {
+        "from": "validation:certifications_block",
+        "relation": "MERGE_AFTER",
+        "to": "merge:final_resume"
+      },
+      {
+        "from": "validation:competencies",
+        "relation": "MERGE_AFTER",
+        "to": "merge:final_resume"
+      },
+      {
+        "from": "validation:education_block",
+        "relation": "MERGE_AFTER",
+        "to": "merge:final_resume"
+      },
+      {
+        "from": "validation:executive_summary",
+        "relation": "MERGE_AFTER",
+        "to": "merge:final_resume"
+      },
+      {
+        "from": "validation:experience_block",
+        "relation": "MERGE_AFTER",
+        "to": "merge:final_resume"
+      },
+      {
+        "from": "validation:headline",
+        "relation": "MERGE_AFTER",
+        "to": "merge:final_resume"
+      },
+      {
+        "from": "validation:skills_block",
+        "relation": "MERGE_AFTER",
+        "to": "merge:final_resume"
+      }
+    ],
+    "nodes": [
+      {
+        "node_id": "merge:final_resume",
+        "node_type": "MERGE"
+      },
+      {
+        "node_id": "u0:validated_jd",
+        "node_type": "U0_INPUT"
+      },
+      {
+        "node_id": "u0:validated_resume",
+        "node_type": "U0_INPUT"
+      },
+      {
+        "node_id": "unit:certifications_block",
+        "node_type": "WORK_UNIT"
+      },
+      {
+        "node_id": "unit:competencies",
+        "node_type": "WORK_UNIT"
+      },
+      {
+        "node_id": "unit:education_block",
+        "node_type": "WORK_UNIT"
+      },
+      {
+        "node_id": "unit:executive_summary",
+        "node_type": "WORK_UNIT"
+      },
+      {
+        "node_id": "unit:experience_block",
+        "node_type": "WORK_UNIT"
+      },
+      {
+        "node_id": "unit:headline",
+        "node_type": "WORK_UNIT"
+      },
+      {
+        "node_id": "unit:skills_block",
+        "node_type": "WORK_UNIT"
+      },
+      {
+        "node_id": "validation:certifications_block",
+        "node_type": "VALIDATION"
+      },
+      {
+        "node_id": "validation:competencies",
+        "node_type": "VALIDATION"
+      },
+      {
+        "node_id": "validation:education_block",
+        "node_type": "VALIDATION"
+      },
+      {
+        "node_id": "validation:executive_summary",
+        "node_type": "VALIDATION"
+      },
+      {
+        "node_id": "validation:experience_block",
+        "node_type": "VALIDATION"
+      },
+      {
+        "node_id": "validation:headline",
+        "node_type": "VALIDATION"
+      },
+      {
+        "node_id": "validation:skills_block",
+        "node_type": "VALIDATION"
+      }
+    ],
+    "schema_version": "apps_rg.l1_work_dag.v2"
+  },
+  "work_unit_ids": [
+    "executive_summary",
+    "headline",
+    "competencies",
+    "experience_block",
+    "skills_block",
+    "education_block",
+    "certifications_block"
+  ]
+}

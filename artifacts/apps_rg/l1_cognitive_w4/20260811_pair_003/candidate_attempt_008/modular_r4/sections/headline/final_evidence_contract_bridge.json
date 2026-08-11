@@ -1,0 +1,4189 @@
+{
+  "schema_version": "section_fec_bridge_v1",
+  "generated_at_utc": "2026-08-11T10:46:44.928652+00:00",
+  "bridge_type": "FinalEvidenceContractBridge",
+  "contract_type": "FinalEvidenceContract",
+  "fec_bridge_mode": "spine_c0_fec_compose",
+  "producer_stage": "section_c0_evidence_room",
+  "consumer_stage": "section_PA",
+  "section_id": "headline",
+  "route_contract_ref": "route_contract.json",
+  "validated_request_ref": "validated_request.json",
+  "l1_plan_contract_ref": "l1_plan_contract.json",
+  "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "proof_pool_digest": "799f7e999e55dfeeb48f366ecaa2294793d401237f70289dcdc56974c0e930ba",
+  "canonical_evidence_set_digest": "799f7e999e55dfeeb48f366ecaa2294793d401237f70289dcdc56974c0e930ba",
+  "fec_allowed_fact_ids_digest": "799f7e999e55dfeeb48f366ecaa2294793d401237f70289dcdc56974c0e930ba",
+  "source_fact_ids": [
+    "reb_ibm_aws_alliance_partner_cosell_gtm",
+    "fact_partnerships_gtm_002",
+    "skill_sr_w12_hyperscaler_alliance_co_sell",
+    "reb_ibm_devsecops_release_resilience",
+    "fact_engineering_platform_002",
+    "skill_ibm_devsecops_pipeline_security",
+    "reb_unify_partner_channel_cosell",
+    "exp_unify_001",
+    "skill_partner_partner_led_ai_solutions"
+  ],
+  "allowed_fact_ids": [
+    "reb_ibm_aws_alliance_partner_cosell_gtm",
+    "fact_partnerships_gtm_002",
+    "skill_sr_w12_hyperscaler_alliance_co_sell",
+    "reb_ibm_devsecops_release_resilience",
+    "fact_engineering_platform_002",
+    "skill_ibm_devsecops_pipeline_security",
+    "reb_unify_partner_channel_cosell",
+    "exp_unify_001",
+    "skill_partner_partner_led_ai_solutions"
+  ],
+  "id_alias_map": {},
+  "fec_materialization_receipt": {
+    "schema_version": "fec_materialization_receipt_v1",
+    "section_id": "headline",
+    "canonical_evidence_set_digest": "799f7e999e55dfeeb48f366ecaa2294793d401237f70289dcdc56974c0e930ba",
+    "fec_allowed_fact_ids_digest": "f7f131fd1a551e3086b2161794c3c633b77044deb6c90866a4e11878208011d5",
+    "fec_narrowed_from_pool": true,
+    "narrowing_dropped_pool_ids": [
+      "exp_unify_001",
+      "fact_engineering_platform_002",
+      "fact_partnerships_gtm_002",
+      "skill_ibm_devsecops_pipeline_security",
+      "skill_partner_partner_led_ai_solutions",
+      "skill_sr_w12_hyperscaler_alliance_co_sell"
+    ],
+    "widening_blocked_ids": [],
+    "fec_allowed_count": 3,
+    "pool_allowed_count": 9,
+    "explicit_narrowing": true
+  },
+  "evidence_items": [
+    {
+      "evidence_id": "evidence:section:reb_ibm_aws_alliance_partner_cosell_gtm",
+      "source_fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+      "source_class": "proof_pool",
+      "content_digest": "a6354d5b2bf36d1aee5c9f55c9837c04",
+      "allowed_prompt_slot": "C0_EVIDENCE_DATA_ONLY",
+      "authority_class": "LEDGER_GRAPH_PROOF"
+    },
+    {
+      "evidence_id": "evidence:section:reb_ibm_devsecops_release_resilience",
+      "source_fact_id": "reb_ibm_devsecops_release_resilience",
+      "source_class": "proof_pool",
+      "content_digest": "0de9511544826e73321087d6f08a1e98",
+      "allowed_prompt_slot": "C0_EVIDENCE_DATA_ONLY",
+      "authority_class": "LEDGER_GRAPH_PROOF"
+    },
+    {
+      "evidence_id": "evidence:section:reb_unify_partner_channel_cosell",
+      "source_fact_id": "reb_unify_partner_channel_cosell",
+      "source_class": "proof_pool",
+      "content_digest": "4256defe6b0924eb60dbfb85fc66cd9c",
+      "allowed_prompt_slot": "C0_EVIDENCE_DATA_ONLY",
+      "authority_class": "LEDGER_GRAPH_PROOF"
+    }
+  ],
+  "citation_lineage_refs": [
+    "graph:reb_ibm_aws_alliance_partner_cosell_gtm",
+    "graph:reb_ibm_devsecops_release_resilience",
+    "graph:reb_unify_partner_channel_cosell",
+    "ref:graph:traverse:39e30dbd232694a8"
+  ],
+  "graph_lineage_refs": [
+    "graph:reb_ibm_aws_alliance_partner_cosell_gtm",
+    "graph:reb_ibm_devsecops_release_resilience",
+    "graph:reb_unify_partner_channel_cosell"
+  ],
+  "claim_support_graph_refs": [
+    "skill_sr_w12_hyperscaler_alliance_co_sell",
+    "skill_ibm_devsecops_pipeline_security",
+    "skill_partner_partner_led_ai_solutions"
+  ],
+  "targeting_graph_refs": [],
+  "receipt_only_lineage_refs": [
+    "ledger:reb_ibm_aws_alliance_partner_cosell_gtm",
+    "ledger:reb_ibm_devsecops_release_resilience",
+    "ledger:reb_unify_partner_channel_cosell"
+  ],
+  "graph_expansion_refs": [
+    "ref:graph:traverse:39e30dbd232694a8"
+  ],
+  "graph_targeting_for_pa": {
+    "claim_support_graph_refs": [
+      "skill_sr_w12_hyperscaler_alliance_co_sell",
+      "skill_ibm_devsecops_pipeline_security",
+      "skill_partner_partner_led_ai_solutions"
+    ],
+    "targeting_graph_refs": [],
+    "receipt_only_lineage_refs": [
+      "ledger:reb_ibm_aws_alliance_partner_cosell_gtm",
+      "ledger:reb_ibm_devsecops_release_resilience",
+      "ledger:reb_unify_partner_channel_cosell"
+    ],
+    "receipt_only_json_expansion_excluded_from_pa": true,
+    "role_family_projection": {
+      "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+      "pillar_hint_ids": [
+        "pillar_insurer_it_strategy_ai_enablement",
+        "pillar_enterprise_portfolio_governance",
+        "pillar_cloud_data_aws",
+        "pillar_actuarial_foundation",
+        "pillar_agentic_ai_platforms"
+      ],
+      "sqlite_projection_row_found": true,
+      "projection_source": "sqlite_role_family_projection",
+      "fallback_pillar_bridge_used": false,
+      "release_eligible_targeting_proof": true,
+      "targeting_degraded_explicit": false,
+      "track_weight_profile": {
+        "track_actuarial_risk_derivatives": 0.2,
+        "track_data_tech_cloud_ml": 0.45,
+        "track_genai_agentic": 0.35
+      },
+      "targeting_keywords": [
+        "pillar_insurer_it_strategy_ai_enablement",
+        "pillar_agentic_ai_platforms",
+        "pillar_cloud_data_aws",
+        "pillar_enterprise_portfolio_governance",
+        "pillar_interoperability_integration_ecosystem"
+      ],
+      "proof_policy_note": "graph_routing_not_claim_proof"
+    },
+    "overloaded_fact_compression": [],
+    "mechanism_vocabulary_cap": {
+      "max_mechanism_terms_sentence_0": 2,
+      "prefer_executive_capability_phrases": true
+    }
+  },
+  "srfs_ref": "",
+  "support_status": "PASS",
+  "canonical_c0_2_claimed": true,
+  "apps_rg_c03_skills_graph_used": true,
+  "core_c03_graph_rag_used": true,
+  "canonical_c0_3_claimed": true,
+  "canonical_c0_5_claimed": true,
+  "fec_shape_only": false,
+  "c0_authority_mode": "ledger_graph_primary",
+  "ledger_graph_primary": true,
+  "jd_targeting_only": true,
+  "briefing_targeting_only": true,
+  "base_resume_static_anchors_only": true,
+  "fact_vector_index_preflight_ref": "c02_fact_vector_index_preflight.json",
+  "fact_vector_index_preflight_status": "PASS",
+  "final_evidence_contract_snapshot": {
+    "request_id": "4cb632dbd7ac8d20",
+    "run_id": "4cb632dbd7ac8d20",
+    "final_evidence_digest": "91aaaad6b4c0cbadb6113d8439385bd1ea8db52aa679785b6352211cfca6b8bc",
+    "support_status": "PASS",
+    "evidence_item_count": 3,
+    "allowed_fact_ids": [
+      "reb_ibm_aws_alliance_partner_cosell_gtm",
+      "reb_ibm_devsecops_release_resilience",
+      "reb_unify_partner_channel_cosell"
+    ],
+    "excluded_evidence_refs": [],
+    "evidence_strata": {
+      "MUST_USE": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_devsecops_release_resilience",
+        "reb_unify_partner_channel_cosell"
+      ],
+      "SUPPORTING": [],
+      "BACKGROUND": [],
+      "CONTRADICTS": [],
+      "EXCLUDED": []
+    },
+    "retrieval_plan_ref": "c01_retrieval_plan:headline",
+    "weak_support_refinement_attempts": [],
+    "graph_expansion_refs": [
+      "ref:graph:traverse:39e30dbd232694a8"
+    ]
+  },
+  "c0_evidence_room": {
+    "c01": {
+      "schema_version": "c01_retrieval_plan_v1",
+      "section_id": "headline",
+      "target_role": "SVP IT Strategy & AI Enablement",
+      "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+      "jd_constraints_present": true,
+      "jd_constraints": {},
+      "jd_role_axes": [
+        "applied_ai_architecture",
+        "deployment_adoption",
+        "joint_solution"
+      ],
+      "jd_text_excerpt": "Required emphasis:\n- Enterprise IT strategy, portfolio governance, and AI enablement\n- Cloud/data platform modernization for regulated insurer environments\n- Reference architecture and delivery governance across business units\n- FSA/actuarial credibility without burying credentials in early-career o",
+      "route_ref": "route_contract.json",
+      "retrieval_targets": {
+        "primary_targets": [
+          "strongest_positioning_facts",
+          "role_family_fit",
+          "enterprise_architecture_standards",
+          "it_strategy_innovation_facts",
+          "data_ai_enablement"
+        ],
+        "secondary_targets": [
+          "metric_highlights",
+          "portfolio_governance",
+          "modernization_roadmap"
+        ],
+        "jd_role_axis_targets": [
+          "applied_ai_architecture",
+          "deployment_adoption",
+          "joint_solution"
+        ]
+      },
+      "retrieval_profile_ref": "apps_rg.headline.c0_profile",
+      "retrieval_profile_source": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/src/apps_rg/config/domain_contract/section_retrieval_profile.yaml",
+      "retrieval_profile_query_fields": [
+        "resume_payload.headline",
+        "jd_payload.jd_text"
+      ],
+      "retrieval_profile_fallback_queries": [
+        "SMOKE_C0_HEADLINE_ANCHOR principal product leader measurable revenue"
+      ],
+      "jd_as_proof": false,
+      "generic_docs_as_truth": false
+    },
+    "c01_artifact": "c01_retrieval_plan.json",
+    "c02": {
+      "schema_version": "c02_evidence_fetch_v1",
+      "section_id": "headline",
+      "rejected_candidates": [
+        {
+          "source_type": "jd_payload",
+          "reason": "forbidden_as_candidate_proof"
+        },
+        {
+          "source_type": "generic_best_practice",
+          "reason": "forbidden_as_candidate_proof"
+        },
+        {
+          "source_type": "rubrics",
+          "reason": "forbidden_as_candidate_proof"
+        },
+        {
+          "source_type": "briefing",
+          "reason": "forbidden_as_candidate_proof"
+        },
+        {
+          "source_type": "jd_payload_inline",
+          "reason": "forbidden_as_candidate_proof"
+        },
+        {
+          "source_type": "app_payload_inline",
+          "reason": "forbidden_as_candidate_proof"
+        },
+        {
+          "source_type": "governance_docs",
+          "reason": "forbidden_as_candidate_proof"
+        },
+        {
+          "source_type": "company_research",
+          "reason": "forbidden_as_candidate_proof"
+        }
+      ],
+      "graph_inference_performed": false,
+      "jd_used_as_proof": false,
+      "srfs_ref": "",
+      "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "c02_chroma_write": {
+        "schema_version": "c02_chroma_write_v1",
+        "status": "ATTEMPTED",
+        "attempted": true,
+        "upserted_count": 0,
+        "bge_embed_for_write": false,
+        "product_eligible": false,
+        "reason": "staged_none_promoted",
+        "ingest_receipt_status": "STAGED"
+      },
+      "fact_vectors_ingest": {
+        "schema_version": "c02_fact_vectors_ingest_v1",
+        "section_id": "headline",
+        "chroma_path": "C:/Git/Agentic-Workflow-FRESH/data/cache/chromadb",
+        "run_id": "headline_20260811_104644",
+        "promotion_mode": "inline",
+        "staged_at_utc": "2026-08-11T10:46:44.948460+00:00",
+        "attempted": true,
+        "upserted_count": 0,
+        "skipped_count": 0,
+        "status": "STAGED",
+        "reason": "staged_none_promoted",
+        "operations": {
+          "extract": 3
+        },
+        "routed_to_semantic_cache": 0,
+        "rejected_ungrounded": 0,
+        "staged_count": 3,
+        "promotion": {
+          "schema_version": "fact_vector_promotion_v2",
+          "staging_collection": "fact_vectors_staging",
+          "live_collection": "fact_vectors",
+          "promotion_run_id": "fact_vector_promotion:2026-08-11T10:46:45.002300Z",
+          "promotion_mode": "inline",
+          "promoted_at_utc": "2026-08-11T10:46:45.002300+00:00",
+          "promotion_score_floor": 0.48,
+          "run_id": "headline_20260811_104644",
+          "x3_code": "",
+          "require_x3_allow": false,
+          "selected_ids": [],
+          "missing_selected_ids": [],
+          "staged_count": 30,
+          "considered_count": 3,
+          "other_run_count": 27,
+          "promoted_count": 0,
+          "held_count": 3,
+          "rejected_count": 0,
+          "promoted": [],
+          "held": [
+            {
+              "id": "apps_rg:fv:reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reason": "duplicate_digest:apps_rg:fv:reb_ibm_aws_alliance_partner_cosell_gtm"
+            },
+            {
+              "id": "apps_rg:fv:reb_ibm_devsecops_release_resilience",
+              "reason": "duplicate_digest:apps_rg:fv:reb_ibm_devsecops_release_resilience"
+            },
+            {
+              "id": "apps_rg:fv:reb_unify_partner_channel_cosell",
+              "reason": "duplicate_digest:apps_rg:fv:reb_unify_partner_channel_cosell"
+            }
+          ],
+          "rejected": [],
+          "sparse_synced": false,
+          "dense_count": 63,
+          "sparse_doc_count": null,
+          "sparse_sync_reason": "",
+          "hitl_required": false,
+          "status": "NONE_PROMOTABLE",
+          "reason": "no_staged_rows_passed_dedupe_or_score_floor",
+          "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\headline\\fact_vector_promotion_receipt.json",
+          "source_x3_code": "",
+          "x3_finish_code_normalized": "",
+          "uwg": {},
+          "hold_annotation": {
+            "status": "PASS",
+            "row_count": 3,
+            "error_type": "",
+            "error": ""
+          },
+          "live_projection": {
+            "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+            "projection_surface": "chromadb.fact_vectors",
+            "target_l4_surface": "l4.apps_rg.fact_vectors",
+            "retrieval_mode": "live_id_get",
+            "dense_count_before": 63,
+            "dense_count_after": 63,
+            "promoted_ids": [],
+            "retrieved_ids": [],
+            "missing_ids": [],
+            "status": "EMPTY",
+            "reason": "no_promoted_ids"
+          },
+          "retrieval_proof": {
+            "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+            "projection_surface": "chromadb.fact_vectors",
+            "target_l4_surface": "l4.apps_rg.fact_vectors",
+            "retrieval_mode": "live_id_get",
+            "dense_count_before": 63,
+            "dense_count_after": 63,
+            "promoted_ids": [],
+            "retrieved_ids": [],
+            "missing_ids": [],
+            "status": "EMPTY",
+            "reason": "no_promoted_ids"
+          },
+          "l7_auditability": {
+            "uwg_required_before_live_chroma_projection": true,
+            "target_l4_surface": "l4.apps_rg.fact_vectors",
+            "staging_collection": "fact_vectors_staging",
+            "live_collection": "fact_vectors",
+            "x3_required": false,
+            "x3_code": "",
+            "x3_gate_code": "",
+            "uwg_status": "",
+            "live_projection_status": "EMPTY",
+            "retrieval_proof_status": "EMPTY"
+          },
+          "uwg_witness": {
+            "ledger": "router_l4_uwg",
+            "event_kind": "route_decision",
+            "event_id": "",
+            "decision_id": "fact_vector_promotion_8ec7c1657759",
+            "selected": "blocked",
+            "promotion_receipt_digest": "8ec7c1657759e6e285ddb014ee94911c0ec2470e104315032d09eef8bbcbcfe0",
+            "promotion_receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\headline\\fact_vector_promotion_receipt.json",
+            "witness_status": "FAIL_SOFT"
+          }
+        }
+      },
+      "fact_vectors_ingest_skipped_count": 0,
+      "fact_vectors_upserted_count": 0,
+      "fact_vector_index_preflight": {
+        "schema_version": "c02_fact_vector_index_preflight_v1",
+        "generated_at_utc": "2026-08-11T10:46:45.020751+00:00",
+        "section_id": "headline",
+        "product_hybrid_required": false,
+        "authority_mode": "positioning_only",
+        "direct_vector_proof": true,
+        "inherited_bullet_proof": false,
+        "aggregate_section_proof": true,
+        "positioning_only": true,
+        "upstream_sections": [
+          "executive_summary",
+          "competencies",
+          "unify_bullets",
+          "ibm_bullets",
+          "insurtech_bullets",
+          "ey_bullets"
+        ],
+        "direct_fact_vector_required": true,
+        "authority_manifest": {
+          "competencies": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "executive_summary": {
+            "authority_mode": "aggregate_section_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": true,
+            "positioning_only": false,
+            "upstream_sections": [
+              "competencies",
+              "unify_bullets",
+              "ibm_bullets",
+              "insurtech_bullets",
+              "ey_bullets",
+              "unify_narrative",
+              "ibm_narrative",
+              "insurtech_narrative",
+              "ey_narrative"
+            ],
+            "product_hybrid_allowed": true
+          },
+          "ey_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "ey_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "ey_bullets"
+            ],
+            "product_hybrid_allowed": false
+          },
+          "headline": {
+            "authority_mode": "positioning_only",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": true,
+            "positioning_only": true,
+            "upstream_sections": [
+              "executive_summary",
+              "competencies",
+              "unify_bullets",
+              "ibm_bullets",
+              "insurtech_bullets",
+              "ey_bullets"
+            ],
+            "product_hybrid_allowed": true
+          },
+          "ibm_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "ibm_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "ibm_bullets"
+            ],
+            "product_hybrid_allowed": false
+          },
+          "insurtech_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "insurtech_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "insurtech_bullets"
+            ],
+            "product_hybrid_allowed": false
+          },
+          "unify_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "unify_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "unify_bullets"
+            ],
+            "product_hybrid_allowed": false
+          }
+        },
+        "status": "PASS",
+        "reasons": [],
+        "manifest_ref": "artifacts/apps_rg/c0/fact_vectors_bootstrap_manifest.json",
+        "manifest_present": true,
+        "manifest_schema_version": "apps_rg.fact_vectors_bootstrap_manifest.v1",
+        "manifest_checksum": "027b8e85c97775c993c553934604b3feb092b994dcc2e925fdd9f5809899f84d",
+        "manifest_generated_at_utc": "2026-08-09T13:36:12.811214+00:00",
+        "manifest_source": "candidate_fact_ledger + base_resume_employment_bullets (tracked first-principles sources); generated output is never a live fact source",
+        "manifest_dry_run": false,
+        "manifest_upserted_count": 45,
+        "manifest_collection_count_after": 45,
+        "manifest_sparse_sidecar_built": true,
+        "manifest_section_target_count": 45,
+        "locked_deterministic_lane": false,
+        "chroma_path": "C:/Git/Agentic-Workflow-FRESH/data/cache/chromadb",
+        "expected_embedding_model": "BAAI/bge-m3",
+        "expected_embedding_dim": 1024,
+        "collection": {
+          "collection_name": "fact_vectors",
+          "collection_count": 63,
+          "metadata_rows_audited": 63,
+          "metadata_audit_truncated": false,
+          "collection_metadata": {
+            "hnsw:space": "cosine",
+            "collection_role": "fact_vectors",
+            "chroma_default_ef_forbidden": "true",
+            "apps_rg_embedding_provider": "bge_local_explicit"
+          },
+          "section_target_count": 45,
+          "section_source_document_ids": [
+            "bul_ey_001",
+            "bul_ey_002",
+            "bul_ey_003",
+            "bul_ey_004",
+            "bul_ey_005",
+            "bul_ibm_001",
+            "bul_ibm_002",
+            "bul_ibm_003",
+            "bul_ibm_004",
+            "bul_ibm_005",
+            "bul_insurtech_001",
+            "bul_insurtech_002",
+            "bul_insurtech_003",
+            "bul_unify_001",
+            "bul_unify_002",
+            "bul_unify_003",
+            "bul_unify_004",
+            "bul_unify_005",
+            "bul_unify_006",
+            "fact_bcbs239_001",
+            "fact_certs_001",
+            "fact_consulting_001",
+            "fact_credit_001",
+            "fact_engineering_platform_001",
+            "fact_engineering_platform_002",
+            "fact_engineering_platform_003",
+            "fact_engineering_platform_004",
+            "fact_engineering_platform_005",
+            "fact_engineering_platform_006",
+            "fact_exec_002",
+            "fact_ey_guidewire_001",
+            "fact_governance_003",
+            "fact_insurance_liabilities_001",
+            "fact_insurance_software_001",
+            "fact_insurtech_aws_001",
+            "fact_quant_act_001",
+            "fact_quant_act_002",
+            "fact_quant_act_003",
+            "fact_quant_act_004",
+            "fact_quant_hpc_001",
+            "fact_quant_hpc_002",
+            "fact_quant_hpc_003",
+            "fact_rag_insurance_001",
+            "fact_solvency_001",
+            "fact_three_lines_001"
+          ],
+          "source_document_id_counts": {
+            "bul_ey_001": 1,
+            "bul_ey_002": 1,
+            "bul_ey_003": 1,
+            "bul_ey_004": 1,
+            "bul_ey_005": 1,
+            "bul_ibm_001": 1,
+            "bul_ibm_002": 1,
+            "bul_ibm_003": 1,
+            "bul_ibm_004": 1,
+            "bul_ibm_005": 1,
+            "bul_insurtech_001": 1,
+            "bul_insurtech_002": 1,
+            "bul_insurtech_003": 1,
+            "bul_unify_001": 1,
+            "bul_unify_002": 1,
+            "bul_unify_003": 1,
+            "bul_unify_004": 1,
+            "bul_unify_005": 1,
+            "bul_unify_006": 1,
+            "exp_unify_001": 1,
+            "fact_bcbs239_001": 1,
+            "fact_certs_001": 1,
+            "fact_consulting_001": 1,
+            "fact_credit_001": 1,
+            "fact_engineering_platform_001": 1,
+            "fact_engineering_platform_002": 1,
+            "fact_engineering_platform_003": 1,
+            "fact_engineering_platform_004": 1,
+            "fact_engineering_platform_005": 1,
+            "fact_engineering_platform_006": 1,
+            "fact_exec_002": 1,
+            "fact_ey_guidewire_001": 1,
+            "fact_governance_003": 1,
+            "fact_insurance_liabilities_001": 1,
+            "fact_insurance_software_001": 1,
+            "fact_insurtech_aws_001": 1,
+            "fact_quant_act_001": 1,
+            "fact_quant_act_002": 1,
+            "fact_quant_act_003": 1,
+            "fact_quant_act_004": 1,
+            "fact_quant_hpc_001": 1,
+            "fact_quant_hpc_002": 1,
+            "fact_quant_hpc_003": 1,
+            "fact_rag_insurance_001": 1,
+            "fact_solvency_001": 1,
+            "fact_three_lines_001": 1,
+            "reb_ey_capital_optimization_solvency": 1,
+            "reb_ey_ccar_capital_liquidity_stress_testing": 1,
+            "reb_ey_erm_risk_governance": 1,
+            "reb_ibm_aws_alliance_partner_cosell_gtm": 1,
+            "reb_ibm_customer_success_value_realization": 1,
+            "reb_ibm_devsecops_release_resilience": 1,
+            "reb_ibm_presales_solution_engineering": 1,
+            "reb_ibm_revenue_sales_target_execution": 1,
+            "reb_insurtech_aws_shared_responsibility_operating_model": 1,
+            "reb_insurtech_regulated_aws_control_implementation": 1,
+            "reb_insurtech_resilient_core_operations": 1,
+            "reb_unify_agentic_platform_architecture": 1,
+            "reb_unify_distributed_ecosystem_engineering": 1,
+            "reb_unify_partner_channel_cosell": 1,
+            "reb_unify_platform_commercialization_leadership": 1,
+            "reb_unify_production_adoption_lifecycle": 1,
+            "reb_unify_runtime_reliability_governance": 1
+          },
+          "section_source_class_counts": {
+            "candidate_profile": 26,
+            "project_evidence": 19
+          },
+          "section_tier_counts": {
+            "seed": 45
+          },
+          "embedding_model_counts": {
+            "BAAI/bge-m3": 63
+          },
+          "embedding_dim_counts": {
+            "1024": 63
+          },
+          "source_class_counts": {
+            "candidate_profile": 44,
+            "project_evidence": 19
+          },
+          "tier_counts": {
+            "learned": 18,
+            "seed": 45
+          },
+          "bad_model_count": 0,
+          "missing_model_count": 0,
+          "bad_dim_count": 0,
+          "missing_dim_count": 0
+        },
+        "delayed_loop_policy": {
+          "pre_run_fact_vector_index_required": true,
+          "live_write_during_c0": false,
+          "generated_output_route": "stage_or_semantic_cache_after_generation",
+          "promotion_gate": "fact_vectors_staging_to_live_after_validation_or_hitl"
+        },
+        "section_sufficiency": {
+          "schema_version": "section_fact_vector_sufficiency_v1",
+          "section_id": "headline",
+          "status": "PASS",
+          "reasons": [],
+          "known_generated_lane": true,
+          "authority_mode": "positioning_only",
+          "direct_vector_proof": true,
+          "inherited_bullet_proof": false,
+          "aggregate_section_proof": true,
+          "positioning_only": true,
+          "upstream_sections": [
+            "executive_summary",
+            "competencies",
+            "unify_bullets",
+            "ibm_bullets",
+            "insurtech_bullets",
+            "ey_bullets"
+          ],
+          "direct_fact_vector_required": true,
+          "product_hybrid_required": false,
+          "manifest_section_target_count": 45,
+          "manifest_coverage_present": true,
+          "live_section_target_count": 45,
+          "pre_run_hydration_present": true,
+          "collection_count": 63,
+          "model_dim_pass": true,
+          "section_source_class_counts": {
+            "candidate_profile": 26,
+            "project_evidence": 19
+          },
+          "section_tier_counts": {
+            "seed": 45
+          },
+          "expected_source_slot_prefix": "",
+          "expected_source_slot_min_count": 0,
+          "source_slot_count": 0,
+          "source_slot_ids": [],
+          "delayed_loop_policy_pass": true
+        },
+        "headline_section_sufficiency": {
+          "schema_version": "section_fact_vector_sufficiency_v1",
+          "section_id": "headline",
+          "status": "PASS",
+          "reasons": [],
+          "known_generated_lane": true,
+          "authority_mode": "positioning_only",
+          "direct_vector_proof": true,
+          "inherited_bullet_proof": false,
+          "aggregate_section_proof": true,
+          "positioning_only": true,
+          "upstream_sections": [
+            "executive_summary",
+            "competencies",
+            "unify_bullets",
+            "ibm_bullets",
+            "insurtech_bullets",
+            "ey_bullets"
+          ],
+          "direct_fact_vector_required": true,
+          "product_hybrid_required": false,
+          "manifest_section_target_count": 45,
+          "manifest_coverage_present": true,
+          "live_section_target_count": 45,
+          "pre_run_hydration_present": true,
+          "collection_count": 63,
+          "model_dim_pass": true,
+          "section_source_class_counts": {
+            "candidate_profile": 26,
+            "project_evidence": 19
+          },
+          "section_tier_counts": {
+            "seed": 45
+          },
+          "expected_source_slot_prefix": "",
+          "expected_source_slot_min_count": 0,
+          "source_slot_count": 0,
+          "source_slot_ids": [],
+          "delayed_loop_policy_pass": true
+        },
+        "section_coverage_present": true,
+        "same_run_write_policy": "forbidden_for_product_retrieval",
+        "write_authority": false,
+        "comparison_authority": true
+      },
+      "fact_vector_index_preflight_ref": "c02_fact_vector_index_preflight.json",
+      "c02_semantic_cache_payload_present": true,
+      "c02_semantic_cache_intent_digest": "1be30238c0a0006f8eaf00a05d17b743e260f9af2c9fc88bb0096b7ff84a9874",
+      "c02_chroma_query": {
+        "schema_version": "c02_vector_query_v1",
+        "section_id": "headline",
+        "retrieval_profile_ref": "apps_rg.headline.c0_profile",
+        "product_hybrid_required": false,
+        "product_hybrid_attempted": false,
+        "dense_attempted": false,
+        "sparse_attempted": false,
+        "bm25_available": true,
+        "failure_reason": "product_hybrid_not_required",
+        "proof_classification": "SHORTCUTS_ALLOWED",
+        "product_hybrid": false,
+        "attempted": false,
+        "lanes": {
+          "dense": "not_run",
+          "sparse": "not_run",
+          "metadata": "not_run"
+        },
+        "c0_authority_mode": "ledger_graph_primary",
+        "hybrid_enrichment_item_count": 0,
+        "c0_retrieval_mode": "ledger_graph_primary_only",
+        "reason": "product_hybrid_not_required"
+      }
+    },
+    "c02_atoms_artifact": "c02_atoms.json",
+    "c02_vector_query_artifact": "c02_vector_query.json",
+    "c02_atom_count": 3,
+    "c03": {
+      "schema_version": "c03_skills_graph_v1",
+      "contract_revision": "w1_w3_authority_first_direct_paths_v1",
+      "step_id": "C0.3_skills_graph",
+      "section_id": "headline",
+      "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+      "binding_mode": "fact_links_first",
+      "selection_boundary": "frozen_plan_or_sqlite_direct_paths_fail_closed",
+      "strict_ranked_selection": false,
+      "missing_required_fact_ids": [],
+      "bindings": [
+        {
+          "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "graph_node_refs": [
+            "skill_sr_w12_hyperscaler_alliance_co_sell"
+          ],
+          "career_phase_refs": [],
+          "skill_cluster_refs": [],
+          "adjacent_skill_refs": [],
+          "metric_binding_refs": [],
+          "section_fit_refs": [
+            "headline"
+          ],
+          "lineage_refs": [
+            "ledger:reb_ibm_aws_alliance_partner_cosell_gtm"
+          ],
+          "relationship_labels": [
+            "direct_support",
+            "section_fit"
+          ],
+          "graph_support_strength": "DIRECT",
+          "claim_support_allowed": true,
+          "binding_source": "skill_fact_links",
+          "binding_query_source": "selected_graph_evidence_plan",
+          "ranked_selection_required": true,
+          "ranked_selection_present": true,
+          "broad_fact_link_fallback_used": false,
+          "label_tag_proof_fallback_used": false,
+          "selected_metric_buckets": [
+            "general_business_outcome"
+          ],
+          "rejected_sibling_skill_refs": [
+            "skill_partner_alliance_gtm_execution",
+            "skill_partner_cloud_vendor_joint_gtm",
+            "skill_partner_hyperscaler_cosell",
+            "skill_partner_ibm_aws_alliance_joint_revenue",
+            "skill_partner_joint_solution_development"
+          ],
+          "rejected_sibling_reasons": [
+            {
+              "skill_id": "skill_partner_alliance_gtm_execution",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_cloud_vendor_joint_gtm",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_hyperscaler_cosell",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_ibm_aws_alliance_joint_revenue",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_joint_solution_development",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            }
+          ],
+          "sqlite_ranked_candidates": [
+            {
+              "skill_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+              "score": 3.5,
+              "base_score": 3.5,
+              "proof_strength_raw": 1.2,
+              "target_alignment_score": 2.3,
+              "authority_pass": true,
+              "metric_bucket": "general_business_outcome",
+              "skill_family": "hyperscaler_alliance_co_sell",
+              "path_signature": "reb_ibm_aws_alliance_partner_cosell_gtm->role_episode_contains_skill->skill_sr_w12_hyperscaler_alliance_co_sell",
+              "prior_metric_usage": 0,
+              "sibling_alternatives": [],
+              "penalties": {},
+              "selection_source": "selected_graph_evidence_plan"
+            }
+          ],
+          "reason": "graph expansion over C0.2 atoms; no new facts minted; direct paths only"
+        },
+        {
+          "fact_id": "reb_ibm_devsecops_release_resilience",
+          "graph_node_refs": [
+            "skill_ibm_devsecops_pipeline_security"
+          ],
+          "career_phase_refs": [],
+          "skill_cluster_refs": [],
+          "adjacent_skill_refs": [],
+          "metric_binding_refs": [],
+          "section_fit_refs": [
+            "headline"
+          ],
+          "lineage_refs": [
+            "ledger:reb_ibm_devsecops_release_resilience"
+          ],
+          "relationship_labels": [
+            "direct_support",
+            "section_fit"
+          ],
+          "graph_support_strength": "DIRECT",
+          "claim_support_allowed": true,
+          "binding_source": "skill_fact_links",
+          "binding_query_source": "selected_graph_evidence_plan",
+          "ranked_selection_required": true,
+          "ranked_selection_present": true,
+          "broad_fact_link_fallback_used": false,
+          "label_tag_proof_fallback_used": false,
+          "selected_metric_buckets": [
+            "general_business_outcome"
+          ],
+          "rejected_sibling_skill_refs": [
+            "skill_ibm_automated_release_pipelines",
+            "skill_p2_tech_devops_pipeline_blueprint"
+          ],
+          "rejected_sibling_reasons": [
+            {
+              "skill_id": "skill_ibm_automated_release_pipelines",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_p2_tech_devops_pipeline_blueprint",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            }
+          ],
+          "sqlite_ranked_candidates": [
+            {
+              "skill_id": "skill_ibm_devsecops_pipeline_security",
+              "score": 1.5,
+              "base_score": 1.5,
+              "proof_strength_raw": 1.3,
+              "target_alignment_score": 0.2,
+              "authority_pass": true,
+              "metric_bucket": "general_business_outcome",
+              "skill_family": "devsecops_pipeline_security",
+              "path_signature": "reb_ibm_devsecops_release_resilience->role_episode_contains_skill->skill_ibm_devsecops_pipeline_security",
+              "prior_metric_usage": 0,
+              "sibling_alternatives": [],
+              "penalties": {},
+              "selection_source": "selected_graph_evidence_plan"
+            }
+          ],
+          "reason": "graph expansion over C0.2 atoms; no new facts minted; direct paths only"
+        },
+        {
+          "fact_id": "reb_unify_partner_channel_cosell",
+          "graph_node_refs": [
+            "skill_partner_partner_led_ai_solutions"
+          ],
+          "career_phase_refs": [],
+          "skill_cluster_refs": [],
+          "adjacent_skill_refs": [],
+          "metric_binding_refs": [],
+          "section_fit_refs": [
+            "headline"
+          ],
+          "lineage_refs": [
+            "ledger:reb_unify_partner_channel_cosell"
+          ],
+          "relationship_labels": [
+            "direct_support",
+            "section_fit"
+          ],
+          "graph_support_strength": "DIRECT",
+          "claim_support_allowed": true,
+          "binding_source": "skill_fact_links",
+          "binding_query_source": "selected_graph_evidence_plan",
+          "ranked_selection_required": true,
+          "ranked_selection_present": true,
+          "broad_fact_link_fallback_used": false,
+          "label_tag_proof_fallback_used": false,
+          "selected_metric_buckets": [
+            "general_business_outcome"
+          ],
+          "rejected_sibling_skill_refs": [
+            "skill_partner_cloud_vendor_joint_gtm",
+            "skill_partner_co_selling",
+            "skill_partner_gtm_enablement",
+            "skill_partner_partner_motions",
+            "skill_partner_partner_revenue_3m"
+          ],
+          "rejected_sibling_reasons": [
+            {
+              "skill_id": "skill_partner_cloud_vendor_joint_gtm",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_co_selling",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_gtm_enablement",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_partner_motions",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            },
+            {
+              "skill_id": "skill_partner_partner_revenue_3m",
+              "reason": "parent_root_not_selected",
+              "failed_gate": "upstream_section_plan",
+              "metric_bucket": "general_business_outcome",
+              "authority_reason_codes": []
+            }
+          ],
+          "sqlite_ranked_candidates": [
+            {
+              "skill_id": "skill_partner_partner_led_ai_solutions",
+              "score": 2.4,
+              "base_score": 2.4,
+              "proof_strength_raw": 1.2,
+              "target_alignment_score": 1.2,
+              "authority_pass": true,
+              "metric_bucket": "general_business_outcome",
+              "skill_family": "partner_led_ai_solutions",
+              "path_signature": "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_partner_led_ai_solutions",
+              "prior_metric_usage": 0,
+              "sibling_alternatives": [],
+              "penalties": {},
+              "selection_source": "selected_graph_evidence_plan"
+            }
+          ],
+          "reason": "graph expansion over C0.2 atoms; no new facts minted; direct paths only"
+        }
+      ],
+      "apps_rg_c03_skills_graph_used": true,
+      "core_c03_graph_rag_used": false,
+      "canonical_c0_3_claimed": false,
+      "role_family_projection": {
+        "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+        "pillar_hint_ids": [
+          "pillar_insurer_it_strategy_ai_enablement",
+          "pillar_enterprise_portfolio_governance",
+          "pillar_cloud_data_aws",
+          "pillar_actuarial_foundation",
+          "pillar_agentic_ai_platforms"
+        ],
+        "sqlite_projection_row_found": true,
+        "projection_source": "sqlite_role_family_projection",
+        "fallback_pillar_bridge_used": false,
+        "release_eligible_targeting_proof": true,
+        "targeting_degraded_explicit": false,
+        "track_weight_profile": {
+          "track_actuarial_risk_derivatives": 0.2,
+          "track_data_tech_cloud_ml": 0.45,
+          "track_genai_agentic": 0.35
+        },
+        "targeting_keywords": [
+          "pillar_insurer_it_strategy_ai_enablement",
+          "pillar_agentic_ai_platforms",
+          "pillar_cloud_data_aws",
+          "pillar_enterprise_portfolio_governance",
+          "pillar_interoperability_integration_ecosystem"
+        ],
+        "proof_policy_note": "graph_routing_not_claim_proof"
+      },
+      "graph_ref_classes": {
+        "claim_support_graph_refs": [
+          "skill_sr_w12_hyperscaler_alliance_co_sell",
+          "skill_ibm_devsecops_pipeline_security",
+          "skill_partner_partner_led_ai_solutions"
+        ],
+        "targeting_graph_refs": [],
+        "receipt_only_lineage_refs": [
+          "ledger:reb_ibm_aws_alliance_partner_cosell_gtm",
+          "ledger:reb_ibm_devsecops_release_resilience",
+          "ledger:reb_unify_partner_channel_cosell"
+        ]
+      },
+      "source_authority_contract": {
+        "schema_version": "c03_source_authority_contract_v1",
+        "authority_source": "augmented_skills_graph",
+        "authority_evaluated_before_targeting": true,
+        "targeting_inputs_are_non_authority": true,
+        "missing_ranked_frontier_fails_closed": true,
+        "component_contracts": [
+          {
+            "schema_version": "c03_source_authority_contract_v1",
+            "authority_source": "augmented_skills_graph",
+            "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+            "authority_evaluated_before_targeting": true,
+            "targeting_inputs_are_non_authority": true,
+            "missing_ranked_frontier_fails_closed": true,
+            "upstream_plan_id": "headline:b9fd7a65b7524997",
+            "upstream_plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4"
+          }
+        ],
+        "component_contracts_digest": "e73e1e51115cc110551716f608d69bbf0ced8a3fb1fd5156a67cbdbcdb16ae79"
+      },
+      "pretarget_authority_receipt": {
+        "schema_version": "c03_pretarget_authority_receipt_v1",
+        "section_id": "headline",
+        "candidate_count": 15,
+        "authority_pass_count": 15,
+        "authority_block_count": 0,
+        "targeting_consulted_count": 0,
+        "authority_before_targeting_pass": true,
+        "authority_decisions_digest": "4e727e757ca6ce101af3f24773f404dc746f8da74148aef74f768b56d6da3ae4",
+        "component_receipts": [
+          {
+            "schema_version": "c03_selected_graph_plan_selection_v1",
+            "selection_policy": "frozen_section_graph_plan_direct_paths_v1",
+            "graph_source": "augmented_skills_graph",
+            "candidate_count": 15,
+            "selection_contract_pass": true
+          }
+        ]
+      },
+      "graph_candidate_decision_ledger": [
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_alliance_gtm_execution",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution",
+          "parent_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "employer_lane": "ibm",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_alliance_gtm_execution",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_004",
+              "Forged relationships with cloud and AI vendors, combining market influence with solution roadmaps and joint go-to-market strategies to accelerate enterprise adoption of advanced analytics and platform services."
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 2.4,
+          "ranking_score": 3.6,
+          "path_signature": "reb_ibm_aws_alliance_partner_cosell_gtm->role_episode_contains_skill->skill_partner_alliance_gtm_execution",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_004",
+            "Forged relationships with cloud and AI vendors, combining market influence with solution roadmaps and joint go-to-market strategies to accelerate enterprise adoption of advanced analytics and platform services."
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_cloud_vendor_joint_gtm",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_cloud_vendor_joint_gtm",
+          "parent_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "employer_lane": "ibm",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_cloud_vendor_joint_gtm",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DERIVED_SUPPORTED",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_004",
+              "Forged relationships with leading cloud and AI vendors, combining market influence with innovative solution roadmaps"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 2.4,
+          "ranking_score": 3.6,
+          "path_signature": "reb_ibm_aws_alliance_partner_cosell_gtm->role_episode_contains_skill->skill_partner_cloud_vendor_joint_gtm",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_004",
+            "Forged relationships with leading cloud and AI vendors, combining market influence with innovative solution roadmaps"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_hyperscaler_cosell",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_hyperscaler_cosell",
+          "parent_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "employer_lane": "ibm",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_hyperscaler_cosell",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_002",
+              "Held executive responsibility for expanding AI and cloud-focused revenue streams within the IBM-AWS alliance for financial services and designed AI-driven sales frameworks that boosted joint revenue by 20%."
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 1.2,
+          "ranking_score": 2.4,
+          "path_signature": "reb_ibm_aws_alliance_partner_cosell_gtm->role_episode_contains_skill->skill_partner_hyperscaler_cosell",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_002",
+            "Held executive responsibility for expanding AI and cloud-focused revenue streams within the IBM-AWS alliance for financial services and designed AI-driven sales frameworks that boosted joint revenue by 20%."
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_ibm_aws_alliance_joint_revenue",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_ibm_aws_alliance_joint_revenue",
+          "parent_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "employer_lane": "ibm",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_ibm_aws_alliance_joint_revenue",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DERIVED_SUPPORTED",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_002",
+              "Held executive responsibility for expanding AI and cloud-focused revenue streams within the IBM–AWS alliance for financial services and designed AI-driven sales frameworks that boosted joint revenue by 20%"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 1.2,
+          "ranking_score": 2.4,
+          "path_signature": "reb_ibm_aws_alliance_partner_cosell_gtm->role_episode_contains_skill->skill_partner_ibm_aws_alliance_joint_revenue",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_002",
+            "Held executive responsibility for expanding AI and cloud-focused revenue streams within the IBM–AWS alliance for financial services and designed AI-driven sales frameworks that boosted joint revenue by 20%"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_joint_solution_development",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development",
+          "parent_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "employer_lane": "ibm",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_joint_solution_development",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_001",
+              "Built a global AI channel program from inception, co-developing analytics frameworks with strategic partners, bundling consulting packages with LLM-driven compliance analysis, and using co-marketing campaigns to generate $3M in partner-derived revenue."
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 1.3,
+          "ranking_score": 2.5,
+          "path_signature": "reb_ibm_aws_alliance_partner_cosell_gtm->role_episode_contains_skill->skill_partner_joint_solution_development",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_001",
+            "Built a global AI channel program from inception, co-developing analytics frameworks with strategic partners, bundling consulting packages with LLM-driven compliance analysis, and using co-marketing campaigns to generate $3M in partner-derived revenue."
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_sr_w12_hyperscaler_alliance_co_sell",
+          "parent_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "employer_lane": "",
+          "hop_depth": 1,
+          "decision": "selected",
+          "reason_codes": [
+            "selected_by_frozen_section_graph_plan"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "bul_ibm_005",
+              "Structured multi-year hyperscaler alliances generating $15M in incremental revenue through co-sell motions aligned to platform modernization and AI growth."
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 2.3,
+          "ranking_score": 3.5,
+          "path_signature": "reb_ibm_aws_alliance_partner_cosell_gtm->role_episode_contains_skill->skill_sr_w12_hyperscaler_alliance_co_sell",
+          "selection_source": "selected_graph_evidence_plan",
+          "evidence_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ],
+          "display_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_ibm_automated_release_pipelines",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_automated_release_pipelines",
+          "parent_id": "reb_ibm_devsecops_release_resilience",
+          "root_id": "reb_ibm_devsecops_release_resilience",
+          "employer_lane": "ibm",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_ibm_automated_release_pipelines",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_engineering_platform_004",
+              "Established automated release pipelines with integrated code scanning, reducing production incidents and accelerating time to market for new AI-driven risk models.",
+              "CI/CD pipelines integrating model validation, container orchestration, and code scanning tools."
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.3,
+          "target_alignment_score": 1.1,
+          "ranking_score": 2.4,
+          "path_signature": "reb_ibm_devsecops_release_resilience->role_episode_contains_skill->skill_ibm_automated_release_pipelines",
+          "skill_label": "",
+          "source_refs": [
+            "fact_engineering_platform_004",
+            "Established automated release pipelines with integrated code scanning, reducing production incidents and accelerating time to market for new AI-driven risk models.",
+            "CI/CD pipelines integrating model validation, container orchestration, and code scanning tools."
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_ibm_devsecops_release_resilience"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_ibm_devsecops_pipeline_security",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_devsecops_pipeline_security",
+          "parent_id": "reb_ibm_devsecops_release_resilience",
+          "root_id": "reb_ibm_devsecops_release_resilience",
+          "employer_lane": "",
+          "hop_depth": 1,
+          "decision": "selected",
+          "reason_codes": [
+            "selected_by_frozen_section_graph_plan"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_ibm_devsecops_pipeline_security",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_engineering_platform_004",
+              "Containerized workloads and integrated DevSecOps scanning; overhead reduction and accelerated daily valuations.",
+              "Implemented automated CI/CD pipelines with real time code scanning and role-based data access, reducing incidents and capturing FinOps best practices savings."
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.3,
+          "target_alignment_score": 0.2,
+          "ranking_score": 1.5,
+          "path_signature": "reb_ibm_devsecops_release_resilience->role_episode_contains_skill->skill_ibm_devsecops_pipeline_security",
+          "selection_source": "selected_graph_evidence_plan",
+          "evidence_fact_ids": [
+            "reb_ibm_devsecops_release_resilience"
+          ],
+          "display_fact_ids": [
+            "reb_ibm_devsecops_release_resilience"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_p2_tech_devops_pipeline_blueprint",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_p2_tech_devops_pipeline_blueprint",
+          "parent_id": "reb_ibm_devsecops_release_resilience",
+          "root_id": "reb_ibm_devsecops_release_resilience",
+          "employer_lane": "ibm",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_p2_tech_devops_pipeline_blueprint",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE",
+            "support_level": "DERIVED_SUPPORTED",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_engineering_platform_003",
+              "Strengthened enterprise retrieval quality, context assembly, evaluation gates, telemetry instrumentation, rollback controls, and AI CI/CD standards"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 0.9,
+          "target_alignment_score": 1.2,
+          "ranking_score": 2.1,
+          "path_signature": "reb_ibm_devsecops_release_resilience->role_episode_contains_skill->skill_p2_tech_devops_pipeline_blueprint",
+          "skill_label": "",
+          "source_refs": [
+            "fact_engineering_platform_003",
+            "Strengthened enterprise retrieval quality, context assembly, evaluation gates, telemetry instrumentation, rollback controls, and AI CI/CD standards"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_ibm_devsecops_release_resilience"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_cloud_vendor_joint_gtm",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_cloud_vendor_joint_gtm",
+          "parent_id": "reb_unify_partner_channel_cosell",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "employer_lane": "unify",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_cloud_vendor_joint_gtm",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DERIVED_SUPPORTED",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_004",
+              "Forged relationships with leading cloud and AI vendors, combining market influence with innovative solution roadmaps"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 2.4,
+          "ranking_score": 3.6,
+          "path_signature": "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_cloud_vendor_joint_gtm",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_004",
+            "Forged relationships with leading cloud and AI vendors, combining market influence with innovative solution roadmaps"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_unify_partner_channel_cosell"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_co_selling",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_co_selling",
+          "parent_id": "reb_unify_partner_channel_cosell",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "employer_lane": "unify",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_co_selling",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_003",
+              "Forged co-selling frameworks with SIs and ISVs"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 0.1,
+          "ranking_score": 1.3,
+          "path_signature": "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_co_selling",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_003",
+            "Forged co-selling frameworks with SIs and ISVs"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_unify_partner_channel_cosell"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_gtm_enablement",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_gtm_enablement",
+          "parent_id": "reb_unify_partner_channel_cosell",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "employer_lane": "unify",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_gtm_enablement",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_001"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.1,
+          "target_alignment_score": 0.2,
+          "ranking_score": 1.3,
+          "path_signature": "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_gtm_enablement",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_001"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_unify_partner_channel_cosell"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_partner_led_ai_solutions",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_led_ai_solutions",
+          "parent_id": "reb_unify_partner_channel_cosell",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "employer_lane": "",
+          "hop_depth": 1,
+          "decision": "selected",
+          "reason_codes": [
+            "selected_by_frozen_section_graph_plan"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_partner_led_ai_solutions",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_001",
+              "co-developing advanced analytics frameworks with strategic partners"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 1.2,
+          "ranking_score": 2.4,
+          "path_signature": "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_partner_led_ai_solutions",
+          "selection_source": "selected_graph_evidence_plan",
+          "evidence_fact_ids": [
+            "reb_unify_partner_channel_cosell"
+          ],
+          "display_fact_ids": [
+            "reb_unify_partner_channel_cosell"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_partner_motions",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_motions",
+          "parent_id": "reb_unify_partner_channel_cosell",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "employer_lane": "unify",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_partner_motions",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_001",
+              "Built a global AI channel program from inception"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 0.1,
+          "ranking_score": 1.3,
+          "path_signature": "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_partner_motions",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_001",
+            "Built a global AI channel program from inception"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_unify_partner_channel_cosell"
+          ]
+        },
+        {
+          "schema_version": "graph_candidate_decision_v2",
+          "section_id": "headline",
+          "candidate_id": "skill_partner_partner_revenue_3m",
+          "candidate_type": "leaf_skill",
+          "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_revenue_3m",
+          "parent_id": "reb_unify_partner_channel_cosell",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "employer_lane": "unify",
+          "hop_depth": 1,
+          "decision": "rejected",
+          "reason_codes": [
+            "parent_root_not_selected"
+          ],
+          "authority": {
+            "schema_version": "c03_pretarget_authority_v1",
+            "candidate_id": "skill_partner_partner_revenue_3m",
+            "candidate_type": "leaf_skill",
+            "section_id": "headline",
+            "authority_source": "augmented_skills_graph",
+            "authority_pass": true,
+            "reason_codes": [],
+            "section_allowed": true,
+            "activation_status": "ACTIVE_CONFIRMED",
+            "support_level": "DIRECT_FROM_RESUME_ARCHIVE",
+            "external_claim_policy": "external_resume_claim_requires_active_fact_or_confirmed_snippet",
+            "external_eligible": true,
+            "claim_eligible": true,
+            "approved": null,
+            "approval_status": "",
+            "source_refs": [
+              "fact_partnerships_gtm_001",
+              "3 million dollars in partner-derived revenue"
+            ],
+            "path_present": true,
+            "targeting_consulted": false,
+            "authority_evaluated_before_targeting": true
+          },
+          "authority_pass": true,
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 0.1,
+          "ranking_score": 1.3,
+          "path_signature": "reb_unify_partner_channel_cosell->role_episode_contains_skill->skill_partner_partner_revenue_3m",
+          "skill_label": "",
+          "source_refs": [
+            "fact_partnerships_gtm_001",
+            "3 million dollars in partner-derived revenue"
+          ],
+          "allocation_selected": false,
+          "plan_id": "headline:b9fd7a65b7524997",
+          "plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+          "evidence_fact_ids": [
+            "reb_unify_partner_channel_cosell"
+          ]
+        }
+      ],
+      "graph_candidate_receipt": {
+        "schema_version": "graph_candidate_receipt_v1",
+        "section_id": "headline",
+        "candidate_decision_count": 15,
+        "selected_candidate_count": 3,
+        "rejected_candidate_count": 12,
+        "unexplained_candidate_count": 0,
+        "duplicate_candidate_path_ids": [],
+        "candidate_conservation_pass": true,
+        "decision_ledger_digest": "2c0df9961a33b31171fdc397e6fc43ccb85b15f363b1755a40770d517434c332",
+        "component_receipts": [
+          {
+            "schema_version": "c03_selected_graph_plan_selection_v1",
+            "selection_policy": "frozen_section_graph_plan_direct_paths_v1",
+            "graph_source": "augmented_skills_graph",
+            "candidate_count": 15,
+            "selection_contract_pass": true
+          }
+        ]
+      },
+      "graph_traversal_receipt": {
+        "schema_version": "graph_traversal_receipt_v1",
+        "event_schema_version": "graph_traversal_event_v1",
+        "producer": "apps_rg.runtime.c0.c03_graph_expansion._combine_component_receipts",
+        "section_id": "headline",
+        "traversal_mode": "combined_direct_path_components",
+        "event_count": 45,
+        "events_digest": "1b40340a0476b2f1563f3093317b8f30862d1dea070d064a61a9edbc75e47bb5",
+        "events": [
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 0,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_sr_w12_hyperscaler_alliance_co_sell",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 1,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_sr_w12_hyperscaler_alliance_co_sell",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 2,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_sr_w12_hyperscaler_alliance_co_sell",
+            "reason_codes": [
+              "selected_by_frozen_section_graph_plan"
+            ],
+            "authority_pass": true,
+            "decision": "selected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 3,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_ibm_devsecops_pipeline_security",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_devsecops_pipeline_security",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 4,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_ibm_devsecops_pipeline_security",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_devsecops_pipeline_security",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 5,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_ibm_devsecops_pipeline_security",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_devsecops_pipeline_security",
+            "reason_codes": [
+              "selected_by_frozen_section_graph_plan"
+            ],
+            "authority_pass": true,
+            "decision": "selected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 6,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_led_ai_solutions",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_led_ai_solutions",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 7,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_led_ai_solutions",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_led_ai_solutions",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 8,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_led_ai_solutions",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_led_ai_solutions",
+            "reason_codes": [
+              "selected_by_frozen_section_graph_plan"
+            ],
+            "authority_pass": true,
+            "decision": "selected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 9,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_alliance_gtm_execution",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 10,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_alliance_gtm_execution",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 11,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_alliance_gtm_execution",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_alliance_gtm_execution",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 12,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_cloud_vendor_joint_gtm",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_cloud_vendor_joint_gtm",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 13,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_cloud_vendor_joint_gtm",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_cloud_vendor_joint_gtm",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 14,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_cloud_vendor_joint_gtm",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_cloud_vendor_joint_gtm",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 15,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_hyperscaler_cosell",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_hyperscaler_cosell",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 16,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_hyperscaler_cosell",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_hyperscaler_cosell",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 17,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_hyperscaler_cosell",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_hyperscaler_cosell",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 18,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_ibm_aws_alliance_joint_revenue",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_ibm_aws_alliance_joint_revenue",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 19,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_ibm_aws_alliance_joint_revenue",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_ibm_aws_alliance_joint_revenue",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 20,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_ibm_aws_alliance_joint_revenue",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_ibm_aws_alliance_joint_revenue",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 21,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_joint_solution_development",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 22,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_joint_solution_development",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 23,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "target_node_id": "skill_partner_joint_solution_development",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_partner_joint_solution_development",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 24,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_ibm_automated_release_pipelines",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_automated_release_pipelines",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 25,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_ibm_automated_release_pipelines",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_automated_release_pipelines",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 26,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_ibm_automated_release_pipelines",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_automated_release_pipelines",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 27,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_p2_tech_devops_pipeline_blueprint",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_p2_tech_devops_pipeline_blueprint",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 28,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_p2_tech_devops_pipeline_blueprint",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_p2_tech_devops_pipeline_blueprint",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 29,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_ibm_devsecops_release_resilience",
+            "target_node_id": "skill_p2_tech_devops_pipeline_blueprint",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_ibm_devsecops_release_resilience/skill:skill_p2_tech_devops_pipeline_blueprint",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 30,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_cloud_vendor_joint_gtm",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_cloud_vendor_joint_gtm",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 31,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_cloud_vendor_joint_gtm",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_cloud_vendor_joint_gtm",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 32,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_cloud_vendor_joint_gtm",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_cloud_vendor_joint_gtm",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 33,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_co_selling",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_co_selling",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 34,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_co_selling",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_co_selling",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 35,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_co_selling",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_co_selling",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 36,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_gtm_enablement",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_gtm_enablement",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 37,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_gtm_enablement",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_gtm_enablement",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 38,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_gtm_enablement",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_gtm_enablement",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 39,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_motions",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_motions",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 40,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_motions",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_motions",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 41,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_motions",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_motions",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 42,
+            "section_id": "headline",
+            "event_type": "edge_traversed",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_revenue_3m",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_revenue_3m",
+            "reason_codes": []
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 43,
+            "section_id": "headline",
+            "event_type": "authority_evaluated",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_revenue_3m",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_revenue_3m",
+            "reason_codes": [],
+            "authority_pass": true
+          },
+          {
+            "schema_version": "graph_traversal_event_v1",
+            "event_index": 44,
+            "section_id": "headline",
+            "event_type": "candidate_terminal",
+            "hop_depth": 1,
+            "source_node_id": "reb_unify_partner_channel_cosell",
+            "target_node_id": "skill_partner_partner_revenue_3m",
+            "edge_type": "selected_graph_plan_contains_skill",
+            "candidate_path_id": "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_revenue_3m",
+            "reason_codes": [
+              "parent_root_not_selected"
+            ],
+            "authority_pass": true,
+            "decision": "rejected"
+          }
+        ],
+        "visited_edges_count": 15,
+        "authority_event_count": 15,
+        "candidate_conservation": {
+          "candidate_count": 15,
+          "terminal_decision_count": 15,
+          "unexplained_candidate_count": 0,
+          "duplicate_candidate_path_ids": [],
+          "pass": true
+        },
+        "component_receipts": [
+          {
+            "schema_version": "c03_selected_graph_plan_selection_v1",
+            "selection_policy": "frozen_section_graph_plan_direct_paths_v1",
+            "graph_source": "augmented_skills_graph",
+            "candidate_count": 15,
+            "selection_contract_pass": true
+          }
+        ],
+        "replayable": true,
+        "pass": true
+      },
+      "binding_metrics": {
+        "atom_count": 3,
+        "direct_support_count": 3,
+        "skill_fact_link_direct_count": 3,
+        "adjacent_only_count": 0,
+        "fact_links_available": 0,
+        "pillar_hint_count": 5,
+        "pillar_aligned_direct_count": 0,
+        "sqlite_ranked_candidate_count": 0,
+        "selected_plan_candidate_count": 15,
+        "selected_skill_count": 3,
+        "rejected_sibling_skill_count": 12,
+        "authority_block_count": 0,
+        "candidate_conservation_pass": true,
+        "metric_bucket_counts": {
+          "general_business_outcome": 3
+        }
+      },
+      "sqlite_selection_receipt": {
+        "schema_version": "c03_sqlite_graph_selection_v4",
+        "selection_policy": "not_needed_frozen_plan_or_no_canonical_frontier",
+        "graph_source": "augmented_skills_graph_sqlite",
+        "graph_version": "",
+        "graph_hash": "",
+        "canonical_ledger_hash": null,
+        "sqlite_logical_digest": null,
+        "sqlite_schema_digest": null,
+        "resume_metric_usage_ranking_input_digest": null,
+        "ranking_input_run_id_scope": null,
+        "metric_policy_version": null,
+        "run_id_scope": "headline_20260811_104644",
+        "current_run_usage_only": true,
+        "candidate_count": 0,
+        "selected_skill_count": 0,
+        "authority_block_count": 0,
+        "candidate_conservation_pass": true,
+        "selection_contract_pass": true,
+        "missing_fact_frontier_ids": [],
+        "metric_bucket_counts": {},
+        "skill_family_counts": {},
+        "rejection_receipts": []
+      },
+      "selected_graph_plan_receipt": {
+        "schema_version": "c03_selected_graph_plan_selection_v1",
+        "selection_policy": "frozen_section_graph_plan_direct_paths_v1",
+        "graph_source": "augmented_skills_graph",
+        "graph_version": "master_skills_arsenal_graph_v1",
+        "graph_hash": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+        "covered_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_devsecops_release_resilience",
+          "reb_unify_partner_channel_cosell"
+        ],
+        "candidate_count": 15,
+        "selected_skill_count": 3,
+        "candidate_conservation_pass": true,
+        "selection_contract_pass": true,
+        "upstream_plan_id": "headline:b9fd7a65b7524997",
+        "upstream_plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4"
+      },
+      "graph_context_ref": "",
+      "broad_fact_link_fallback_used": false,
+      "label_tag_proof_fallback_used": false,
+      "new_atoms_created": 0,
+      "pending_trace_promoted": false
+    },
+    "c03_skills_graph": true,
+    "c04": {
+      "schema_version": "c04_stratify_v1",
+      "section_id": "headline",
+      "strata": {
+        "MUST_USE": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_devsecops_release_resilience",
+          "reb_unify_partner_channel_cosell"
+        ],
+        "SUPPORTING": [],
+        "BACKGROUND": [],
+        "CONTRADICTS": [],
+        "EXCLUDED": []
+      },
+      "allowed_fact_ids": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_devsecops_release_resilience",
+        "reb_unify_partner_channel_cosell"
+      ],
+      "excluded_fact_ids": []
+    },
+    "c05": {
+      "schema_version": "c05_fec_packet_v1",
+      "section_id": "headline",
+      "allowed_fact_ids": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_devsecops_release_resilience",
+        "reb_unify_partner_channel_cosell"
+      ],
+      "evidence_item_count": 3,
+      "ledger_proof_item_count": 3,
+      "product_hybrid_enrichment_item_count": 0,
+      "product_hybrid_required": false,
+      "graph_binding_count": 3,
+      "final_evidence_digest": "91aaaad6b4c0cbadb6113d8439385bd1ea8db52aa679785b6352211cfca6b8bc",
+      "support_status": "PASS",
+      "c0_authority_mode": "ledger_graph_primary",
+      "hybrid_excluded": [],
+      "c02_vector_query": {
+        "schema_version": "c02_vector_query_v1",
+        "section_id": "headline",
+        "retrieval_profile_ref": "apps_rg.headline.c0_profile",
+        "product_hybrid_required": false,
+        "product_hybrid_attempted": false,
+        "dense_attempted": false,
+        "sparse_attempted": false,
+        "bm25_available": true,
+        "failure_reason": "product_hybrid_not_required",
+        "proof_classification": "SHORTCUTS_ALLOWED",
+        "product_hybrid": false,
+        "attempted": false,
+        "lanes": {
+          "dense": "not_run",
+          "sparse": "not_run",
+          "metadata": "not_run"
+        },
+        "c0_authority_mode": "ledger_graph_primary",
+        "hybrid_enrichment_item_count": 0,
+        "c0_retrieval_mode": "ledger_graph_primary_only",
+        "reason": "product_hybrid_not_required",
+        "chroma_write_in_c02": true,
+        "fact_vector_index_preflight_status": "PASS",
+        "fact_vector_index_preflight_ref": "c02_fact_vector_index_preflight.json"
+      },
+      "data_only": true,
+      "section_fec_authority": "apps_rg_c0_evidence_room",
+      "weak_support_refinement_attempts": [],
+      "c06_receipt_ref": "c06_weak_refine_receipt.json",
+      "fact_vector_index_preflight": {
+        "schema_version": "c02_fact_vector_index_preflight_v1",
+        "generated_at_utc": "2026-08-11T10:46:45.020751+00:00",
+        "section_id": "headline",
+        "product_hybrid_required": false,
+        "authority_mode": "positioning_only",
+        "direct_vector_proof": true,
+        "inherited_bullet_proof": false,
+        "aggregate_section_proof": true,
+        "positioning_only": true,
+        "upstream_sections": [
+          "executive_summary",
+          "competencies",
+          "unify_bullets",
+          "ibm_bullets",
+          "insurtech_bullets",
+          "ey_bullets"
+        ],
+        "direct_fact_vector_required": true,
+        "authority_manifest": {
+          "competencies": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "executive_summary": {
+            "authority_mode": "aggregate_section_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": true,
+            "positioning_only": false,
+            "upstream_sections": [
+              "competencies",
+              "unify_bullets",
+              "ibm_bullets",
+              "insurtech_bullets",
+              "ey_bullets",
+              "unify_narrative",
+              "ibm_narrative",
+              "insurtech_narrative",
+              "ey_narrative"
+            ],
+            "product_hybrid_allowed": true
+          },
+          "ey_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "ey_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "ey_bullets"
+            ],
+            "product_hybrid_allowed": false
+          },
+          "headline": {
+            "authority_mode": "positioning_only",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": true,
+            "positioning_only": true,
+            "upstream_sections": [
+              "executive_summary",
+              "competencies",
+              "unify_bullets",
+              "ibm_bullets",
+              "insurtech_bullets",
+              "ey_bullets"
+            ],
+            "product_hybrid_allowed": true
+          },
+          "ibm_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "ibm_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "ibm_bullets"
+            ],
+            "product_hybrid_allowed": false
+          },
+          "insurtech_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "insurtech_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "insurtech_bullets"
+            ],
+            "product_hybrid_allowed": false
+          },
+          "unify_bullets": {
+            "authority_mode": "direct_vector_proof",
+            "direct_vector_proof": true,
+            "inherited_bullet_proof": false,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [],
+            "product_hybrid_allowed": true
+          },
+          "unify_narrative": {
+            "authority_mode": "inherited_bullet_proof",
+            "direct_vector_proof": false,
+            "inherited_bullet_proof": true,
+            "aggregate_section_proof": false,
+            "positioning_only": false,
+            "upstream_sections": [
+              "unify_bullets"
+            ],
+            "product_hybrid_allowed": false
+          }
+        },
+        "status": "PASS",
+        "reasons": [],
+        "manifest_ref": "artifacts/apps_rg/c0/fact_vectors_bootstrap_manifest.json",
+        "manifest_present": true,
+        "manifest_schema_version": "apps_rg.fact_vectors_bootstrap_manifest.v1",
+        "manifest_checksum": "027b8e85c97775c993c553934604b3feb092b994dcc2e925fdd9f5809899f84d",
+        "manifest_generated_at_utc": "2026-08-09T13:36:12.811214+00:00",
+        "manifest_source": "candidate_fact_ledger + base_resume_employment_bullets (tracked first-principles sources); generated output is never a live fact source",
+        "manifest_dry_run": false,
+        "manifest_upserted_count": 45,
+        "manifest_collection_count_after": 45,
+        "manifest_sparse_sidecar_built": true,
+        "manifest_section_target_count": 45,
+        "locked_deterministic_lane": false,
+        "chroma_path": "C:/Git/Agentic-Workflow-FRESH/data/cache/chromadb",
+        "expected_embedding_model": "BAAI/bge-m3",
+        "expected_embedding_dim": 1024,
+        "collection": {
+          "collection_name": "fact_vectors",
+          "collection_count": 63,
+          "metadata_rows_audited": 63,
+          "metadata_audit_truncated": false,
+          "collection_metadata": {
+            "hnsw:space": "cosine",
+            "collection_role": "fact_vectors",
+            "chroma_default_ef_forbidden": "true",
+            "apps_rg_embedding_provider": "bge_local_explicit"
+          },
+          "section_target_count": 45,
+          "section_source_document_ids": [
+            "bul_ey_001",
+            "bul_ey_002",
+            "bul_ey_003",
+            "bul_ey_004",
+            "bul_ey_005",
+            "bul_ibm_001",
+            "bul_ibm_002",
+            "bul_ibm_003",
+            "bul_ibm_004",
+            "bul_ibm_005",
+            "bul_insurtech_001",
+            "bul_insurtech_002",
+            "bul_insurtech_003",
+            "bul_unify_001",
+            "bul_unify_002",
+            "bul_unify_003",
+            "bul_unify_004",
+            "bul_unify_005",
+            "bul_unify_006",
+            "fact_bcbs239_001",
+            "fact_certs_001",
+            "fact_consulting_001",
+            "fact_credit_001",
+            "fact_engineering_platform_001",
+            "fact_engineering_platform_002",
+            "fact_engineering_platform_003",
+            "fact_engineering_platform_004",
+            "fact_engineering_platform_005",
+            "fact_engineering_platform_006",
+            "fact_exec_002",
+            "fact_ey_guidewire_001",
+            "fact_governance_003",
+            "fact_insurance_liabilities_001",
+            "fact_insurance_software_001",
+            "fact_insurtech_aws_001",
+            "fact_quant_act_001",
+            "fact_quant_act_002",
+            "fact_quant_act_003",
+            "fact_quant_act_004",
+            "fact_quant_hpc_001",
+            "fact_quant_hpc_002",
+            "fact_quant_hpc_003",
+            "fact_rag_insurance_001",
+            "fact_solvency_001",
+            "fact_three_lines_001"
+          ],
+          "source_document_id_counts": {
+            "bul_ey_001": 1,
+            "bul_ey_002": 1,
+            "bul_ey_003": 1,
+            "bul_ey_004": 1,
+            "bul_ey_005": 1,
+            "bul_ibm_001": 1,
+            "bul_ibm_002": 1,
+            "bul_ibm_003": 1,
+            "bul_ibm_004": 1,
+            "bul_ibm_005": 1,
+            "bul_insurtech_001": 1,
+            "bul_insurtech_002": 1,
+            "bul_insurtech_003": 1,
+            "bul_unify_001": 1,
+            "bul_unify_002": 1,
+            "bul_unify_003": 1,
+            "bul_unify_004": 1,
+            "bul_unify_005": 1,
+            "bul_unify_006": 1,
+            "exp_unify_001": 1,
+            "fact_bcbs239_001": 1,
+            "fact_certs_001": 1,
+            "fact_consulting_001": 1,
+            "fact_credit_001": 1,
+            "fact_engineering_platform_001": 1,
+            "fact_engineering_platform_002": 1,
+            "fact_engineering_platform_003": 1,
+            "fact_engineering_platform_004": 1,
+            "fact_engineering_platform_005": 1,
+            "fact_engineering_platform_006": 1,
+            "fact_exec_002": 1,
+            "fact_ey_guidewire_001": 1,
+            "fact_governance_003": 1,
+            "fact_insurance_liabilities_001": 1,
+            "fact_insurance_software_001": 1,
+            "fact_insurtech_aws_001": 1,
+            "fact_quant_act_001": 1,
+            "fact_quant_act_002": 1,
+            "fact_quant_act_003": 1,
+            "fact_quant_act_004": 1,
+            "fact_quant_hpc_001": 1,
+            "fact_quant_hpc_002": 1,
+            "fact_quant_hpc_003": 1,
+            "fact_rag_insurance_001": 1,
+            "fact_solvency_001": 1,
+            "fact_three_lines_001": 1,
+            "reb_ey_capital_optimization_solvency": 1,
+            "reb_ey_ccar_capital_liquidity_stress_testing": 1,
+            "reb_ey_erm_risk_governance": 1,
+            "reb_ibm_aws_alliance_partner_cosell_gtm": 1,
+            "reb_ibm_customer_success_value_realization": 1,
+            "reb_ibm_devsecops_release_resilience": 1,
+            "reb_ibm_presales_solution_engineering": 1,
+            "reb_ibm_revenue_sales_target_execution": 1,
+            "reb_insurtech_aws_shared_responsibility_operating_model": 1,
+            "reb_insurtech_regulated_aws_control_implementation": 1,
+            "reb_insurtech_resilient_core_operations": 1,
+            "reb_unify_agentic_platform_architecture": 1,
+            "reb_unify_distributed_ecosystem_engineering": 1,
+            "reb_unify_partner_channel_cosell": 1,
+            "reb_unify_platform_commercialization_leadership": 1,
+            "reb_unify_production_adoption_lifecycle": 1,
+            "reb_unify_runtime_reliability_governance": 1
+          },
+          "section_source_class_counts": {
+            "candidate_profile": 26,
+            "project_evidence": 19
+          },
+          "section_tier_counts": {
+            "seed": 45
+          },
+          "embedding_model_counts": {
+            "BAAI/bge-m3": 63
+          },
+          "embedding_dim_counts": {
+            "1024": 63
+          },
+          "source_class_counts": {
+            "candidate_profile": 44,
+            "project_evidence": 19
+          },
+          "tier_counts": {
+            "learned": 18,
+            "seed": 45
+          },
+          "bad_model_count": 0,
+          "missing_model_count": 0,
+          "bad_dim_count": 0,
+          "missing_dim_count": 0
+        },
+        "delayed_loop_policy": {
+          "pre_run_fact_vector_index_required": true,
+          "live_write_during_c0": false,
+          "generated_output_route": "stage_or_semantic_cache_after_generation",
+          "promotion_gate": "fact_vectors_staging_to_live_after_validation_or_hitl"
+        },
+        "section_sufficiency": {
+          "schema_version": "section_fact_vector_sufficiency_v1",
+          "section_id": "headline",
+          "status": "PASS",
+          "reasons": [],
+          "known_generated_lane": true,
+          "authority_mode": "positioning_only",
+          "direct_vector_proof": true,
+          "inherited_bullet_proof": false,
+          "aggregate_section_proof": true,
+          "positioning_only": true,
+          "upstream_sections": [
+            "executive_summary",
+            "competencies",
+            "unify_bullets",
+            "ibm_bullets",
+            "insurtech_bullets",
+            "ey_bullets"
+          ],
+          "direct_fact_vector_required": true,
+          "product_hybrid_required": false,
+          "manifest_section_target_count": 45,
+          "manifest_coverage_present": true,
+          "live_section_target_count": 45,
+          "pre_run_hydration_present": true,
+          "collection_count": 63,
+          "model_dim_pass": true,
+          "section_source_class_counts": {
+            "candidate_profile": 26,
+            "project_evidence": 19
+          },
+          "section_tier_counts": {
+            "seed": 45
+          },
+          "expected_source_slot_prefix": "",
+          "expected_source_slot_min_count": 0,
+          "source_slot_count": 0,
+          "source_slot_ids": [],
+          "delayed_loop_policy_pass": true
+        },
+        "headline_section_sufficiency": {
+          "schema_version": "section_fact_vector_sufficiency_v1",
+          "section_id": "headline",
+          "status": "PASS",
+          "reasons": [],
+          "known_generated_lane": true,
+          "authority_mode": "positioning_only",
+          "direct_vector_proof": true,
+          "inherited_bullet_proof": false,
+          "aggregate_section_proof": true,
+          "positioning_only": true,
+          "upstream_sections": [
+            "executive_summary",
+            "competencies",
+            "unify_bullets",
+            "ibm_bullets",
+            "insurtech_bullets",
+            "ey_bullets"
+          ],
+          "direct_fact_vector_required": true,
+          "product_hybrid_required": false,
+          "manifest_section_target_count": 45,
+          "manifest_coverage_present": true,
+          "live_section_target_count": 45,
+          "pre_run_hydration_present": true,
+          "collection_count": 63,
+          "model_dim_pass": true,
+          "section_source_class_counts": {
+            "candidate_profile": 26,
+            "project_evidence": 19
+          },
+          "section_tier_counts": {
+            "seed": 45
+          },
+          "expected_source_slot_prefix": "",
+          "expected_source_slot_min_count": 0,
+          "source_slot_count": 0,
+          "source_slot_ids": [],
+          "delayed_loop_policy_pass": true
+        },
+        "section_coverage_present": true,
+        "same_run_write_policy": "forbidden_for_product_retrieval",
+        "write_authority": false,
+        "comparison_authority": true
+      },
+      "fact_vector_index_preflight_ref": "c02_fact_vector_index_preflight.json"
+    },
+    "c06": {
+      "schema_version": "c06_weak_refine_v1",
+      "section_id": "headline",
+      "run_id": "headline_20260811_104644",
+      "attempted": false,
+      "attempt_count": 0,
+      "max_attempts": 1,
+      "strategy": "frozen_section_graph_plan_direct_path_retry",
+      "reentry_target": "C0.3",
+      "route_scope": {
+        "section_id": "headline",
+        "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+        "route_ref": "route_contract.json"
+      },
+      "requested_route_scope": {
+        "section_id": "headline",
+        "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+        "route_ref": "route_contract.json"
+      },
+      "requested_route_digest": "b1ca2615f074ac02800f218b2835acb8a52854d9a9de547edaba9af2f92be2a6",
+      "route_digest_before": "b1ca2615f074ac02800f218b2835acb8a52854d9a9de547edaba9af2f92be2a6",
+      "route_digest_after": "b1ca2615f074ac02800f218b2835acb8a52854d9a9de547edaba9af2f92be2a6",
+      "route_changed": false,
+      "atom_payload_digest_before": "6cba7aa0b5611e1472f8dc33d4209c74a2995db2a510382a01c29b16949af084",
+      "atom_payload_digest_after": "6cba7aa0b5611e1472f8dc33d4209c74a2995db2a510382a01c29b16949af084",
+      "atom_scope_digest_before": "bcbc49e12a9e9ec22a4735cb5ff82f225ffa58f258223f4d16dbd29f18e0bc27",
+      "atom_scope_digest_after": "bcbc49e12a9e9ec22a4735cb5ff82f225ffa58f258223f4d16dbd29f18e0bc27",
+      "fact_ids_digest_before": "f7f131fd1a551e3086b2161794c3c633b77044deb6c90866a4e11878208011d5",
+      "fact_ids_digest_after": "f7f131fd1a551e3086b2161794c3c633b77044deb6c90866a4e11878208011d5",
+      "binding_fact_ids_before": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_devsecops_release_resilience",
+        "reb_unify_partner_channel_cosell"
+      ],
+      "binding_fact_ids_after": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_devsecops_release_resilience",
+        "reb_unify_partner_channel_cosell"
+      ],
+      "binding_fact_ids_digest_before": "f7f131fd1a551e3086b2161794c3c633b77044deb6c90866a4e11878208011d5",
+      "binding_fact_ids_digest_after": "f7f131fd1a551e3086b2161794c3c633b77044deb6c90866a4e11878208011d5",
+      "adopted_c03_digest": "abdd95f524b098e4149230aed182457918279c2b03072ec833109d78dd1bcb93",
+      "adopted_graph_bindings_digest": "e5e6dc5bf2251c13742c8ddabe6a6872fee8a3fba0cc639cc1006d766ecdbcb1",
+      "authority_widened": false,
+      "acl_scope_widened": false,
+      "initial_coverage": {
+        "status": "PASS",
+        "proof_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_devsecops_release_resilience",
+          "reb_unify_partner_channel_cosell"
+        ],
+        "direct_supported_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_devsecops_release_resilience",
+          "reb_unify_partner_channel_cosell"
+        ],
+        "unresolved_fact_ids": [],
+        "proof_fact_count": 3,
+        "direct_supported_fact_count": 3,
+        "coverage_ratio": 1.0,
+        "candidate_conservation_pass": true,
+        "traversal_pass": true,
+        "authority_before_targeting_pass": true
+      },
+      "final_coverage": {
+        "status": "PASS",
+        "proof_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_devsecops_release_resilience",
+          "reb_unify_partner_channel_cosell"
+        ],
+        "direct_supported_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_devsecops_release_resilience",
+          "reb_unify_partner_channel_cosell"
+        ],
+        "unresolved_fact_ids": [],
+        "proof_fact_count": 3,
+        "direct_supported_fact_count": 3,
+        "coverage_ratio": 1.0,
+        "candidate_conservation_pass": true,
+        "traversal_pass": true,
+        "authority_before_targeting_pass": true
+      },
+      "initial_c05_support_status": "PASS",
+      "final_c05_support_status": "PASS",
+      "selected_graph_plan_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+      "selected_graph_plan_payload_digest_before": "6f138d2d952fa4882a37539ea7471cfb8021e37c2b9431beeb5327edb4488fd4",
+      "selected_graph_plan_payload_digest_after": "6f138d2d952fa4882a37539ea7471cfb8021e37c2b9431beeb5327edb4488fd4",
+      "selected_graph_plan_changed": false,
+      "frozen_graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+      "graph_digest_before": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+      "graph_digest_after": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+      "candidate_decisions_digest": "2c0df9961a33b31171fdc397e6fc43ccb85b15f363b1755a40770d517434c332",
+      "traversal_events_digest": "1b40340a0476b2f1563f3093317b8f30862d1dea070d064a61a9edbc75e47bb5",
+      "broad_fact_link_fallback_used": false,
+      "label_tag_proof_fallback_used": false,
+      "new_atoms_created": 0,
+      "failure_reasons": [],
+      "outcome": "NOT_REQUIRED",
+      "pass": true,
+      "receipt_digest": "99a3f8d40b4d2b156e1c9d3fb7f0f84c097bd86d7876c685277f4a06565d6ed4"
+    },
+    "c07": {
+      "schema_version": "c07_handoff_audit_v1",
+      "handoff_safe": true,
+      "violations": [],
+      "allowed_fact_ids_count": 3,
+      "checks": {
+        "fec_exists": true,
+        "allowed_fact_ids_preserved": true,
+        "no_jd_as_proof": true,
+        "no_generic_docs": true,
+        "c02_c03_boundary": true,
+        "data_only_evidence": true,
+        "skills_graph_not_core_graphrag": true,
+        "product_hybrid_truth_fields": true,
+        "fact_vector_index_preflight_required": false,
+        "fact_vector_index_preflight_present": true,
+        "fact_vector_index_preflight_status": "PASS",
+        "fact_vector_index_preflight_pass": true,
+        "same_run_write_policy_visible": true,
+        "c06_receipt_present": true,
+        "c06_bounded_refinement_pass": true
+      }
+    }
+  },
+  "c07_handoff_safe": true,
+  "pa_proof_authority_metadata": {
+    "fec_bridge_mode": "spine_c0_fec_compose",
+    "route_contract_ref": "route_contract.json",
+    "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "proof_pool_digest": "b9fd7a65b75249973d598b0dea88641a0e882ed6cc0377736c7a231c218d01e4",
+    "proof_source": "augmented_skills_graph",
+    "evidence_authority": {
+      "authority": "augmented_skills_graph",
+      "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "ledger_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json",
+      "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+      "ledger_digest": "8d51311d531d3adbeda76e89540372c40e084d1069e5aa708b012fb10a9a44c7",
+      "skills_authority_status": "PASS",
+      "block_reason": null,
+      "forbidden_as_product_authority": [
+        "base_resume",
+        "base_resume_fallback",
+        "broad_skills_ledger",
+        "candidate_fact_ledger",
+        "fallback_pool",
+        "legacy_pool",
+        "prompt_pool",
+        "proof_pool",
+        "selected_role_fact_set",
+        "srfs",
+        "unknown"
+      ]
+    },
+    "selection_scope": {
+      "section_id": "headline",
+      "selection_method": "selected_graph_evidence_plan_headline",
+      "role_target_projection": "graph_ledger_substrate_with_optional_srfs_filter",
+      "jd_targeting_active": true,
+      "briefing_targeting_active": true,
+      "jd_ref": "targeting_only",
+      "briefing_ref": "targeting_only",
+      "section_slice": "headline",
+      "allowed_fact_ids_count": 9,
+      "is_proof_authority": false
+    },
+    "layout_context": {
+      "base_resume_ref": "apps_rg/resume/base/amit_ayer_base_resume_v1.json",
+      "base_resume_json_ref": "apps_rg/resume/base/amit_ayer_base_resume_v1.json",
+      "base_resume_json_hash": "8e7622c9528310e95288e97ddcb58a566b22b6a14435e389f0096f9aa10611e7",
+      "override_used": false,
+      "allowed_fields": [
+        "titles",
+        "companies",
+        "dates",
+        "education",
+        "certifications",
+        "identity",
+        "company_names",
+        "locations"
+      ],
+      "permitted_uses": [
+        "titles",
+        "companies",
+        "dates",
+        "education",
+        "certifications",
+        "identity",
+        "company_names",
+        "locations"
+      ],
+      "story_claim_authority": false,
+      "generated_story_claims_from_base_resume": false
+    },
+    "proof_pool_type": "augmented_skills_graph",
+    "proof_pool_type_role": "receipt_label_not_authority_switch",
+    "claim_evidence_source_type": "augmented_skills_graph",
+    "augmented_skills_graph_present": true,
+    "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "graph_version": "master_skills_arsenal_graph_v1",
+    "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+    "skills_source_authority_status": "PASS",
+    "legacy_skills_ledger_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json",
+    "c03_graphrag_bound_status": "BOUND",
+    "support_status": "SUPPORTED",
+    "graph_lineage_refs": [
+      "ref:graph:version:master_skills_arsenal_graph_v1",
+      "ref:graph:node_count:375",
+      "ref:graph:edge_count:2315",
+      "ref:graph:fact_lineage:reb_ey_insurance_core_modernization",
+      "ref:graph:fact_lineage:reb_ibm_offering_accelerator_management",
+      "ref:graph:fact_lineage:reb_insurtech_regulated_aws_control_implementation",
+      "ref:graph:fact_lineage:reb_unify_distributed_ecosystem_engineering"
+    ],
+    "graph_expansion_refs": [],
+    "resume_graph_allocation_scope": "WHOLE_RESUME",
+    "resume_graph_allocation_plan_id": "resume_graph_allocation:e54afe7811077f77ac9f",
+    "resume_graph_allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+    "resume_graph_global_uniqueness_claimed": true,
+    "final_graph_evidence_contract": {
+      "schema_version": "section_final_graph_evidence_contract_v1",
+      "section_id": "headline",
+      "allocation_scope": "WHOLE_RESUME",
+      "allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+      "source_section_plan_id": "headline:392b875a22edc999",
+      "source_section_plan_digest": "392b875a22edc999463b050714eb087590ae3801c76ee50b1cb3937b7aa1ff1d",
+      "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+      "assignments": [
+        {
+          "candidate_id": "alloc-cand:311fb284f9a6818555a8889c",
+          "section_id": "headline",
+          "claim_unit_id": "headline:skill:01",
+          "skill_id": "skill_ibm_devsecops_pipeline_security",
+          "skill_label": "",
+          "fact_id": "fact_engineering_platform_002",
+          "metric_outcome_id": "",
+          "metric_text": "",
+          "metric_value": "",
+          "metric_unit": "",
+          "normalized_metric_signature": "",
+          "root_id": "reb_ibm_devsecops_release_resilience",
+          "employer_lane": "ibm",
+          "source_family": "ibm",
+          "proof_strength_raw": 1.3,
+          "target_alignment_score": 0.6,
+          "claim_entailment_score": 1.0,
+          "metric_binding_score": 0.0,
+          "path_confidence_raw": 1.0,
+          "source_independence_score": 1.0,
+          "selection_margin": -0.1,
+          "selection_margin_available": true,
+          "selection_margin_basis": "proof_strength_raw",
+          "best_eligible_rejected_candidate_id": "alloc-cand:25ab0076de2263066fa68b15",
+          "graph_path_ids": [
+            "root:reb_ibm_devsecops_release_resilience",
+            "root:reb_ibm_devsecops_release_resilience/skill:skill_ibm_devsecops_pipeline_security",
+            "root:reb_ibm_devsecops_release_resilience/fact:fact_engineering_platform_002"
+          ],
+          "edge_ids": [
+            "edge:889f1cc3b8299819a7c0613c",
+            "edge:20b27a9d5a3628910290b95b"
+          ],
+          "citation_refs": [
+            "fact_engineering_platform_002"
+          ],
+          "root_bundle_theme": "DevSecOps release resilience and governed delivery automation",
+          "root_claim_text": "Embedded release automation and security scanning into regulated modernization delivery paths",
+          "root_claim_action": "Embedded release automation and security scanning into regulated modernization delivery paths",
+          "root_claim_scope": "IBM regulated delivery programs requiring release governance, security scanning, and deployment repeatability.",
+          "root_claim_outcome": "Frame as delivery resilience: pipeline automation and security controls, qualitative unless future graph metrics are linked.",
+          "metric_required": false,
+          "metric_outcome_required": false,
+          "counts_toward_global_uniqueness": true
+        },
+        {
+          "candidate_id": "alloc-cand:21f932cf137ea5e591b5cc65",
+          "section_id": "headline",
+          "claim_unit_id": "headline:skill:02",
+          "skill_id": "skill_sr_w12_hyperscaler_alliance_co_sell",
+          "skill_label": "",
+          "fact_id": "fact_partnerships_gtm_002",
+          "metric_outcome_id": "",
+          "metric_text": "",
+          "metric_value": "",
+          "metric_unit": "",
+          "normalized_metric_signature": "",
+          "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "employer_lane": "ibm",
+          "source_family": "ibm",
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 0.7,
+          "claim_entailment_score": 1.0,
+          "metric_binding_score": 0.0,
+          "path_confidence_raw": 1.0,
+          "source_independence_score": 0.75,
+          "selection_margin": -0.2,
+          "selection_margin_available": true,
+          "selection_margin_basis": "proof_strength_raw",
+          "best_eligible_rejected_candidate_id": "alloc-cand:a8c1098d5fe07d0bf1da6321",
+          "graph_path_ids": [
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/skill:skill_sr_w12_hyperscaler_alliance_co_sell",
+            "root:reb_ibm_aws_alliance_partner_cosell_gtm/fact:fact_partnerships_gtm_002"
+          ],
+          "edge_ids": [
+            "edge:b95d80c6934e39272efd1db6",
+            "edge:ab44170417c11551ae68a66d"
+          ],
+          "citation_refs": [
+            "fact_partnerships_gtm_002"
+          ],
+          "root_bundle_theme": "AWS partnership, alliance co-sell, and joint GTM execution",
+          "root_claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+          "root_claim_action": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+          "root_claim_scope": "IBM-AWS financial-services alliance and co-sell motion across cloud and AI modernization opportunities.",
+          "root_claim_outcome": "Frame as alliance GTM leadership: joint planning, solution architecture, co-sell execution, and 20% joint revenue growth only when the metric outcome ID is selected.",
+          "metric_required": false,
+          "metric_outcome_required": false,
+          "counts_toward_global_uniqueness": true
+        },
+        {
+          "candidate_id": "alloc-cand:19268a5e540a48dbd1bb8207",
+          "section_id": "headline",
+          "claim_unit_id": "headline:skill:03",
+          "skill_id": "skill_partner_partner_led_ai_solutions",
+          "skill_label": "",
+          "fact_id": "exp_unify_001",
+          "metric_outcome_id": "",
+          "metric_text": "",
+          "metric_value": "",
+          "metric_unit": "",
+          "normalized_metric_signature": "",
+          "root_id": "reb_unify_partner_channel_cosell",
+          "employer_lane": "unify",
+          "source_family": "unify",
+          "proof_strength_raw": 1.2,
+          "target_alignment_score": 1.25,
+          "claim_entailment_score": 1.0,
+          "metric_binding_score": 0.0,
+          "path_confidence_raw": 1.0,
+          "source_independence_score": 0.75,
+          "selection_margin": -0.2,
+          "selection_margin_available": true,
+          "selection_margin_basis": "proof_strength_raw",
+          "best_eligible_rejected_candidate_id": "alloc-cand:38bffdd5167671775268b958",
+          "graph_path_ids": [
+            "root:reb_unify_partner_channel_cosell",
+            "root:reb_unify_partner_channel_cosell/skill:skill_partner_partner_led_ai_solutions",
+            "root:reb_unify_partner_channel_cosell/fact:exp_unify_001"
+          ],
+          "edge_ids": [
+            "edge:3e79154abc791c9a41fd8721",
+            "edge:d695e535f049023ab87e23f0"
+          ],
+          "citation_refs": [
+            "exp_unify_001"
+          ],
+          "root_bundle_theme": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+          "root_claim_text": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+          "root_claim_action": "AI Partnerships, Co-Sell Channel & Alliance GTM",
+          "root_claim_scope": "Global AI channel program from inception: co-developed analytics frameworks with strategic partners, co-sell bundling with cloud/streaming vendors, consumption-based SaaS licensing driving partner-derived revenue and renewals.",
+          "root_claim_outcome": "Frame as AI partnerships / co-sell channel leadership; metrics only from graph-selected Unify facts (fact_partnerships_gtm_001, fact_sales_accounts_004/005).",
+          "metric_required": false,
+          "metric_outcome_required": false,
+          "counts_toward_global_uniqueness": true
+        }
+      ],
+      "assignment_count": 3,
+      "representation_mode": "CANONICAL_VISIBLE",
+      "derived_from_section_id": "",
+      "counts_toward_global_uniqueness": true,
+      "traversal_receipt_digest": "3d649d1aa9c3b53915b022ef74a779fb94d6e6a2bdcd1029b1a186f787f974aa",
+      "traversal_conservation_pass": true,
+      "pass": true,
+      "contract_digest": "14be57aff77131d07b0c7f226da6e42f9976aeff7772657d84e32316ec05c338"
+    },
+    "final_graph_evidence_contract_digest": "14be57aff77131d07b0c7f226da6e42f9976aeff7772657d84e32316ec05c338",
+    "durable_graph_state_mutated": false,
+    "headline_positioning_bundle_consumption": true,
+    "headline_positioning_bundle_consumption_mode": "headline_positioning_bundle_required",
+    "headline_positioning_bundles": [
+      {
+        "headline_positioning_bundle_id": "hpb_svp_engineering_leadership",
+        "positioning_family": "svp_engineering_leadership",
+        "display_phrase_candidate": "SVP Engineering",
+        "source_competency_bundle_ids": [
+          "ccb_engineering_leadership"
+        ],
+        "graph_skill_node_ids": [
+          "skill_svp_it_strategy_innovation",
+          "skill_commercial_board_level_stakeholder_alignment"
+        ],
+        "linked_source_fact_ids": [
+          "fact_exec_001",
+          "fact_consulting_001"
+        ],
+        "graph_lineage_refs": [
+          "ccb_engineering_leadership"
+        ],
+        "seniority_signal": "svp_engineering_operating_model",
+        "technical_specificity_signal": "medium",
+        "platform_signal": "engineering_operating_model",
+        "governance_signal": "board_level_operating_governance",
+        "target_relevance_rationale": "Anchors the seniority floor: SVP Engineering operating-model ownership and board-level alignment.",
+        "external_claim_policy": "skill_projection_not_proof",
+        "bound_skills": [
+          {
+            "skill_id": "skill_svp_it_strategy_innovation",
+            "allowed_phrases": [
+              "IT Strategy & Innovation",
+              "IT strategy",
+              "enterprise architecture",
+              "innovation agenda",
+              "enterprise innovation",
+              "technology direction"
+            ],
+            "activation_status": "ACTIVE_CONFIRMED"
+          },
+          {
+            "skill_id": "skill_commercial_board_level_stakeholder_alignment",
+            "allowed_phrases": [
+              "board level priorities",
+              "C level stakeholders",
+              "data centric solutions"
+            ],
+            "activation_status": "ACTIVE_CONFIRMED"
+          }
+        ]
+      },
+      {
+        "headline_positioning_bundle_id": "hpb_distributed_ai_infrastructure",
+        "positioning_family": "distributed_ai_infrastructure",
+        "display_phrase_candidate": "Distributed AI Infrastructure",
+        "source_competency_bundle_ids": [
+          "ccb_distributed_systems_engineering"
+        ],
+        "graph_skill_node_ids": [
+          "skill_sr_cloud_data_platform_engineering",
+          "skill_sr_microservices_integration_platform",
+          "skill_p2_tech_reference_architecture"
+        ],
+        "linked_source_fact_ids": [
+          "fact_engineering_platform_002"
+        ],
+        "graph_lineage_refs": [
+          "ccb_distributed_systems_engineering",
+          "reb_ibm_cloud_modernization"
+        ],
+        "seniority_signal": "distributed_platform_architecture",
+        "technical_specificity_signal": "high",
+        "platform_signal": "distributed_cloud_data_infrastructure",
+        "governance_signal": "cloud_native_platform_scale",
+        "target_relevance_rationale": "Distributed cloud and data execution infrastructure positioning for enterprise AI scale.",
+        "external_claim_policy": "skill_projection_not_proof",
+        "bound_skills": [
+          {
+            "skill_id": "skill_sr_cloud_data_platform_engineering",
+            "allowed_phrases": [
+              "cloud-native",
+              "platform engineering"
+            ],
+            "activation_status": "ACTIVE"
+          },
+          {
+            "skill_id": "skill_sr_microservices_integration_platform",
+            "allowed_phrases": [
+              "microservices",
+              "cloud-native",
+              "integration"
+            ],
+            "activation_status": "ACTIVE"
+          },
+          {
+            "skill_id": "skill_p2_tech_reference_architecture",
+            "allowed_phrases": [
+              "industry-specific",
+              "cloud modernization solutions",
+              "reference architecture"
+            ],
+            "activation_status": "ACTIVE"
+          }
+        ]
+      },
+      {
+        "headline_positioning_bundle_id": "hpb_runtime_governance",
+        "positioning_family": "runtime_governance",
+        "display_phrase_candidate": "Runtime Governance",
+        "source_competency_bundle_ids": [
+          "ccb_runtime_governance"
+        ],
+        "graph_skill_node_ids": [
+          "skill_runtime_gate_mesh_design",
+          "skill_policy_bound_runtime_design",
+          "skill_exit_disposition_governance"
+        ],
+        "linked_source_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "graph_lineage_refs": [
+          "ccb_runtime_governance"
+        ],
+        "seniority_signal": "runtime_control_governance",
+        "technical_specificity_signal": "high",
+        "platform_signal": "policy_gated_runtime",
+        "governance_signal": "deterministic_gate_governance",
+        "target_relevance_rationale": "Runtime governance and deterministic gate meshes differentiate the engineering leadership posture for regulated AI.",
+        "external_claim_policy": "skill_projection_not_proof",
+        "bound_skills": [
+          {
+            "skill_id": "skill_runtime_gate_mesh_design",
+            "allowed_phrases": [
+              "runtime gate mesh design"
+            ],
+            "activation_status": "ACTIVE_CONFIRMED"
+          },
+          {
+            "skill_id": "skill_policy_bound_runtime_design",
+            "allowed_phrases": [
+              "policy bound runtime design"
+            ],
+            "activation_status": "ACTIVE"
+          },
+          {
+            "skill_id": "skill_exit_disposition_governance",
+            "allowed_phrases": [
+              "exit disposition governance"
+            ],
+            "activation_status": "ACTIVE"
+          }
+        ]
+      },
+      {
+        "headline_positioning_bundle_id": "hpb_enterprise_ai_architecture",
+        "positioning_family": "enterprise_ai_architecture",
+        "display_phrase_candidate": "Enterprise AI Architecture",
+        "source_competency_bundle_ids": [
+          "ccb_agentic_platforms",
+          "ccb_distributed_systems_engineering"
+        ],
+        "graph_skill_node_ids": [
+          "skill_layered_runtime_spine_design",
+          "skill_app_overlay_runtime_binding",
+          "skill_reusable_agentic_platform_architecture"
+        ],
+        "linked_source_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "graph_lineage_refs": [
+          "ccb_agentic_platforms"
+        ],
+        "seniority_signal": "enterprise_architecture_ownership",
+        "technical_specificity_signal": "high",
+        "platform_signal": "enterprise_ai_platform_architecture",
+        "governance_signal": "layered_runtime_spine",
+        "target_relevance_rationale": "Enterprise architecture modernization positioning for large-scale AI platform ownership.",
+        "external_claim_policy": "skill_projection_not_proof",
+        "bound_skills": [
+          {
+            "skill_id": "skill_layered_runtime_spine_design",
+            "allowed_phrases": [
+              "layered runtime spine design"
+            ],
+            "activation_status": "ACTIVE"
+          },
+          {
+            "skill_id": "skill_app_overlay_runtime_binding",
+            "allowed_phrases": [
+              "app overlay runtime binding"
+            ],
+            "activation_status": "ACTIVE"
+          },
+          {
+            "skill_id": "skill_reusable_agentic_platform_architecture",
+            "allowed_phrases": [
+              "reusable agentic platform architecture"
+            ],
+            "activation_status": "ACTIVE_CONFIRMED"
+          }
+        ]
+      }
+    ],
+    "headline_positioning_bundle_ids": [
+      "hpb_svp_engineering_leadership",
+      "hpb_distributed_ai_infrastructure",
+      "hpb_runtime_governance",
+      "hpb_enterprise_ai_architecture"
+    ],
+    "headline_positioning_section_packet": {
+      "section_id": "headline",
+      "proof_authority": "graph_positioning_bundles_plus_linked_source_facts",
+      "base_headline_usage": "calibration_only",
+      "competency_bundle_usage": "positioning_source",
+      "jd_usage": "targeting_only",
+      "examples_usage": "style_only",
+      "headline_positioning_bundles": [
+        {
+          "headline_positioning_bundle_id": "hpb_svp_engineering_leadership",
+          "positioning_family": "svp_engineering_leadership",
+          "display_phrase_candidate": "SVP Engineering",
+          "source_competency_bundle_ids": [
+            "ccb_engineering_leadership"
+          ],
+          "graph_skill_node_ids": [
+            "skill_svp_it_strategy_innovation",
+            "skill_commercial_board_level_stakeholder_alignment"
+          ],
+          "linked_source_fact_ids": [
+            "fact_exec_001",
+            "fact_consulting_001"
+          ],
+          "graph_lineage_refs": [
+            "ccb_engineering_leadership"
+          ],
+          "seniority_signal": "svp_engineering_operating_model",
+          "technical_specificity_signal": "medium",
+          "platform_signal": "engineering_operating_model",
+          "governance_signal": "board_level_operating_governance",
+          "target_relevance_rationale": "Anchors the seniority floor: SVP Engineering operating-model ownership and board-level alignment.",
+          "external_claim_policy": "skill_projection_not_proof",
+          "bound_skills": [
+            {
+              "skill_id": "skill_svp_it_strategy_innovation",
+              "allowed_phrases": [
+                "IT Strategy & Innovation",
+                "IT strategy",
+                "enterprise architecture",
+                "innovation agenda",
+                "enterprise innovation",
+                "technology direction"
+              ],
+              "activation_status": "ACTIVE_CONFIRMED"
+            },
+            {
+              "skill_id": "skill_commercial_board_level_stakeholder_alignment",
+              "allowed_phrases": [
+                "board level priorities",
+                "C level stakeholders",
+                "data centric solutions"
+              ],
+              "activation_status": "ACTIVE_CONFIRMED"
+            }
+          ]
+        },
+        {
+          "headline_positioning_bundle_id": "hpb_distributed_ai_infrastructure",
+          "positioning_family": "distributed_ai_infrastructure",
+          "display_phrase_candidate": "Distributed AI Infrastructure",
+          "source_competency_bundle_ids": [
+            "ccb_distributed_systems_engineering"
+          ],
+          "graph_skill_node_ids": [
+            "skill_sr_cloud_data_platform_engineering",
+            "skill_sr_microservices_integration_platform",
+            "skill_p2_tech_reference_architecture"
+          ],
+          "linked_source_fact_ids": [
+            "fact_engineering_platform_002"
+          ],
+          "graph_lineage_refs": [
+            "ccb_distributed_systems_engineering",
+            "reb_ibm_cloud_modernization"
+          ],
+          "seniority_signal": "distributed_platform_architecture",
+          "technical_specificity_signal": "high",
+          "platform_signal": "distributed_cloud_data_infrastructure",
+          "governance_signal": "cloud_native_platform_scale",
+          "target_relevance_rationale": "Distributed cloud and data execution infrastructure positioning for enterprise AI scale.",
+          "external_claim_policy": "skill_projection_not_proof",
+          "bound_skills": [
+            {
+              "skill_id": "skill_sr_cloud_data_platform_engineering",
+              "allowed_phrases": [
+                "cloud-native",
+                "platform engineering"
+              ],
+              "activation_status": "ACTIVE"
+            },
+            {
+              "skill_id": "skill_sr_microservices_integration_platform",
+              "allowed_phrases": [
+                "microservices",
+                "cloud-native",
+                "integration"
+              ],
+              "activation_status": "ACTIVE"
+            },
+            {
+              "skill_id": "skill_p2_tech_reference_architecture",
+              "allowed_phrases": [
+                "industry-specific",
+                "cloud modernization solutions",
+                "reference architecture"
+              ],
+              "activation_status": "ACTIVE"
+            }
+          ]
+        },
+        {
+          "headline_positioning_bundle_id": "hpb_runtime_governance",
+          "positioning_family": "runtime_governance",
+          "display_phrase_candidate": "Runtime Governance",
+          "source_competency_bundle_ids": [
+            "ccb_runtime_governance"
+          ],
+          "graph_skill_node_ids": [
+            "skill_runtime_gate_mesh_design",
+            "skill_policy_bound_runtime_design",
+            "skill_exit_disposition_governance"
+          ],
+          "linked_source_fact_ids": [
+            "fact_engineering_platform_001"
+          ],
+          "graph_lineage_refs": [
+            "ccb_runtime_governance"
+          ],
+          "seniority_signal": "runtime_control_governance",
+          "technical_specificity_signal": "high",
+          "platform_signal": "policy_gated_runtime",
+          "governance_signal": "deterministic_gate_governance",
+          "target_relevance_rationale": "Runtime governance and deterministic gate meshes differentiate the engineering leadership posture for regulated AI.",
+          "external_claim_policy": "skill_projection_not_proof",
+          "bound_skills": [
+            {
+              "skill_id": "skill_runtime_gate_mesh_design",
+              "allowed_phrases": [
+                "runtime gate mesh design"
+              ],
+              "activation_status": "ACTIVE_CONFIRMED"
+            },
+            {
+              "skill_id": "skill_policy_bound_runtime_design",
+              "allowed_phrases": [
+                "policy bound runtime design"
+              ],
+              "activation_status": "ACTIVE"
+            },
+            {
+              "skill_id": "skill_exit_disposition_governance",
+              "allowed_phrases": [
+                "exit disposition governance"
+              ],
+              "activation_status": "ACTIVE"
+            }
+          ]
+        },
+        {
+          "headline_positioning_bundle_id": "hpb_enterprise_ai_architecture",
+          "positioning_family": "enterprise_ai_architecture",
+          "display_phrase_candidate": "Enterprise AI Architecture",
+          "source_competency_bundle_ids": [
+            "ccb_agentic_platforms",
+            "ccb_distributed_systems_engineering"
+          ],
+          "graph_skill_node_ids": [
+            "skill_layered_runtime_spine_design",
+            "skill_app_overlay_runtime_binding",
+            "skill_reusable_agentic_platform_architecture"
+          ],
+          "linked_source_fact_ids": [
+            "fact_engineering_platform_001"
+          ],
+          "graph_lineage_refs": [
+            "ccb_agentic_platforms"
+          ],
+          "seniority_signal": "enterprise_architecture_ownership",
+          "technical_specificity_signal": "high",
+          "platform_signal": "enterprise_ai_platform_architecture",
+          "governance_signal": "layered_runtime_spine",
+          "target_relevance_rationale": "Enterprise architecture modernization positioning for large-scale AI platform ownership.",
+          "external_claim_policy": "skill_projection_not_proof",
+          "bound_skills": [
+            {
+              "skill_id": "skill_layered_runtime_spine_design",
+              "allowed_phrases": [
+                "layered runtime spine design"
+              ],
+              "activation_status": "ACTIVE"
+            },
+            {
+              "skill_id": "skill_app_overlay_runtime_binding",
+              "allowed_phrases": [
+                "app overlay runtime binding"
+              ],
+              "activation_status": "ACTIVE"
+            },
+            {
+              "skill_id": "skill_reusable_agentic_platform_architecture",
+              "allowed_phrases": [
+                "reusable agentic platform architecture"
+              ],
+              "activation_status": "ACTIVE_CONFIRMED"
+            }
+          ]
+        }
+      ],
+      "headline_positioning_bundle_ids": [
+        "hpb_svp_engineering_leadership",
+        "hpb_distributed_ai_infrastructure",
+        "hpb_runtime_governance",
+        "hpb_enterprise_ai_architecture"
+      ],
+      "competency_bundle_ids": [
+        "ccb_agentic_platforms",
+        "ccb_distributed_systems_engineering",
+        "ccb_engineering_leadership",
+        "ccb_runtime_governance"
+      ],
+      "graph_skill_node_ids": [
+        "skill_app_overlay_runtime_binding",
+        "skill_commercial_board_level_stakeholder_alignment",
+        "skill_exit_disposition_governance",
+        "skill_layered_runtime_spine_design",
+        "skill_p2_tech_reference_architecture",
+        "skill_policy_bound_runtime_design",
+        "skill_reusable_agentic_platform_architecture",
+        "skill_runtime_gate_mesh_design",
+        "skill_sr_cloud_data_platform_engineering",
+        "skill_sr_microservices_integration_platform",
+        "skill_svp_it_strategy_innovation"
+      ],
+      "source_fact_ids": [
+        "fact_consulting_001",
+        "fact_engineering_platform_001",
+        "fact_engineering_platform_002",
+        "fact_exec_001"
+      ],
+      "seniority_floor": "SVP Engineering",
+      "technical_specificity_floor": 2,
+      "required_positioning_families": [
+        "svp_engineering_leadership",
+        "agentic_ai_platforms",
+        "distributed_ai_infrastructure",
+        "runtime_governance",
+        "enterprise_ai_architecture",
+        "partner_applied_ai_architecture",
+        "platform_productization",
+        "regulated_ai_systems"
+      ],
+      "consumption_mode": "headline_positioning_bundle_required",
+      "flat_skill_only_forbidden": true,
+      "selected_graph_evidence_plan_applied": true,
+      "selected_headline_positioning_families": [
+        "distributed_ai_infrastructure",
+        "enterprise_ai_architecture",
+        "runtime_governance",
+        "svp_engineering_leadership"
+      ]
+    },
+    "graph_expansion_consumes_headline_positioning_bundles": true,
+    "flat_skill_only_graph_context_forbidden": true,
+    "binding_kind": "spine_c0_retrieve_apps_rg",
+    "fec_shape_only": false,
+    "canonical_c0_path": true,
+    "claim_support_graph_refs": [
+      "skill_sr_w12_hyperscaler_alliance_co_sell",
+      "skill_ibm_devsecops_pipeline_security",
+      "skill_partner_partner_led_ai_solutions"
+    ],
+    "targeting_graph_refs": [],
+    "receipt_only_lineage_refs": [
+      "ledger:reb_ibm_aws_alliance_partner_cosell_gtm",
+      "ledger:reb_ibm_devsecops_release_resilience",
+      "ledger:reb_unify_partner_channel_cosell"
+    ],
+    "receipt_only_json_expansion_excluded_from_pa": true,
+    "role_family_projection": {
+      "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+      "pillar_hint_ids": [
+        "pillar_insurer_it_strategy_ai_enablement",
+        "pillar_enterprise_portfolio_governance",
+        "pillar_cloud_data_aws",
+        "pillar_actuarial_foundation",
+        "pillar_agentic_ai_platforms"
+      ],
+      "sqlite_projection_row_found": true,
+      "projection_source": "sqlite_role_family_projection",
+      "fallback_pillar_bridge_used": false,
+      "release_eligible_targeting_proof": true,
+      "targeting_degraded_explicit": false,
+      "track_weight_profile": {
+        "track_actuarial_risk_derivatives": 0.2,
+        "track_data_tech_cloud_ml": 0.45,
+        "track_genai_agentic": 0.35
+      },
+      "targeting_keywords": [
+        "pillar_insurer_it_strategy_ai_enablement",
+        "pillar_agentic_ai_platforms",
+        "pillar_cloud_data_aws",
+        "pillar_enterprise_portfolio_governance",
+        "pillar_interoperability_integration_ecosystem"
+      ],
+      "proof_policy_note": "graph_routing_not_claim_proof"
+    },
+    "spine_graph_authority": true,
+    "core_c03_graph_rag_used": true,
+    "spine_c0_retrieve_receipt_ref": "section_spine_c0_retrieve_receipt.json"
+  },
+  "product_visible": true,
+  "resume_graph_allocation_scope": "WHOLE_RESUME",
+  "resume_graph_allocation_plan_id": "resume_graph_allocation:e54afe7811077f77ac9f",
+  "resume_graph_allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+  "resume_graph_global_uniqueness_claimed": true,
+  "final_graph_evidence_contract_digest": "14be57aff77131d07b0c7f226da6e42f9976aeff7772657d84e32316ec05c338",
+  "spine_c0_retrieve_receipt": {
+    "schema_version": "section_spine_c0_retrieve_receipt_v2",
+    "generated_at_utc": "2026-08-11T10:46:46.003478+00:00",
+    "section_id": "headline",
+    "stop_as_evidence_gap_policy": "STOP_AS_EVIDENCE_GAP",
+    "spine_binding": "apps_rg.runtime.bindings.c0_planned_binding.c0_retrieve_apps_rg_planned",
+    "cert_ref": "test:valid:w6",
+    "support_status": "PASS",
+    "not_applicable_reason": "",
+    "final_evidence_digest": "b96db1072d597070b37a4ec0ad48cb683e0e58a90153dd78a41e220024a4d90b",
+    "retrieval_plan_ref": "l1_evidence_plan:d3b0929c77eff12e:capsule:sha256:4bb73dfbc2aa7a98b",
+    "audit_refs": [
+      "l1_capsule_digest:sha256:4bb73dfbc2aa7a98b",
+      "l1_evidence_plan_digest:d3b0929c77eff12ee728472a",
+      "l1_v2_evidence_obligation_ledger:sha256:d530f242b6f0901d02d0e44ab1d065db77b9ff3df943c08276b7012534da5ccd",
+      "l1_evidence_obligation_receipt_digest:sha256:6828d17aac3b07613c2d30b800f399e8bb855093285c67dc2f2fdd0730374dee",
+      "l1_evidence_obligation_receipt_ref:l1_evidence_obligation_receipt.json",
+      "l1_cognitive_c0_outcome_receipt_digest:sha256:7c177bac7cf5aeec059e22873cf951282491a7dd9f9e2bae37774984697ac4ff",
+      "l1_cognitive_c0_outcome_receipt_ref:l1_cognitive_c0_outcome_receipt.json"
+    ],
+    "l1_v2_evidence_obligation_reconciliation_refs": [
+      "l1_v2_evidence_obligation_ledger:sha256:d530f242b6f0901d02d0e44ab1d065db77b9ff3df943c08276b7012534da5ccd",
+      "l1_evidence_obligation_receipt_digest:sha256:6828d17aac3b07613c2d30b800f399e8bb855093285c67dc2f2fdd0730374dee",
+      "l1_evidence_obligation_receipt_ref:l1_evidence_obligation_receipt.json",
+      "l1_cognitive_c0_outcome_receipt_digest:sha256:7c177bac7cf5aeec059e22873cf951282491a7dd9f9e2bae37774984697ac4ff",
+      "l1_cognitive_c0_outcome_receipt_ref:l1_cognitive_c0_outcome_receipt.json"
+    ],
+    "l1_cognitive_v3_outcome_reconciliation_refs": [
+      "l1_cognitive_c0_outcome_receipt_digest:sha256:7c177bac7cf5aeec059e22873cf951282491a7dd9f9e2bae37774984697ac4ff",
+      "l1_cognitive_c0_outcome_receipt_ref:l1_cognitive_c0_outcome_receipt.json"
+    ],
+    "evidence_item_count": 38,
+    "dense_search_refs": [
+      "dense:fact_vectors:C:/Git/Agentic-Workflow-FRESH/data/cache/chromadb"
+    ],
+    "sparse_search_refs": [
+      "ref:sparse:lane:apps_rg.headline.sparse:status=OK:hits=4",
+      "ref:sparse:lane:apps_rg.executive_summary.sparse:status=OK:hits=4",
+      "ref:sparse:lane:apps_rg.competencies.sparse:status=OK:hits=5",
+      "ref:sparse:lane:apps_rg.unify_bullets.sparse:status=OK:hits=4",
+      "ref:sparse:lane:apps_rg.unify_narrative.sparse:status=OK:hits=4",
+      "ref:sparse:lane:apps_rg.ibm_bullets.sparse:status=OK:hits=4",
+      "ref:sparse:lane:apps_rg.ibm_narrative.sparse:status=OK:hits=4"
+    ],
+    "graph_expansion_refs": [
+      "ref:graph:traverse:39e30dbd232694a8"
+    ],
+    "graph_lane_na_ref": "ref:graph:traverse:39e30dbd232694a8",
+    "canonical_c0_2_dense_claimed": true,
+    "canonical_c0_3_graph_claimed": true,
+    "graph_lane_deferred": false,
+    "proof_pool_shim_skipped": false
+  },
+  "canonical_c0_3_graph_claimed": true,
+  "proof_pool_shim_only": false,
+  "binding_kind": "spine_c0_retrieve_apps_rg",
+  "explicit_non_claims": []
+}

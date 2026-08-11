@@ -10,8 +10,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 DELETED_MODULE_PATHS: tuple[str, ...] = (
     "apps_rg.cache.r1b_uwg_gateway_shim",
-    "agentic_core.runtime.entrypoints.apps_rg_integrated_pipeline",
-    "agentic_core.runtime.entrypoints.integrated_r4_deterministic_pipeline_run",
+    "apps_rg_runtime.runtime.entrypoints.apps_rg_integrated_pipeline",
+    "apps_rg_runtime.runtime.entrypoints.integrated_r4_deterministic_pipeline_run",
     "apps_rg.runtime.dispatch.headline_dispatch",
     "apps_rg.runtime.dispatch.executive_summary_dispatch",
     "apps_rg.runtime._offline.lane_batch",
@@ -20,8 +20,8 @@ DELETED_MODULE_PATHS: tuple[str, ...] = (
 
 DELETED_FILE_PATHS: tuple[str, ...] = (
     "apps_rg/cache/r1b_uwg_gateway_shim.py",
-    "agentic_core/runtime/entrypoints/apps_rg_integrated_pipeline.py",
-    "agentic_core/runtime/entrypoints/integrated_r4_deterministic_pipeline_run.py",
+    "apps_rg_runtime/runtime/entrypoints/apps_rg_integrated_pipeline.py",
+    "apps_rg_runtime/runtime/entrypoints/integrated_r4_deterministic_pipeline_run.py",
     "tools/cursor/migrate_shadow_import_paths.py",
     "artifacts/_tmp_w2b_shim.py",
     "artifacts/_tmp_w2c_shim.py",
@@ -49,7 +49,7 @@ def test_r1b_core_receipt_gap_fixture_replaces_shim_fixture() -> None:
     from apps_rg.cache.r1b_uwg_receipt_contract import document_r1b_uwg_core_receipt_gaps
 
     gaps = document_r1b_uwg_core_receipt_gaps()
-    assert gaps["agentic_core_edit_required_for_full_parity"] is False
+    assert gaps["apps_rg_runtime_edit_required_for_full_parity"] is False
     assert "R1bUwgPromotionGateway" in gaps["promotion_gateway_module"]
     stale_fixture = REPO_ROOT / "artifacts" / "apps_rg" / "r1b_semantic_cache" / "w10b_fixtures" / "shim_vs_core_gap.json"
     assert not stale_fixture.is_file()

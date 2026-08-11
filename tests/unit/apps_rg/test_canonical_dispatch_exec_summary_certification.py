@@ -27,7 +27,7 @@ def test_canonical_full_resume_fails_on_exec_summary_judge_block(
         art = Path(kwargs["artifact_dir"])
         es_dir = art / "lanes" / "executive_summary"
         es_dir.mkdir(parents=True, exist_ok=True)
-        (art / "agentic_core_how_trace.json").write_text("{}", encoding="utf-8")
+        (art / "apps_rg_how_trace.json").write_text("{}", encoding="utf-8")
         (art / "r4_run_manifest.json").write_text("{}", encoding="utf-8")
         (es_dir / "x3_disposition.json").write_text(
             json.dumps(

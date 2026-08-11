@@ -5,7 +5,7 @@ Local `main` integration target for the simplified `apps_rg` extraction.
 This initial commit is a provenance-preserving source transplant from the
 Agentic Workflow source-refreeze and standalone worktrees. It is intentionally
 not independently installable: product entry requires an external
-`agentic_core` source runtime. Before any product preflight, it writes
+`apps_rg` source runtime. Before any product preflight, it writes
 `standalone_runtime_dependency_receipt.json`, proving the resolved external
 package and the U0 → L1 → L0 → C0 → PA → L2 → Exit contract sentinels. An
 uninstalled editable/source-tree dependency is valid; the receipt does not

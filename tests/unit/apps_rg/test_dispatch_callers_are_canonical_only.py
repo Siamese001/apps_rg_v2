@@ -11,14 +11,14 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 ALLOWED_DISPATCH_APPS_RG_RUN = frozenset(
     {
         "apps_rg/__main__.py",
-        "agentic_core/runtime/entry/apps_rg_dispatch.py",
+        "apps_rg_runtime/runtime/entry/apps_rg_dispatch.py",
         "apps_rg/runtime/dispatch/apps_rg_dispatch.py",  # apps_rg_parse helper, not public CLI
     }
 )
 
 ALLOWED_CANONICAL_DISPATCH_PREFIXES = (
     "apps_rg/__main__.py",
-    "agentic_core/runtime/entry/apps_rg_dispatch.py",
+    "apps_rg_runtime/runtime/entry/apps_rg_dispatch.py",
     "apps_rg/runtime/dispatch/apps_rg_dispatch.py",
 )
 

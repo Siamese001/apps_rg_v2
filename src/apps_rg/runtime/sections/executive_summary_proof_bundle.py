@@ -1,4 +1,4 @@
-"""Post–X3 runtime proof surfaces for executive_summary (lane-local; not agentic_core)."""
+"""Post–X3 runtime proof surfaces for executive_summary (lane-local; not apps_rg)."""
 
 from __future__ import annotations
 
@@ -177,8 +177,8 @@ def build_section_runtime_proof_bundle(
 ) -> dict[str, Any]:
     # L99 / full L7 certification not claimed for modular section lane runs.
     l7_surfaces = [
-        "agentic_core_l7_route_family_coverage.json",
-        "agentic_core_spine_proof.json",
+        "apps_rg_l7_route_family_coverage.json",
+        "apps_rg_spine_proof.json",
         "integrated_runtime_artifact_manifest.json",
     ]
     spine = section_lane_spine_classification()

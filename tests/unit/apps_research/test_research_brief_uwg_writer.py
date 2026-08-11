@@ -4,7 +4,7 @@ from __future__ import annotations
 
 
 def test_commit_brief_record_supplies_l5_certification_ref() -> None:
-    from agentic_core.L4_state.uwg.durable_write_gateway import (
+    from apps_rg.runtime.local_state import (
         compute_state_diffs_digest,
     )
     from apps_research.integrations.governed_research_run import GovernedE2ERunRecord

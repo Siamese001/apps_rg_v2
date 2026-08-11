@@ -154,7 +154,16 @@ def compile_ibm_bullets_prompt(
         r0_response_schema=BULLETS_R0,
         render_context={"section_id": "ibm_bullets"},
     )
-    compiled = compile_section_prompt(assembly, section_id="ibm_bullets")
+    compiled = compile_section_prompt(
+        assembly,
+        section_id="ibm_bullets",
+        l1_cognitive_advisory=runtime_payload.get("l1_cognitive_advisory"),
+        l1_cognitive_plan=runtime_payload.get("l1_cognitive_v3_plan"),
+        l1_cognitive_revision=runtime_payload.get("l1_cognitive_revision"),
+        l1_cognitive_revision_advisory=runtime_payload.get(
+            "l1_cognitive_revision_advisory"
+        ),
+    )
     return finalize_section_compiled_with_proof_pool(compiled, runtime_payload=runtime_payload)
 
 

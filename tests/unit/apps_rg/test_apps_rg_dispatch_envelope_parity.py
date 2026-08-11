@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import RequestEnvelope
+from apps_rg.runtime.spine_contracts import RequestEnvelope
 from apps_rg.runtime.bindings.u0_binding import u0_validate_apps_rg
 from apps_rg.runtime.dispatch.apps_rg_dispatch import apps_rg_parse
 
@@ -48,3 +48,26 @@ def test_parse_preserves_jd_resume_brief_refs_and_enriches_resume_text(tmp_path:
     assert ap.get("source_resume_text") == p.source_resume_text
     assert ap.get("briefing_artifact_ref") == str(brief)
     assert ap.get("manual_brief_path") == str(brief)
+
+
+def test_parse_binds_cognitive_treatment_through_u0(tmp_path: Path) -> None:
+    brief = tmp_path / "brief.txt"
+    brief.write_text("Briefing.\n", encoding="utf-8")
+
+    env = apps_rg_parse(
+        {
+            "target_company": "Co",
+            "target_role": "Role",
+            "job_description_text": "Must lead platform engineering.",
+            "source_resume_text": "Led platform engineering.",
+            "briefing_artifact_ref": str(brief),
+            "l1_cognitive_treatment_arm": "l1_v2_control",
+            "l5_certification_ref": "test:valid:w6",
+        }
+    )
+
+    vr = u0_validate_apps_rg(env)
+    treatment = vr.app_payload["task_spec"]["l1_cognitive_treatment"]
+    assert treatment["arm"] == "l1_v2_control"
+    assert treatment["assignment_origin"] == "U0_VALIDATED_INGRESS"
+    assert treatment["v3_cognitive_plan_enabled"] is False

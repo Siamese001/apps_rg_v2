@@ -151,7 +151,7 @@ def test_payload_never_claims_write_authority() -> None:
 
 
 def test_exit_populates_cache_write_proposal_when_l5_verified() -> None:
-    from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+    from apps_rg_runtime.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
     from apps_rg.runtime.bindings.exit_binding import _exit_finalize_apps_rg_impl
     from apps_rg.runtime.l5.packet_builder import (
         attach_l5_packet_to_sealed,

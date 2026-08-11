@@ -57,7 +57,7 @@ def _unsafe_artifact_dir_result(*, detail: str) -> dict[str, Any]:
 def _runtime_dependency_blocked_result(
     *, artifact_dir: Path, dependency_receipt_path: Path, dependency_receipt: dict[str, Any]
 ) -> dict[str, Any]:
-    """Fail closed before preflight when the excluded core runtime is unavailable."""
+    """Fail closed before preflight when local runtime independence is unavailable."""
 
     dependency_status = str(dependency_receipt.get("status") or "UNKNOWN")
     return {
@@ -68,8 +68,8 @@ def _runtime_dependency_blocked_result(
         "pipeline_complete": False,
         "observability_repair_required": False,
         "completion_status": "BLOCKED",
-        "fault": "STANDALONE_RUNTIME_DEPENDENCY_UNAVAILABLE",
-        "completion_fault": "STANDALONE_RUNTIME_DEPENDENCY_UNAVAILABLE",
+        "fault": "APP_RUNTIME_INDEPENDENCE_UNAVAILABLE",
+        "completion_fault": "APP_RUNTIME_INDEPENDENCE_UNAVAILABLE",
         "artifact_dir": str(artifact_dir),
         "standalone_runtime_dependency_receipt": str(dependency_receipt_path),
         "standalone_runtime_dependency_status": dependency_status,
@@ -138,17 +138,17 @@ def run_product_whole_run_from_primitives(
         return _input_bundle_blocked_result(artifact_dir=art, detail=str(exc))
 
     from apps_rg.runtime.standalone_dependency_posture import (
-        EXTERNAL_RUNTIME_BOUND,
-        verify_external_agentic_core_runtime,
-        write_standalone_runtime_dependency_receipt,
+        APP_RUNTIME_INDEPENDENT,
+        verify_app_runtime_independence,
+        write_app_runtime_independence_receipt,
     )
 
-    dependency_receipt = verify_external_agentic_core_runtime(repo_root=repo)
-    dependency_receipt_path = write_standalone_runtime_dependency_receipt(
+    dependency_receipt = verify_app_runtime_independence(repo_root=repo)
+    dependency_receipt_path = write_app_runtime_independence_receipt(
         artifact_dir=art,
         receipt=dependency_receipt,
     )
-    if dependency_receipt.get("status") != EXTERNAL_RUNTIME_BOUND:
+    if dependency_receipt.get("status") != APP_RUNTIME_INDEPENDENT:
         result = _runtime_dependency_blocked_result(
             artifact_dir=art,
             dependency_receipt_path=dependency_receipt_path,

@@ -19,22 +19,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.L3_orchestration.exit_eval.dimension import Dimension, GraderClass
-from agentic_core.L3_orchestration.exit_eval.graders.base import GraderError
-from agentic_core.L3_orchestration.exit_eval.judges.google_judge import GoogleJudge
-from agentic_core.runtime.contracts.sealed_workflow_types import SealedWorkflowPackage
-from agentic_core.runtime.exit.apps_research_exit_binding import (
+from apps_rg.runtime.apps_runtime_compat import Dimension, GraderClass
+from apps_rg.runtime.apps_runtime_compat import GraderError
+from apps_rg.runtime.apps_runtime_compat import GoogleJudge
+from apps_rg.runtime.apps_runtime_compat import SealedWorkflowPackage
+from apps_rg.runtime.apps_runtime_compat import (
     exit_bind_and_finalize_apps_research,
 )
-from agentic_core.runtime.exit.exit_disposition import (
+from apps_rg.runtime.apps_runtime_compat import (
     X3D_ALLOW_FINISH,
     ExitDispositionReceipt,
     ExitReviewPacket,
     RuntimeExhaustBundle,
 )
-from agentic_core.runtime.exit.exit_package_driven_binding import ExitInput, ExitPolicy
-from agentic_core.runtime.gates.gate_profile_resolver import GateProfile
-from agentic_core.runtime.gates.gate_types import (
+from apps_rg.runtime.apps_runtime_compat import ExitInput, ExitPolicy
+from apps_rg.runtime.apps_runtime_compat import GateProfile
+from apps_rg.runtime.apps_runtime_compat import (
     GateMeshResult,
     GateVerdict,
     build_gate_mesh_result,

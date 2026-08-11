@@ -176,7 +176,7 @@ def _build_all_pass_run(root: Path) -> None:
             lane_root / "x3_disposition_receipt.json",
             {
                 "producer_component": (
-                    "agentic_core.runtime.entrypoints."
+                    "apps_rg_runtime.runtime.entrypoints."
                     "integrated_single_action_spine_run"
                 ),
                 "artifact_hash": _digest(core_payload),
@@ -544,7 +544,7 @@ def test_producer_core_x3_denial_overrides_allowing_app_mirror(
         lane_root / "x3_disposition_receipt.json",
         {
             "producer_component": (
-                "agentic_core.runtime.entrypoints.integrated_single_action_spine_run"
+                "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run"
             ),
             "artifact_hash": _digest(core_payload),
             "payload": core_payload,
@@ -650,7 +650,7 @@ def test_w1_emits_additive_correction_and_parallel_replay_proof(
         lane_root / "x3_disposition_receipt.json",
         {
             "producer_component": (
-                "agentic_core.runtime.entrypoints.integrated_single_action_spine_run"
+                "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run"
             ),
             "artifact_hash": _digest(core_payload),
             "payload": core_payload,

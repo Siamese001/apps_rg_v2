@@ -433,7 +433,7 @@ def main() -> int:
         "P1_FINDINGS_FIXED": validation.get("p1_fixed", []),
         "PROTECTED_PATHS_UNTOUCHED": [
             "apps_rg/runtime/",
-            "agentic_core/",
+            "apps_rg/",
             "prompts/",
             "selected_role_fact_set",
             "section generation lanes",

@@ -1,0 +1,874 @@
+{
+  "contract_type": "AppsRgC03FinalEvidenceContract",
+  "contract_version": "apps_rg_native_c03_v1",
+  "generated_at_utc": "2026-08-11T10:35:05.680168+00:00",
+  "section_id": "competencies",
+  "route_contract_ref": "route_contract.json",
+  "route_id": "R3_SIMPLE_GROUNDED_READ",
+  "route_family": "R3_SIMPLE_GROUNDED_READ",
+  "support_target": "R3_SIMPLE_GROUNDED_READ",
+  "graph_source": "augmented_skills_graph",
+  "graph_source_version": "master_skills_arsenal_graph_v1",
+  "graph_expansion_allowed": true,
+  "route_bound": true,
+  "acl_bound": true,
+  "acl_scope": "section:competencies",
+  "source_scope": "augmented_skills_graph",
+  "freshness_profile": "apps_rg_static_graph_v1",
+  "graph_hop_bounds": 2,
+  "graph_query_seed": "R3_SIMPLE_GROUNDED_READ",
+  "selected_graph_nodes": [
+    "metric_ey_bcbs239_risk_data_domain_count",
+    "metric_ey_core_conversion_rule_traceability_count",
+    "metric_ey_core_integration_data_mapping_count",
+    "metric_ey_risk",
+    "metric_ibm_client_facing_modernization_playbooks",
+    "metric_ibm_executive_buyer_architecture_alignment",
+    "metric_ibm_offering_accelerator_package_reuse",
+    "metric_ibm_presales_discovery_to_solution_handoff",
+    "metric_insurtech_audit_logging_coverage_pct",
+    "metric_insurtech_control_ownership_matrix_count",
+    "metric_insurtech_safety_operating_model_artifacts_count",
+    "metric_insurtech_sensitive_data_controls_count",
+    "metric_unify_cloud_data_runtime_integration_patterns",
+    "metric_unify_high_availability_distributed_service_patterns",
+    "metric_unify_partner_cosell_solution_motion_count",
+    "metric_unify_partner_enablement_asset_set",
+    "node_fact_metric_ey_bcbs239_risk_data_domain_count",
+    "node_fact_metric_ey_core_conversion_rule_traceability_count",
+    "node_fact_metric_ey_core_integration_data_mapping_count",
+    "node_fact_metric_ey_risk",
+    "node_fact_metric_ibm_client_facing_modernization_playbooks",
+    "node_fact_metric_ibm_executive_buyer_architecture_alignment",
+    "node_fact_metric_ibm_offering_accelerator_package_reuse",
+    "node_fact_metric_ibm_presales_discovery_to_solution_handoff",
+    "node_fact_metric_insurtech_audit_logging_coverage_pct",
+    "node_fact_metric_insurtech_control_ownership_matrix_count",
+    "node_fact_metric_insurtech_safety_operating_model_artifacts_count",
+    "node_fact_metric_insurtech_sensitive_data_controls_count",
+    "node_fact_metric_unify_cloud_data_runtime_integration_patterns",
+    "node_fact_metric_unify_high_availability_distributed_service_patterns",
+    "node_fact_metric_unify_partner_cosell_solution_motion_count",
+    "node_fact_metric_unify_partner_enablement_asset_set",
+    "node_fact_reb_ey_erm_risk_governance",
+    "node_fact_reb_ey_insurance_core_modernization",
+    "node_fact_reb_ibm_offering_accelerator_management",
+    "node_fact_reb_ibm_presales_solution_engineering",
+    "node_fact_reb_insurtech_aws_shared_responsibility_operating_model",
+    "node_fact_reb_insurtech_regulated_aws_control_implementation",
+    "node_fact_reb_unify_distributed_ecosystem_engineering",
+    "node_fact_reb_unify_partner_channel_cosell",
+    "node_fact_skill_aws_iam_kms_cloudtrail_controls",
+    "node_fact_skill_cloud_control_ownership_mapping",
+    "node_fact_skill_credit_adjudication_default_risk",
+    "node_fact_skill_dense_sparse_exact_retrieval_design",
+    "node_fact_skill_insurance_claims_automation",
+    "node_fact_skill_insurance_core_to_bi_reporting_handoff",
+    "node_fact_skill_p2_gtm_executive_buyer_alignment",
+    "node_fact_skill_p2_gtm_solution_mapping",
+    "node_fact_skill_p2_tech_demoable_accelerator",
+    "node_fact_skill_p2_tech_ibm_cloud_portfolio_anchor",
+    "node_fact_skill_partner_cloud_vendor_joint_gtm",
+    "node_fact_skill_partner_co_selling",
+    "node_fact_skill_partner_partner_led_ai_solutions",
+    "node_fact_skill_partner_pre_sales",
+    "node_fact_skill_pii_encryption_for_insurance_data",
+    "node_fact_skill_regulated_cloud_adoption_guardrails",
+    "node_fact_skill_risk_data_aggregation_bcbs239",
+    "node_fact_skill_runtime_resilience_controls",
+    "node_fact_skill_soc2_zero_trust_security",
+    "node_fact_skill_sr_cloud_data_platform_engineering",
+    "node_fact_skill_sr_w12_industry_reference_architecture",
+    "reb_ey_erm_risk_governance",
+    "reb_ey_insurance_core_modernization",
+    "reb_ibm_offering_accelerator_management",
+    "reb_ibm_presales_solution_engineering",
+    "reb_insurtech_aws_shared_responsibility_operating_model",
+    "reb_insurtech_regulated_aws_control_implementation",
+    "reb_unify_distributed_ecosystem_engineering",
+    "reb_unify_partner_channel_cosell",
+    "skill_aws_iam_kms_cloudtrail_controls",
+    "skill_cloud_control_ownership_mapping",
+    "skill_credit_adjudication_default_risk",
+    "skill_dense_sparse_exact_retrieval_design",
+    "skill_insurance_claims_automation",
+    "skill_insurance_core_to_bi_reporting_handoff",
+    "skill_p2_gtm_executive_buyer_alignment",
+    "skill_p2_gtm_solution_mapping",
+    "skill_p2_tech_demoable_accelerator",
+    "skill_p2_tech_ibm_cloud_portfolio_anchor",
+    "skill_partner_cloud_vendor_joint_gtm",
+    "skill_partner_co_selling",
+    "skill_partner_partner_led_ai_solutions",
+    "skill_partner_pre_sales",
+    "skill_pii_encryption_for_insurance_data",
+    "skill_regulated_cloud_adoption_guardrails",
+    "skill_risk_data_aggregation_bcbs239",
+    "skill_runtime_resilience_controls",
+    "skill_soc2_zero_trust_security",
+    "skill_sr_cloud_data_platform_engineering",
+    "skill_sr_w12_industry_reference_architecture"
+  ],
+  "selected_source_fact_ids": [
+    "metric_ey_bcbs239_risk_data_domain_count",
+    "metric_ey_core_conversion_rule_traceability_count",
+    "metric_ey_core_integration_data_mapping_count",
+    "metric_ey_risk_metric_definition_count",
+    "metric_ibm_client_facing_modernization_playbooks",
+    "metric_ibm_executive_buyer_architecture_alignment",
+    "metric_ibm_offering_accelerator_package_reuse",
+    "metric_ibm_presales_discovery_to_solution_handoff",
+    "metric_insurtech_audit_logging_coverage_pct",
+    "metric_insurtech_control_ownership_matrix_count",
+    "metric_insurtech_safety_operating_model_artifacts_count",
+    "metric_insurtech_sensitive_data_controls_count",
+    "metric_unify_cloud_data_runtime_integration_patterns",
+    "metric_unify_high_availability_distributed_service_patterns",
+    "metric_unify_partner_cosell_solution_motion_count",
+    "metric_unify_partner_enablement_asset_set",
+    "reb_ey_erm_risk_governance",
+    "reb_ey_insurance_core_modernization",
+    "reb_ibm_offering_accelerator_management",
+    "reb_ibm_presales_solution_engineering",
+    "reb_insurtech_aws_shared_responsibility_operating_model",
+    "reb_insurtech_regulated_aws_control_implementation",
+    "reb_unify_distributed_ecosystem_engineering",
+    "reb_unify_partner_channel_cosell",
+    "skill_aws_iam_kms_cloudtrail_controls",
+    "skill_cloud_control_ownership_mapping",
+    "skill_credit_adjudication_default_risk",
+    "skill_dense_sparse_exact_retrieval_design",
+    "skill_insurance_claims_automation",
+    "skill_insurance_core_to_bi_reporting_handoff",
+    "skill_p2_gtm_executive_buyer_alignment",
+    "skill_p2_gtm_solution_mapping",
+    "skill_p2_tech_demoable_accelerator",
+    "skill_p2_tech_ibm_cloud_portfolio_anchor",
+    "skill_partner_cloud_vendor_joint_gtm",
+    "skill_partner_co_selling",
+    "skill_partner_partner_led_ai_solutions",
+    "skill_partner_pre_sales",
+    "skill_pii_encryption_for_insurance_data",
+    "skill_regulated_cloud_adoption_guardrails",
+    "skill_risk_data_aggregation_bcbs239",
+    "skill_runtime_resilience_controls",
+    "skill_soc2_zero_trust_security",
+    "skill_sr_cloud_data_platform_engineering",
+    "skill_sr_w12_industry_reference_architecture"
+  ],
+  "graph_lineage_refs": [
+    "ref:graph:version:master_skills_arsenal_graph_v1",
+    "ref:graph:node_count:375",
+    "ref:graph:edge_count:2315",
+    "ref:graph:fact_lineage:metric_ey_bcbs239_risk_data_domain_count",
+    "ref:graph:fact_lineage:metric_ey_core_conversion_rule_traceability_count",
+    "ref:graph:fact_lineage:metric_ey_core_integration_data_mapping_count",
+    "ref:graph:fact_lineage:metric_ey_risk_metric_definition_count",
+    "ref:graph:fact_lineage:metric_ibm_client_facing_modernization_playbooks",
+    "ref:graph:fact_lineage:metric_ibm_executive_buyer_architecture_alignment",
+    "ref:graph:fact_lineage:metric_ibm_offering_accelerator_package_reuse",
+    "ref:graph:fact_lineage:metric_ibm_presales_discovery_to_solution_handoff",
+    "ref:graph:fact_lineage:metric_insurtech_audit_logging_coverage_pct",
+    "ref:graph:fact_lineage:metric_insurtech_control_ownership_matrix_count",
+    "ref:graph:fact_lineage:metric_insurtech_safety_operating_model_artifacts_count",
+    "ref:graph:fact_lineage:metric_insurtech_sensitive_data_controls_count",
+    "ref:graph:fact_lineage:metric_unify_cloud_data_runtime_integration_patterns",
+    "ref:graph:fact_lineage:metric_unify_high_availability_distributed_service_patterns",
+    "ref:graph:fact_lineage:metric_unify_partner_cosell_solution_motion_count",
+    "ref:graph:fact_lineage:metric_unify_partner_enablement_asset_set",
+    "ref:graph:fact_lineage:reb_ey_erm_risk_governance",
+    "ref:graph:fact_lineage:reb_ey_insurance_core_modernization",
+    "ref:graph:fact_lineage:reb_ibm_offering_accelerator_management",
+    "ref:graph:fact_lineage:reb_ibm_presales_solution_engineering",
+    "ref:graph:fact_lineage:reb_insurtech_aws_shared_responsibility_operating_model",
+    "ref:graph:fact_lineage:reb_insurtech_regulated_aws_control_implementation",
+    "ref:graph:fact_lineage:reb_unify_distributed_ecosystem_engineering",
+    "ref:graph:fact_lineage:reb_unify_partner_channel_cosell",
+    "ref:graph:fact_lineage:skill_aws_iam_kms_cloudtrail_controls",
+    "ref:graph:fact_lineage:skill_cloud_control_ownership_mapping",
+    "ref:graph:fact_lineage:skill_credit_adjudication_default_risk",
+    "ref:graph:fact_lineage:skill_dense_sparse_exact_retrieval_design",
+    "ref:graph:fact_lineage:skill_insurance_claims_automation",
+    "ref:graph:fact_lineage:skill_insurance_core_to_bi_reporting_handoff",
+    "ref:graph:fact_lineage:skill_p2_gtm_executive_buyer_alignment",
+    "ref:graph:fact_lineage:skill_p2_gtm_solution_mapping"
+  ],
+  "source_lineage_refs": [
+    "ref:source:augmented_skills_graph",
+    "ref:graph:apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "ref:source_fact:metric_ey_bcbs239_risk_data_domain_count",
+    "ref:source_fact:metric_ey_core_conversion_rule_traceability_count",
+    "ref:source_fact:metric_ey_core_integration_data_mapping_count",
+    "ref:source_fact:metric_ey_risk_metric_definition_count",
+    "ref:source_fact:metric_ibm_client_facing_modernization_playbooks",
+    "ref:source_fact:metric_ibm_executive_buyer_architecture_alignment",
+    "ref:source_fact:metric_ibm_offering_accelerator_package_reuse",
+    "ref:source_fact:metric_ibm_presales_discovery_to_solution_handoff",
+    "ref:source_fact:metric_insurtech_audit_logging_coverage_pct",
+    "ref:source_fact:metric_insurtech_control_ownership_matrix_count",
+    "ref:source_fact:metric_insurtech_safety_operating_model_artifacts_count",
+    "ref:source_fact:metric_insurtech_sensitive_data_controls_count",
+    "ref:source_fact:metric_unify_cloud_data_runtime_integration_patterns",
+    "ref:source_fact:metric_unify_high_availability_distributed_service_patterns",
+    "ref:source_fact:metric_unify_partner_cosell_solution_motion_count",
+    "ref:source_fact:metric_unify_partner_enablement_asset_set",
+    "ref:source_fact:reb_ey_erm_risk_governance",
+    "ref:source_fact:reb_ey_insurance_core_modernization",
+    "ref:source_fact:reb_ibm_offering_accelerator_management",
+    "ref:source_fact:reb_ibm_presales_solution_engineering",
+    "ref:source_fact:reb_insurtech_aws_shared_responsibility_operating_model",
+    "ref:source_fact:reb_insurtech_regulated_aws_control_implementation",
+    "ref:source_fact:reb_unify_distributed_ecosystem_engineering",
+    "ref:source_fact:reb_unify_partner_channel_cosell",
+    "ref:source_fact:skill_aws_iam_kms_cloudtrail_controls",
+    "ref:source_fact:skill_cloud_control_ownership_mapping",
+    "ref:source_fact:skill_credit_adjudication_default_risk",
+    "ref:source_fact:skill_dense_sparse_exact_retrieval_design",
+    "ref:source_fact:skill_insurance_claims_automation",
+    "ref:source_fact:skill_insurance_core_to_bi_reporting_handoff",
+    "ref:source_fact:skill_p2_gtm_executive_buyer_alignment",
+    "ref:source_fact:skill_p2_gtm_solution_mapping"
+  ],
+  "citation_map": {
+    "metric_ey_bcbs239_risk_data_domain_count": [
+      "ref:graph:fact_lineage:metric_ey_bcbs239_risk_data_domain_count"
+    ],
+    "metric_ey_core_conversion_rule_traceability_count": [
+      "ref:graph:fact_lineage:metric_ey_core_conversion_rule_traceability_count"
+    ],
+    "metric_ey_core_integration_data_mapping_count": [
+      "ref:graph:fact_lineage:metric_ey_core_integration_data_mapping_count"
+    ],
+    "metric_ey_risk_metric_definition_count": [
+      "ref:graph:fact_lineage:metric_ey_risk_metric_definition_count"
+    ],
+    "metric_ibm_client_facing_modernization_playbooks": [
+      "ref:graph:fact_lineage:metric_ibm_client_facing_modernization_playbooks"
+    ],
+    "metric_ibm_executive_buyer_architecture_alignment": [
+      "ref:graph:fact_lineage:metric_ibm_executive_buyer_architecture_alignment"
+    ],
+    "metric_ibm_offering_accelerator_package_reuse": [
+      "ref:graph:fact_lineage:metric_ibm_offering_accelerator_package_reuse"
+    ],
+    "metric_ibm_presales_discovery_to_solution_handoff": [
+      "ref:graph:fact_lineage:metric_ibm_presales_discovery_to_solution_handoff"
+    ],
+    "metric_insurtech_audit_logging_coverage_pct": [
+      "ref:graph:fact_lineage:metric_insurtech_audit_logging_coverage_pct"
+    ],
+    "metric_insurtech_control_ownership_matrix_count": [
+      "ref:graph:fact_lineage:metric_insurtech_control_ownership_matrix_count"
+    ],
+    "metric_insurtech_safety_operating_model_artifacts_count": [
+      "ref:graph:fact_lineage:metric_insurtech_safety_operating_model_artifacts_count"
+    ],
+    "metric_insurtech_sensitive_data_controls_count": [
+      "ref:graph:fact_lineage:metric_insurtech_sensitive_data_controls_count"
+    ],
+    "metric_unify_cloud_data_runtime_integration_patterns": [
+      "ref:graph:fact_lineage:metric_unify_cloud_data_runtime_integration_patterns"
+    ],
+    "metric_unify_high_availability_distributed_service_patterns": [
+      "ref:graph:fact_lineage:metric_unify_high_availability_distributed_service_patterns"
+    ],
+    "metric_unify_partner_cosell_solution_motion_count": [
+      "ref:graph:fact_lineage:metric_unify_partner_cosell_solution_motion_count"
+    ],
+    "metric_unify_partner_enablement_asset_set": [
+      "ref:graph:fact_lineage:metric_unify_partner_enablement_asset_set"
+    ],
+    "reb_ey_erm_risk_governance": [
+      "ref:graph:fact_lineage:reb_ey_erm_risk_governance"
+    ],
+    "reb_ey_insurance_core_modernization": [
+      "ref:graph:fact_lineage:reb_ey_insurance_core_modernization"
+    ],
+    "reb_ibm_offering_accelerator_management": [
+      "ref:graph:fact_lineage:reb_ibm_offering_accelerator_management"
+    ],
+    "reb_ibm_presales_solution_engineering": [
+      "ref:graph:fact_lineage:reb_ibm_presales_solution_engineering"
+    ],
+    "reb_insurtech_aws_shared_responsibility_operating_model": [
+      "ref:graph:fact_lineage:reb_insurtech_aws_shared_responsibility_operating_model"
+    ],
+    "reb_insurtech_regulated_aws_control_implementation": [
+      "ref:graph:fact_lineage:reb_insurtech_regulated_aws_control_implementation"
+    ],
+    "reb_unify_distributed_ecosystem_engineering": [
+      "ref:graph:fact_lineage:reb_unify_distributed_ecosystem_engineering"
+    ],
+    "reb_unify_partner_channel_cosell": [
+      "ref:graph:fact_lineage:reb_unify_partner_channel_cosell"
+    ],
+    "skill_aws_iam_kms_cloudtrail_controls": [
+      "ref:graph:fact_lineage:skill_aws_iam_kms_cloudtrail_controls"
+    ],
+    "skill_cloud_control_ownership_mapping": [
+      "ref:graph:fact_lineage:skill_cloud_control_ownership_mapping"
+    ],
+    "skill_credit_adjudication_default_risk": [
+      "ref:graph:fact_lineage:skill_credit_adjudication_default_risk"
+    ],
+    "skill_dense_sparse_exact_retrieval_design": [
+      "ref:graph:fact_lineage:skill_dense_sparse_exact_retrieval_design"
+    ],
+    "skill_insurance_claims_automation": [
+      "ref:graph:fact_lineage:skill_insurance_claims_automation"
+    ],
+    "skill_insurance_core_to_bi_reporting_handoff": [
+      "ref:graph:fact_lineage:skill_insurance_core_to_bi_reporting_handoff"
+    ],
+    "skill_p2_gtm_executive_buyer_alignment": [
+      "ref:graph:fact_lineage:skill_p2_gtm_executive_buyer_alignment"
+    ],
+    "skill_p2_gtm_solution_mapping": [
+      "ref:graph:fact_lineage:skill_p2_gtm_solution_mapping"
+    ],
+    "skill_p2_tech_demoable_accelerator": [
+      "ref:graph:fact_lineage:skill_p2_tech_demoable_accelerator"
+    ],
+    "skill_p2_tech_ibm_cloud_portfolio_anchor": [
+      "ref:graph:fact_lineage:skill_p2_tech_ibm_cloud_portfolio_anchor"
+    ],
+    "skill_partner_cloud_vendor_joint_gtm": [
+      "ref:graph:fact_lineage:skill_partner_cloud_vendor_joint_gtm"
+    ],
+    "skill_partner_co_selling": [
+      "ref:graph:fact_lineage:skill_partner_co_selling"
+    ],
+    "skill_partner_partner_led_ai_solutions": [
+      "ref:graph:fact_lineage:skill_partner_partner_led_ai_solutions"
+    ],
+    "skill_partner_pre_sales": [
+      "ref:graph:fact_lineage:skill_partner_pre_sales"
+    ],
+    "skill_pii_encryption_for_insurance_data": [
+      "ref:graph:fact_lineage:skill_pii_encryption_for_insurance_data"
+    ],
+    "skill_regulated_cloud_adoption_guardrails": [
+      "ref:graph:fact_lineage:skill_regulated_cloud_adoption_guardrails"
+    ],
+    "skill_risk_data_aggregation_bcbs239": [
+      "ref:graph:fact_lineage:skill_risk_data_aggregation_bcbs239"
+    ],
+    "skill_runtime_resilience_controls": [
+      "ref:graph:fact_lineage:skill_runtime_resilience_controls"
+    ],
+    "skill_soc2_zero_trust_security": [
+      "ref:graph:fact_lineage:skill_soc2_zero_trust_security"
+    ],
+    "skill_sr_cloud_data_platform_engineering": [
+      "ref:graph:fact_lineage:skill_sr_cloud_data_platform_engineering"
+    ],
+    "skill_sr_w12_industry_reference_architecture": [
+      "ref:graph:fact_lineage:skill_sr_w12_industry_reference_architecture"
+    ]
+  },
+  "evidence_items": [
+    {
+      "evidence_id": "evidence:graph:metric_ey_bcbs239_risk_data_domain_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ey_bcbs239_risk_data_domain_count",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_ey_core_conversion_rule_traceability_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ey_core_conversion_rule_traceability_count",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_ey_core_integration_data_mapping_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ey_core_integration_data_mapping_count",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_ey_risk_metric_definition_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ey_risk",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_ibm_client_facing_modernization_playbooks",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ibm_client_facing_modernization_playbooks",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_ibm_executive_buyer_architecture_alignment",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ibm_executive_buyer_architecture_alignment",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_ibm_offering_accelerator_package_reuse",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ibm_offering_accelerator_package_reuse",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_ibm_presales_discovery_to_solution_handoff",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_ibm_presales_discovery_to_solution_handoff",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_insurtech_audit_logging_coverage_pct",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_insurtech_audit_logging_coverage_pct",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_insurtech_control_ownership_matrix_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_insurtech_control_ownership_matrix_count",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_insurtech_safety_operating_model_artifacts_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_insurtech_safety_operating_model_artifacts_count",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_insurtech_sensitive_data_controls_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_insurtech_sensitive_data_controls_count",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_unify_cloud_data_runtime_integration_patterns",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_unify_cloud_data_runtime_integration_patterns",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_unify_high_availability_distributed_service_patterns",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_unify_high_availability_distributed_service_patterns",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_unify_partner_cosell_solution_motion_count",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_unify_partner_cosell_solution_motion_count",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:metric_unify_partner_enablement_asset_set",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_metric_unify_partner_enablement_asset_set",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_ey_erm_risk_governance",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ey_erm_risk_governance",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_ey_insurance_core_modernization",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ey_insurance_core_modernization",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_ibm_offering_accelerator_management",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ibm_offering_accelerator_management",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_ibm_presales_solution_engineering",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_ibm_presales_solution_engineering",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_insurtech_aws_shared_responsibility_operating_model",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_insurtech_aws_shared_responsibility_operating_model",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_insurtech_regulated_aws_control_implementation",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_insurtech_regulated_aws_control_implementation",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_unify_distributed_ecosystem_engineering",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_unify_distributed_ecosystem_engineering",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:reb_unify_partner_channel_cosell",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_reb_unify_partner_channel_cosell",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_aws_iam_kms_cloudtrail_controls",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_aws_iam_kms_cloudtrail_controls",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_cloud_control_ownership_mapping",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_cloud_control_ownership_mapping",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_credit_adjudication_default_risk",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_credit_adjudication_default_risk",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_dense_sparse_exact_retrieval_design",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_dense_sparse_exact_retrieval_design",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_insurance_claims_automation",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_insurance_claims_automation",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_insurance_core_to_bi_reporting_handoff",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_insurance_core_to_bi_reporting_handoff",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_p2_gtm_executive_buyer_alignment",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_p2_gtm_executive_buyer_alignment",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_p2_gtm_solution_mapping",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_p2_gtm_solution_mapping",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_p2_tech_demoable_accelerator",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_p2_tech_demoable_accelerator",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_p2_tech_ibm_cloud_portfolio_anchor",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_p2_tech_ibm_cloud_portfolio_anchor",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_partner_cloud_vendor_joint_gtm",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_partner_cloud_vendor_joint_gtm",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_partner_co_selling",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_partner_co_selling",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_partner_partner_led_ai_solutions",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_partner_partner_led_ai_solutions",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_partner_pre_sales",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_partner_pre_sales",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_pii_encryption_for_insurance_data",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_pii_encryption_for_insurance_data",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_regulated_cloud_adoption_guardrails",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_regulated_cloud_adoption_guardrails",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_risk_data_aggregation_bcbs239",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_risk_data_aggregation_bcbs239",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_runtime_resilience_controls",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_runtime_resilience_controls",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_soc2_zero_trust_security",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_soc2_zero_trust_security",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_sr_cloud_data_platform_engineering",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_sr_cloud_data_platform_engineering",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    },
+    {
+      "evidence_id": "evidence:graph:skill_sr_w12_industry_reference_architecture",
+      "source": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+      "source_class": "augmented_skills_graph",
+      "graph_node_ref": "node_fact_skill_sr_w12_industry_reference_architecture",
+      "authority": "augmented_skills_graph",
+      "data_only": true,
+      "not_instruction": true
+    }
+  ],
+  "evidence_strata": {
+    "graph_substrate": "augmented_skills_graph",
+    "targeting_inputs": "non_proof"
+  },
+  "support_status": "SUPPORTED",
+  "excluded_evidence_refs": [],
+  "blocked_source_refs": [],
+  "blocked_node_ids": [],
+  "contradiction_report": {
+    "conflicts": []
+  },
+  "final_evidence_digest": "b333869e715ad19b4c06e55e240f5df7",
+  "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "graph_sig": "607bafe73e111a30d6f1e269b84267c4",
+  "graph_expansion_refs": [
+    "ref:graph:edge:edge_domain_skill_skill_partner_co_selling",
+    "ref:graph:edge:edge_epoch_skill_skill_partner_co_selling",
+    "ref:graph:edge:edge_skill_fact_skill_partner_co_selling_fact_partnerships_gtm_003",
+    "ref:graph:edge:edge_external_eligible_skill_partner_co_selling",
+    "ref:graph:edge:edge_skill_section_skill_partner_co_selling_executive_summary",
+    "ref:graph:edge:edge_skill_section_skill_partner_co_selling_unify_bullets",
+    "ref:graph:edge:edge_domain_skill_skill_partner_pre_sales",
+    "ref:graph:edge:edge_epoch_skill_skill_partner_pre_sales",
+    "ref:graph:edge:edge_skill_section_skill_partner_pre_sales_ibm_bullets",
+    "ref:graph:edge:edge_skill_section_skill_partner_pre_sales_unify_narrative",
+    "ref:graph:edge:edge_domain_skill_skill_partner_partner_led_ai_solutions",
+    "ref:graph:edge:edge_epoch_skill_skill_partner_partner_led_ai_solutions",
+    "ref:graph:edge:edge_skill_fact_skill_partner_partner_led_ai_solutions_fact_partnerships_gtm_001",
+    "ref:graph:edge:edge_external_eligible_skill_partner_partner_led_ai_solutions",
+    "ref:graph:edge:edge_skill_section_skill_partner_partner_led_ai_solutions_unify_bullets",
+    "ref:graph:edge:edge_domain_skill_skill_partner_cloud_vendor_joint_gtm",
+    "ref:graph:edge:edge_epoch_skill_skill_partner_cloud_vendor_joint_gtm",
+    "ref:graph:edge:edge_skill_fact_skill_partner_cloud_vendor_joint_gtm_fact_partnerships_gtm_004",
+    "ref:graph:edge:edge_external_eligible_skill_partner_cloud_vendor_joint_gtm",
+    "ref:graph:edge:edge_skill_section_skill_partner_cloud_vendor_joint_gtm_competencies",
+    "ref:graph:edge:edge_skill_section_skill_partner_cloud_vendor_joint_gtm_unify_bullets",
+    "ref:graph:edge:edge_domain_skill_skill_p2_gtm_solution_mapping",
+    "ref:graph:edge:edge_epoch_skill_skill_p2_gtm_solution_mapping",
+    "ref:graph:edge:edge_skill_fact_skill_p2_gtm_solution_mapping_fact_solutions_001",
+    "ref:graph:edge:edge_external_eligible_skill_p2_gtm_solution_mapping",
+    "ref:graph:edge:edge_skill_section_skill_p2_gtm_solution_mapping_executive_summary",
+    "ref:graph:edge:edge_skill_section_skill_p2_gtm_solution_mapping_competencies",
+    "ref:graph:edge:edge_skill_section_skill_p2_gtm_solution_mapping_ibm_narrative",
+    "ref:graph:edge:edge_domain_skill_skill_p2_gtm_executive_buyer_alignment",
+    "ref:graph:edge:edge_epoch_skill_skill_p2_gtm_executive_buyer_alignment",
+    "ref:graph:edge:edge_skill_fact_skill_p2_gtm_executive_buyer_alignment_fact_sales_accounts_001",
+    "ref:graph:edge:edge_external_eligible_skill_p2_gtm_executive_buyer_alignment",
+    "ref:graph:edge:edge_skill_section_skill_p2_gtm_executive_buyer_alignment_executive_summary",
+    "ref:graph:edge:edge_skill_section_skill_p2_gtm_executive_buyer_alignment_headline",
+    "ref:graph:edge:edge_domain_skill_skill_p2_tech_demoable_accelerator",
+    "ref:graph:edge:edge_epoch_skill_skill_p2_tech_demoable_accelerator",
+    "ref:graph:edge:edge_skill_section_skill_p2_tech_demoable_accelerator_unify_narrative",
+    "ref:graph:edge:edge_skill_section_skill_p2_tech_demoable_accelerator_executive_summary",
+    "ref:graph:edge:edge_domain_skill_skill_p2_tech_ibm_cloud_portfolio_anchor",
+    "ref:graph:edge:edge_epoch_skill_skill_p2_tech_ibm_cloud_portfolio_anchor",
+    "ref:graph:edge:edge_skill_section_skill_p2_tech_ibm_cloud_portfolio_anchor_ibm_narrative",
+    "ref:graph:edge:edge_skill_section_skill_p2_tech_ibm_cloud_portfolio_anchor_executive_summary",
+    "ref:graph:edge:edge_domain_skill_skill_sr_cloud_data_platform_engineering",
+    "ref:graph:edge:edge_epoch_skill_skill_sr_cloud_data_platform_engineering",
+    "ref:graph:edge:edge_skill_fact_skill_sr_cloud_data_platform_engineering_fact_engineering_platform_001",
+    "ref:graph:edge:edge_external_eligible_skill_sr_cloud_data_platform_engineering",
+    "ref:graph:edge:edge_skill_section_skill_sr_cloud_data_platform_engineering_competencies",
+    "ref:graph:edge:edge_skill_section_skill_sr_cloud_data_platform_engineering_unify_bullets",
+    "ref:graph:edge:edge_domain_skill_skill_sr_w12_industry_reference_architecture",
+    "ref:graph:edge:edge_epoch_skill_skill_sr_w12_industry_reference_architecture",
+    "ref:graph:edge:edge_skill_fact_skill_sr_w12_industry_reference_architecture_fact_solutions_002",
+    "ref:graph:edge:edge_external_eligible_skill_sr_w12_industry_reference_architecture",
+    "ref:graph:edge:edge_skill_section_skill_sr_w12_industry_reference_architecture_competencies",
+    "ref:graph:edge:edge_skill_section_skill_sr_w12_industry_reference_architecture_ibm_bullets",
+    "ref:graph:edge:edge_domain_skill_skill_dense_sparse_exact_retrieval_design",
+    "ref:graph:edge:edge_epoch_skill_skill_dense_sparse_exact_retrieval_design",
+    "ref:graph:edge:edge_skill_concept_skill_dense_sparse_exact_retrieval_design_concept_GraphRAG",
+    "ref:graph:edge:edge_skill_concept_skill_dense_sparse_exact_retrieval_design_concept_DenseSparseRetrieval",
+    "ref:graph:edge:edge_skill_repo_skill_dense_sparse_exact_retrieval_design_repo_488fa1",
+    "ref:graph:edge:edge_skill_fact_skill_dense_sparse_exact_retrieval_design_fact_engineering_platform_001",
+    "ref:graph:edge:edge_external_eligible_skill_dense_sparse_exact_retrieval_design",
+    "ref:graph:edge:edge_skill_section_skill_dense_sparse_exact_retrieval_design_executive_summary",
+    "ref:graph:edge:edge_skill_section_skill_dense_sparse_exact_retrieval_design_competencies",
+    "ref:graph:edge:edge_skill_section_skill_dense_sparse_exact_retrieval_design_unify_bullets"
+  ],
+  "apps_rg_c03_skills_graph_used": true,
+  "core_c03_graph_rag_used": false,
+  "canonical_c0_3_claimed": false,
+  "binding_classification": "FULL_C0_3_GRAPHRAG_BINDING",
+  "binding_kind": "native_c03_skills_graph",
+  "fec_shape_only": false,
+  "canonical_final_evidence_contract_emitted": true,
+  "section_local_graph_context_only": false,
+  "can_satisfy_integrated_product_proof": true,
+  "product_proof_eligible": true,
+  "pa_data_only": true,
+  "explicit_non_claims": [
+    "graph nodes and evidence_items are PA data only — not instructions",
+    "JD/briefing are targeting only unless explicitly source-authorized",
+    "section CLI alone does not satisfy integrated product proof"
+  ],
+  "producer_stage": "apps_rg.native_c03_skills_graph"
+}

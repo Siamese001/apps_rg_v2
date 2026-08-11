@@ -1,0 +1,180 @@
+{
+  "alignment_source": "contract_only_pseudo_rows",
+  "apps_eval_rows_bound": false,
+  "child_run_id": "unify_bullets_20260811_101248",
+  "current_run_mutation_assertion": false,
+  "current_run_x3_mutation_assertion": false,
+  "direct_l4_write_assertion": false,
+  "durable_write_assertion": false,
+  "eval_binding_status": "PENDING",
+  "evidence_class": "CONTRACT_ONLY_ADVISORY",
+  "future_run_only_assertion": true,
+  "g28_audit_completeness": {
+    "assertion_results": {
+      "exit_disposition_ref": true,
+      "l5_certification_ref": true,
+      "policy_hash": true,
+      "replay_key": true,
+      "route_contract_ref": true,
+      "sealed_artifacts": true,
+      "source_lineage_or_normalized_records": true,
+      "trace_root": false
+    },
+    "deterministic_digest": "48efcff12b34e65c88090f5641459a5eb2ef72dfc1ec7b0074007dbc454a512b",
+    "forbidden_attempts": [],
+    "gate_id": "G28_AUDIT_COMPLETENESS",
+    "gate_name": "L6 G28 audit completeness",
+    "gate_receipt_id": "g28-cd9d611b66cc403899c9b5e77e7558db",
+    "missing_refs": [
+      "trace_root"
+    ],
+    "notes": "UNKNOWN is fail-closed; sentinel L5 certification is missing evidence.",
+    "present_refs": [
+      "exit_disposition_ref",
+      "policy_hash",
+      "replay_key",
+      "route_contract_ref",
+      "l5_certification_ref",
+      "source_lineage_or_normalized_records",
+      "sealed_artifacts"
+    ],
+    "reason_codes": [
+      "MISSING_TRACE_ROOT"
+    ],
+    "required_refs": [
+      "trace_root",
+      "exit_disposition_ref",
+      "policy_hash",
+      "replay_key",
+      "route_contract_ref",
+      "l5_certification_ref",
+      "source_lineage_or_normalized_records",
+      "sealed_artifacts"
+    ],
+    "runtime_exhaust_bundle_id": "rxb-9349f001701c44a6a7f68f310082f6da",
+    "verdict": "FAIL"
+  },
+  "g29_learning_firewall": {
+    "assertion_results": {
+      "no_bus_u_publish_attempt": true,
+      "no_current_run_mutation_attempt": true,
+      "no_current_run_x3_mutation": true,
+      "no_direct_prompt_policy_patch": true,
+      "no_l4_write_attempt": true,
+      "observer_isolation_clean": true,
+      "observer_no_bus_u_publish_assertion": true,
+      "observer_no_l4_write_assertion": true,
+      "observer_no_live_feedback_assertion": true
+    },
+    "deterministic_digest": "ad4f7de8f75240be703e67a79b91bfe537c0b601d2d631038688c95f676e28de",
+    "forbidden_attempts": [],
+    "gate_id": "G29_LEARNING_FIREWALL",
+    "gate_name": "L6 G29 learning firewall",
+    "gate_receipt_id": "g29-b9f64833d68e474d894f0720111d04c7",
+    "missing_refs": [],
+    "notes": "L6 proposals remain inert and future-run only; UWG is the durable write path.",
+    "present_refs": [
+      "no_current_run_mutation_attempt",
+      "no_l4_write_attempt",
+      "no_bus_u_publish_attempt",
+      "no_current_run_x3_mutation",
+      "no_direct_prompt_policy_patch",
+      "observer_isolation_clean",
+      "observer_no_l4_write_assertion",
+      "observer_no_bus_u_publish_assertion",
+      "observer_no_live_feedback_assertion"
+    ],
+    "reason_codes": [],
+    "required_refs": [
+      "no_current_run_mutation_attempt",
+      "no_l4_write_attempt",
+      "no_bus_u_publish_attempt",
+      "no_current_run_x3_mutation",
+      "no_direct_prompt_policy_patch",
+      "observer_isolation_clean",
+      "observer_no_l4_write_assertion",
+      "observer_no_bus_u_publish_assertion",
+      "observer_no_live_feedback_assertion"
+    ],
+    "runtime_exhaust_bundle_id": "rxb-9349f001701c44a6a7f68f310082f6da",
+    "verdict": "PASS"
+  },
+  "grain_parity_status": "WARN",
+  "ingest_gap_report": {
+    "gap_codes": [
+      "TRACE_LINK_MISSING",
+      "U0",
+      "L1"
+    ],
+    "gap_report_id": "gap-54f1d2d6ec7f43e18b1f8a7ec06ff85e",
+    "impossible_order_flags": [],
+    "missing_evidence_refs": [],
+    "notes": "",
+    "orphan_artifact_refs": [],
+    "repair_required": true,
+    "runtime_exhaust_bundle_id": "rxb-9349f001701c44a6a7f68f310082f6da"
+  },
+  "input_refs": {
+    "artifact_dir": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets",
+    "exit_disposition_receipt": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/exit_disposition_receipt.json",
+    "runtime_exhaust_bundle": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/runtime_exhaust_bundle.json",
+    "trace_reconciliation": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/trace_reconciliation.json"
+  },
+  "l5_certification_receipt_digest": "sha256:7e321f822e6937eee0a3a2860da217f411c03ee74d685b9d8e78f5e279b9ca77",
+  "l5_certification_receipt_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l5_certification_receipt.json",
+  "l5_certification_valid": true,
+  "l6_apps_eval_alignment_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_apps_eval_alignment.json",
+  "l6_apps_eval_grain_parity_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_apps_eval_grain_parity.json",
+  "l6_microstep_coverage_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_microstep_coverage.json",
+  "l6_microstep_future_run_proposals_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_microstep_future_run_proposals.json",
+  "l6_microstep_observations_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_microstep_observations.jsonl",
+  "l6_microstep_patterns_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_microstep_patterns.json",
+  "l6_microstep_rca_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_microstep_rca.json",
+  "l6_observability_closure_receipt_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_observability_closure_receipt.json",
+  "l6_trace_observability_summary_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_trace_observability_summary.json",
+  "microstep_contract_digest": "sha256:d18a9dd3b8c318ec496ac2dd37021a9ce800166b11ee629064b4aa314ddaa1a5",
+  "parent_run_id": "",
+  "readiness_decision": "NON_EVALUABLE_PACKET",
+  "readiness_receipt": {
+    "artifact_integrity_status": "PRESENT",
+    "deterministic_digest": "d97d6c0b44ab55c93cf0086a323c1cd8f13f17ad805863b56dd58b09f78b3a75",
+    "eval_readiness_receipt_id": "ready-03273bee951844c6a2a4ebd38bc2c974",
+    "evaluator_input_status": "PRESENT",
+    "excluded_from_learning_until": "indefinite",
+    "g28_audit_completeness_receipt_ref": "g28-cd9d611b66cc403899c9b5e77e7558db",
+    "g29_learning_firewall_receipt_ref": "g29-b9f64833d68e474d894f0720111d04c7",
+    "l5_certification_status": "PRESENT",
+    "missing_evidence_map_ref": null,
+    "observer_receipt_id": "observer-7a0945c5e72f4b1a88538c3f566706c0",
+    "policy_hash_status": "PRESENT",
+    "prompt_hash_status": "PRESENT",
+    "readiness_decision": "NON_EVALUABLE_PACKET",
+    "reason_codes": [
+      "trace_root"
+    ],
+    "replay_key_status": "PRESENT",
+    "route_contract_status": "PRESENT",
+    "runtime_exhaust_bundle_id": "rxb-9349f001701c44a6a7f68f310082f6da",
+    "sealed_artifacts_status": "PRESENT",
+    "source_lineage_or_records_status": "PRESENT",
+    "source_lineage_status": "PRESENT",
+    "terminal_status_status": "PRESENT",
+    "trace_completeness_status": "MISSING"
+  },
+  "registry_digest": "sha256:d18a9dd3b8c318ec496ac2dd37021a9ce800166b11ee629064b4aa314ddaa1a5",
+  "runtime_exhaust_bundle_digest": "sha256:d4f21ea0bbd95525727570ee1521ff2aedb08b70484024649c0ab74a19f2e375",
+  "runtime_exhaust_bundle_id": "rxb-9349f001701c44a6a7f68f310082f6da",
+  "schema_version": "apps_rg.l6_v40_shadow_eval.v2",
+  "section_attempt_id": "unify_bullets:unify_bullets_20260811_101248:attempt:1",
+  "section_id": "unify_bullets",
+  "span_export_jsonl_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_spans.jsonl",
+  "span_export_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/l6_v40_shadow_eval_spans.json",
+  "trace_reconciliation_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/trace_reconciliation.json",
+  "trace_reconciliation_rows_ref": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/control_attempt_002/modular_r4/sections/unify_bullets/trace_reconciliation_rows.jsonl",
+  "v40_gap_codes": [
+    "MISSING_PARENT_RUN_ID",
+    "MISSING_SESSION_ID",
+    "MISSING_TRACE_ROOT"
+  ],
+  "valid_v40_shadow_exhaust": false
+}

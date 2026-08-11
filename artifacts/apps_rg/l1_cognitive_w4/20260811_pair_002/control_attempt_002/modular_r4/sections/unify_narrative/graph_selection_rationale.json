@@ -1,0 +1,324 @@
+{
+  "schema": "graph_selection_rationale_v1",
+  "section_id": "unify_narrative",
+  "targeting": {
+    "target_company": "Lincoln Financial Group",
+    "target_role": "SVP IT Strategy & AI Enablement",
+    "jd_sha256": "ccfc9f3f9acf49500aceba4e1c090f68bb7b219ccfa28cc96279fa888e0e1caa",
+    "briefing_sha256": "0e94c7825dbf467326539e142f3d3e5c2ead476afce526d7317c7b7d7a6aeb11"
+  },
+  "jd_subgraph_policy": {
+    "jd_used_as_proof": false,
+    "jd_shapes_ranking_only": true,
+    "briefing_used_as_proof": false,
+    "targeting_only": true
+  },
+  "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+  "three_phase_jd_detected": true,
+  "jd_hit_tracks": [
+    "track_actuarial_risk_derivatives",
+    "track_data_tech_cloud_ml",
+    "track_genai_agentic"
+  ],
+  "track_weight_audit": {
+    "weights_without_jd": {
+      "track_actuarial_risk_derivatives": 0.2,
+      "track_data_tech_cloud_ml": 0.45,
+      "track_genai_agentic": 0.35
+    },
+    "weights_with_jd": {
+      "track_actuarial_risk_derivatives": 0.2101,
+      "track_data_tech_cloud_ml": 0.4454,
+      "track_genai_agentic": 0.3445
+    },
+    "weight_deltas": {
+      "track_actuarial_risk_derivatives": 0.0101,
+      "track_data_tech_cloud_ml": -0.0046,
+      "track_genai_agentic": -0.0055
+    },
+    "jd_boosted_tracks": [
+      "track_actuarial_risk_derivatives",
+      "track_data_tech_cloud_ml",
+      "track_genai_agentic"
+    ],
+    "jd_boost_monotonic": false
+  },
+  "briefing_signal_packet": {
+    "schema": "briefing_signal_packet_v1",
+    "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+    "section_count": 1,
+    "section_ids": [
+      "preamble"
+    ],
+    "theme_counts": {
+      "strategy": 0,
+      "operating_model": 1,
+      "commercial_motion": 0,
+      "partner_ecosystem": 1,
+      "adoption_motion": 1,
+      "leadership": 0,
+      "platform": 0,
+      "forward_looking": 0,
+      "urgency": 0
+    },
+    "dominant_themes": [
+      "operating_model",
+      "adoption_motion",
+      "partner_ecosystem"
+    ],
+    "section_signals": [
+      {
+        "section_id": "preamble",
+        "themes": [
+          "operating_model",
+          "partner_ecosystem",
+          "adoption_motion"
+        ],
+        "char_count": 128
+      }
+    ],
+    "signal_summary": "operating_model=1; adoption_motion=1; partner_ecosystem=1"
+  },
+  "jd_keyword_hits": [
+    {
+      "track_id": "track_actuarial_risk_derivatives",
+      "bump": 0.05,
+      "keywords_matched": [
+        "actuarial"
+      ],
+      "policy_ref": "apps_rg/fact_inventory/track_weighted_graph_expansion.py:resolve_career_track_weights"
+    },
+    {
+      "track_id": "track_data_tech_cloud_ml",
+      "bump": 0.05,
+      "keywords_matched": [
+        "cloud"
+      ],
+      "policy_ref": "apps_rg/fact_inventory/track_weighted_graph_expansion.py:resolve_career_track_weights"
+    },
+    {
+      "track_id": "track_genai_agentic",
+      "bump": 0.05,
+      "keywords_matched": [
+        "agentic"
+      ],
+      "policy_ref": "apps_rg/fact_inventory/track_weighted_graph_expansion.py:resolve_career_track_weights"
+    },
+    {
+      "track_id": "track_data_tech_cloud_ml",
+      "bump": 0.08,
+      "keywords_matched": [
+        "it strategy"
+      ],
+      "policy_ref": "apps_rg/fact_inventory/track_weighted_graph_expansion.py:resolve_career_track_weights"
+    },
+    {
+      "track_id": "track_genai_agentic",
+      "bump": 0.06,
+      "keywords_matched": [
+        "it strategy"
+      ],
+      "policy_ref": "apps_rg/fact_inventory/track_weighted_graph_expansion.py:resolve_career_track_weights"
+    }
+  ],
+  "selection_method": "selected_graph_evidence_plan_unify_narrative",
+  "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+  "graph_digest": "47d41419a4235c588d622375fea9a37cabafe0db65728b6d78bf268eff8ef500",
+  "graph_digest_scope": "full_graph_payload",
+  "selected_skill_ids": [
+    "skill_actuarial_fsa_fellowship",
+    "skill_agentic_control_plane_design",
+    "skill_agile_delivery_for_regulated_insurers",
+    "skill_algo_trading_sub_ms_inference",
+    "skill_app_overlay_runtime_binding",
+    "skill_authority_ordered_prompt_packaging",
+    "skill_bounded_agent_execution",
+    "skill_bounded_fanout_and_retry_design",
+    "skill_cache_fallback_grounded_action_routing",
+    "skill_capital_capital_modeling",
+    "skill_capital_regulatory_capital",
+    "skill_context_engineering",
+    "skill_ibm_automated_release_pipelines",
+    "skill_ibm_devsecops_pipeline_security",
+    "skill_ibm_metadata_audit_rbac",
+    "skill_sr_cloud_data_platform_engineering",
+    "skill_sr_enterprise_portfolio_data_governance",
+    "skill_sr_insurtech_cto_it_enablement",
+    "skill_sr_microservices_integration_platform",
+    "skill_svp_it_strategy_innovation"
+  ],
+  "selected_skill_count": 20,
+  "allowed_fact_count": 35,
+  "jd_only_admission_checks": [
+    {
+      "skill_id": "skill_actuarial_fsa_fellowship",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 2,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_agentic_control_plane_design",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_agile_delivery_for_regulated_insurers",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_algo_trading_sub_ms_inference",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_app_overlay_runtime_binding",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_authority_ordered_prompt_packaging",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_bounded_agent_execution",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_bounded_fanout_and_retry_design",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_cache_fallback_grounded_action_routing",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_capital_capital_modeling",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 3,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_capital_regulatory_capital",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_context_engineering",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_ibm_automated_release_pipelines",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_ibm_devsecops_pipeline_security",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_ibm_metadata_audit_rbac",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_sr_cloud_data_platform_engineering",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_sr_enterprise_portfolio_data_governance",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_sr_insurtech_cto_it_enablement",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_sr_microservices_integration_platform",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 1,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "skill_svp_it_strategy_innovation",
+      "admitted": true,
+      "reason_code": "ok_graph_fact_links",
+      "fact_id_links_count": 3,
+      "jd_only_skill_id_pattern": false,
+      "jd_text_present": true
+    },
+    {
+      "skill_id": "jd_inferred_skill_svp_it_strategy",
+      "admitted": false,
+      "reason_code": "jd_only_or_empty_fact_id_links",
+      "fact_id_links_count": 0,
+      "jd_only_skill_id_pattern": true,
+      "jd_text_present": true
+    }
+  ],
+  "neg1_all_selected_skills_have_fact_links": true,
+  "evidence_authority": "augmented_skills_graph"
+}

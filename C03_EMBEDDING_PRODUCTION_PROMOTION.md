@@ -151,7 +151,7 @@ The final uncapped repository suite passed `5418 passed, 161 skipped` with zero
 failures or collection errors. Its pre/post Git status snapshots were exactly
 identical, and no canonical graph, cache, context-receipt, or runtime artifact
 changed. No `collect_ignore` quarantine remains. The 161 skips are explicit
-coverage boundaries, dominated by excluded monorepo-owned `agentic_core`,
+coverage boundaries, dominated by excluded monorepo-owned `apps_rg`,
 Apps LIC, operator/render/retrieval tools, Windows symlink/POSIX permission
 capabilities, and historical runtime/certification fixtures that are not in the
 standalone source baseline. They are not production qualification evidence.
@@ -167,8 +167,8 @@ operator probe rather than a source-bound controlled comparison or release
 receipt.
 
 The audit workstation is not dependency-isolated. With the documented
-standalone test path (`PYTHONPATH=src;.`), importing `agentic_core` resolves to
-`C:\Git\Agentic-Workflow-FRESH\agentic_core\__init__.py` through an ambient
+standalone test path (`PYTHONPATH=src;.`), importing `apps_rg` resolves to
+`C:\Git\Agentic-Workflow-FRESH\apps_rg\__init__.py` through an ambient
 editable installation outside this repository. The current test, preflight, and
 smoke results are therefore workstation-local evidence, not proof that this
 checkout can reproduce the runtime from its own declared inputs. The promoted
@@ -234,7 +234,7 @@ release does not permit fabricated or self-authorized evidence.
 | --- | --- | --- |
 | P0. Exact source snapshot | Open | A clean checkout at the exact source commit used for every evaluation and deployment artifact. |
 | P1. Six-case source authority | Ready after P0 on a supported authority host | All 12 canonical JD/brief inputs now resolve in the standalone layout and match the frozen SHA-256 values. Close this gate by freezing from the clean committed source on a host that can verify owner-only storage, then externally pinning the source-freeze receipt. |
-| P2. Reproducible production runtime | Partially verified | The exact local model/runtime passed strict CUDA preflight and smoke, but the audit environment imports `agentic_core` from an ambient editable `Agentic-Workflow-FRESH` checkout. Close with a fresh, provisioned, dependency-locked production image that installs only declared inputs, proves module provenance, and passes preflight on every deployment node class. Human-evaluation control storage remains a separate supported-platform requirement under P1/P4. |
+| P2. Reproducible production runtime | Partially verified | The exact local model/runtime passed strict CUDA preflight and smoke, but the audit environment imports `apps_rg` from an ambient editable `Agentic-Workflow-FRESH` checkout. Close with a fresh, provisioned, dependency-locked production image that installs only declared inputs, proves module provenance, and passes preflight on every deployment node class. Human-evaluation control storage remains a separate supported-platform requirement under P1/P4. |
 | P3. Evaluation trust roots | Open | Owner-pinned evaluation manifest, graph/corpus bindings, human-authority file SHA, truth bundle digests, threshold policy digests, and split commitments. |
 | P4. Sealed prelabel packet | Blocked; implementation available after P0/P1 on a supported authority host | A real six-case allocator freeze/readiness run followed by a 282-claim, 84-query, full-finite-universe packet; owner-held nonce; source-freeze pin; prelabel receipt; and out-of-band packet-manifest pin. |
 | P5. Authorized human evidence | Open | Exactly two distinct authorized primary reviews per item, complete candidate labels, required adjudication receipts, no `UNKNOWN`, and optional W9 evidence from its separate qualified cohort. |

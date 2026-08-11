@@ -1,0 +1,67 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.0,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Bullet bul_ibm_005 repeats bullet bul_ibm_002 verbatim, failing outcome diversity and synthesis quality."
+    ],
+    "cited_sentence_indexes": [
+      5
+    ],
+    "remediation_suggestions": [
+      "Differentiate bullet bul_ibm_005 using distinct IBM fact pool evidence."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "DUPLICATE_BULLET_TEXT"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "REDUNDANT_CLAIM_SELECTION"
+        ]
+      },
+      "deterministic_alignment": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\ibm_bullets\\x1d_gemini_provider_response_raw_20260811_100408_674.json",
+  "original_model": null,
+  "fallback_model": null
+}

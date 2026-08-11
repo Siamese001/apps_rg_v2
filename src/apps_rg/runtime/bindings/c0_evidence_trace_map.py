@@ -2,9 +2,9 @@
 
 This module is part of the apps_rg C0 binding / integration path (retrieval wiring
 and trace shapes accompanying FinalEvidenceContract). Generic FEC schema and C0
-machinery remain in agentic_core.
+machinery remain in apps_rg.
 
-See ``FinalEvidenceContract`` in agentic_core — this map is not a substitute FEC.
+See ``FinalEvidenceContract`` in apps_rg — this map is not a substitute FEC.
 """
 from __future__ import annotations
 

@@ -683,7 +683,7 @@ def main() -> int:
             "w13_fixtures": False,
             "runtime_proof": False,
             "track_weight_code": False,
-            "agentic_core": False,
+            "apps_rg": False,
             "prompts": False,
             "broad_skills_ledger_authority": False,
         },

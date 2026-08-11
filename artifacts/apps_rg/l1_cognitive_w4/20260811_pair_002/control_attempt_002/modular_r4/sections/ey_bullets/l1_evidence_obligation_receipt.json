@@ -1,0 +1,81 @@
+{
+  "app_scope": "APPS_RG_V2_ONLY",
+  "authority_class": "C0_EVIDENCE_RECONCILIATION_ONLY",
+  "c0": {
+    "evidence_item_count": 38,
+    "final_evidence_digest": "b96db1072d597070b37a4ec0ad48cb683e0e58a90153dd78a41e220024a4d90b"
+  },
+  "coverage": {
+    "all_obligations_disposed": true,
+    "disposition_counts": {
+      "CONTRADICTED": 0,
+      "INSUFFICIENT": 2,
+      "NOT_APPLICABLE": 0,
+      "SUPPORTED": 0
+    },
+    "jd_targeting_used_as_candidate_evidence": false,
+    "no_unplanned_obligations": true,
+    "observed_disposition_count": 2,
+    "planned_obligation_count": 2
+  },
+  "identity": {
+    "request_id": "923f5178-3daf-4aac-a930-115e6a72b083",
+    "run_id": "0488e3cf-8c56-4812-b7ec-c7c7f54872b5",
+    "trace_id": "923f5178-3daf-4aac-a930-115e6a72b083"
+  },
+  "l1_v2": {
+    "capsule_digest": "sha256:1604aa6225b099be63354d81cb8123eac10bc63dc99d830da25cb4a2df6f15ad",
+    "evidence_obligation_ledger_digest": "sha256:d530f242b6f0901d02d0e44ab1d065db77b9ff3df943c08276b7012534da5ccd"
+  },
+  "obligation_dispositions": [
+    {
+      "c0_is_evidence_authority": true,
+      "candidate_evidence_roles": [
+        "candidate_support",
+        "candidate_counterevidence"
+      ],
+      "contradiction_scan_status": "NO_CANDIDATE_EVIDENCE",
+      "evidence_refs": [],
+      "jd_targeting_is_not_candidate_evidence": true,
+      "obligation_id": "l1obl-f2dc581d4faedb60",
+      "reason_code": "NO_C0_CANDIDATE_EVIDENCE_FOR_OBLIGATION",
+      "requirement_id": "l1req-6bea010c6877ce53",
+      "source_roles": [
+        "candidate_support",
+        "candidate_counterevidence",
+        "JD_targeting"
+      ],
+      "support_disposition": "INSUFFICIENT",
+      "target_unit_id": "experience_block"
+    },
+    {
+      "c0_is_evidence_authority": true,
+      "candidate_evidence_roles": [
+        "candidate_support",
+        "candidate_counterevidence"
+      ],
+      "contradiction_scan_status": "NO_CANDIDATE_EVIDENCE",
+      "evidence_refs": [],
+      "jd_targeting_is_not_candidate_evidence": true,
+      "obligation_id": "l1obl-f8cd6a23aa50410c",
+      "reason_code": "NO_C0_CANDIDATE_EVIDENCE_FOR_OBLIGATION",
+      "requirement_id": "l1req-8e74f12460de8962",
+      "source_roles": [
+        "candidate_support",
+        "candidate_counterevidence",
+        "JD_targeting"
+      ],
+      "support_disposition": "INSUFFICIENT",
+      "target_unit_id": "competencies"
+    }
+  ],
+  "receipt_digest": "sha256:d0e9984b2adee41a469643f36d98a4dddefbf2cccaa508779328e1c32c45d647",
+  "schema_version": "apps_rg.l1_evidence_obligation_receipt.v1",
+  "validation": {
+    "c0_is_only_evidence_authority": true,
+    "evidence_refs_are_fec_item_scoped": true,
+    "exact_l1_obligation_coverage": true,
+    "jd_targeting_not_candidate_evidence": true,
+    "no_added_l1_obligation": true
+  }
+}

@@ -3,7 +3,7 @@
 Separates preflight credential availability from runtime judge execution outcomes and quality.
 Used by whole-run exit reason codes and lane-dev diagnostics.
 
-Does not import agentic_core.
+Does not import apps_rg.
 """
 
 from __future__ import annotations

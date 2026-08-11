@@ -1,0 +1,272 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_ibm_bullets",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_FAIL",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\ibm_bullets\\x1d_gemini_provider_response_raw_20260811_104336_866.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "ibm_bullets_x1d_v4",
+      "input_hash": "0ece5af686243aa9",
+      "output_hash": "8d16d85970a205e0",
+      "score": 3.2,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.64,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Bul_ibm_005 is an exact duplicate of bul_ibm_002 text, violating cross-bullet diversity.",
+        "Bul_ibm_005 lacks terminal punctuation."
+      ],
+      "cited_sentence_indexes": [
+        2,
+        5
+      ],
+      "remediation_suggestions": [
+        "Differentiate bul_ibm_005 content to cover a distinct IBM outcome.",
+        "Add terminal punctuation to sentence 5."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "0ece5af686243aa9",
+      "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_003/candidate_attempt_008/modular_r4/sections/ibm_bullets/ibm_bullets_judge_packet.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/employment_bullet_judge_rubric.py#ibm_bullets",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "minor",
+          "codes": [
+            "punctuation_inconsistency"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "duplicate_bullet_content"
+          ]
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "bullet_rewrite_quality",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "ibm_bullets",
+      "pass": false,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_anthropic_claude_bullet_pool_selector",
+      "provider_name": "Anthropic Claude",
+      "provider_key": "anthropic_claude",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "claude-sonnet-5",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\ibm_bullets\\x1d_anthropic_claude_provider_response_raw_20260811_104327_425.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "employment_bullet_judge_v1",
+      "input_hash": "1dc2bee059e1f316",
+      "output_hash": "",
+      "score": 0.75,
+      "score_scale": "0_to_1",
+      "normalized_score": 0.75,
+      "threshold": 0.72,
+      "normalized_threshold": 0.72,
+      "decisive_failure": false,
+      "findings": [
+        "Employment pool selector: 5 slots, min_score=0.75, threshold=0.72, gate_ok=True"
+      ],
+      "cited_sentence_indexes": [],
+      "remediation_suggestions": [],
+      "model_requested": "claude-sonnet-5",
+      "model_actual": "claude-sonnet-5",
+      "reasoning_effort": null,
+      "judge_packet_hash": null,
+      "judge_packet_ref": null,
+      "candidate_output_ref": null,
+      "allowed_fact_packet_ref": null,
+      "rubric_ref": "apps_rg/runtime/judges/employment_bullet_judge_rubric.py#ibm_bullets",
+      "rationale": "apps_rg/config/provider_profiles.yaml:selector_models.employment_bullet_pool_selector.model",
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": null,
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": true,
+      "model_tier": null,
+      "proof_eligible_judge": false,
+      "fallback_used": false,
+      "section_id": "ibm_bullets",
+      "pass": true,
+      "model_source": "apps_rg/config/provider_profiles.yaml:selector_models.employment_bullet_pool_selector.model",
+      "pass_": true,
+      "judge_role": "employment_bullet_pool_selector",
+      "pool_selector_dimensions": [
+        "claim_ledger_grounding",
+        "bullet_line_discipline",
+        "jd_briefing_targeting_discipline",
+        "keyword_discipline_without_stuffing",
+        "cross_bullet_outcome_diversity",
+        "foundation_enterprise_credibility",
+        "no_unify_runtime_vocabulary"
+      ],
+      "selection_mode": "anthropic_claude_employment_top_n_pass"
+    },
+    {
+      "judge_id": "x1d_gemini_pro_ibm_bullets",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_FAIL",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\ibm_bullets\\x1d_gemini_provider_response_raw_20260811_104348_027.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "ibm_bullets_x1d_v4",
+      "input_hash": "0ece5af686243aa9",
+      "output_hash": "cc0bdda4affc6fc0",
+      "score": 3.2,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.64,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Bullet 5 (bul_ibm_005) repeats the exact wording of bullet 2 (bul_ibm_002), violating cross-bullet outcome diversity."
+      ],
+      "cited_sentence_indexes": [
+        2,
+        5
+      ],
+      "remediation_suggestions": [
+        "Differentiate bul_ibm_005 to cover a distinct IBM outcome from the allowed fact packet rather than repeating bul_ibm_002."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "0ece5af686243aa9",
+      "judge_packet_ref": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_003/candidate_attempt_008/modular_r4/sections/ibm_bullets/ibm_bullets_judge_packet.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/employment_bullet_judge_rubric.py#ibm_bullets",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "DUPLICATE_BULLET_CONTENT"
+          ]
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "bullet_rewrite_quality",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "ibm_bullets",
+      "pass": false,
+      "thinking_level": "high",
+      "adjudicator_panel_row": true
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+  "graph_claim_binding_contract_digest": "08ec1c83eff03610bafa4675cc93804c21803d2b3e9dd401744ae61de49a0789",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json",
+  "resume_graph_claim_binding_active": true,
+  "resume_graph_claim_binding_pass": true
+}

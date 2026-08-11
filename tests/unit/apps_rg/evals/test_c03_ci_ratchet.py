@@ -11,7 +11,7 @@ def _junit(path: Path, *, failing: bool = False, fragment: str = "augmented_skil
     path.write_text(
         f"<testsuites><testsuite tests=\"1\" failures=\"{failure_count}\" errors=\"0\" skipped=\"0\">"
         "<testcase classname=\"tests._apps_contract.test_apps_rg_c0_ownership_split."
-        "TestAgenticCoreGraphSkillBoundary\" name=\"test_agentic_core_does_not_embed_"
+        "TestAppsRgGraphSkillBoundary\" name=\"test_apps_rg_does_not_embed_"
         f"resume_graph_skill_authority_literals\">{failure}</testcase></testsuite></testsuites>",
         encoding="utf-8",
     )

@@ -14,8 +14,8 @@ from apps_rg.runtime.c0_mandatory_policy import (
 from apps_rg.runtime.bindings.c0_binding import C0EvidenceGapError, c0_retrieve_apps_rg
 from apps_rg.runtime.c0.c02_product_hybrid_retrieval import product_hybrid_retrieval_required
 from apps_rg.runtime.embedding_settings import bootstrap_apps_rg_embedding_env
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-from agentic_core.runtime.contracts.route_contract import RouteContract
+from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
+from apps_rg_runtime.runtime.contracts.route_contract import RouteContract
 
 
 def _route() -> RouteContract:

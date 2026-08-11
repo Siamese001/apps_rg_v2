@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import (
     AppsRgIngressPayload,
     RequestEnvelope,
 )

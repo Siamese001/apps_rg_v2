@@ -193,7 +193,7 @@ def test_w6d_core_d2_shadow_path_non_durable_cannot_prove_vectors(tmp_path: Path
     assert "execution_orchestrator" in assertion["primary_culprit"]
     assert any("gptcache_client" in step for step in CULPRIT_CALL_CHAIN)
     d2_callers = {c["caller"] for c in PROMOTE_TO_LONG_TERM_CALLERS}
-    assert "agentic_core/L0_routing/reasoning/execution_orchestrator.py" in d2_callers
+    assert "apps_rg_runtime/L0_routing/reasoning/execution_orchestrator.py" in d2_callers
     for caller in PROMOTE_TO_LONG_TERM_CALLERS:
         if "execution_orchestrator" in caller["caller"] or "gptcache" in caller.get("symbol", ""):
             assert caller["classification"] == CHROMA_CLASS_NON_DURABLE

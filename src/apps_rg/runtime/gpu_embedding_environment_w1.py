@@ -11,7 +11,6 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Mapping
-from urllib.parse import unquote, urlparse
 
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
@@ -166,21 +165,14 @@ def _git_value(repository: Path, *args: str) -> str:
     ).stdout.strip()
 
 
-def _agentic_core_observation() -> dict[str, Any]:
+def _apps_rg_source_observation(repository: Path) -> dict[str, Any]:
+    """Observe this checkout's Apps RG source tree without package indirection."""
+
     try:
-        distribution = metadata.distribution("agentic-workflow")
-        direct_url = json.loads(distribution.read_text("direct_url.json") or "{}")
-        parsed_url = urlparse(str(direct_url.get("url") or ""))
-        if parsed_url.scheme != "file" or direct_url.get("dir_info") != {
-            "editable": True
-        }:
-            raise ValueError(
-                "agentic-workflow is not an editable local source checkout"
-            )
-        repository = Path(unquote(parsed_url.path).lstrip("/")).resolve()
-        module_path = repository / "agentic_core/__init__.py"
+        repository = Path(repository).resolve()
+        module_path = repository / "src" / "apps_rg" / "__init__.py"
         if not module_path.is_file():
-            raise OSError(f"agentic_core module is absent: {module_path}")
+            raise OSError(f"Apps RG source module is absent: {module_path}")
         relative = module_path.relative_to(repository).as_posix()
         status = _git_value(
             repository,
@@ -188,24 +180,21 @@ def _agentic_core_observation() -> dict[str, Any]:
             "--porcelain",
             "--untracked-files=all",
             "--",
-            "agentic_core",
+            "src/apps_rg",
         )
         return {
             "available": True,
-            "distribution_version": distribution.version,
-            "module_file": str(module_path),
-            "module_relative_path": relative,
+            "source_file": str(module_path),
+            "source_relative_path": relative,
             "repository": str(repository),
             "repository_url": _git_value(repository, "remote", "get-url", "origin"),
             "revision": _git_value(repository, "rev-parse", "HEAD"),
-            "tree_sha": _git_value(repository, "rev-parse", "HEAD:agentic_core"),
-            "tracked_or_untracked_module_changes": status.splitlines()
+            "tree_sha": _git_value(repository, "rev-parse", "HEAD:src/apps_rg"),
+            "tracked_or_untracked_source_changes": status.splitlines()
             if status
             else [],
         }
     except (
-        metadata.PackageNotFoundError,
-        json.JSONDecodeError,
         OSError,
         subprocess.SubprocessError,
         ValueError,
@@ -319,7 +308,7 @@ def collect_observations(
         "locked_packages": locked,
         "installed_locked_packages": installed,
         "critical_distributions": critical,
-        "agentic_core": _agentic_core_observation(),
+        "apps_rg_source": _apps_rg_source_observation(root),
         "cuda": _cuda_observation(),
         "model": _model_observation(Path(model_path).resolve()),
         "offline_environment": {
@@ -368,24 +357,20 @@ def evaluate_observations(
             if observed.get(field) != expected.get(field):
                 issues.append(f"CRITICAL_DISTRIBUTION_{field.upper()}::{name}")
 
-    expected_core = contract.get("agentic_core") or {}
-    observed_core = observations.get("agentic_core") or {}
-    if observed_core.get("available") is not True:
-        issues.append("AGENTIC_CORE_UNAVAILABLE")
+    expected_source = contract.get("apps_rg_source") or {}
+    observed_source = observations.get("apps_rg_source") or {}
+    if observed_source.get("available") is not True:
+        issues.append("APP_SOURCE_UNAVAILABLE")
     else:
         for field in (
-            "distribution_version",
-            "repository_url",
-            "revision",
-            "tree_sha",
-            "module_relative_path",
+            "source_relative_path",
         ):
-            if observed_core.get(field) != expected_core.get(field):
-                issues.append(f"AGENTIC_CORE_{field.upper()}_MISMATCH")
-        if expected_core.get(
-            "tracked_module_tree_must_be_clean"
-        ) is True and observed_core.get("tracked_or_untracked_module_changes"):
-            issues.append("AGENTIC_CORE_MODULE_TREE_DIRTY")
+            if observed_source.get(field) != expected_source.get(field):
+                issues.append(f"APP_SOURCE_{field.upper()}_MISMATCH")
+        if expected_source.get(
+            "tracked_source_tree_must_be_clean"
+        ) is True and observed_source.get("tracked_or_untracked_source_changes"):
+            issues.append("APP_SOURCE_TREE_DIRTY")
 
     expected_runtime = contract.get("embedding_runtime") or {}
     expected_gpu = contract.get("gpu") or {}

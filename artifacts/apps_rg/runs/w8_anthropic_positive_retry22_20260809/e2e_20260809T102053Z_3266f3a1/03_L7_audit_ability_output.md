@@ -2,9 +2,9 @@
 
 | Artifact | Path | Status |
 |---|---|---|
-| **HOW trace** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_anthropic_positive_retry22_20260809\e2e_20260809T102053Z_3266f3a1\agentic_core_how_trace.json` | `PRESENT` |
-| **Route-family coverage** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_anthropic_positive_retry22_20260809\e2e_20260809T102053Z_3266f3a1\agentic_core_l7_route_family_coverage.json` | `PRESENT` |
-| **Spine proof** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_anthropic_positive_retry22_20260809\e2e_20260809T102053Z_3266f3a1\agentic_core_spine_proof.json` | `PRESENT` |
+| **HOW trace** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_anthropic_positive_retry22_20260809\e2e_20260809T102053Z_3266f3a1\apps_rg_how_trace.json` | `PRESENT` |
+| **Route-family coverage** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_anthropic_positive_retry22_20260809\e2e_20260809T102053Z_3266f3a1\apps_rg_l7_route_family_coverage.json` | `PRESENT` |
+| **Spine proof** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_anthropic_positive_retry22_20260809\e2e_20260809T102053Z_3266f3a1\apps_rg_spine_proof.json` | `PRESENT` |
 
 | Signal | Value |
 |---|---|

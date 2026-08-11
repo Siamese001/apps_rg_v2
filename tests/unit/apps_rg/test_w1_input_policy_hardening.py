@@ -87,7 +87,7 @@ def test_product_entry_blocks_reference_before_preflight(
 
 
 def test_u0_ignores_caller_profile_manifest_policy_override() -> None:
-    from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
+    from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import (
         AppsRgIngressPayload,
         RequestEnvelope,
     )
@@ -127,7 +127,7 @@ def test_u0_ignores_caller_profile_manifest_policy_override() -> None:
 def test_u0_package_rejects_foreign_identity_and_digest_drift(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from agentic_core.runtime.contracts.runtime_customization_package import (
+    from apps_rg_runtime.runtime.contracts.runtime_customization_package import (
         RuntimeCustomizationPackage,
     )
     from apps_rg.runtime.bindings import u0_package_ingest

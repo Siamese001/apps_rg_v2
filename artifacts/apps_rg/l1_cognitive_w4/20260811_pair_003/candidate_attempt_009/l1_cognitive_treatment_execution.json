@@ -1,0 +1,72 @@
+{
+  "app_scope": "APPS_RG_V2_ONLY",
+  "authority": {
+    "does_not_authorize_promotion": true,
+    "does_not_dispatch": true,
+    "does_not_score_resume_quality": true,
+    "human_qualified": false
+  },
+  "authority_class": "TECHNICAL_EXECUTION_OBSERVATION_ONLY",
+  "errors": [
+    "modular_r4/sections/competencies/l1_cognitive_output_disposition.json:blocks_finalization:C0_OUTCOME_DISPOSITION_UNRETAINED",
+    "modular_r4/sections/competencies/l2_output.json:missing_required_change_log_tag:L1_COGNITIVE_ATOM:l1cogreq-331c12158135fd54:GAP",
+    "modular_r4/sections/competencies/l2_output.json:missing_required_gap_tag:L1_COGNITIVE_GAP:l1cogreq-331c12158135fd54:C0_INSUFFICIENT"
+  ],
+  "lineage": {
+    "c0_outcome_set_digest": "sha256:f370e6aead3b998de02aef1199786debf818847f7930ada2bf4dd23d2b88853f",
+    "l1_cognitive_advisory_digest": "sha256:b9363399fee8495ec5b18c95dc2e036778e22e80f3e846e8468a06f3794802a6",
+    "l1_cognitive_plan_digest": "sha256:6380bc28747d91942835f470f511f15237d19942e3515240446869af65969b59",
+    "l1_cognitive_revision_set_digest": "sha256:b570e8e2387218d63da4f18cca8ee369b4d38eb3b7aaaab44d496fb6117bf237",
+    "l1_v2_capsule_digest": "sha256:5bd5887224dae16ff2942fc65a5cce07cc2f4ee9d95a2c41b283177288d19c78"
+  },
+  "receipt_digest": "sha256:ab3728440b8b8ed76d0f5cf80dfda475ec335e779bd89909379845fa2339a6f6",
+  "records": [
+    {
+      "compiled_prompt_artifact_digest": "sha256:383cdb8767cdfd7d3fdea59f18bf2bc37efcb286cdb0ff80c8f0673c17d85ae3",
+      "compiled_prompt_artifact_ref": "modular_r4/sections/competencies/compiled_prompt_artifact.json",
+      "linked_digests": {
+        "c0_outcome": "sha256:4f34888a07dd4c12551715c586473316a132ae1306df8539a03287fed683429d",
+        "revision": "sha256:c6660712061642c6debca99837424669121865cedcfdbfe8d68b29276be8726e",
+        "revision_advisory": "sha256:034edd7dc1b575b9515970752f6b74ddc5d2e50d9a811c16a378c488df9df6fb"
+      },
+      "observed": false,
+      "provider_request_observation": {
+        "compiled_prompt_hash": "ec92d722bc7017bb",
+        "observed": true,
+        "provider_prompt_hash": "ec92d722bc7017bb",
+        "provider_request_ref": "modular_r4/sections/competencies/provider_request.json"
+      },
+      "revision_output_observation": {
+        "applicable": true,
+        "l2_output_ref": "modular_r4/sections/competencies/l2_output.json",
+        "observed": false,
+        "observed_change_log_tags": [],
+        "observed_gap_tags": [],
+        "output_disposition_blocks_finalization": true,
+        "output_disposition_reason_code": "C0_OUTCOME_DISPOSITION_UNRETAINED",
+        "output_disposition_ref": "modular_r4/sections/competencies/l1_cognitive_output_disposition.json",
+        "output_disposition_status": "BLOCKED",
+        "required_change_log_tags": [
+          "L1_COGNITIVE_ATOM:l1cogreq-331c12158135fd54:GAP"
+        ],
+        "required_gap_tags": [
+          "L1_COGNITIVE_GAP:l1cogreq-331c12158135fd54:C0_INSUFFICIENT"
+        ]
+      },
+      "section_id": "competencies"
+    }
+  ],
+  "schema_version": "apps_rg.l1_cognitive_treatment_execution.v3",
+  "status": "BLOCKED",
+  "summary": {
+    "all_observed_records_source_bound": false,
+    "compiled_prompt_artifact_count": 1,
+    "error_count": 3,
+    "observed_consumption_count": 0
+  },
+  "treatment": {
+    "arm": "l1_cognitive_v3",
+    "assignment_origin": "U0_VALIDATED_INGRESS",
+    "treatment_digest": "sha256:376ec8b0ab4bbc423a286169da47d0cc04bb105b19493c6c2b001203d0bb8b97"
+  }
+}

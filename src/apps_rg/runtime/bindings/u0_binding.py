@@ -1,7 +1,7 @@
 """apps_rg U0 binding — cert reference, task class, and ingress validator.
 
 Canonical U0 ingress binding for apps_rg. Import from
-``apps_rg.runtime.bindings.u0_binding`` only — not from agentic_core shims.
+``apps_rg.runtime.bindings.u0_binding`` only — not from apps_rg shims.
 """
 from __future__ import annotations
 
@@ -190,7 +190,7 @@ def u0_validate_apps_rg(
     )
     from apps_rg.runtime.bindings.u0_package_ingest import (
         U0PackageValidationError,
-        ingest_apps_rg_runtime_package,
+        ingest_apps_rg_package,
     )
     from apps_rg.runtime.bindings.u0_rejection import (
         AppsRgIngressReasonCode,
@@ -220,7 +220,7 @@ def u0_validate_apps_rg(
         )
 
     try:
-        pkg_ingest = ingest_apps_rg_runtime_package(
+        pkg_ingest = ingest_apps_rg_package(
             app_id=str(meta.get("app_id") or app_payload.get("app_id") or "apps_rg"),
             task_class=str(app_payload.get("task_class") or APPS_RG_TASK_CLASS),
             request_context={
@@ -238,7 +238,7 @@ def u0_validate_apps_rg(
             machine_readable_detail={
                 "field": exc.field,
                 "message": exc.message,
-                "validator": "ingest_apps_rg_runtime_package",
+                "validator": "ingest_apps_rg_package",
             },
         )
         raise AppsRgU0RejectedError(notice=notice, message=exc.message) from exc
@@ -255,6 +255,20 @@ def u0_validate_apps_rg(
         app_payload.get("generation_mode")
         or (app_payload.get("user_constraints") or {}).get("_generation_mode")
         or "strategic_tailor"
+    )
+    from apps_rg.runtime.bindings.l1_cognitive_treatment import (
+        build_l1_cognitive_treatment,
+    )
+
+    user_constraints = app_payload.get("user_constraints")
+    treatment_request = (
+        user_constraints.get("_l1_cognitive_treatment_arm")
+        if isinstance(user_constraints, Mapping)
+        else None
+    )
+    l1_cognitive_treatment = build_l1_cognitive_treatment(
+        str(treatment_request) if treatment_request is not None else None,
+        assignment_origin="U0_VALIDATED_INGRESS",
     )
 
     jd_ref: str = str(app_payload.get("job_description_ref") or "").strip()
@@ -433,6 +447,7 @@ def u0_validate_apps_rg(
             "generation_mode": generation_mode,
             "task_class": APPS_RG_TASK_CLASS,
             "capability_requirements": capability_requirements,
+            "l1_cognitive_treatment": l1_cognitive_treatment,
         },
         "query_spec": {
             "jd_hash": jd_hash,
@@ -545,7 +560,7 @@ def u0_validate_apps_rg(
         receipt,
         authority_receipt_digest=apps_rg_u0_authority_receipt_digest(receipt),
     )
-    from agentic_core.runtime.u0.reflection_receipt import AppsRgU0ReflectionReceipt
+    from apps_rg.runtime.local_u0 import AppsRgU0ReflectionReceipt
 
     reflection_receipt = AppsRgU0ReflectionReceipt(
         contract_version="apps_rg_ingress_payload.v1",

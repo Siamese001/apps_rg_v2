@@ -318,10 +318,10 @@ def test_render_run_summary_uses_modular_r4_outputs_and_nested_l7(tmp_path: Path
     _write_json(run_dir / "r4_run_manifest.json", {"run_id": "r4"})
     _write_json(run_dir / "runtime_identity_envelope.json", {"payload": {"run_id": "r4"}})
     _write_json(run_dir / "terminal_ret_packet.json", {"payload": {}})
-    _write_json(run_dir / "agentic_core_how_trace.json", {"ok": True})
-    _write_json(run_dir / "agentic_core_spine_proof.json", {"ok": True})
+    _write_json(run_dir / "apps_rg_how_trace.json", {"ok": True})
+    _write_json(run_dir / "apps_rg_spine_proof.json", {"ok": True})
     _write_json(
-        run_dir / "agentic_core_l7_route_family_coverage.json",
+        run_dir / "apps_rg_l7_route_family_coverage.json",
         {
             "payload": {
                 "summary": {

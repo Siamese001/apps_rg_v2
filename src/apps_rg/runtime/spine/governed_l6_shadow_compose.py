@@ -50,7 +50,7 @@ def assert_l6_shadow_ingest_preconditions(
 
 
 def assert_integrated_exhaust_may_feed_l6(exhaust: Any) -> None:
-    """Integrated path — only sealed core ``RuntimeExhaustBundle`` may feed L6."""
+    """Integrated path — only a sealed Apps RG ``RuntimeExhaustBundle`` may feed L6."""
     if not governed_l6_shadow_enabled():
         return
     if exhaust is None:
@@ -137,10 +137,8 @@ def run_integrated_exhaust_through_l6(
 ) -> Any:
     """Explicit post-boundary evaluation; never called on the live response path."""
     assert_integrated_exhaust_may_feed_l6(exhaust)
-    from agentic_core.L6_observability.shadow_eval.post_boundary_runner import (
+    from apps_rg.runtime.local_l6 import (
         run_l6_shadow_from_sealed_exhaust,
-    )
-    from agentic_core.runtime.exhaust.shadow_raw_exhaust_adapter import (
         build_l6_shadow_raw_exhaust_from_runtime_bundle,
     )
 

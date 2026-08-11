@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from agentic_core.L2_execution.reasoning.compiled_artifact import (
+from apps_rg.runtime.apps_runtime_compat import (
     AuthorityLevel,
     AuthoritySlot,
 )

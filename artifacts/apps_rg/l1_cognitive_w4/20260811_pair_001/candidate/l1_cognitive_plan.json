@@ -1,0 +1,95 @@
+{
+  "alternative_plan_ledger": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "decisions": [],
+    "ledger_digest": "sha256:1af4417e12488c3487c5068f7377e9de9461973b24b788b0f1d241be4bdac106",
+    "schema_version": "apps_rg.l1_alternative_plan_ledger.v1"
+  },
+  "app_scope": "APPS_RG_V2_ONLY",
+  "atomic_requirement_graph": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "graph_digest": "sha256:d72b6aa8d6f6cb946a2b63254c77d294714ec40338e00712285dfb3c955bde98",
+    "relations": [],
+    "requirements": [],
+    "schema_version": "apps_rg.l1_atomic_requirement_graph.v1"
+  },
+  "authority_class": "PLANNING_ADVISORY_ONLY",
+  "critique_ledger": {
+    "assertions": {
+      "alternative_ledger_digest": "sha256:1af4417e12488c3487c5068f7377e9de9461973b24b788b0f1d241be4bdac106",
+      "does_not_create_candidate_evidence": true,
+      "does_not_resolve_conflicts": true,
+      "does_not_select_route": true
+    },
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "finding_count": 1,
+    "findings": [
+      {
+        "code": "JD_TEXT_NOT_AVAILABLE_FOR_COGNITIVE_PLAN",
+        "failed_invariant": "COGNITIVE_PLAN_REQUIRES_U0_JD_TEXT",
+        "finding_id": "l1crit-1ecd078f2885fda7",
+        "requirement_id": "",
+        "resolver": "U0",
+        "severity": "HIGH"
+      }
+    ],
+    "ledger_digest": "sha256:a06b824c318b1fc3199c54e70b8aac05942712a5c1f829057403f39373449987",
+    "schema_version": "apps_rg.l1_critique_ledger.v1"
+  },
+  "feasibility_graph": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "graph_digest": "sha256:c3a122d37bd097dbae064605a58ee1a575e3ae29be567f0b840104becd40ec85",
+    "options": [],
+    "schema_version": "apps_rg.l1_feasibility_graph.v1"
+  },
+  "goal_constraint_frame": {
+    "authority_class": "PLANNING_ADVISORY_ONLY",
+    "conflict_constraint_keys": [],
+    "definition_of_done": {
+      "all_critical_requirements_targeted_or_escalated": true,
+      "candidate_evidence_claims_forbidden": true,
+      "downstream_authority_required": true
+    },
+    "generation_mode": "strategic_tailor",
+    "goal_frame_id": "l1goal-c2dcd4e609561a53",
+    "hard_constraint_keys": [
+      "_l1_cognitive_treatment_arm"
+    ],
+    "requested_artifact": "resume_generation",
+    "target_level": "EXECUTIVE",
+    "target_role_digest": "sha256:b34ff67ef4578a08cfa8e81dd7016fd4de987e583f79a600200aa55af0ff4d3d"
+  },
+  "plan_digest": "sha256:50fe71a159f2c9a0feca1e074b3453153e5cf98e30c26b1d4634d569e4a6cfe1",
+  "planning_priors": [
+    {
+      "authority_class": "PLANNING_PRIOR_ONLY",
+      "digest": "ee164e9e2233d0a4865ebecc552879cc79500c2c08a1baf0cda119f25cefcff4",
+      "ref": "apps_rg/profiles/rg_l1_requirement_taxonomy.v1.json"
+    },
+    {
+      "authority_class": "PLANNING_PRIOR_ONLY",
+      "digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+      "ref": "apps_rg/profiles/rg_planning_profile.yaml"
+    }
+  ],
+  "planning_status": "BLOCKED",
+  "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:0671515221ec86aa:95ba6fa39b055869::v1",
+  "request_id": "req-e2f8728e2ab0474999e44a7cfa2ad2b1",
+  "run_id": "d1a01a43-fc6d-425c-bbb3-f919bc2335bd",
+  "schema_version": "apps_rg.l1_cognitive_plan.v3",
+  "trace_id": "45014cff-083e-424f-afea-8b11e68ce58d",
+  "v2_parent": {
+    "capsule_digest": "sha256:99dbbd758d0e7301682285fdc49b655e804f1711ad2208dd015a1f23b812fa10",
+    "schema_version": "apps_rg_l1_planning_capsule.v2"
+  },
+  "validation": {
+    "no_candidate_evidence_claim": true,
+    "no_evidence_retrieval": true,
+    "no_l4_write": true,
+    "no_model_call": true,
+    "no_prompt_assembly": true,
+    "no_route_selection": true,
+    "no_tool_call": true,
+    "u0_payload_only": true
+  }
+}

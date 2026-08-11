@@ -28,36 +28,36 @@ W6C_READ_SURFACE_DEFERRED_REASON = "w6c_chroma_read_surface_projection_deferred"
 
 # Static SSOT from W5/W6A read-only inspection (no runtime mutation).
 CULPRIT_CALL_CHAIN: tuple[str, ...] = (
-    "agentic_core/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
-    "agentic_core/L4_state/utils/memory/semantic_cache_manager.py::promote_to_long_term",
-    "agentic_core/L4_state/cache/gptcache_client.py::NativePersistentCacheClient.store",
-    "agentic_core/L4_state/cache/gptcache_client.py::_chroma_collection.upsert",
+    "apps_rg/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
+    "apps_rg/L4_state/utils/memory/semantic_cache_manager.py::promote_to_long_term",
+    "apps_rg/L4_state/cache/gptcache_client.py::NativePersistentCacheClient.store",
+    "apps_rg/L4_state/cache/gptcache_client.py::_chroma_collection.upsert",
 )
 
 PROMOTE_TO_LONG_TERM_CALLERS: tuple[dict[str, str], ...] = (
     {
-        "caller": "agentic_core/L0_routing/reasoning/execution_orchestrator.py",
+        "caller": "apps_rg/L0_routing/reasoning/execution_orchestrator.py",
         "symbol": "_populate_d2_cache_promote → promote_to_long_term",
         "runtime_active": "yes",
         "uwg_gated": "no",
         "classification": CHROMA_CLASS_NON_DURABLE,
     },
     {
-        "caller": "agentic_core/mixins/semantic_cache_mixin.py",
+        "caller": "apps_rg/mixins/semantic_cache_mixin.py",
         "symbol": "promote_to_long_term",
         "runtime_active": "optional",
         "uwg_gated": "no",
         "classification": CHROMA_CLASS_NON_DURABLE,
     },
     {
-        "caller": "agentic_core/utils/meta_learning_storage_util.py",
+        "caller": "apps_rg/utils/meta_learning_storage_util.py",
         "symbol": "promote_to_long_term",
         "runtime_active": "optional",
         "uwg_gated": "no",
         "classification": CHROMA_CLASS_NON_DURABLE,
     },
     {
-        "caller": "agentic_core/L4_state/utils/memory/semantic_cache_manager.py",
+        "caller": "apps_rg/L4_state/utils/memory/semantic_cache_manager.py",
         "symbol": "promote_to_long_term (internal DNA path)",
         "runtime_active": "yes",
         "uwg_gated": "no",
@@ -74,13 +74,13 @@ PROMOTE_TO_LONG_TERM_CALLERS: tuple[dict[str, str], ...] = (
 
 CHROMA_UPSERT_PATHS: tuple[dict[str, str], ...] = (
     {
-        "path": "agentic_core/L4_state/cache/gptcache_client.py",
+        "path": "apps_rg/L4_state/cache/gptcache_client.py",
         "operation": "NativePersistentCacheClient.store → _chroma_collection.upsert",
         "uwg_routed": "no",
         "classification": CHROMA_CLASS_NON_DURABLE,
     },
     {
-        "path": "agentic_core/L4_state/utils/memory/semantic_cache_manager.py",
+        "path": "apps_rg/L4_state/utils/memory/semantic_cache_manager.py",
         "operation": "_gptcache._chroma_collection.query/delete",
         "uwg_routed": "no",
         "classification": CHROMA_CLASS_NON_DURABLE,
@@ -588,7 +588,7 @@ def build_semantic_cache_persistence_slots(
             "chroma_collection_index_ref",
             status="MISSING",
             notes=(
-                "core D2 shadow path uses agentic_core/L4_state/cache/gptcache_client Chroma upsert; "
+                "core D2 shadow path uses apps_rg/L4_state/cache/gptcache_client Chroma upsert; "
                 "classified NON_DURABLE_INDEX_WRITE without governed read_surface_refresh chain"
             ),
         )

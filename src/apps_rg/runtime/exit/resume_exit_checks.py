@@ -7,7 +7,7 @@ S6 BOUNDARY (see apps_rg_resume_shipping_s6_deterministic_resume_exit_checks.md)
 - Deterministic checks ONLY ΓÇö no LLM judges
 - No PA, C0, L2, provider, model, cache, L4, or L6 calls
 - No routing changes
-- No agentic_core imports
+- No apps_rg imports
 
 UNKNOWN is NEVER PASS. Material UNKNOWN blocks sendable=True.
 

@@ -380,6 +380,14 @@ def _compose_ag2_user_instruction(plan: L1PlanContract, vr: ValidatedRequest) ->
     fmts = out.get("formats")
     if fmts:
         lines.append(f"Output formats: {', '.join(str(x) for x in fmts)}.")
+    from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+        build_l1_cognitive_consumer_advisory,
+        cognitive_advisory_prompt_lines,
+    )
+
+    lines.extend(
+        cognitive_advisory_prompt_lines(build_l1_cognitive_consumer_advisory(plan))
+    )
     return "\n".join(lines)
 
 
@@ -487,6 +495,18 @@ def _pa_compose_apps_rg_legacy(
         "route": _sha256_hex64(route_key),
     }
     component_hash_map.update(_l1_planning_component_hashes(_l1_planning_capsule_from_plan(plan)))
+    from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+        build_l1_cognitive_consumer_advisory,
+    )
+
+    cognitive_advisory = build_l1_cognitive_consumer_advisory(plan)
+    if cognitive_advisory is not None:
+        component_hash_map["l1_cognitive_advisory"] = str(
+            cognitive_advisory["advisory_digest"]
+        ).removeprefix("sha256:")
+        slot_lineage_map["l1_cognitive_advisory"] = (
+            "L1_PLAN_PROJECTIONS|PLANNING_ADVISORY_ONLY|COVERAGE_ESCALATION"
+        )
 
     rk = plan.replay_key or getattr(validated_request, "replay_key", "") or ""
     replay_manifest_ref = f"replay_key:{rk}" if rk else f"reflection:{validated_request.request_id}"

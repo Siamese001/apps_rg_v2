@@ -2,9 +2,9 @@
 
 | Artifact | Path | Status |
 |---|---|---|
-| **HOW trace** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w1_live\e2e_20260808T202911Z_af499cb7\agentic_core_how_trace.json` | `PRESENT` |
-| **Route-family coverage** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w1_live\e2e_20260808T202911Z_af499cb7\agentic_core_l7_route_family_coverage.json` | `PRESENT` |
-| **Spine proof** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w1_live\e2e_20260808T202911Z_af499cb7\agentic_core_spine_proof.json` | `PRESENT` |
+| **HOW trace** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w1_live\e2e_20260808T202911Z_af499cb7\apps_rg_how_trace.json` | `PRESENT` |
+| **Route-family coverage** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w1_live\e2e_20260808T202911Z_af499cb7\apps_rg_l7_route_family_coverage.json` | `PRESENT` |
+| **Spine proof** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w1_live\e2e_20260808T202911Z_af499cb7\apps_rg_spine_proof.json` | `PRESENT` |
 
 | Signal | Value |
 |---|---|

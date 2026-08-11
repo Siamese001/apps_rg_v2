@@ -2,7 +2,7 @@
 
 W1 freezes the currently working Windows GPU embedding control without changing
 the production runtime. It binds Python, the complete embedding dependency
-closure, stable critical wheel payload digests, the external `agentic_core` Git tree,
+closure, stable critical wheel payload digests, the local Apps RG source tree,
 the C0.3 runtime contract, the BGE-M3 model bytes, offline policy, and the
 observed single-GPU requirements.
 
@@ -47,7 +47,7 @@ fails closed unless all of the following match the contract:
 - all 87 registry-resolved dependency pins plus the two direct source pins;
 - versions, stable wheel payload digests, and module locations for eight critical
   distributions;
-- external `agentic_core` distribution, remote, commit, tree, module location,
+- local Apps RG source location, commit, tree, and working-tree state,
   and clean module subtree;
 - `cuda:0`, the required compiled CUDA architecture, working CUDA kernel,
   minimum driver, total VRAM, and currently free VRAM;

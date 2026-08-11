@@ -103,8 +103,8 @@ def fresh_failed_core_run(tmp_path_factory: pytest.TempPathFactory) -> tuple[Pat
     monkeypatch.setenv("CHROMA_PERSIST_DIR", str(root / "chroma"))
     monkeypatch.setenv("EMBEDDING_ENABLED", "false")
     try:
-        import agentic_core.L4_state.cache.gptcache_client as cache_module
-        from agentic_core.L4_state.contracts.vector_cache_layout import (
+        import apps_rg_runtime.L4_state.cache.gptcache_client as cache_module
+        from apps_rg_runtime.L4_state.contracts.vector_cache_layout import (
             VectorCacheLayout,
         )
         from apps_rg.runtime.orchestration.integrated_spine_runner import (
@@ -147,8 +147,8 @@ def fresh_nonfault_core_run(
     monkeypatch.setenv("CHROMA_PERSIST_DIR", str(root / "chroma"))
     monkeypatch.setenv("EMBEDDING_ENABLED", "false")
     try:
-        import agentic_core.L4_state.cache.gptcache_client as cache_module
-        from agentic_core.L4_state.contracts.vector_cache_layout import (
+        import apps_rg_runtime.L4_state.cache.gptcache_client as cache_module
+        from apps_rg_runtime.L4_state.contracts.vector_cache_layout import (
             VectorCacheLayout,
         )
         from apps_rg.runtime.orchestration.integrated_spine_runner import (
@@ -191,7 +191,7 @@ def test_frozen_manifest_and_artifacts_are_canonical_json_bound() -> None:
 def test_frozen_failure_signature_is_preserved() -> None:
     failure = _load(FIXTURE_DIR / "integrated_lane_pre_run_failure.json")
     witness = _load(FIXTURE_DIR / "runtime_execution_witness.json")["payload"]
-    proof = _load(FIXTURE_DIR / "agentic_core_spine_proof.json")["payload"]
+    proof = _load(FIXTURE_DIR / "apps_rg_spine_proof.json")["payload"]
     assert failure["lane_id"] == "competencies"
     assert failure["dispatch_result"]["error"] == "[Errno 22] Invalid argument"
     assert witness["l2"]["status"] == "FAIL"
@@ -244,16 +244,16 @@ def test_failed_l2_cannot_emit_successful_spine_proof(
     root, result = fresh_failed_core_run
     authority = _load(root / "apps_rg_core_runtime_authority.json")
     raw_witness = _load(root / "runtime_execution_witness.json")["payload"]
-    raw_proof = _load(root / "agentic_core_spine_proof.json")["payload"]
+    raw_proof = _load(root / "apps_rg_spine_proof.json")["payload"]
     proof = authority["normalized_contract"]["spine_proof"]
     assert result.fault
     assert raw_witness["l2"]["status"] == "FAIL"
     assert raw_proof["success"] is False
     assert raw_proof["exit_code"] != 0
-    assert raw_proof["agentic_core_spine_status"] == "R4_SINGLE_ACTION_BLOCKED"
+    assert raw_proof["apps_rg_runtime_spine_status"] == "R4_SINGLE_ACTION_BLOCKED"
     assert proof["success"] is False
     assert proof["exit_code"] != 0
-    assert proof["agentic_core_spine_status"] != "R4_SINGLE_ACTION_PROVEN"
+    assert proof["apps_rg_runtime_spine_status"] != "R4_SINGLE_ACTION_PROVEN"
     assert not any(
         row["code"] == "CORE_SPINE_SUCCESS_CONTRADICTS_L2_FAILURE"
         for row in authority["source_contract_violations"]
@@ -394,12 +394,12 @@ def test_core_runtime_authority_rejects_semantically_contradictory_sources(
     source, _ = fresh_failed_core_run
     run_dir = tmp_path / "contradictory"
     shutil.copytree(source, run_dir)
-    proof_path = run_dir / "agentic_core_spine_proof.json"
+    proof_path = run_dir / "apps_rg_spine_proof.json"
     proof = _load(proof_path)
     proof["payload"]["success"] = True
     proof["payload"]["exit_code"] = 0
     proof["payload"]["blocking_gaps"] = []
-    proof["payload"]["agentic_core_spine_status"] = "R4_SINGLE_ACTION_PROVEN"
+    proof["payload"]["apps_rg_runtime_spine_status"] = "R4_SINGLE_ACTION_PROVEN"
     proof["artifact_hash"] = _authority_digest(proof["payload"])
     proof_path.write_text(json.dumps(proof), encoding="utf-8")
 
@@ -493,7 +493,7 @@ def test_nonfault_but_governed_deny_fails_closed_without_inventing_authorization
 
     assert report.valid is True
     assert set(receipt["normalized_contract"]["runtime_modes"].values()) == {"fixture"}
-    raw_proof = _load(root / "agentic_core_spine_proof.json")["payload"]
+    raw_proof = _load(root / "apps_rg_spine_proof.json")["payload"]
     assert raw_proof["success"] is False
     assert raw_proof["exit_code"] != 0
     assert "GOVERNED_EXIT_NOT_ALLOW_FINISH:X3A_DENY_REROUTE" in raw_proof[
@@ -609,7 +609,7 @@ def test_real_canonical_section_entry_uses_e2e_lane_directory(
     tmp_path: Path,
 ) -> None:
     """Exercise the real canonical section runner; mock only the external core seam."""
-    from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+    from apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run import (
         ROUTE_ID,
         SingleActionSpineRunResult,
     )

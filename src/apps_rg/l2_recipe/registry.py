@@ -1,6 +1,6 @@
 """apps_rg L2 recipe registry — metadata for ``resolve_l2_recipe``.
 
-``agentic_core.runtime.l2_recipe_resolver`` imports ``get_apps_rg_recipe_metadata``
+``apps_rg.runtime.l2_recipe_resolver`` imports ``get_apps_rg_recipe_metadata``
 lazily.  This module MUST stay free of heavy side effects at import time.
 """
 from __future__ import annotations

@@ -1,7 +1,7 @@
 """
 End-to-End Integration Tests — apps_research
 
-Validates full integration with agentic_core and structure blueprint.
+Validates full integration with apps_rg and structure blueprint.
 """
 
 from __future__ import annotations

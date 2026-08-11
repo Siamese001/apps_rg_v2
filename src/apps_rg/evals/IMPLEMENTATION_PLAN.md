@@ -51,4 +51,4 @@ non-release-authorizing by itself.
   test controls.
 - Do not claim real-run G5 qualification without qualifying stored artifacts.
 - Do not invent human labels or freeze human-agreement thresholds.
-- Do not import or modify `agentic_core`, `ops_scripts`, or runtime behavior.
+- Do not import or modify `apps_rg`, `ops_scripts`, or runtime behavior.

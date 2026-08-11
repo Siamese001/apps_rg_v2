@@ -1,0 +1,448 @@
+{
+  "allowed_file_roots": [],
+  "allowed_models": [
+    "claude-sonnet-5"
+  ],
+  "allowed_networks": [],
+  "allowed_tools": [],
+  "app_id": "apps_rg",
+  "audit_manifest_ref": "l2_receipt_bundle.json",
+  "audit_refs": [
+    "section_lane:ibm_bullets",
+    "l2_packet:15ddf91af1f92ca49265a0f2168eb981b5c2f4a9d2b158cd1d7f119b0230ee29",
+    "frozen_execution_room:1e45312962209bd4f6b8b24c7d2e35c40f766ad64436c463bbafa6ec0fc566f2",
+    "receipt:attempt_receipt.json:b24247938a8353b6b1662eb6583fb48ca78c134738050fad7187e0fe974d56df",
+    "receipt:frozen_execution_context.json:480bdb0019aa3a4524794885fb14c7460c304ccf378f5ea41ac2dac188db0ffc",
+    "receipt:l2_execution_packet.json:d2a03c523545b8328205a39c16344268b001d65d936bf0d8ffe896d9062becad",
+    "receipt:prep_receipt.json:4ebd28d8bf9e2055d4798b10c75d3b4d3342ed96a8d9ab52a92f8c9281aa9d77",
+    "receipt:validation_receipt.json:7bb32111dc91926e2e299a958636b279ceb67e3df7842a804a133a66c18e729e"
+  ],
+  "compilation_hash": "de59a02412f6ecfa69a7f4357881e0070d6ff28e8ee6ac828cafcd0de8616f4d",
+  "egress_policy_ref": "apps_rg::provider_model::resume_generation::v1",
+  "evidence_refs": [
+    "56d881a0e5f7bf75e8024568344f9b5896fb5d888bb4a995178f4a2e4503f97c"
+  ],
+  "execution_duration_ms": 0,
+  "execution_status": "completed",
+  "execution_timestamp": "",
+  "gate_verdict_refs": [
+    "G11:PASS:MODEL_REGISTRY_BOUND",
+    "G12:PASS:SIGNED_ARGS_AND_IDENTITY_BOUND",
+    "G13:PASS:EVIDENCE_AND_SCHEMA_BOUND",
+    "G15:PASS:SANDBOX_ENVELOPE_BOUND",
+    "G19:PASS:RETRY_BUDGET_BOUND",
+    "G20:PASS:EXECUTION_BUDGET_BOUND"
+  ],
+  "generated_content": "{\"allow_non_allow_exit_zero_cli\": false, \"allow_test_mock_judges_hatch\": false, \"apps_rg_prompt_template_ref\": \"apps_rg/prompt_assembly/templates/ibm_bullet_tailor_v1.yaml\", \"artifact_namespace_class\": \"NON_PROOF_PLUMBING\", \"authoritative_attempt_number\": 1, \"authoritative_l2_source\": \"initial_llm\", \"authorization_scope\": \"PLUMBING_ONLY\", \"bullets\": [{\"bullet_id\": \"bul_ibm_001\", \"bullet_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\", \"bullet_theme\": \"aws_modernization_architecture\", \"has_metric\": true, \"metric_raw\": \"20% joint revenue growth\", \"source_fact_ids\": [\"bul_ibm_001\"]}, {\"bullet_id\": \"bul_ibm_002\", \"bullet_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\", \"bullet_theme\": \"cognitive_decision_support\", \"has_metric\": false, \"metric_raw\": null, \"source_fact_ids\": [\"bul_ibm_002\"]}, {\"bullet_id\": \"bul_ibm_003\", \"bullet_text\": \"Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.\", \"bullet_theme\": \"presales_solution_engineering\", \"has_metric\": false, \"metric_raw\": null, \"source_fact_ids\": [\"bul_ibm_003\"]}, {\"bullet_id\": \"bul_ibm_004\", \"bullet_text\": \"Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.\", \"bullet_theme\": \"data_modeling_bi\", \"has_metric\": false, \"metric_raw\": null, \"source_fact_ids\": [\"bul_ibm_004\"]}, {\"bullet_id\": \"bul_ibm_005\", \"bullet_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions\", \"bullet_theme\": \"hyperscaler_alliance_gtm\", \"has_metric\": false, \"metric_raw\": null, \"source_fact_ids\": [\"bul_ibm_005\"]}], \"change_log\": [{\"allocation_claim_unit_id\": \"ibm_bullets:bul_ibm_001\", \"bullet_id\": \"bul_ibm_001\", \"fact_ids_used\": [\"bul_ibm_001\"], \"graph_skill_node_ids\": [\"skill_partner_joint_solution_development\"], \"metric_outcome_ids\": [], \"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\"}, {\"allocation_claim_unit_id\": \"ibm_bullets:bul_ibm_002\", \"bullet_id\": \"bul_ibm_002\", \"fact_ids_used\": [\"bul_ibm_002\"], \"graph_skill_node_ids\": [\"skill_sr_cloud_data_platform_engineering\"], \"metric_outcome_ids\": [], \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\"}, {\"allocation_claim_unit_id\": \"ibm_bullets:bul_ibm_003\", \"bullet_id\": \"bul_ibm_003\", \"fact_ids_used\": [\"bul_ibm_003\", \"fact_revenue_ops_001\"], \"graph_skill_node_ids\": [\"skill_partner_pnl_oversight\"], \"metric_outcome_ids\": [], \"role_episode_bundle_id\": \"reb_ibm_revenue_sales_target_execution\"}, {\"allocation_claim_unit_id\": \"ibm_bullets:bul_ibm_004\", \"bullet_id\": \"bul_ibm_004\", \"fact_ids_used\": [\"bul_ibm_004\", \"fact_revenue_ops_005\"], \"graph_skill_node_ids\": [\"skill_p2_gtm_executive_buyer_alignment\"], \"metric_outcome_ids\": [\"metric_ibm_budget_portfolio_bi_views\"], \"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\"}, {\"allocation_claim_unit_id\": \"ibm_bullets:bul_ibm_005\", \"bullet_id\": \"bul_ibm_005\", \"fact_ids_used\": [\"bul_ibm_005\", \"fact_partnerships_gtm_002\"], \"graph_skill_node_ids\": [\"skill_sr_enterprise_portfolio_data_governance\"], \"metric_outcome_ids\": [\"metric_ibm_20pct_joint_revenue_growth\"], \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\"}, {\"operation\": \"skip_ibm_locked_metric_anchor\", \"reason\": \"plan_fact_metric_does_not_match_canonical:bul_ibm_002 (canonical=weeks to hours, plan_metric='', has_metric=False) \\u2014 graph selector chose this fact intentionally; do not append canonical-metric suffix\"}], \"claim_ledger\": [{\"claim_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\", \"source_fact_ids\": [\"bul_ibm_001\"]}, {\"claim_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\", \"source_fact_ids\": [\"bul_ibm_002\"]}, {\"claim_text\": \"Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.\", \"source_fact_ids\": [\"bul_ibm_003\"]}, {\"claim_text\": \"Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.\", \"source_fact_ids\": [\"bul_ibm_004\"]}, {\"claim_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions\", \"source_fact_ids\": [\"bul_ibm_005\"]}], \"compiler_template_id\": \"strategic_tailor_v1\", \"gap_notes\": [\"No FSA/actuarial fact exists within IBM C0 bundle; FSA credential remains outside this experience block's evidence scope and is not asserted here.\", \"Insurer-specific domain terms are targeting emphasis only; underlying proof remains financial-services modernization facts.\"], \"generation_runtime_status\": \"REAL_LLM\", \"graph_claim_binding_contract_digest\": \"08ec1c83eff03610bafa4675cc93804c21803d2b3e9dd401744ae61de49a0789\", \"graph_claim_bindings_ref\": \"graph_claim_bindings.json\", \"ibm_header\": {\"employer\": \"IBM\", \"end_date\": \"2022-10\", \"fact_id\": \"exp_ibm_001\", \"is_current\": false, \"location\": \"Edgewater, NJ\", \"start_date\": \"2017-04\", \"title\": \"Partner\"}, \"input_payload_hash\": \"d5a4005727e17b17\", \"jd_alignment\": {\"briefing_used_as_proof\": false, \"jd_used_as_proof\": false, \"selected_briefing_themes\": [\"insurer IT-enablement\", \"portfolio governance pillars\"], \"selected_jd_themes\": [\"enterprise IT strategy and portfolio governance\", \"cloud/data platform modernization for regulated insurer environments\", \"reference architecture and delivery governance\"], \"targeting_only\": true, \"targeting_rationale\": \"Ordered bullets to foreground architecture/modernization and BI/portfolio-governance framing ahead of pure alliance GTM, matching insurer IT-strategy emphasis; no employer, tool, or metric was invented from JD/briefing.\"}, \"judge_proof_eligible\": false, \"judge_required_for_proof\": true, \"judge_tier\": \"BULLET_REWRITE_QUALITY\", \"mocked_provider_selected\": false, \"offline_contract_stub_used\": false, \"product_quality_reason\": \"X2 failed gates: ['x2_ibm_cross_bullet_semantic_overlap_zero']\", \"product_quality_status\": \"FAIL\", \"prompt_hash\": \"494f8eecff7a9e57\", \"prompt_id\": \"ibm_bullet_tailor_dispatch_v1\", \"proof_closeout_note\": \"\", \"proof_eligible\": false, \"proof_scope\": \"plumbing_only\", \"proof_status\": \"NOT_PROOF_ELIGIBLE\", \"provider_proof_eligible\": false, \"required_judge_rows_missing\": false, \"resume_graph_allocation_plan_digest\": \"e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced\", \"resume_graph_claim_binding_active\": true, \"resume_graph_claim_binding_pass\": true, \"run_id\": \"ibm_bullets_20260811_100308\", \"runtime_certification\": false, \"runtime_generation_status\": \"REAL_LLM\", \"runtime_generation_status_class\": \"REAL_LLM\", \"section_id\": \"ibm_bullets\", \"section_prompt_adapter\": true, \"section_repair_ledger\": \"section_repair_ledger.json\", \"selected_fact_plan\": {\"bul_ibm_001\": {\"fact_ids\": [\"bul_ibm_001\"], \"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\"}, \"bul_ibm_002\": {\"fact_ids\": [\"bul_ibm_002\"], \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\"}, \"bul_ibm_003\": {\"fact_ids\": [\"bul_ibm_003\", \"fact_revenue_ops_001\"], \"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\"}, \"bul_ibm_004\": {\"fact_ids\": [\"bul_ibm_004\", \"fact_revenue_ops_005\"], \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\"}, \"bul_ibm_005\": {\"fact_ids\": [\"bul_ibm_005\", \"fact_partnerships_gtm_002\", \"metric_ibm_20pct_joint_revenue_growth\"], \"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\"}}, \"self_check\": {\"bullets_composed_from_role_episode_bundles\": true, \"exactly_5_bullets\": true, \"no_archive_prose_copy\": true, \"no_verbatim_base_resume_copy\": true, \"only_ibm_ids_cited\": true}, \"test_only_mock_judges\": false, \"test_only_mock_provider\": false, \"text_claim_coverage\": {\"coverage_schema\": \"ibm_bullets_structural_v1\", \"integrity_notes\": [], \"overall_pass\": true, \"sentences\": [{\"bullet_id\": \"bul_ibm_001\", \"material_claims\": [{\"claim_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\", \"reason\": \"Structural row aligned to bullet_id and claim_ledger.\", \"source_fact_ids\": [\"bul_ibm_001\"], \"support_status\": \"SUPPORTED\"}], \"sentence_index\": 1, \"sentence_pass\": true, \"sentence_text\": \"- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\"}, {\"bullet_id\": \"bul_ibm_002\", \"material_claims\": [{\"claim_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\", \"reason\": \"Structural row aligned to bullet_id and claim_ledger.\", \"source_fact_ids\": [\"bul_ibm_002\"], \"support_status\": \"SUPPORTED\"}], \"sentence_index\": 2, \"sentence_pass\": true, \"sentence_text\": \"- bul_ibm_002: Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\"}, {\"bullet_id\": \"bul_ibm_003\", \"material_claims\": [{\"claim_text\": \"Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.\", \"reason\": \"Structural row aligned to bullet_id and claim_ledger.\", \"source_fact_ids\": [\"bul_ibm_003\"], \"support_status\": \"SUPPORTED\"}], \"sentence_index\": 3, \"sentence_pass\": true, \"sentence_text\": \"- bul_ibm_003: Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.\"}, {\"bullet_id\": \"bul_ibm_004\", \"material_claims\": [{\"claim_text\": \"Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.\", \"reason\": \"Structural row aligned to bullet_id and claim_ledger.\", \"source_fact_ids\": [\"bul_ibm_004\"], \"support_status\": \"SUPPORTED\"}], \"sentence_index\": 4, \"sentence_pass\": true, \"sentence_text\": \"- bul_ibm_004: Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.\"}, {\"bullet_id\": \"bul_ibm_005\", \"material_claims\": [{\"claim_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions\", \"reason\": \"Structural row aligned to bullet_id and claim_ledger.\", \"source_fact_ids\": [\"bul_ibm_005\"], \"support_status\": \"SUPPORTED\"}], \"sentence_index\": 5, \"sentence_pass\": true, \"sentence_text\": \"- bul_ibm_005: Built decision-support data models and BI views that connected modernization programs to executive operating decisions\"}]}, \"x1d_runtime_status\": \"MODEL_BACKED\"}",
+  "generated_content_origin": "MODEL_GENERATION",
+  "is_future_run_only": false,
+  "is_uwg_write_authority": false,
+  "l5_certification_packet": null,
+  "l5_certification_packet_digest": "",
+  "l5_certification_packet_ref": "",
+  "l5_certification_ref": "test:valid:w6",
+  "l5_certification_status": "",
+  "l5_certification_verification_digest": "",
+  "l5_certification_verified": false,
+  "l5_egress_receipt_digests": [],
+  "l5_egress_receipt_refs": [],
+  "l5_egress_receipts": [],
+  "l5_evidence_contract_digest": "",
+  "l5_prompt_artifact_digest": "",
+  "l5_runtime_binding_digest": "",
+  "model_call_refs": [
+    "provider_request:66e6ca5b2004555dba5c6f87de13bbb12fc51412a579854813d412f5976dd413"
+  ],
+  "otel_span_refs": [],
+  "posture": {
+    "external_call": false,
+    "hitl_required": false,
+    "posture_class": "write_intent",
+    "read_only": false,
+    "write_intent": true
+  },
+  "prompt_artifact_digest": "c8a1b7ad12cb1ddbd86400be42271b04c2292d596e511465e7261bef11755d88",
+  "prompt_refs": [
+    "c8a1b7ad12cb1ddbd86400be42271b04c2292d596e511465e7261bef11755d88"
+  ],
+  "proposed_state_diff": {
+    "payload": {
+      "allow_non_allow_exit_zero_cli": false,
+      "allow_test_mock_judges_hatch": false,
+      "apps_rg_prompt_template_ref": "apps_rg/prompt_assembly/templates/ibm_bullet_tailor_v1.yaml",
+      "artifact_namespace_class": "NON_PROOF_PLUMBING",
+      "authoritative_attempt_number": 1,
+      "authoritative_l2_source": "initial_llm",
+      "authorization_scope": "PLUMBING_ONLY",
+      "bullets": [
+        {
+          "bullet_id": "bul_ibm_001",
+          "bullet_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.",
+          "bullet_theme": "aws_modernization_architecture",
+          "has_metric": true,
+          "metric_raw": "20% joint revenue growth",
+          "source_fact_ids": [
+            "bul_ibm_001"
+          ]
+        },
+        {
+          "bullet_id": "bul_ibm_002",
+          "bullet_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions.",
+          "bullet_theme": "cognitive_decision_support",
+          "has_metric": false,
+          "metric_raw": null,
+          "source_fact_ids": [
+            "bul_ibm_002"
+          ]
+        },
+        {
+          "bullet_id": "bul_ibm_003",
+          "bullet_text": "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.",
+          "bullet_theme": "presales_solution_engineering",
+          "has_metric": false,
+          "metric_raw": null,
+          "source_fact_ids": [
+            "bul_ibm_003"
+          ]
+        },
+        {
+          "bullet_id": "bul_ibm_004",
+          "bullet_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.",
+          "bullet_theme": "data_modeling_bi",
+          "has_metric": false,
+          "metric_raw": null,
+          "source_fact_ids": [
+            "bul_ibm_004"
+          ]
+        },
+        {
+          "bullet_id": "bul_ibm_005",
+          "bullet_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions",
+          "bullet_theme": "hyperscaler_alliance_gtm",
+          "has_metric": false,
+          "metric_raw": null,
+          "source_fact_ids": [
+            "bul_ibm_005"
+          ]
+        }
+      ],
+      "change_log": [
+        {
+          "allocation_claim_unit_id": "ibm_bullets:bul_ibm_001",
+          "bullet_id": "bul_ibm_001",
+          "fact_ids_used": [
+            "bul_ibm_001"
+          ],
+          "graph_skill_node_ids": [
+            "skill_partner_joint_solution_development"
+          ],
+          "metric_outcome_ids": [],
+          "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm"
+        },
+        {
+          "allocation_claim_unit_id": "ibm_bullets:bul_ibm_002",
+          "bullet_id": "bul_ibm_002",
+          "fact_ids_used": [
+            "bul_ibm_002"
+          ],
+          "graph_skill_node_ids": [
+            "skill_sr_cloud_data_platform_engineering"
+          ],
+          "metric_outcome_ids": [],
+          "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support"
+        },
+        {
+          "allocation_claim_unit_id": "ibm_bullets:bul_ibm_003",
+          "bullet_id": "bul_ibm_003",
+          "fact_ids_used": [
+            "bul_ibm_003",
+            "fact_revenue_ops_001"
+          ],
+          "graph_skill_node_ids": [
+            "skill_partner_pnl_oversight"
+          ],
+          "metric_outcome_ids": [],
+          "role_episode_bundle_id": "reb_ibm_revenue_sales_target_execution"
+        },
+        {
+          "allocation_claim_unit_id": "ibm_bullets:bul_ibm_004",
+          "bullet_id": "bul_ibm_004",
+          "fact_ids_used": [
+            "bul_ibm_004",
+            "fact_revenue_ops_005"
+          ],
+          "graph_skill_node_ids": [
+            "skill_p2_gtm_executive_buyer_alignment"
+          ],
+          "metric_outcome_ids": [
+            "metric_ibm_budget_portfolio_bi_views"
+          ],
+          "role_episode_bundle_id": "reb_ibm_presales_solution_engineering"
+        },
+        {
+          "allocation_claim_unit_id": "ibm_bullets:bul_ibm_005",
+          "bullet_id": "bul_ibm_005",
+          "fact_ids_used": [
+            "bul_ibm_005",
+            "fact_partnerships_gtm_002"
+          ],
+          "graph_skill_node_ids": [
+            "skill_sr_enterprise_portfolio_data_governance"
+          ],
+          "metric_outcome_ids": [
+            "metric_ibm_20pct_joint_revenue_growth"
+          ],
+          "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support"
+        },
+        {
+          "operation": "skip_ibm_locked_metric_anchor",
+          "reason": "plan_fact_metric_does_not_match_canonical:bul_ibm_002 (canonical=weeks to hours, plan_metric='', has_metric=False) — graph selector chose this fact intentionally; do not append canonical-metric suffix"
+        }
+      ],
+      "claim_ledger": [
+        {
+          "claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.",
+          "source_fact_ids": [
+            "bul_ibm_001"
+          ]
+        },
+        {
+          "claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions.",
+          "source_fact_ids": [
+            "bul_ibm_002"
+          ]
+        },
+        {
+          "claim_text": "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.",
+          "source_fact_ids": [
+            "bul_ibm_003"
+          ]
+        },
+        {
+          "claim_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.",
+          "source_fact_ids": [
+            "bul_ibm_004"
+          ]
+        },
+        {
+          "claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions",
+          "source_fact_ids": [
+            "bul_ibm_005"
+          ]
+        }
+      ],
+      "compiler_template_id": "strategic_tailor_v1",
+      "gap_notes": [
+        "No FSA/actuarial fact exists within IBM C0 bundle; FSA credential remains outside this experience block's evidence scope and is not asserted here.",
+        "Insurer-specific domain terms are targeting emphasis only; underlying proof remains financial-services modernization facts."
+      ],
+      "generation_runtime_status": "REAL_LLM",
+      "graph_claim_binding_contract_digest": "08ec1c83eff03610bafa4675cc93804c21803d2b3e9dd401744ae61de49a0789",
+      "graph_claim_bindings_ref": "graph_claim_bindings.json",
+      "ibm_header": {
+        "employer": "IBM",
+        "end_date": "2022-10",
+        "fact_id": "exp_ibm_001",
+        "is_current": false,
+        "location": "Edgewater, NJ",
+        "start_date": "2017-04",
+        "title": "Partner"
+      },
+      "input_payload_hash": "d5a4005727e17b17",
+      "jd_alignment": {
+        "briefing_used_as_proof": false,
+        "jd_used_as_proof": false,
+        "selected_briefing_themes": [
+          "insurer IT-enablement",
+          "portfolio governance pillars"
+        ],
+        "selected_jd_themes": [
+          "enterprise IT strategy and portfolio governance",
+          "cloud/data platform modernization for regulated insurer environments",
+          "reference architecture and delivery governance"
+        ],
+        "targeting_only": true,
+        "targeting_rationale": "Ordered bullets to foreground architecture/modernization and BI/portfolio-governance framing ahead of pure alliance GTM, matching insurer IT-strategy emphasis; no employer, tool, or metric was invented from JD/briefing."
+      },
+      "judge_proof_eligible": false,
+      "judge_required_for_proof": true,
+      "judge_tier": "BULLET_REWRITE_QUALITY",
+      "mocked_provider_selected": false,
+      "offline_contract_stub_used": false,
+      "product_quality_reason": "X2 failed gates: ['x2_ibm_cross_bullet_semantic_overlap_zero']",
+      "product_quality_status": "FAIL",
+      "prompt_hash": "494f8eecff7a9e57",
+      "prompt_id": "ibm_bullet_tailor_dispatch_v1",
+      "proof_closeout_note": "",
+      "proof_eligible": false,
+      "proof_scope": "plumbing_only",
+      "proof_status": "NOT_PROOF_ELIGIBLE",
+      "provider_proof_eligible": false,
+      "required_judge_rows_missing": false,
+      "resume_graph_allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+      "resume_graph_claim_binding_active": true,
+      "resume_graph_claim_binding_pass": true,
+      "run_id": "ibm_bullets_20260811_100308",
+      "runtime_certification": false,
+      "runtime_generation_status": "REAL_LLM",
+      "runtime_generation_status_class": "REAL_LLM",
+      "section_id": "ibm_bullets",
+      "section_prompt_adapter": true,
+      "section_repair_ledger": "section_repair_ledger.json",
+      "selected_fact_plan": {
+        "bul_ibm_001": {
+          "fact_ids": [
+            "bul_ibm_001"
+          ],
+          "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm"
+        },
+        "bul_ibm_002": {
+          "fact_ids": [
+            "bul_ibm_002"
+          ],
+          "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support"
+        },
+        "bul_ibm_003": {
+          "fact_ids": [
+            "bul_ibm_003",
+            "fact_revenue_ops_001"
+          ],
+          "role_episode_bundle_id": "reb_ibm_presales_solution_engineering"
+        },
+        "bul_ibm_004": {
+          "fact_ids": [
+            "bul_ibm_004",
+            "fact_revenue_ops_005"
+          ],
+          "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support"
+        },
+        "bul_ibm_005": {
+          "fact_ids": [
+            "bul_ibm_005",
+            "fact_partnerships_gtm_002",
+            "metric_ibm_20pct_joint_revenue_growth"
+          ],
+          "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm"
+        }
+      },
+      "self_check": {
+        "bullets_composed_from_role_episode_bundles": true,
+        "exactly_5_bullets": true,
+        "no_archive_prose_copy": true,
+        "no_verbatim_base_resume_copy": true,
+        "only_ibm_ids_cited": true
+      },
+      "test_only_mock_judges": false,
+      "test_only_mock_provider": false,
+      "text_claim_coverage": {
+        "coverage_schema": "ibm_bullets_structural_v1",
+        "integrity_notes": [],
+        "overall_pass": true,
+        "sentences": [
+          {
+            "bullet_id": "bul_ibm_001",
+            "material_claims": [
+              {
+                "claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.",
+                "reason": "Structural row aligned to bullet_id and claim_ledger.",
+                "source_fact_ids": [
+                  "bul_ibm_001"
+                ],
+                "support_status": "SUPPORTED"
+              }
+            ],
+            "sentence_index": 1,
+            "sentence_pass": true,
+            "sentence_text": "- bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth."
+          },
+          {
+            "bullet_id": "bul_ibm_002",
+            "material_claims": [
+              {
+                "claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions.",
+                "reason": "Structural row aligned to bullet_id and claim_ledger.",
+                "source_fact_ids": [
+                  "bul_ibm_002"
+                ],
+                "support_status": "SUPPORTED"
+              }
+            ],
+            "sentence_index": 2,
+            "sentence_pass": true,
+            "sentence_text": "- bul_ibm_002: Built decision-support data models and BI views that connected modernization programs to executive operating decisions."
+          },
+          {
+            "bullet_id": "bul_ibm_003",
+            "material_claims": [
+              {
+                "claim_text": "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions.",
+                "reason": "Structural row aligned to bullet_id and claim_ledger.",
+                "source_fact_ids": [
+                  "bul_ibm_003"
+                ],
+                "support_status": "SUPPORTED"
+              }
+            ],
+            "sentence_index": 3,
+            "sentence_pass": true,
+            "sentence_text": "- bul_ibm_003: Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, applying pipeline discipline to client portfolio expansion motions."
+          },
+          {
+            "bullet_id": "bul_ibm_004",
+            "material_claims": [
+              {
+                "claim_text": "Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.",
+                "reason": "Structural row aligned to bullet_id and claim_ledger.",
+                "source_fact_ids": [
+                  "bul_ibm_004"
+                ],
+                "support_status": "SUPPORTED"
+              }
+            ],
+            "sentence_index": 4,
+            "sentence_pass": true,
+            "sentence_text": "- bul_ibm_004: Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria."
+          },
+          {
+            "bullet_id": "bul_ibm_005",
+            "material_claims": [
+              {
+                "claim_text": "Built decision-support data models and BI views that connected modernization programs to executive operating decisions",
+                "reason": "Structural row aligned to bullet_id and claim_ledger.",
+                "source_fact_ids": [
+                  "bul_ibm_005"
+                ],
+                "support_status": "SUPPORTED"
+              }
+            ],
+            "sentence_index": 5,
+            "sentence_pass": true,
+            "sentence_text": "- bul_ibm_005: Built decision-support data models and BI views that connected modernization programs to executive operating decisions"
+          }
+        ]
+      },
+      "x1d_runtime_status": "MODEL_BACKED"
+    },
+    "section_id": "ibm_bullets",
+    "section_output_ref": "l2_output.json"
+  },
+  "provider_receipts": [
+    "provider_response:c9c9c0d6e74485a7a9775fcacddf6b279b4cac138f392ddfbc7a99c11dd85f0b"
+  ],
+  "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:33acc0ea1ff22073:b7312c750abe8c77::v1",
+  "replay_manifest": "replay_key:c6a4ea1e689d7796641b6b1f3fa889103fd65e35afde720bf89da86c120b232d",
+  "request_id": "61432ab4-abd1-423e-8266-bcf72c645ec2",
+  "run_id": "f64ef0e2-f869-47e1-93fb-382b32148f7b",
+  "sandbox_required": false,
+  "schema_version": "W6.0",
+  "signature": "",
+  "snapshot_refs": [
+    "15ddf91af1f92ca49265a0f2168eb981b5c2f4a9d2b158cd1d7f119b0230ee29",
+    "1e45312962209bd4f6b8b24c7d2e35c40f766ad64436c463bbafa6ec0fc566f2"
+  ],
+  "sovereign_execution_receipt": "l2_packet:15ddf91af1f92ca49265a0f2168eb981b5c2f4a9d2b158cd1d7f119b0230ee29",
+  "state_diff_authorized": false,
+  "tenant_id": "apps_rg_l1_cognitive_shadow",
+  "tool_call_refs": [],
+  "trace_id": "61432ab4-abd1-423e-8266-bcf72c645ec2"
+}

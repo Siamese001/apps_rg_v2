@@ -1,7 +1,7 @@
 """apps_research Chroma-backed research store — W6 real-embeddings upgrade.
 
 W5N (no-core track) invariants enforced here:
-  - App-owned integration layer only; does not edit agentic_core.
+  - App-owned integration layer only; does not edit apps_rg.
   - Does not write durable L4 state directly.
   - Does not call UWG.
   - Does not answer, route, or assemble prompts.

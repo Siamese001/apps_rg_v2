@@ -1,7 +1,7 @@
 """apps_rg-owned multi-provider judge panel harness.
 
 This module mirrors the small app-facing panel contract surface used by the
-executive-summary X1D proof path without importing concrete agentic_core judge
+executive-summary X1D proof path without importing concrete apps_rg judge
 internals.
 """
 

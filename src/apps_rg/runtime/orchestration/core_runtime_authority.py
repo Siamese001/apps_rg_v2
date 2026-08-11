@@ -1,6 +1,6 @@
 """App-owned authority adapter for the externally pinned core runtime bundle.
 
-The standalone app cannot rewrite artifacts stamped by ``agentic_core``.  It
+The standalone app cannot rewrite artifacts stamped by ``apps_rg``.  It
 therefore consumes those artifacts, records source-contract drift, and emits a
 separate content-bound normalization receipt that is the only core bundle view
 the app may use for product authorization.
@@ -51,9 +51,9 @@ _SOURCE_ARTIFACTS = (
     "l2_sealed_artifact.json",
     "runtime_exhaust_bundle.json",
     "runtime_trace_snapshot.json",
-    "agentic_core_how_trace.json",
+    "apps_rg_how_trace.json",
     "integrated_runtime_artifact_manifest.json",
-    "agentic_core_spine_proof.json",
+    "apps_rg_spine_proof.json",
 )
 
 
@@ -186,8 +186,8 @@ def _build_core_runtime_authority(
 
     witness = payloads["runtime_execution_witness.json"]
     exhaust = payloads["runtime_exhaust_bundle.json"]
-    how = payloads["agentic_core_how_trace.json"]
-    spine = payloads["agentic_core_spine_proof.json"]
+    how = payloads["apps_rg_how_trace.json"]
+    spine = payloads["apps_rg_spine_proof.json"]
     x3 = payloads["x3_disposition_receipt.json"]
     l2 = witness.get("l2") if isinstance(witness.get("l2"), Mapping) else {}
     l2_fault = str(l2.get("fault") or exhaust.get("l2_fault") or "")
@@ -202,8 +202,8 @@ def _build_core_runtime_authority(
     )
     source_modes = {
         "runtime_exhaust_bundle.json": str(exhaust.get("runtime_mode") or ""),
-        "agentic_core_how_trace.json": str(how.get("runtime_mode") or ""),
-        "agentic_core_spine_proof.json": str(spine.get("runtime_mode") or ""),
+        "apps_rg_how_trace.json": str(how.get("runtime_mode") or ""),
+        "apps_rg_spine_proof.json": str(spine.get("runtime_mode") or ""),
     }
     if len({value for value in source_modes.values() if value}) > 1:
         violations.append(
@@ -310,7 +310,7 @@ def _build_core_runtime_authority(
         "runtime_mode": runtime_mode,
         "success": normalized_spine_success,
         "exit_code": 0 if normalized_spine_success else 1,
-        "agentic_core_spine_status": (
+        "apps_rg_spine_status": (
             "R4_SINGLE_ACTION_PROVEN"
             if normalized_spine_success
             else "R4_SINGLE_ACTION_BLOCKED"
@@ -351,7 +351,7 @@ def _build_core_runtime_authority(
         "schema_version": CORE_RUNTIME_AUTHORITY_SCHEMA,
         "generated_at_utc": generated_at_utc,
         "producer_component": "apps_rg.runtime.orchestration.core_runtime_authority",
-        "source_runtime_subject": "agentic_core",
+        "source_runtime_subject": "apps_rg",
         "source_artifact_bindings": bindings,
         "source_contract_violations": violations,
         "normalized_contract": {
@@ -359,7 +359,7 @@ def _build_core_runtime_authority(
             "errors": normalized_errors,
             "runtime_modes": normalized_modes,
             "how_trace": {
-                "source_ref": "agentic_core_how_trace.json",
+                "source_ref": "apps_rg_how_trace.json",
                 "source_stored_digest": source_how_digest,
                 "source_recomputed_digest": recomputed_source_how_digest,
                 "deterministic_digest": normalized_how_digest,

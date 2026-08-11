@@ -59,11 +59,11 @@ _REQUIRED_ARTIFACTS: tuple[tuple[str, tuple[str, ...]], ...] = (
         "apps_rg_core_runtime_authority.json",
         ("apps_rg_core_runtime_authority.json",),
     ),
-    ("agentic_core_how_trace.json", ("agentic_core_how_trace.json",)),
-    ("agentic_core_spine_proof.json", ("agentic_core_spine_proof.json",)),
+    ("apps_rg_how_trace.json", ("apps_rg_how_trace.json",)),
+    ("apps_rg_spine_proof.json", ("apps_rg_spine_proof.json",)),
     (
-        "agentic_core_l7_route_family_coverage.json",
-        ("agentic_core_l7_route_family_coverage.json",),
+        "apps_rg_l7_route_family_coverage.json",
+        ("apps_rg_l7_route_family_coverage.json",),
     ),
     (
         "integrated_run_manifest",
@@ -374,15 +374,15 @@ def _detect_integrated_r4(
             return True
         if "integrated_runtime_artifact_manifest" in blob.get("artifact_filenames", []):
             return True
-    if paths.get("agentic_core_how_trace.json") and paths.get(
-        "agentic_core_spine_proof.json"
+    if paths.get("apps_rg_how_trace.json") and paths.get(
+        "apps_rg_spine_proof.json"
     ):
         return True
     return False
 
 
 def _has_no_bypass_assertions(paths: dict[str, Path | None]) -> bool:
-    how = paths.get("agentic_core_how_trace.json")
+    how = paths.get("apps_rg_how_trace.json")
     if how is None:
         return False
     doc = _load_json(how)
@@ -510,7 +510,7 @@ def _live_product_outcome_blockers(
             if code and code != "X3D_ALLOW_FINISH":
                 blockers.append(f"integrated_exit_x3:{code}")
             break
-        spine_path = run_dir / "agentic_core_spine_proof.json"
+        spine_path = run_dir / "apps_rg_spine_proof.json"
         if spine_path.is_file():
             spine_doc = _load_json(spine_path) or {}
             spine = (
@@ -518,7 +518,7 @@ def _live_product_outcome_blockers(
                 if isinstance(spine_doc.get("payload"), dict)
                 else spine_doc
             )
-            status = str(spine.get("agentic_core_spine_status") or "")
+            status = str(spine.get("apps_rg_spine_status") or "")
             if "BLOCKED" in status or "MISSING" in status:
                 blockers.append(f"spine_status:{status}")
             gaps = spine.get("blocking_gaps")

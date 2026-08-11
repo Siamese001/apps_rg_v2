@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from agentic_core.L2_execution.regen.delta_shape_guard import estimate_token_count
-from agentic_core.L2_execution.regen.prompt_lock import DEFAULT_MAX_DELTA_TOKENS
+from apps_rg_runtime.L2_execution.regen.delta_shape_guard import estimate_token_count
+from apps_rg_runtime.L2_execution.regen.prompt_lock import DEFAULT_MAX_DELTA_TOKENS
 from apps_rg.runtime.sections.executive_summary_judge_remediation import (
     all_model_backed_judges_pass,
     any_model_backed_soft_fail,
@@ -181,7 +181,7 @@ def test_judge_remediation_user_message_includes_x2_floor() -> None:
 
 
 def test_prescriptive_delta_locks_compile_core_runner_splits_anchor() -> None:
-    from agentic_core.L2_execution.regen.prompt_lock import PROMPT_LOCK_GENERIC
+    from apps_rg.runtime.sections.executive_summary_regen_support import PROMPT_LOCK_GENERIC
 
     msg = build_judge_remediation_prescriptive_delta_message(
         x1d_judges=[_soft_fail_judge("anthropic_claude", findings=["weak synthesis"])],
@@ -439,12 +439,12 @@ def test_all_soft_failed_judges_emit_untruncated_feedback() -> None:
     assert "openai_chatgpt remediation:" in joined
 
 
-def test_retry_provider_falls_back_when_core_runner_refuses(tmp_path: Path, monkeypatch) -> None:
+def test_retry_provider_falls_back_when_same_authority_runner_refuses(tmp_path: Path, monkeypatch) -> None:
     import json
 
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN", "1")
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_PRESCRIPTIVE_DELTA", "1")
-    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_CORE_SAME_AUTHORITY_REGEN", "1")
+    monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_SAME_AUTHORITY_REGEN", "1")
     monkeypatch.setenv("APPS_RG_EXEC_SUMMARY_JUDGE_REGEN_LEGACY_BLOCK", "0")
 
     (tmp_path / "compiled_prompt_artifact.json").write_text(
@@ -457,7 +457,7 @@ def test_retry_provider_falls_back_when_core_runner_refuses(tmp_path: Path, monk
     }
     raw = json.dumps(parsed)
 
-    def _refuse_core(**kwargs):
+    def _refuse_same_authority(**kwargs):
         return (
             "",
             {
@@ -481,8 +481,8 @@ def test_retry_provider_falls_back_when_core_runner_refuses(tmp_path: Path, monk
             return {"raw_model_output": self.raw_model_output}
 
     monkeypatch.setattr(
-        "apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge.run_core_same_authority_regen",
-        _refuse_core,
+        "apps_rg.runtime.sections.executive_summary_same_authority_regen_bridge.run_apps_rg_same_authority_regen",
+        _refuse_same_authority,
     )
     monkeypatch.setattr(
         "apps_rg.runtime.sections.executive_summary_regen_dispatch.generate_section",
@@ -510,7 +510,7 @@ def test_retry_provider_falls_back_when_core_runner_refuses(tmp_path: Path, monk
         artifact_dir=tmp_path,
         max_attempts=1,
     )
-    assert receipt.get("core_runner_fallback") == "apps_rg.thread_append"
+    assert receipt.get("same_authority_runner_fallback") == "apps_rg.thread_append"
     assert receipt.get("accepted") is True
     assert receipt.get("output_changed") is True
     assert "Revised" in str(new_parsed.get("resume_display_text") or "")

@@ -3,8 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from agentic_core.L3_orchestration.exit_eval.dimension import Dimension, GraderClass
-from agentic_core.L3_orchestration.exit_eval.graders.llm_judge import JudgeResponse
+from apps_rg.runtime.apps_runtime_compat import Dimension, GraderClass, JudgeResponse
 from apps_model_telemetry.external_model_usage import LEDGER_FILENAME
 from apps_research.config.model_pins import apps_rg_handoff_judge_pin
 from apps_research.integrations.apps_rg_handoff import (

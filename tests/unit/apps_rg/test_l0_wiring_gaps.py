@@ -149,7 +149,7 @@ class TestMainR1AWiring:
             return _fake_r4_result()
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -157,7 +157,7 @@ class TestMainR1AWiring:
         _mock_prereq_result = {"selected_route": "R1", "reason_codes": [], "briefing_status": "valid"}
 
         args = self._make_args(tmp_path)
-        with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+        with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
             with pytest.raises(SystemExit) as exc_info:
                 harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
         assert exc_info.value.code == 0
@@ -176,7 +176,7 @@ class TestMainR1AWiring:
             return _fake_r4_result()
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -184,7 +184,7 @@ class TestMainR1AWiring:
         _mock_prereq_result = {"selected_route": "R1", "reason_codes": [], "briefing_status": "valid"}
 
         args = self._make_args(tmp_path)
-        with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+        with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
             with pytest.raises(SystemExit) as exc_info:
                 harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
         assert exc_info.value.code == 0
@@ -208,7 +208,7 @@ class TestMainR1AWiring:
             return _fake_r4_result(fault="")
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -216,7 +216,7 @@ class TestMainR1AWiring:
         _mock_prereq_result = {"selected_route": "R1", "reason_codes": [], "briefing_status": "valid"}
 
         args = self._make_args(tmp_path)
-        with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+        with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
             with pytest.raises(SystemExit):
                 harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
 
@@ -240,7 +240,7 @@ class TestMainR1AWiring:
             return _fake_r4_result(fault="L2_EXECUTION_ERROR:something")
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -248,7 +248,7 @@ class TestMainR1AWiring:
         _mock_prereq_result = {"selected_route": "R1", "reason_codes": [], "briefing_status": "valid"}
 
         args = self._make_args(tmp_path)
-        with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+        with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
             with pytest.raises(SystemExit) as exc_info:
                 harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
         assert exc_info.value.code == 1  # fault → exit 1
@@ -272,7 +272,7 @@ class TestMainR1AWiring:
             return _fake_r4_result(terminal_r5=True)
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -280,7 +280,7 @@ class TestMainR1AWiring:
         _mock_prereq_result = {"selected_route": "R1", "reason_codes": [], "briefing_status": "valid"}
 
         args = self._make_args(tmp_path)
-        with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+        with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
             with pytest.raises(SystemExit):
                 harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
         assert not stamped_keys
@@ -325,11 +325,11 @@ class TestMainR1BWiring:
                 return _fake_r4_result()
 
             monkeypatch.setattr(
-                "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+                "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
                 fake_pipeline,
             )
             args = self._make_args(tmp_path)
-            with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+            with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
                 with pytest.raises(SystemExit):
                     harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
 
@@ -353,7 +353,7 @@ class TestMainR1BWiring:
             return _fake_r4_result()
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -382,7 +382,7 @@ class TestMainR1BWiring:
             fake_whole_preflight,
         ):
             args = self._make_args(tmp_path)
-            with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+            with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
                 with pytest.raises(SystemExit) as exc_info:
                     harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
             assert exc_info.value.code == 0
@@ -403,7 +403,7 @@ class TestMainR1BWiring:
             return _fake_r4_result()
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -412,7 +412,7 @@ class TestMainR1BWiring:
 
         with patch("apps_rg.cache.r1b_adapter.check_r1b_for_apps_rg", return_value=None):
             args = self._make_args(tmp_path)
-            with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+            with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
                 with pytest.raises(SystemExit):
                     harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
 
@@ -450,7 +450,7 @@ class TestMainR1BWiring:
             return r
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -458,7 +458,7 @@ class TestMainR1BWiring:
         _mock_prereq_result = {"selected_route": "R1", "reason_codes": [], "briefing_status": "valid"}
 
         args = self._make_args(tmp_path)
-        with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+        with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
             with pytest.raises(SystemExit):
                 harness.run_whole_run_spine_harness(args, runs_dir=tmp_path, artifact_dir_override=artifact_dir)
 
@@ -476,7 +476,7 @@ class TestMainR1BWiring:
             return _fake_r4_result()
 
         monkeypatch.setattr(
-            "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+            "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
             fake_pipeline,
         )
 
@@ -488,7 +488,7 @@ class TestMainR1BWiring:
         with patch("apps_rg.cache.r1b_adapter.check_r1b_for_apps_rg", return_value=None):
             with patch("apps_rg.cache.r1b_adapter.AppsRgR1BCacheAdapter", return_value=mock_adapter):
                 args = self._make_args(tmp_path)
-                with patch("agentic_core.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
+                with patch("apps_rg_runtime.L0_routing.gates.apps_rg_prerequisite_gate.check_apps_rg_prerequisites", return_value=_mock_prereq_result):
                     with pytest.raises(SystemExit):
                         harness.run_whole_run_spine_harness(args, runs_dir=tmp_path)
 
@@ -503,14 +503,14 @@ class TestLoadRouteIdForApp:
     """Tests for _load_route_id_for_app helper in integrated_single_action_spine_run."""
 
     def test_returns_route_id_constant_when_no_app(self):
-        from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+        from apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run import (
             _load_route_id_for_app,
             ROUTE_ID,
         )
         assert _load_route_id_for_app("") == ROUTE_ID
 
     def test_returns_route_id_constant_when_registry_absent(self, tmp_path, monkeypatch):
-        from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+        from apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run import (
             _load_route_id_for_app,
             ROUTE_ID,
         )
@@ -518,7 +518,7 @@ class TestLoadRouteIdForApp:
         assert _load_route_id_for_app("nonexistent_app") == ROUTE_ID
 
     def test_reads_route_id_from_yaml(self, tmp_path, monkeypatch):
-        from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+        from apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run import (
             _load_route_id_for_app,
         )
         monkeypatch.chdir(tmp_path)
@@ -532,7 +532,7 @@ class TestLoadRouteIdForApp:
         assert result == "my_app.primary_v1"
 
     def test_fallback_on_malformed_yaml(self, tmp_path, monkeypatch):
-        from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+        from apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run import (
             _load_route_id_for_app,
             ROUTE_ID,
         )
@@ -546,7 +546,7 @@ class TestLoadRouteIdForApp:
         assert result == ROUTE_ID
 
     def test_fallback_on_empty_routes(self, tmp_path, monkeypatch):
-        from agentic_core.runtime.entrypoints.integrated_single_action_spine_run import (
+        from apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run import (
             _load_route_id_for_app,
             ROUTE_ID,
         )

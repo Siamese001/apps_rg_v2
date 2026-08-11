@@ -1,0 +1,137 @@
+{
+  "schema_version": "c02_fact_vectors_ingest_v1",
+  "section_id": "competencies",
+  "chroma_path": "C:/Git/Agentic-Workflow-FRESH/data/cache/chromadb",
+  "run_id": "competencies_20260811_095850",
+  "promotion_mode": "inline",
+  "staged_at_utc": "2026-08-11T09:58:50.287567+00:00",
+  "attempted": true,
+  "upserted_count": 0,
+  "skipped_count": 0,
+  "skipped": [],
+  "status": "STAGED",
+  "reason": "staged_none_promoted",
+  "operations": {
+    "extract": 7
+  },
+  "routed_to_semantic_cache": 0,
+  "rejected_ungrounded": 0,
+  "staged_count": 7,
+  "promotion": {
+    "schema_version": "fact_vector_promotion_v2",
+    "staging_collection": "fact_vectors_staging",
+    "live_collection": "fact_vectors",
+    "promotion_run_id": "fact_vector_promotion:2026-08-11T09:58:52.805048Z",
+    "promotion_mode": "inline",
+    "promoted_at_utc": "2026-08-11T09:58:52.805048+00:00",
+    "promotion_score_floor": 0.48,
+    "run_id": "competencies_20260811_095850",
+    "x3_code": "",
+    "require_x3_allow": false,
+    "selected_ids": [],
+    "missing_selected_ids": [],
+    "staged_count": 21,
+    "considered_count": 7,
+    "other_run_count": 14,
+    "promoted_count": 0,
+    "held_count": 7,
+    "rejected_count": 0,
+    "promoted": [],
+    "held": [
+      {
+        "id": "apps_rg:fv:reb_ibm_customer_success_value_realization",
+        "reason": "duplicate_digest:apps_rg:fv:reb_ibm_customer_success_value_realization"
+      },
+      {
+        "id": "apps_rg:fv:reb_unify_agentic_platform_architecture",
+        "reason": "duplicate_digest:apps_rg:fv:reb_unify_agentic_platform_architecture"
+      },
+      {
+        "id": "apps_rg:fv:reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reason": "duplicate_digest:apps_rg:fv:reb_ibm_aws_alliance_partner_cosell_gtm"
+      },
+      {
+        "id": "apps_rg:fv:reb_ibm_devsecops_release_resilience",
+        "reason": "duplicate_digest:apps_rg:fv:reb_ibm_devsecops_release_resilience"
+      },
+      {
+        "id": "apps_rg:fv:reb_unify_partner_channel_cosell",
+        "reason": "duplicate_digest:apps_rg:fv:reb_unify_partner_channel_cosell"
+      },
+      {
+        "id": "apps_rg:fv:reb_ibm_presales_solution_engineering",
+        "reason": "duplicate_digest:apps_rg:fv:reb_ibm_presales_solution_engineering"
+      },
+      {
+        "id": "apps_rg:fv:reb_ibm_revenue_sales_target_execution",
+        "reason": "duplicate_digest:apps_rg:fv:reb_ibm_revenue_sales_target_execution"
+      }
+    ],
+    "rejected": [],
+    "sparse_synced": false,
+    "dense_count": 54,
+    "sparse_doc_count": null,
+    "sparse_sync_reason": "",
+    "hitl_required": false,
+    "status": "NONE_PROMOTABLE",
+    "reason": "no_staged_rows_passed_dedupe_or_score_floor",
+    "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\competencies\\fact_vector_promotion_receipt.json",
+    "source_x3_code": "",
+    "x3_finish_code_normalized": "",
+    "uwg": {},
+    "hold_annotation": {
+      "status": "PASS",
+      "row_count": 7,
+      "error_type": "",
+      "error": ""
+    },
+    "live_projection": {
+      "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+      "projection_surface": "chromadb.fact_vectors",
+      "target_l4_surface": "l4.apps_rg.fact_vectors",
+      "retrieval_mode": "live_id_get",
+      "dense_count_before": 54,
+      "dense_count_after": 54,
+      "promoted_ids": [],
+      "retrieved_ids": [],
+      "missing_ids": [],
+      "status": "EMPTY",
+      "reason": "no_promoted_ids"
+    },
+    "retrieval_proof": {
+      "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+      "projection_surface": "chromadb.fact_vectors",
+      "target_l4_surface": "l4.apps_rg.fact_vectors",
+      "retrieval_mode": "live_id_get",
+      "dense_count_before": 54,
+      "dense_count_after": 54,
+      "promoted_ids": [],
+      "retrieved_ids": [],
+      "missing_ids": [],
+      "status": "EMPTY",
+      "reason": "no_promoted_ids"
+    },
+    "l7_auditability": {
+      "uwg_required_before_live_chroma_projection": true,
+      "target_l4_surface": "l4.apps_rg.fact_vectors",
+      "staging_collection": "fact_vectors_staging",
+      "live_collection": "fact_vectors",
+      "x3_required": false,
+      "x3_code": "",
+      "x3_gate_code": "",
+      "uwg_status": "",
+      "live_projection_status": "EMPTY",
+      "retrieval_proof_status": "EMPTY"
+    },
+    "uwg_witness": {
+      "ledger": "router_l4_uwg",
+      "event_kind": "route_decision",
+      "event_id": "",
+      "decision_id": "fact_vector_promotion_de6d3ca87e91",
+      "selected": "blocked",
+      "promotion_receipt_digest": "de6d3ca87e919d8e7d083beab88ae941dad8468aa68a7fb443971677891c554a",
+      "promotion_receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\candidate_attempt_005\\modular_r4\\sections\\competencies\\fact_vector_promotion_receipt.json",
+      "witness_status": "FAIL_SOFT"
+    }
+  }
+}

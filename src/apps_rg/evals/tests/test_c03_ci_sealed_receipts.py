@@ -19,11 +19,11 @@ from apps_rg.evals.c03_ci_ratchet import (
 
 def _junit(path: Path, *, baseline: bool = False) -> None:
     name = (
-        "test_agentic_core_does_not_embed_resume_graph_skill_authority_literals"
+        "test_apps_rg_does_not_embed_resume_graph_skill_authority_literals"
         if baseline
         else "test_strict"
     )
-    classname = "TestAgenticCoreGraphSkillBoundary" if baseline else "TestStrict"
+    classname = "TestAppsRgGraphSkillBoundary" if baseline else "TestStrict"
     failure = '<failure message="augmented_skills_graph">known debt</failure>' if baseline else ""
     failures = 1 if baseline else 0
     path.write_text(

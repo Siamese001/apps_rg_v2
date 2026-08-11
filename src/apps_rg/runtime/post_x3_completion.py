@@ -16,22 +16,20 @@ import time
 from pathlib import Path
 from typing import Any, Mapping
 
-from agentic_core.L4_state.contracts import (
+from apps_rg.runtime.local_state import (
     CommitRequest,
     ReadSurfaceRefreshPlan,
     RollbackPlan,
     StateDiff,
 )
-from agentic_core.L4_state.contracts.records import stamp_digest
-from agentic_core.L4_state.uwg.durable_write_gateway import get_default_gateway
-from agentic_core.L6_observability.shadow_eval.independent_parity import (
+from apps_rg.runtime.local_state import stamp_digest
+from apps_rg.runtime.local_state import get_default_gateway
+from apps_rg.runtime.local_shadow import (
     SEALED_APPS_RG_OBSERVATION_ORIGIN,
     build_independent_apps_eval_parity,
+    compute_artifact_hash,
     read_jsonl,
     write_independent_parity,
-)
-from agentic_core.runtime.artifacts.integrated_runtime_emitter import (
-    compute_artifact_hash,
 )
 from apps_rg.runtime.package.apps_rg_full_resume_x3_eligibility import (
     evaluate_apps_rg_product_authority_eligibility,
@@ -124,7 +122,7 @@ def _json_ready(value: Any) -> Any:
 
 
 def _state_diffs_digest(state_diffs: list[Any]) -> str:
-    from agentic_core.L4_state.uwg.durable_write_gateway import (
+    from apps_rg.runtime.local_state import (
         compute_state_diffs_digest,
     )
 
@@ -137,7 +135,7 @@ def _commit_request_signature(
     state_diff_hash: str,
     clearance_proof_id: str,
 ) -> str:
-    from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
+    from apps_rg.runtime.local_state import compute_deterministic_digest
 
     return compute_deterministic_digest(
         {
@@ -519,7 +517,7 @@ def _bind_completion_artifacts(
     _update_envelope_payload(
         artifact_dir / "integrated_runtime_artifact_manifest.json", updates
     )
-    _update_envelope_payload(artifact_dir / "agentic_core_spine_proof.json", updates)
+    _update_envelope_payload(artifact_dir / "apps_rg_spine_proof.json", updates)
 
 
 def _run_current_eval(
@@ -581,7 +579,7 @@ def _emit_post_x3_failure_l6_shadow_bridge(
         "future_run_only": True,
     }
     parity = {
-        "schema_version": "agentic_core.l6_independent_apps_eval_parity.v1",
+        "schema_version": "apps_rg.l6_independent_apps_eval_parity.v1",
         "run_id": str(partial_payload.get("run_id") or ""),
         "alignment_source": "failure_terminal_no_apps_eval_rows",
         "apps_eval_rows_bound": False,

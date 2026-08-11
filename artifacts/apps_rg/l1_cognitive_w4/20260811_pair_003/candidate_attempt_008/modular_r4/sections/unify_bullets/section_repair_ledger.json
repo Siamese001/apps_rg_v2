@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "section_id": "unify_bullets",
+  "run_id": "unify_bullets_20260811_104126",
+  "product_fail_closed": false,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 1,
+  "authoritative_l2_source": "initial_llm",
+  "attempt_1_x2_failed": false,
+  "attempt_1_x2_failed_gate_ids": [],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "deterministic_rewrite",
+      "operation": "bullet_judge_feedback_reselection",
+      "reason": "x1d judge-feedback pool reselection (G14)",
+      "replaced_l2": true,
+      "detail": {
+        "section_id": "unify_bullets",
+        "trigger_arm": "decisive",
+        "outcome": "rejudge_fail_final",
+        "slots": [
+          {
+            "slot": "bul_unify_006",
+            "old_path_index": 1,
+            "new_path_index": 0,
+            "old_text_sha16": "c1ca408a5cf412f9",
+            "new_text_sha16": "a0cec331457cc917",
+            "alternate_basis": "first_compliant_alternate",
+            "compliance_checks": [
+              "line_discipline",
+              "quality_floors",
+              "fact_scope",
+              "fact_entailment"
+            ]
+          }
+        ],
+        "receipt": "reselection_receipt.json"
+      }
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "initial_llm",
+      "failed_gate_ids": [],
+      "passed": true
+    }
+  ]
+}

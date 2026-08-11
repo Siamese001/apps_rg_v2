@@ -1,6 +1,6 @@
 """apps_rg Exit evidence builder — G22/G24 app-owned evidence computation.
 
-All evidence builders live in apps_rg.exit, NOT in agentic_core.
+All evidence builders live in apps_rg.exit, NOT in apps_rg.
 The generic Exit gate evaluators consume these results.
 
 Exports
@@ -199,7 +199,7 @@ def compute_g22_rubric_scores(
     """Compute G22 quality/safety rubric scores for a generated resume.
 
     Returns a dict of rubric dimension scores that can be passed to the
-    generic G22 gate evaluator in agentic_core.
+    generic G22 gate evaluator in apps_rg.
     """
     fg = compute_factual_grounding(generated_content, fec)
 

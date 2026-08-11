@@ -2,15 +2,14 @@
 
 These are the narrow data shapes needed by ``governed_pa_compose`` when it
 builds inputs for prompt governance. They preserve the attribute surface read by
-``agentic_core.prompt_governance.assemble_prompt`` without importing concrete
-L0/C0 retrieval internals from apps_rg.
+the local prompt assembler without importing concrete L0/C0 retrieval internals
+from apps_rg.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Mapping
 
 
 class FreshnessClass(str, Enum):

@@ -1550,7 +1550,7 @@ def _build_positive_fixture(root: Path) -> tuple[dict[str, str], dict[str, Any]]
             lane_root / "x3_disposition_receipt.json",
             {
                 "producer_component": (
-                    "agentic_core.runtime.entrypoints."
+                    "apps_rg.runtime.entrypoints."
                     "integrated_single_action_spine_run"
                 ),
                 "artifact_hash": _canonical_digest(core_payload),

@@ -222,7 +222,7 @@ def run_apps_rg_spine(
                 "run_id": str(getattr(result, "run_id", "") or ""),
                 "request_id": str(getattr(result, "request_id", "") or ""),
                 "l7_how_trace_emitted": bool(
-                    not fault and (art / "agentic_core_how_trace.json").is_file()
+                    not fault and (art / "apps_rg_how_trace.json").is_file()
                 ),
                 "terminal_r5": bool(getattr(result, "terminal_r5", False)),
             }

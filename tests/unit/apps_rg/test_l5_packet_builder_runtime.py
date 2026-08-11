@@ -1,6 +1,6 @@
 """apps-test-model: SPINE BINDING."""
 
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg.runtime.spine_contracts import SealedL2Artifact
 
 from apps_rg.runtime.l5.packet_builder import (
     attach_l5_packet_to_sealed,

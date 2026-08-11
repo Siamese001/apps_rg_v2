@@ -1,7 +1,7 @@
 """apps_rg Exit evidence receipts — G21/G22 app-owned receipt types.
 
 These dataclasses are apps_rg-owned.  They do NOT import from canonical
-G21/G22 gate modules in agentic_core.  They carry structured evidence
+G21/G22 gate modules in apps_rg.  They carry structured evidence
 that generic Exit gate evaluators consume.
 """
 from __future__ import annotations

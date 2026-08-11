@@ -194,9 +194,9 @@ def judge_regen_prescriptive_delta_enabled() -> bool:
     return True
 
 
-def judge_regen_core_runner_enabled() -> bool:
-    """Delegate prescriptive regen to agentic_core SameAuthorityRegenRunner (ADR-085)."""
-    raw = os.environ.get("APPS_RG_EXEC_SUMMARY_CORE_SAME_AUTHORITY_REGEN", "1").strip().lower()
+def judge_regen_same_authority_runner_enabled() -> bool:
+    """Enable the app-owned bounded same-authority regeneration path."""
+    raw = os.environ.get("APPS_RG_EXEC_SUMMARY_SAME_AUTHORITY_REGEN", "1").strip().lower()
     return raw not in ("0", "false", "no", "off")
 
 
@@ -248,7 +248,7 @@ __all__ = [
     "exploratory_full_paragraph_regen_enabled",
     "graph_only_repair_mode_enabled",
     "graph_only_repair_mode_env_state",
-    "judge_regen_core_runner_enabled",
+    "judge_regen_same_authority_runner_enabled",
     "judge_pass_floor_0_to_5",
     "judge_regen_max_attempts",
     "judge_regen_max_delta_lines",

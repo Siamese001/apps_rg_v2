@@ -5,36 +5,36 @@
   "section_id": "executive_summary",
   "run_id": "exec_summary_20260809_113533",
   "culprit_path": [
-    "agentic_core/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
-    "agentic_core/L4_state/utils/memory/semantic_cache_manager.py::promote_to_long_term",
-    "agentic_core/L4_state/cache/gptcache_client.py::NativePersistentCacheClient.store",
-    "agentic_core/L4_state/cache/gptcache_client.py::_chroma_collection.upsert"
+    "apps_rg/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
+    "apps_rg/L4_state/utils/memory/semantic_cache_manager.py::promote_to_long_term",
+    "apps_rg/L4_state/cache/gptcache_client.py::NativePersistentCacheClient.store",
+    "apps_rg/L4_state/cache/gptcache_client.py::_chroma_collection.upsert"
   ],
-  "primary_culprit": "agentic_core/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
+  "primary_culprit": "apps_rg/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
   "promote_to_long_term_callers": [
     {
-      "caller": "agentic_core/L0_routing/reasoning/execution_orchestrator.py",
+      "caller": "apps_rg/L0_routing/reasoning/execution_orchestrator.py",
       "symbol": "_populate_d2_cache_promote → promote_to_long_term",
       "runtime_active": "yes",
       "uwg_gated": "no",
       "classification": "NON_DURABLE_INDEX_WRITE"
     },
     {
-      "caller": "agentic_core/mixins/semantic_cache_mixin.py",
+      "caller": "apps_rg/mixins/semantic_cache_mixin.py",
       "symbol": "promote_to_long_term",
       "runtime_active": "optional",
       "uwg_gated": "no",
       "classification": "NON_DURABLE_INDEX_WRITE"
     },
     {
-      "caller": "agentic_core/utils/meta_learning_storage_util.py",
+      "caller": "apps_rg/utils/meta_learning_storage_util.py",
       "symbol": "promote_to_long_term",
       "runtime_active": "optional",
       "uwg_gated": "no",
       "classification": "NON_DURABLE_INDEX_WRITE"
     },
     {
-      "caller": "agentic_core/L4_state/utils/memory/semantic_cache_manager.py",
+      "caller": "apps_rg/L4_state/utils/memory/semantic_cache_manager.py",
       "symbol": "promote_to_long_term (internal DNA path)",
       "runtime_active": "yes",
       "uwg_gated": "no",
@@ -50,13 +50,13 @@
   ],
   "chroma_upsert_paths": [
     {
-      "path": "agentic_core/L4_state/cache/gptcache_client.py",
+      "path": "apps_rg/L4_state/cache/gptcache_client.py",
       "operation": "NativePersistentCacheClient.store → _chroma_collection.upsert",
       "uwg_routed": "no",
       "classification": "NON_DURABLE_INDEX_WRITE"
     },
     {
-      "path": "agentic_core/L4_state/utils/memory/semantic_cache_manager.py",
+      "path": "apps_rg/L4_state/utils/memory/semantic_cache_manager.py",
       "operation": "_gptcache._chroma_collection.query/delete",
       "uwg_routed": "no",
       "classification": "NON_DURABLE_INDEX_WRITE"

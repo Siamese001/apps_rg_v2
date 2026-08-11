@@ -3,9 +3,8 @@
 W3: Produces a durable c0_metrics.json artifact for each run.
 W3 invariant: PARTIAL support_status is coerced to UNKNOWN before storage.
 
-No agentic_core imports for app-specific logic — this module uses the
-generic extractor from agentic_core.runtime.c0.evidence_metrics_extractor
-and adds apps_rg-specific serialisation around it.
+This module derives metrics from Apps RG-owned retrieval contracts and adds
+Apps RG-specific serialization around them.
 
 Plan: apps-rg-retrieval-metrics-ownership-and-c0-evidence-plan W3
 """
@@ -18,28 +17,24 @@ from pathlib import Path
 from typing import Any, Optional
 
 from apps_rg.runtime.spine_contracts import (
-    EvidenceItem,
     FinalEvidenceContract,
     STATUS_UNKNOWN,
     SUPPORT_STATUS_EMPTY,
-    SUPPORT_STATUS_WEAK_WITH_CAVEATS,
 )
-from agentic_core.runtime.c0.evidence_metrics_extractor import (
+from apps_rg.runtime.local_retrieval import (
     SupportTarget,
     extract_evidence_metrics,
 )
 from apps_rg.runtime.profiles.retrieval_requirements import get_normative_source_classes
 from apps_rg.runtime.bindings.briefing_mode_classifier import (
-    BRIEFING_MODE_NONE,
     _VALID_BRIEFING_MODES,
     BriefingModeDecision,
 )
+from apps_rg.runtime.c0.c0_section_authority import proof_support_target
 
 _logger = logging.getLogger(__name__)
 
 SCHEMA_VERSION: str = "c0_metrics.v1"
-
-from apps_rg.runtime.c0.c0_section_authority import proof_support_target
 
 # Proof-authority targets only (JD/resume/briefing are non-proof context).
 _DEFAULT_SUPPORT_TARGET = proof_support_target()

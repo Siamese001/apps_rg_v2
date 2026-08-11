@@ -20,6 +20,9 @@ from apps_rg.runtime.bindings.l1_planning_capsule import (
     PlanningCapsuleIntegrityError,
     extract_verified_planning_capsule,
 )
+from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+    build_l1_cognitive_consumer_advisory,
+)
 from apps_rg.runtime.bindings.pa_binding import pa_compose_apps_rg
 
 
@@ -67,6 +70,22 @@ def pa_compose_apps_rg_planned(
         raise PlanningCapsuleIntegrityError(
             "PA artifact is missing L1 planning capsule slot lineage"
         )
+    cognitive_advisory = build_l1_cognitive_consumer_advisory(plan)
+    if cognitive_advisory is not None:
+        expected_digest = str(cognitive_advisory["advisory_digest"]).removeprefix(
+            "sha256:"
+        )
+        if component_hashes.get("l1_cognitive_advisory") != expected_digest:
+            raise PlanningCapsuleIntegrityError(
+                "PA artifact did not preserve the verified L1 cognitive advisory"
+            )
+        cognitive_lineage = str(
+            (artifact.slot_lineage_map or {}).get("l1_cognitive_advisory") or ""
+        )
+        if "L1_PLAN_PROJECTIONS" not in cognitive_lineage:
+            raise PlanningCapsuleIntegrityError(
+                "PA artifact is missing L1 cognitive advisory slot lineage"
+            )
     return artifact
 
 

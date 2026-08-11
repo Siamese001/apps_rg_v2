@@ -546,7 +546,16 @@ def compile_executive_summary_prompt(runtime_payload: dict[str, Any], *, run_id:
         run_id=run_id,
         trace_root=f"exec_summary:{run_id}",
     )
-    compiled = compile_section_prompt(assembly, section_id="executive_summary")
+    compiled = compile_section_prompt(
+        assembly,
+        section_id="executive_summary",
+        l1_cognitive_advisory=runtime_payload.get("l1_cognitive_advisory"),
+        l1_cognitive_plan=runtime_payload.get("l1_cognitive_v3_plan"),
+        l1_cognitive_revision=runtime_payload.get("l1_cognitive_revision"),
+        l1_cognitive_revision_advisory=runtime_payload.get(
+            "l1_cognitive_revision_advisory"
+        ),
+    )
     from apps_rg.runtime.spine.governed_pa_compose import stamp_section_governed_pa_receipt
 
     stamp_section_governed_pa_receipt(runtime_payload, compiled)

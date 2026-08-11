@@ -3,7 +3,7 @@
 from dataclasses import asdict
 from types import SimpleNamespace
 
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg.runtime.spine_contracts import SealedL2Artifact
 from apps_rg.runtime.l5.packet_builder import build_l5_certification_packet
 from apps_rg.runtime.l5.egress_receipts import (
     SYMBOLIC_APPS_RG_PROVIDER_REF,

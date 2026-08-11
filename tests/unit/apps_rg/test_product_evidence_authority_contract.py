@@ -502,7 +502,7 @@ def test_product_sections_fail_closed_on_unresolved_graph_bindings(
     blocker: str,
 ) -> None:
     pytest.importorskip(
-        "agentic_core.runtime.contracts.apps_rg_ingress_payload",
+        "apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload",
         reason="standalone checkout omits the external Agentic Workflow contract runtime",
     )
     from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool

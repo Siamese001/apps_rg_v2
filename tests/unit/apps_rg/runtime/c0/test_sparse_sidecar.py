@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from agentic_core.knowledge.retrieval import SparseLexicalLaneStatus, SparseLexicalQuerySpec
+from apps_rg.runtime.local_retrieval import SparseLexicalLaneStatus, SparseLexicalQuerySpec
 from apps_rg.runtime.c0 import sparse_sidecar
 
 

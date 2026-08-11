@@ -18,7 +18,7 @@ FORBIDDEN IMPORTS (enforced by TestBoundaryGuard in test suite):
 - openai / anthropic / PROVIDER_MODEL / external model
 - requests.post / httpx
 - pa_binding / l2_binding / c0_binding (circular)
-- agentic_core (only stdlib + pathlib + json allowed)
+- apps_rg (only stdlib + pathlib + json allowed)
 """
 from __future__ import annotations
 

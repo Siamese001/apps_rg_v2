@@ -426,7 +426,7 @@ def _record_from_section_calls(
 
 def diagnose_l7_verifier_layout_mismatch(integrated_dir: Path) -> dict[str, Any] | None:
     """If spine proof reports missing L7 while files exist on disk, record diagnosis."""
-    spine_path = integrated_dir / "agentic_core_spine_proof.json"
+    spine_path = integrated_dir / "apps_rg_spine_proof.json"
     if not spine_path.is_file():
         return None
     spine = _load_json(spine_path)
@@ -464,7 +464,7 @@ def diagnose_l7_verifier_layout_mismatch(integrated_dir: Path) -> dict[str, Any]
         "verifier_blocking_signals": texts[:12],
         "explicit_non_claims": [
             "files exist at integrated run root but spine verifier still reports gaps",
-            "W8B does not rewrite agentic_core spine verifier",
+            "W8B does not rewrite apps_rg spine verifier",
             "packaging-only diagnosis for operator repair",
         ],
     }

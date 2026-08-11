@@ -13,10 +13,8 @@ import json
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from agentic_core.L6_observability.shadow_eval.grain_parity import (
+from apps_rg.runtime.local_l6 import (
     build_l6_apps_eval_grain_parity,
-)
-from agentic_core.L6_observability.shadow_eval.microsteps import (
     L6MicrostepObservation,
     build_apps_eval_alignment,
     build_future_run_proposals,

@@ -51,7 +51,7 @@ wirings:
     description: >-
       L0 Path-D execution must call SemanticCacheManager.recall before dispatch
       so the D2 semantic cache is read on every Path-D request.
-    entry_module: agentic_core/L0_routing/reasoning/execution_orchestrator.py
+    entry_module: apps_rg/L0_routing/reasoning/execution_orchestrator.py
     entry_symbol: ExecutionOrchestrator.execute
     required_call: SemanticCacheManager.recall
     required_env_flags:
@@ -72,7 +72,7 @@ wirings:
       On Path-D success with completed=True, the orchestrator must write the
       result into the semantic cache via SemanticCacheManager.learn. Without
       this call the cache is permanently empty.
-    entry_module: agentic_core/L0_routing/reasoning/execution_orchestrator.py
+    entry_module: apps_rg/L0_routing/reasoning/execution_orchestrator.py
     entry_symbol: ExecutionOrchestrator._populate_d2_cache
     required_call: SemanticCacheManager.learn
     required_env_flags:
@@ -93,7 +93,7 @@ wirings:
       When SEMANTIC_CACHE_PROMOTE_ENABLED is set and feedback qualifies, the
       orchestrator must call promote_to_long_term so L2 (Chroma + SQLite)
       actually receives writes.
-    entry_module: agentic_core/L0_routing/reasoning/execution_orchestrator.py
+    entry_module: apps_rg/L0_routing/reasoning/execution_orchestrator.py
     entry_symbol: ExecutionOrchestrator._populate_d2_cache
     required_call: promote_to_long_term
     required_env_flags:
@@ -114,7 +114,7 @@ wirings:
       SemanticCacheManager._initialize must invoke _warm_l1_from_l2 so the
       persistent L2 store is projected into Redis on singleton boot, closing
       the "persistent vector → in-memory read" claim in the runbook.
-    entry_module: agentic_core/L4_state/utils/memory/semantic_cache_manager.py
+    entry_module: apps_rg/L4_state/utils/memory/semantic_cache_manager.py
     entry_symbol: SemanticCacheManager._initialize
     required_call: _warm_l1_from_l2
     required_env_flags: []
@@ -130,9 +130,9 @@ wirings:
     description: >-
       EmbeddingSovereignAgent must reach the embedding provider through the
       sanctioned factory (create_embedding_client) so all provider-SDK traffic
-      routes through agentic_core.embeddings.embedding_factory. Removing this
+      routes through apps_rg.embeddings.embedding_factory. Removing this
       call would leave the approved adapter structurally orphan.
-    entry_module: agentic_core/L2_execution/reasoning/EmbeddingSovereignAgent.py
+    entry_module: apps_rg/L2_execution/reasoning/EmbeddingSovereignAgent.py
     entry_symbol: EmbeddingSovereignAgent
     required_call: create_embedding_client
     required_env_flags: []
@@ -159,40 +159,40 @@ wirings:
       get_mcp_authority must resolve through mcp_sovereign_authority_enforcer
       so MCP tool invocations pass the authority check. Silent orphan =
       all-tools-allowed fail-open.
-    entry_module: agentic_core/seams/contracts/authority.py
+    entry_module: apps_rg/seams/contracts/authority.py
     entry_symbol: get_mcp_authority
     required_call: mcp_authority
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/seams/contracts/test_authority.py
+    proof_test: tests/unit/apps_rg/seams/contracts/test_authority.py
     plan_id: lazy-import-arch-defect-review
 
   - id: l5-activation-gate
     description: >-
       unified_workflow_config._get_assert_activation_allowed must reach
       assert_activation_allowed. Dormant = workflows activate without gate.
-    entry_module: agentic_core/L2_execution/config/unified_workflow_config.py
+    entry_module: apps_rg/L2_execution/config/unified_workflow_config.py
     entry_symbol: _get_assert_activation_allowed
     required_call: assert_activation_allowed
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/L2_execution/config/test_unified_workflow_config.py
+    proof_test: tests/unit/apps_rg/L2_execution/config/test_unified_workflow_config.py
     plan_id: lazy-import-arch-defect-review
 
   - id: l5-guardian-decision-path
     description: >-
       execution_gateway._get_guardian_decision must resolve to L5Guardian.
       This is the L0→L5 guardian seam — orphan = all L0 actions unguarded.
-    entry_module: agentic_core/L0_routing/enforcement/execution_gateway.py
+    entry_module: apps_rg/L0_routing/enforcement/execution_gateway.py
     entry_symbol: _get_guardian_decision
     required_call: L5Guardian
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/L0_routing/enforcement/test_execution_gateway.py
+    proof_test: tests/unit/apps_rg/L0_routing/enforcement/test_execution_gateway.py
     plan_id: lazy-import-arch-defect-review
 
   - id: l5-injection-regression-gate
     description: >-
       injection_detector must call evaluate_against_baseline from the
       injection_regression_gate so baseline drift is caught at gate time.
-    entry_module: agentic_core/prompt_governance/security/detectors/injection_detector.py
+    entry_module: apps_rg/prompt_governance/security/detectors/injection_detector.py
     entry_symbol: InjectionDetector
     required_call: evaluate_against_baseline
     required_env_flags: []
@@ -208,40 +208,40 @@ wirings:
     description: >-
       escalation_router._get_violation_event_store_class must return
       ViolationEventStore so escalations persist. Orphan = violations lost.
-    entry_module: agentic_core/L0_routing/reasoning/escalation_router.py
+    entry_module: apps_rg/L0_routing/reasoning/escalation_router.py
     entry_symbol: _get_violation_event_store_class
     required_call: ViolationEventStore
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/L0_routing/reasoning/test_escalation_router.py
+    proof_test: tests/unit/apps_rg/L0_routing/reasoning/test_escalation_router.py
     plan_id: lazy-import-arch-defect-review
 
   - id: l4-retrieval-eval-registry
     description: >-
       HybridRetriever.hybrid_search must reach get_global_eval_registry so
       retrieval quality metrics flow into the shadow eval pipeline.
-    entry_module: agentic_core/L2_execution/config/hybrid_retriever_config.py
+    entry_module: apps_rg/L2_execution/config/hybrid_retriever_config.py
     entry_symbol: HybridRetriever
     required_call: get_global_eval_registry
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/L2_execution/config/test_hybrid_retriever_config.py
+    proof_test: tests/unit/apps_rg/L2_execution/config/test_hybrid_retriever_config.py
     plan_id: lazy-import-arch-defect-review
 
   - id: l4-filesystem-store
     description: >-
       tool_call_store must instantiate FileSystemStore so PTC tool-call
       persistence survives process boundary.
-    entry_module: agentic_core/L3_orchestration/reasoning/ptc/tool_call_store.py
+    entry_module: apps_rg/L3_orchestration/reasoning/ptc/tool_call_store.py
     entry_symbol: ToolCallStore
     required_call: FileSystemStore
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/L3_orchestration/reasoning/ptc/test_tool_call_store.py
+    proof_test: tests/unit/apps_rg/L3_orchestration/reasoning/ptc/test_tool_call_store.py
     plan_id: lazy-import-arch-defect-review
 
   - id: l4-in-memory-vector-store
     description: >-
       sovereign_semantic_cache must construct InMemoryVectorStore so the
       vector store is present for all cache ops.
-    entry_module: agentic_core/L4_state/utils/memory/sovereign_semantic_cache.py
+    entry_module: apps_rg/L4_state/utils/memory/sovereign_semantic_cache.py
     entry_symbol: SovereignSemanticCache
     required_call: InMemoryVectorStore
     required_env_flags: []
@@ -250,19 +250,19 @@ wirings:
 
   - id: l4-runtime-state-guard
     # MW-9 (2026-04-24) relocated the LocationHealerAgent class body from
-    # agentic_core/L5_safety/reasoning/LocationHealerAgent.py (now a
+    # apps_rg/L5_safety/reasoning/LocationHealerAgent.py (now a
     # deprecation re-export shim, archive-eligible 2026-07-23) to
-    # agentic_core/L5_safety/utils/location_healer_util.py. entry_module
+    # apps_rg/L5_safety/utils/location_healer_util.py. entry_module
     # was repointed at the canonical location so the AST walker can resolve
     # the class.
     description: >-
       LocationHealerAgent must instantiate RuntimeStateGuard before file
       moves so runtime state transitions are guarded.
-    entry_module: agentic_core/L5_safety/utils/location_healer_util.py
+    entry_module: apps_rg/L5_safety/utils/location_healer_util.py
     entry_symbol: LocationHealerAgent
     required_call: RuntimeStateGuard
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/L5_safety/reasoning/test_LocationHealerAgent.py
+    proof_test: tests/unit/apps_rg/L5_safety/reasoning/test_LocationHealerAgent.py
     plan_id: lazy-import-arch-defect-review
 
   # --------------------------------------------------------------------
@@ -294,17 +294,17 @@ wirings:
       retrieval. Without this call C0 is only whatever the caller hand-fed
       via bom.raw_c0, which silently disables the entire elevator-shaft
       retrieval seam.
-    entry_module: agentic_core/L0_routing/reasoning/assembly_stage.py
+    entry_module: apps_rg/L0_routing/reasoning/assembly_stage.py
     entry_symbol: AirlockAssembler.assemble_from_bom
     required_call: load_context_jit
     required_env_flags: []
-    proof_test: tests/unit/agentic_core/L0_routing/utils/test_elevator_shaft_seam.py
+    proof_test: tests/unit/apps_rg/L0_routing/utils/test_elevator_shaft_seam.py
     plan_id: l0-context-prompt-retrieval-review-b7c4a2
 
   - id: l0-assembly-injection-neutralizer
     # ``AssemblyInjectionNeutralizer`` is reached through the module-level
     # ``_get_neutralizer()`` lazy-factory pattern (assembly_stage.py:43-48)
-    # because the class lives in agentic_core.prompt_governance.security and
+    # because the class lives in apps_rg.prompt_governance.security and
     # cannot be eagerly imported from L0 without re-creating the L0 -> L_PG
     # layer violation that ADR-024 corrected. The runtime call chain is:
     #   assemble_from_bom -> _get_neutralizer() -> neutralizer_cls() -> .neutralize()
@@ -319,7 +319,7 @@ wirings:
       U0 prompt-injection defense runs before the artifact is signed.
       Dropping this call lets a user prompt smuggle role-override tokens past
       the governance boundary.
-    entry_module: agentic_core/L0_routing/reasoning/assembly_stage.py
+    entry_module: apps_rg/L0_routing/reasoning/assembly_stage.py
     entry_symbol: AirlockAssembler.assemble_from_bom
     required_call: _get_neutralizer
     required_env_flags: []

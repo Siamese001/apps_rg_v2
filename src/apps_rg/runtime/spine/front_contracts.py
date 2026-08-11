@@ -215,7 +215,7 @@ def build_section_front_spine_from_args(
     if not ap.get("runtime_customization_package"):
         raise SectionFrontSpinePreconditionError(
             "section_front_spine_bridge blocked: U0 package path did not attach "
-            "runtime_customization_package (ingest_apps_rg_runtime_package required)"
+            "runtime_customization_package (ingest_apps_rg_package required)"
         )
     l1_plan = l1_plan_apps_rg(validated_request)
     route = l0_route_apps_rg(l1_plan)

@@ -491,7 +491,7 @@ def table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
         rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
     except Exception as exc:
         # Import the governed adapter only on the exceptional path. A module-
-        # level import causes agentic_core reachability to load this apps module
+        # level import causes apps_rg reachability to load this apps module
         # again before its public functions exist.
         from apps_rg.runtime.core_sqlite import sqlite3_adapter
 

@@ -1,0 +1,54 @@
+{
+  "app_scope": "APPS_RG_V2_ONLY",
+  "assertions": {
+    "blocks_apps_rg_finalization_only": true,
+    "does_not_authorize_promotion": true,
+    "does_not_create_evidence": true,
+    "does_not_modify_generated_output": true,
+    "does_not_retry": true,
+    "does_not_select_route": true
+  },
+  "authority_class": "APPS_RG_LOCAL_SAFETY_GATE_ONLY",
+  "blocks_finalization": true,
+  "disposition_digest": "sha256:8591dedfa89063d04e6e0e8c7e2802b086bd2041e930964b24725d2acc45bcb4",
+  "errors": [
+    "l2_output.json:missing_required_change_log_tag:L1_COGNITIVE_ATOM:l1cogreq-331c12158135fd54:GAP",
+    "l2_output.json:missing_required_gap_tag:L1_COGNITIVE_GAP:l1cogreq-331c12158135fd54:C0_INSUFFICIENT"
+  ],
+  "gate_id": "x3_l1_cognitive_c0_outcome_disposition",
+  "l2_output": {
+    "digest": "sha256:c45c53833a2042c74965444b3f214887b15780132da11ed5baed9bf4af93adcb",
+    "readable": true,
+    "ref": "l2_output.json"
+  },
+  "outcome_requirements": [
+    {
+      "change_log_tag": "L1_COGNITIVE_ATOM:l1cogreq-331c12158135fd54:GAP",
+      "gap_tag": "L1_COGNITIVE_GAP:l1cogreq-331c12158135fd54:C0_INSUFFICIENT",
+      "l2_output_reported_change_log_tag": false,
+      "l2_output_reported_gap_tag": false,
+      "outcome_code": "C0_INSUFFICIENT",
+      "requirement_id": "l1cogreq-331c12158135fd54"
+    }
+  ],
+  "reason_code": "C0_OUTCOME_DISPOSITION_UNRETAINED",
+  "revision_advisory": {
+    "revision_advisory_artifact_present": true,
+    "revision_advisory_digest": "sha256:034edd7dc1b575b9515970752f6b74ddc5d2e50d9a811c16a378c488df9df6fb",
+    "revision_advisory_ref": "l1_cognitive_revision_advisory.json",
+    "revision_advisory_source": "runtime_payload_and_artifact"
+  },
+  "schema_version": "apps_rg.l1_cognitive_output_disposition.v1",
+  "section_id": "competencies",
+  "source_binding": {
+    "c0_outcome_digest_matches": true,
+    "compiled_prompt_artifact_digest": "sha256:383cdb8767cdfd7d3fdea59f18bf2bc37efcb286cdb0ff80c8f0673c17d85ae3",
+    "compiled_prompt_artifact_ref": "compiled_prompt_artifact.json",
+    "compiled_prompt_matches_revision_advisory": true,
+    "revision_advisory_digest_matches": true,
+    "revision_advisory_ref_matches": true,
+    "revision_outcome_ref_matches": true,
+    "revision_ref_matches": true
+  },
+  "status": "BLOCKED"
+}

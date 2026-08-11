@@ -14,18 +14,22 @@ from typing import Any
 
 import pytest
 
-from agentic_core.L0_routing.u0_intake_validator import AuthorityValidationReceipt
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg_runtime.L0_routing.u0_intake_validator import AuthorityValidationReceipt
+from apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
+from apps_rg_runtime.runtime.contracts.final_evidence_contract import (
     SUPPORT_STATUS_PASS,
     FinalEvidenceContract,
 )
-from agentic_core.runtime.contracts.l1_plan_contract import L1PlanContract
+from apps_rg_runtime.runtime.contracts.l1_plan_contract import L1PlanContract
 from apps_rg.runtime.bindings.c0_binding import C0EvidenceGapError
 from apps_rg.runtime.bindings.c0_planned_binding import c0_retrieve_apps_rg_planned
 from apps_rg.runtime.bindings.l0_binding import l0_route_apps_rg
 from apps_rg.runtime.bindings.l0_route_evidence import L1PlanNotReadyError
 from apps_rg.runtime.bindings.l1_binding import l1_plan_apps_rg
+from apps_rg.runtime.bindings.l1_cognitive_treatment import (
+    L1_COGNITIVE_V3_CANDIDATE_ARM,
+    build_l1_cognitive_treatment,
+)
 from apps_rg.runtime.bindings.l1_plan_evidence import build_validation_receipt_id
 from apps_rg.runtime.bindings.l1_planning_capsule import (
     PlanningCapsuleIntegrityError,
@@ -36,6 +40,9 @@ from apps_rg.runtime.bindings.l1_planning_capsule import (
 )
 from apps_rg.runtime.contracts.l1_evidence_obligation_receipt import (
     build_l1_evidence_obligation_receipt,
+)
+from apps_rg.runtime.contracts.l1_cognitive_c0_outcome_receipt import (
+    build_l1_cognitive_c0_outcome_receipt,
 )
 from apps_rg.runtime.bindings.pa_planned_binding import pa_compose_apps_rg_planned
 from apps_rg.runtime.bindings.u0_profile_manifest import (
@@ -117,7 +124,16 @@ def _app_payload(
 
 
 def _validated(**payload_kwargs: Any) -> ValidatedRequest:
+    cognitive_candidate = bool(payload_kwargs.pop("l1_cognitive_candidate", False))
     mode = str(payload_kwargs.get("generation_mode") or "strategic_tailor")
+    app_payload = _app_payload(**payload_kwargs)
+    if cognitive_candidate:
+        app_payload["task_spec"]["l1_cognitive_treatment"] = (
+            build_l1_cognitive_treatment(
+                L1_COGNITIVE_V3_CANDIDATE_ARM,
+                assignment_origin="U0_VALIDATED_INGRESS",
+            )
+        )
     return ValidatedRequest(
         request_id=f"req-p0-{mode}",
         run_id="run-l1-p0",
@@ -129,7 +145,7 @@ def _validated(**payload_kwargs: Any) -> ValidatedRequest:
         tenant_id="tenant-l1",
         replay_key="replay-l1-p0",
         l5_certification_ref="test:valid:w6",
-        app_payload=_app_payload(**payload_kwargs),
+        app_payload=app_payload,
     )
 
 
@@ -205,6 +221,11 @@ def _planned_fec(plan: L1PlanContract) -> FinalEvidenceContract:
         final_evidence_digest="d" * 64,
         evidence_items=(),
     )
+    cognitive_outcome = build_l1_cognitive_c0_outcome_receipt(
+        cognitive_plan=plan.task_spec["apps_rg_cognitive_v3_plan"],
+        v2_capsule=v2_capsule,
+        c0_obligation_receipt=obligation_receipt,
+    )
     return FinalEvidenceContract(
         request_id=plan.request_id,
         run_id=plan.run_id,
@@ -221,6 +242,8 @@ def _planned_fec(plan: L1PlanContract) -> FinalEvidenceContract:
             f"{v2_capsule['evidence_obligation_ledger']['ledger_digest']}",
             "l1_evidence_obligation_receipt_digest:"
             f"{obligation_receipt['receipt_digest']}",
+            "l1_cognitive_c0_outcome_receipt_digest:"
+            f"{cognitive_outcome['receipt_digest']}",
         ),
     )
 
@@ -228,7 +251,7 @@ def _planned_fec(plan: L1PlanContract) -> FinalEvidenceContract:
 def test_planned_c0_wrapper_threads_verified_plan(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    plan = l1_plan_apps_rg(_validated())
+    plan = l1_plan_apps_rg(_validated(l1_cognitive_candidate=True))
     route = l0_route_apps_rg(plan)
     observed: dict[str, Any] = {}
 
@@ -243,7 +266,7 @@ def test_planned_c0_wrapper_threads_verified_plan(
         "apps_rg.runtime.bindings.c0_planned_binding.c0_retrieve_apps_rg",
         _fake_c0,
     )
-    request = _validated()
+    request = _validated(l1_cognitive_candidate=True)
     fec = c0_retrieve_apps_rg_planned(
         route,
         request,
@@ -286,7 +309,7 @@ def test_planned_c0_wrapper_rejects_missing_capsule_lineage(
 def test_planned_c0_wrapper_rejects_hash_only_v2_obligation_coverage(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    plan = l1_plan_apps_rg(_validated())
+    plan = l1_plan_apps_rg(_validated(l1_cognitive_candidate=True))
     route = l0_route_apps_rg(plan)
 
     def _fake_c0(*_args, **_kwargs):
@@ -305,13 +328,17 @@ def test_planned_c0_wrapper_rejects_hash_only_v2_obligation_coverage(
         _fake_c0,
     )
     with pytest.raises(C0EvidenceGapError, match="evidence-obligation reconciliation"):
-        c0_retrieve_apps_rg_planned(route, _validated(), l1_plan=plan)
+        c0_retrieve_apps_rg_planned(
+            route,
+            _validated(l1_cognitive_candidate=True),
+            l1_plan=plan,
+        )
 
 
 def test_planned_pa_wrapper_rejects_missing_capsule_consumption(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    plan = l1_plan_apps_rg(_validated())
+    plan = l1_plan_apps_rg(_validated(l1_cognitive_candidate=True))
     route = l0_route_apps_rg(plan)
     fec = _planned_fec(plan)
 
@@ -323,7 +350,12 @@ def test_planned_pa_wrapper_rejects_missing_capsule_consumption(
         ),
     )
     with pytest.raises(PlanningCapsuleIntegrityError, match="component hashes"):
-        pa_compose_apps_rg_planned(route, plan, fec, _validated())
+        pa_compose_apps_rg_planned(
+            route,
+            plan,
+            fec,
+            _validated(l1_cognitive_candidate=True),
+        )
 
 
 def test_profile_ref_is_bound_to_exact_loaded_bytes() -> None:
@@ -473,9 +505,9 @@ def _find_call(tree: ast.AST, function_name: str) -> ast.Call:
 
 
 def test_canonical_ag2_threads_plan_into_verified_c0_boundary() -> None:
-    path = REPO_ROOT / "agentic_core/runtime/entry/apps_rg_dispatch.py"
+    path = REPO_ROOT / "apps_rg_runtime/runtime/entry/apps_rg_dispatch.py"
     if not path.is_file():
-        pytest.skip("standalone source baseline excludes the agentic_core source tree")
+        pytest.skip("standalone source baseline excludes the apps_rg_runtime source tree")
     source = path.read_text(encoding="utf-8")
     tree = ast.parse(source)
     call = _find_call(tree, "c0_retrieve_apps_rg")

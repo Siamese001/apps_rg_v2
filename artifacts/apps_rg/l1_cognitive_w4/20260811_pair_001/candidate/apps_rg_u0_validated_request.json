@@ -1,0 +1,222 @@
+{
+  "artifact_hash": "sha256:5776570ccfd384a844659d63c693fcd62c33d341b7ff5ff915e7ab73209780d3",
+  "authority_contract_id": "apps_rg.u0.authority_validation.v1",
+  "authority_receipt_digest": "sha256:0ec6a600722877a23297b65c954c7ea78a956b87f4f53aa6a92411d883b22f16",
+  "consumer_stage": "section_lane_modular",
+  "contract_type": "ValidatedRequest",
+  "contract_version": "apps_rg_spine_front_contracts_v1",
+  "payload": {
+    "app_id": "apps_rg",
+    "app_payload": {
+      "allow_test_l5_cert_ref": false,
+      "auto_research_internal": false,
+      "briefing_artifact_ref": "docs/reports/apps_rg/fixtures/senior_roles/lincoln_insurer_it_ai_brief.txt",
+      "cert_ref": "u0-apps-rg-resume-generation-w2",
+      "generation_mode": "strategic_tailor",
+      "jd_hash": "95ba6fa39b0558698b9da1fadd3e5e0a5bdfb691d4306f0a45588c3274fce378",
+      "jd_payload": {
+        "hash": "95ba6fa39b0558698b9da1fadd3e5e0a5bdfb691d4306f0a45588c3274fce378",
+        "jd_text": "",
+        "ref": "docs/reports/apps_rg/fixtures/senior_roles/lincoln_insurer_it_ai_jd.txt",
+        "targeting_mode": "RUN_SPECIFIC",
+        "text": ""
+      },
+      "jd_text": "",
+      "job_description_ref": "docs/reports/apps_rg/fixtures/senior_roles/lincoln_insurer_it_ai_jd.txt",
+      "job_description_text": "",
+      "manual_brief_path": "docs/reports/apps_rg/fixtures/senior_roles/lincoln_insurer_it_ai_brief.txt",
+      "output_expectation": {
+        "fact_checked_required": true,
+        "formats": [
+          "json"
+        ],
+        "provenance_required": true
+      },
+      "package_validation_receipt": {
+        "digest_verified": true,
+        "package_id": "apps_rg_runtime_package_resume_generation_v1",
+        "package_version": "1.0.0",
+        "task_class": "resume_generation",
+        "timestamp_iso": "2026-08-11T09:36:34.077713+00:00",
+        "validation_passed": true
+      },
+      "policy_refs": {
+        "agent_spec_ref": "apps_rg/config/specs/agent_spec.resume_generation.v1.0.0.yaml",
+        "hitl_policy_ref": "apps_rg/config/hitl_trigger_policy.yaml",
+        "l0_policy_ref": "apps_rg/config/l0_policy.yaml",
+        "l5_governance_profile_ref": "apps_rg/profiles/rg_l5_governance_profile.yaml",
+        "manifest_digest": "a31e2bd1493543031b997e04e2b5bf13ec6b67358fb82671bfe292362b91c48c",
+        "prompt_registry_ref": "apps_rg/prompt_assembly/templates/registry.v1.yaml",
+        "thresholds_ref": "apps_rg/config/rg_thresholds.yaml"
+      },
+      "profile_manifest": {
+        "agent_spec_ref": "apps_rg/config/specs/agent_spec.resume_generation.v1.0.0.yaml",
+        "hitl_policy_ref": "apps_rg/config/hitl_trigger_policy.yaml",
+        "l0_policy_ref": "apps_rg/config/l0_policy.yaml",
+        "l1_planning_profile_digest": "b19a1f53318e04904e2565ec4b859d1d155b6088731d18ef574770d4c3b22ba4",
+        "l1_planning_profile_ref": "apps_rg/profiles/rg_planning_profile.yaml",
+        "l5_governance_profile_ref": "apps_rg/profiles/rg_l5_governance_profile.yaml",
+        "manifest_digest": "a31e2bd1493543031b997e04e2b5bf13ec6b67358fb82671bfe292362b91c48c",
+        "orchestration_profile_ref": "apps_rg_orch_managed_workflow_v1",
+        "prompt_registry_ref": "apps_rg/prompt_assembly/templates/registry.v1.yaml",
+        "runtime_customization_package_digest": "d4b03c407866a09055561813092555bef09aa2b15f8eb9e13f9dd6578add72eb",
+        "runtime_customization_package_ref": "apps_rg/config/domain_contract/runtime_customization_package.yaml",
+        "thresholds_ref": "apps_rg/config/rg_thresholds.yaml",
+        "workflow_manifest_ref": "wfm::apps_rg::resume_generation::v1"
+      },
+      "query_spec": {
+        "jd_hash": "95ba6fa39b0558698b9da1fadd3e5e0a5bdfb691d4306f0a45588c3274fce378",
+        "jd_targeting_mode": "RUN_SPECIFIC",
+        "resume_hash": "0671515221ec86aa27ec2481ae32478fb023de659f13eab1af87db9fa2881e0b",
+        "target": {
+          "company": "Lincoln Financial Group",
+          "level": "EXECUTIVE",
+          "role": "SVP IT Strategy & AI Enablement"
+        }
+      },
+      "research_via": null,
+      "resume_hash": "0671515221ec86aa27ec2481ae32478fb023de659f13eab1af87db9fa2881e0b",
+      "resume_payload": {
+        "hash": "0671515221ec86aa27ec2481ae32478fb023de659f13eab1af87db9fa2881e0b",
+        "ref": "src/apps_rg/resume/base/amit_ayer_base_resume_v1.json",
+        "resume_text": ""
+      },
+      "runtime_customization_package": {
+        "cache_profile_ref": "apps_rg/config/domain_contract/cache_profiles.yaml",
+        "learning_profile_ref": "apps_rg/config/domain_contract/l6_learning_profile.json",
+        "orchestration_profile_ref": "apps_rg_orch_managed_workflow_v1",
+        "package_digest": "d4b03c407866a09055561813092555bef09aa2b15f8eb9e13f9dd6578add72eb",
+        "prompt_profile_ref": "apps_rg/prompt_assembly/templates/registry.v1.yaml",
+        "retrieval_profile_ref": "apps_rg/config/domain_contract/section_retrieval_profile.yaml",
+        "route_profile_ref": "apps_rg/config/domain_contract/route_profiles.yaml",
+        "runtime_gate_profile_ref": "apps_rg/config/domain_contract/runtime_gate_profile.resume_generation.v1.json",
+        "workflow_manifest_ref": "wfm::apps_rg::resume_generation::v1",
+        "write_policy": "read_only"
+      },
+      "source_channel": "apps_rg_cli",
+      "source_resume_ref": "src/apps_rg/resume/base/amit_ayer_base_resume_v1.json",
+      "source_resume_text": "",
+      "support_expectation": {
+        "fact_checked_required": true,
+        "min_ats": 70,
+        "min_quality": 0.75,
+        "per_bullet_required": true,
+        "provenance_required": true,
+        "source_quote_required": true,
+        "word_max": 1200,
+        "word_min": 400
+      },
+      "target_company": "Lincoln Financial Group",
+      "target_level": "EXECUTIVE",
+      "target_role": "SVP IT Strategy & AI Enablement",
+      "target_title": "SVP IT Strategy & AI Enablement",
+      "task_class": "resume_generation",
+      "task_spec": {
+        "capability_requirements": [
+          "needs_strong_narrative",
+          "needs_long_context"
+        ],
+        "generation_mode": "strategic_tailor",
+        "l1_cognitive_treatment": {
+          "app_scope": "APPS_RG_V2_ONLY",
+          "arm": "l1_cognitive_v3",
+          "assignment_origin": "U0_VALIDATED_INGRESS",
+          "authority_class": "EXPERIMENT_ASSIGNMENT_ONLY",
+          "automatic_promotion": false,
+          "schema_version": "apps_rg.l1_cognitive_treatment.v1",
+          "treatment_digest": "sha256:376ec8b0ab4bbc423a286169da47d0cc04bb105b19493c6c2b001203d0bb8b97",
+          "v3_cognitive_plan_enabled": true
+        },
+        "task_class": "resume_generation"
+      },
+      "transport": "ui",
+      "u0_payload_digests": {
+        "raw_input_sha256": "sha256:6f2d8646563e672edfa259b306d14e86ec920787408a9c56316a31b67b298f6c",
+        "schema_version": "apps_rg.u0_payload_digests.v1",
+        "transformed_output_sha256": "sha256:ced8ce83b712bf34e179d0337214532191d1c3d012141ad41c823f68df9f4ec5"
+      },
+      "user_constraints": {
+        "_l1_cognitive_treatment_arm": "l1_cognitive_v3"
+      },
+      "validated_input_bundle": {
+        "digest": "",
+        "ref": ""
+      },
+      "validated_input_bundle_digest": "",
+      "validated_input_bundle_ref": ""
+    },
+    "audit_refs": [],
+    "authority_validation_receipt": {
+      "app_id": "apps_rg",
+      "authority_contract_id": "apps_rg.u0.authority_validation.v1",
+      "authority_receipt_digest": "sha256:0ec6a600722877a23297b65c954c7ea78a956b87f4f53aa6a92411d883b22f16",
+      "forbidden_fields_checked": [
+        "route_id",
+        "execution_form",
+        "provider",
+        "workflow_dag",
+        "llm_gateway",
+        "model_endpoint"
+      ],
+      "request_id": "req-e2f8728e2ab0474999e44a7cfa2ad2b1",
+      "run_id": "d1a01a43-fc6d-425c-bbb3-f919bc2335bd",
+      "tenant_id": "default",
+      "trace_id": "45014cff-083e-424f-afea-8b11e68ce58d",
+      "trace_root": "45014cff-083e-424f-afea-8b11e68ce58d",
+      "validated_input_digest": "ced8ce83b712bf34e179d0337214532191d1c3d012141ad41c823f68df9f4ec5",
+      "validation_passed": true,
+      "validation_timestamp": "2026-08-11T09:36:34.077713+00:00",
+      "validator_version": "W6.0"
+    },
+    "caller_scope_baseline": "tenant:default",
+    "gate_verdict_refs": [],
+    "l5_certification_ref": "l5:apps_rg:u0:4918ab365fc178372fc5ad7e",
+    "otel_span_refs": [],
+    "payload_digest": "ced8ce83b712bf34e179d0337214532191d1c3d012141ad41c823f68df9f4ec5",
+    "posture": {
+      "external_call": false,
+      "hitl_required": false,
+      "posture_class": "read_only",
+      "read_only": true,
+      "write_intent": false
+    },
+    "reflection_receipt": {
+      "contract_version": "apps_rg_ingress_payload.v1",
+      "deferred_reasons": [],
+      "field_map_version": "u0_validate_apps_rg.synthetic.v1",
+      "input_payload_digest": "6f2d8646563e672edfa259b306d14e86ec920787408a9c56316a31b67b298f6c",
+      "pass_status": true,
+      "pointers_deferred": 0,
+      "pointers_derived": 0,
+      "pointers_mapped": 20,
+      "pointers_rejected": 0,
+      "pointers_total": 20,
+      "schema_version": "apps_rg_ingress_payload.v1",
+      "silently_dropped": [],
+      "timestamp_iso": "2026-08-11T09:36:34.077713+00:00",
+      "unknown_mappings": [],
+      "validated_request_digest": "ced8ce83b712bf34e179d0337214532191d1c3d012141ad41c823f68df9f4ec5"
+    },
+    "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:0671515221ec86aa:95ba6fa39b055869::v1",
+    "request_id": "req-e2f8728e2ab0474999e44a7cfa2ad2b1",
+    "run_id": "d1a01a43-fc6d-425c-bbb3-f919bc2335bd",
+    "schema_version": "W6.0",
+    "session_id": "d1a01a43-fc6d-425c-bbb3-f919bc2335bd",
+    "signature": "",
+    "snapshot_refs": [],
+    "target_level": "EXECUTIVE",
+    "task_class": "resume_generation",
+    "tenant_id": "default",
+    "trace_id": "45014cff-083e-424f-afea-8b11e68ce58d",
+    "trace_root": "45014cff-083e-424f-afea-8b11e68ce58d"
+  },
+  "payload_digest": "ced8ce83b712bf34e179d0337214532191d1c3d012141ad41c823f68df9f4ec5",
+  "producer_stage": "U0",
+  "request_id": "req-e2f8728e2ab0474999e44a7cfa2ad2b1",
+  "run_id": "d1a01a43-fc6d-425c-bbb3-f919bc2335bd",
+  "schema_version": "apps_rg.validated_request_contract.v1",
+  "tenant_id": "default",
+  "trace_id": "45014cff-083e-424f-afea-8b11e68ce58d",
+  "trace_root": "45014cff-083e-424f-afea-8b11e68ce58d",
+  "validation_status": "PASS"
+}

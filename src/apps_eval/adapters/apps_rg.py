@@ -45,7 +45,7 @@ _IDENTITY_ARTIFACTS = (
     "apps_rg_product_authorization_receipt.json",
     "r4_run_manifest.json",
     "integrated_runtime_artifact_manifest.json",
-    "agentic_core_spine_proof.json",
+    "apps_rg_spine_proof.json",
     "runtime_exhaust_bundle.json",
 )
 _CANONICAL_IDENTITY_KEYS = (
@@ -974,7 +974,7 @@ def _normalize_live_snapshot(
         claims=claims,
         artifacts=_artifact_names(artifact_dir),
         provenance={
-            "entrypoint": "agentic_core.runtime.entry.apps_rg_dispatch:dispatch_apps_rg_run",
+            "entrypoint": "apps_rg.runtime.entry.apps_rg_dispatch:dispatch_apps_rg_run",
             "preflight": _preflight_status(verified_preflight) or "unknown",
             "preflight_verified": preflight_verification_status == "VERIFIED"
             and not preflight_errors,

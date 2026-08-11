@@ -11,7 +11,7 @@ The suite has two tiers:
 1. *Source-level* regression tests (robust to future import-cascade regressions)
 2. *Functional* regression tests that actually import and instantiate the
    executor, exercising the end-to-end construction path that EX1+EX2 unblocked
-   (agentic_core package re-export of get_clock, apps_rg bootstrap_runtime
+   (apps_rg_runtime package re-export of get_clock, apps_rg bootstrap_runtime
    _ensure_module real-import preference, hardening_mixin lazy-import helpers).
 """
 
@@ -160,9 +160,9 @@ def test_cascade_breakage_is_acknowledged():
     """
     rca_note = (
         "HardenedAnthropicExecutor import cascade RESOLVED by: "
-        "(1) agentic_core/L2_execution/utils/__init__.py get_clock re-export, "
+        "(1) apps_rg_runtime/L2_execution/utils/__init__.py get_clock re-export, "
         "(2) apps_rg/bootstrap_runtime.py _ensure_module real-import preference, "
-        "(3) agentic_core/mixins/hardening_mixin.py __init__ lazy-import fix."
+        "(3) apps_rg_runtime/mixins/hardening_mixin.py __init__ lazy-import fix."
     )
     assert rca_note  # History marker; survives refactors.
 
@@ -236,26 +236,26 @@ def test_executor_without_api_key_keeps_client_none(monkeypatch, caplog):
 
 def test_get_clock_reexport_from_l2_execution_utils():
     """EX1 regression guard: the package-level re-export must remain."""
-    from agentic_core.L2_execution.utils import get_clock
+    from apps_rg_runtime.L2_execution.utils import get_clock
 
     assert callable(get_clock)
 
 
-def test_bootstrap_runtime_does_not_clobber_agentic_core_package():
+def test_bootstrap_runtime_does_not_clobber_apps_rg_runtime_package():
     """EX1 regression guard: _ensure_module must prefer real imports.
 
-    Before EX1: importing apps_rg would replace the real `agentic_core`
+    Before EX1: importing apps_rg would replace the real `apps_rg_runtime`
     package with a bare types.ModuleType (no __path__), breaking all
-    subsequent `from agentic_core.X import Y` calls.
+    subsequent `from apps_rg_runtime.X import Y` calls.
     """
     # Import apps_rg (which runs bootstrap_runtime.install_runtime_shims)
     import apps_rg  # noqa: F401
-    import agentic_core
+    import apps_rg_runtime
 
     # The real package has __path__ set; a bare types.ModuleType stub does not
-    assert hasattr(agentic_core, "__path__"), (
-        "agentic_core must remain a real package after apps_rg import; "
+    assert hasattr(apps_rg_runtime, "__path__"), (
+        "apps_rg_runtime must remain a real package after apps_rg import; "
         "bootstrap_runtime._ensure_module has regressed if __path__ is missing"
     )
-    assert agentic_core.__path__ is not None
-    assert agentic_core.__spec__ is not None
+    assert apps_rg_runtime.__path__ is not None
+    assert apps_rg_runtime.__spec__ is not None

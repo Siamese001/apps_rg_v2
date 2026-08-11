@@ -57,7 +57,7 @@ GENERATED_LANES: tuple[str, ...] = (
     "competencies",
 )
 
-_CORE_PRODUCER = "agentic_core.runtime.entrypoints.integrated_single_action_spine_run"
+_CORE_PRODUCER = "apps_rg.runtime.entrypoints.integrated_single_action_spine_run"
 _LANE_REQUIRED_ARTIFACTS: tuple[str, ...] = (
     "l2_handoff_receipt.json",
     "l2_spine_receipt.json",

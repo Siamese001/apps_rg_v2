@@ -2,9 +2,9 @@
 
 | Artifact | Path | Status |
 |---|---|---|
-| **HOW trace** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_controlled_negative_otel_unreachable_retry2_20260809\e2e_20260809T122224Z_9969e7c9\agentic_core_how_trace.json` | `MISSING_REQUIRED` |
-| **Route-family coverage** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_controlled_negative_otel_unreachable_retry2_20260809\e2e_20260809T122224Z_9969e7c9\agentic_core_l7_route_family_coverage.json` | `MISSING_REQUIRED` |
-| **Spine proof** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_controlled_negative_otel_unreachable_retry2_20260809\e2e_20260809T122224Z_9969e7c9\agentic_core_spine_proof.json` | `NOT_OBSERVED_OPTIONAL` |
+| **HOW trace** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_controlled_negative_otel_unreachable_retry2_20260809\e2e_20260809T122224Z_9969e7c9\apps_rg_how_trace.json` | `MISSING_REQUIRED` |
+| **Route-family coverage** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_controlled_negative_otel_unreachable_retry2_20260809\e2e_20260809T122224Z_9969e7c9\apps_rg_l7_route_family_coverage.json` | `MISSING_REQUIRED` |
+| **Spine proof** | `C:\Git\apps_rg_v2-worktrees\codex-e2e-defect-remediation-w0\artifacts\apps_rg\runs\w8_controlled_negative_otel_unreachable_retry2_20260809\e2e_20260809T122224Z_9969e7c9\apps_rg_spine_proof.json` | `NOT_OBSERVED_OPTIONAL` |
 
 | Signal | Value |
 |---|---|
@@ -15,4 +15,4 @@
 
 Certified: **0 / 0** | fixture-only: 0 | not certified: 0
 
-_agentic_core_l7_route_family_coverage.json not found._
+_apps_rg_l7_route_family_coverage.json not found._

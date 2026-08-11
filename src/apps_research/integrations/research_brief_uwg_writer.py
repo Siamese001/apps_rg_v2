@@ -34,16 +34,16 @@ import uuid
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
-from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
-from agentic_core.L4_state.contracts.records import (
+from apps_rg.runtime.apps_runtime_compat import compute_deterministic_digest
+from apps_rg.runtime.apps_runtime_compat import (
     CommitRequest,
     ReadSurfaceRefreshPlan,
     RollbackPlan,
     StateDiff,
     stamp_digest,
 )
-from agentic_core.L4_state.research.research_brief_record import ResearchBriefRecord
-from agentic_core.L4_state.uwg.durable_write_gateway import (
+from apps_rg.runtime.apps_runtime_compat import ResearchBriefRecord
+from apps_rg.runtime.apps_runtime_compat import (
     DurableWriteGateway,
     compute_state_diffs_digest,
     get_default_gateway,

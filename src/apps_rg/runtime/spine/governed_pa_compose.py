@@ -1,8 +1,8 @@
-"""Governed PA compose — apps_rg domain slots + core ``assemble_prompt`` (W5).
+"""Governed PA compose — Apps RG domain slots and prompt assembly (W5).
 
 Section lanes: ``apps_rg.prompt_assembly.compiler`` produces slot payloads / BOM only.
-Integrated spine: ``agentic_core.prompt_governance.orchestrator.assemble_prompt`` runs
-PA.0–PA.8 (via ``run_prompt_assembly_pipeline``) and returns HMAC-signed manifest.
+Integrated spine runs the app-owned prompt assembler and returns an HMAC-signed
+manifest.
 """
 
 from __future__ import annotations
@@ -114,7 +114,7 @@ def runtime_fec_to_orchestrator_contract(
     route: RouteContract,
     plan: L1PlanContract,
 ) -> Any:
-    """Adapt runtime ``FinalEvidenceContract`` for core PA orchestrator."""
+    """Adapt runtime ``FinalEvidenceContract`` for the Apps RG PA assembler."""
     from apps_rg.runtime.spine.governed_pa_c0_contracts import (
         CandidateChunk,
         ChunkBoundaryRisk,
@@ -237,6 +237,13 @@ def runtime_plan_to_orchestrator_plan(
     ts = dict(plan.task_spec or {})
     if ts.get("generation_mode"):
         lines.append(f"Generation mode: {ts.get('generation_mode')}")
+    from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+        build_l1_cognitive_consumer_advisory,
+        cognitive_advisory_prompt_lines,
+    )
+
+    cognitive_advisory = build_l1_cognitive_consumer_advisory(plan)
+    lines.extend(cognitive_advisory_prompt_lines(cognitive_advisory))
     user_task = "\n".join(lines)
     return OrchPlan(
         task_spec=json.dumps(dict(plan.task_spec or {}), sort_keys=True),
@@ -254,7 +261,7 @@ def envelope_to_runtime_compiled_prompt(
     fec: RuntimeFEC,
     validated_request: ValidatedRequest,
 ) -> CompiledPromptArtifact:
-    """Map core ``CompiledPromptEnvelope`` to runtime ``CompiledPromptArtifact``."""
+    """Map the local prompt envelope to runtime ``CompiledPromptArtifact``."""
     from apps_rg.runtime.bindings.pa_binding import (
         APPS_RG_TARGET_MODEL,
         APPS_RG_TARGET_PROVIDER,
@@ -318,12 +325,25 @@ def envelope_to_runtime_compiled_prompt(
     }
     capsule = _l1_planning_capsule_from_plan(plan)
     component_hash_map.update(_l1_planning_component_hashes(capsule))
+    from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+        build_l1_cognitive_consumer_advisory,
+    )
+
+    cognitive_advisory = build_l1_cognitive_consumer_advisory(plan)
+    if cognitive_advisory is not None:
+        component_hash_map["l1_cognitive_advisory"] = str(
+            cognitive_advisory["advisory_digest"]
+        ).removeprefix("sha256:")
     slot_lineage_map: dict[str, str] = {
         "system_block_0": "PA-authored|SYSTEM_INTERNAL|core_assemble_prompt",
         "user_block_1": "USER_INTENT|L1_PLAN_PROJECTIONS|core_assemble_prompt",
         "l1_planning_capsule": "L1_PLAN_PROJECTIONS|PLANNING_ADVISORY_ONLY",
         "evidence": f"C0:{ev_digest}",
     }
+    if cognitive_advisory is not None:
+        slot_lineage_map["l1_cognitive_advisory"] = (
+            "L1_PLAN_PROJECTIONS|PLANNING_ADVISORY_ONLY|COVERAGE_ESCALATION"
+        )
     for idx, row in enumerate(envelope.slot_manifest):
         if not isinstance(row, dict):
             continue
@@ -367,8 +387,8 @@ def governed_pa_compose_integrated(
     *,
     secret_key: bytes | None = None,
 ) -> CompiledPromptArtifact:
-    """Integrated apps_rg PA — core ``assemble_prompt`` (PA.0–PA.8)."""
-    from agentic_core.prompt_governance import assemble_prompt
+    """Integrated Apps RG PA using the local prompt assembler."""
+    from apps_rg.runtime.local_prompt import assemble_prompt
 
     orch_fec = runtime_fec_to_orchestrator_contract(fec, route=route, plan=plan)
     orch_route = runtime_route_to_orchestrator_route(route)
@@ -429,7 +449,7 @@ def governed_pa_sign_section_core(
     *,
     artifact_dir: Path | None = None,
 ) -> dict[str, Any] | None:
-    """Run core ``assemble_prompt`` for HMAC/manifest; keep section slot BOM as primary."""
+    """Run the local assembler for HMAC/manifest; keep section slot BOM primary."""
     from pathlib import Path as _Path
 
     from apps_rg.runtime.spine.spine_contract_loaders import load_spine_contracts_for_section

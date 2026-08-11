@@ -22,10 +22,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from agentic_core.L3_orchestration.reasoning.engines.hybrid_search_engine import (
+from apps_rg.runtime.local_retrieval import (
     HybridSearchResult,
-)
-from agentic_core.knowledge.retrieval.c0_sparse_exact_seam import (
     SparseLexicalHit,
     SparseLexicalLaneOutcome,
     SparseLexicalLaneStatus,

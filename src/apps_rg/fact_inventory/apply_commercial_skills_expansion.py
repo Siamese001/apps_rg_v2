@@ -419,7 +419,7 @@ def main() -> int:
         "standalone_cro_role_family_added": False,
         "scope_control": {
             "section_prompts_touched": False,
-            "agentic_core_touched": False,
+            "apps_rg_touched": False,
             "resume_pa_prompt_profile_touched": False,
         },
         "explicit_non_claims": [

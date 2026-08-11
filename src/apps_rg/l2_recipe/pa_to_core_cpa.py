@@ -1,4 +1,4 @@
-"""Adapt apps_rg PA ``CompiledPromptArtifact`` → agentic_core ``CompiledPromptArtifact``.
+"""Adapt apps_rg PA ``CompiledPromptArtifact`` → apps_rg ``CompiledPromptArtifact``.
 
 The PA compiler in ``apps_rg.prompt_assembly.contracts`` emits a local dataclass
 shape (messages/system_prompt/…). The L2 v4 envelope expects the core runtime

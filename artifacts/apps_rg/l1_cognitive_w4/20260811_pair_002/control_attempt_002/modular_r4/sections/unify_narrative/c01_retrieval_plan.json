@@ -1,0 +1,46 @@
+{
+  "schema_version": "c01_retrieval_plan_v1",
+  "section_id": "unify_narrative",
+  "target_role": "SVP IT Strategy & AI Enablement",
+  "role_family_key": "INSURER_IT_AI_ENABLEMENT",
+  "jd_constraints_present": true,
+  "jd_constraints": {},
+  "jd_role_axes": [
+    "applied_ai_architecture",
+    "deployment_adoption",
+    "joint_solution"
+  ],
+  "jd_text_excerpt": "Required emphasis:\n- Enterprise IT strategy, portfolio governance, and AI enablement\n- Cloud/data platform modernization for regulated insurer environments\n- Reference architecture and delivery governance across business units\n- FSA/actuarial credibility without burying credentials in early-career o",
+  "route_ref": "route_contract.json",
+  "retrieval_targets": {
+    "primary_targets": [
+      "career_phase_facts",
+      "capstone_narrative_atoms",
+      "enterprise_architecture_standards",
+      "it_strategy_innovation_facts",
+      "data_ai_enablement"
+    ],
+    "secondary_targets": [
+      "lineage_support",
+      "portfolio_governance",
+      "modernization_roadmap"
+    ],
+    "jd_role_axis_targets": [
+      "applied_ai_architecture",
+      "deployment_adoption",
+      "joint_solution"
+    ]
+  },
+  "retrieval_profile_ref": "apps_rg.unify_narrative.c0_profile",
+  "retrieval_profile_source": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/src/apps_rg/config/domain_contract/section_retrieval_profile.yaml",
+  "retrieval_profile_query_fields": [
+    "resume_payload.unify_narrative",
+    "resume_payload.summary",
+    "jd_payload.jd_text"
+  ],
+  "retrieval_profile_fallback_queries": [
+    "SMOKE_C0_UNIFY_NARR_ANCHOR cohesive story arc problem discovery execution"
+  ],
+  "jd_as_proof": false,
+  "generic_docs_as_truth": false
+}

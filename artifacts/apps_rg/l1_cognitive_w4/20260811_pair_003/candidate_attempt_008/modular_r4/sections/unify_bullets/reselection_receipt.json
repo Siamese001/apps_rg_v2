@@ -1,0 +1,75 @@
+{
+  "receipt_version": 1,
+  "section_id": "unify_bullets",
+  "run_id": "unify_bullets_20260811_104126",
+  "fired": true,
+  "outcome": "rejudge_fail_final",
+  "kill_switch": {
+    "env": "APPS_RG_BULLET_RESELECTION_DISABLE",
+    "disabled": false
+  },
+  "trigger": {
+    "x2_all_pass_pre": true,
+    "trigger_arm": "decisive",
+    "rows": [
+      {
+        "judge_id": "x1d_gemini_pro_unify_bullets",
+        "provider_key": "gemini_pro",
+        "judge_role": null,
+        "score": 3.0,
+        "threshold": 4.0,
+        "normalized_score": 0.6,
+        "normalized_threshold": 0.8,
+        "decisive_failure": true
+      },
+      {
+        "judge_id": "x1d_gemini_pro_unify_bullets",
+        "provider_key": "gemini_pro",
+        "judge_role": null,
+        "score": 2.5,
+        "threshold": 4.0,
+        "normalized_score": 0.5,
+        "normalized_threshold": 0.8,
+        "decisive_failure": true
+      }
+    ]
+  },
+  "slot_resolution_method": "bullet_id_regex",
+  "slots": [
+    {
+      "slot": "bul_unify_006",
+      "old_path_index": 1,
+      "new_path_index": 0,
+      "old_text_sha16": "c1ca408a5cf412f9",
+      "new_text_sha16": "a0cec331457cc917",
+      "alternate_basis": "first_compliant_alternate",
+      "compliance_checks": [
+        "line_discipline",
+        "quality_floors",
+        "fact_scope",
+        "fact_entailment"
+      ]
+    }
+  ],
+  "x2": {
+    "failed_before": [],
+    "failed_after": []
+  },
+  "rejudge": {
+    "provider_keys": [
+      "gemini_pro"
+    ],
+    "dropped_non_required_keys": [],
+    "scores_before": {
+      "gemini_pro": 0.5
+    },
+    "scores_after": {
+      "gemini_pro": 0.4
+    },
+    "decisive_after": true,
+    "pass_after": false
+  },
+  "attempt": 1,
+  "max_attempts": 1,
+  "slots_without_alternate": []
+}

@@ -21,10 +21,10 @@ pipelines:
       Five stages: Plan (C0.1), Fetch (C0.2), Graph (C0.3), Shape (C0.4),
       Contract (C0.5). C0.3 is currently deferred (no entity KG implementation).
     # Note on `min_fanin_from_layers`: C0 retrieval modules under
-    # `agentic_core/knowledge/retrieval/*` form a coherent *knowledge subsystem*
+    # `apps_rg/knowledge/retrieval/*` form a coherent *knowledge subsystem*
     # at layer L_PG with internal closed-loop wiring. They are reachable from
     # production code paths via L_PG → L_PG (subsystem-internal) and from L3
-    # via `agentic_core/L3_orchestration/.../context_compaction.py` for
+    # via `apps_rg/L3_orchestration/.../context_compaction.py` for
     # evidence-binding. The pipeline's overall ingress remains L0 (the C0
     # request is initiated from routing), but individual stage modules can
     # legitimately be called from their natural layer (L_PG, L1, L3) inside
@@ -37,15 +37,15 @@ pipelines:
     stages:
       - id: C01_plan
         description: "Plan: scope/policy/freshness/tenant-ACL."
-        module: agentic_core/knowledge/retrieval/retrieval_plan.py
+        module: apps_rg/knowledge/retrieval/retrieval_plan.py
         min_fanin_from_layers: [L0, L1, L3, L_PG]
         status: active
 
       - id: C01_acl_gate
         description: "Plan: pre-retrieval gate (ACL, tenant, freshness)."
-        module: agentic_core/knowledge/gates/__init__.py
+        module: apps_rg/knowledge/gates/__init__.py
         # Activated 2026-04-30 (Author-Gate refactor_scope: finish_two_items
-        # _introduced_this_chat). Wired into agentic_core/L0_routing/
+        # _introduced_this_chat). Wired into apps_rg/L0_routing/
         # c0_retrieval/dispatcher.py as new pipeline stage C0.0b
         # (post-preflight, pre-plan). Two latent bugs that prevented prior
         # adoption (FilterResult.result attribute error; missing `event`
@@ -57,7 +57,7 @@ pipelines:
 
       - id: C02_recall
         description: "Fetch: hybrid recall (dense + sparse + raw chunks)."
-        module: agentic_core/knowledge/retrieval/hybrid_recall_stage.py
+        module: apps_rg/knowledge/retrieval/hybrid_recall_stage.py
         min_fanin_from_layers: [L0, L1, L3, L_PG]
         status: active
 
@@ -72,12 +72,12 @@ pipelines:
 
       - id: C04_rerank
         description: "Shape: rerank + dedup + consolidation."
-        module: agentic_core/knowledge/retrieval/senior_librarian_reranker.py
+        module: apps_rg/knowledge/retrieval/senior_librarian_reranker.py
         min_fanin_from_layers: [L0, L1, L3, L_PG]
         status: active
 
       - id: C05_evidence
         description: "Contract: evidence binding + citation slip."
-        module: agentic_core/knowledge/retrieval/evidence_contract_builder.py
+        module: apps_rg/knowledge/retrieval/evidence_contract_builder.py
         min_fanin_from_layers: [L0, L1, L3, L_PG]
         status: active

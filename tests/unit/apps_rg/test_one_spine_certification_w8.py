@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from agentic_core.runtime.contracts.final_evidence_contract import (
+from apps_rg_runtime.runtime.contracts.final_evidence_contract import (
     EvidenceItem,
     FinalEvidenceContract,
     SUPPORT_STATUS_PASS,

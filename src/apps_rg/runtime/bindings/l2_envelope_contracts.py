@@ -9,7 +9,7 @@ from enum import Enum
 from typing import Any
 
 L2_ENVELOPE_AUTHORITY_SCOPE = "apps_rg_l2_envelope_adapter_receipts"
-CANONICAL_L2_ARTIFACT_AUTHORITY_SCOPE = "agentic_core_runtime_sealed_l2_artifact"
+CANONICAL_L2_ARTIFACT_AUTHORITY_SCOPE = "apps_rg_sealed_l2_artifact"
 
 
 class ResultClass(str, Enum):

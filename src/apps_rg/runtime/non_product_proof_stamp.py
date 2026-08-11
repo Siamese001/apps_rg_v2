@@ -14,14 +14,14 @@ ORCHESTRATOR_EXPLICIT_NON_CLAIMS: tuple[str, ...] = (
     "not L7 proof",
     "not Fort Knox proof",
     "not integrated R4",
-    "not agentic_core Exit X3",
+    "not apps_rg Exit X3",
 )
 
 # Package rollup X3 (SP-003)
 PACKAGE_DISPOSITION_CLASSIFICATION = "OFFLINE_PACKAGE_ROLLUP"
 PACKAGE_EXPLICIT_NON_CLAIMS: tuple[str, ...] = (
     "package X3 is not integrated R4 X3",
-    "package X3 is not agentic_core Exit X3",
+    "package X3 is not apps_rg Exit X3",
     "package rollup is not 99 RuntimeProofBundle",
     "package rollup is not product certification",
     "package_x3_allow is not exit_x3_allow",
@@ -108,7 +108,7 @@ def package_rollup_non_product_stamp(*, package_x3_allow: bool) -> dict[str, Any
         "spine_x3_allow": False,
         "product_x3_allow": False,
         "integrated_r4_invoked": False,
-        "agentic_core_how_trace_required_for_product_cert": True,
+        "apps_rg_how_trace_required_for_product_cert": True,
         "eligible_for_l7_certification": False,
         "product_certification": "NOT_CLAIMED",
         "l7_certification": "NOT_CLAIMED",

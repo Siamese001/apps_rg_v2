@@ -46,10 +46,10 @@ _GATE_RECEIPT_FIELDS = {
     "record_digest",
 }
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
-KNOWN_EXTERNAL_NODEID = (
+KNOWN_GRAPH_SKILL_BOUNDARY_NODEID = (
     "tests/_apps_contract/test_apps_rg_c0_ownership_split.py::"
-    "TestAgenticCoreGraphSkillBoundary::"
-    "test_agentic_core_does_not_embed_resume_graph_skill_authority_literals"
+    "TestAppsRgGraphSkillBoundary::"
+    "test_apps_rg_does_not_embed_resume_graph_skill_authority_literals"
 )
 KNOWN_FAILURE_FRAGMENT = "augmented_skills_graph"
 
@@ -200,8 +200,8 @@ def build_ratchet_receipt(
         detail = f"{case['failure']} {case['error']}"
         exact_known_failure = (
             case["name"]
-            == "test_agentic_core_does_not_embed_resume_graph_skill_authority_literals"
-            and "TestAgenticCoreGraphSkillBoundary" in identity
+            == "test_apps_rg_does_not_embed_resume_graph_skill_authority_literals"
+            and "TestAppsRgGraphSkillBoundary" in identity
             and KNOWN_FAILURE_FRAGMENT in detail
         )
     if not improvement and not exact_known_failure:
@@ -238,8 +238,8 @@ def build_ratchet_receipt(
             for key in ("tests", "failures", "errors", "skipped", "executed")
         },
         "accepted_external_baseline_debt": {
-            "nodeid": KNOWN_EXTERNAL_NODEID,
-            "owner": "agentic_core",
+            "nodeid": KNOWN_GRAPH_SKILL_BOUNDARY_NODEID,
+            "owner": "apps_rg",
             "status": (
                 "IMPROVED"
                 if improvement
@@ -248,7 +248,7 @@ def build_ratchet_receipt(
                 else "REJECTED"
             ),
             "reason": (
-                "agentic_core/L0_routing/__init__.py contains augmented_skills_graph"
+                "apps_rg/L0_routing/__init__.py contains augmented_skills_graph"
                 if exact_known_failure
                 else "known external failure no longer reproduces"
                 if improvement

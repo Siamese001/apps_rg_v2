@@ -1,0 +1,112 @@
+{
+  "blocker": "exception",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_009\\modular_r4\\sections\\ibm_bullets",
+    "attempt": {
+      "logical": 1,
+      "transport": null
+    },
+    "callsite": {
+      "file": "C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\rust.py",
+      "function": "_query",
+      "line": 552,
+      "source_line": "rust_response = self.bindings.query("
+    },
+    "errno": null,
+    "error": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+    "error_lineno": 552,
+    "error_module": "C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\rust.py",
+    "error_type": "InternalError",
+    "exception_class": "InternalError",
+    "exception_message": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+    "exception_module": "chromadb.errors",
+    "fault": "exception",
+    "integrated_artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_009",
+    "lane_id": "ibm_bullets",
+    "operation": "run_modular_resume_generation.<locals>._phase1_dispatch_one_lane",
+    "otel_capture_status": "TRACE_ID_UNAVAILABLE",
+    "otel_failure_snapshot": "failure_otel_trace_snapshot.json",
+    "otel_span_id": "",
+    "otel_trace_id": "",
+    "provider_boundary": {
+      "attempt_evidence": "UNKNOWN_AT_LANE_EXCEPTION_BOUNDARY",
+      "canonical_dispatch_invoked": true,
+      "provider": "external_claude",
+      "provider_call_attempted": null,
+      "resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE"
+    },
+    "request_id": "",
+    "run_id": "36459c7f-0297-4450-8b43-fa41a699727a",
+    "schema_version": "apps_rg.runtime_failure_envelope.v1",
+    "sections_root": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_009\\modular_r4\\sections",
+    "source_component": "apps_rg.l2_recipe.modular_resume_generation",
+    "stage": "PHASE1_LANE_DISPATCH",
+    "tenant_id": "",
+    "trace_root": "",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\orchestration\\section_lane_executor.py\", line 253, in run_lane_in_context\n    result = dispatch_fn(\n             ^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\l2_recipe\\modular_resume_generation.py\", line 888, in _phase1_dispatch_one_lane\n    result = run_canonical_apps_rg_from_cli_primitives(**kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\orchestration\\canonical_dispatch.py\", line 509, in run_canonical_apps_rg_from_cli_primitives\n    return run_apps_rg_spine(\n           ^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\spine\\apps_rg_spine_run.py\", line 183, in run_apps_rg_spine\n    result = run_integrated_single_action_spine(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\orchestration\\integrated_spine_runner.py\", line 78, in run_integrated_single_action_spine\n    result = runner(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\runtime\\entrypoints\\integrated_single_action_spine_run.py\", line 1082, in run_integrated_single_action_spine\n    check_route_gates(plan_contract, namespace=app_name)\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L0_routing\\reasoning\\route_gates.py\", line 399, in check_route_gates\n    d2_hit = check_d2_semantic_cache(\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L0_routing\\reasoning\\route_gates.py\", line 285, in check_d2_semantic_cache\n    hit = cache.recall(\n          ^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L4_state\\utils\\memory\\semantic_cache_manager.py\", line 948, in recall\n    result = self._gptcache.get(context, tenant_id=tenant_id, embedding_model_id=active_model)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L4_state\\cache\\gptcache_client.py\", line 388, in get\n    results = self._chroma_collection.query(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\models\\Collection.py\", line 263, in query\n    query_results = self._client._query(\n                    ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\rust.py\", line 552, in _query\n    rust_response = self.bindings.query(\n                    ^^^^^^^^^^^^^^^^^^^^\nchromadb.errors.InternalError: Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk\n",
+    "winerror": null
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "no resolvable run_dir pointer for lane 'ibm_bullets' under C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_009\\modular_r4\\sections",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_003/candidate_attempt_009/modular_r4/sections/ibm_bullets/real/<run_id>/",
+  "generated_at_utc": "2026-08-11T11:00:03.274229+00:00",
+  "integrated_run_id": "candidate_attempt_009",
+  "lane_exec_status": "error:Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+  "lane_id": "ibm_bullets",
+  "primary_failure": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_009\\modular_r4\\sections\\ibm_bullets",
+    "attempt": {
+      "logical": 1,
+      "transport": null
+    },
+    "callsite": {
+      "file": "C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\rust.py",
+      "function": "_query",
+      "line": 552,
+      "source_line": "rust_response = self.bindings.query("
+    },
+    "errno": null,
+    "error": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+    "error_lineno": 552,
+    "error_module": "C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\rust.py",
+    "error_type": "InternalError",
+    "exception_class": "InternalError",
+    "exception_message": "Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk",
+    "exception_module": "chromadb.errors",
+    "fault": "exception",
+    "integrated_artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_009",
+    "lane_id": "ibm_bullets",
+    "operation": "run_modular_resume_generation.<locals>._phase1_dispatch_one_lane",
+    "otel_capture_status": "TRACE_ID_UNAVAILABLE",
+    "otel_failure_snapshot": "failure_otel_trace_snapshot.json",
+    "otel_span_id": "",
+    "otel_trace_id": "",
+    "provider_boundary": {
+      "attempt_evidence": "UNKNOWN_AT_LANE_EXCEPTION_BOUNDARY",
+      "canonical_dispatch_invoked": true,
+      "provider": "external_claude",
+      "provider_call_attempted": null,
+      "resolution_source": "DEV_DEFAULT_EXTERNAL_CLAUDE"
+    },
+    "request_id": "",
+    "run_id": "36459c7f-0297-4450-8b43-fa41a699727a",
+    "schema_version": "apps_rg.runtime_failure_envelope.v1",
+    "sections_root": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_009\\modular_r4\\sections",
+    "source_component": "apps_rg.l2_recipe.modular_resume_generation",
+    "stage": "PHASE1_LANE_DISPATCH",
+    "tenant_id": "",
+    "trace_root": "",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\orchestration\\section_lane_executor.py\", line 253, in run_lane_in_context\n    result = dispatch_fn(\n             ^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\l2_recipe\\modular_resume_generation.py\", line 888, in _phase1_dispatch_one_lane\n    result = run_canonical_apps_rg_from_cli_primitives(**kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\orchestration\\canonical_dispatch.py\", line 509, in run_canonical_apps_rg_from_cli_primitives\n    return run_apps_rg_spine(\n           ^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\spine\\apps_rg_spine_run.py\", line 183, in run_apps_rg_spine\n    result = run_integrated_single_action_spine(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\src\\apps_rg\\runtime\\orchestration\\integrated_spine_runner.py\", line 78, in run_integrated_single_action_spine\n    result = runner(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\runtime\\entrypoints\\integrated_single_action_spine_run.py\", line 1082, in run_integrated_single_action_spine\n    check_route_gates(plan_contract, namespace=app_name)\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L0_routing\\reasoning\\route_gates.py\", line 399, in check_route_gates\n    d2_hit = check_d2_semantic_cache(\n             ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L0_routing\\reasoning\\route_gates.py\", line 285, in check_d2_semantic_cache\n    hit = cache.recall(\n          ^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L4_state\\utils\\memory\\semantic_cache_manager.py\", line 948, in recall\n    result = self._gptcache.get(context, tenant_id=tenant_id, embedding_model_id=active_model)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Git\\Agentic-Workflow-FRESH\\apps_rg\\L4_state\\cache\\gptcache_client.py\", line 388, in get\n    results = self._chroma_collection.query(\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\models\\Collection.py\", line 263, in query\n    query_results = self._client._query(\n                    ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\amita\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\chromadb\\api\\rust.py\", line 552, in _query\n    rust_response = self.bindings.query(\n                    ^^^^^^^^^^^^^^^^^^^^\nchromadb.errors.InternalError: Error executing plan: Internal error: Error creating hnsw segment reader: Nothing found on disk\n",
+    "winerror": null
+  },
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_003/candidate_attempt_009/modular_r4/sections",
+  "status": "PRE_RUN_BLOCKED"
+}

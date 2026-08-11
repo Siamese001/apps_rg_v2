@@ -10,7 +10,7 @@ import hashlib
 import json
 import logging
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -31,34 +31,34 @@ from apps_rg.runtime.spine_contracts import (
     STATUS_NOT_APPLICABLE,
     SUPPORT_STATUS_PASSING_VALUES,
 )
-
-# Alias for backward compat — the canonical name is STATUS_NOT_APPLICABLE
-SUPPORT_STATUS_NOT_APPLICABLE = STATUS_NOT_APPLICABLE
-
-from agentic_core.runtime.gates.gate_types import (
+from apps_rg.runtime.bindings.c0_briefing_bypass import (
+    BriefEvaluationResult,
+    BriefingBypassEvaluator,
+    evaluate_manual_brief,
+)
+from apps_rg.runtime.bindings.c0_evidence_trace_map import (
+    AppsRgEvidenceTraceMap,
+    SectionEvidenceTrace,
+)
+from apps_rg.runtime.c0.sparse_sidecar import query_apps_rg_sparse_lexical_lane
+from apps_rg.runtime.local_retrieval import (
     GateVerdict,
     VERDICT_PASS,
     VERDICT_UNKNOWN,
     VERDICT_NOT_APPLICABLE,
     VERDICT_WARN,
     VERDICT_FAIL,
-)
-from agentic_core.L3_orchestration.reasoning.engines.hybrid_search_engine import (
     HybridSearchResult,
-)
-from agentic_core.knowledge.retrieval import (
     SparseLexicalLaneStatus,
     SparseLexicalQuerySpec,
     dedupe_hybrid_by_chunk_id,
     fec_sparse_refs_from_lane_outcomes,
-    filter_candidates_exact_subphrase,
     merge_dense_sparse_rrf,
+    maybe_run_graph_rag,
 )
-from apps_rg.runtime.c0.sparse_sidecar import query_apps_rg_sparse_lexical_lane
-from apps_rg.runtime.bindings.c0_evidence_trace_map import (
-    AppsRgEvidenceTraceMap,
-    SectionEvidenceTrace,
-)
+
+# Alias for backward compat — the canonical name is STATUS_NOT_APPLICABLE
+SUPPORT_STATUS_NOT_APPLICABLE = STATUS_NOT_APPLICABLE
 
 APPS_RG_C0_CERT_REF = "apps_rg::c0::resume_generation::v1"
 
@@ -80,27 +80,20 @@ def _chroma_source_label(source_class: str, object_id: str) -> str:
 
 
 def _persistent_chroma_client(path: str) -> Any:
-    from agentic_core.L4_state.utils.client.chroma_client import (
-        chromadb_module as chroma_module,
-    )
-    from chromadb.config import Settings
+    from apps_rg.runtime.c0.chroma_persistent_client import ensure_apps_rg_chroma_client
 
-    return chroma_module.PersistentClient(
-        path=path,
-        settings=Settings(anonymized_telemetry=False),
-    )
+    return ensure_apps_rg_chroma_client(path)
 
 
 def _resolve_spine_graph_expansion_refs(
     route: Any,
     merged_items: list[Any],
 ) -> tuple[str, ...]:
-    """W10-AG: spine C0.3 graph refs via ``maybe_run_graph_rag`` when route policy is LIVE."""
+    """Resolve C0.3 graph refs from the Apps RG-owned graph index when enabled."""
     policy = getattr(route, "graph_traverse_policy", None)
     if policy is None or not getattr(policy, "is_active", False):
         return (C0_GRAPH_LANE_NA_REF,)
 
-    from agentic_core.runtime.c0.c0_3_graph_rag_executor import maybe_run_graph_rag
     from apps_rg.integrations.c0_graph_adapter import _extract_fact_id
     from apps_rg.fact_inventory.augmented_skills_graph import (
         load_augmented_skills_graph,
@@ -954,6 +947,41 @@ def _l1_evidence_plan_receipts(
         audit_refs.append(
             "l1_evidence_obligation_receipt_ref:l1_evidence_obligation_receipt.json"
         )
+    from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+        extract_l1_cognitive_plan,
+    )
+    from apps_rg.runtime.contracts.l1_cognitive_c0_outcome_receipt import (
+        build_l1_cognitive_c0_outcome_receipt,
+        write_l1_cognitive_c0_outcome_receipt,
+    )
+    from apps_rg.runtime.dispatch import spine_stage_receipts as sr
+
+    cognitive_plan = extract_l1_cognitive_plan(l1_plan, required=False)
+    if cognitive_plan is not None:
+        cognitive_outcome = build_l1_cognitive_c0_outcome_receipt(
+            cognitive_plan=cognitive_plan,
+            v2_capsule=v2_capsule,
+            c0_obligation_receipt=obligation_receipt,
+        )
+        audit_refs.append(
+            "l1_cognitive_c0_outcome_receipt_digest:"
+            f"{cognitive_outcome['receipt_digest']}"
+        )
+        if obligation_receipt_artifact_dir:
+            write_l1_cognitive_c0_outcome_receipt(
+                output_path=(
+                    Path(obligation_receipt_artifact_dir)
+                    / sr.FILENAME_L1_COGNITIVE_C0_OUTCOME_RECEIPT
+                ),
+                receipt=cognitive_outcome,
+                cognitive_plan=cognitive_plan,
+                v2_capsule=v2_capsule,
+                c0_obligation_receipt=obligation_receipt,
+            )
+            audit_refs.append(
+                "l1_cognitive_c0_outcome_receipt_ref:"
+                + sr.FILENAME_L1_COGNITIVE_C0_OUTCOME_RECEIPT
+            )
     return ref, tuple(audit_refs)
 
 
@@ -2484,13 +2512,6 @@ def _build_chroma_evidence(
 
     return items_out, citations, lineage, freshness
 
-
-# Re-export from c0_briefing_bypass for W3 integration
-from apps_rg.runtime.bindings.c0_briefing_bypass import (
-    BriefEvaluationResult,
-    BriefingBypassEvaluator,
-    evaluate_manual_brief,
-)
 
 __all__ = [
     "APPS_RG_C0_CERT_REF",

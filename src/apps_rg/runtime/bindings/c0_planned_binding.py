@@ -19,8 +19,14 @@ from apps_rg.runtime.bindings.l1_planning_capsule import (
 from apps_rg.runtime.bindings.l1_planning_capsule_v2 import (
     extract_verified_planning_capsule_v2,
 )
+from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+    extract_l1_cognitive_plan,
+)
 from apps_rg.runtime.contracts.l1_evidence_obligation_receipt import (
     build_l1_evidence_obligation_receipt,
+)
+from apps_rg.runtime.contracts.l1_cognitive_c0_outcome_receipt import (
+    build_l1_cognitive_c0_outcome_receipt,
 )
 
 
@@ -85,6 +91,21 @@ def c0_retrieve_apps_rg_planned(
             raise C0EvidenceGapError(
                 "C0 completed without exact L1 v2 evidence-obligation reconciliation"
             )
+        cognitive_plan = extract_l1_cognitive_plan(l1_plan, required=False)
+        if cognitive_plan is not None:
+            cognitive_outcome = build_l1_cognitive_c0_outcome_receipt(
+                cognitive_plan=cognitive_plan,
+                v2_capsule=v2_capsule,
+                c0_obligation_receipt=obligation_receipt,
+            )
+            if (
+                "l1_cognitive_c0_outcome_receipt_digest:"
+                + str(cognitive_outcome["receipt_digest"])
+                not in audit_refs
+            ):
+                raise C0EvidenceGapError(
+                    "C0 completed without exact L1 v3 cognitive outcome reconciliation"
+                )
     return fec
 
 

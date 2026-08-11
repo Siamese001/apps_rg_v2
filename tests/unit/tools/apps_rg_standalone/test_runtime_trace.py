@@ -96,14 +96,14 @@ def test_redis_transitive_import_does_not_decide_target_dependency() -> None:
     record = redis_transitive_import_record(
         "apps_rg.__main__",
         {
-            "local_modules": [{"module": "agentic_core.cache.redis_cache_client"}],
+            "local_modules": [{"module": "apps_rg.cache.redis_cache_client"}],
             "third_party_modules": [{"module": "redis"}],
             "network_attempts": [],
         },
     )
 
     assert record["classification"] == "SOURCE_RUNTIME_TRANSITIVE_IMPORT"
-    assert record["importing_chain"][-2:] == ["agentic_core.cache.redis_cache_client", "redis"]
+    assert record["importing_chain"][-2:] == ["apps_rg.cache.redis_cache_client", "redis"]
     assert record["network_connection_attempt_count"] == 0
     assert record["target_dependency_disposition"] == "UNDECIDED_PENDING_APPROVED_PRODUCT_SCENARIO"
 

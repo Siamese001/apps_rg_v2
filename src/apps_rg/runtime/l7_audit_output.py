@@ -8,9 +8,9 @@ from typing import Any
 from apps_rg.runtime.core_io import write_gateway as _wg
 from apps_rg.runtime.run_output_contract import L7_AUDIT_ABILITY_OUTPUT_MD
 
-L7_HOW_TRACE_JSON = "agentic_core_how_trace.json"
-L7_ROUTE_FAMILY_COVERAGE_JSON = "agentic_core_l7_route_family_coverage.json"
-L7_SPINE_PROOF_JSON = "agentic_core_spine_proof.json"
+L7_HOW_TRACE_JSON = "apps_rg_how_trace.json"
+L7_ROUTE_FAMILY_COVERAGE_JSON = "apps_rg_l7_route_family_coverage.json"
+L7_SPINE_PROOF_JSON = "apps_rg_spine_proof.json"
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -114,7 +114,7 @@ def render_l7_audit_ability_output(run_dir: Path) -> str:
             )
         lines.append("")
     elif not coverage:
-        lines.extend(["_agentic_core_l7_route_family_coverage.json not found._", ""])
+        lines.extend(["_apps_rg_l7_route_family_coverage.json not found._", ""])
 
     return "\n".join(lines).rstrip() + "\n"
 

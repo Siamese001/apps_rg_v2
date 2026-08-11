@@ -1,4 +1,5 @@
 """Section-lane hooks for canonical L2 authority and compatibility mirrors."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -99,7 +100,9 @@ def prepare_section_l2_before_provider(
             if _product_visible(runtime_payload)
             else "apps_rg/runtime/section_l2_spine_receipt.py"
         ),
-        status="authority_validated" if _product_visible(runtime_payload) else "legacy_mirror",
+        status="authority_validated"
+        if _product_visible(runtime_payload)
+        else "legacy_mirror",
         product_visible=_product_visible(runtime_payload),
     )
     return packet
@@ -113,7 +116,33 @@ def finalize_section_l2_after_output(
     section_output_ref: str | None = None,
     l2_output_ref: str = "l2_output.json",
 ) -> dict[str, Path]:
-    """Seal observed E3 output and derive section mirrors from the canonical bundle."""
+    """Seal observed E3 output and derive section mirrors from the canonical bundle.
+
+    The Apps RG-local L1 cognitive projection and gate run after an L2 result
+    exists but before its seal and exit mirror. The projection adds only
+    source-bound non-display C0 gap diagnostics; it never changes provider
+    content, display content, claims, evidence, routing, retries, or promotion.
+    The following gate verifies that those diagnostics remain bound to L2 and
+    also prevents an unsafe X3 mirror from authorizing finalization when a
+    source-bound hard user-goal constraint or critical L1 requirement remains
+    unresolved.
+    """
+    from apps_rg.runtime.contracts.l1_cognitive_output_disposition import (
+        apply_l1_cognitive_output_disposition_to_x3_mirror,
+        apply_l1_cognitive_output_projection,
+        emit_l1_cognitive_output_disposition,
+    )
+
+    apply_l1_cognitive_output_projection(
+        artifact_dir=artifact_dir,
+        section_id=section_id,
+        runtime_payload=runtime_payload,
+    )
+    emit_l1_cognitive_output_disposition(
+        artifact_dir=artifact_dir,
+        section_id=section_id,
+        runtime_payload=runtime_payload,
+    )
     if _product_visible(runtime_payload):
         from apps_rg.runtime.section_l2_authority import finalize_section_l2_authority
 
@@ -133,14 +162,20 @@ def finalize_section_l2_after_output(
             section_output_ref=section_output_ref,
         )
 
-    from apps_rg.runtime.graph_skills_run_artifacts import persist_graph_skills_lane_artifacts
+    from apps_rg.runtime.graph_skills_run_artifacts import (
+        persist_graph_skills_lane_artifacts,
+    )
 
     persist_graph_skills_lane_artifacts(
         artifact_dir,
         section_id=section_id,
         runtime_payload=runtime_payload,
     )
-    from apps_rg.runtime.spine.section_x3_finalize import finalize_section_spine_exit_after_sealed_l2
+    apply_l1_cognitive_output_disposition_to_x3_mirror(artifact_dir)
+
+    from apps_rg.runtime.spine.section_x3_finalize import (
+        finalize_section_spine_exit_after_sealed_l2,
+    )
 
     finalize_section_spine_exit_after_sealed_l2(
         artifact_dir,

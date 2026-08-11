@@ -190,7 +190,7 @@ def test_main_r1a_before_r1b_order(tmp_path: Path, monkeypatch: pytest.MonkeyPat
         lambda: True,
     )
     monkeypatch.setattr(
-        "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+        "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
         lambda **k: order.append("PIPELINE") or _fake_outcome(tmp_path),
     )
     monkeypatch.setattr("apps_rg.cache.r1a_adapter.stamp_r1a_cache", lambda *a, **k: None)
@@ -267,7 +267,7 @@ def test_main_r1b_hit_skips_pipeline(tmp_path: Path, monkeypatch: pytest.MonkeyP
         return _fake_outcome(tmp_path)
 
     monkeypatch.setattr(
-        "agentic_core.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
+        "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run.run_integrated_single_action_spine",
         fake_pipeline,
     )
 

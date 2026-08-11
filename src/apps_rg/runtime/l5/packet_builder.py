@@ -7,11 +7,11 @@ import json
 from dataclasses import dataclass, replace
 from typing import Any, Mapping, Sequence
 
-from agentic_core.L5_safety.certification.l5_packet_producer import L5PacketProducer
-from agentic_core.L5_safety.contracts.l5_certification_contracts import (
+from apps_rg.runtime.local_l5 import (
     ChildCertifierReceipt,
     EgressCertificationReceipt,
     L5CertificationPacket,
+    L5PacketProducer,
 )
 
 from apps_rg.runtime.l5.child_receipts import (

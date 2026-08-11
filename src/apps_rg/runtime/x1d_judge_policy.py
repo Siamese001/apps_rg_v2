@@ -1,4 +1,4 @@
-"""apps_rg-local X1D judge preflight and proof policy (no agentic_core imports).
+"""apps_rg-local X1D judge preflight and proof policy (no apps_rg imports).
 
 Aligns CI proof configuration with ``REQUIRED_JUDGE_PROVIDER_KEYS`` in section judge policy and with
 ``run_llm_judges`` credential checks in ``executive_summary_x1d`` (same primary ``*_API_KEY`` env

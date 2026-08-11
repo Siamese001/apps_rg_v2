@@ -381,7 +381,17 @@ def compile_ibm_narrative_prompt(
             "apps_rg_prompt_spec_ref": "apps_rg/prompt_assembly/templates/ibm_position_narrative_v1.yaml",
         },
     )
-    compiled = compile_section_prompt(assembly, section_id="ibm_narrative", companion_u_tier=tier)
+    compiled = compile_section_prompt(
+        assembly,
+        section_id="ibm_narrative",
+        companion_u_tier=tier,
+        l1_cognitive_advisory=runtime_payload.get("l1_cognitive_advisory"),
+        l1_cognitive_plan=runtime_payload.get("l1_cognitive_v3_plan"),
+        l1_cognitive_revision=runtime_payload.get("l1_cognitive_revision"),
+        l1_cognitive_revision_advisory=runtime_payload.get(
+            "l1_cognitive_revision_advisory"
+        ),
+    )
     return finalize_section_compiled_with_proof_pool(compiled, runtime_payload=runtime_payload)
 
 

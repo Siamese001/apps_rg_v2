@@ -1,0 +1,93 @@
+{
+  "categories": [
+    {
+      "category": "LLMOps Evaluation & Reliability Gauntlets",
+      "competency_bundle_id": "ccb_llmops_reliability",
+      "graph_skill_node_ids": ["skill_audit_grade_observability", "skill_output_quality_and_schema_gates", "skill_fail_closed_gate_semantics"],
+      "terms": [
+        {"text": "audit-grade observability pipelines", "source_fact_id": "fact_engineering_platform_003", "source_fact_ids": ["fact_engineering_platform_003"]},
+        {"text": "output quality schema gate design", "source_fact_id": "fact_engineering_platform_004", "source_fact_ids": ["fact_engineering_platform_004"]},
+        {"text": "fail-closed evaluation gauntlets", "source_fact_id": "fact_engineering_platform_003", "source_fact_ids": ["fact_engineering_platform_003"]}
+      ]
+    },
+    {
+      "category": "Runtime Control Gate Observability",
+      "competency_bundle_id": "ccb_runtime_governance",
+      "graph_skill_node_ids": ["skill_runtime_gate_mesh_design", "skill_x1_x2_x3_exit_control", "skill_policy_bound_runtime_design"],
+      "terms": [
+        {"text": "runtime gate mesh observability", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "exit-control evaluation checkpoints", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "policy-bound runtime evaluation", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]}
+      ]
+    },
+    {
+      "category": "Agentic Platform Architecture",
+      "competency_bundle_id": "ccb_agentic_platforms",
+      "graph_skill_node_ids": ["skill_governed_agentic_systems_architecture", "skill_reusable_agentic_platform_architecture", "skill_agentic_control_plane_design"],
+      "terms": [
+        {"text": "governed multi-agent control planes", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "reusable agentic architecture design", "source_fact_id": "fact_engineering_platform_001", "source_fact_ids": ["fact_engineering_platform_001"]},
+        {"text": "agentic control-plane architecture", "source_fact_id": "reb_unify_agentic_platform_architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]}
+      ]
+    },
+    {
+      "category": "Retrieval Grounding & Context Observability",
+      "competency_bundle_id": "ccb_retrieval_context_engineering",
+      "graph_skill_node_ids": ["skill_context_engineering", "skill_dense_sparse_exact_retrieval_design", "skill_graph_aware_relationship_grounding"],
+      "terms": [
+        {"text": "context engineering evaluation loops", "source_fact_id": "fact_engineering_platform_003", "source_fact_ids": ["fact_engineering_platform_003"]},
+        {"text": "dense-sparse retrieval reliability design", "source_fact_id": "fact_engineering_platform_003", "source_fact_ids": ["fact_engineering_platform_003"]},
+        {"text": "graph-aware grounding verification", "source_fact_id": "fact_engineering_platform_003", "source_fact_ids": ["fact_engineering_platform_003"]}
+      ]
+    },
+    {
+      "category": "Regulated Release Pipeline Resilience",
+      "competency_bundle_id": "ccb_llmops_reliability",
+      "graph_skill_node_ids": ["skill_runtime_resilience_controls", "skill_ibm_automated_release_pipelines", "skill_audit_grade_observability"],
+      "terms": [
+        {"text": "automated release pipeline resilience", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+        {"text": "regulated delivery evaluation controls", "source_fact_id": "reb_ibm_devsecops_release_resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+        {"text": "audit-ready observability evidence", "source_fact_id": "fact_engineering_platform_004", "source_fact_ids": ["fact_engineering_platform_004"]}
+      ]
+    },
+    {
+      "category": "Distributed Data Platform Engineering",
+      "competency_bundle_id": "ccb_distributed_systems_engineering",
+      "graph_skill_node_ids": ["skill_sr_cloud_data_platform_engineering", "skill_sr_microservices_integration_platform", "skill_p2_tech_reference_architecture"],
+      "terms": [
+        {"text": "cloud data platform engineering", "source_fact_id": "fact_engineering_platform_002", "source_fact_ids": ["fact_engineering_platform_002"]},
+        {"text": "microservices integration observability", "source_fact_id": "fact_engineering_platform_002", "source_fact_ids": ["fact_engineering_platform_002"]},
+        {"text": "reference architecture reliability design", "source_fact_id": "fact_engineering_platform_002", "source_fact_ids": ["fact_engineering_platform_002"]}
+      ]
+    },
+    {
+      "category": "Partner Applied AI Evaluation Patterns",
+      "competency_bundle_id": "ccb_partner_applied_ai_architecture",
+      "graph_skill_node_ids": ["skill_partner_joint_solution_development", "skill_partner_solution_architecture", "skill_partner_ai_architecture_advisory"],
+      "terms": [
+        {"text": "co-sell AI solution evaluation", "source_fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]},
+        {"text": "partner AI architecture advisory", "source_fact_id": "reb_unify_partner_channel_cosell", "source_fact_ids": ["reb_unify_partner_channel_cosell"]},
+        {"text": "joint solution reliability patterns", "source_fact_id": "skill_partner_cloud_vendor_joint_gtm", "source_fact_ids": ["skill_partner_cloud_vendor_joint_gtm"]}
+      ]
+    }
+  ],
+  "selected_fact_plan": {
+    "section_id": "competencies_path3",
+    "selection_method": "lens_biased_neighborhood_expansion",
+    "required_fact_ids": ["fact_engineering_platform_001", "fact_engineering_platform_002", "fact_engineering_platform_003", "fact_engineering_platform_004", "reb_ibm_devsecops_release_resilience", "reb_ibm_aws_alliance_partner_cosell_gtm", "reb_unify_partner_channel_cosell", "reb_unify_agentic_platform_architecture"]
+  },
+  "claim_ledger": [
+    {"claim": "audit-grade observability pipelines", "source_fact_ids": ["fact_engineering_platform_003"]},
+    {"claim": "runtime gate mesh observability", "source_fact_ids": ["fact_engineering_platform_001"]},
+    {"claim": "agentic control-plane architecture", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+    {"claim": "automated release pipeline resilience", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+    {"claim": "cloud data platform engineering", "source_fact_ids": ["fact_engineering_platform_002"]},
+    {"claim": "co-sell AI solution evaluation", "source_fact_ids": ["reb_ibm_aws_alliance_partner_cosell_gtm"]}
+  ],
+  "jd_alignment": ["ai_platform_leadership", "governance_risk_compliance", "engineering_delivery_leadership"],
+  "excluded_jd_skills": ["insurance_domain_specific_actuarial"],
+  "removed_or_rewritten_terms": ["generic 'AI strategy' rewritten to evaluation/observability specific terms"],
+  "gap_notes": ["no direct Lincoln Financial evidence in retained facts"],
+  "change_log": ["biased 4+ categories toward llmops/evaluation/observability lens"],
+  "self_check": ["all source_fact_ids drawn from allowed list", "3 terms per category", "7 categories emitted"]
+}

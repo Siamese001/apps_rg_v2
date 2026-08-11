@@ -1,0 +1,72 @@
+{
+  "app_scope": "APPS_RG_V2_ONLY",
+  "authority": {
+    "does_not_authorize_promotion": true,
+    "does_not_dispatch": true,
+    "does_not_score_resume_quality": true,
+    "human_qualified": false
+  },
+  "authority_class": "TECHNICAL_EXECUTION_OBSERVATION_ONLY",
+  "errors": [
+    "modular_r4/sections/competencies/compiled_prompt_artifact.json:l1_cognitive_advisory_digest_mismatch",
+    "modular_r4/sections/competencies/compiled_prompt_artifact.json:l1_cognitive_plan_digest_mismatch",
+    "modular_r4/sections/competencies/l2_output.json:unreadable:FileNotFoundError"
+  ],
+  "lineage": {
+    "c0_outcome_set_digest": "sha256:7a5ce37a6c5b49a68b02cdc0ca8289bcaaccef03a82d000f9e2e9366c2614785",
+    "l1_cognitive_advisory_digest": "sha256:f6789f7b9f53eae8dc9be90288b00cd3ff8d2240fd7966410a5446807bb8c3e2",
+    "l1_cognitive_plan_digest": "sha256:c5ec4993b0a6ebf93ba76eb7cea2e3bf289756ef355854e7889949f6a33d4cce",
+    "l1_cognitive_revision_set_digest": "sha256:085ec7a9d6ad2a84b01a13a217f329b8da6a0a68f28365cc992207b64d982505",
+    "l1_v2_capsule_digest": "sha256:32d0b789cbc4ae6662af9c242f226c3157a325cbbb54054e9208ded7c165c4f4"
+  },
+  "receipt_digest": "sha256:4d46dc562cc2fa58722513640888032985445a1795a7c5aefba8f780fb056456",
+  "records": [
+    {
+      "compiled_prompt_artifact_digest": "sha256:122db46c1c29ab614796facd4e33815c8d7e59197d0cf9f6c6c0e9a42cd5efc2",
+      "compiled_prompt_artifact_ref": "modular_r4/sections/competencies/compiled_prompt_artifact.json",
+      "linked_digests": {
+        "c0_outcome": "sha256:8224b19082f565c8f4783b90439f18884a616d9ebd1679b04a44f82a4fd158ee",
+        "revision": "sha256:cc3f37919a93e6e8036cf37cb2c661b2e5efaafa71f8b4076cc83c2573fbc7a4",
+        "revision_advisory": "sha256:96e8210d1e96947b43c339779309ba2ece87ba432aa7fe7ff1431751c1b680ab"
+      },
+      "observed": false,
+      "provider_request_observation": {
+        "compiled_prompt_hash": "ec92d722bc7017bb",
+        "observed": true,
+        "provider_prompt_hash": "ec92d722bc7017bb",
+        "provider_request_ref": "modular_r4/sections/competencies/provider_request.json"
+      },
+      "revision_output_observation": {
+        "applicable": true,
+        "l2_output_ref": "modular_r4/sections/competencies/l2_output.json",
+        "observed": false,
+        "observed_change_log_tags": [],
+        "observed_gap_tags": [],
+        "output_disposition_blocks_finalization": null,
+        "output_disposition_reason_code": "",
+        "output_disposition_ref": "modular_r4/sections/competencies/l1_cognitive_output_disposition.json",
+        "output_disposition_status": "",
+        "required_change_log_tags": [
+          "L1_COGNITIVE_ATOM:l1cogreq-331c12158135fd54:GAP"
+        ],
+        "required_gap_tags": [
+          "L1_COGNITIVE_GAP:l1cogreq-331c12158135fd54:C0_INSUFFICIENT"
+        ]
+      },
+      "section_id": "competencies"
+    }
+  ],
+  "schema_version": "apps_rg.l1_cognitive_treatment_execution.v3",
+  "status": "BLOCKED",
+  "summary": {
+    "all_observed_records_source_bound": false,
+    "compiled_prompt_artifact_count": 1,
+    "error_count": 3,
+    "observed_consumption_count": 0
+  },
+  "treatment": {
+    "arm": "l1_cognitive_v3",
+    "assignment_origin": "U0_VALIDATED_INGRESS",
+    "treatment_digest": "sha256:376ec8b0ab4bbc423a286169da47d0cc04bb105b19493c6c2b001203d0bb8b97"
+  }
+}

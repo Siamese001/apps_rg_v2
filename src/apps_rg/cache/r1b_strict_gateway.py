@@ -9,10 +9,10 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from agentic_core.L4_state.contracts.records import stamp_digest
-from agentic_core.L4_state.storage.sqlite_backend import SQLiteL4Backend
-from agentic_core.L4_state.uwg.durable_write_gateway import compute_state_diffs_digest
-from agentic_core.L4_state.uwg.transactional_durable_write_gateway import (
+from apps_rg.runtime.local_state import stamp_digest
+from apps_rg.runtime.local_state import SQLiteL4Backend
+from apps_rg.runtime.local_state import compute_state_diffs_digest
+from apps_rg.runtime.local_state import (
     TransactionalDurableWriteGateway,
 )
 from apps_rg.cache.r1b_commit_authority import validate_r1b_commit_request_evidence
@@ -29,7 +29,7 @@ class R1BStrictUWGGateway(TransactionalDurableWriteGateway):
     ) -> None:
         backend = canonical_backend
         if backend is None:
-            from agentic_core.L4_state.storage.sqlite_backend import get_default_backend
+            from apps_rg.runtime.local_state import get_default_backend
 
             backend = get_default_backend()
         if backend is None:

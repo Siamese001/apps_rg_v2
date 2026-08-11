@@ -16,7 +16,7 @@ from apps_rg.runtime.observability.trace_reconciliation import (
 L6_PACKET_TYPE = "L6_SHADOW_HANDOFF_PACKET"
 L6_PACKET_VERSION = "1"
 L6_LEGACY_HANDOFF_AUTHORITY_SCOPE = "apps_rg_legacy_l6_shadow_summary_advisory"
-L6_GOVERNED_AUTHORITY_SCOPE = "agentic_core_l6_runtime_exhaust_shadow_eval"
+L6_GOVERNED_AUTHORITY_SCOPE = "apps_rg_l6_runtime_exhaust_shadow_eval"
 
 BULLET_LANE_IDS = frozenset({"unify_bullets", "ibm_bullets"})
 

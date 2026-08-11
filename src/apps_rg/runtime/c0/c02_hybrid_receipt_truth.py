@@ -10,8 +10,8 @@ FORBIDDEN_RECEIPT_REASON = "spine_chroma_enrich_disabled"
 
 
 def retrieval_profile_ref(section_id: str) -> str:
-    # Keep this import lazy: ``agentic_core`` discovers the C0 evidence room
-    # while ``c0_binding`` itself is importing agentic-core contracts.  An eager
+    # Keep this import lazy while the C0 evidence room initializes.
+    # An eager
     # reverse import here leaves ``c0_binding`` only partially initialized.
     from apps_rg.runtime.bindings.c0_binding import SectionRetrievalProfile
 

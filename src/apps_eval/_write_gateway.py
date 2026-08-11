@@ -2,7 +2,7 @@
 
 Apps Eval output is proof-harness state, not a product-state mutation.  Keeping
 this gateway stdlib-only lets post-runtime evaluation run without importing the
-product UWG or any provider-adjacent Agentic Core package graph.
+product UWG or any provider-adjacent Apps RG runtime package graph.
 """
 
 from __future__ import annotations

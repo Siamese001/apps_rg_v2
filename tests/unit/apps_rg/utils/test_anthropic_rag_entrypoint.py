@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from agentic_core.knowledge.retrieval.prompt_envelope import (
+from apps_rg_runtime.knowledge.retrieval.prompt_envelope import (
     AssemblyStatusCode,
     PromptAssemblyStatus,
     PromptEnvelope,

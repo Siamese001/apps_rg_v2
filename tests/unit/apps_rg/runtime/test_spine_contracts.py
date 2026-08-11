@@ -1,14 +1,5 @@
 from __future__ import annotations
 
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import ValidatedRequest
-from agentic_core.runtime.contracts.compiled_prompt_artifact import CompiledPromptArtifact
-from agentic_core.runtime.contracts.final_evidence_contract import FinalEvidenceContract
-from agentic_core.runtime.contracts.l1_plan_contract import L1PlanContract
-from agentic_core.runtime.contracts.l3_to_l2_step_contract import L3ToL2StepContract
-from agentic_core.runtime.contracts.route_contract import GraphTraversePolicy, RouteContract
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
-from agentic_core.runtime.contracts.x3_disposition import X3Disposition
-
 from apps_rg.runtime import spine_contracts
 
 
@@ -51,13 +42,16 @@ def test_spine_contracts_exports_only_verified_contract_symbols() -> None:
     }
 
 
-def test_spine_contracts_reexport_canonical_core_contracts() -> None:
-    assert spine_contracts.CompiledPromptArtifact is CompiledPromptArtifact
-    assert spine_contracts.FinalEvidenceContract is FinalEvidenceContract
-    assert spine_contracts.GraphTraversePolicy is GraphTraversePolicy
-    assert spine_contracts.L1PlanContract is L1PlanContract
-    assert spine_contracts.L3ToL2StepContract is L3ToL2StepContract
-    assert spine_contracts.RouteContract is RouteContract
-    assert spine_contracts.SealedL2Artifact is SealedL2Artifact
-    assert spine_contracts.ValidatedRequest is ValidatedRequest
-    assert spine_contracts.X3Disposition is X3Disposition
+def test_spine_contracts_export_local_contracts() -> None:
+    for contract in (
+        spine_contracts.CompiledPromptArtifact,
+        spine_contracts.FinalEvidenceContract,
+        spine_contracts.GraphTraversePolicy,
+        spine_contracts.L1PlanContract,
+        spine_contracts.L3ToL2StepContract,
+        spine_contracts.RouteContract,
+        spine_contracts.SealedL2Artifact,
+        spine_contracts.ValidatedRequest,
+        spine_contracts.X3Disposition,
+    ):
+        assert contract.__module__ == "apps_rg.runtime.spine_contracts"

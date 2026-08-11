@@ -31,13 +31,13 @@ from apps_rg.runtime.bindings.judge_calibration_baseline import (
 from apps_rg.runtime.schemas import SectionCacheWriteProposal
 
 if TYPE_CHECKING:
-    from agentic_core.L4_state.contracts.app_domain import (
+    from apps_rg.runtime.local_state import (
         ApprovedJudgeCalibrationBaseline,
     )
-    from agentic_core.L4_state.contracts.app_domain_lookup import (
+    from apps_rg.runtime.local_state import (
         InMemoryAppDomainStore,
     )
-    from agentic_core.runtime.exhaust.runtime_exhaust_bundle import RuntimeExhaustBundle
+    from apps_rg.runtime.local_exhaust import RuntimeExhaustBundle
 
 _BLOCKING_SUPPORT_STATUSES: frozenset[str] = frozenset(
     {
@@ -172,7 +172,7 @@ def _resolve_judge_reliability_gate(
     """Resolve an approved baseline through the read-only L4 lookup surface."""
     if not baseline_ref:
         return _evaluate_judge_reliability_gate(None)
-    from agentic_core.L4_state.contracts.app_domain_lookup import (
+    from apps_rg.runtime.local_state import (
         AppDomainLookupError,
         get_default_app_domain_store,
     )
@@ -534,7 +534,7 @@ def build_exhaust_bundle_from_exit(
     gate_mesh_result_ref: str | None = None,
     sealed_result_ref: str | None = None,
 ) -> "RuntimeExhaustBundle":
-    from agentic_core.runtime.exhaust.runtime_exhaust_bundle import (
+    from apps_rg.runtime.local_exhaust import (
         build_runtime_exhaust_bundle,
     )
 

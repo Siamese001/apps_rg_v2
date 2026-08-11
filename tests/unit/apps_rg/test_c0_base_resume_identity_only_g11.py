@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import pytest
 
-from agentic_core.runtime.contracts.final_evidence_contract import EvidenceItem
+from apps_rg_runtime.runtime.contracts.final_evidence_contract import EvidenceItem
 from apps_rg.runtime.c0.c0_section_authority import (
     AUTHORITY_CLASS_LEDGER_GRAPH_PROOF,
     AUTHORITY_CLASS_NON_PROOF_CONTEXT,

@@ -44,9 +44,9 @@ def _write_pipeline_defaults(repo: Path) -> None:
 
 def _seed_parent_l7(integrated: Path) -> None:
     for name in (
-        "agentic_core_how_trace.json",
-        "agentic_core_l7_route_family_coverage.json",
-        "agentic_core_spine_proof.json",
+        "apps_rg_how_trace.json",
+        "apps_rg_l7_route_family_coverage.json",
+        "apps_rg_spine_proof.json",
         "integrated_runtime_artifact_manifest.json",
         "runtime_trace_snapshot.json",
     ):

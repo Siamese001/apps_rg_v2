@@ -1,10 +1,8 @@
-"""Delegate executive_summary judge regen to core SameAuthorityRegenRunner (ADR-085 W3)."""
+"""Run executive-summary judge regeneration through the app-owned contract."""
 
 from __future__ import annotations
 
 import json
-import re
-from importlib import import_module
 from pathlib import Path
 from typing import Any
 
@@ -18,14 +16,13 @@ from apps_rg.runtime.sections.executive_summary_regen_support import (
 from apps_rg.runtime.sections.executive_summary_judge_remediation import (
     collect_judge_remediation_delta_lines,
 )
-
-_CORE_REGEN_MODULE = ".".join(("agentic_core", "L2_execution", "regen"))
-_core_regen = import_module(_CORE_REGEN_MODULE)
-AnchorClassification = _core_regen.AnchorClassification
-DefectClass = _core_regen.DefectClass
-IncrementalRepairContract = _core_regen.IncrementalRepairContract
-SameAuthorityRegenRunner = _core_regen.SameAuthorityRegenRunner
-TriggerSource = _core_regen.TriggerSource
+from apps_rg.runtime.sections.executive_summary_local_regen import (
+    AnchorClassification,
+    DefectClass,
+    IncrementalRepairContract,
+    SameAuthorityRegenRunner,
+    TriggerSource,
+)
 
 
 def messages_to_prompt_messages(messages: list[dict[str, str]]) -> PromptMessages:
@@ -78,7 +75,7 @@ def build_regen_delta_user_turn(
     prior_attempt_resume_display_text: str = "",
     prior_cycle_judges: list[dict[str, Any]] | None = None,
 ) -> str:
-    """App delta lines + floors; core owns REGEN_DELTA header and PROMPT_LOCK."""
+    """Build app-owned bounded delta lines and prompt-lock envelope."""
     lines = list(
         collect_judge_remediation_delta_lines(
             x1d_judges,
@@ -202,7 +199,7 @@ def build_incremental_repair_contract(
     )
 
 
-def run_core_same_authority_regen(
+def run_apps_rg_same_authority_regen(
     *,
     messages: list[dict[str, str]],
     provider_payload: dict[str, Any],
@@ -210,7 +207,7 @@ def run_core_same_authority_regen(
     artifact_dir: Path | None,
     run_id: str | None,
 ) -> tuple[str, dict[str, Any], dict[str, Any], tuple[dict[str, str], ...]]:
-    """Invoke core runner; persist receipt + provider_request proof artifacts."""
+    """Invoke the app-owned runner and persist request/receipt proof artifacts."""
     from apps_rg.runtime.sections.executive_summary_lane import write_json
     from apps_rg.runtime.sections.executive_summary_regen_dispatch import (
         budgeted_regen_call,
@@ -225,7 +222,7 @@ def run_core_same_authority_regen(
             provider_payload,
             messages=list(chat_messages),
             phase="judge_regen",
-            call_site="run_core_same_authority_regen",
+            call_site="run_apps_rg_same_authority_regen",
             cycle_index=max(0, _semantic_index - 1),
             attempt_index=0,
             artifact_dir=artifact_dir,
@@ -252,9 +249,9 @@ def run_core_same_authority_regen(
     )
 
     receipt_dict: dict[str, Any] = {
-        "schema": "executive_summary_core_same_authority_regen_v1",
+        "schema": "apps_rg.executive_summary_same_authority_regen.v1",
         "accepted": result.accepted,
-        "regen_engine": "agentic_core.L2_execution.regen.SameAuthorityRegenRunner",
+        "regen_engine": "apps_rg.runtime.sections.executive_summary_local_regen.SameAuthorityRegenRunner",
         "max_delta_tokens": int(contract.max_delta_tokens),
     }
     if result.receipt is not None:

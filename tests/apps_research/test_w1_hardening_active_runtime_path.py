@@ -18,24 +18,22 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-import agentic_core
+import apps_rg
 import pytest
 
 REPO = Path(__file__).resolve().parents[2]
-if not Path(agentic_core.__file__).resolve().is_relative_to(REPO):
+if not Path(apps_rg.__file__).resolve().is_relative_to(REPO):
     pytest.skip(
-        "agentic_core resolves outside the standalone checkout; this integration is not isolated",
+        "apps_rg resolves outside the standalone checkout; this integration is not isolated",
         allow_module_level=True,
     )
 
-from agentic_core.runtime.contracts.apps_research_runtime_package import (
+from apps_research.runtime.app_contracts import (
     RuntimeCustomizationPackage,
-)
-from agentic_core.runtime.contracts.apps_rg_ingress_payload import (
     AppsRgIngressPayload,
     RequestEnvelope,
 )
-from agentic_core.runtime.entry.u0_apps_research_binding import (
+from apps_research.runtime.u0.binding import (
     u0_validate_apps_research,
 )
 from apps_research.runtime.u0.binding import u0_validate_apps_research_v2
@@ -93,9 +91,9 @@ class TestNoParallelRetiredDispatchPath:
     """Verify retired core dispatch module is not part of the live path."""
 
     def test_core_dispatch_module_absent(self):
-        dispatch_path = Path("agentic_core/runtime/entry/apps_research_dispatch.py")
+        dispatch_path = Path("src/apps_rg/runtime/entry/apps_research_dispatch.py")
         assert not dispatch_path.exists(), (
-            "agentic_core.runtime.entry.apps_research_dispatch must remain deleted; "
+            "the retired application dispatch module must remain deleted; "
             "use apps_research.integrations.spine_handoff"
         )
 

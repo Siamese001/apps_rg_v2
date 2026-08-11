@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from agentic_core.config.model_catalog import BGE_M3_MODEL_ID
+from apps_rg_runtime.config.model_catalog import BGE_M3_MODEL_ID
 from apps_rg.runtime.c0 import fact_vector_index_preflight as fvip
 from apps_rg.runtime.c0.section_authority_profile import direct_vector_section_ids
 from apps_rg.runtime.chroma_precomputed_collection import EXPECTED_BGE_DIMENSION

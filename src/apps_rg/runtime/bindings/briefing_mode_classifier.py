@@ -1,7 +1,7 @@
 """apps_rg briefing mode classifier.
 
 W5: Strict precedence-based classification of the company-brief sourcing path.
-No agentic_core imports — this is apps_rg-owned logic.
+No apps_rg imports — this is apps_rg-owned logic.
 
 Canonical briefing modes (must match profile YAML):
   UPLOADED_BRIEFING        — caller supplied a briefing_artifact_ref (policy_refs)

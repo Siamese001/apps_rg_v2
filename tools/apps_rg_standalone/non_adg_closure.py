@@ -146,7 +146,7 @@ def _dynamic_policy(
 
 DYNAMIC_IMPORT_RECONCILIATION_POLICIES: dict[tuple[str, int], dict[str, str]] = {
     (
-        "agentic_core.L0_routing.c0_retrieval.c0_3_enhanced.adapter_registry",
+        "apps_rg.L0_routing.c0_retrieval.c0_3_enhanced.adapter_registry",
         150,
     ): _dynamic_policy(
         "REWRITE_BEHIND_PORT",
@@ -154,31 +154,31 @@ DYNAMIC_IMPORT_RECONCILIATION_POLICIES: dict[tuple[str, int], dict[str, str]] = 
         "A configured graph_adapter_ref is resolved.",
         "The target may accept an approved graph-read adapter contract, not an arbitrary source module reference.",
     ),
-    ("agentic_core.L0_routing.utils.layer_emission_seam", 124): _dynamic_policy(
+    ("apps_rg.L0_routing.utils.layer_emission_seam", 124): _dynamic_policy(
         "LEGACY_DO_NOT_INHERIT",
         "none",
         "The legacy layer-emission seam requests its enforcement module.",
         "Core emission enforcement is not a standalone Apps RG dependency.",
     ),
-    ("agentic_core.L4_state.cache.gptcache_client", 200): _dynamic_policy(
+    ("apps_rg.L4_state.cache.gptcache_client", 200): _dynamic_policy(
         "OPTIONAL_EXPLICIT",
         "unassigned cache adapter",
         "The legacy GPT cache probes chromadb.errors.",
         "A target cache implementation must be separately approved; no legacy cache dependency is inherited.",
     ),
-    ("agentic_core._reexport", 11): _dynamic_policy(
+    ("apps_rg._reexport", 11): _dynamic_policy(
         "LEGACY_DO_NOT_INHERIT",
         "none",
         "A compatibility shim re-exports a caller-supplied module.",
         "The target uses explicit public imports rather than a generic re-export mechanism.",
     ),
-    ("agentic_core.mixins.subatomic_testing_mixin", 39): _dynamic_policy(
+    ("apps_rg.mixins.subatomic_testing_mixin", 39): _dynamic_policy(
         "TEST_ONLY",
         "none",
         "The subatomic self-test mixin requests a stale MCP operation module.",
         "This is a source test-resilience fallback and not product runtime behavior.",
     ),
-    ("agentic_core.mixins.tool_reliability_mixin", 303): _dynamic_policy(
+    ("apps_rg.mixins.tool_reliability_mixin", 303): _dynamic_policy(
         "LEGACY_DO_NOT_INHERIT",
         "none",
         "The generic tool-reliability mixin lazily imports threading.",
@@ -252,7 +252,7 @@ DYNAMIC_IMPORT_RECONCILIATION_POLICIES: dict[tuple[str, int], dict[str, str]] = 
 # target dependencies.
 UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]] = {
     (
-        "agentic_core.L2_execution.config.hybrid_retriever_config",
+        "apps_rg.L2_execution.config.hybrid_retriever_config",
         "ops_scripts.dev_tools.L0_routing_scripts.sovereign_ingestion_mission",
         242,
     ): {
@@ -274,8 +274,8 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "rationale": "The missing module is a development ingestion tool and must not be copied into the target; the frozen product has no characterized cache-miss fallback.",
     },
     (
-        "agentic_core.L2_execution.enforcement.manifest_hash_validator",
-        "agentic_core.L4_state.config.versioned_configs",
+        "apps_rg.L2_execution.enforcement.manifest_hash_validator",
+        "apps_rg.L4_state.config.versioned_configs",
         108,
     ): {
         "defect_id": "W1-IMPORT-002",
@@ -289,8 +289,8 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "supported_path": "Execution inputs with no populated required hash fields bypass this validator.",
         "frozen_behavior_impact": "A hash-bearing manifest fails before its hash set can be compared with the absent L4 configuration source.",
         "current_tests_covering_path": [
-            "tests/agentic_core/L2_execution/enforcement/test_manifest_hash_validator.py",
-            "tests/agentic_core/L0_routing/enforcement/test_execution_gateway.py",
+            "tests/apps_rg/L2_execution/enforcement/test_manifest_hash_validator.py",
+            "tests/apps_rg/L0_routing/enforcement/test_execution_gateway.py",
         ],
         "migration_disposition": "BLOCKED_SOURCE_DEFECT",
         "target_owner": "unassigned; standalone manifest-integrity port requires a separately approved behavior contract",
@@ -299,8 +299,8 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "rationale": "The missing L4 configuration provider is part of a frozen integrity gate; no supported fallback is characterized in the source.",
     },
     (
-        "agentic_core.base_agents.SovereignBaseAgent",
-        "agentic_core.L3_orchestration.healers.healing_tier_router",
+        "apps_rg.base_agents.SovereignBaseAgent",
+        "apps_rg.L3_orchestration.healers.healing_tier_router",
         751,
     ): {
         "defect_id": "W1-IMPORT-003",
@@ -318,8 +318,8 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "rationale": "Repository self-healing is outside the approved Apps RG standalone product surface.",
     },
     (
-        "agentic_core.base_agents.SovereignBaseAgent",
-        "agentic_core.L3_orchestration.healers.healing_tier_types",
+        "apps_rg.base_agents.SovereignBaseAgent",
+        "apps_rg.L3_orchestration.healers.healing_tier_types",
         752,
     ): {
         "defect_id": "W1-IMPORT-004",
@@ -337,7 +337,7 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "rationale": "The missing tier type serves the excluded repository-healing surface only.",
     },
     (
-        "agentic_core.embeddings.embedding_factory",
+        "apps_rg.embeddings.embedding_factory",
         "data.sdks_mcps.client_wrappers",
         298,
     ): {
@@ -356,8 +356,8 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "rationale": "This branch is an explicit live-provider option, and W1 forbids live provider invocation.",
     },
     (
-        "agentic_core.mixins.mcp_operation_mixin",
-        "agentic_core.L2_execution.enforcement.SovereignMCPGateway",
+        "apps_rg.mixins.mcp_operation_mixin",
+        "apps_rg.L2_execution.enforcement.SovereignMCPGateway",
         135,
     ): {
         "defect_id": "W1-IMPORT-006",
@@ -375,8 +375,8 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "rationale": "The source imports a stale enforcement path while the actual gateway implementation is elsewhere; neither is a target dependency.",
     },
     (
-        "agentic_core.utils.decorators_util",
-        "agentic_core.L3_orchestration.healers.healing_tier_router",
+        "apps_rg.utils.decorators_util",
+        "apps_rg.L3_orchestration.healers.healing_tier_router",
         202,
     ): {
         "defect_id": "W1-IMPORT-007",
@@ -387,8 +387,8 @@ UNRESOLVED_IMPORT_MIGRATION_POLICIES: dict[tuple[str, str, int], dict[str, Any]]
         "supported_path": "Importing decorators_util is supported; the missing router is lazy and only used when a decorated healing method executes.",
         "frozen_behavior_impact": "Decorated legacy repository-healing operations cannot resolve their tier router.",
         "current_tests_covering_path": [
-            "tests/unit/agentic_core/utils/test_decorators_util.py",
-            "tests/unit/agentic_core/L5_safety/utils/test_decorators_util.py",
+            "tests/unit/apps_rg/utils/test_decorators_util.py",
+            "tests/unit/apps_rg/L5_safety/utils/test_decorators_util.py",
         ],
         "migration_disposition": "LEGACY_DO_NOT_INHERIT",
         "target_owner": "none",

@@ -10,7 +10,7 @@
   },
   "install": {
     "lock_path": "tools/apps_rg_standalone/gpu_embedding_environment_w1.lock.txt",
-    "lock_sha256": "6dc78b0cbe645b191b5f446b7917683588386e254241a226bd0e66e9c36d522e",
+    "lock_sha256": "d920591a5d44d45aab54e692d8a269e72bdbc57a43f068003589efc8f4eaac46",
     "install_mode": "python -m pip install --no-deps -r <lock_path>",
     "primary_index": "https://pypi.org/simple",
     "torch_index": "https://download.pytorch.org/whl/nightly/cu128",
@@ -71,14 +71,9 @@
       "module_relative_path": "huggingface_hub/__init__.py"
     }
   },
-  "agentic_core": {
-    "distribution": "agentic-workflow",
-    "distribution_version": "1.0.0",
-    "repository_url": "https://github.com/Siamese001/Agentic-Workflow.git",
-    "revision": "cba1303f044f24af364b888122971cab7a972457",
-    "tree_sha": "b94d65692da1890c07d8add5b75383ed10a67a36",
-    "module_relative_path": "agentic_core/__init__.py",
-    "tracked_module_tree_must_be_clean": true
+  "apps_rg_source": {
+    "source_relative_path": "src/apps_rg/__init__.py",
+    "tracked_source_tree_must_be_clean": true
   },
   "embedding_runtime": {
     "runtime_contract_path": "tools/apps_rg_standalone/c03_embedding_runtime_contract.json",
@@ -117,5 +112,5 @@
     "candidate_must_pass_w0_functional_and_performance_gates": true,
     "automatic_promotion_allowed": false
   },
-  "contract_sha256": "26256a2c63a0853986a94d65934c2b49a8b4ecb369dbada31fef6b49afa18b0a"
+  "contract_sha256": "4f824e241a8ce37c9cd55fd0a242b6bbf19aa0d4ba4429eec282a2185f8291df"
 }

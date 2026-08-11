@@ -1,0 +1,54 @@
+{
+  "blocker": "EXECUTED_X3A_DENY_REROUTE",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_001\\control_attempt_001\\modular_r4\\sections\\headline",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:L2AuthorityError:V0_IDENTITY_CHAIN_MISMATCH: tenant_id must be non-empty and identical across U0, L0, and PA: ('', '', '')",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-a882a22b1a52419c8f519c05e4955e9f",
+    "run_id": "8d7795bc-8270-4388-92c4-bd1b73647997",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "no resolvable run_dir pointer for lane 'headline' under C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_001\\control_attempt_001\\modular_r4\\sections",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_001/control_attempt_001/modular_r4/sections/headline/real/<run_id>/",
+  "generated_at_utc": "2026-08-11T09:48:28.818522+00:00",
+  "integrated_run_id": "control_attempt_001",
+  "lane_exec_status": "dispatch_error:L2_EXECUTION_ERROR:L2AuthorityError:V0_IDENTITY_CHAIN_MISMATCH: tenant_id must be non-empty and identical across U0, L0, and PA: ('', '', '')",
+  "lane_id": "headline",
+  "primary_failure": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_001\\control_attempt_001\\modular_r4\\sections\\headline",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "L2_EXECUTION_ERROR:L2AuthorityError:V0_IDENTITY_CHAIN_MISMATCH: tenant_id must be non-empty and identical across U0, L0, and PA: ('', '', '')",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "req-a882a22b1a52419c8f519c05e4955e9f",
+    "run_id": "8d7795bc-8270-4388-92c4-bd1b73647997",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/l1_cognitive_w4/20260811_pair_001/control_attempt_001/modular_r4/sections",
+  "status": "PRE_RUN_BLOCKED"
+}

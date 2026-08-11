@@ -34,7 +34,7 @@ from typing import Any
 
 from apps_rg.runtime.core_io import write_gateway as _wg
 from apps_rg.runtime.core_sqlite import sqlite3_adapter as sqlite3
-from agentic_core.L4_state.fact_writeback import (
+from apps_rg.runtime.local_state import (
     FactWritebackEngine,
     FactWritebackProfile,
     PromotedFactRow,
@@ -43,7 +43,7 @@ from agentic_core.L4_state.fact_writeback import (
     WriteBackDecision,
     scalarize_metadata,
 )
-from agentic_core.L4_state.fact_writeback import (
+from apps_rg.runtime.local_state import (
     norm as _core_norm,
 )
 from apps_rg.runtime.c0.constants import (
@@ -303,7 +303,7 @@ def _rows_digest(rows: Sequence[PromotedFactRow]) -> str:
 
 
 def _state_diffs_digest(state_diffs: list[Any]) -> str:
-    from agentic_core.L4_state.uwg.durable_write_gateway import compute_state_diffs_digest
+    from apps_rg.runtime.local_state import compute_state_diffs_digest
 
     return compute_state_diffs_digest(state_diffs)
 
@@ -314,7 +314,7 @@ def _commit_request_signature(
     state_diff_hash: str,
     clearance_proof_id: str,
 ) -> str:
-    from agentic_core.L4_state.contracts.digests import compute_deterministic_digest
+    from apps_rg.runtime.local_state import compute_deterministic_digest
 
     return compute_deterministic_digest(
         {
@@ -331,7 +331,7 @@ def _build_fact_vectors_uwg_commit_bundle(
     request: PromotionRequest,
 ) -> tuple[Any, list[Any], Any, Any]:
     """Build the Exit-sourced UWG admission packet before live Chroma projection."""
-    from agentic_core.L4_state.contracts.records import (
+    from apps_rg.runtime.local_state import (
         CommitRequest,
         ReadSurfaceRefreshPlan,
         RollbackPlan,
@@ -484,7 +484,7 @@ def _admit_fact_vector_promotion_via_uwg(
     gateway: Any | None = None,
 ) -> dict[str, Any]:
     """Submit the fact_vectors promotion to UWG before mutating live Chroma."""
-    from agentic_core.L4_state.uwg.durable_write_gateway import get_default_gateway
+    from apps_rg.runtime.local_state import get_default_gateway
 
     commit_request, state_diffs, rollback, refresh = _build_fact_vectors_uwg_commit_bundle(
         rows=rows,

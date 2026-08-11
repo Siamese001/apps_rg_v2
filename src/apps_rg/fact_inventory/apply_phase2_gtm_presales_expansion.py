@@ -686,7 +686,7 @@ def main() -> int:
             "phase1_actuarial_track_touched": False,
             "phase3_genai_track_touched": False,
             "section_prompts_touched": False,
-            "agentic_core_touched": False,
+            "apps_rg_touched": False,
         },
     }
     _wg.write_text(CLOSEOUT_JSON, json.dumps(closeout, indent=2) + "\n", encoding="utf-8")

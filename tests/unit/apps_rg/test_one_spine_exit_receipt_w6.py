@@ -42,7 +42,7 @@ REPO = Path(__file__).resolve().parents[3]
 @pytest.fixture(autouse=True)
 def _patch_spine_c0_for_w6_chain(monkeypatch: pytest.MonkeyPatch) -> None:
     """Avoid live Chroma in full L2→Exit chain tests."""
-    from agentic_core.runtime.contracts.final_evidence_contract import (
+    from apps_rg_runtime.runtime.contracts.final_evidence_contract import (
         FinalEvidenceContract,
         SUPPORT_STATUS_PASS,
     )

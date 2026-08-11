@@ -1,0 +1,145 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_ey_narrative_allowed_fact_ids_non_empty",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 13
+    },
+    {
+      "gate_id": "x2_ey_narrative_source_fact_ids_supported",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "bad": [],
+        "cited_count": 2
+      }
+    },
+    {
+      "gate_id": "x2_claim_ledger_claim_text_non_empty",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 1
+    },
+    {
+      "gate_id": "x2_ey_narrative_display_text_proof_authorized",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "status": "PASS",
+        "display_text_authority": "selected_fact_plan_claim_text",
+        "rows": [
+          {
+            "row_id": "narrative_sentence",
+            "source_fact_ids": [
+              "reb_ey_ccar_capital_liquidity_stress_testing",
+              "reb_ey_capital_optimization_solvency"
+            ],
+            "source_fact_ids_allowed": true,
+            "text_matches_selected_fact_claim_text": true
+          }
+        ]
+      }
+    },
+    {
+      "gate_id": "x2_ey_narrative_runtime_real_llm",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": "REAL_LLM"
+    },
+    {
+      "gate_id": "x2_no_first_person",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_no_em_dash",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_ey_narrative_targeting_only_not_experience_claim",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": []
+    },
+    {
+      "gate_id": "x2_ey_narrative_exactly_one_sentence",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "sentence_count": 1,
+        "text": "Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions."
+      }
+    },
+    {
+      "gate_id": "x2_ey_narrative_word_budget",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 24
+    },
+    {
+      "gate_id": "x2_ey_narrative_char_budget",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 217
+    },
+    {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority",
+      "pass": true,
+      "observed_value": {
+        "allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+        "claim_count": 1,
+        "bound_claim_count": 1,
+        "binding_coverage": 1.0,
+        "metric_exactness_pass": true,
+        "orphan_allocation_claim_unit_ids": [],
+        "failure_reasons": []
+      },
+      "threshold": {
+        "binding_coverage": 1.0,
+        "metric_exactness": 1.0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "",
+      "evidence_ref": "graph_claim_bindings.json"
+    }
+  ],
+  "x2_failed": 0,
+  "x2_passed": 12,
+  "failed_gates": [],
+  "final_materialized_input_binding": {
+    "schema_version": "apps_rg.final_materialized_input_binding.v1",
+    "section_id": "ey_narrative",
+    "final_materialized_output_ref": "command_output.txt",
+    "final_materialized_output_present": true,
+    "final_materialized_output_char_count": 217,
+    "final_materialized_output_sha256": "86ea09d22869db02bbeed7b75b9f67fa34b6bac539b60c650bc8e7272af43e3f",
+    "l2_output_present": true,
+    "l2_output_sha256": "9ba3c336804dd50af4107b9bac49a205ef0e4b5170671d833d2117365a879d65",
+    "final_claim_ledger_present": true,
+    "final_claim_ledger_row_count": 1,
+    "final_claim_ledger_sha256": "9d5785872945bf45d039db4a7f8904c08f1d75e8476a954974eb48e8accd9353"
+  },
+  "final_materialized_output_sha256": "86ea09d22869db02bbeed7b75b9f67fa34b6bac539b60c650bc8e7272af43e3f",
+  "final_claim_ledger_sha256": "9d5785872945bf45d039db4a7f8904c08f1d75e8476a954974eb48e8accd9353",
+  "l2_output_sha256": "9ba3c336804dd50af4107b9bac49a205ef0e4b5170671d833d2117365a879d65",
+  "total_x2_gates": 12,
+  "resume_graph_allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+  "graph_claim_binding_contract_digest": "60ddb0573b31db894c9b02acb7497028d948c13198a2ba7b11a6eb4f625de921",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

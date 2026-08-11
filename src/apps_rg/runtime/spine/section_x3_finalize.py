@@ -1,4 +1,4 @@
-"""Section lane X3 + spine Exit — aggregate_x3 judge math then ExitEvalPipeline authority."""
+"""Section lane X3 + Apps RG exit disposition — aggregate_x3 judge math then exit authority."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-from agentic_core.L3_orchestration.exit_eval.v6.pipeline import ExitEvalPipeline
+from apps_rg.runtime.local_exit import ExitEvalPipeline
 from apps_rg.runtime.executive_summary_certification import (
     executive_summary_x3_requires_failure,
 )
@@ -22,7 +22,7 @@ from apps_rg.runtime.sections import (
 SPINE_FEC_ARTIFACT = "final_evidence_contract.json"
 LEGACY_FEC_BRIDGE_ALIAS = "final_evidence_contract_bridge.json"
 LANE_X3_MIRROR_AUTHORITY_SCOPE = "apps_rg_lane_x3_mirror_not_core_exit_authority"
-CORE_EXIT_AUTHORITY_SCOPE = "agentic_core_exit_disposition_receipt"
+CORE_EXIT_AUTHORITY_SCOPE = "apps_rg_exit_disposition_receipt"
 FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT = "final_materialized_acceptance_contract.json"
 FINAL_MATERIALIZED_ACCEPTANCE_GATE_ID = "x3_final_materialized_acceptance_contract"
 FINAL_MATERIALIZED_BLOCK_X3_CODE = "X3_BLOCK_FINAL_MATERIALIZED_ACCEPTANCE"
@@ -481,7 +481,7 @@ def _run_section_spine_exit_eval(
     x3: Any | None = None,
     receipts_extra: dict[str, Any] | None = None,
 ) -> None:
-    """ExitEvalPipeline + section exit receipts — requires ``sealed_l2_artifact.json`` on disk."""
+    """Exit disposition + section receipts — requires ``sealed_l2_artifact.json`` on disk."""
     run_id = str(runtime_payload.get("run_id") or "")
     request_id = str(runtime_payload.get("request_id") or run_id)
     receipts: dict[str, Any] = {
@@ -548,7 +548,7 @@ def refresh_section_exit_after_x3_change(
     runtime_payload: dict[str, Any],
     x3_doc: dict[str, Any],
 ) -> None:
-    """Re-run ExitEvalPipeline + exit receipts when x3 mirror changed after initial finalize."""
+    """Re-run the exit disposition and receipts when the X3 mirror changes."""
     _run_section_spine_exit_eval(
         artifact_dir,
         section_id=section_id,

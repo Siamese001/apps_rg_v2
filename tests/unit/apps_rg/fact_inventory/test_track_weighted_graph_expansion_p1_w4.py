@@ -129,5 +129,5 @@ def test_write_p1_w4_receipts_on_disk(tmp_path: Path) -> None:
     hybrid = data["hybrid_fixture"]
     assert len(hybrid["tracks_with_facts"]) >= 2
     assert data["c03_binding_proof"]["c03_graph_bound_status"] == "BOUND"
-    iso = data["agentic_core_isolation"]
+    iso = data["apps_rg_runtime_isolation"]
     assert iso["touched_by_this_wave"] is False

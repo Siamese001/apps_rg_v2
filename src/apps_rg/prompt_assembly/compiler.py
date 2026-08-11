@@ -111,7 +111,7 @@ PROTECTED_SLOTS = {"S0", "D0", "I0", "R0"}
 class PromptCompiler:
     """Local PA compiler for apps_rg declarative prompt artifacts.
     
-    NO agentic_core imports — self-contained for apps_rg local use.
+    NO apps_rg imports — self-contained for apps_rg local use.
     """
     
     def __init__(self, base_path: Optional[Path] = None):

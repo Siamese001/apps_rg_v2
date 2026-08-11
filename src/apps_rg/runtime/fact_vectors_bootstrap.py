@@ -183,7 +183,7 @@ def prepare_fact_vector_hydration_env(
     repo_root: Path | str,
     chroma_path: str | None = None,
 ) -> dict[str, Any]:
-    """Prepare hydration env without importing agentic_core or heavy ML packages."""
+    """Prepare hydration env without importing apps_rg or heavy ML packages."""
     repo = Path(repo_root).resolve()
     applied: dict[str, str] = {}
     os.environ.setdefault("AGENTIC_REPO_ROOT", str(repo))

@@ -1,11 +1,11 @@
 """apps_rg runtime dispatch — payload parsing and dispatch helpers.
 
-`apps_rg_parse` converts a raw dict payload into an `agentic_core`
+`apps_rg_parse` converts a raw dict payload into an `apps_rg`
 `RequestEnvelope`. `apps_rg_dispatch` runs the full pipeline from a
 parsed envelope and returns the run result dict.
 
 These helpers are the thin app-side counterparts to
-`agentic_core.runtime.entry.apps_rg_dispatch`.
+`apps_rg.runtime.entry.apps_rg_dispatch`.
 """
 from __future__ import annotations
 
@@ -72,7 +72,7 @@ def apps_rg_parse(payload: dict[str, Any]) -> Any:
     Returns
     -------
     RequestEnvelope
-        A validated `agentic_core` RequestEnvelope ready for U0 validation.
+        A validated `apps_rg` RequestEnvelope ready for U0 validation.
     """
     from apps_rg.runtime.spine_contracts import RequestEnvelope
 
@@ -81,6 +81,10 @@ def apps_rg_parse(payload: dict[str, Any]) -> Any:
     user_constraints = dict(payload.get("user_constraints") or {})
     if "generation_mode" in payload:
         user_constraints["_generation_mode"] = str(payload["generation_mode"])
+    if "l1_cognitive_treatment_arm" in payload:
+        user_constraints["_l1_cognitive_treatment_arm"] = str(
+            payload["l1_cognitive_treatment_arm"]
+        )
 
     bar = (payload.get("briefing_artifact_ref") or payload.get("manual_brief_path") or None)
     if bar is not None:

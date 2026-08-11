@@ -8,8 +8,8 @@ from collections.abc import Mapping
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-from agentic_core.L3_orchestration.doctrine.contracts_l3_6 import WorkflowNodeType
-from agentic_core.L3_orchestration.doctrine.contracts_l3_7 import (
+from apps_rg.runtime.local_l3 import WorkflowNodeType
+from apps_rg.runtime.local_l3 import (
     L3ContextBus,
     L3StepContract,
     StepInputs,

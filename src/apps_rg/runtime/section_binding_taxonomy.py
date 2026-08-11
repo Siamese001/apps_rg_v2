@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 L7_CORE_ARTIFACTS: tuple[str, ...] = (
-    "agentic_core_how_trace.json",
-    "agentic_core_l7_route_family_coverage.json",
-    "agentic_core_spine_proof.json",
+    "apps_rg_how_trace.json",
+    "apps_rg_l7_route_family_coverage.json",
+    "apps_rg_spine_proof.json",
     "integrated_runtime_artifact_manifest.json",
     "runtime_trace_snapshot.json",
     "runtime_gate_verdict_bundle.json",
@@ -12,9 +12,9 @@ L7_CORE_ARTIFACTS: tuple[str, ...] = (
 
 # W4: hash-only verified external refs when a correlated integrated cli_* run exists.
 W4_VERIFIED_EXTERNAL_ARTIFACTS: tuple[str, ...] = (
-    "agentic_core_how_trace.json",
-    "agentic_core_l7_route_family_coverage.json",
-    "agentic_core_spine_proof.json",
+    "apps_rg_how_trace.json",
+    "apps_rg_l7_route_family_coverage.json",
+    "apps_rg_spine_proof.json",
     "integrated_runtime_artifact_manifest.json",
     "runtime_trace_snapshot.json",
 )

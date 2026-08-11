@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from agentic_core.runtime.contracts.final_evidence_contract import SUPPORT_STATUS_PASS
+from apps_rg_runtime.runtime.contracts.final_evidence_contract import SUPPORT_STATUS_PASS
 from apps_rg.runtime.bindings.c0_metrics_writer import SCHEMA_VERSION
 from apps_rg.runtime.bindings.section_lane_c0_metrics import (
     C0_METRICS_FILENAME,

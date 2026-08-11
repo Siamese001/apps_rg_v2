@@ -1,0 +1,59 @@
+{
+  "section_id": "ibm_bullets",
+  "trigger_decision": {
+    "should_escalate": true,
+    "triggers": [
+      "JUDGE_CONFIDENCE_LOW",
+      "METRIC_BULLET_BORDERLINE"
+    ],
+    "detail": {
+      "section_id": "ibm_bullets",
+      "model_backed_judge_count": 2,
+      "x2_all_pass": false,
+      "borderline": [
+        {
+          "normalized_score": 0.7,
+          "normalized_threshold": 0.8,
+          "window": 0.08000000000000002,
+          "band_low": 0.72,
+          "band_high": 0.8800000000000001,
+          "provider_key": "gemini_pro"
+        },
+        {
+          "normalized_score": 0.76,
+          "normalized_threshold": 0.72,
+          "window": 0.072,
+          "band_low": 0.648,
+          "band_high": 0.7919999999999999,
+          "provider_key": "anthropic_claude"
+        }
+      ],
+      "has_high_value_metric_bullet": true
+    }
+  },
+  "aggregation": {
+    "decision": "REJECT_X2_HARD_FAILURE",
+    "accepted": false,
+    "should_adjudicate": false,
+    "pass_threshold": 0.72,
+    "margin_threshold": 0.05,
+    "composite_score": 0.76,
+    "composite_threshold": 0.72,
+    "margin": 0.040000000000000036,
+    "x2_failed_gate_ids": [
+      "x2_ibm_cross_bullet_semantic_overlap_zero"
+    ],
+    "reasons": [
+      "x2_hard_failure:x2_ibm_cross_bullet_semantic_overlap_zero"
+    ],
+    "detail": {
+      "section_id": "ibm_bullets",
+      "composite_provider_key": "anthropic_claude",
+      "composite_decisive_failure": false
+    }
+  },
+  "escalated": true,
+  "panel_provider_keys": [
+    "openai_chatgpt"
+  ]
+}

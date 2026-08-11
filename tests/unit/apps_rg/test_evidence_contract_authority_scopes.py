@@ -97,7 +97,7 @@ def test_exit_artifacts_scope_x1_x2_and_canonical_exit(tmp_path: Path) -> None:
 
 
 def test_prompt_assembly_projection_names_are_canonical_with_legacy_aliases() -> None:
-    from agentic_core.prompt_governance.prompt_assembly import input_contracts as ic
+    from apps_rg_runtime.prompt_governance.prompt_assembly import input_contracts as ic
 
     assert ic.L1PlanContract is ic.PAL1PlanProjection
     assert ic.L0RouteContract is ic.PAL0RouteProjection

@@ -1,0 +1,178 @@
+{
+  "schema": "executive_summary_synthesis_regen_v2",
+  "triggered": true,
+  "reject_reason": "sentence 3: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+  "initial_candidate_digest": "848911f090140c69",
+  "initial_defects": [
+    "sentence 3: mechanism_comma_list",
+    "dominant_source_fact=unknown",
+    "claim_support_graph_refs=[]",
+    "suppressed_skills=[]"
+  ],
+  "first_pass_resume_word_count": 125,
+  "first_pass_claim_ledger_rows": 6,
+  "max_attempts": 3,
+  "acceptance_semantics": {
+    "monotonicity_accepted": "candidate improved relative to the prior draft; full pre-X2 shape closure is not implied",
+    "receipt_accepted": "the selected candidate cleared every pre-X2 synthesis-shape check",
+    "transport_accepted": "the provider call completed and parsed; product acceptance is not implied"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "reject_reason": "sentence 3: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "call_id": "synthesis_regen-00-01-bb710c1a",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "d2221fef8ae9c7f5",
+      "regen_resume_word_count": 136,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [
+        "sentence 3: mechanism_comma_list",
+        "dominant_source_fact=unknown",
+        "claim_support_graph_refs=[]",
+        "suppressed_skills=[]"
+      ],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": false,
+        "failed_reasons": [
+          "sentence 3: mechanism_comma_list",
+          "dominant_source_fact=unknown",
+          "claim_support_graph_refs=[]",
+          "suppressed_skills=[]"
+        ]
+      },
+      "shape_failure_count": 4,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 125,
+        "post_resume_word_count": 136,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 10,
+        "post_unique_source_fact_ids": 10,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": true,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "MONOTONIC_IMPROVEMENT_ONLY",
+      "advanced_to_next_attempt": true,
+      "best_candidate": true
+    },
+    {
+      "attempt": 2,
+      "reject_reason": "sentence 3: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "call_id": "synthesis_regen-00-02-d62b27d9",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "a0979d3c40827a59",
+      "regen_resume_word_count": 146,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [
+        "robotic_transition_stack:3_in_s2_s5_matched=from that,against that,that operating foundation",
+        "robotic_transition_stack:3_in_s2_s5_matched=from that,against that,that operating foundation"
+      ],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": false,
+        "failed_reasons": [
+          "robotic_transition_stack:3_in_s2_s5_matched=from that,against that,that operating foundation",
+          "robotic_transition_stack:3_in_s2_s5_matched=from that,against that,that operating foundation"
+        ]
+      },
+      "shape_failure_count": 2,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 136,
+        "post_resume_word_count": 146,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 10,
+        "post_unique_source_fact_ids": 10,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": true,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "MONOTONIC_IMPROVEMENT_ONLY",
+      "advanced_to_next_attempt": true,
+      "best_candidate": true
+    },
+    {
+      "attempt": 3,
+      "reject_reason": "robotic_transition_stack:3_in_s2_s5_matched=from that,against that,that operating foundation; robotic_transition_stack:3_in_s2_s5_matched=from that,against that,that operating foundation",
+      "call_id": "synthesis_regen-00-03-64d49ccb",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "4e04877ea14d0c9e",
+      "regen_resume_word_count": 154,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [
+        "executive summary word count 154 exceeds maximum 150"
+      ],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": false,
+        "failed_reasons": [
+          "executive summary word count 154 exceeds maximum 150"
+        ]
+      },
+      "shape_failure_count": 1,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 146,
+        "post_resume_word_count": 154,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 10,
+        "post_unique_source_fact_ids": 10,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": false,
+        "prior_needs_density_reduction": false,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": false,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": false
+      },
+      "acceptance_scope": "MONOTONIC_IMPROVEMENT_ONLY",
+      "advanced_to_next_attempt": true,
+      "best_candidate": true
+    }
+  ],
+  "accepted": false,
+  "authoritative_candidate_digest": "848911f090140c69",
+  "judge_stage_eligible_from_retry": false,
+  "final_reject_reason": "executive summary word count 154 exceeds maximum 150",
+  "final_resume_word_count": 154,
+  "final_claim_ledger_rows": 6,
+  "reverted_to_first_pass": true
+}

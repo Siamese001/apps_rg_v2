@@ -12,7 +12,7 @@ from typing import Any
 
 import pytest
 
-from agentic_core.runtime.contracts.route_contract import RouteContract
+from apps_rg_runtime.runtime.contracts.route_contract import RouteContract
 from apps_rg.fact_inventory import p2_graph_skills_accelerated_closeout as closeout_mod
 from apps_rg.l2_recipe.r4_modular_proof_verification import (
     verify_recorded_modular_r4_proof_bundle,

@@ -12,7 +12,7 @@ from typing import Any
 import pytest
 
 pytest.importorskip(
-    "agentic_core.runtime.contracts.apps_rg_ingress_payload",
+    "apps_rg_runtime.runtime.contracts.apps_rg_ingress_payload",
     reason="standalone checkout omits the external Agentic Workflow contract runtime",
 )
 

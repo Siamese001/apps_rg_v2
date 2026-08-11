@@ -1,0 +1,475 @@
+{
+  "schema_version": "section_runtime_exhaust_bundle_v1",
+  "generated_at_utc": "2026-08-11T10:05:42.131852+00:00",
+  "contract_type": "RuntimeExhaustBundle",
+  "section_id": "unify_narrative",
+  "request_id": "61432ab4-abd1-423e-8266-bcf72c645ec2",
+  "run_id": "unify_narrative_20260811_100515",
+  "parent_run_id": "",
+  "child_run_id": "unify_narrative_20260811_100515",
+  "section_attempt_id": "unify_narrative:unify_narrative_20260811_100515:attempt:1",
+  "session_id": "",
+  "tenant_id": "default",
+  "trace_root": "",
+  "policy_hash": "no-policy",
+  "blueprint_hash": "no-blueprint",
+  "replay_key": "Lincoln Financial Group:SVP IT Strategy & AI Enablement:33acc0ea1ff22073:b7312c750abe8c77::v1",
+  "producer_stage": "Exit",
+  "consumer_stage": "L6",
+  "exit_disposition_receipt_ref": "exit_disposition_receipt.json",
+  "sealed_l2_artifact_ref": "sealed_l2_artifact.json",
+  "l2_execution_packet_ref": "l2_execution_packet.json",
+  "section_x3_disposition_ref": "x3_disposition.json",
+  "section_x3_authoritative": false,
+  "canonical_exit_authority_ref": "exit_disposition_receipt.json",
+  "x3_disposition": {
+    "x3_code": "X3_ALLOW",
+    "decisive_reason": "REAL_LLM output, X2 pass, all X1D judges model-backed pass, product quality PASS.",
+    "review_reason": "",
+    "authorization_scope": "PRODUCT_QUALITY",
+    "proceed_to_runtime": true,
+    "runtime_generation_status": "REAL_LLM",
+    "x1d_evaluator_mode": "MODEL_BACKED",
+    "product_quality_status": "PASS",
+    "x2_failed_gates": [],
+    "blocked_judges": [],
+    "mocked_judges": [],
+    "soft_failed_judges": [],
+    "decisive_judge_failures": [],
+    "final_summary_hash": "866825648d3c39f6",
+    "claim_ledger_hash": "b2b3526468c9d0db",
+    "required_remediation": [],
+    "blocked_judge_detail_rows": [],
+    "model_backed_pass_provider_keys": [
+      "gemini_pro"
+    ],
+    "proof_eligible_allow_requires": "every_configured_x1d_judge_model_backed_pass",
+    "pass": true,
+    "disposition_authority": "lane",
+    "section_x3_authoritative": false,
+    "section_x3_mirror_only": true,
+    "spine_x3_claimed": false,
+    "proof_eligible": true,
+    "judge_proof_eligible": true,
+    "resume_graph_allocation_plan_digest": "e54afe7811077f77ac9ff501f35da92360af79600571a81e74b67e0a0b5b5ced",
+    "graph_claim_binding_contract_digest": "16a0859e22959328796fa09c10db9d80710e19e7272a99d86df034fc3f29d7fc",
+    "graph_claim_bindings_ref": "graph_claim_bindings.json",
+    "resume_graph_claim_binding_pass": true,
+    "final_materialized_acceptance_contract_ref": "final_materialized_acceptance_contract.json",
+    "final_materialized_acceptance_ok": true,
+    "authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+    "artifact_authority_scope": "apps_rg_lane_x3_mirror_not_core_exit_authority",
+    "core_exit_authority_ref": "x3_disposition_receipt.json",
+    "core_exit_authority_scope": "apps_rg_exit_disposition_receipt"
+  },
+  "x3_code": "X3_ALLOW",
+  "artifact_inventory": [
+    {
+      "name": "attempt_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c01_retrieval_plan.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c02_atoms.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c02_fact_vector_index_preflight.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c02_fact_vectors_ingest_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c02_semantic_cache_payload.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c02_vector_query.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c06_weak_refine_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c0_evidence_room_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c0_fec_compose_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c0_graph_lane_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "c0_metrics.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "canonical_claim_ledger_v2.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "canonical_evidence_digest_chain.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "claim_ledger.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "companion_unify_bullets_context.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "companion_unify_bullets_context.txt",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "compiled_prompt.txt",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "compiled_prompt_artifact.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "exit_disposition_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "exit_review_packet.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "exit_spine_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "external_model_token_reservations.jsonl",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "external_model_usage_ledger.jsonl",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "fact_check_result.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "fact_vector_promotion_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "final_evidence_contract.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "final_evidence_contract_bridge.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "final_materialized_acceptance_contract.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "frozen_execution_context.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "graph_claim_bindings.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "graph_selection_rationale.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "judge_attempt_ledger.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l1_cognitive_c0_outcome_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l1_cognitive_revision.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l1_cognitive_revision_advisory.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l1_evidence_obligation_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l1_plan_contract.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l2_execution_packet.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l2_handoff_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l2_output.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l2_receipt_bundle.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "l2_spine_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "lane_dispatch_attempt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "parsed_output.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "prep_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "prompt_selection_trace.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "provider_request.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "provider_response.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "r4_c0_bypass_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "r4_identity_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "raw_model_output.txt",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "route_contract.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "runtime_payload.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "seal_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "sealed_l2_artifact.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "section_exit_x1_result.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "section_exit_x2_result.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "section_front_spine_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "section_input_usage_ledger.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "section_repair_ledger.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "section_spine_c0_retrieve_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "selected_fact_plan.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "spine_span_emit_receipt.jsonl",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "text_claim_coverage.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "unify_narrative_judge_packet.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "unify_narrative_output.txt",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "validated_request.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "validation_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "x1d_gemini_provider_parse_result_20260811_100541_495.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "x1d_gemini_provider_request_20260811_100533_761.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "x1d_gemini_provider_response_raw_20260811_100541_490.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "x1d_llm_judge_outputs.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "x2_gate_outputs.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "x2_source_fact_pool_receipt.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    },
+    {
+      "name": "x3_disposition.json",
+      "kind": "file",
+      "section_id": "unify_narrative"
+    }
+  ],
+  "artifact_inventory_count": 76,
+  "l6_v40_shadow_eval_package_ref": "l6_v40_shadow_eval_package.json",
+  "l6_v40_shadow_eval_spans_ref": "l6_v40_shadow_eval_spans.json",
+  "trace_refs": {
+    "route_contract.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/route_contract.json",
+    "final_evidence_contract_bridge.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/final_evidence_contract_bridge.json",
+    "l2_execution_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/l2_execution_packet.json",
+    "exit_review_packet.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/exit_review_packet.json",
+    "provider_request.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/provider_request.json",
+    "provider_response.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/provider_response.json",
+    "x2_gate_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/x2_gate_outputs.json",
+    "x1d_llm_judge_outputs.json": "C:/Git/apps_rg_v2-worktrees/codex-l1-cognitive-causal-loop-w1/artifacts/apps_rg/l1_cognitive_w4/20260811_pair_002/candidate_attempt_005/modular_r4/sections/unify_narrative/x1d_llm_judge_outputs.json"
+  },
+  "proof_refs": {
+    "exit_spine_receipt": "exit_spine_receipt.json",
+    "l2_spine_receipt": "l2_spine_receipt.json"
+  },
+  "runtime_terminal_boundary": "post_exit_disposition",
+  "durable_commit_occurred": false,
+  "uwg_commit_occurred": false,
+  "product_certification": "NOT_CLAIMED",
+  "spine_runtime_exhaust_bundle_claimed": true,
+  "explicit_non_claims": [
+    "L6 is post-run shadow only; cannot mutate or rescue current run",
+    "not product certification",
+    "not durable UWG/L4 commit"
+  ]
+}

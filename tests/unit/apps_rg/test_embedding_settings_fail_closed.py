@@ -1,4 +1,4 @@
-"""Fail-closed apps_rg embedding / BGE / Chroma semantics (no agentic_core edits)."""
+"""Fail-closed apps_rg embedding / BGE / Chroma semantics (no apps_rg_runtime edits)."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from agentic_core.config.model_catalog import (
+from apps_rg_runtime.config.model_catalog import (
     BGE_M3_EMBEDDING_DIMENSION,
     BGE_M3_MODEL_ID,
 )

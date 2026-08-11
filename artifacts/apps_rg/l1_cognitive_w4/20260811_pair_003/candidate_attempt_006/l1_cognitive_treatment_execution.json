@@ -1,0 +1,66 @@
+{
+  "app_scope": "APPS_RG_V2_ONLY",
+  "authority": {
+    "does_not_authorize_promotion": true,
+    "does_not_dispatch": true,
+    "does_not_score_resume_quality": true,
+    "human_qualified": false
+  },
+  "authority_class": "TECHNICAL_EXECUTION_OBSERVATION_ONLY",
+  "errors": [
+    "modular_r4/sections/competencies/l2_output.json:unreadable:FileNotFoundError"
+  ],
+  "lineage": {
+    "c0_outcome_set_digest": "sha256:f4c509911edf60aed3d53aa86e56f70a9e1b489d46aa7e344b7aac178bcc3082",
+    "l1_cognitive_advisory_digest": "sha256:4f4e53600721bcefa0cf2ae0c8543c2acc0abec1364e197715a8675fb27ee2dc",
+    "l1_cognitive_plan_digest": "sha256:e2e5b888cd079320482c38aa5092d49d7850508960a774c61d2d09238c71263d",
+    "l1_cognitive_revision_set_digest": "sha256:d34aa59ebaecc18e47716d37dfe1845af9ecaf5637e2892a293f1c79b0ad2831",
+    "l1_v2_capsule_digest": "sha256:be7b1cf88d654b79f72c4e5f3d92754bb6fdde71e5e46dc52401b55042b69374"
+  },
+  "receipt_digest": "sha256:073c5b12de80866f25f84abb9c6dc930b59c581f3d6b899d9a2e9e7842d0cb08",
+  "records": [
+    {
+      "compiled_prompt_artifact_digest": "sha256:b4e0bb7cdcd4a92c80a34b48aa19a462b243d26532192df362acd49785c0d24c",
+      "compiled_prompt_artifact_ref": "modular_r4/sections/competencies/compiled_prompt_artifact.json",
+      "linked_digests": {
+        "c0_outcome": "sha256:65fa87e9bb4d81c76ff2bec98b050a0584996c6362d76a0cd40e7c0d51b66304",
+        "revision": "sha256:0a61506fe2d2935f40ec6dc2709492325a1fac72d93735d8931473c42329cf31",
+        "revision_advisory": "sha256:39f89e08b32a940aba21af4fd0edf6ecd585f519545c529904f02b7ce35d2b9b"
+      },
+      "observed": false,
+      "provider_request_observation": {
+        "compiled_prompt_hash": "ec92d722bc7017bb",
+        "observed": true,
+        "provider_prompt_hash": "ec92d722bc7017bb",
+        "provider_request_ref": "modular_r4/sections/competencies/provider_request.json"
+      },
+      "revision_output_observation": {
+        "applicable": true,
+        "l2_output_ref": "modular_r4/sections/competencies/l2_output.json",
+        "observed": false,
+        "observed_change_log_tags": [],
+        "observed_gap_tags": [],
+        "required_change_log_tags": [
+          "L1_COGNITIVE_ATOM:l1cogreq-331c12158135fd54:GAP"
+        ],
+        "required_gap_tags": [
+          "L1_COGNITIVE_GAP:l1cogreq-331c12158135fd54:C0_INSUFFICIENT"
+        ]
+      },
+      "section_id": "competencies"
+    }
+  ],
+  "schema_version": "apps_rg.l1_cognitive_treatment_execution.v2",
+  "status": "BLOCKED",
+  "summary": {
+    "all_observed_records_source_bound": false,
+    "compiled_prompt_artifact_count": 1,
+    "error_count": 1,
+    "observed_consumption_count": 0
+  },
+  "treatment": {
+    "arm": "l1_cognitive_v3",
+    "assignment_origin": "U0_VALIDATED_INGRESS",
+    "treatment_digest": "sha256:376ec8b0ab4bbc423a286169da47d0cc04bb105b19493c6c2b001203d0bb8b97"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.2,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": false,
+    "findings": [
+      "Bul_ibm_005 is an exact duplicate of bul_ibm_002 text, violating cross-bullet diversity.",
+      "Bul_ibm_005 lacks terminal punctuation."
+    ],
+    "cited_sentence_indexes": [
+      2,
+      5
+    ],
+    "remediation_suggestions": [
+      "Differentiate bul_ibm_005 content to cover a distinct IBM outcome.",
+      "Add terminal punctuation to sentence 5."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "punctuation_inconsistency"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "duplicate_bullet_content"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_003\\candidate_attempt_008\\modular_r4\\sections\\ibm_bullets\\x1d_gemini_provider_response_raw_20260811_104336_866.json",
+  "original_model": null,
+  "fallback_model": null
+}

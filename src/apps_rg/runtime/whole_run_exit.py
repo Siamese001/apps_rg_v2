@@ -4,7 +4,7 @@ Computes one canonical product X3 disposition from lane rollups, assembly
 gates, C0/FEC grounding signals, and X1D policy. Per-lane X3 codes are preserved as evidence
 in ``aggregated_from_lane_x3``; they are not overwritten.
 
-This module is apps_rg-local and does not import agentic_core.
+This module is apps_rg-local and does not import apps_rg.
 """
 
 from __future__ import annotations

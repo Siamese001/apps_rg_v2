@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from agentic_core.runtime.providers.provider_types import (
+from apps_rg_runtime.runtime.providers.provider_types import (
     ProviderKind,
     ProviderMode,
     ProviderProfile,

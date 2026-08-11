@@ -1,0 +1,113 @@
+{
+  "schema_version": "fact_vector_promotion_v2",
+  "staging_collection": "fact_vectors_staging",
+  "live_collection": "fact_vectors",
+  "promotion_run_id": "fact_vector_promotion:2026-08-11T10:12:48.634651Z",
+  "promotion_mode": "inline",
+  "promoted_at_utc": "2026-08-11T10:12:48.634651+00:00",
+  "promotion_score_floor": 0.48,
+  "run_id": "unify_bullets_20260811_101248",
+  "x3_code": "",
+  "require_x3_allow": false,
+  "selected_ids": [],
+  "missing_selected_ids": [],
+  "staged_count": 21,
+  "considered_count": 6,
+  "other_run_count": 15,
+  "promoted_count": 0,
+  "held_count": 6,
+  "rejected_count": 0,
+  "promoted": [],
+  "held": [
+    {
+      "id": "apps_rg:fv:fact_engineering_platform_001",
+      "reason": "duplicate_digest:apps_rg:fv:fact_engineering_platform_001"
+    },
+    {
+      "id": "apps_rg:fv:fact_engineering_platform_003",
+      "reason": "duplicate_digest:apps_rg:fv:fact_engineering_platform_003"
+    },
+    {
+      "id": "apps_rg:fv:fact_engineering_platform_002",
+      "reason": "duplicate_digest:apps_rg:fv:fact_engineering_platform_002"
+    },
+    {
+      "id": "apps_rg:fv:fact_engineering_platform_006",
+      "reason": "duplicate_digest:apps_rg:fv:fact_engineering_platform_006"
+    },
+    {
+      "id": "apps_rg:fv:fact_engineering_platform_004",
+      "reason": "duplicate_digest:apps_rg:fv:fact_engineering_platform_004"
+    },
+    {
+      "id": "apps_rg:fv:exp_unify_001",
+      "reason": "duplicate_digest:apps_rg:fv:exp_unify_001"
+    }
+  ],
+  "rejected": [],
+  "sparse_synced": false,
+  "dense_count": 63,
+  "sparse_doc_count": null,
+  "sparse_sync_reason": "",
+  "hitl_required": false,
+  "status": "NONE_PROMOTABLE",
+  "reason": "no_staged_rows_passed_dedupe_or_score_floor",
+  "receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\control_attempt_002\\modular_r4\\sections\\unify_bullets\\fact_vector_promotion_receipt.json",
+  "source_x3_code": "",
+  "x3_finish_code_normalized": "",
+  "uwg": {},
+  "hold_annotation": {
+    "status": "PASS",
+    "row_count": 6,
+    "error_type": "",
+    "error": ""
+  },
+  "live_projection": {
+    "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+    "projection_surface": "chromadb.fact_vectors",
+    "target_l4_surface": "l4.apps_rg.fact_vectors",
+    "retrieval_mode": "live_id_get",
+    "dense_count_before": 63,
+    "dense_count_after": 63,
+    "promoted_ids": [],
+    "retrieved_ids": [],
+    "missing_ids": [],
+    "status": "EMPTY",
+    "reason": "no_promoted_ids"
+  },
+  "retrieval_proof": {
+    "schema_version": "apps_rg.fact_vectors_live_projection_proof.v1",
+    "projection_surface": "chromadb.fact_vectors",
+    "target_l4_surface": "l4.apps_rg.fact_vectors",
+    "retrieval_mode": "live_id_get",
+    "dense_count_before": 63,
+    "dense_count_after": 63,
+    "promoted_ids": [],
+    "retrieved_ids": [],
+    "missing_ids": [],
+    "status": "EMPTY",
+    "reason": "no_promoted_ids"
+  },
+  "l7_auditability": {
+    "uwg_required_before_live_chroma_projection": true,
+    "target_l4_surface": "l4.apps_rg.fact_vectors",
+    "staging_collection": "fact_vectors_staging",
+    "live_collection": "fact_vectors",
+    "x3_required": false,
+    "x3_code": "",
+    "x3_gate_code": "",
+    "uwg_status": "",
+    "live_projection_status": "EMPTY",
+    "retrieval_proof_status": "EMPTY"
+  },
+  "uwg_witness": {
+    "ledger": "router_l4_uwg",
+    "event_kind": "route_decision",
+    "event_id": "",
+    "decision_id": "fact_vector_promotion_75331f2f4e11",
+    "selected": "blocked",
+    "promotion_receipt_digest": "75331f2f4e119c8284ea074a7387c3f88001653fc39b05356053e66178e7db21",
+    "promotion_receipt_path": "C:\\Git\\apps_rg_v2-worktrees\\codex-l1-cognitive-causal-loop-w1\\artifacts\\apps_rg\\l1_cognitive_w4\\20260811_pair_002\\control_attempt_002\\modular_r4\\sections\\unify_bullets\\fact_vector_promotion_receipt.json",
+    "witness_status": "FAIL_SOFT"
+  }
+}

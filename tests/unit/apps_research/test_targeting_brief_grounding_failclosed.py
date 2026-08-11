@@ -7,8 +7,7 @@ import json
 
 import pytest
 
-from agentic_core.L3_orchestration.exit_eval.graders.base import GraderError
-from agentic_core.L3_orchestration.exit_eval.graders.llm_judge import JudgeResponse
+from apps_rg.runtime.apps_runtime_compat import GraderError, JudgeResponse
 from apps_research.engines.company_brief_engine import (
     CompanyBriefEngine,
     CompanyBriefUnavailableError,

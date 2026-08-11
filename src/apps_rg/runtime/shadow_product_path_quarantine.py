@@ -24,7 +24,7 @@ SHADOW_PATH_ARTIFACT_SPECS: dict[str, str] = {
 SHADOW_PATH_EXPLICIT_NON_CLAIMS: tuple[str, ...] = (
     "shadow path artifacts are offline or dev harness evidence only",
     "orchestrator rollup is not integrated R4 product runtime proof",
-    "package rollup X3 is not agentic_core Exit X3",
+    "package rollup X3 is not apps_rg Exit X3",
     "demo harness output is not canonical python -m apps_rg section proof",
 )
 

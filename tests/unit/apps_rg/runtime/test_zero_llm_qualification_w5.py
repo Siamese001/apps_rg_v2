@@ -469,7 +469,7 @@ blocked = sorted(
     or name.startswith("openai.")
     or name == "anthropic"
     or name.startswith("anthropic.")
-    or name.startswith("agentic_core")
+    or name.startswith("apps_rg_runtime")
 )
 print(json.dumps({
     "blocked_modules_loaded": blocked,
@@ -520,7 +520,7 @@ blocked = sorted(
     or name.startswith("openai.")
     or name == "anthropic"
     or name.startswith("anthropic.")
-    or name.startswith("agentic_core")
+    or name.startswith("apps_rg_runtime")
 )
 print(json.dumps({"blocked_modules_loaded": blocked}, sort_keys=True))
 """

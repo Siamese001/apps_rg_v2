@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from agentic_core.L4_state.fact_writeback import FactWritebackProfile
+from apps_rg_runtime.L4_state.fact_writeback import FactWritebackProfile
 from apps_rg.runtime.c0.fact_vector_write_back import (
     APPS_RG_FACT_WRITEBACK_PROFILE,
     ENRICH,

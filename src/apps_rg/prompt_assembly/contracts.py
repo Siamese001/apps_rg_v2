@@ -1,6 +1,6 @@
 # apps_rg Prompt Assembly Contracts
 # Typed artifacts for local compile/validation path
-# NO agentic_core imports — self-contained for apps_rg local use
+# NO apps_rg imports — self-contained for apps_rg local use
 
 from __future__ import annotations
 

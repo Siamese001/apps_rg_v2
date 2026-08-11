@@ -169,6 +169,8 @@ def _build_spine_retrieve_receipt(
                 "l1_v2_evidence_obligation_ledger:",
                 "l1_evidence_obligation_receipt_digest:",
                 "l1_evidence_obligation_receipt_ref:",
+                "l1_cognitive_c0_outcome_receipt_digest:",
+                "l1_cognitive_c0_outcome_receipt_ref:",
             )
         )
     ]
@@ -189,6 +191,11 @@ def _build_spine_retrieve_receipt(
         "l1_v2_evidence_obligation_reconciliation_refs": (
             obligation_reconciliation_refs
         ),
+        "l1_cognitive_v3_outcome_reconciliation_refs": [
+            ref
+            for ref in obligation_reconciliation_refs
+            if str(ref).startswith("l1_cognitive_c0_outcome_receipt_")
+        ],
         "evidence_item_count": len(fec.evidence_items or ()),
         "dense_search_refs": list(getattr(fec, "dense_search_refs", None) or ()),
         "sparse_search_refs": sparse_refs,
@@ -206,6 +213,7 @@ def invoke_section_spine_c0_retrieve(
     front_spine: SectionFrontSpineBridge,
     section_id: str,
     chromadb_path: str | None = None,
+    artifact_dir: Path | None = None,
     assert_grounding: bool = True,
 ) -> SectionSpineC0RetrieveResult:
     """Run verified-plan C0 retrieval for a section front-spine bundle."""
@@ -230,6 +238,7 @@ def invoke_section_spine_c0_retrieve(
             validated_request=front_spine.validated_request,
             l1_plan=front_spine.l1_plan,
             chromadb_path=chroma,
+            obligation_receipt_artifact_dir=artifact_dir,
         )
     except C0EvidenceGapError as exc:
         raise StopAsEvidenceGapError(

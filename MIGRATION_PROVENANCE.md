@@ -42,15 +42,15 @@ was uncommitted at import time.
 
 ## Explicit exclusions
 
-- `agentic_core/**` remains in the Agentic Workflow source repository.
+- `apps_rg/**` remains in the Agentic Workflow source repository.
 - Source-only ADRs, source plans, `ops_scripts/apps_rg/**`, and
-  `tests/**/agentic_core/**` remain in the source repository under the approved
+  `tests/**/apps_rg/**` remain in the source repository under the approved
   Wave 1 import boundary.
 - `.runtime/**`, Python bytecode, and test caches were not imported.
 - The source-refreeze branch was not merged into Agentic Workflow `main`.
 - This target does not contain standalone packaging or a parity claim. Product
   entry now records `standalone_runtime_dependency_receipt.json` and fails
-  closed unless the excluded `agentic_core` resolves as an external regular
+  closed unless the excluded `apps_rg` resolves as an external regular
   package with U0 → L1 → L0 → C0 → PA → L2 → Exit contract sentinels. This is
   an explicit external-runtime posture, not an independent-installability or
   behavior-parity assertion.
@@ -88,7 +88,7 @@ change metrics or runtime behavior. The v2-only graph-embedding qualifier is
 preserved. Exact counts, tree digests, validation results, and authority limits
 are recorded in `src/apps_rg/evals/EVALUATION_SYNC_RECEIPT.json`.
 
-This sync does not import `agentic_core` or `ops_scripts`, change Apps RG
+This sync does not import `apps_rg` or `ops_scripts`, change Apps RG
 runtime behavior, create human-review evidence, or claim release authority.
 
 ## Source-bound measurement remediation
@@ -113,7 +113,7 @@ this repository owns those sources under `src/apps_rg/**`. The standalone
 operator in `tools/apps_rg_standalone/c03_embeddings.py` rebuilds and
 requalifies candidates against the standalone paths before replacing the
 active manifests. It does not restore the excluded monorepo `ops_scripts`
-surface or import `agentic_core`.
+surface or import `apps_rg`.
 
 The bundled seven-query qualification is explicitly `REGRESSION_ONLY` and
 non-release-authorizing. Authoritative empirical qualification remains bound

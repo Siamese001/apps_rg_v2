@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, replace
 from types import SimpleNamespace
 
-from agentic_core.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
+from apps_rg_runtime.runtime.contracts.sealed_l2_artifact import SealedL2Artifact
 from apps_rg.runtime.bindings.exit_binding import _exit_finalize_apps_rg_impl
 from apps_rg.runtime.l5.egress_receipts import receipt_from_provider_exchange
 from apps_rg.runtime.l5.packet_builder import (

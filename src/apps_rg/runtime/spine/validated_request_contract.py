@@ -114,7 +114,7 @@ def _tuple_values(body: dict[str, Any], *names: str) -> None:
 def _deserialize_validated_request(payload: Mapping[str, Any]) -> ValidatedRequest:
     from apps_rg.runtime.spine_contracts import ValidatedRequest
     from apps_rg.runtime.spine_contracts import RuntimePosture
-    from agentic_core.runtime.u0.reflection_receipt import AppsRgU0ReflectionReceipt
+    from apps_rg.runtime.local_u0 import AppsRgU0ReflectionReceipt
     from apps_rg.runtime.bindings.u0_binding import AppsRgU0AuthorityReceipt
 
     body = dict(payload)

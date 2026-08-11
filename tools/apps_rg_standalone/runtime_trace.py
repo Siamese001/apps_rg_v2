@@ -407,7 +407,7 @@ def redis_transitive_import_record(module_name: str, trace: dict[str, Any]) -> d
     """Keep a source runtime Redis import distinct from a target dependency decision."""
     loaded_modules = {str(row["module"]) for row in trace["local_modules"]}
     redis_loaded = any(str(row["module"]) == "redis" for row in trace["third_party_modules"])
-    source_client_loaded = "agentic_core.cache.redis_cache_client" in loaded_modules
+    source_client_loaded = "apps_rg.cache.redis_cache_client" in loaded_modules
     loaded = redis_loaded and source_client_loaded
     return {
         "loaded": loaded,
@@ -415,9 +415,8 @@ def redis_transitive_import_record(module_name: str, trace: dict[str, Any]) -> d
         "importing_chain": (
             [
                 module_name,
-                "agentic_core.L2_execution.utils.write_gateway",
-                "agentic_core.__init__",
-                "agentic_core.cache.redis_cache_client",
+                "apps_rg.runtime.orchestration.canonical_dispatch",
+                "apps_rg.cache.redis_cache_client",
                 "redis",
             ]
             if loaded and module_name == "apps_rg.__main__"

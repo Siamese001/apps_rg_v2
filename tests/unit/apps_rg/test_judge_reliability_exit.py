@@ -5,12 +5,12 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from agentic_core.L4_state.contracts.app_domain import (
+from apps_rg_runtime.L4_state.contracts.app_domain import (
     AppDomainContractError,
     ApprovedJudgeCalibrationBaseline,
 )
-from agentic_core.L4_state.contracts.app_domain_lookup import AppDomainLookupError, InMemoryAppDomainStore
-from agentic_core.L4_state.contracts.records import stamp_digest
+from apps_rg_runtime.L4_state.contracts.app_domain_lookup import AppDomainLookupError, InMemoryAppDomainStore
+from apps_rg_runtime.L4_state.contracts.records import stamp_digest
 from apps_rg.runtime.bindings.exit_binding import (
     ExitGateVerdict,
     _evaluate_judge_reliability_gate,

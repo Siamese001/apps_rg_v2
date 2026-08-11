@@ -7,12 +7,7 @@ import json
 from dataclasses import asdict, is_dataclass
 from typing import Any, Mapping
 
-from agentic_core.L5_safety.certification.egress_certifier import (
-    MetadataOnlyEgressCertifier,
-)
-from agentic_core.L5_safety.contracts.l5_certification_contracts import (
-    EgressCertificationReceipt,
-)
+from apps_rg.runtime.local_l5 import EgressCertificationReceipt
 
 SYMBOLIC_APPS_RG_PROVIDER_REF = "urn:provider:governed-gateway:rg:v1"
 DEFAULT_REDACTION_POLICY_REF = "urn:redaction:apps-rg:metadata-only:v1"
@@ -58,7 +53,7 @@ def build_apps_rg_egress_receipt(
 ) -> EgressCertificationReceipt:
     """Build a metadata-only receipt over canonical request/response digests."""
 
-    return MetadataOnlyEgressCertifier().certify_egress(
+    return EgressCertificationReceipt(
         provider_ref=SYMBOLIC_APPS_RG_PROVIDER_REF,
         call_purpose_ref=call_purpose_ref,
         request_digest=_canonical_digest(dict(request_metadata)),

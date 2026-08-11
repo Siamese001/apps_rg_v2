@@ -84,9 +84,9 @@ DEFAULT_FORBIDDEN_IMPORT_PREFIXES: tuple[str, ...] = (
     "apps_rg.runtime.providers",
     "apps_rg.runtime.judges",
     "apps_rg.runtime.sections.section_generation",
-    "agentic_core.L2_execution.utils.write_gateway",
-    "agentic_core.L4_state.uwg",
-    "agentic_core.L4_state.enforcement.promotion_write_gateway",
+    "apps_rg.L2_execution.utils.write_gateway",
+    "apps_rg.L4_state.uwg",
+    "apps_rg.L4_state.enforcement.promotion_write_gateway",
 )
 
 

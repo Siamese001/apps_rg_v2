@@ -29,24 +29,108 @@ def _patch_spine_c0_retrieve(monkeypatch: pytest.MonkeyPatch) -> None:
     """Unit FEC bridge tests use minimal pools — mock spine C0 retrieve and skip evidence room."""
     deactivate_fixture_dev_bypass()
     monkeypatch.setenv("APPS_RG_C0_EVIDENCE_ROOM", "0")
-    from agentic_core.runtime.contracts.final_evidence_contract import (
+    from apps_rg_runtime.runtime.contracts.final_evidence_contract import (
         FinalEvidenceContract,
         SUPPORT_STATUS_PASS,
     )
     from apps_rg.runtime.bindings.c0_binding import C0_GRAPH_LANE_NA_REF
 
-    def _fake_c0_retrieve(**_: object) -> FinalEvidenceContract:
+    def _fake_c0_retrieve(**kwargs: object) -> FinalEvidenceContract:
+        """Emit the same Apps RG-owned C0 sidecars that the real planned seam emits.
+
+        This fixture deliberately avoids a live retrieval provider, but it must
+        not bypass the Apps RG L1-to-C0 outcome contract under test.
+        """
+        from apps_rg.runtime.bindings.l1_cognitive_consumption import (
+            extract_l1_cognitive_plan,
+        )
+        from apps_rg.runtime.bindings.l1_planning_capsule import (
+            extract_verified_planning_capsule,
+        )
+        from apps_rg.runtime.bindings.l1_planning_capsule_v2 import (
+            extract_verified_planning_capsule_v2,
+        )
+        from apps_rg.runtime.contracts.l1_cognitive_c0_outcome_receipt import (
+            build_l1_cognitive_c0_outcome_receipt,
+            write_l1_cognitive_c0_outcome_receipt,
+        )
+        from apps_rg.runtime.contracts.l1_evidence_obligation_receipt import (
+            build_l1_evidence_obligation_receipt,
+            emit_l1_evidence_obligation_receipt,
+        )
+        from apps_rg.runtime.dispatch import spine_stage_receipts as sr
+
+        l1_plan = kwargs["l1_plan"]
+        capsule, _ = extract_verified_planning_capsule(l1_plan, required=True)
+        v2_capsule, _ = extract_verified_planning_capsule_v2(l1_plan, required=True)
+        request_id = str(v2_capsule["request_id"])
+        run_id = str(v2_capsule["run_id"])
+        trace_id = str(v2_capsule["trace_id"])
+        obligation = build_l1_evidence_obligation_receipt(
+            capsule=v2_capsule,
+            request_id=request_id,
+            run_id=run_id,
+            trace_id=trace_id,
+            final_evidence_digest="digest-test",
+            evidence_items=(),
+        )
+        audit_refs = [
+            "l1_capsule_digest:" + str(capsule["capsule_digest"]),
+            "l1_v2_evidence_obligation_ledger:"
+            + str(v2_capsule["evidence_obligation_ledger"]["ledger_digest"]),
+            "l1_evidence_obligation_receipt_digest:"
+            + str(obligation["receipt_digest"]),
+        ]
+        artifact_dir = kwargs.get("obligation_receipt_artifact_dir")
+        if isinstance(artifact_dir, Path):
+            emit_l1_evidence_obligation_receipt(
+                artifact_dir=artifact_dir,
+                receipt=obligation,
+                capsule=v2_capsule,
+            )
+            audit_refs.append(
+                "l1_evidence_obligation_receipt_ref:"
+                + sr.FILENAME_L1_EVIDENCE_OBLIGATION_RECEIPT
+            )
+            cognitive_plan = extract_l1_cognitive_plan(l1_plan, required=False)
+            if cognitive_plan is not None:
+                outcome = build_l1_cognitive_c0_outcome_receipt(
+                    cognitive_plan=cognitive_plan,
+                    v2_capsule=v2_capsule,
+                    c0_obligation_receipt=obligation,
+                )
+                write_l1_cognitive_c0_outcome_receipt(
+                    output_path=(
+                        artifact_dir / sr.FILENAME_L1_COGNITIVE_C0_OUTCOME_RECEIPT
+                    ),
+                    receipt=outcome,
+                    cognitive_plan=cognitive_plan,
+                    v2_capsule=v2_capsule,
+                    c0_obligation_receipt=obligation,
+                )
+                audit_refs.extend(
+                    (
+                        "l1_cognitive_c0_outcome_receipt_digest:"
+                        + str(outcome["receipt_digest"]),
+                        "l1_cognitive_c0_outcome_receipt_ref:"
+                        + sr.FILENAME_L1_COGNITIVE_C0_OUTCOME_RECEIPT,
+                    )
+                )
         return FinalEvidenceContract(
-            request_id="req-fec-bridge-test",
-            run_id="run-fec-bridge-test",
+            request_id=request_id,
+            run_id=run_id,
             app_id="apps_rg",
-            trace_id="trace-fec-bridge-test",
+            trace_id=trace_id,
             l5_certification_ref="test:valid:w6",
             support_status=SUPPORT_STATUS_PASS,
             support_target_met=True,
             final_evidence_digest="digest-test",
             graph_expansion_refs=(C0_GRAPH_LANE_NA_REF,),
             dense_search_refs=("chromadb:fact_vectors:test",),
+            retrieval_plan_ref=(
+                "l1_capsule:" + str(capsule["capsule_digest"])[7:31]
+            ),
+            audit_refs=tuple(audit_refs),
         )
 
     monkeypatch.setattr(

@@ -767,6 +767,15 @@ def _build_parser() -> argparse.ArgumentParser:
         default="strategic_tailor",
         choices=["strategic_tailor", "keyword_match", "generate_scratch"],
     )
+    p.add_argument(
+        "--l1-cognitive-treatment-arm",
+        default="l1_v2_control",
+        choices=["l1_v2_control", "l1_cognitive_v3"],
+        help=(
+            "Frozen Apps RG-only arm for the L1 cognitive paired experiment; "
+            "defaults to control and does not authorize promotion."
+        ),
+    )
     p.add_argument("--dry-run", action="store_true", help="Validate inputs without calling LLM")
     p.add_argument(
         "--disable-existing-index-fallback",
@@ -1135,7 +1144,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
                 return preflight.exit_code
         from apps_rg.runtime.e2e_preflight import run_fresh_e2e_preflight
         from apps_rg.runtime.standalone_dependency_posture import (
-            verify_external_agentic_core_runtime,
+            verify_app_runtime_independence,
         )
 
         baseline_ref_text = str(
@@ -1147,7 +1156,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
             e2e_run_id=Path(str(args.artifact_dir)).name,
             repo_root=_repo_root,
             baseline_ref=_resolve_e2e_baseline_ref(_repo_root, baseline_ref_text),
-            dependency_check=lambda: verify_external_agentic_core_runtime(
+            dependency_check=lambda: verify_app_runtime_independence(
                 repo_root=_repo_root
             ),
             runtime_check=(
@@ -1694,6 +1703,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: C901
                 manual_brief=args.manual_brief,
                 resume_path=args.resume,
                 generation_mode=args.generation_mode,
+                l1_cognitive_treatment_arm=args.l1_cognitive_treatment_arm,
                 artifact_dir=args.artifact_dir,
                 preflight_continuation_ref=fresh_e2e_continuation_ref,
                 require_fresh_preflight=fresh_e2e,

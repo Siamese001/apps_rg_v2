@@ -16,10 +16,10 @@ from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
-from agentic_core.L6_observability.shadow_eval.grain_parity import (
+from apps_rg.runtime.apps_runtime_compat import (
     build_l6_apps_eval_grain_parity,
 )
-from agentic_core.L6_observability.shadow_eval.microsteps import (
+from apps_rg.runtime.apps_runtime_compat import (
     EVIDENCE_CLASS_CONTRACT_ONLY_ADVISORY,
     build_apps_eval_alignment,
     build_future_run_proposals,
@@ -28,12 +28,12 @@ from agentic_core.L6_observability.shadow_eval.microsteps import (
     build_microstep_rca,
     build_observations_from_eval_rows,
 )
-from agentic_core.L6_observability.shadow_eval.pipeline import (
+from apps_rg.runtime.apps_runtime_compat import (
     L6PipelineState,
     run_6a,
     run_observer,
 )
-from agentic_core.L6_observability.shadow_eval.span_export import write_span_artifacts
+from apps_rg.runtime.apps_runtime_compat import write_span_artifacts
 from apps_eval import _write_gateway as _wg
 from apps_eval.contracts import CURRENT_EVAL_RECORD_SCHEMA_VERSION, CompletedEvalRecord
 
@@ -65,13 +65,13 @@ def _deterministic_l6_runtime(
     """
 
     ingest = importlib.import_module(
-        "agentic_core.L6_observability.shadow_eval.ingest"
+        "apps_rg.L6_observability.shadow_eval.ingest"
     )
     observer = importlib.import_module(
-        "agentic_core.L6_observability.shadow_eval.observer"
+        "apps_rg.L6_observability.shadow_eval.observer"
     )
     span_export = importlib.import_module(
-        "agentic_core.L6_observability.shadow_eval.span_export"
+        "apps_rg.L6_observability.shadow_eval.span_export"
     )
     originals = {
         "ingest_id": ingest._gen_id,

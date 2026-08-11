@@ -29,12 +29,12 @@ from apps_rg.runtime.section_l7_binding_manifest import (
 def test_evidence_ref_schema_verified_external() -> None:
     ref = build_evidence_ref_record(
         ref_kind=REF_KIND_VERIFIED_EXTERNAL,
-        artifact_name="agentic_core_how_trace.json",
-        source_path="artifacts/apps_rg/runs/cli_x/agentic_core_how_trace.json",
+        artifact_name="apps_rg_how_trace.json",
+        source_path="artifacts/apps_rg/runs/cli_x/apps_rg_how_trace.json",
         local_path=None,
-        source_owner_layer="agentic_core",
+        source_owner_layer="apps_rg_runtime",
         owner_class="VERIFIED_EXTERNAL_REF",
-        producer_module="agentic_core.L7_auditability.how_trace.how_trace_builder",
+        producer_module="apps_rg_runtime.L7_auditability.how_trace.how_trace_builder",
         sha256="abc",
         trust_status="trusted",
         trust_reason="l7_how_trace_shape",
@@ -170,7 +170,7 @@ def test_verified_external_refs_from_integrated_fixture(tmp_path: Path) -> None:
     fixture_dir = (
         Path(__file__).resolve().parents[3]
         / "certification"
-        / "agentic_core"
+        / "apps_rg_runtime"
         / "integrated_runtime"
         / "r4_latest"
     )
@@ -182,7 +182,7 @@ def test_verified_external_refs_from_integrated_fixture(tmp_path: Path) -> None:
         tmp_path, fixture_dir, section_artifact_dir=section_ad
     )
     names = {r["artifact_name"] for r in refs}
-    assert "agentic_core_spine_proof.json" in names or "agentic_core_how_trace.json" in names
+    assert "apps_rg_spine_proof.json" in names or "apps_rg_how_trace.json" in names
     for ref in refs:
         assert ref["ref_kind"] == REF_KIND_VERIFIED_EXTERNAL
         assert ref["local_path"] is None

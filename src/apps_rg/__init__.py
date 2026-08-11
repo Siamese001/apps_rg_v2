@@ -1,10 +1,6 @@
 """apps_rg package."""
 from __future__ import annotations
 
-from apps_standalone_import_guard import ensure_external_agentic_core
-
-ensure_external_agentic_core()
-
 __version__ = "0.1.0"
 
 

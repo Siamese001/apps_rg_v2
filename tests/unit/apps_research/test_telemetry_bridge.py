@@ -34,15 +34,15 @@ def test_bridge_exports_are_callable(module_name: str) -> None:
 
 
 @pytest.mark.parametrize("module_name", MODULE_NAMES)
-def test_bridge_falls_back_to_noops_when_agentic_core_missing(
+def test_bridge_falls_back_to_noops_when_apps_rg_missing(
     monkeypatch: pytest.MonkeyPatch,
     module_name: str,
 ) -> None:
-    """When agentic_core is unavailable, the bridge must keep returning no-ops."""
+    """When apps_rg is unavailable, the bridge must keep returning no-ops."""
     real_import = builtins.__import__
 
     def _blocked(name: str, *args, **kwargs):
-        if name.startswith("agentic_core"):
+        if name.startswith("apps_rg"):
             raise ImportError(f"simulated missing: {name}")
         return real_import(name, *args, **kwargs)
 

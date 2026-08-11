@@ -119,7 +119,7 @@ def _misnamed_c0_artifacts() -> list[dict[str, Any]]:
             "artifact_file": LEGACY_C03_ARTIFACT_BASENAME,
             "recommended_artifact_file": RECOMMENDED_BINDING_ARTIFACT_BASENAME,
             "changed_now": "metadata_fields_added",
-            "reason": "Static ledger neighbor expansion is not agentic_core graph traverse",
+            "reason": "Static ledger neighbor expansion is not apps_rg graph traverse",
         },
         {
             "path": LEGACY_FEC_SNAPSHOT_BASENAME,
