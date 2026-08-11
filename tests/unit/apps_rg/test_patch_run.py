@@ -757,6 +757,19 @@ def test_patch_run_restores_persisted_whole_resume_graph_authority(tmp_path: Pat
     }
     for name, payload in artifacts.items():
         _write_json(allocation_dir / name, payload)
+    prior_w6 = {
+        "receipt_ref": "artifacts/calibration/official_w6.json",
+        "receipt_sha256": "sha256:" + "a" * 64,
+        "trusted_receipt_sha256": "sha256:" + "b" * 64,
+        "trusted_full_report_sha256": "sha256:" + "c" * 64,
+    }
+    _write_json(
+        run_dir
+        / "modular_r4"
+        / "generated_lane_rollup"
+        / "generated_lane_rollup.json",
+        {"resume_graph_w6_release_evidence": prior_w6},
+    )
 
     bindings = pr._whole_resume_graph_env_for_patch(run_dir)
 
@@ -790,7 +803,7 @@ def test_patch_run_restores_persisted_whole_resume_graph_authority(tmp_path: Pat
             "run/modular_r4/resume_graph_allocation/c03_section_graph_plans.json"
         ),
     }
-    assert "resume_graph_w6_release_evidence" not in authority
+    assert authority["resume_graph_w6_release_evidence"] == prior_w6
     assert Path(bindings["APPS_RG_SECTION_GRAPH_SOURCE_PLANS"]).name == (
         "c03_section_graph_plans.json"
     )

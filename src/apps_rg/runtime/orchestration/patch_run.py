@@ -188,6 +188,18 @@ def _whole_resume_graph_rollup_authority(
     prior_w6 = prior_rollup.get("resume_graph_w6_release_evidence")
     if isinstance(prior_w6, dict):
         authority["resume_graph_w6_release_evidence"] = dict(prior_w6)
+    else:
+        # A patched run must not get as far as aggregate coherence judging if
+        # the original run lacked the mandatory W6 release evidence. The
+        # helper only validates a pre-existing human/offline receipt.
+        from apps_rg.runtime.c0.resume_graph_w6_release_authority import (
+            require_w6_release_authority,
+        )
+
+        authority["resume_graph_w6_release_evidence"] = require_w6_release_authority(
+            repo_root=repo,
+            artifact_dir=run_dir,
+        )
     return authority
 
 # CLI flags whose values we re-derive from a persisted lane ``run_manifest.json`` command.
@@ -1582,6 +1594,14 @@ def execute_patch_run(
     run_token = f"patch_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
 
     graph_env = _whole_resume_graph_env_for_patch(plan.run_dir)
+
+    # Validate a mandatory whole-resume release receipt before this process
+    # enters _dispatch_patch_lanes.  The same helper also supplies the
+    # aggregation rollup binding below; calling it here is deliberately early
+    # so an absent human/offline W6 authority cannot spend a replacement lane
+    # or aggregate-judge request.
+    if _whole_resume_graph_digest_for_run(plan.run_dir):
+        _whole_resume_graph_rollup_authority(repo=plan.repo, run_dir=plan.run_dir)
 
     saved_env = {
         name: os.environ.get(name)
