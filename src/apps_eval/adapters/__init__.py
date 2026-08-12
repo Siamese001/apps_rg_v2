@@ -22,5 +22,12 @@ _apps_rg._LANE_ARTIFACT_ROLE_BY_NAME.update(
 )
 
 run_apps_rg_live = _apps_rg.run_apps_rg_live
+normalize_anthropic_deterministic_fixture_snapshot = (
+    _apps_rg.normalize_anthropic_deterministic_fixture_snapshot
+)
 
-__all__ = ["run_apps_lic_live", "run_apps_rg_live"]
+__all__ = [
+    "normalize_anthropic_deterministic_fixture_snapshot",
+    "run_apps_lic_live",
+    "run_apps_rg_live",
+]

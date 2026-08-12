@@ -485,6 +485,11 @@ def emit_completed_eval_l6_shadow_bridge(
         "record_id": record.record_id,
         "suite_id": record.suite_id,
         "app_id": record.app_id,
+        "contract_profile_id": record.contract_profile_id,
+        "evidence_class": (
+            record.evidence_class or EVIDENCE_CLASS_CONTRACT_ONLY_ADVISORY
+        ),
+        "product_eligible": record.product_eligible,
         "runtime_exhaust_bundle_id": ingest.bundle.runtime_exhaust_bundle_id,
         "readiness_decision": readiness.readiness_decision,
         "readiness_receipt": _jsonable(readiness),
@@ -493,7 +498,9 @@ def emit_completed_eval_l6_shadow_bridge(
         "span_export_ref": span_paths["span_export_json"].as_posix(),
         "span_export_jsonl_ref": span_paths["span_export_jsonl"].as_posix(),
         "l6_microstep_artifact_refs": dict(microstep_paths),
-        "evidence_class": EVIDENCE_CLASS_CONTRACT_ONLY_ADVISORY if microstep_paths else "",
+        "l6_projection_evidence_class": (
+            EVIDENCE_CLASS_CONTRACT_ONLY_ADVISORY if microstep_paths else ""
+        ),
         "projection_consistency_only": bool(microstep_paths),
         "independent_observation_required_for_bound_proof": True,
         "trace_reconciliation_refs": _trace_reconciliation_refs(record),

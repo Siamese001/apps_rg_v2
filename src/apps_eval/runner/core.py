@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as package_version
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from apps_eval import _write_gateway as _wg
 from apps_eval.adapters import run_apps_lic_live, run_apps_rg_live
@@ -44,7 +44,14 @@ from apps_eval.contracts import (
     Scorecard,
     ScorecardRow,
 )
-from apps_eval.coverage import apps_rg_contract_digest, build_apps_rg_microstep_evaluation
+from apps_eval.coverage import (
+    ANTHROPIC_DETERMINISTIC_FIXTURE_PROFILE_ID,
+    DEFAULT_APPS_RG_CONTRACT_PROFILE_ID,
+    apps_rg_contract_digest,
+    apps_rg_contract_profile,
+    build_apps_rg_microstep_evaluation,
+    is_fixture_only_apps_rg_profile,
+)
 from apps_eval.diagnostics import build_apps_rg_diagnostics
 from apps_eval.graders.deterministic import build_default_graders
 from apps_eval.outputs.render import render_record_markdown, render_report
@@ -422,6 +429,7 @@ def _planned_eval_artifacts(run_dir: Path) -> dict[str, Any]:
             (root / "regression.json").as_posix(),
             (root / "regression_flywheel.json").as_posix(),
         ],
+        "fixture_l6_handoff": (root / "apps_rg_l6_eval_handoff.json").as_posix(),
     }
 
 
@@ -491,6 +499,9 @@ def _seal_apps_rg_eval_package(
     run_dir: Path,
     record_id: str,
     planned_eval_artifacts: dict[str, Any],
+    contract_profile_id: str = "",
+    evidence_class: str = "",
+    product_eligible: bool | None = None,
 ) -> Path:
     if planned_eval_artifacts.get("__emission_complete__") is not True:
         raise RuntimeError("Apps RG Eval package cannot seal before emission completes")
@@ -546,6 +557,14 @@ def _seal_apps_rg_eval_package(
         "emission_phase": "POST_EMISSION_REOPENED_AND_VALIDATED",
         "artifacts": entries,
     }
+    if contract_profile_id:
+        body.update(
+            {
+                "contract_profile_id": contract_profile_id,
+                "evidence_class": evidence_class,
+                "product_eligible": bool(product_eligible),
+            }
+        )
     payload = {
         **body,
         "manifest_sha256": "sha256:"
@@ -1494,6 +1513,7 @@ def _emit_artifacts(
             "runtime_exhaust_bundle_id",
             "microstep_contract_digest",
             "registry_digest",
+            "contract_profile_id",
             "snapshot_digest",
         ]
         coverage_buffer = io.StringIO(newline="")
@@ -1524,6 +1544,7 @@ def _emit_artifacts(
             "runtime_exhaust_bundle_id",
             "microstep_contract_digest",
             "registry_digest",
+            "contract_profile_id",
             "snapshot_digest",
             "verdict",
         ]
@@ -1538,6 +1559,9 @@ def _emit_artifacts(
             "record_id": record.record_id,
             "suite_id": record.suite_id,
             "app_id": record.app_id,
+            "contract_profile_id": record.contract_profile_id,
+            "evidence_class": record.evidence_class,
+            "product_eligible": record.product_eligible,
             "requested_action": "consume_completed_eval_artifacts_only",
             "current_run_mutated": False,
             "future_run_only": True,
@@ -1609,6 +1633,9 @@ def _emit_artifacts(
             verdict=record.scorecard.verdict,
             finding_count=record.scorecard.finding_count,
             block_failures=record.scorecard.block_failures,
+            contract_profile_id=record.contract_profile_id,
+            evidence_class=record.evidence_class,
+            product_eligible=record.product_eligible,
         )
         handoff_path = run_dir / "l6_handoff.json"
         _wg.write_text(handoff_path, json.dumps(handoff.to_dict(), indent=2, sort_keys=True), encoding="utf-8")
@@ -1616,7 +1643,11 @@ def _emit_artifacts(
     return {k: str(v).replace("\\", "/") for k, v in paths.items()}
 
 
-def run_eval(request: EvalRequest) -> CompletedEvalRecord:
+def run_eval(
+    request: EvalRequest,
+    *,
+    snapshot_overrides: Mapping[str, AppOutputSnapshot] | None = None,
+) -> CompletedEvalRecord:
     if request.suite_id in OLD_SUITE_NAMES:
         raise ValueError(f"old suite name is rejected: {request.suite_id}")
     if request.with_judge:
@@ -1624,6 +1655,42 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
     suite = load_suite(request.suite_id)
     if suite.get("app_id") not in {"apps_rg", "apps_lic"}:
         raise ValueError(f"unsupported app: {suite.get('app_id')}")
+    contract_profile_id = str(
+        suite.get("apps_rg_contract_profile_id")
+        or DEFAULT_APPS_RG_CONTRACT_PROFILE_ID
+    )
+    profile = (
+        apps_rg_contract_profile(contract_profile_id)
+        if suite.get("app_id") == "apps_rg"
+        else {}
+    )
+    fixture_profile = (
+        suite.get("app_id") == "apps_rg"
+        and is_fixture_only_apps_rg_profile(contract_profile_id)
+    )
+    if fixture_profile:
+        if (
+            suite.get("split") != "fixture"
+            or suite.get("fixture_only") is not True
+            or request.mode != "snapshot"
+            or request.deterministic_only is not True
+            or request.with_judge
+            or request.compare_baseline
+            or os.environ.get("APPS_EVAL_RELEASE_GATE") == "1"
+            or str(os.environ.get("APPS_RG_TEST_HARNESS") or "").strip().lower()
+            not in {"1", "true", "yes", "on"}
+        ):
+            raise PermissionError(
+                "fixture-only Apps RG profile is limited to the deterministic test harness outside release gates"
+            )
+        if not snapshot_overrides:
+            raise PermissionError(
+                "fixture-only Apps RG profile requires a runtime-produced snapshot override"
+            )
+    elif snapshot_overrides:
+        raise PermissionError(
+            "runtime snapshot overrides are reserved for fixture-only Apps RG profiles"
+        )
     l6_handoff_required = (
         request.mode == "live_adapter"
         or suite.get("split") == "holdout"
@@ -1638,6 +1705,25 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
     fixtures = [_load_fixture(request.suite_id, suite, scenario_id) for scenario_id in suite.get("scenarios", [])]
     if not fixtures:
         raise ValueError(f"suite has no fixtures: {request.suite_id}")
+    if fixture_profile:
+        expected_scenarios = {fixture.scenario.scenario_id for fixture in fixtures}
+        supplied_scenarios = set(snapshot_overrides or {})
+        if supplied_scenarios != expected_scenarios:
+            raise ValueError(
+                "fixture-only snapshot overrides must cover exactly the configured scenarios"
+            )
+        fixtures = [
+            replace(
+                fixture,
+                provenance=replace(
+                    fixture.provenance,
+                    contract_profile_id=contract_profile_id,
+                    evidence_class=str(profile.get("evidence_class") or ""),
+                    product_eligible=bool(profile.get("product_eligible")),
+                ),
+            )
+            for fixture in fixtures
+        ]
     graders = build_default_graders()
     thresholds = load_thresholds_registry().get(request.suite_id, {})
     created_at = _run_started_at(request.deterministic_only)
@@ -1645,7 +1731,11 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
     suite_digest = _suite_digest(suite)
     threshold_digest = _threshold_digest(thresholds)
     failure_mode_catalog_digest = _failure_mode_catalog_digest(graders)
-    app_microstep_contract_digest = apps_rg_contract_digest() if suite.get("app_id") == "apps_rg" else ""
+    app_microstep_contract_digest = (
+        apps_rg_contract_digest(contract_profile_id)
+        if suite.get("app_id") == "apps_rg"
+        else ""
+    )
     fixture_provenance = [fixture.provenance for fixture in fixtures]
     baseline_digest = ""
     baseline_payload: dict[str, Any] | None = None
@@ -1680,6 +1770,14 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
         "scorer_version": CURRENT_SCORER_VERSION,
         "fixture_provenance": [provenance.to_dict() for provenance in fixture_provenance],
     }
+    if fixture_profile:
+        record_seed.update(
+            {
+                "contract_profile_id": contract_profile_id,
+                "evidence_class": str(profile.get("evidence_class") or ""),
+                "product_eligible": bool(profile.get("product_eligible")),
+            }
+        )
     if not request.deterministic_only:
         record_seed["created_at"] = created_at
     record_id = _stable_record_id(record_seed)
@@ -1694,12 +1792,29 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
     rubric_ids = sorted({fixture.scenario.rubric_id for fixture in fixtures})
     planned_eval_artifacts = _planned_eval_artifacts(run_dir) if suite.get("app_id") == "apps_rg" else {}
     for fixture in fixtures:
-        snapshot = _load_snapshot(fixture) if request.mode == "snapshot" else _run_live(fixture, run_dir)
+        snapshot = (
+            (snapshot_overrides or {}).get(fixture.scenario.scenario_id)
+            if fixture_profile
+            else _load_snapshot(fixture)
+            if request.mode == "snapshot"
+            else _run_live(fixture, run_dir)
+        )
+        if snapshot is None:
+            raise ValueError(
+                f"missing runtime snapshot for fixture scenario {fixture.scenario.scenario_id}"
+            )
         if suite.get("app_id") == "apps_rg":
             snapshot = _enrich_apps_rg_snapshot(
                 snapshot,
                 registry_digest=app_microstep_contract_digest,
             )
+            if fixture_profile:
+                fixture_hash_payload = snapshot.to_dict()
+                fixture_hash_payload.pop("deterministic_hash", None)
+                snapshot = replace(
+                    snapshot,
+                    deterministic_hash=_canonical_digest(fixture_hash_payload),
+                )
             apps_rg_snapshots.append(snapshot)
         snapshot_payload = snapshot.to_dict()
         scenario_findings = [grader.grade(fixture, snapshot) for grader in graders]
@@ -1720,6 +1835,7 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
                 created_at=created_at,
                 planned_eval_artifacts=planned_eval_artifacts,
                 snapshot_digest=snapshot.snapshot_digest,
+                contract_profile_id=contract_profile_id,
             )
             rows = _apps_rg_record_rows(list(microstep_eval["rows"]))
             components = [component.to_dict() for component in microstep_eval["component_scorecards"]]
@@ -1795,6 +1911,9 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
             deterministic_only=request.deterministic_only,
             with_judge=request.with_judge,
             compare_baseline=request.compare_baseline,
+            contract_profile_id=(contract_profile_id if fixture_profile else ""),
+            evidence_class=(str(profile.get("evidence_class") or "") if fixture_profile else ""),
+            product_eligible=(bool(profile.get("product_eligible")) if fixture_profile else True),
         ),
         fixture_provenance=fixture_provenance,
         **_record_evidence_bindings(
@@ -1804,6 +1923,9 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
         )
         if suite.get("app_id") == "apps_rg"
         else {"eval_record_id": record_id},
+        contract_profile_id=(contract_profile_id if fixture_profile else ""),
+        evidence_class=(str(profile.get("evidence_class") or "") if fixture_profile else ""),
+        product_eligible=(bool(profile.get("product_eligible")) if fixture_profile else True),
     )
     flywheel = _regression_flywheel_summary(
         record=provisional,
@@ -1849,6 +1971,7 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
                 created_at=created_at,
                 planned_eval_artifacts=planned_eval_artifacts,
                 snapshot_digest=snapshot.snapshot_digest,
+                contract_profile_id=contract_profile_id,
             )
             scenario_rows = _apps_rg_record_rows(list(microstep_eval["rows"]))
             scenario_components = [
@@ -1964,10 +2087,49 @@ def run_eval(request: EvalRequest) -> CompletedEvalRecord:
             run_dir=run_dir,
             record_id=record_id,
             planned_eval_artifacts=planned_eval_artifacts,
+            contract_profile_id=(contract_profile_id if fixture_profile else ""),
+            evidence_class=(str(profile.get("evidence_class") or "") if fixture_profile else ""),
+            product_eligible=(bool(profile.get("product_eligible")) if fixture_profile else None),
         )
     for snapshot in apps_rg_snapshots:
         _assert_source_snapshot_unchanged(snapshot)
     return record
+
+
+def run_anthropic_deterministic_fixture_eval(
+    snapshot: AppOutputSnapshot,
+    *,
+    out_dir: str = "artifacts/apps_eval/runs",
+) -> CompletedEvalRecord:
+    """Evaluate one runtime-produced Anthropic fixture snapshot.
+
+    The public helper fixes the only allowed suite/profile pairing and never
+    routes through product current-snapshot or live-adapter evaluation.
+    """
+
+    if snapshot.app_id != "apps_rg":
+        raise ValueError("Anthropic deterministic fixture eval supports apps_rg only")
+    if snapshot.contract_profile_id != ANTHROPIC_DETERMINISTIC_FIXTURE_PROFILE_ID:
+        raise ValueError("snapshot is not bound to the Anthropic fixture contract profile")
+    if (
+        snapshot.provenance.get("fixture_only") is not True
+        or snapshot.provenance.get("product_eligible") is not False
+        or snapshot.provenance.get("provider_call_attempted") is not False
+        or snapshot.provenance.get("network_call_attempted") is not False
+    ):
+        raise ValueError("snapshot does not prove the no-provider fixture boundary")
+    return run_eval(
+        EvalRequest(
+            suite_id="apps_rg.fixture.anthropic_deterministic_e2e",
+            mode="snapshot",
+            deterministic_only=True,
+            with_judge=False,
+            compare_baseline=False,
+            out_dir=out_dir,
+            emit_l6_handoff=True,
+        ),
+        snapshot_overrides={"anthropic_deterministic_fixture": snapshot},
+    )
 
 
 def render_record(record_path: str) -> str:
