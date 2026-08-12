@@ -951,6 +951,15 @@ def run_current_snapshot_eval(
     """
     if snapshot.app_id != "apps_rg":
         raise ValueError(f"current snapshot eval supports apps_rg only, got {snapshot.app_id!r}")
+    if (
+        is_fixture_only_apps_rg_profile(snapshot.contract_profile_id)
+        or snapshot.provenance.get("fixture_only") is True
+        or snapshot.x3_disposition == "TEST_FIXTURE_ONLY"
+    ):
+        raise ValueError(
+            "apps_rg current-run eval requires a verified product authorization seal; "
+            "fixture-only evidence is ineligible"
+        )
     if not emit_l6_handoff:
         raise PermissionError("apps_rg current-run eval requires L6 shadow handoff")
     if snapshot.provenance.get("source_unchanged") is not True:

@@ -245,6 +245,11 @@ def _emit_record_microstep_artifacts(
         record.artifact_paths.get("scorecard_rows") or (run_dir / "scorecard_rows.jsonl")
     ).replace("\\", "/")
     contract_digest = str(record.record_seed.get("apps_rg_microstep_contract_digest") or "")
+    registry_digest = str(
+        record.registry_digest
+        or record.record_seed.get("registry_digest")
+        or contract_digest
+    )
 
     alignment = build_apps_eval_alignment(
         run_id=record.record_id,
@@ -256,6 +261,7 @@ def _emit_record_microstep_artifacts(
         l6_observations=observation_dicts,
         alignment_source="contract_only_pseudo_rows",
         apps_eval_rows_bound=False,
+        registry_digest=registry_digest,
     )
     alignment.update(
         {
@@ -279,6 +285,7 @@ def _emit_record_microstep_artifacts(
         apps_eval_rows=scorecard_rows,
         l6_observations=observation_dicts,
         alignment_source="contract_only_pseudo_rows",
+        registry_digest=registry_digest,
     )
     parity.update(
         {
