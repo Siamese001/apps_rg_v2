@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import os
 import uuid
@@ -18,6 +19,7 @@ __all__ = [
     "AppsResearchHandoffValidation",
     "HistoricalBriefingValidator",
     "find_legacy_apps_research_envelope_for_briefing",
+    "find_apps_rg_deterministic_fixture_handoff_for_briefing",
     "find_apps_research_handoff_v2_for_briefing",
     "validate_apps_research_handoff",
     "check_briefing_prerequisite",
@@ -146,6 +148,28 @@ def find_apps_research_handoff_v2_for_briefing(brief_ref: str) -> Path | None:
     if direct.is_file():
         return direct.resolve()
     return None
+
+
+def find_apps_rg_deterministic_fixture_handoff_for_briefing(
+    brief_ref: str,
+) -> Path | None:
+    """Locate the explicitly test-only Anthropic fixture sidecar.
+
+    This is intentionally separate from the Apps Research v2 product handoff.
+    Discovering it does not grant product authority; the validator below rejects
+    it unless the process declares the test harness guard.
+    """
+
+    from apps_rg.evals.anthropic_deterministic_fixture import FIXTURE_HANDOFF_FILENAME
+
+    ref = str(brief_ref or "").strip()
+    if not ref or ref.startswith(("http://", "https://")):
+        return None
+    brief_path = Path(ref)
+    if not brief_path.is_file():
+        return None
+    direct = brief_path.parent / FIXTURE_HANDOFF_FILENAME
+    return direct.resolve() if direct.is_file() else None
 
 
 def _sha256_bytes(payload: bytes) -> str:
@@ -1102,6 +1126,227 @@ def _parse_timestamp(value: Any) -> datetime | None:
     return None
 
 
+def _fixture_harness_enabled() -> bool:
+    from apps_rg.evals.anthropic_deterministic_fixture import TEST_HARNESS_ENV
+
+    return str(os.environ.get(TEST_HARNESS_ENV) or "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+def _validate_deterministic_fixture_handoff(
+    *,
+    manifest_path: Path,
+    brief_ref: str,
+    jd_ref: str,
+    now: datetime | None,
+    expected_target_company: str,
+    expected_target_role: str,
+    expected_parent_run_id: str,
+    expected_request_id: str,
+    expected_trace_root: str,
+    expected_tenant_id: str,
+) -> AppsResearchHandoffValidation:
+    """Validate the no-provider fixture without conferring product authority."""
+
+    from apps_rg.evals.anthropic_deterministic_fixture import (
+        FIXTURE_EVAL_PROFILE_ID,
+        FIXTURE_EVIDENCE_CLASS,
+        FIXTURE_HANDOFF_SCHEMA_VERSION,
+        FIXTURE_HMAC_SECRET_ENV,
+        fixture_signature,
+    )
+
+    if not _fixture_harness_enabled():
+        return AppsResearchHandoffValidation(
+            observed=True,
+            valid=False,
+            reason="test_fixture_handoff_not_allowed_outside_test_harness",
+            envelope_path=str(manifest_path),
+        )
+    failures: list[str] = []
+    root = manifest_path.parent.resolve()
+    try:
+        loaded = json.loads(manifest_path.read_bytes())
+    except (OSError, json.JSONDecodeError) as exc:
+        return AppsResearchHandoffValidation(
+            observed=True,
+            valid=False,
+            reason=f"unreadable_deterministic_fixture_manifest:{type(exc).__name__}",
+            envelope_path=str(manifest_path),
+        )
+    manifest = dict(loaded) if isinstance(loaded, Mapping) else {}
+    expected_top_level = {
+        "schema_version",
+        "fixture_policy_id",
+        "evidence_class",
+        "product_eligible",
+        "provider_call_attempted",
+        "network_call_attempted",
+        "producer",
+        "identity",
+        "artifacts",
+        "created_at_utc",
+        "fixture_signature",
+    }
+    if set(manifest) != expected_top_level:
+        failures.append("fixture_schema_top_level_keys_mismatch")
+    if manifest.get("schema_version") != FIXTURE_HANDOFF_SCHEMA_VERSION:
+        failures.append("fixture_schema_version_mismatch")
+    if manifest.get("fixture_policy_id") != FIXTURE_EVAL_PROFILE_ID:
+        failures.append("fixture_policy_id_mismatch")
+    if manifest.get("evidence_class") != FIXTURE_EVIDENCE_CLASS:
+        failures.append("fixture_evidence_class_mismatch")
+    for field, expected in (
+        ("product_eligible", False),
+        ("provider_call_attempted", False),
+        ("network_call_attempted", False),
+    ):
+        if manifest.get(field) is not expected:
+            failures.append(f"fixture_{field}_must_be_false")
+    producer = _as_mapping(manifest.get("producer"))
+    if producer != {
+        "producer_app_id": "apps_rg.deterministic_test_fixture",
+        "test_harness_required": True,
+    }:
+        failures.append("fixture_producer_mismatch")
+
+    identity = _as_mapping(manifest.get("identity"))
+    if set(identity) != _V2_IDENTITY_KEYS:
+        failures.append("fixture_identity_schema_keys_mismatch")
+    for key in _V2_IDENTITY_KEYS:
+        if not str(identity.get(key) or "").strip():
+            failures.append(f"fixture_identity_missing_{key}")
+    if identity.get("producer_app_id") != "apps_rg.deterministic_test_fixture":
+        failures.append("fixture_identity_producer_app_id_mismatch")
+    if identity.get("consumer_app_id") != "apps_rg":
+        failures.append("fixture_identity_consumer_app_id_mismatch")
+    if identity.get("schema_version") != "apps_rg.deterministic_fixture_run_identity.v1":
+        failures.append("fixture_identity_schema_version_mismatch")
+    for key in ("jd_sha256", "brief_sha256", "policy_hash", "blueprint_hash"):
+        if not _valid_sha256(identity.get(key)):
+            failures.append(f"fixture_identity_{key}_format_invalid")
+    for key, expected in {
+        "target_company": expected_target_company,
+        "target_role": expected_target_role,
+        "parent_run_id": expected_parent_run_id,
+        "request_id": expected_request_id,
+        "trace_root": expected_trace_root,
+        "tenant_id": expected_tenant_id,
+    }.items():
+        if expected and str(identity.get(key) or "") != str(expected):
+            failures.append(f"fixture_identity_{key}_context_mismatch")
+
+    artifacts = _as_mapping(manifest.get("artifacts"))
+    if set(artifacts) != {"briefing", "normalized_jd"}:
+        failures.append("fixture_artifact_set_mismatch")
+    artifact_validations: list[dict[str, Any]] = []
+    artifact_bytes: dict[str, bytes] = {}
+    for label, expected_name in (
+        ("briefing", "briefing.md"),
+        ("normalized_jd", "job_description.normalized.txt"),
+    ):
+        binding = _as_mapping(artifacts.get(label))
+        ref = str(binding.get("artifact_ref") or "")
+        candidate = (root / ref).resolve() if ref else root / "__missing__"
+        valid_path = bool(ref == expected_name and _path_within(candidate, root))
+        raw = b""
+        if not valid_path:
+            failures.append(f"fixture_{label}_ref_invalid")
+        elif not candidate.is_file():
+            failures.append(f"fixture_{label}_missing")
+        else:
+            try:
+                raw = candidate.read_bytes()
+            except OSError:
+                failures.append(f"fixture_{label}_unreadable")
+        expected_digest = str(binding.get("sha256") or "")
+        expected_length = _int_or_none(binding.get("byte_length"))
+        actual_digest = _sha256_bytes(raw)
+        if not _valid_sha256(expected_digest) or expected_digest != actual_digest:
+            failures.append(f"fixture_{label}_sha256_mismatch")
+        if expected_length != len(raw):
+            failures.append(f"fixture_{label}_byte_length_mismatch")
+        artifact_bytes[label] = raw
+        artifact_validations.append(
+            {
+                "artifact_ref": ref,
+                "expected_sha256": expected_digest,
+                "actual_sha256": actual_digest,
+                "byte_length": len(raw),
+                "status": "PASS" if valid_path and raw and expected_digest == actual_digest and expected_length == len(raw) else "BLOCKED",
+            }
+        )
+    try:
+        supplied_brief = Path(brief_ref).read_bytes()
+    except OSError:
+        supplied_brief = b""
+        failures.append("fixture_brief_unreadable")
+    if _sha256_bytes(supplied_brief) != str(identity.get("brief_sha256") or ""):
+        failures.append("fixture_brief_sha256_mismatch")
+    if _sha256_bytes(artifact_bytes.get("briefing", b"")) != str(identity.get("brief_sha256") or ""):
+        failures.append("fixture_committed_brief_sha256_mismatch")
+    if jd_ref:
+        try:
+            supplied_jd = _normalized_input_bytes(jd_ref)
+        except (OSError, UnicodeError):
+            supplied_jd = b""
+            failures.append("fixture_jd_unreadable")
+        if _sha256_bytes(supplied_jd) != str(identity.get("jd_sha256") or ""):
+            failures.append("fixture_jd_sha256_mismatch")
+    if _sha256_bytes(artifact_bytes.get("normalized_jd", b"")) != str(identity.get("jd_sha256") or ""):
+        failures.append("fixture_committed_jd_sha256_mismatch")
+
+    secret = str(os.environ.get(FIXTURE_HMAC_SECRET_ENV) or "")
+    body = {key: value for key, value in manifest.items() if key != "fixture_signature"}
+    expected_signature = fixture_signature(secret, body) if secret else ""
+    if not secret or not hmac.compare_digest(
+        str(manifest.get("fixture_signature") or ""), expected_signature
+    ):
+        failures.append("fixture_signature_invalid")
+    observed_now = now or datetime.now(timezone.utc)
+    created_at = _parse_timestamp(manifest.get("created_at_utc"))
+    if created_at is None:
+        failures.append("fixture_created_at_invalid")
+    elif created_at > observed_now + timedelta(minutes=5):
+        failures.append("fixture_created_in_future")
+    elif observed_now - created_at > timedelta(days=7):
+        failures.append("fixture_stale")
+
+    receipt = {
+        "schema_version": "apps_rg.apps_research_handoff_validation_receipt.v2",
+        "evidence_class": FIXTURE_EVIDENCE_CLASS,
+        "fixture_policy_id": FIXTURE_EVAL_PROFILE_ID,
+        "product_eligible": False,
+        "provider_call_attempted": False,
+        "network_call_attempted": False,
+        "identity": identity,
+        "identity_sha256": _sha256_bytes(_canonical_json_bytes(identity)),
+        "bundle_manifest_sha256": _sha256_bytes(manifest_path.read_bytes()),
+        "artifact_validations": artifact_validations,
+        "status": "BLOCKED" if failures else "PASS",
+        "failure_reasons": sorted(set(failures)),
+        "validated_at_utc": observed_now.isoformat(),
+    }
+    try:
+        receipt = _persist_consumer_receipt(root, receipt)
+    except OSError as exc:
+        failures.append(f"fixture_consumer_receipt_persist_failed:{type(exc).__name__}")
+        receipt["status"] = "BLOCKED"
+        receipt["failure_reasons"] = sorted(set(failures))
+    return AppsResearchHandoffValidation(
+        observed=True,
+        valid=not failures,
+        reason="fixture_only_ok" if not failures else ";".join(sorted(set(failures))),
+        envelope_path=str(manifest_path),
+        envelope=manifest,
+        receipt=receipt,
+    )
+
+
 def validate_apps_research_handoff(
     *,
     brief_ref: str,
@@ -1128,6 +1373,23 @@ def validate_apps_research_handoff(
     if handoff_v2_path is not None:
         return _validate_v2_handoff(
             manifest_path=handoff_v2_path,
+            brief_ref=brief_ref,
+            jd_ref=jd_ref,
+            now=now,
+            expected_target_company=expected_target_company,
+            expected_target_role=expected_target_role,
+            expected_parent_run_id=expected_parent_run_id,
+            expected_request_id=expected_request_id,
+            expected_trace_root=expected_trace_root,
+            expected_tenant_id=expected_tenant_id,
+        )
+
+    fixture_path = find_apps_rg_deterministic_fixture_handoff_for_briefing(
+        brief_ref
+    )
+    if fixture_path is not None:
+        return _validate_deterministic_fixture_handoff(
+            manifest_path=fixture_path,
             brief_ref=brief_ref,
             jd_ref=jd_ref,
             now=now,

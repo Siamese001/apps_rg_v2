@@ -25,6 +25,7 @@ _EVAL_OUTPUT_ROLES = frozenset(
         "component_scorecards",
         "coverage_matrix",
         "regression_summary",
+        "fixture_l6_handoff",
     }
 )
 

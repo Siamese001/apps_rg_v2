@@ -345,8 +345,15 @@ def invoke_gemini_handoff_judge(
     application_validator: Callable[[Mapping[str, Any]], Any],
     urlopen: Callable[..., Any] | None = None,
     artifact_dir: str | None = None,
+    stage: str = "L2.X2_research_semantic_gate",
+    section_id: str = "X2",
 ) -> ApprovedProviderResult:
-    """Invoke the approved Gemini judge lane and validate before success."""
+    """Invoke the approved Gemini judge lane and validate before success.
+
+    ``stage`` and ``section_id`` default to the historical X2 values so
+    existing callers retain their records.  Callers whose Gemini invocation is
+    an actual X3 evaluation can now report that truthfully.
+    """
 
     pin = apps_rg_handoff_judge_pin()
     resolved_urlopen = urlopen
@@ -373,8 +380,8 @@ def invoke_gemini_handoff_judge(
             run_id=context["run_id"],
             trace_id=context["trace_id"],
             app_id=context["app_id"],
-            stage="L2.X2_research_semantic_gate",
-            section_id="X2",
+            stage=str(stage),
+            section_id=str(section_id),
             provider=pin.provider,
             requested_model=pin.model,
             request_digest=_request_digest(body),

@@ -86,6 +86,7 @@ def _apps_research_proof_required(app_payload: Mapping[str, Any]) -> bool:
     ref = _briefing_ref(app_payload)
     if ref:
         from apps_rg.prerequisites.briefing_validator import (
+            find_apps_rg_deterministic_fixture_handoff_for_briefing,
             find_apps_research_handoff_v2_for_briefing,
             find_legacy_apps_research_envelope_for_briefing,
         )
@@ -95,6 +96,7 @@ def _apps_research_proof_required(app_payload: Mapping[str, Any]) -> bool:
         # then rejected by the canonical validator below.
         declared_delegation = declared_delegation or bool(
             find_apps_research_handoff_v2_for_briefing(ref)
+            or find_apps_rg_deterministic_fixture_handoff_for_briefing(ref)
             or find_legacy_apps_research_envelope_for_briefing(ref)
         )
     return declared_delegation

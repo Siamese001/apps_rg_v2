@@ -1083,8 +1083,148 @@ def run_apps_rg_live(scenario_id: str, payload: dict[str, Any], artifact_dir: Pa
     return snapshot
 
 
+def normalize_anthropic_deterministic_fixture_snapshot(
+    *,
+    scenario_id: str,
+    artifact_dir: Path,
+) -> AppOutputSnapshot:
+    """Normalize only the explicit test-fixture boundary into an Eval snapshot.
+
+    This path is intentionally separate from ``run_apps_rg_live``: it rejects
+    product authority and records that L2 was replaced before any provider work
+    could occur.
+    """
+
+    from apps_rg.evals.anthropic_deterministic_fixture import (
+        FIXTURE_EVAL_PROFILE_ID,
+        FIXTURE_EVIDENCE_CLASS,
+        FIXTURE_HANDOFF_FILENAME,
+        FIXTURE_L2_OUTPUT_FILENAME,
+        FIXTURE_RUN_RECEIPT_FILENAME,
+        TEST_HARNESS_ENV,
+    )
+
+    if str(os.environ.get(TEST_HARNESS_ENV) or "").strip().lower() not in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }:
+        raise PermissionError("deterministic fixture normalization requires APPS_RG_TEST_HARNESS")
+    root = Path(artifact_dir).resolve()
+    if not root.is_dir():
+        raise ValueError("deterministic fixture run root is missing")
+    manifest = _json_object(root / FIXTURE_HANDOFF_FILENAME)
+    l2_output = _json_object(root / FIXTURE_L2_OUTPUT_FILENAME)
+    receipt = _json_object(root / FIXTURE_RUN_RECEIPT_FILENAME)
+    expected_no_provider = {
+        "evidence_class": FIXTURE_EVIDENCE_CLASS,
+        "fixture_policy_id": FIXTURE_EVAL_PROFILE_ID,
+        "product_eligible": False,
+        "provider_call_attempted": False,
+        "network_call_attempted": False,
+    }
+    for label, payload in (
+        ("fixture_handoff", manifest),
+        ("fixture_l2_output", l2_output),
+        ("fixture_run_receipt", receipt),
+    ):
+        if not payload:
+            raise ValueError(f"deterministic fixture {label} is missing or unreadable")
+        mismatches = {
+            key: payload.get(key)
+            for key, expected in expected_no_provider.items()
+            if payload.get(key) != expected
+        }
+        if mismatches:
+            raise ValueError(f"deterministic fixture {label} provenance mismatch: {sorted(mismatches)}")
+    if receipt.get("l2_external_seam_replaced") is not True:
+        raise ValueError("deterministic fixture receipt does not declare the L2 seam replacement")
+    source_identity = manifest.get("identity")
+    fixture_identity = receipt.get("identity")
+    source_identity = dict(source_identity) if isinstance(source_identity, Mapping) else {}
+    fixture_identity = dict(fixture_identity) if isinstance(fixture_identity, Mapping) else {}
+    for key in ("parent_run_id", "child_run_id"):
+        if not str(source_identity.get(key) or "").strip() or source_identity.get(key) != fixture_identity.get(key):
+            raise ValueError(f"deterministic fixture identity mismatch: {key}")
+    for key in ("section_attempt_id", "runtime_exhaust_bundle_id"):
+        if not str(fixture_identity.get(key) or "").strip():
+            raise ValueError(f"deterministic fixture identity is missing {key}")
+
+    source_manifest_before = build_source_artifact_manifest(root)
+    manifest_by_ref = {
+        str(row.get("artifact_ref") or ""): row
+        for row in source_manifest_before
+        if row.get("artifact_ref")
+    }
+    artifact_index: dict[str, Any] = {}
+    for role, ref in (
+        ("fixture_handoff", FIXTURE_HANDOFF_FILENAME),
+        ("fixture_u0_receipt", "u0_receipt.json"),
+        ("fixture_l1_plan", "l1_plan_contract.json"),
+        ("fixture_l0_route", "route_contract.json"),
+        ("fixture_l2_output", FIXTURE_L2_OUTPUT_FILENAME),
+    ):
+        entry = _artifact_index_entry(ref, root, manifest_by_ref)
+        if not entry:
+            raise ValueError(f"deterministic fixture required artifact is absent or unbound: {role}")
+        artifact_index[role] = entry
+    generated_resume = _json_object(root / "outputs" / "generated_resume.json")
+    sections = _normalize_sections(generated_resume)
+    if set(sections) != {"executive_summary", "experience", "skills"}:
+        raise ValueError("deterministic fixture generated-resume sections are incomplete")
+    source_manifest_after = build_source_artifact_manifest(root)
+    source_digest = source_artifact_manifest_digest(source_manifest_before)
+    if source_artifact_manifest_digest(source_manifest_after) != source_digest:
+        raise RuntimeError("fixture_source_mutated_during_snapshot_normalization")
+    return AppOutputSnapshot(
+        app_id="apps_rg",
+        scenario_id=scenario_id,
+        x3_disposition="TEST_FIXTURE_ONLY",
+        output={
+            "runtime": {
+                "fixture_only": True,
+                "product_authorized": False,
+                "provider_call_attempted": False,
+                "network_call_attempted": False,
+            },
+            "sections": sections,
+        },
+        claims=[
+            {
+                "id": "anthropic_fixture_boundary_claim",
+                "source_ids": ["fixture:anthropic-partnership"],
+                "supported": True,
+                "text": "Deterministic fixture boundary only",
+            }
+        ],
+        artifacts=_artifact_names(root),
+        provenance={
+            **expected_no_provider,
+            "fixture_only": True,
+            "evidence_refs": ["fixture:anthropic-partnership"],
+            "source_unchanged": True,
+            "source_digest_before": source_digest,
+            "source_digest_after": source_digest,
+            "l2_external_seam_replaced": True,
+        },
+        side_effects={"product_state_mutated": False, "writes": []},
+        run_root=str(root),
+        artifact_index=artifact_index,
+        raw_artifact_refs=[str(row["artifact_ref"]) for row in source_manifest_before],
+        parent_run_id=str(fixture_identity["parent_run_id"]),
+        child_run_id=str(fixture_identity["child_run_id"]),
+        section_attempt_id=str(fixture_identity["section_attempt_id"]),
+        runtime_exhaust_bundle_id=str(fixture_identity["runtime_exhaust_bundle_id"]),
+        contract_profile_id=FIXTURE_EVAL_PROFILE_ID,
+        snapshot_digest=source_digest,
+        source_artifact_manifest=source_manifest_before,
+    )
+
+
 __all__ = [
     "build_source_artifact_manifest",
+    "normalize_anthropic_deterministic_fixture_snapshot",
     "normalize_existing_apps_rg_run_snapshot",
     "run_apps_rg_live",
     "source_artifact_manifest_digest",
