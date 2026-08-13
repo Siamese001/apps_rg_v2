@@ -110,6 +110,19 @@ def _read_json_mapping(path: Path) -> dict[str, Any]:
     return dict(value) if isinstance(value, Mapping) else {}
 
 
+def _detached_contract_value(value: Any) -> Any:
+    """Return a serializable copy without mutating immutable ingress contracts."""
+
+    if isinstance(value, Mapping):
+        return {
+            str(key): _detached_contract_value(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return [_detached_contract_value(item) for item in value]
+    return copy.deepcopy(value)
+
+
 def _control_receipt_ref(unit_id: str) -> str:
     safe_unit = "".join(
         character if character.isalnum() or character in {"-", "_"} else "_"
@@ -256,7 +269,7 @@ def _control_execution_receipt_for_unit(
             raise PlanExecutionReconciliationError(
                 f"W3 supplied control receipt is invalid for {unit_id}: {exc}"
             ) from exc
-        return copy.deepcopy(dict(supplied))
+        return _detached_contract_value(dict(supplied))
 
     cognition_rows = plan_capsule.get("cognition_plan") or ()
     cognition = next(
@@ -399,8 +412,10 @@ def _unit_observations(
             {
                 "unit_id": unit_id,
                 "planned_inputs": list(unit.get("required_inputs") or ()),
-                "evidence_plan": copy.deepcopy(dict(evidence_by_unit[unit_id])),
-                "requested_controls": copy.deepcopy(
+                "evidence_plan": _detached_contract_value(
+                    dict(evidence_by_unit[unit_id])
+                ),
+                "requested_controls": _detached_contract_value(
                     _mapping(cognition_by_unit[unit_id]).get("requested_controls") or {}
                 ),
                 "reasoning_control_execution_receipt": control_receipt,
