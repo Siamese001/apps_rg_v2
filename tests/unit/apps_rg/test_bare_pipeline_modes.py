@@ -48,6 +48,51 @@ def test_deterministic_mode_runs_full_contract_without_live_hooks(monkeypatch, t
     }
 
 
+def test_live_provider_timeout_is_recorded_as_a_failed_attempt(monkeypatch, tmp_path: Path) -> None:
+    """A dispatched provider call must remain observable when it raises."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test-openai-key")
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-google-key")
+    monkeypatch.setattr(
+        bare_pipeline,
+        "_retrieve_sources",
+        lambda _company, _role: (
+            [
+                {
+                    "family": "company",
+                    "query": "test query",
+                    "title": "Test source",
+                    "url": "https://example.test/source",
+                    "snippet": "Test source material.",
+                    "engines": [],
+                }
+            ],
+            [],
+        ),
+    )
+
+    def timed_out_openai(**_kwargs):
+        raise TimeoutError("injected transport timeout")
+
+    monkeypatch.setattr(bare_pipeline, "_call_openai", timed_out_openai)
+
+    result = bare_pipeline.run_bare_live_e2e(artifact_root=str(tmp_path / "timeout"))
+
+    assert result["status"] == "FAIL"
+    assert result["failure_stage"] == "APPS_RESEARCH"
+    assert result["provider_call_count"] == 1
+    provider = result["providers"]["apps_research_openai"]
+    assert provider["provider_call_attempted"] is True
+    assert provider["status"] == "FAIL"
+    assert provider["failure_code"] == "TRANSPORT_TIMEOUT"
+    assert "TimeoutError: injected transport timeout" in provider["error"]
+    report = json.loads(
+        (Path(str(result["artifact_dir"])) / "provider_calls.json").read_text(encoding="utf-8")
+    )
+    assert report["provider_call_count"] == 1
+    assert report["providers"]["apps_research_openai"]["failure_code"] == "TRANSPORT_TIMEOUT"
+    assert result["outputs"]["provider_calls"] == "provider_calls.json"
+
+
 def test_deterministic_runs_compare_equal_after_documented_normalization(tmp_path: Path) -> None:
     first = _run_deterministic(tmp_path, "first")
     second = _run_deterministic(tmp_path, "second")

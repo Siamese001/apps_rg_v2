@@ -97,43 +97,33 @@ def _write_receipt(
 
 @pytest.fixture(scope="module")
 def fresh_failed_core_run(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, Any]:
-    """Generate one deterministic L2 fault through the real pinned core runner."""
+    """Generate one deterministic L2 fault through the current app-owned spine."""
     root = tmp_path_factory.mktemp("w0_failed_core")
-    monkeypatch = pytest.MonkeyPatch()
-    monkeypatch.setenv("CHROMA_PERSIST_DIR", str(root / "chroma"))
-    monkeypatch.setenv("EMBEDDING_ENABLED", "false")
-    try:
-        import apps_rg_runtime.L4_state.cache.gptcache_client as cache_module
-        from apps_rg_runtime.L4_state.contracts.vector_cache_layout import (
-            VectorCacheLayout,
-        )
-        from apps_rg.runtime.orchestration.integrated_spine_runner import (
-            run_integrated_single_action_spine,
-        )
+    from apps_rg.runtime.orchestration.integrated_spine_runner import (
+        run_integrated_single_action_spine,
+    )
 
-        monkeypatch.setattr(
-            cache_module,
-            "VECTOR_CACHE_LAYOUT",
-            VectorCacheLayout(base_dir=root / "l2_cache"),
-        )
+    def _raise_invalid_argument() -> None:
+        raise OSError(22, "Invalid argument")
 
-        def _raise_invalid_argument() -> None:
-            raise OSError(22, "Invalid argument")
+    result = run_integrated_single_action_spine(
+        raw_request={
+            "jd_payload": {"title": "Partnerships Lead", "description": "JD"},
+            "jd_hash": "w0-jd",
+            "brief_hash": "w0-brief",
+            "resume_hash": "w0-resume",
+        },
+        l2_callable=_raise_invalid_argument,
+        artifact_dir=root,
+        cache_preflight_evidence={},
+        _test_mode=True,
+    )
+    from apps_rg.runtime.orchestration.core_runtime_authority import (
+        emit_core_runtime_authority,
+    )
 
-        result = run_integrated_single_action_spine(
-            raw_request={
-                "jd_payload": {"title": "Partnerships Lead", "description": "JD"},
-                "jd_hash": "w0-jd",
-                "brief_hash": "w0-brief",
-                "resume_hash": "w0-resume",
-            },
-            l2_callable=_raise_invalid_argument,
-            artifact_dir=root,
-            _test_mode=True,
-        )
-    finally:
-        monkeypatch.undo()
-    assert "OSError:[Errno 22] Invalid argument" in result.fault
+    emit_core_runtime_authority(root)
+    assert result.fault == "OSError:[Errno 22] Invalid argument"
     return root, result
 
 
@@ -141,38 +131,29 @@ def fresh_failed_core_run(tmp_path_factory: pytest.TempPathFactory) -> tuple[Pat
 def fresh_nonfault_core_run(
     tmp_path_factory: pytest.TempPathFactory,
 ) -> tuple[Path, Any]:
-    """Generate a non-fault core run to exercise normalization's allow-side logic."""
+    """Generate a non-fault current-spine run to exercise the allow-side logic."""
     root = tmp_path_factory.mktemp("w2_nonfault_core")
-    monkeypatch = pytest.MonkeyPatch()
-    monkeypatch.setenv("CHROMA_PERSIST_DIR", str(root / "chroma"))
-    monkeypatch.setenv("EMBEDDING_ENABLED", "false")
-    try:
-        import apps_rg_runtime.L4_state.cache.gptcache_client as cache_module
-        from apps_rg_runtime.L4_state.contracts.vector_cache_layout import (
-            VectorCacheLayout,
-        )
-        from apps_rg.runtime.orchestration.integrated_spine_runner import (
-            run_integrated_single_action_spine,
-        )
+    from apps_rg.runtime.orchestration.integrated_spine_runner import (
+        run_integrated_single_action_spine,
+    )
 
-        monkeypatch.setattr(
-            cache_module,
-            "VECTOR_CACHE_LAYOUT",
-            VectorCacheLayout(base_dir=root / "l2_cache"),
-        )
-        result = run_integrated_single_action_spine(
-            raw_request={
-                "jd_payload": {"title": "Partnerships Lead", "description": "JD"},
-                "jd_hash": "w2-jd",
-                "brief_hash": "w2-brief",
-                "resume_hash": "w2-resume",
-            },
-            l2_callable=lambda: {"status": "ok"},
-            artifact_dir=root,
-            _test_mode=True,
-        )
-    finally:
-        monkeypatch.undo()
+    result = run_integrated_single_action_spine(
+        raw_request={
+            "jd_payload": {"title": "Partnerships Lead", "description": "JD"},
+            "jd_hash": "w2-jd",
+            "brief_hash": "w2-brief",
+            "resume_hash": "w2-resume",
+        },
+        l2_callable=lambda: {"status": "ok"},
+        artifact_dir=root,
+        cache_preflight_evidence={},
+        _test_mode=True,
+    )
+    from apps_rg.runtime.orchestration.core_runtime_authority import (
+        emit_core_runtime_authority,
+    )
+
+    emit_core_runtime_authority(root)
     assert result.fault == ""
     return root, result
 
@@ -180,6 +161,9 @@ def fresh_nonfault_core_run(
 def test_frozen_manifest_and_artifacts_are_canonical_json_bound() -> None:
     manifest = _load(FIXTURE_DIR / "manifest.json")
     assert manifest["schema_version"] == "apps_rg.e2e_failure_freeze.v1"
+    assert manifest["source_agentic_core_commit"] == "cba1303f044f24af364b888122971cab7a972457"
+    assert "agentic_core_spine_proof.json" in manifest["artifacts"]
+    assert "agentic_core_how_trace.json" in manifest["artifacts"]
     assert manifest["product_authorized"] is False
     assert manifest["pipeline_complete"] is False
     for filename, binding in manifest["artifacts"].items():
@@ -191,10 +175,13 @@ def test_frozen_manifest_and_artifacts_are_canonical_json_bound() -> None:
 def test_frozen_failure_signature_is_preserved() -> None:
     failure = _load(FIXTURE_DIR / "integrated_lane_pre_run_failure.json")
     witness = _load(FIXTURE_DIR / "runtime_execution_witness.json")["payload"]
-    proof = _load(FIXTURE_DIR / "apps_rg_spine_proof.json")["payload"]
+    proof = _load(FIXTURE_DIR / "agentic_core_spine_proof.json")["payload"]
     assert failure["lane_id"] == "competencies"
     assert failure["dispatch_result"]["error"] == "[Errno 22] Invalid argument"
     assert witness["l2"]["status"] == "FAIL"
+    assert "agentic_core" in _load(FIXTURE_DIR / "runtime_execution_witness.json")[
+        "producer_component"
+    ]
     assert proof["success"] is True
 
 
@@ -250,10 +237,10 @@ def test_failed_l2_cannot_emit_successful_spine_proof(
     assert raw_witness["l2"]["status"] == "FAIL"
     assert raw_proof["success"] is False
     assert raw_proof["exit_code"] != 0
-    assert raw_proof["apps_rg_runtime_spine_status"] == "R4_SINGLE_ACTION_BLOCKED"
+    assert "apps_rg_spine_status" not in raw_proof
     assert proof["success"] is False
     assert proof["exit_code"] != 0
-    assert proof["apps_rg_runtime_spine_status"] != "R4_SINGLE_ACTION_PROVEN"
+    assert proof["apps_rg_spine_status"] != "R4_SINGLE_ACTION_PROVEN"
     assert not any(
         row["code"] == "CORE_SPINE_SUCCESS_CONTRADICTS_L2_FAILURE"
         for row in authority["source_contract_violations"]
@@ -399,7 +386,7 @@ def test_core_runtime_authority_rejects_semantically_contradictory_sources(
     proof["payload"]["success"] = True
     proof["payload"]["exit_code"] = 0
     proof["payload"]["blocking_gaps"] = []
-    proof["payload"]["apps_rg_runtime_spine_status"] = "R4_SINGLE_ACTION_PROVEN"
+    proof["payload"]["apps_rg_spine_status"] = "R4_SINGLE_ACTION_PROVEN"
     proof["artifact_hash"] = _authority_digest(proof["payload"])
     proof_path.write_text(json.dumps(proof), encoding="utf-8")
 
@@ -479,7 +466,7 @@ def test_product_gate_consumes_normalized_authority_not_raw_core_x3(
     assert "integrated_exit_x3:X3A" not in blockers
 
 
-def test_nonfault_but_governed_deny_fails_closed_without_inventing_authorization(
+def test_nonfault_current_spine_emits_valid_allow_side_evidence(
     fresh_nonfault_core_run: tuple[Path, Any],
 ) -> None:
     from apps_rg.runtime.orchestration.core_runtime_authority import (
@@ -492,20 +479,18 @@ def test_nonfault_but_governed_deny_fails_closed_without_inventing_authorization
     proof = receipt["normalized_contract"]["spine_proof"]
 
     assert report.valid is True
-    assert set(receipt["normalized_contract"]["runtime_modes"].values()) == {"fixture"}
+    assert set(receipt["normalized_contract"]["runtime_modes"].values()) == {"production"}
     raw_proof = _load(root / "apps_rg_spine_proof.json")["payload"]
-    assert raw_proof["success"] is False
-    assert raw_proof["exit_code"] != 0
-    assert "GOVERNED_EXIT_NOT_ALLOW_FINISH:X3A_DENY_REROUTE" in raw_proof[
-        "blocking_gaps"
-    ]
-    assert proof["success"] is False
+    assert raw_proof["success"] is True
+    assert raw_proof["exit_code"] == 0
+    assert raw_proof["blocking_gaps"] == []
+    assert proof["success"] is True
     assert proof["resolved_refs"]["runtime_l2_artifact_ref"]["artifact_ref"] == (
         "l2_sealed_artifact.json"
     )
-    assert result.x3_disposition == "X3A_DENY_REROUTE"
-    assert receipt["outcome_authorized"] is False
-    assert receipt["status"] == "BLOCKED"
+    assert result.x3_disposition == "X3D_ALLOW_FINISH"
+    assert receipt["outcome_authorized"] is True
+    assert receipt["status"] == "PASS"
 
 
 def test_product_ledger_survives_source_receipt_overwrite(tmp_path: Path) -> None:
@@ -609,9 +594,9 @@ def test_real_canonical_section_entry_uses_e2e_lane_directory(
     tmp_path: Path,
 ) -> None:
     """Exercise the real canonical section runner; mock only the external core seam."""
-    from apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run import (
+    from apps_rg.runtime.orchestration.app_single_action_spine import (
+        AppsRgSingleActionSpineRunResult,
         ROUTE_ID,
-        SingleActionSpineRunResult,
     )
     from apps_rg.runtime.orchestration.canonical_dispatch import (
         run_canonical_apps_rg_from_cli_primitives,
@@ -639,17 +624,19 @@ def test_real_canonical_section_entry_uses_e2e_lane_directory(
     )
     captured: dict[str, Any] = {}
 
-    def _core_seam(**kwargs: Any) -> SingleActionSpineRunResult:
+    def _core_seam(**kwargs: Any) -> AppsRgSingleActionSpineRunResult:
         captured.update(kwargs)
-        return SingleActionSpineRunResult(
+        return AppsRgSingleActionSpineRunResult(
             run_id="w0-core-run",
             request_id="w0-core-request",
             route_id=ROUTE_ID,
-            x3_disposition="X3A",
+            x3_disposition="X3A_DENY_REROUTE",
             terminal_r5=False,
             terminal_r5_reason="",
             artifact_dir=Path(kwargs["artifact_dir"]),
             fault="controlled-w0-core-boundary",
+            l2_result={},
+            execution_witness={},
         )
 
     monkeypatch.setattr(

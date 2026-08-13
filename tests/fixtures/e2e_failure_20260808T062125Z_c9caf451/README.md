@@ -5,7 +5,7 @@ This directory is an immutable, canonical-JSON regression corpus from run
 
 The run was produced by the Apps RG checkout at
 `ad0898ad7bdf9efa35a765ac80fe92535319dd80` with the external
-`apps_rg` checkout at
+`agentic_core` checkout at
 `cba1303f044f24af364b888122971cab7a972457`.
 
 Only non-content-bearing authority and diagnostic artifacts are retained. The
