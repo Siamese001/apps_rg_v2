@@ -14,10 +14,17 @@ def _runtime_functions():
     sys.path.insert(0, str(REPO_ROOT / "src"))
     from apps_model_telemetry.otel_runtime import (
         configure_otel_runtime,
+        resolve_otel_environment,
         verify_live_collector_receipt,
     )
+    from apps_rg.runtime.env_bootstrap import bootstrap_apps_rg_env
 
-    return configure_otel_runtime, verify_live_collector_receipt
+    return (
+        bootstrap_apps_rg_env,
+        configure_otel_runtime,
+        resolve_otel_environment,
+        verify_live_collector_receipt,
+    )
 
 
 def main() -> int:
@@ -27,7 +34,14 @@ def main() -> int:
 
     artifact_dir = Path(args.artifact_dir).resolve()
     artifact_dir.mkdir(parents=True, exist_ok=True)
-    configure_otel_runtime, verify_live_collector_receipt = _runtime_functions()
+    (
+        bootstrap_apps_rg_env,
+        configure_otel_runtime,
+        resolve_otel_environment,
+        verify_live_collector_receipt,
+    ) = _runtime_functions()
+    dotenv = bootstrap_apps_rg_env(repo_root=REPO_ROOT)
+    environment = resolve_otel_environment()
     runtime = configure_otel_runtime(
         service_name="apps_rg_otel_preflight",
         artifact_dir=artifact_dir,
@@ -38,6 +52,8 @@ def main() -> int:
         "runtime_reason": runtime.reason,
         "collector_status": receipt.get("status"),
         "collector_reason": receipt.get("reason"),
+        "dotenv_source": dotenv.dotenv_source,
+        "environment_errors": list(environment.errors),
         "artifact_dir": str(artifact_dir),
     }
     print(json.dumps(payload, sort_keys=True))

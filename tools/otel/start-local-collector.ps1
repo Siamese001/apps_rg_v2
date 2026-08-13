@@ -47,8 +47,17 @@ if (-not $running) {
 for ($attempt = 1; $attempt -le 20; $attempt++) {
     $listening = Test-NetConnection -ComputerName '127.0.0.1' -Port $hostPort -InformationLevel Quiet -WarningAction SilentlyContinue
     if ($listening) {
-        $env:OTEL_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:${hostPort}"
-        $env:APPS_OTEL_COLLECTOR_SPANS_FILE = (Join-Path $outputDir 'traces.jsonl')
+        $collectorEndpoint = "http://127.0.0.1:${hostPort}"
+        $collectorSpansFile = (Join-Path $outputDir 'traces.jsonl')
+
+        # Apps RG loads the shared dotenv after this launcher runs. Seed the
+        # supported legacy aliases too, so dotenv's non-overriding load cannot
+        # reintroduce a conflicting stale collector configuration.
+        $env:OTEL_EXPORTER_OTLP_ENDPOINT = $collectorEndpoint
+        $env:APPS_OTEL_EXPORTER_OTLP_ENDPOINT = $collectorEndpoint
+        $env:APPS_OTEL_COLLECTOR_SPANS_FILE = $collectorSpansFile
+        $env:APPS_OTEL_COLLECTOR_FILE = $collectorSpansFile
+        $env:OTEL_COLLECTOR_SPANS_FILE = $collectorSpansFile
         Write-Output "OTEL_EXPORTER_OTLP_ENDPOINT=$env:OTEL_EXPORTER_OTLP_ENDPOINT"
         Write-Output "APPS_OTEL_COLLECTOR_SPANS_FILE=$env:APPS_OTEL_COLLECTOR_SPANS_FILE"
         Write-Output "Collector=$containerName"
