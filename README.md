@@ -1,5 +1,22 @@
 # Apps RG V2
 
+## Canonical resume workflow
+
+The sole public Apps RG resume command is:
+
+```powershell
+python -m apps_rg run
+```
+
+It defaults to the canonical Anthropic partnership JD and canonical base
+resume. Use `--mode deterministic` for a no-provider repeatability proof,
+`eval` to inspect a completed run without a provider call, and `show` to print
+an exact stored output. See
+[the canonical-entrypoint guide](docs/APPS_RG_V2_CANONICAL_ENTRYPOINTS.md).
+
+No legacy section, W6, cache, telemetry, or external-governance command is a
+required part of this resume run.
+
 Local `main` integration target for the simplified `apps_rg` extraction.
 
 This initial commit is a provenance-preserving source transplant from the

@@ -1,14 +1,20 @@
-"""Small, live-provider Apps RG pipeline.
+"""The compact, observable Apps RG resume pipeline.
 
-This is the public ``--fresh-e2e`` path.  It deliberately contains only the
-work needed to produce a tailored resume:
+The only public resume command routes here through :mod:`apps_rg.__main__`.
+It has two intentionally distinct modes:
 
-``Apps Research -> U0 -> L1 -> L0 -> C0 -> PA -> L2 -> X1/X3``.
+* ``live`` uses real SearXNG, OpenAI, and Gemini providers and records their
+  observed receipts.
+* ``deterministic`` performs the same stage contract from a fixed local source
+  pack and deterministic transforms. It makes no provider call and is never
+  labelled a live-provider result.
 
-It uses SearXNG for source retrieval, OpenAI for the research brief and resume
-draft, and Gemini for the final evaluation.  It does not import the legacy
-shared runner, local reranker, cache layer, telemetry collector, or release
-authority stack.
+Both modes run the same small product path:
+
+``SETUP -> APPS_RESEARCH -> U0 -> L1 -> L0 -> C0 -> PA -> L2 -> X1 -> X3 -> DELIVERY``.
+
+The path intentionally does not import the legacy shared runner, local
+reranker, cache layer, telemetry collector, or release-authority stack.
 """
 
 from __future__ import annotations
@@ -17,7 +23,9 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import uuid
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
@@ -37,6 +45,33 @@ from apps_rg.runtime.resume_resolution import resolve_resume_for_lanes
 DEFAULT_TARGET_COMPANY = "Anthropic"
 DEFAULT_TARGET_ROLE = "Manager of Applied AI Architecture, Partnerships"
 DEFAULT_JD_FILENAME = "anthropic_manager_applied_ai_architecture_partnerships_jd.txt"
+DETERMINISTIC_SOURCE_PACK_FILENAME = "anthropic_deterministic_source_pack.v1.json"
+DETERMINISTIC_TIMESTAMP = "2000-01-01T00:00:00+00:00"
+CANONICAL_STAGE_ORDER = (
+    "SETUP",
+    "APPS_RESEARCH",
+    "U0",
+    "L1",
+    "L0",
+    "C0",
+    "PA",
+    "L2",
+    "X1",
+    "X3",
+    "DELIVERY",
+)
+REQUIRED_OUTPUT_FILENAMES = {
+    "research_brief": "research.md",
+    "sources": "sources.json",
+    "l2_raw": "l2_raw.md",
+    "resume_markdown": "resume.md",
+    "resume_docx": "resume.docx",
+    "outreach_email": "outreach_email.md",
+    "evaluation": "evaluation.json",
+    "provider_calls": "provider_calls.json",
+    "summary": "run_summary.json",
+    "x3_raw": "x3_raw.txt",
+}
 REQUIRED_RESUME_HEADINGS = (
     "EXECUTIVE SUMMARY",
     "CORE COMPETENCIES",
@@ -57,6 +92,255 @@ def _utc_now() -> str:
 
 def _sha256_text(value: str) -> str:
     return "sha256:" + hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _sha256_file(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git_value(repo: Path, *args: str) -> str:
+    """Return a git value without making repository state a runtime dependency."""
+    try:
+        completed = subprocess.run(
+            ["git", *args],
+            cwd=repo,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return ""
+    return completed.stdout.strip() if completed.returncode == 0 else ""
+
+
+def _repository_identity(repo: Path) -> dict[str, Any]:
+    """Record the checked-out code that actually executed a run."""
+    commit = _git_value(repo, "rev-parse", "HEAD")
+    branch = _git_value(repo, "branch", "--show-current")
+    local_main = _git_value(repo, "rev-parse", "main")
+    ancestor = False
+    if commit and local_main:
+        try:
+            ancestor = (
+                subprocess.run(
+                    ["git", "merge-base", "--is-ancestor", "HEAD", "main"],
+                    cwd=repo,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                ).returncode
+                == 0
+            )
+        except OSError:
+            pass
+    return {
+        "repository_root": str(repo),
+        "branch": branch or "DETACHED",
+        "commit_sha": commit,
+        "local_main_sha": local_main,
+        "head_is_ancestor_of_local_main": ancestor,
+        "worktree_dirty": bool(_git_value(repo, "status", "--porcelain")),
+    }
+
+
+def _deterministic_source_pack_path() -> Path:
+    return Path(__file__).resolve().parent / "config" / "targeting" / DETERMINISTIC_SOURCE_PACK_FILENAME
+
+
+def _load_deterministic_source_pack() -> tuple[list[dict[str, Any]], dict[str, Any], Path]:
+    """Load the fixed source material for the genuinely no-provider mode."""
+    path = _deterministic_source_pack_path()
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise BarePipelineError(f"cannot load deterministic source pack: {path}: {exc}") from exc
+    if not isinstance(payload, Mapping):
+        raise BarePipelineError("deterministic source pack root must be an object")
+    sources = payload.get("sources")
+    if not isinstance(sources, list) or not sources:
+        raise BarePipelineError("deterministic source pack must contain sources")
+    normalized: list[dict[str, Any]] = []
+    for index, source in enumerate(sources, start=1):
+        if not isinstance(source, Mapping):
+            raise BarePipelineError(f"deterministic source {index} must be an object")
+        row = {
+            "id": str(source.get("id") or f"source-{index}").strip(),
+            "family": str(source.get("family") or "reference").strip(),
+            "query": str(source.get("query") or "canonical deterministic source pack").strip(),
+            "title": str(source.get("title") or "").strip(),
+            "url": str(source.get("url") or "").strip(),
+            "snippet": str(source.get("snippet") or "").strip(),
+            "engines": ["deterministic_source_pack"],
+        }
+        if not row["id"] or not row["title"] or not row["url"] or not row["snippet"]:
+            raise BarePipelineError(f"deterministic source {index} is incomplete")
+        if not row["url"].startswith(("https://", "http://")):
+            raise BarePipelineError(f"deterministic source {index} has a non-URL reference")
+        normalized.append(row)
+    return normalized, dict(payload), path
+
+
+def _resume_document_from_source(resume_source: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(resume_source)
+    except json.JSONDecodeError as exc:
+        raise BarePipelineError("deterministic mode requires a JSON base resume") from exc
+    if not isinstance(payload, dict):
+        raise BarePipelineError("deterministic mode requires a JSON base resume object")
+    return payload
+
+
+def _format_resume_date(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    if text.casefold() == "present":
+        return "Present"
+    if re.fullmatch(r"\d{4}-\d{2}", text):
+        return datetime.strptime(text, "%Y-%m").strftime("%b %Y")
+    return text
+
+
+def _render_deterministic_resume(
+    *,
+    resume_source: str,
+    company: str,
+    role: str,
+) -> str:
+    """Render the canonical JSON resume without a language-model call."""
+    document = _resume_document_from_source(resume_source)
+    header = document.get("header")
+    facts = document.get("facts")
+    if not isinstance(header, Mapping) or not isinstance(facts, Mapping):
+        raise BarePipelineError("base resume is missing header or facts")
+    name = str(header.get("name") or document.get("candidate_name") or "Candidate").strip()
+    contact = " | ".join(
+        value
+        for value in (
+            str(header.get("location") or "").strip(),
+            str(header.get("phone") or "").strip(),
+            str(header.get("email") or "").strip(),
+            str(header.get("linkedin") or "").strip(),
+            str(header.get("github") or "").strip(),
+        )
+        if value
+    )
+    employment = facts.get("employment")
+    skills = facts.get("skills")
+    education = facts.get("education")
+    certifications = facts.get("certifications")
+    if not isinstance(employment, list) or not employment:
+        raise BarePipelineError("base resume has no employment facts")
+    if not isinstance(skills, list):
+        skills = []
+    if not isinstance(education, list):
+        education = []
+    if not isinstance(certifications, list):
+        certifications = []
+
+    current = employment[0] if isinstance(employment[0], Mapping) else {}
+    current_role = str(current.get("title") or "engineering leadership").strip()
+    current_employer = str(current.get("employer") or "the current employer").strip()
+    summary = (
+        f"Partner-facing engineering and AI platform leader targeting the {role} role at {company}. "
+        f"Brings 20+ years of cloud, data, regulated-enterprise, and AI platform experience, including "
+        f"{current_role} leadership at {current_employer}."
+    )
+
+    lines = [f"# {name}", contact, "", "## EXECUTIVE SUMMARY", summary, "", "## CORE COMPETENCIES"]
+    for item in skills:
+        if not isinstance(item, Mapping):
+            continue
+        category = str(item.get("category") or "Expertise").strip()
+        terms = item.get("terms")
+        if isinstance(terms, list) and terms:
+            lines.append(f"- **{category}:** " + ", ".join(str(term).strip() for term in terms if str(term).strip()))
+    lines.extend(["", "## PROFESSIONAL EXPERIENCE"])
+    for role_fact in employment:
+        if not isinstance(role_fact, Mapping):
+            continue
+        employer = str(role_fact.get("employer") or "").strip()
+        title = str(role_fact.get("title") or "").strip()
+        location = str(role_fact.get("location") or "").strip()
+        start = _format_resume_date(role_fact.get("start_date"))
+        end = _format_resume_date(role_fact.get("end_date"))
+        lines.append(f"### {employer}" + (f" — {location}" if location else ""))
+        lines.append(f"**{title}**" + (f" | {start}–{end}" if start or end else ""))
+        narrative = str(role_fact.get("role_narrative") or "").strip()
+        if narrative:
+            lines.append(narrative)
+        for bullet in role_fact.get("bullets") or []:
+            text = str(bullet.get("text") or "").strip() if isinstance(bullet, Mapping) else ""
+            if text:
+                lines.append(f"- {text}")
+        lines.append("")
+    lines.extend(["## TECHNICAL EXPERTISE"])
+    for item in skills:
+        if not isinstance(item, Mapping):
+            continue
+        category = str(item.get("category") or "Expertise").strip()
+        terms = item.get("terms")
+        if isinstance(terms, list) and terms:
+            lines.append(f"**{category}:** " + ", ".join(str(term).strip() for term in terms if str(term).strip()))
+    lines.extend(["", "## EDUCATION"])
+    for item in education:
+        if not isinstance(item, Mapping):
+            continue
+        degree = str(item.get("degree") or "").strip()
+        institution = str(item.get("institution") or "").strip()
+        honors = str(item.get("honors") or "").strip()
+        line = "**" + degree + "**" if degree else ""
+        if institution:
+            line += (", " if line else "") + institution
+        if honors:
+            line += (" — " if line else "") + honors
+        if line:
+            lines.append(line)
+    lines.extend(["", "## CERTIFICATIONS"])
+    for item in certifications:
+        if not isinstance(item, Mapping):
+            continue
+        name_value = str(item.get("name") or "").strip()
+        issuer = str(item.get("issuing_organization") or "").strip()
+        year = str(item.get("year") or "").strip()
+        if name_value:
+            suffix = " — ".join(value for value in (issuer, year) if value)
+            lines.append(f"- {name_value}" + (f" — {suffix}" if suffix else ""))
+    return "\n".join(lines).strip()
+
+
+def _render_deterministic_email(
+    *,
+    resume_source: str,
+    company: str,
+    role: str,
+) -> str:
+    document = _resume_document_from_source(resume_source)
+    header = document.get("header") if isinstance(document.get("header"), Mapping) else {}
+    facts = document.get("facts") if isinstance(document.get("facts"), Mapping) else {}
+    employment = facts.get("employment") if isinstance(facts.get("employment"), list) else []
+    current = employment[0] if employment and isinstance(employment[0], Mapping) else {}
+    name = str(header.get("name") or document.get("candidate_name") or "Candidate").strip()
+    title = str(current.get("title") or "engineering leadership").strip()
+    employer = str(current.get("employer") or "the current employer").strip()
+    narrative = str(current.get("role_narrative") or "").strip()
+    return (
+        f"Subject: {role} — Interest\n\n"
+        f"Hello {company} Hiring Team,\n\n"
+        f"I am writing about the {role} role at {company}. I currently serve as {title} at {employer}. "
+        f"{narrative}\n\n"
+        f"My experience building partner-facing cloud and AI platforms, reusable solution accelerators, and "
+        f"enterprise adoption programs aligns with the role's focus on technical partnerships, enablement, "
+        f"and safe deployment. I would welcome the opportunity to discuss how I can support {company}'s "
+        f"partnerships organization.\n\n"
+        f"Best regards,\n{name}\n"
+    )
+
+
+def _set_stage_details(stages: list[dict[str, Any]], stage_id: str, details: Mapping[str, Any]) -> None:
+    """Attach inspectable detail to the stage that just completed."""
+    if stages and stages[-1].get("stage") == stage_id:
+        stages[-1]["details"] = dict(details)
 
 
 def _resume_employers_from_source(resume_source: str) -> tuple[str, ...]:
@@ -158,6 +442,24 @@ def _write_text(path: Path, text: str) -> None:
     temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
     temporary.write_text(text.rstrip() + "\n", encoding="utf-8")
     os.replace(temporary, path)
+
+
+def _write_provider_call_report(
+    path: Path,
+    *,
+    mode: str,
+    providers: Mapping[str, Mapping[str, Any]],
+) -> None:
+    """Write an explicit provider-call inventory without inventing an event."""
+    _write_json(
+        path,
+        {
+            "schema_version": "apps_rg.provider_calls.v1",
+            "mode": mode,
+            "provider_call_count": len(providers),
+            "providers": {name: dict(value) for name, value in providers.items()},
+        },
+    )
 
 
 def _repo_root() -> Path:
@@ -502,6 +804,35 @@ def _write_resume_docx(path: Path, *, target_role: str, resume_markdown: str) ->
     return "written"
 
 
+def _validate_resume_docx(
+    path: Path,
+    *,
+    required_employers: tuple[str, ...],
+) -> dict[str, Any]:
+    """Reopen the emitted DOCX and prove its visible resume sections survived export."""
+    try:
+        from docx import Document
+
+        document = Document(path)
+    except Exception as exc:
+        return {"status": "FAIL", "error": f"{type(exc).__name__}: {exc}"}
+    paragraphs = [paragraph.text.strip() for paragraph in document.paragraphs if paragraph.text.strip()]
+    heading_checks = {heading: heading in paragraphs for heading in REQUIRED_RESUME_HEADINGS}
+    employer_checks = {
+        employer: any(employer in paragraph for paragraph in paragraphs)
+        for employer in required_employers
+    }
+    missing = [f"heading:{heading}" for heading, passed in heading_checks.items() if not passed]
+    missing.extend(f"employer:{employer}" for employer, passed in employer_checks.items() if not passed)
+    return {
+        "status": "PASS" if not missing else "FAIL",
+        "paragraph_count": len(paragraphs),
+        "headings": heading_checks,
+        "employers": employer_checks,
+        "missing": missing,
+    }
+
+
 def run_bare_live_e2e(
     *,
     target_company: str = "",
@@ -550,10 +881,13 @@ def run_bare_live_e2e(
         return value
 
     result: dict[str, Any] = {
-        "pipeline": "apps_rg_bare_live_e2e.v1",
-        "command": "python -m apps_rg --fresh-e2e",
+        "pipeline": "apps_rg_bare_e2e.v2",
+        "mode": "live",
+        "outcome_label": "LIVE_PROVIDER_FAIL",
+        "command": "python -m apps_rg run --mode live",
         "run_id": run_dir.name,
         "artifact_dir": str(run_dir),
+        "repository": _repository_identity(repo),
         "target_company": company,
         "target_role": role,
         "status": "FAIL",
@@ -582,11 +916,14 @@ def run_bare_live_e2e(
                 "jd_sha256": _sha256_text(jd_text),
                 "resume_ref": resolved_resume.resume_ref_used,
                 "resume_sha256": "sha256:" + resolved_resume.resume_digest,
+                "mode": "live",
             }
             return {
                 "jd_loaded": True,
                 "resume_loaded": True,
                 "required_employer_count": len(required_employers),
+                "repository_commit": result["repository"]["commit_sha"],
+                "repository_branch": result["repository"]["branch"],
             }
 
         run_stage("SETUP", setup)
@@ -629,6 +966,7 @@ def run_bare_live_e2e(
             return full_brief, sources, retrieval_failures
 
         research_brief, sources, retrieval_failures = run_stage("APPS_RESEARCH", apps_research)
+        _set_stage_details(stages, "APPS_RESEARCH", result["research"])
 
         def u0() -> dict[str, Any]:
             if not company or not role or not jd_text or not resume_source or not research_brief:
@@ -695,6 +1033,15 @@ def run_bare_live_e2e(
             )
 
         l2_prompt = run_stage("PA", prompt_assembly)
+        _set_stage_details(
+            stages,
+            "PA",
+            {
+                "prompt_inputs": ["job_description", "base_resume", "research"],
+                "required_resume_headings": list(REQUIRED_RESUME_HEADINGS),
+                "required_employer_count": len(required_employers),
+            },
+        )
 
         def l2() -> tuple[str, str]:
             raw_output, receipt = _call_openai(
@@ -721,6 +1068,15 @@ def run_bare_live_e2e(
             return tailored, email
 
         tailored_resume, outreach_email = run_stage("L2", l2)
+        _set_stage_details(
+            stages,
+            "L2",
+            {
+                "resume_characters": len(tailored_resume),
+                "email_characters": len(outreach_email),
+                "provider": "apps_research_openai",
+            },
+        )
 
         def x1() -> dict[str, Any]:
             resume_check = _validate_tailored_resume(
@@ -778,8 +1134,25 @@ def run_bare_live_e2e(
 
         evaluation, gemini_provider = run_stage("X3", x3)
         providers["x3_gemini"] = gemini_provider
-        evaluation.update({"x1": x1, "retrieval_failures": retrieval_failures})
+        evaluation.update(
+            {
+                "evaluation_type": "live_provider",
+                "x1": x1,
+                "retrieval_failures": retrieval_failures,
+            }
+        )
+        _set_stage_details(
+            stages,
+            "X3",
+            {
+                "verdict": evaluation["verdict"],
+                "score": evaluation["score"],
+                "provider": "x3_gemini",
+            },
+        )
         outputs["x3_raw"] = "x3_raw.txt"
+        _write_provider_call_report(run_dir / "provider_calls.json", mode="live", providers=providers)
+        outputs["provider_calls"] = "provider_calls.json"
 
         def delivery() -> dict[str, Any]:
             _write_json(run_dir / "evaluation.json", evaluation)
@@ -789,22 +1162,737 @@ def run_bare_live_e2e(
             )
             if docx_status != "written":
                 raise BarePipelineError(f"DOCX export failed: {docx_status}")
+            docx_check = _validate_resume_docx(
+                run_dir / "resume.docx",
+                required_employers=required_employers,
+            )
+            if docx_check["status"] != "PASS":
+                raise BarePipelineError(
+                    "DOCX output completeness check failed: "
+                    + ", ".join(docx_check.get("missing") or [str(docx_check.get("error") or "unknown")])
+                )
             outputs["resume_docx"] = "resume.docx"
             _write_json(run_dir / "plan.json", {"l1": plan, "l0": route})
             outputs["plan"] = "plan.json"
-            return {"written_outputs": sorted(outputs.values())}
+            return {"written_outputs": sorted(outputs.values()), "docx_check": docx_check}
 
         result["delivery"] = run_stage("DELIVERY", delivery)
         result["status"] = "SUCCESS"
+        result["outcome_label"] = "LIVE_PROVIDER_PASS"
         result["evaluation"] = evaluation
     except Exception as exc:
         result["status"] = "FAIL"
         result["failure_stage"] = current_stage
         result["error"] = f"{type(exc).__name__}: {exc}"
     result["finished_at_utc"] = _utc_now()
+    result["provider_call_count"] = len(providers)
     outputs["summary"] = "run_summary.json"
     _write_json(run_dir / "run_summary.json", result)
     return result
 
 
-__all__ = ["BarePipelineError", "run_bare_live_e2e"]
+def _deterministic_research_brief(
+    *,
+    company: str,
+    role: str,
+    sources: list[dict[str, Any]],
+) -> str:
+    """Create a stable research brief strictly from the versioned local pack."""
+    priorities = [
+        "Partner solutions architecture and technical enablement.",
+        "Joint solution development and partner-led enterprise adoption.",
+        "Safe, reliable, and production-ready AI deployment.",
+    ]
+    lines = [
+        f"# {company} Research Brief",
+        "",
+        f"This deterministic brief supports the {role} role.",
+        "",
+        "## Role Priorities",
+        *(f"- {priority}" for priority in priorities),
+        "",
+        "## Source Signals",
+    ]
+    for source in sources:
+        lines.append(f"- **{source['title']}:** {source['snippet']}")
+    lines.extend(["", "## Sources", _sources_markdown(sources)])
+    return "\n".join(lines).strip()
+
+
+def _run_deterministic_evaluation(
+    *,
+    run_dir: Path,
+    x1: Mapping[str, Any],
+    sources: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Evaluate deterministic output with transparent local rules, not a mock provider."""
+    passed = str(x1.get("status") or "") == "PASS" and bool(sources)
+    decision = {
+        "evaluation_type": "deterministic_local",
+        "verdict": "PASS" if passed else "FAIL",
+        "score": 1.0 if passed else 0.0,
+        "reasoning": (
+            "All required resume sections, base-resume employers, email fields, and local source records passed."
+            if passed
+            else "A required local output check did not pass."
+        ),
+    }
+    _write_text(run_dir / "x3_raw.txt", json.dumps(decision, sort_keys=True))
+    return decision
+
+
+def run_bare_deterministic_e2e(
+    *,
+    target_company: str = "",
+    target_role: str = "",
+    jd: str = "",
+    resume_path: str = "",
+    artifact_root: str = "",
+) -> dict[str, Any]:
+    """Run the complete no-provider Apps RG contract from fixed local inputs.
+
+    This is an offline repeatability proof, not a replacement for a live
+    OpenAI/Gemini product run. It does not read provider credentials or invoke
+    provider/retrieval code.
+    """
+
+    repo = _repo_root()
+    company = str(target_company or DEFAULT_TARGET_COMPANY).strip()
+    role = str(target_role or DEFAULT_TARGET_ROLE).strip()
+    run_dir = _allocate_run_dir(artifact_root, repo_root=repo)
+    stages: list[dict[str, Any]] = []
+    providers: dict[str, dict[str, Any]] = {}
+    outputs: dict[str, str] = {}
+    current_stage = "SETUP"
+
+    def run_stage(stage_id: str, action: Callable[[], Any]) -> Any:
+        nonlocal current_stage
+        current_stage = stage_id
+        started = DETERMINISTIC_TIMESTAMP
+        try:
+            value = action()
+        except Exception as exc:
+            stages.append(
+                {
+                    "stage": stage_id,
+                    "status": "FAIL",
+                    "started_at_utc": started,
+                    "finished_at_utc": DETERMINISTIC_TIMESTAMP,
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
+            raise
+        record: dict[str, Any] = {
+            "stage": stage_id,
+            "status": "PASS",
+            "started_at_utc": started,
+            "finished_at_utc": DETERMINISTIC_TIMESTAMP,
+        }
+        if isinstance(value, Mapping):
+            record["details"] = dict(value)
+        stages.append(record)
+        return value
+
+    result: dict[str, Any] = {
+        "pipeline": "apps_rg_bare_e2e.v2",
+        "mode": "deterministic",
+        "outcome_label": "DETERMINISTIC_OFFLINE_FAIL",
+        "command": "python -m apps_rg run --mode deterministic",
+        "run_id": run_dir.name,
+        "artifact_dir": str(run_dir),
+        "repository": _repository_identity(repo),
+        "target_company": company,
+        "target_role": role,
+        "status": "FAIL",
+        "stages": stages,
+        "providers": providers,
+        "outputs": outputs,
+        "provider_call_count": 0,
+    }
+    jd_text = ""
+    resume_source = ""
+    required_employers: tuple[str, ...] = ()
+    try:
+        def setup() -> dict[str, Any]:
+            nonlocal jd_text, resume_source, required_employers
+            jd_text, jd_ref = _resolve_text_input(jd, default_path=_default_jd_path())
+            resolved_resume = resolve_resume_for_lanes(
+                source_resume_ref=str(resume_path or "") or None,
+                repo_root=repo,
+                require_json_document=True,
+            )
+            resume_source = resolved_resume.raw_utf8
+            required_employers = _resume_employers_from_source(resume_source)
+            if not required_employers:
+                raise BarePipelineError("deterministic mode could not resolve source-resume employers")
+            result["inputs"] = {
+                "jd_ref": jd_ref,
+                "jd_sha256": _sha256_text(jd_text),
+                "resume_ref": resolved_resume.resume_ref_used,
+                "resume_sha256": "sha256:" + resolved_resume.resume_digest,
+                "mode": "deterministic",
+            }
+            return {
+                "jd_loaded": True,
+                "resume_loaded": True,
+                "required_employer_count": len(required_employers),
+                "provider_credentials_read": False,
+                "repository_commit": result["repository"]["commit_sha"],
+                "repository_branch": result["repository"]["branch"],
+            }
+
+        run_stage("SETUP", setup)
+
+        def apps_research() -> tuple[str, list[dict[str, Any]]]:
+            sources, source_pack, source_pack_path = _load_deterministic_source_pack()
+            source_company = str(source_pack.get("target_company") or "").strip()
+            source_role = str(source_pack.get("target_role") or "").strip()
+            if (company, role) != (source_company, source_role):
+                raise BarePipelineError(
+                    "deterministic source pack supports only "
+                    f"{source_company!r} / {source_role!r}; requested {company!r} / {role!r}"
+                )
+            full_brief = _deterministic_research_brief(company=company, role=role, sources=sources)
+            _write_text(run_dir / "research.md", full_brief)
+            _write_json(
+                run_dir / "sources.json",
+                {
+                    "source_count": len(sources),
+                    "sources": sources,
+                    "retrieval_failures": [],
+                    "source_mode": "deterministic_source_pack",
+                },
+            )
+            _write_json(run_dir / "deterministic_source_pack.json", source_pack)
+            outputs["research_brief"] = "research.md"
+            outputs["sources"] = "sources.json"
+            outputs["deterministic_source_pack"] = "deterministic_source_pack.json"
+            result["research"] = {
+                "source_count": len(sources),
+                "retrieval_failure_count": 0,
+                "source_mode": "deterministic_source_pack",
+                "source_pack_ref": str(source_pack_path),
+                "source_pack_sha256": _sha256_file(source_pack_path),
+            }
+            return full_brief, sources
+
+        research_brief, sources = run_stage("APPS_RESEARCH", apps_research)
+        _set_stage_details(stages, "APPS_RESEARCH", result["research"])
+
+        def u0() -> dict[str, Any]:
+            if not company or not role or not jd_text or not resume_source or not research_brief:
+                raise BarePipelineError("U0 rejected an empty core input")
+            return {
+                "company": company,
+                "role": role,
+                "jd_present": True,
+                "resume_present": True,
+                "research_present": True,
+            }
+
+        run_stage("U0", u0)
+        plan = run_stage(
+            "L1",
+            lambda: {
+                "goal": "tailor the candidate resume to the supplied role",
+                "source_count": len(sources),
+                "candidate_resume_sha256": result["inputs"]["resume_sha256"],
+            },
+        )
+        route = run_stage("L0", lambda: {"route": "bare_deterministic_local"})
+
+        def c0() -> dict[str, Any]:
+            usable_source_urls = sum(1 for source in sources if str(source.get("url") or "").startswith("http"))
+            if not usable_source_urls:
+                raise BarePipelineError("C0 found no usable deterministic source URLs")
+            return {"source_count": len(sources), "usable_source_url_count": usable_source_urls}
+
+        run_stage("C0", c0)
+        pa = run_stage(
+            "PA",
+            lambda: {
+                "prompt_inputs": ["job_description", "base_resume", "deterministic_research"],
+                "required_resume_headings": list(REQUIRED_RESUME_HEADINGS),
+                "required_employer_count": len(required_employers),
+            },
+        )
+
+        def l2() -> tuple[str, str]:
+            tailored = _render_deterministic_resume(
+                resume_source=resume_source,
+                company=company,
+                role=role,
+            )
+            email = _render_deterministic_email(
+                resume_source=resume_source,
+                company=company,
+                role=role,
+            )
+            raw_output = f"<tailored_resume>\n{tailored}\n</tailored_resume>\n\n<outreach_email>\n{email}\n</outreach_email>"
+            _write_text(run_dir / "l2_raw.md", raw_output)
+            _write_text(run_dir / "resume.md", tailored)
+            _write_text(run_dir / "outreach_email.md", email)
+            outputs["l2_raw"] = "l2_raw.md"
+            outputs["resume_markdown"] = "resume.md"
+            outputs["outreach_email"] = "outreach_email.md"
+            return tailored, email
+
+        tailored_resume, outreach_email = run_stage("L2", l2)
+        _set_stage_details(
+            stages,
+            "L2",
+            {
+                "resume_characters": len(tailored_resume),
+                "email_characters": len(outreach_email),
+                "provider": "none",
+            },
+        )
+
+        def x1() -> dict[str, Any]:
+            resume_check = _validate_tailored_resume(
+                tailored_resume,
+                required_employers=required_employers,
+            )
+            email_check = _validate_outreach_email(
+                outreach_email,
+                company=company,
+                role=role,
+            )
+            source_check = {"status": "PASS" if sources else "FAIL", "source_count": len(sources)}
+            status = (
+                "PASS"
+                if resume_check["status"] == "PASS"
+                and email_check["status"] == "PASS"
+                and source_check["status"] == "PASS"
+                else "FAIL"
+            )
+            value = {
+                "status": status,
+                "resume": resume_check,
+                "outreach_email": email_check,
+                "sources": source_check,
+            }
+            if status != "PASS":
+                raise BarePipelineError(
+                    "X1 output completeness check failed: "
+                    + ", ".join(
+                        resume_check["missing"]
+                        + email_check["missing"]
+                        + ([] if sources else ["sources"])
+                    )
+                )
+            return value
+
+        x1 = run_stage("X1", x1)
+        result["section_checks"] = x1
+
+        def x3() -> dict[str, Any]:
+            decision = _run_deterministic_evaluation(run_dir=run_dir, x1=x1, sources=sources)
+            if decision["verdict"] != "PASS":
+                raise BarePipelineError("X3 deterministic evaluation did not pass")
+            return decision
+
+        evaluation = run_stage("X3", x3)
+        evaluation.update({"x1": x1, "retrieval_failures": []})
+        _set_stage_details(
+            stages,
+            "X3",
+            {
+                "verdict": evaluation["verdict"],
+                "score": evaluation["score"],
+                "provider": "none",
+                "evaluation_type": "deterministic_local",
+            },
+        )
+        outputs["x3_raw"] = "x3_raw.txt"
+        _write_provider_call_report(run_dir / "provider_calls.json", mode="deterministic", providers=providers)
+        outputs["provider_calls"] = "provider_calls.json"
+
+        def delivery() -> dict[str, Any]:
+            _write_json(run_dir / "evaluation.json", evaluation)
+            outputs["evaluation"] = "evaluation.json"
+            docx_status = _write_resume_docx(
+                run_dir / "resume.docx", target_role=role, resume_markdown=tailored_resume
+            )
+            if docx_status != "written":
+                raise BarePipelineError(f"DOCX export failed: {docx_status}")
+            docx_check = _validate_resume_docx(
+                run_dir / "resume.docx",
+                required_employers=required_employers,
+            )
+            if docx_check["status"] != "PASS":
+                raise BarePipelineError(
+                    "DOCX output completeness check failed: "
+                    + ", ".join(docx_check.get("missing") or [str(docx_check.get("error") or "unknown")])
+                )
+            outputs["resume_docx"] = "resume.docx"
+            _write_json(run_dir / "plan.json", {"l1": plan, "l0": route, "pa": pa})
+            outputs["plan"] = "plan.json"
+            return {"written_outputs": sorted(outputs.values()), "docx_check": docx_check}
+
+        result["delivery"] = run_stage("DELIVERY", delivery)
+        result["status"] = "SUCCESS"
+        result["outcome_label"] = "DETERMINISTIC_OFFLINE_PASS"
+        result["evaluation"] = evaluation
+    except Exception as exc:
+        result["status"] = "FAIL"
+        result["failure_stage"] = current_stage
+        result["error"] = f"{type(exc).__name__}: {exc}"
+    result["finished_at_utc"] = DETERMINISTIC_TIMESTAMP
+    outputs["summary"] = "run_summary.json"
+    _write_json(run_dir / "run_summary.json", result)
+    return result
+
+
+def run_bare_e2e(
+    *,
+    mode: str = "live",
+    target_company: str = "",
+    target_role: str = "",
+    jd: str = "",
+    resume_path: str = "",
+    artifact_root: str = "",
+) -> dict[str, Any]:
+    """Dispatch the one pipeline to the explicitly selected execution mode."""
+    normalized_mode = str(mode or "live").strip().casefold()
+    kwargs = {
+        "target_company": target_company,
+        "target_role": target_role,
+        "jd": jd,
+        "resume_path": resume_path,
+        "artifact_root": artifact_root,
+    }
+    if normalized_mode == "live":
+        return run_bare_live_e2e(**kwargs)
+    if normalized_mode == "deterministic":
+        return run_bare_deterministic_e2e(**kwargs)
+    raise BarePipelineError(f"unsupported run mode: {mode!r}")
+
+
+def _read_json_object(path: Path) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise BarePipelineError(f"cannot read JSON artifact {path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise BarePipelineError(f"JSON artifact must be an object: {path}")
+    return payload
+
+
+def _resolve_run_dir(run_dir: str | Path) -> Path:
+    resolved = Path(run_dir).expanduser().resolve()
+    if not resolved.is_dir():
+        raise BarePipelineError(f"run directory does not exist: {resolved}")
+    return resolved
+
+
+def _docx_semantic_digest(path: Path) -> str:
+    """Hash the semantic OOXML body rather than nondeterministic ZIP metadata."""
+    try:
+        with zipfile.ZipFile(path) as archive:
+            body = archive.read("word/document.xml")
+    except (OSError, KeyError, zipfile.BadZipFile) as exc:
+        raise BarePipelineError(f"cannot read DOCX semantic body: {path}: {exc}") from exc
+    return "sha256:" + hashlib.sha256(body).hexdigest()
+
+
+def _normalize_deterministic_value(value: Any) -> Any:
+    """Remove only per-run physical location and time fields from a comparison projection."""
+    ignored_keys = {
+        "artifact_dir",
+        "run_id",
+        "finished_at_utc",
+        "started_at_utc",
+        "repository_root",
+        "jd_ref",
+        "resume_ref",
+        "source_pack_ref",
+    }
+    if isinstance(value, Mapping):
+        return {
+            str(key): _normalize_deterministic_value(child)
+            for key, child in value.items()
+            if str(key) not in ignored_keys
+        }
+    if isinstance(value, list):
+        return [_normalize_deterministic_value(child) for child in value]
+    return value
+
+
+def deterministic_run_projection(run_dir: str | Path) -> dict[str, Any]:
+    """Build the documented, run-root-independent deterministic comparison projection."""
+    root = _resolve_run_dir(run_dir)
+    summary = _read_json_object(root / "run_summary.json")
+    if summary.get("mode") != "deterministic":
+        raise BarePipelineError("deterministic comparison requires a deterministic run")
+    text_files = (
+        "research.md",
+        "sources.json",
+        "deterministic_source_pack.json",
+        "l2_raw.md",
+        "resume.md",
+        "outreach_email.md",
+        "x3_raw.txt",
+        "evaluation.json",
+        "plan.json",
+        "provider_calls.json",
+    )
+    digests: dict[str, str] = {}
+    for filename in text_files:
+        path = root / filename
+        if not path.is_file():
+            raise BarePipelineError(f"deterministic run is missing artifact: {filename}")
+        digests[filename] = _sha256_file(path)
+    docx_path = root / "resume.docx"
+    if not docx_path.is_file():
+        raise BarePipelineError("deterministic run is missing artifact: resume.docx")
+    digests["resume.docx.semantic"] = _docx_semantic_digest(docx_path)
+    return {
+        "schema_version": "apps_rg.deterministic_projection.v1",
+        "summary": _normalize_deterministic_value(summary),
+        "artifact_digests": digests,
+    }
+
+
+def compare_deterministic_runs(first_run_dir: str | Path, second_run_dir: str | Path) -> dict[str, Any]:
+    """Compare two clean no-provider runs with only documented normalization."""
+    first = deterministic_run_projection(first_run_dir)
+    second = deterministic_run_projection(second_run_dir)
+    same = first == second
+    return {
+        "schema_version": "apps_rg.deterministic_comparison.v1",
+        "status": "PASS" if same else "FAIL",
+        "first_run_dir": str(_resolve_run_dir(first_run_dir)),
+        "second_run_dir": str(_resolve_run_dir(second_run_dir)),
+        "normalized_fields": [
+            "artifact_dir",
+            "run_id",
+            "started_at_utc",
+            "finished_at_utc",
+            "repository_root",
+            "jd_ref",
+            "resume_ref",
+            "source_pack_ref",
+        ],
+        "difference": "" if same else "Normalized projections differ.",
+    }
+
+
+def _run_stage_check(summary: Mapping[str, Any]) -> dict[str, Any]:
+    stages = summary.get("stages")
+    if not isinstance(stages, list):
+        return {"status": "FAIL", "error": "run summary has no stage list"}
+    names = [str(stage.get("stage") or "") for stage in stages if isinstance(stage, Mapping)]
+    statuses = [str(stage.get("status") or "") for stage in stages if isinstance(stage, Mapping)]
+    valid = names == list(CANONICAL_STAGE_ORDER) and all(status == "PASS" for status in statuses)
+    return {
+        "status": "PASS" if valid else "FAIL",
+        "expected": list(CANONICAL_STAGE_ORDER),
+        "observed": names,
+        "statuses": statuses,
+    }
+
+
+def _artifact_check(root: Path, summary: Mapping[str, Any]) -> dict[str, Any]:
+    outputs = summary.get("outputs")
+    if not isinstance(outputs, Mapping):
+        return {"status": "FAIL", "error": "run summary has no outputs mapping"}
+    missing: list[str] = []
+    for key, filename in REQUIRED_OUTPUT_FILENAMES.items():
+        actual = str(outputs.get(key) or "")
+        path = root / actual if actual else root / filename
+        if actual != filename or not path.is_file() or path.stat().st_size == 0:
+            missing.append(key)
+    return {"status": "PASS" if not missing else "FAIL", "missing": missing}
+
+
+def _live_provider_check(root: Path, summary: Mapping[str, Any]) -> dict[str, Any]:
+    providers = summary.get("providers")
+    if not isinstance(providers, Mapping):
+        return {"status": "FAIL", "error": "live run has no provider receipts"}
+    required = ("apps_research_openai", "l2_openai", "x3_gemini")
+    missing = [name for name in required if not isinstance(providers.get(name), Mapping)]
+    invalid: list[str] = []
+    for name in required:
+        value = providers.get(name)
+        if not isinstance(value, Mapping):
+            continue
+        if str(value.get("status") or "") != "SUCCESS" or not str(value.get("response_id") or ""):
+            invalid.append(name)
+    ledger_path = root / "external_model_usage_ledger.jsonl"
+    x3_terminal = False
+    if ledger_path.is_file():
+        for line in ledger_path.read_text(encoding="utf-8").splitlines():
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if (
+                row.get("stage") == "X3"
+                and row.get("section_id") == "X3"
+                and row.get("outcome") == "SUCCESS"
+            ):
+                x3_terminal = True
+                break
+    if not x3_terminal:
+        invalid.append("x3_ledger")
+    return {
+        "status": "PASS" if not missing and not invalid else "FAIL",
+        "missing": missing,
+        "invalid": invalid,
+        "x3_terminal_ledger": x3_terminal,
+    }
+
+
+def _deterministic_provider_check(root: Path, summary: Mapping[str, Any]) -> dict[str, Any]:
+    providers = summary.get("providers")
+    report = _read_json_object(root / "provider_calls.json")
+    no_provider = (
+        summary.get("provider_call_count") == 0
+        and not providers
+        and report.get("mode") == "deterministic"
+        and report.get("provider_call_count") == 0
+    )
+    return {
+        "status": "PASS" if no_provider else "FAIL",
+        "provider_call_count": summary.get("provider_call_count"),
+        "provider_report_count": report.get("provider_call_count"),
+    }
+
+
+def evaluate_bare_run(
+    run_dir: str | Path,
+    *,
+    compare_run_dir: str | Path | None = None,
+) -> dict[str, Any]:
+    """Re-evaluate a completed bare run without a model/provider call."""
+    root = _resolve_run_dir(run_dir)
+    summary = _read_json_object(root / "run_summary.json")
+    mode = str(summary.get("mode") or "")
+    checks: dict[str, Any] = {
+        "summary_status": {"status": "PASS" if summary.get("status") == "SUCCESS" else "FAIL"},
+        "stage_contract": _run_stage_check(summary),
+        "artifacts": _artifact_check(root, summary),
+    }
+    section_checks = summary.get("section_checks")
+    checks["section_contract"] = {
+        "status": "PASS"
+        if isinstance(section_checks, Mapping) and section_checks.get("status") == "PASS"
+        else "FAIL"
+    }
+    evaluation = summary.get("evaluation")
+    try:
+        evaluation_score = float(evaluation.get("score") or 0) if isinstance(evaluation, Mapping) else 0.0
+    except (TypeError, ValueError):
+        evaluation_score = 0.0
+    checks["evaluation"] = {
+        "status": "PASS"
+        if isinstance(evaluation, Mapping)
+        and evaluation.get("verdict") == "PASS"
+        and evaluation_score >= 0.70
+        else "FAIL"
+    }
+    required_employers: tuple[str, ...] = ()
+    if isinstance(section_checks, Mapping):
+        resume_check = section_checks.get("resume")
+        if isinstance(resume_check, Mapping):
+            raw_employers = resume_check.get("required_employers")
+            if isinstance(raw_employers, list):
+                required_employers = tuple(str(value) for value in raw_employers)
+    resume_path = root / "resume.md"
+    email_path = root / "outreach_email.md"
+    sources_path = root / "sources.json"
+    checks["resume_markdown"] = (
+        _validate_tailored_resume(
+            resume_path.read_text(encoding="utf-8"),
+            required_employers=required_employers,
+        )
+        if resume_path.is_file()
+        else {"status": "FAIL", "error": "resume.md is missing"}
+    )
+    checks["outreach_email"] = (
+        _validate_outreach_email(
+            email_path.read_text(encoding="utf-8"),
+            company=str(summary.get("target_company") or ""),
+            role=str(summary.get("target_role") or ""),
+        )
+        if email_path.is_file()
+        else {"status": "FAIL", "error": "outreach_email.md is missing"}
+    )
+    if sources_path.is_file():
+        sources_artifact = _read_json_object(sources_path)
+        source_rows = sources_artifact.get("sources")
+        checks["source_register"] = {
+            "status": "PASS"
+            if isinstance(source_rows, list)
+            and bool(source_rows)
+            and all(
+                isinstance(row, Mapping) and str(row.get("url") or "").startswith("http")
+                for row in source_rows
+            )
+            else "FAIL",
+            "source_count": len(source_rows) if isinstance(source_rows, list) else 0,
+        }
+    else:
+        checks["source_register"] = {"status": "FAIL", "error": "sources.json is missing"}
+    checks["resume_docx"] = _validate_resume_docx(
+        root / "resume.docx",
+        required_employers=required_employers,
+    )
+    if mode == "live":
+        checks["provider_contract"] = _live_provider_check(root, summary)
+    elif mode == "deterministic":
+        checks["provider_contract"] = _deterministic_provider_check(root, summary)
+    else:
+        checks["provider_contract"] = {"status": "FAIL", "error": f"unsupported mode: {mode!r}"}
+    if compare_run_dir is not None:
+        if mode != "deterministic":
+            checks["deterministic_comparison"] = {
+                "status": "FAIL",
+                "error": "only deterministic runs can be compared",
+            }
+        else:
+            checks["deterministic_comparison"] = compare_deterministic_runs(root, compare_run_dir)
+    passed = all(str(check.get("status") or "") == "PASS" for check in checks.values())
+    return {
+        "schema_version": "apps_rg.run_evaluation.v1",
+        "run_dir": str(root),
+        "mode": mode,
+        "status": "PASS" if passed else "FAIL",
+        "checks": checks,
+    }
+
+
+_SHOW_ARTIFACTS = {
+    "resume": "resume.md",
+    "email": "outreach_email.md",
+    "research": "research.md",
+    "summary": "run_summary.json",
+    "evaluation": "evaluation.json",
+}
+
+
+def read_bare_artifact(run_dir: str | Path, artifact: str) -> str:
+    """Return an exact requested artifact for the single public ``show`` command."""
+    filename = _SHOW_ARTIFACTS.get(str(artifact or "").strip().casefold())
+    if not filename:
+        raise BarePipelineError(
+            "unsupported artifact; choose one of: " + ", ".join(sorted(_SHOW_ARTIFACTS))
+        )
+    path = _resolve_run_dir(run_dir) / filename
+    if not path.is_file():
+        raise BarePipelineError(f"run artifact does not exist: {path}")
+    return path.read_text(encoding="utf-8")
+
+
+__all__ = [
+    "BarePipelineError",
+    "CANONICAL_STAGE_ORDER",
+    "compare_deterministic_runs",
+    "deterministic_run_projection",
+    "evaluate_bare_run",
+    "read_bare_artifact",
+    "run_bare_deterministic_e2e",
+    "run_bare_e2e",
+    "run_bare_live_e2e",
+]
