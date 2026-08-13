@@ -18,6 +18,7 @@ from collections.abc import Callable
 from datetime import datetime, timezone
 from typing import Any, Mapping
 from urllib.error import HTTPError
+from urllib.parse import urlparse
 
 from apps_rg.runtime.env_bootstrap import bootstrap_process_env_if_needed
 from apps_rg.runtime.model_capabilities import try_model_capabilities
@@ -242,6 +243,27 @@ def _validate_native_anthropic_payload(payload: Mapping[str, Any]) -> None:
         raise ProviderGatewayError(f"Native Anthropic payload includes gateway-owned key(s): {joined}")
 
 
+def _contains_anthropic_cache_control(value: Any) -> bool:
+    """Return whether a native payload carries an Anthropic cache directive."""
+    if isinstance(value, Mapping):
+        if isinstance(value.get("cache_control"), Mapping):
+            return True
+        return any(_contains_anthropic_cache_control(item) for item in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_contains_anthropic_cache_control(item) for item in value)
+    return False
+
+
+def _is_direct_anthropic_messages_endpoint(url: Any) -> bool:
+    """Whether ``url`` is Anthropic's native HTTPS Messages endpoint."""
+    parsed = urlparse(str(url or "").strip())
+    return (
+        parsed.scheme.lower() == "https"
+        and str(parsed.hostname or "").lower() == "api.anthropic.com"
+        and parsed.path.rstrip("/") == "/v1/messages"
+    )
+
+
 def _anthropic_body_from_native_request(request: dict[str, Any], provider_model: str) -> dict[str, Any]:
     native = request.get("anthropic_payload")
     if not isinstance(native, Mapping):
@@ -284,6 +306,7 @@ class ExternalProvider:
         api_key_env_var: str | None = None,
         base_url: str | None = None,
         transport: ExternalTransport | None = None,
+        supports_anthropic_prompt_caching: bool | None = None,
         environ: Mapping[str, str] | None = None,
     ) -> None:
         if provider_profile not in (
@@ -308,11 +331,38 @@ class ExternalProvider:
         )
         self.base_url = base_url or ""
         self.transport = transport
+        self._supports_anthropic_prompt_caching = supports_anthropic_prompt_caching
 
     def _default_transport(self, request: dict[str, Any]) -> dict[str, Any]:
         if self.provider_profile == ProviderProfile.EXTERNAL_CLAUDE:
             return self._anthropic_messages_transport(request)
         return self._openai_responses_transport(request)
+
+    def _native_anthropic_prompt_cache_capability(
+        self,
+        request: Mapping[str, Any],
+    ) -> tuple[bool, str]:
+        """Resolve whether cache directives may cross this provider boundary.
+
+        The native Anthropic schema is intentionally not sent to an injected
+        adapter or a non-Anthropic endpoint unless that adapter declares support.
+        A normal direct Messages API request remains enabled by default.
+        """
+        if self.provider_profile != ProviderProfile.EXTERNAL_CLAUDE:
+            return False, "provider_is_not_anthropic"
+        if self._supports_anthropic_prompt_caching is not None:
+            return (
+                bool(self._supports_anthropic_prompt_caching),
+                "explicit_adapter_capability",
+            )
+        if self.transport is not None:
+            return False, "custom_transport_not_confirmed"
+        endpoint = str(
+            request.get("base_url") or self.base_url or DEFAULT_ANTHROPIC_MESSAGES_URL
+        )
+        if _is_direct_anthropic_messages_endpoint(endpoint):
+            return True, "direct_anthropic_messages_api"
+        return False, "non_anthropic_messages_endpoint"
 
     def _transport_attempt_evidence(
         self, request: Mapping[str, Any], *, transport_attempt: int
@@ -722,6 +772,7 @@ class ExternalProvider:
             "last_transport_attempt": 0,
             "attempt_ids": [],
         }
+        cache_transport_state: dict[str, Any] | None = None
         reasoning_effort = str(getattr(compiled_prompt, "reasoning_effort", None) or "").strip().lower()
         capabilities = try_model_capabilities(self.model)
         if reasoning_effort and capabilities and not capabilities.supports_reasoning_effort(
@@ -739,6 +790,11 @@ class ExternalProvider:
             model: str | None = None,
         ) -> dict[str, Any]:
             response = dict(payload or {})
+            if cache_transport_state is not None:
+                response.setdefault(
+                    "anthropic_prompt_cache_transport",
+                    dict(cache_transport_state),
+                )
             if reasoning_effort:
                 response.setdefault("reasoning_effort", reasoning_effort)
             response.setdefault("attempt_started_at_utc", attempt_started_at_utc)
@@ -837,15 +893,28 @@ class ExternalProvider:
             },
             "_provider_attempt_state": attempt_state,
         }
+        native_cache_seed: Mapping[str, Any] | None = None
         if reasoning_effort:
             request["reasoning_effort"] = reasoning_effort
         if self.provider_profile == ProviderProfile.EXTERNAL_CLAUDE:
             native_anthropic_payload = getattr(compiled_prompt, "anthropic_payload", None)
             if isinstance(native_anthropic_payload, Mapping):
-                request["anthropic_payload"] = dict(native_anthropic_payload)
-            native_cache_seed = getattr(compiled_prompt, "anthropic_cache_receipt_seed", None)
-            if isinstance(native_cache_seed, Mapping):
-                request["anthropic_cache_receipt_seed"] = dict(native_cache_seed)
+                if _contains_anthropic_cache_control(native_anthropic_payload):
+                    cache_supported, cache_reason = self._native_anthropic_prompt_cache_capability(
+                        request
+                    )
+                    cache_transport_state = {
+                        "cache_directives_requested": True,
+                        "cache_directives_transmitted": cache_supported,
+                        "capability_source": cache_reason,
+                    }
+                    if cache_supported:
+                        request["anthropic_payload"] = dict(native_anthropic_payload)
+                else:
+                    request["anthropic_payload"] = dict(native_anthropic_payload)
+            candidate_cache_seed = getattr(compiled_prompt, "anthropic_cache_receipt_seed", None)
+            if isinstance(candidate_cache_seed, Mapping):
+                native_cache_seed = dict(candidate_cache_seed)
         if self._uses_process_environ:
             bootstrap_process_env_if_needed(self.environ)
         if not str(self.environ.get(self.api_key_env_var) or "").strip():
@@ -861,7 +930,7 @@ class ExternalProvider:
                 provider_response=_provider_response_with_attempt(
                     {
                         "provider_profile": self.provider_profile.value,
-                        "anthropic_cache_receipt_seed": request.get("anthropic_cache_receipt_seed"),
+                        "anthropic_cache_receipt_seed": native_cache_seed,
                     },
                     provider_attempted=False,
                     provider_available=False,

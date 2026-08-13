@@ -68,6 +68,43 @@ class _CapturingGateway:
         )
 
 
+class _CacheSuppressingGateway(_CapturingGateway):
+    def generate(
+        self,
+        profile,
+        compiled_prompt,
+        *,
+        token_budget: int,
+        temperature: float = 0.7,
+        timeout_seconds: int | float | None = None,
+    ) -> ProviderResult:
+        self.calls.append(
+            {
+                "profile": profile,
+                "compiled_prompt": compiled_prompt,
+                "token_budget": token_budget,
+                "temperature": temperature,
+                "timeout_seconds": timeout_seconds,
+            }
+        )
+        return ProviderResult(
+            provider_requested=str(getattr(profile, "value", profile)),
+            provider_attempted=True,
+            provider_available=True,
+            exact_provider_error=None,
+            runtime_generation_status="REAL_LLM",
+            model=pins.CLAUDE_GENERATOR_MODEL,
+            raw_model_output='{"ok":true}',
+            provider_response={
+                "anthropic_prompt_cache_transport": {
+                    "cache_directives_requested": True,
+                    "cache_directives_transmitted": False,
+                    "capability_source": "custom_transport_not_confirmed",
+                }
+            },
+        )
+
+
 def _slot(slot_id: str, content: str) -> PromptSlotPayload:
     return PromptSlotPayload(
         slot_id=slot_id,
@@ -155,6 +192,34 @@ def test_cache_disabled_does_not_attach_native_anthropic_payload(monkeypatch) ->
     compiled = gateway.calls[0]["compiled_prompt"]
     assert compiled.anthropic_payload is None
     assert compiled.anthropic_cache_receipt_seed is None
+
+
+def test_suppressed_native_cache_does_not_claim_a_provider_cache_hit(monkeypatch, tmp_path) -> None:
+    monkeypatch.setenv("APPS_RG_ANTHROPIC_PROMPT_CACHE", "1")
+    gateway = _CacheSuppressingGateway()
+    monkeypatch.setattr(
+        section_provider_call,
+        "build_section_provider_gateway",
+        lambda claude_model=None, openai_model=None: gateway,
+    )
+    artifact = _artifact()
+
+    result = section_provider_call.call_section_model_provider(
+        ProviderProfile.EXTERNAL_CLAUDE,
+        {
+            "messages": [*artifact.messages, {"role": "user", "content": "path_index=0"}],
+            "compiled_prompt_artifact": artifact,
+            "anthropic_workload_kind": "SELF_CONSISTENCY",
+            "_reasoning_section_lane": "competencies",
+        },
+        artifact_dir=tmp_path,
+        run_id="run-1",
+    )
+
+    assert result.prompt_cache_receipt is not None
+    assert result.prompt_cache_receipt["cache_enabled"] is False
+    assert result.prompt_cache_receipt["cache_requested"] is True
+    assert result.prompt_cache_receipt["cache_suppressed_reason"] == "custom_transport_not_confirmed"
 
 
 def test_external_openai_generate_ignores_anthropic_only_payload(monkeypatch) -> None:

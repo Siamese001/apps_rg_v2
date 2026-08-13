@@ -202,6 +202,20 @@ def _write_provider_cache_receipt(
     )
 
 
+def _cache_directive_suppression_reason(result: ProviderResult) -> str | None:
+    """Return the native-adapter reason when cache directives never left Apps RG."""
+    response = result.provider_response if isinstance(result.provider_response, Mapping) else {}
+    state = response.get("anthropic_prompt_cache_transport")
+    if not isinstance(state, Mapping):
+        return None
+    if (
+        state.get("cache_directives_requested") is True
+        and state.get("cache_directives_transmitted") is False
+    ):
+        return str(state.get("capability_source") or "native_cache_transport_not_confirmed")
+    return None
+
+
 def _with_cache_receipt(
     result: ProviderResult,
     *,
@@ -211,7 +225,8 @@ def _with_cache_receipt(
     seed: Mapping[str, Any] | None = None,
     artifact_dir: Path | None = None,
 ) -> ProviderResult:
-    if seed is not None and anthropic_prompt_cache_enabled():
+    suppression_reason = _cache_directive_suppression_reason(result)
+    if seed is not None and anthropic_prompt_cache_enabled() and suppression_reason is None:
         receipt = build_cache_receipt_from_usage(
             seed=seed,
             provider=profile.value,
@@ -225,6 +240,9 @@ def _with_cache_receipt(
             model=str(model or result.model or ""),
             section_id=section_id,
         )
+        if suppression_reason is not None:
+            receipt["cache_requested"] = True
+            receipt["cache_suppressed_reason"] = suppression_reason
     response = dict(result.provider_response or {})
     response.setdefault("provider_cache_receipt", receipt)
     result.provider_response = response

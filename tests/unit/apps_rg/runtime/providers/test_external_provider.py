@@ -137,6 +137,95 @@ def test_external_provider_threads_request_to_injected_transport() -> None:
     }
 
 
+def _compiled_prompt_with_anthropic_cache() -> SimpleNamespace:
+    compiled = _compiled_prompt()
+    compiled.anthropic_payload = {
+        "system": [
+            {
+                "type": "text",
+                "text": "Stable system rules.",
+                "cache_control": {"type": "ephemeral"},
+            }
+        ],
+        "messages": [{"role": "user", "content": "Write one bullet."}],
+    }
+    compiled.anthropic_cache_receipt_seed = {"cache_enabled": True}
+    return compiled
+
+
+def test_custom_anthropic_transport_does_not_receive_cache_directives_without_capability() -> None:
+    captured: dict[str, object] = {}
+
+    def _transport(request):
+        captured.update(request)
+        return {"text": "Generated section.", "model": pins.CLAUDE_GENERATOR_MODEL}
+
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
+        model=pins.CLAUDE_GENERATOR_MODEL,
+        base_url="https://proxy.example.test/v1/messages",
+        transport=_transport,
+        environ={"ANTHROPIC_API_KEY": "test-key"},
+    )
+
+    result = provider.generate(_compiled_prompt_with_anthropic_cache(), token_budget=88)
+
+    assert "anthropic_payload" not in captured
+    assert "anthropic_cache_receipt_seed" not in captured
+    assert captured["messages"] == [
+        {"role": "system", "content": "System guard."},
+        {"role": "user", "content": "Write one bullet."},
+    ]
+    assert result.provider_response is not None
+    assert result.provider_response["anthropic_prompt_cache_transport"] == {
+        "cache_directives_requested": True,
+        "cache_directives_transmitted": False,
+        "capability_source": "custom_transport_not_confirmed",
+    }
+
+
+def test_explicitly_cache_capable_anthropic_adapter_receives_native_payload() -> None:
+    captured: dict[str, object] = {}
+
+    def _transport(request):
+        captured.update(request)
+        return {"text": "Generated section.", "model": pins.CLAUDE_GENERATOR_MODEL}
+
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
+        model=pins.CLAUDE_GENERATOR_MODEL,
+        base_url="https://proxy.example.test/v1/messages",
+        transport=_transport,
+        supports_anthropic_prompt_caching=True,
+        environ={"ANTHROPIC_API_KEY": "test-key"},
+    )
+
+    result = provider.generate(_compiled_prompt_with_anthropic_cache(), token_budget=88)
+
+    assert captured["anthropic_payload"]["system"][0]["cache_control"] == {
+        "type": "ephemeral"
+    }
+    assert result.provider_response is not None
+    assert result.provider_response["anthropic_prompt_cache_transport"] == {
+        "cache_directives_requested": True,
+        "cache_directives_transmitted": True,
+        "capability_source": "explicit_adapter_capability",
+    }
+
+
+def test_direct_anthropic_messages_endpoint_supports_native_cache_directives() -> None:
+    provider = ExternalProvider(
+        provider_profile=ProviderProfile.EXTERNAL_CLAUDE,
+        model=pins.CLAUDE_GENERATOR_MODEL,
+        environ={"ANTHROPIC_API_KEY": "test-key"},
+    )
+
+    assert provider._native_anthropic_prompt_cache_capability({}) == (
+        True,
+        "direct_anthropic_messages_api",
+    )
+
+
 def test_external_provider_threads_section_effort_to_request_and_receipt() -> None:
     captured: dict[str, object] = {}
 
