@@ -73,7 +73,7 @@ Constraints that every implementation phase must preserve:
   claims. Retrieval can rank candidates but cannot become evidence authority.
 - Apps Eval remains a read-only regression harness. Its scalar and row
   aggregates remain explicitly non-authoritative for product success.
-- App-local telemetry must not claim coverage of an external runtime seam
+- App-local telemetry must not claim coverage of an external agentic_core seam
   without linked core evidence. The receipt must state a coverage gap when such
   linkage is absent.
 
