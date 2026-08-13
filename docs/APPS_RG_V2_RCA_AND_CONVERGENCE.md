@@ -21,6 +21,23 @@ history is merged or deleted.
 | `C:\Temp\apps-rg-main-full-resume-20260813\bare_e2e_20260813T061825Z_ce6d2750` | Prior live package: `SUCCESS`, all compact stages pass, actual OpenAI and Gemini provider receipts. |
 | `C:\Temp\apps-rg-fixture-proof-a` and `...-b` | Fixture proof passed one-run tests but differed across runs due to timestamp/path data; it was not proof of byte-identical product determinism. |
 
+## GitHub PR evidence
+
+Remote PR metadata was inspected from `Siamese001/apps_rg_v2` on 2026-08-13.
+It confirms that GitHub pull requests and local branch merges are different
+events in this history:
+
+| Remote PR | Merge commit | Relevance |
+| --- | --- | --- |
+| [#8 — Preserve zero-LLM RCA remediation evidence](https://github.com/Siamese001/apps_rg_v2/pull/8) | `27d129da6` | Historical zero-LLM/RCA work. |
+| [#20 — scope local-generator scan to code](https://github.com/Siamese001/apps_rg_v2/pull/20) | `20f3b3781` | Merged head `codex/zero-llm-resume-e2e-r3`. |
+
+The local-main commits `2cb675750` (`codex/anthropic-deterministic-e2e`) and
+`c0f0da1da` (`codex/w3-anthropic-fresh-e2e`) have local merge messages, but
+no corresponding merged GitHub PR appeared in the remote PR list. They must
+be reported as **local merges**, never as PRs. This branch has not been pushed
+and has no PR yet.
+
 ## Root causes
 
 | Symptom | Root cause | Corrective action on this branch |
