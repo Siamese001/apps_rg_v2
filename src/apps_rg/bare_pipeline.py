@@ -43,6 +43,12 @@ from apps_research.integrations.provider_gateway import (
 from apps_research.integrations.search_retrieval import retrieve
 from apps_research.integrations.searxng_readiness import runtime_base_url
 from apps_rg.runtime.resume_resolution import resolve_resume_for_lanes
+from apps_rg.runtime.sections.section_product_shape_export_bounds import (
+    COMPETENCIES_EXPORT_MAX_CATEGORIES,
+    COMPETENCIES_EXPORT_MIN_CATEGORIES,
+)
+from apps_rg.runtime.validators.ibm_bullets_x2 import IBM_BULLET_IDS
+from apps_rg.runtime.validators.unify_bullets_x2 import UNIFY_BULLET_IDS
 
 
 DEFAULT_TARGET_COMPANY = "Anthropic"
@@ -79,10 +85,10 @@ REQUIRED_RESUME_HEADINGS = (
     "EXECUTIVE SUMMARY",
     "CORE COMPETENCIES",
     "PROFESSIONAL EXPERIENCE",
-    "TECHNICAL EXPERTISE",
     "EDUCATION",
     "CERTIFICATIONS",
 )
+FORBIDDEN_RESUME_HEADINGS = ("TECHNICAL EXPERTISE",)
 
 
 class BarePipelineError(RuntimeError):
@@ -204,6 +210,28 @@ def _format_resume_date(value: Any) -> str:
     return text
 
 
+def _core_competency_rows(skills: list[Any]) -> list[tuple[str, list[str]]]:
+    """Return the bounded Core Competencies rows from canonical resume skills.
+
+    The public CLI deliberately reuses the section product bounds instead of
+    maintaining a second, looser skills list.  Source ordering is the
+    deterministic fallback selection policy; live generation must satisfy the
+    same range through X1 validation.
+    """
+    rows: list[tuple[str, list[str]]] = []
+    for item in skills:
+        if not isinstance(item, Mapping):
+            continue
+        category = str(item.get("category") or "").strip()
+        terms = item.get("terms")
+        if not category or not isinstance(terms, list):
+            continue
+        cleaned_terms = [str(term).strip() for term in terms if str(term).strip()]
+        if cleaned_terms:
+            rows.append((category, cleaned_terms))
+    return rows[:COMPETENCIES_EXPORT_MAX_CATEGORIES]
+
+
 def _render_deterministic_resume(
     *,
     resume_source: str,
@@ -251,13 +279,8 @@ def _render_deterministic_resume(
     )
 
     lines = [f"# {name}", contact, "", "## EXECUTIVE SUMMARY", summary, "", "## CORE COMPETENCIES"]
-    for item in skills:
-        if not isinstance(item, Mapping):
-            continue
-        category = str(item.get("category") or "Expertise").strip()
-        terms = item.get("terms")
-        if isinstance(terms, list) and terms:
-            lines.append(f"- **{category}:** " + ", ".join(str(term).strip() for term in terms if str(term).strip()))
+    for category, terms in _core_competency_rows(skills):
+        lines.append(f"- **{category}:** " + ", ".join(terms))
     lines.extend(["", "## PROFESSIONAL EXPERIENCE"])
     for role_fact in employment:
         if not isinstance(role_fact, Mapping):
@@ -277,14 +300,6 @@ def _render_deterministic_resume(
             if text:
                 lines.append(f"- {text}")
         lines.append("")
-    lines.extend(["## TECHNICAL EXPERTISE"])
-    for item in skills:
-        if not isinstance(item, Mapping):
-            continue
-        category = str(item.get("category") or "Expertise").strip()
-        terms = item.get("terms")
-        if isinstance(terms, list) and terms:
-            lines.append(f"**{category}:** " + ", ".join(str(term).strip() for term in terms if str(term).strip()))
     lines.extend(["", "## EDUCATION"])
     for item in education:
         if not isinstance(item, Mapping):
@@ -366,6 +381,33 @@ def _resume_employers_from_source(resume_source: str) -> tuple[str, ...]:
     return tuple(employers)
 
 
+def _markdown_section(text: str, heading: str, *, level: int) -> str:
+    """Return a Markdown heading's body without consuming a peer heading."""
+    match = re.search(rf"(?im)^{'#' * level}\s+{re.escape(heading)}\s*$", text)
+    if not match:
+        return ""
+    next_heading = re.search(rf"(?m)^{'#' * level}\s+", text[match.end() :])
+    end = match.end() + next_heading.start() if next_heading else len(text)
+    return text[match.end() : end]
+
+
+def _markdown_bullet_count(text: str) -> int:
+    return len(re.findall(r"(?m)^\s*-\s+\S.*$", text))
+
+
+def _employment_bullet_count(text: str, employer: str) -> int:
+    """Count Markdown bullets for one employer before the next employer heading."""
+    match = re.search(
+        rf"(?im)^###\s+{re.escape(employer)}(?:\s*(?:—|-|\|).*)?$",
+        text,
+    )
+    if not match:
+        return 0
+    next_boundary = re.search(r"(?m)^#{1,3}\s+", text[match.end() :])
+    end = match.end() + next_boundary.start() if next_boundary else len(text)
+    return _markdown_bullet_count(text[match.end() : end])
+
+
 def _validate_tailored_resume(
     tailored_resume: str,
     *,
@@ -386,22 +428,67 @@ def _validate_tailored_resume(
         )
         for employer in required_employers
     }
+    competency_count = _markdown_bullet_count(_markdown_section(text, "CORE COMPETENCIES", level=2))
+    technical_expertise_absent = all(
+        not re.search(rf"(?im)^##\s+{re.escape(heading)}\s*$", text)
+        for heading in FORBIDDEN_RESUME_HEADINGS
+    )
+    outreach_email_not_embedded = not re.search(r"(?im)^\s*subject\s*:\s*\S+", text)
+    role_shape_checks: dict[str, bool] = {}
+    role_shape_details: dict[str, dict[str, int]] = {}
+    if "Unify Consulting" in required_employers:
+        actual = _employment_bullet_count(text, "Unify Consulting")
+        role_shape_checks["unify_bullet_count"] = actual == len(UNIFY_BULLET_IDS)
+        role_shape_details["unify_bullet_count"] = {
+            "actual": actual,
+            "required": len(UNIFY_BULLET_IDS),
+        }
+    if "IBM" in required_employers:
+        actual = _employment_bullet_count(text, "IBM")
+        role_shape_checks["ibm_bullet_count"] = actual == len(IBM_BULLET_IDS)
+        role_shape_details["ibm_bullet_count"] = {
+            "actual": actual,
+            "required": len(IBM_BULLET_IDS),
+        }
     checks = {
         "header": bool(re.search(r"(?m)^#\s+\S", text)),
         "headings": heading_checks,
         "employers": employer_checks,
         "minimum_length": len(text) >= 700,
+        "core_competency_category_count": (
+            COMPETENCIES_EXPORT_MIN_CATEGORIES
+            <= competency_count
+            <= COMPETENCIES_EXPORT_MAX_CATEGORIES
+        ),
+        "technical_expertise_not_separate_section": technical_expertise_absent,
+        "outreach_email_not_embedded_in_resume": outreach_email_not_embedded,
+        **role_shape_checks,
     }
     missing = ["header"] if not checks["header"] else []
     missing.extend(f"heading:{heading}" for heading, passed in heading_checks.items() if not passed)
     missing.extend(f"employer:{employer}" for employer, passed in employer_checks.items() if not passed)
     if not checks["minimum_length"]:
         missing.append("minimum_length")
+    if not checks["core_competency_category_count"]:
+        missing.append("core_competency_category_count")
+    if not checks["technical_expertise_not_separate_section"]:
+        missing.append("forbidden_heading:TECHNICAL EXPERTISE")
+    if not checks["outreach_email_not_embedded_in_resume"]:
+        missing.append("outreach_email_embedded_in_resume")
+    missing.extend(name for name, passed in role_shape_checks.items() if not passed)
     return {
         "status": "PASS" if not missing else "FAIL",
         "resume_characters": len(text),
         "required_headings": list(REQUIRED_RESUME_HEADINGS),
         "required_employers": list(required_employers),
+        "shape": {
+            "core_competency_category_count": {
+                "actual": competency_count,
+                "minimum": COMPETENCIES_EXPORT_MIN_CATEGORIES,
+                "maximum": COMPETENCIES_EXPORT_MAX_CATEGORIES,
+            },
+            "employment_bullet_counts": role_shape_details,
+        },
         "checks": checks,
         "missing": missing,
     }
@@ -847,7 +934,7 @@ def _run_gemini_evaluation(
         "verdict": verdict,
         "score": max(0.0, min(1.0, score)),
         "reasoning": str(decision.get("reasoning") or "").strip()[:240],
-    }, _provider_summary(response.receipt)
+    }, dict(response.receipt)
 
 
 def _write_resume_docx(path: Path, *, target_role: str, resume_markdown: str) -> str:
@@ -890,16 +977,23 @@ def _validate_resume_docx(
         return {"status": "FAIL", "error": f"{type(exc).__name__}: {exc}"}
     paragraphs = [paragraph.text.strip() for paragraph in document.paragraphs if paragraph.text.strip()]
     heading_checks = {heading: heading in paragraphs for heading in REQUIRED_RESUME_HEADINGS}
+    forbidden_heading_checks = {
+        heading: heading not in paragraphs for heading in FORBIDDEN_RESUME_HEADINGS
+    }
     employer_checks = {
         employer: any(employer in paragraph for paragraph in paragraphs)
         for employer in required_employers
     }
     missing = [f"heading:{heading}" for heading, passed in heading_checks.items() if not passed]
+    missing.extend(
+        f"forbidden_heading:{heading}" for heading, passed in forbidden_heading_checks.items() if not passed
+    )
     missing.extend(f"employer:{employer}" for employer, passed in employer_checks.items() if not passed)
     return {
         "status": "PASS" if not missing else "FAIL",
         "paragraph_count": len(paragraphs),
         "headings": heading_checks,
+        "forbidden_headings": forbidden_heading_checks,
         "employers": employer_checks,
         "missing": missing,
     }
@@ -1115,14 +1209,18 @@ def run_bare_live_e2e(
                 "Return exactly these two XML-style blocks and nothing before them:\n"
                 "<tailored_resume>\n"
                 "A complete, ATS-readable Markdown resume. Keep every candidate claim grounded in the base resume. "
-                "Use this exact section order and include every employer below:\n"
+                "Use this exact section order and include every employer below. Core Competencies must contain "
+                f"{COMPETENCIES_EXPORT_MIN_CATEGORIES} to {COMPETENCIES_EXPORT_MAX_CATEGORIES} category bullets. "
+                f"Unify Consulting must contain exactly {len(UNIFY_BULLET_IDS)} employment bullets. "
+                f"IBM must contain exactly {len(IBM_BULLET_IDS)} employment bullets. Do not add a separate "
+                "Technical Expertise or skills section; Core Competencies is the sole skills section. The outreach "
+                "email is a separate output: do not include a Subject: line or any email copy in the résumé block.\n"
                 "# Candidate Name\n"
                 "contact information\n"
                 "## EXECUTIVE SUMMARY\n"
                 "## CORE COMPETENCIES\n"
                 "## PROFESSIONAL EXPERIENCE\n"
                 f"{employer_outline}\n"
-                "## TECHNICAL EXPERTISE\n"
                 "## EDUCATION\n"
                 "## CERTIFICATIONS\n"
                 "</tailored_resume>\n\n"
