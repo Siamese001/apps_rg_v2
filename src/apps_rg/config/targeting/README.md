@@ -4,7 +4,7 @@
 
 | File pattern | Use |
 |--------------|-----|
-| `*_briefing.md` | Targeting brief SSOT (role themes, leadership, M&A/AI hooks) for all lanes and `python -m apps_rg` CLI. |
+| `*_briefing.md` | Reference material for target tailoring. It is not a public CLI input. |
 
 ### Brown & Brown SVP IT Strategy & Innovation
 
@@ -12,10 +12,9 @@
 - JD: [brown_brown_svp_it_strategy_innovation_jd.txt](brown_brown_svp_it_strategy_innovation_jd.txt)
 
 ```powershell
-python -m apps_rg --target-company "Brown & Brown" `
+python -m apps_rg run --target-company "Brown & Brown" `
   --target-role "SVP IT Strategy & Innovation" `
-  --jd apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt `
-  --manual-brief apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_briefing.md
+  --jd apps_rg/config/targeting/brown_brown_svp_it_strategy_innovation_jd.txt
 ```
 
 ### AIG VP Global Head Agentic AI
@@ -28,7 +27,7 @@ python -m apps_rg --target-company "Brown & Brown" `
 - JD: [citi_head_of_ai_strategy_jd.txt](citi_head_of_ai_strategy_jd.txt)
 
 ```powershell
-python -m apps_rg --target-company "Citi" `
+python -m apps_rg run --target-company "Citi" `
   --target-role "Head of AI Strategy - Firmwide AI" `
   --jd apps_rg/config/targeting/citi_head_of_ai_strategy_jd.txt
 ```

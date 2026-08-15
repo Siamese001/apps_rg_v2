@@ -52,9 +52,9 @@ end-to-end Apps RG resume runners:
 - `apps_rg.runtime.*`, `apps_rg.fact_inventory.*`, and section-lane modules —
   implementation or maintenance surfaces, not operator resume pipelines.
 
-The historical `python -m apps_rg --section ...`, `doctor`, bootstrap,
-manual-brief, cache, W6, and legacy-spine command shapes are not part of this
-public resume command. They must not be added back to its parser.
+The historical section-selection, `doctor`, bootstrap, manual-brief, cache,
+W6, and legacy-spine command shapes are not part of this public resume
+command. They must not be added back to its parser.
 
 ## Enforcement
 

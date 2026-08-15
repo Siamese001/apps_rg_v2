@@ -1,84 +1,37 @@
-# apps_rg runtime proof — runbook (canonical CLI only)
+# Apps RG resume workflow
 
-There is **no** `python -m apps_rg.runtime.*` product or section CLI. Runtime proof enters only through `apps_rg/__main__.py`.
+The sole public, end-to-end resume command is:
+
+```bash
+python -m apps_rg run [--mode live|deterministic] [--target-company <company>] [--target-role <role>] [--jd <path-or-text>] [--resume <path>]
+```
+
+With no arguments, `python -m apps_rg` runs the same canonical workflow. It
+uses the canonical Anthropic partnership JD and base resume unless an override
+is supplied.
+
+## Supported actions
 
 | Goal | Command |
-|------|---------|
-| **Product / integrated spine proof** | `python -m apps_rg --target-company <co> --target-role <role> [--jd …] [--manual-brief …]` |
-| **Single-lane dev proof** | `python -m apps_rg --section <lane> --target-company <co> --target-role <role> --jd … --manual-brief …` |
-| **Read-only integrated product proof check** | `python -m apps_rg.runtime.integrated_product_proof_gate <run_dir> [--json]` |
+| --- | --- |
+| Run the complete product workflow | `python -m apps_rg run` |
+| Run a no-provider repeatability proof | `python -m apps_rg run --mode deterministic` |
+| Re-evaluate a completed run | `python -m apps_rg eval --run-dir <run-dir>` |
+| Print a stored artifact | `python -m apps_rg show --run-dir <run-dir> --artifact resume\|email\|research\|summary\|evaluation` |
 
-Offline batch helpers (`run_orchestration`, rollup, assembly, package disposition) are **library-only** under `apps_rg.runtime.*` — not module CLIs.
+`eval` and `show` are actions of the same command surface; neither produces a
+new resume or makes a provider call.
 
-Outputs from non-canonical historical runs must not be claimed as product, L7, or Fort Knox proof.
+## Retired command shapes
 
----
+There is no section, manual-brief, bootstrap, cache, W6, patch-run, or runtime
+module command for the public resume workflow. Those historical paths must not
+be used to claim an end-to-end Apps RG run. Runtime modules, evaluators,
+validators, fact-inventory tools, and graph maintenance utilities may have
+their own maintainer interfaces, but none generates the complete resume
+product.
 
-## Required services (live lanes)
-
-| Dependency | Purpose |
-|------------|---------|
-| **external model PROVIDER_MODEL** | Section lanes with `external_model` (or contract stub in CI) |
-| **X1D judge backends** | Per-lane judge configuration when not using test mocks |
-
-Run from repository root.
-
----
-
-## Product whole-run
-
-```bash
-python -m apps_rg \
-  --target-company "Contoso Labs" \
-  --target-role "Principal Engineer" \
-  --jd artifacts/apps_rg/runtime_inputs/example_jd.txt \
-  --manual-brief artifacts/apps_rg/runtime_inputs/example_briefing.txt
-```
-
-Dry-run (no lane runtime):
-
-```bash
-python -m apps_rg --section executive_summary --dry-run \
-  --target-company "Contoso Labs" \
-  --target-role "Principal Engineer" \
-  --jd path/to/jd.txt \
-  --manual-brief path/to/briefing.txt
-```
-
----
-
-## Single-lane dev
-
-```bash
-python -m apps_rg --section executive_summary \
-  --target-company "Contoso Labs" \
-  --target-role "Principal Engineer" \
-  --jd artifacts/apps_rg/runtime_inputs/example_jd.txt \
-  --manual-brief artifacts/apps_rg/runtime_inputs/example_briefing.txt \
-  --provider external_model \
-  --allow-non-allow-exit-zero
-```
-
----
-
-## JD + briefing validation (no generation)
-
-```bash
-python -m apps_rg.runtime.prepare_orchestrator_inputs \
-  --job-description path/to/jd.txt \
-  --briefing path/to/briefing.txt
-```
-
-Prints a suggested **canonical** `python -m apps_rg` command. Does not read or write base resume.
-
----
-
-## CI lane-dev harness (retired direct script)
-
-`ops_scripts/ci/prove_apps_rg_e2e_runtime.py` remains importable for unit tests only. Do not run it as a product proof entrypoint. Lane-dev proof uses `python -m apps_rg --section <lane>` per lane.
-
----
-
-## Maintainer boundaries
-
-Generated lane behavior, X1D/X2/X3, L6, DOCX internals, registry, and `apps_rg` are out of scope for this runbook. This document covers **how to invoke canonical entrypoints only**.
+Every `run` prints the full resume, evaluation results, and runtime details in
+fenced blocks. See
+[`docs/APPS_RG_V2_CANONICAL_ENTRYPOINTS.md`](../../../docs/APPS_RG_V2_CANONICAL_ENTRYPOINTS.md)
+for the authoritative public-command contract.

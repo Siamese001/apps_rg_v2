@@ -1,19 +1,19 @@
 """SSOT for which ``apps_rg`` modules may be executed outside ``python -m apps_rg``.
 
-Product and section runtime must enter through [apps_rg/__main__.py](../__main__.py).
-Legacy shadow dotted paths (``dispatch.*_dispatch``, ``_offline.*``, moved orchestrate/package paths)
-are deleted — ``python -m`` must raise ``ModuleNotFoundError``.
-Internal helpers live under ``apps_rg.runtime.internal`` and ``apps_rg.runtime.sections.*_lane``;
-they are library-only (``ImportError`` if executed as ``__main__``).
+The complete resume product must enter through [apps_rg/__main__.py](../__main__.py).
+Legacy shadow dotted paths (``dispatch.*_dispatch``, ``_offline.*``, moved
+orchestrate/package paths) are deleted — ``python -m`` must raise
+``ModuleNotFoundError``. Internal helpers live under ``apps_rg.runtime.internal``
+and ``apps_rg.runtime.sections.*_lane``; they are library-only (``ImportError``
+if executed as ``__main__``).
 """
 from __future__ import annotations
 
-# Read-only validators / audit / input helpers (no provider, no resume generation).
+# Read-only validators / audit helpers (no provider, no resume generation).
 ALLOWED_OUTSIDE_MAIN_MODULE_CLI: frozenset[str] = frozenset(
     {
         "apps_rg.runtime.integrated_product_proof_gate",
         "apps_rg.runtime.validators.validate_exec_summary_graph_only_generation",
-        "apps_rg.runtime.prepare_orchestrator_inputs",
     }
 )
 
@@ -70,8 +70,7 @@ DISALLOWED_DOC_CI_COMMAND_SUBSTRINGS: tuple[str, ...] = (
     "python ops_scripts/ci/prove_apps_rg_e2e_runtime.py",
 )
 
-CANONICAL_PRODUCT_COMMAND = "python -m apps_rg"
-CANONICAL_SECTION_COMMAND_PREFIX = "python -m apps_rg --section"
+CANONICAL_PRODUCT_COMMAND = "python -m apps_rg run"
 
 
 def is_allowed_outside_main_module_cli(module_name: str) -> bool:
@@ -92,7 +91,6 @@ __all__ = [
     "ALLOWED_OUTSIDE_MAIN_MODULE_CLI",
     "ALLOWED_OUTSIDE_MAIN_MODULE_PREFIXES",
     "CANONICAL_PRODUCT_COMMAND",
-    "CANONICAL_SECTION_COMMAND_PREFIX",
     "DELETED_RUNTIME_MODULE_CLI",
     "DISALLOWED_DOC_CI_COMMAND_SUBSTRINGS",
     "is_allowed_outside_main_module_cli",
