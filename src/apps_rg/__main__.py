@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 from typing import Any, Sequence
 
 from apps_rg.bare_pipeline import (
@@ -101,6 +102,89 @@ def _normalize_argv(argv: Sequence[str] | None) -> list[str]:
     return values
 
 
+def _completed_run_path(result: dict[str, Any]) -> Path | None:
+    raw = str(result.get("artifact_dir") or "").strip()
+    if not raw:
+        return None
+    path = Path(raw).expanduser()
+    return path if path.is_dir() else None
+
+
+def _read_inline_artifact(result: dict[str, Any], filename: str) -> tuple[str | None, str | None]:
+    run_dir = _completed_run_path(result)
+    if run_dir is None:
+        return None, "run artifact directory is unavailable"
+    path = run_dir / filename
+    if not path.is_file():
+        return None, f"required artifact was not written: {filename}"
+    try:
+        return path.read_text(encoding="utf-8"), None
+    except OSError as exc:
+        return None, f"cannot read {filename}: {type(exc).__name__}: {exc}"
+
+
+def _inline_evaluations(result: dict[str, Any]) -> dict[str, Any]:
+    """Return every evaluation surface without issuing another provider call."""
+    run_evaluation: dict[str, Any]
+    run_dir = _completed_run_path(result)
+    if run_dir is None:
+        run_evaluation = {"status": "UNAVAILABLE", "reason": "run artifact directory is unavailable"}
+    else:
+        try:
+            run_evaluation = evaluate_bare_run(run_dir)
+        except BarePipelineError as exc:
+            run_evaluation = {"status": "UNAVAILABLE", "reason": str(exc)}
+    return {
+        "x1_section_checks": result.get("section_checks") or {"status": "UNAVAILABLE"},
+        "x3_evaluation": result.get("evaluation") or {"status": "UNAVAILABLE"},
+        "run_evaluation": run_evaluation,
+    }
+
+
+def _runtime_details(result: dict[str, Any]) -> dict[str, Any]:
+    """Render the operational receipt without duplicating the full resume."""
+    keys = (
+        "pipeline",
+        "command",
+        "run_id",
+        "status",
+        "mode",
+        "outcome_label",
+        "failure_stage",
+        "error",
+        "repository",
+        "target_company",
+        "target_role",
+        "inputs",
+        "outputs",
+        "provider_call_count",
+        "providers",
+        "stages",
+        "delivery",
+        "finished_at_utc",
+    )
+    return {key: result[key] for key in keys if key in result}
+
+
+def _print_inline_run_outputs(result: dict[str, Any]) -> None:
+    """Always print the product, evaluations, and execution receipt after ``run``."""
+    resume, resume_error = _read_inline_artifact(result, "resume.md")
+    print("FULL_RESUME", flush=True)
+    print("```markdown", flush=True)
+    print(resume.rstrip() if resume is not None else f"UNAVAILABLE: {resume_error}", flush=True)
+    print("```", flush=True)
+
+    print("EVALS", flush=True)
+    print("```json", flush=True)
+    print(json.dumps(_inline_evaluations(result), ensure_ascii=False, indent=2, sort_keys=True), flush=True)
+    print("```", flush=True)
+
+    print("RUNTIME_DETAILS", flush=True)
+    print("```json", flush=True)
+    print(json.dumps(_runtime_details(result), ensure_ascii=False, indent=2, sort_keys=True), flush=True)
+    print("```", flush=True)
+
+
 def _print_result(result: dict[str, Any]) -> None:
     print(
         "APPS_RG "
@@ -144,6 +228,7 @@ def _print_result(result: dict[str, Any]) -> None:
         )
     if result.get("error"):
         print(f"APPS_RG_ERROR {result['error']}", file=sys.stderr, flush=True)
+    _print_inline_run_outputs(result)
 
 
 def _print_evaluation(report: dict[str, Any]) -> None:

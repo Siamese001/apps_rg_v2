@@ -69,6 +69,11 @@ def test_public_cli_deterministic_run_enforces_the_same_resume_shape(capsys, tmp
     assert main(["run", "--mode", "deterministic", "--artifact-dir", str(tmp_path)]) == 0
     output = capsys.readouterr().out
     assert "APPS_RG status=SUCCESS mode=deterministic" in output
+    assert "FULL_RESUME\n```markdown\n# Amit Ayer" in output
+    assert "EVALS\n```json" in output
+    assert '"run_evaluation"' in output
+    assert "RUNTIME_DETAILS\n```json" in output
+    assert '"stages"' in output
 
     run_dirs = [path for path in tmp_path.iterdir() if path.is_dir()]
     assert len(run_dirs) == 1
@@ -79,6 +84,28 @@ def test_public_cli_deterministic_run_enforces_the_same_resume_shape(capsys, tmp
     assert resume_check["checks"]["ibm_bullet_count"] is True
     assert resume_check["checks"]["technical_expertise_not_separate_section"] is True
     assert resume_check["checks"]["outreach_email_not_embedded_in_resume"] is True
+
+
+def test_run_inline_outputs_are_mandatory_when_a_run_fails_before_artifacts(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        "apps_rg.__main__.run_bare_e2e",
+        lambda **_kwargs: {
+            "status": "FAIL",
+            "mode": "live",
+            "outcome_label": "LIVE_PROVIDER_FAIL",
+            "artifact_dir": "C:/not-a-real-run",
+            "stages": [],
+            "error": "injected failure",
+        },
+    )
+
+    assert main(["run"]) == 1
+    captured = capsys.readouterr()
+    assert "FULL_RESUME\n```markdown\nUNAVAILABLE: run artifact directory is unavailable" in captured.out
+    assert "EVALS\n```json" in captured.out
+    assert '"status": "UNAVAILABLE"' in captured.out
+    assert "RUNTIME_DETAILS\n```json" in captured.out
+    assert "APPS_RG_ERROR injected failure" in captured.err
 
 
 def test_live_provider_timeout_is_recorded_as_a_failed_attempt(monkeypatch, tmp_path: Path) -> None:
