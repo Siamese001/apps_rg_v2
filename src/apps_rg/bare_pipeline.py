@@ -89,6 +89,14 @@ REQUIRED_RESUME_HEADINGS = (
     "CERTIFICATIONS",
 )
 FORBIDDEN_RESUME_HEADINGS = ("TECHNICAL EXPERTISE",)
+X3_GEMINI_TIMEOUT_SECONDS = 90.0
+X3_GEMINI_MAX_TRANSPORT_ATTEMPTS = 2
+X3_GEMINI_RETRY_BACKOFF_BASE_SECONDS = 1.0
+X3_GEMINI_RETRY_BACKOFF_MAX_SECONDS = 3.0
+X3_RESUME_MANIFEST_FILENAME = "x3_resume_manifest.json"
+X3_RESUME_JD_FILENAME = "x3_input_jd.txt"
+X3_RESUME_BASE_RESUME_FILENAME = "x3_input_base_resume.txt"
+X3_RESUME_MANIFEST_SCHEMA = "apps_rg.x3_resume_manifest.v1"
 
 
 class BarePipelineError(RuntimeError):
@@ -699,6 +707,10 @@ def _provider_summary(receipt: Mapping[str, Any]) -> dict[str, Any]:
         "response_id": str(receipt.get("provider_response_id") or ""),
         "status": str(receipt.get("terminal_status") or ""),
         "usage": dict(receipt.get("usage") or {}),
+        "transport_attempt_count": max(1, int(receipt.get("transport_attempt_count") or 1)),
+        "retry_count": max(0, int(receipt.get("retry_count") or 0)),
+        "retry_reason": str(receipt.get("retry_reason") or ""),
+        "input_characters": max(0, int(receipt.get("input_characters") or 0)),
         "provider_call_attempted": True,
     }
 
@@ -712,6 +724,9 @@ def _provider_attempt_summary(*, provider: str, requested_model: str) -> dict[st
         "response_id": "",
         "status": "ATTEMPTED",
         "usage": {},
+        "transport_attempt_count": 1,
+        "retry_count": 0,
+        "retry_reason": "",
         "provider_call_attempted": True,
     }
 
@@ -904,11 +919,14 @@ def _run_gemini_evaluation(
             body=body,
             method="POST",
             headers={"content-type": "application/json"},
-            timeout=45.0,
+            timeout=X3_GEMINI_TIMEOUT_SECONDS,
             application_validator=_gemini_text_from_response,
             artifact_dir=str(run_dir),
             stage="X3",
             section_id="X3",
+            max_transport_attempts=X3_GEMINI_MAX_TRANSPORT_ATTEMPTS,
+            retry_backoff_base_seconds=X3_GEMINI_RETRY_BACKOFF_BASE_SECONDS,
+            retry_backoff_max_seconds=X3_GEMINI_RETRY_BACKOFF_MAX_SECONDS,
         )
     except AppsResearchProviderGatewayError as exc:
         raise BarePipelineError(f"Gemini evaluation failed: {exc}") from exc
@@ -930,11 +948,13 @@ def _run_gemini_evaluation(
         raise BarePipelineError("Gemini evaluation score was not numeric") from exc
     if verdict not in {"PASS", "FAIL"}:
         raise BarePipelineError(f"Gemini evaluation verdict was invalid: {verdict!r}")
+    receipt = dict(response.receipt)
+    receipt["input_characters"] = len(prompt)
     return {
         "verdict": verdict,
         "score": max(0.0, min(1.0, score)),
         "reasoning": str(decision.get("reasoning") or "").strip()[:240],
-    }, dict(response.receipt)
+    }, receipt
 
 
 def _write_resume_docx(path: Path, *, target_role: str, resume_markdown: str) -> str:
@@ -997,6 +1017,115 @@ def _validate_resume_docx(
         "employers": employer_checks,
         "missing": missing,
     }
+
+
+def _x3_resume_artifact_digests(run_dir: Path) -> dict[str, str]:
+    """Hash every immutable input required to re-run only X3 and DELIVERY."""
+
+    required = (
+        X3_RESUME_JD_FILENAME,
+        X3_RESUME_BASE_RESUME_FILENAME,
+        "research.md",
+        "sources.json",
+        "resume.md",
+        "outreach_email.md",
+    )
+    digests: dict[str, str] = {}
+    for filename in required:
+        path = run_dir / filename
+        if not path.is_file() or path.stat().st_size == 0:
+            raise BarePipelineError(f"X3 resume artifact is missing or empty: {filename}")
+        digests[filename] = _sha256_file(path)
+    return digests
+
+
+def _write_x3_resume_manifest(run_dir: Path) -> dict[str, Any]:
+    manifest = {
+        "schema_version": X3_RESUME_MANIFEST_SCHEMA,
+        "artifact_digests": _x3_resume_artifact_digests(run_dir),
+    }
+    _write_json(run_dir / X3_RESUME_MANIFEST_FILENAME, manifest)
+    return manifest
+
+
+def _read_x3_resume_manifest(run_dir: Path) -> dict[str, Any]:
+    path = run_dir / X3_RESUME_MANIFEST_FILENAME
+    payload = _read_json_object(path)
+    if payload.get("schema_version") != X3_RESUME_MANIFEST_SCHEMA:
+        raise BarePipelineError("X3 resume manifest has an unsupported schema")
+    expected = payload.get("artifact_digests")
+    if not isinstance(expected, Mapping) or not expected:
+        raise BarePipelineError("X3 resume manifest has no artifact digests")
+    actual = _x3_resume_artifact_digests(run_dir)
+    if dict(expected) != actual:
+        raise BarePipelineError("X3 resume artifact digests do not match the sealed manifest")
+    return payload
+
+
+def _require_x3_provider_credential() -> None:
+    if not (
+        os.environ.get("GOOGLE_API_KEY", "").strip()
+        or os.environ.get("GEMINI_API_KEY", "").strip()
+    ):
+        raise BarePipelineError("GOOGLE_API_KEY is required for X3 evaluation resume")
+
+
+def _stage_record(summary: Mapping[str, Any], stage_id: str) -> dict[str, Any]:
+    for row in summary.get("stages") or []:
+        if isinstance(row, Mapping) and row.get("stage") == stage_id:
+            return dict(row)
+    raise BarePipelineError(f"X3 resume source is missing stage record: {stage_id}")
+
+
+def _assert_x3_resume_eligible(summary: Mapping[str, Any], *, run_dir: Path) -> None:
+    if summary.get("mode") != "live":
+        raise BarePipelineError("X3 resume supports only a failed live run")
+    stages = summary.get("stages")
+    if not isinstance(stages, list):
+        raise BarePipelineError("X3 resume source has no stage ledger")
+    observed = [str(row.get("stage") or "") for row in stages if isinstance(row, Mapping)]
+    expected = list(CANONICAL_STAGE_ORDER[:10])
+    if observed != expected:
+        raise BarePipelineError("X3 resume source must stop exactly at the failed X3 stage")
+    statuses = [str(row.get("status") or "") for row in stages if isinstance(row, Mapping)]
+    if statuses[:-1] != ["PASS"] * (len(expected) - 1) or statuses[-1] != "FAIL":
+        raise BarePipelineError("X3 resume source must have passing predecessors and a failed X3 stage")
+    if str(summary.get("failure_stage") or "") != "X3":
+        raise BarePipelineError("X3 resume source did not fail at X3")
+    if Path(str(summary.get("artifact_dir") or "")).resolve() != run_dir.resolve():
+        raise BarePipelineError("X3 resume source has an invalid artifact directory")
+
+
+def _write_live_delivery(
+    *,
+    run_dir: Path,
+    outputs: dict[str, str],
+    target_role: str,
+    resume_markdown: str,
+    required_employers: tuple[str, ...],
+    evaluation: Mapping[str, Any],
+    plan_payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    _write_json(run_dir / "evaluation.json", evaluation)
+    outputs["evaluation"] = "evaluation.json"
+    docx_status = _write_resume_docx(
+        run_dir / "resume.docx", target_role=target_role, resume_markdown=resume_markdown
+    )
+    if docx_status != "written":
+        raise BarePipelineError(f"DOCX export failed: {docx_status}")
+    docx_check = _validate_resume_docx(
+        run_dir / "resume.docx",
+        required_employers=required_employers,
+    )
+    if docx_check["status"] != "PASS":
+        raise BarePipelineError(
+            "DOCX output completeness check failed: "
+            + ", ".join(docx_check.get("missing") or [str(docx_check.get("error") or "unknown")])
+        )
+    outputs["resume_docx"] = "resume.docx"
+    _write_json(run_dir / "plan.json", plan_payload)
+    outputs["plan"] = "plan.json"
+    return {"written_outputs": sorted(outputs.values()), "docx_check": docx_check}
 
 
 def run_bare_live_e2e(
@@ -1108,6 +1237,10 @@ def run_bare_live_e2e(
                 "resume_sha256": "sha256:" + resolved_resume.resume_digest,
                 "mode": "live",
             }
+            _write_text(run_dir / X3_RESUME_JD_FILENAME, jd_text)
+            _write_text(run_dir / X3_RESUME_BASE_RESUME_FILENAME, resume_source)
+            outputs["x3_input_jd"] = X3_RESUME_JD_FILENAME
+            outputs["x3_input_base_resume"] = X3_RESUME_BASE_RESUME_FILENAME
             return {
                 "jd_loaded": True,
                 "resume_loaded": True,
@@ -1279,6 +1412,8 @@ def run_bare_live_e2e(
                 "provider": "apps_research_openai",
             },
         )
+        _write_x3_resume_manifest(run_dir)
+        outputs["x3_resume_manifest"] = X3_RESUME_MANIFEST_FILENAME
 
         def x1() -> dict[str, Any]:
             resume_check = _validate_tailored_resume(
@@ -1361,26 +1496,15 @@ def run_bare_live_e2e(
         )
         outputs["x3_raw"] = "x3_raw.txt"
         def delivery() -> dict[str, Any]:
-            _write_json(run_dir / "evaluation.json", evaluation)
-            outputs["evaluation"] = "evaluation.json"
-            docx_status = _write_resume_docx(
-                run_dir / "resume.docx", target_role=role, resume_markdown=tailored_resume
-            )
-            if docx_status != "written":
-                raise BarePipelineError(f"DOCX export failed: {docx_status}")
-            docx_check = _validate_resume_docx(
-                run_dir / "resume.docx",
+            return _write_live_delivery(
+                run_dir=run_dir,
+                outputs=outputs,
+                target_role=role,
+                resume_markdown=tailored_resume,
                 required_employers=required_employers,
+                evaluation=evaluation,
+                plan_payload={"l1": plan, "l0": route},
             )
-            if docx_check["status"] != "PASS":
-                raise BarePipelineError(
-                    "DOCX output completeness check failed: "
-                    + ", ".join(docx_check.get("missing") or [str(docx_check.get("error") or "unknown")])
-                )
-            outputs["resume_docx"] = "resume.docx"
-            _write_json(run_dir / "plan.json", {"l1": plan, "l0": route})
-            outputs["plan"] = "plan.json"
-            return {"written_outputs": sorted(outputs.values()), "docx_check": docx_check}
 
         result["delivery"] = run_stage("DELIVERY", delivery)
         result["status"] = "SUCCESS"
@@ -1396,6 +1520,218 @@ def run_bare_live_e2e(
     outputs["provider_calls"] = "provider_calls.json"
     outputs["summary"] = "run_summary.json"
     _write_json(run_dir / "run_summary.json", result)
+    return result
+
+
+def resume_bare_live_x3(*, resume_run_dir: str | Path) -> dict[str, Any]:
+    """Re-run only X3 and DELIVERY from a sealed failed live-run artifact.
+
+    This recovery path is deliberately narrow: it never reuses an unsealed
+    input, regenerates research or L2, or turns a missing evaluator response
+    into a pass. Its sole provider dispatch is a fresh X3 evaluation.
+    """
+
+    run_dir = _resolve_run_dir(resume_run_dir)
+    summary_path = run_dir / "run_summary.json"
+    source_summary_sha256 = _sha256_file(summary_path)
+    source_summary = _read_json_object(summary_path)
+    _assert_x3_resume_eligible(source_summary, run_dir=run_dir)
+    manifest = _read_x3_resume_manifest(run_dir)
+
+    try:
+        jd_text = (run_dir / X3_RESUME_JD_FILENAME).read_text(encoding="utf-8")
+        resume_source = (run_dir / X3_RESUME_BASE_RESUME_FILENAME).read_text(encoding="utf-8")
+        research_brief = (run_dir / "research.md").read_text(encoding="utf-8")
+        tailored_resume = (run_dir / "resume.md").read_text(encoding="utf-8")
+        outreach_email = (run_dir / "outreach_email.md").read_text(encoding="utf-8")
+    except OSError as exc:
+        raise BarePipelineError(f"cannot read sealed X3 resume input: {type(exc).__name__}: {exc}") from exc
+    sources_payload = _read_json_object(run_dir / "sources.json")
+    source_rows = sources_payload.get("sources")
+    if not isinstance(source_rows, list) or not source_rows or not all(
+        isinstance(row, Mapping) for row in source_rows
+    ):
+        raise BarePipelineError("sealed X3 resume sources are incomplete")
+    sources = [dict(row) for row in source_rows]
+    company = str(source_summary.get("target_company") or "").strip()
+    role = str(source_summary.get("target_role") or "").strip()
+    if not company or not role or not jd_text or not resume_source or not research_brief:
+        raise BarePipelineError("sealed X3 resume inputs are incomplete")
+    required_employers = _resume_employers_from_source(resume_source)
+    if not required_employers:
+        raise BarePipelineError("sealed X3 resume base resume has no employers")
+
+    repo = _repo_root()
+    result = json.loads(json.dumps(source_summary))
+    stages = [dict(row) for row in source_summary["stages"] if isinstance(row, Mapping)]
+    providers = {
+        str(name): dict(row)
+        for name, row in (source_summary.get("providers") or {}).items()
+        if isinstance(row, Mapping)
+    }
+    outputs = {
+        str(name): str(value)
+        for name, value in (source_summary.get("outputs") or {}).items()
+        if str(name) and str(value)
+    }
+    prior_x3 = dict(stages[-1])
+    prior_x3_provider = dict(providers.get("x3_gemini") or {})
+    resume_started_at = _utc_now()
+    resume_history = list(result.get("resume_history") or [])
+    resume_history.append(
+        {
+            "resumed_at_utc": resume_started_at,
+            "source_run_summary_sha256": source_summary_sha256,
+            "x3_resume_manifest_sha256": _sha256_file(run_dir / X3_RESUME_MANIFEST_FILENAME),
+            "x3_resume_manifest_schema": manifest["schema_version"],
+            "prior_outcome_label": source_summary.get("outcome_label"),
+            "prior_x3_stage": prior_x3,
+            "prior_x3_provider": prior_x3_provider,
+        }
+    )
+    result.update(
+        {
+            "command": f"python -m apps_rg run --resume-run-dir {run_dir}",
+            "repository": _repository_identity(repo),
+            "status": "FAIL",
+            "outcome_label": "LIVE_PROVIDER_FAIL_AFTER_X3_RESUME",
+            "stages": stages,
+            "providers": providers,
+            "outputs": outputs,
+            "resume_history": resume_history,
+        }
+    )
+    current_stage = "X3"
+
+    def capture_x3() -> tuple[dict[str, Any], Mapping[str, Any]]:
+        providers["x3_gemini"] = _provider_attempt_summary(
+            provider=apps_rg_handoff_judge_pin().provider,
+            requested_model=apps_rg_handoff_judge_pin().model,
+        )
+        try:
+            decision, receipt = _run_gemini_evaluation(
+                run_dir=run_dir,
+                jd_text=jd_text,
+                resume_source=resume_source,
+                research_brief=research_brief,
+                tailored_resume=tailored_resume,
+                outreach_email=outreach_email,
+                sources=sources,
+            )
+        except Exception as exc:
+            providers["x3_gemini"] = _provider_failure_summary(
+                provider=apps_rg_handoff_judge_pin().provider,
+                requested_model=apps_rg_handoff_judge_pin().model,
+                error=exc,
+            )
+            raise
+        providers["x3_gemini"] = _provider_summary(receipt)
+        return decision, receipt
+
+    try:
+        x1 = {
+            "status": "FAIL",
+            "resume": _validate_tailored_resume(
+                tailored_resume,
+                required_employers=required_employers,
+            ),
+            "outreach_email": _validate_outreach_email(
+                outreach_email,
+                company=company,
+                role=role,
+            ),
+            "sources": {"status": "PASS" if sources else "FAIL", "source_count": len(sources)},
+        }
+        x1["status"] = (
+            "PASS"
+            if all(
+                str(x1[name].get("status") or "") == "PASS"
+                for name in ("resume", "outreach_email", "sources")
+            )
+            else "FAIL"
+        )
+        if x1["status"] != "PASS":
+            raise BarePipelineError("sealed X3 resume outputs no longer pass X1")
+        _require_x3_provider_credential()
+        decision, _receipt = capture_x3()
+        if decision["verdict"] != "PASS" or float(decision["score"]) < 0.70:
+            raise BarePipelineError(
+                f"X3 evaluation did not pass: {decision['verdict']} score={decision['score']:.2f}"
+            )
+        evaluation = {
+            **decision,
+            "evaluation_type": "live_provider",
+            "x1": x1,
+            "retrieval_failures": list(sources_payload.get("retrieval_failures") or []),
+            "resumed_x3": True,
+        }
+        stages[-1] = {
+            "stage": "X3",
+            "status": "PASS",
+            "started_at_utc": resume_started_at,
+            "finished_at_utc": _utc_now(),
+            "details": {
+                "verdict": evaluation["verdict"],
+                "score": evaluation["score"],
+                "provider": "x3_gemini",
+                "resumed": True,
+                "prior_failure_stage": "X3",
+            },
+        }
+        outputs["x3_raw"] = "x3_raw.txt"
+        current_stage = "DELIVERY"
+        delivery_started = _utc_now()
+        try:
+            plan_payload = {
+                "l1": dict(_stage_record(source_summary, "L1").get("details") or {}),
+                "l0": dict(_stage_record(source_summary, "L0").get("details") or {}),
+            }
+            result["delivery"] = _write_live_delivery(
+                run_dir=run_dir,
+                outputs=outputs,
+                target_role=role,
+                resume_markdown=tailored_resume,
+                required_employers=required_employers,
+                evaluation=evaluation,
+                plan_payload=plan_payload,
+            )
+        except Exception as exc:
+            stages.append(
+                {
+                    "stage": "DELIVERY",
+                    "status": "FAIL",
+                    "started_at_utc": delivery_started,
+                    "finished_at_utc": _utc_now(),
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
+            raise
+        stages.append(
+            {
+                "stage": "DELIVERY",
+                "status": "PASS",
+                "started_at_utc": delivery_started,
+                "finished_at_utc": _utc_now(),
+                "details": dict(result["delivery"]),
+            }
+        )
+        result["evaluation"] = evaluation
+        result["section_checks"] = x1
+        result["status"] = "SUCCESS"
+        result["outcome_label"] = "LIVE_PROVIDER_PASS_AFTER_X3_RESUME"
+        result.pop("failure_stage", None)
+        result.pop("error", None)
+    except Exception as exc:
+        result["status"] = "FAIL"
+        result["failure_stage"] = current_stage
+        result["error"] = f"{type(exc).__name__}: {exc}"
+
+    result["finished_at_utc"] = _utc_now()
+    result["provider_call_count"] = len(providers)
+    _write_provider_call_report(run_dir / "provider_calls.json", mode="live", providers=providers)
+    outputs["provider_calls"] = "provider_calls.json"
+    outputs["summary"] = "run_summary.json"
+    _write_json(summary_path, result)
     return result
 
 
@@ -1760,9 +2096,16 @@ def run_bare_e2e(
     jd: str = "",
     resume_path: str = "",
     artifact_root: str = "",
+    resume_run_dir: str = "",
 ) -> dict[str, Any]:
     """Dispatch the one pipeline to the explicitly selected execution mode."""
     normalized_mode = str(mode or "live").strip().casefold()
+    if str(resume_run_dir or "").strip():
+        if normalized_mode != "live":
+            raise BarePipelineError("X3 resume is available only in live mode")
+        if any(str(value or "").strip() for value in (jd, resume_path, artifact_root)):
+            raise BarePipelineError("X3 resume uses only sealed prior-run artifacts")
+        return resume_bare_live_x3(resume_run_dir=resume_run_dir)
     kwargs = {
         "target_company": target_company,
         "target_role": target_role,

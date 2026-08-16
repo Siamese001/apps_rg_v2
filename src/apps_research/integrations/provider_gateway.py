@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import random
 import socket
+import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -92,6 +94,8 @@ def _terminal_receipt(
     application_output_valid: bool,
     validation_reason: str,
     usage: Mapping[str, Any] | None = None,
+    transport_attempt_count: int = 1,
+    retry_count: int = 0,
 ) -> dict[str, Any]:
     transport_response_received = bool(
         attempt.sdk_response_returned
@@ -123,6 +127,7 @@ def _terminal_receipt(
         section_id=attempt.section_id,
         logical_attempt=attempt.logical_attempt,
         transport_attempt=attempt.transport_attempt,
+        retry_reason=attempt.retry_reason,
         attempt_id=attempt.attempt_id,
         logical_attempt_id=attempt.logical_attempt_id,
         transport_attempt_id=attempt.transport_attempt_id,
@@ -157,6 +162,10 @@ def _terminal_receipt(
         "attempt_id": attempt.attempt_id,
         "logical_attempt_id": attempt.logical_attempt_id,
         "transport_attempt_id": attempt.transport_attempt_id,
+        "transport_attempt": attempt.transport_attempt,
+        "transport_attempt_count": max(1, int(transport_attempt_count)),
+        "retry_count": max(0, int(retry_count)),
+        "retry_reason": attempt.retry_reason,
         "run_id": attempt.run_id,
         "trace_id": attempt.trace_id,
         "request_digest": attempt.request_digest,
@@ -204,6 +213,55 @@ def _raise_gateway_error(
         usage=usage,
     )
     raise AppsResearchProviderGatewayError(message, receipt=receipt, cause=cause) from cause
+
+
+def _is_retryable_gemini_transport_error(error: AppsResearchProviderGatewayError) -> bool:
+    """Allow only bounded retries whose remote outcome is safely classified.
+
+    A timeout before response headers is not proof that Gemini did not process
+    the request, so the first attempt remains recorded as
+    ``REMOTE_OUTCOME_UNKNOWN``. X3 is read-only evaluation, however, and the
+    caller explicitly budgets one retry for this transient class. Response
+    schema, model-pin, auth, and application-validation errors are never
+    retried here.
+    """
+
+    receipt = error.receipt
+    lifecycle = receipt.get("lifecycle") if isinstance(receipt.get("lifecycle"), Mapping) else {}
+    phase = str(receipt.get("validation_reason") or "")
+    cause = error.cause or error.__cause__ or error.__context__
+    if isinstance(cause, urllib.error.HTTPError):
+        return cause.code == 429 or 500 <= int(cause.code) <= 599
+    if phase not in {"WAIT_RESPONSE_HEADERS", "CONNECT_OR_DNS"}:
+        return False
+    if bool(lifecycle.get("response_headers_received")):
+        return False
+    return isinstance(cause, (socket.timeout, urllib.error.URLError, OSError))
+
+
+def _gemini_retry_reason(error: AppsResearchProviderGatewayError) -> str:
+    receipt = error.receipt
+    phase = str(receipt.get("validation_reason") or "TRANSPORT_ERROR")
+    cause = error.cause or error.__cause__ or error.__context__
+    if isinstance(cause, urllib.error.HTTPError):
+        return f"retry_after_http_{cause.code}"
+    return "retry_after_" + phase.lower()
+
+
+def _gemini_retry_delay_seconds(
+    *,
+    transport_attempt: int,
+    base_seconds: float,
+    max_seconds: float,
+    uniform: Callable[[float, float], float],
+) -> float:
+    """Return a bounded exponential delay with small positive jitter."""
+
+    base = max(0.0, float(base_seconds))
+    maximum = max(base, float(max_seconds))
+    exponential = min(maximum, base * (2 ** max(0, transport_attempt - 1)))
+    jitter_ceiling = max(0.0, maximum - exponential)
+    return min(maximum, exponential + uniform(0.0, jitter_ceiling))
 
 
 def invoke_openai_company_brief(
@@ -347,6 +405,11 @@ def invoke_gemini_handoff_judge(
     artifact_dir: str | None = None,
     stage: str = "L2.X2_research_semantic_gate",
     section_id: str = "X2",
+    max_transport_attempts: int = 1,
+    retry_backoff_base_seconds: float = 0.0,
+    retry_backoff_max_seconds: float = 0.0,
+    sleep: Callable[[float], None] = time.sleep,
+    uniform: Callable[[float, float], float] = random.uniform,
 ) -> ApprovedProviderResult:
     """Invoke the approved Gemini judge lane and validate before success.
 
@@ -362,161 +425,191 @@ def invoke_gemini_handoff_judge(
     context = _attempt_context(role=pin.role)
     if artifact_dir:
         context["artifact_dir"] = str(artifact_dir)
+    try:
+        allowed_attempts = max(1, min(2, int(max_transport_attempts)))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("max_transport_attempts must be an integer") from exc
     logical_attempt = allocate_provider_logical_attempt()
-    response_schema_valid = False
-    model_pin_valid = False
-    application_output_valid = False
-    usage: Mapping[str, Any] | None = None
-    attempt: ProviderAttempt
     request = urllib.request.Request(
         url=url,
         data=body,
         method=method,
         headers=dict(headers),
     )
-    try:
-        with provider_attempt(
-            artifact_dir=context["artifact_dir"] or None,
-            run_id=context["run_id"],
-            trace_id=context["trace_id"],
-            app_id=context["app_id"],
-            stage=str(stage),
-            section_id=str(section_id),
-            provider=pin.provider,
-            requested_model=pin.model,
-            request_digest=_request_digest(body),
-            logical_attempt=logical_attempt,
-            transport_attempt=1,
-        ) as attempt:
-            attempt.mark_local_dispatch_started()
-            try:
-                response_context = (
-                    resolved_urlopen(request, timeout=timeout)
-                    if resolved_urlopen is not None
-                    else urlopen_with_transport_evidence(
-                        request,
-                        timeout=timeout,
-                        evidence=attempt,
-                    )
-                )
-                with response_context as response:
-                    response_headers = getattr(response, "headers", None)
-                    response_id = ""
-                    if response_headers is not None:
-                        response_id = str(
-                            response_headers.get("x-request-id")
-                            or response_headers.get("request-id")
-                            or ""
+    retry_reason = ""
+    for transport_attempt in range(1, allowed_attempts + 1):
+        response_schema_valid = False
+        model_pin_valid = False
+        application_output_valid = False
+        usage: Mapping[str, Any] | None = None
+        attempt: ProviderAttempt
+        try:
+            with provider_attempt(
+                artifact_dir=context["artifact_dir"] or None,
+                run_id=context["run_id"],
+                trace_id=context["trace_id"],
+                app_id=context["app_id"],
+                stage=str(stage),
+                section_id=str(section_id),
+                provider=pin.provider,
+                requested_model=pin.model,
+                request_digest=_request_digest(body),
+                logical_attempt=logical_attempt,
+                transport_attempt=transport_attempt,
+                retry_reason=retry_reason,
+            ) as attempt:
+                attempt.mark_local_dispatch_started()
+                try:
+                    response_context = (
+                        resolved_urlopen(request, timeout=timeout)
+                        if resolved_urlopen is not None
+                        else urlopen_with_transport_evidence(
+                            request,
+                            timeout=timeout,
+                            evidence=attempt,
                         )
-                    attempt.mark_response_headers(
-                        status_code=getattr(response, "status", None),
-                        provider_response_id=response_id,
                     )
-                    response_body = response.read()
-                    if response_body:
-                        attempt.mark_first_byte()
-            except socket.timeout as exc:
-                attempt.failure_phase = "WAIT_RESPONSE_HEADERS"
-                raise AppsResearchProviderGatewayError(
-                    f"Gemini HTTP timeout after {timeout}s: {exc}",
-                    receipt={},
-                    cause=exc,
-                ) from exc
-            except urllib.error.HTTPError as exc:
-                attempt.mark_response_headers(status_code=int(exc.code))
-                attempt.failure_phase = "HTTP_RESPONSE"
-                detail = exc.read().decode("utf-8", errors="ignore")[:500]
-                raise AppsResearchProviderGatewayError(
-                    f"Gemini HTTP {exc.code} {exc.reason}: {detail}",
-                    receipt={},
-                    cause=exc,
-                ) from exc
-            except urllib.error.URLError as exc:
-                attempt.failure_phase = "WAIT_RESPONSE_HEADERS"
-                raise AppsResearchProviderGatewayError(
-                    f"Gemini HTTP URLError: {exc.reason}",
-                    receipt={},
-                    cause=exc,
-                ) from exc
-            except OSError as exc:
-                attempt.failure_phase = (
-                    "READ_RESPONSE_BODY"
-                    if attempt.response_headers_received
-                    else "WAIT_RESPONSE_HEADERS"
+                    with response_context as response:
+                        response_headers = getattr(response, "headers", None)
+                        response_id = ""
+                        if response_headers is not None:
+                            response_id = str(
+                                response_headers.get("x-request-id")
+                                or response_headers.get("request-id")
+                                or ""
+                            )
+                        attempt.mark_response_headers(
+                            status_code=getattr(response, "status", None),
+                            provider_response_id=response_id,
+                        )
+                        response_body = response.read()
+                        if response_body:
+                            attempt.mark_first_byte()
+                except socket.timeout as exc:
+                    attempt.failure_phase = "WAIT_RESPONSE_HEADERS"
+                    raise AppsResearchProviderGatewayError(
+                        f"Gemini HTTP timeout after {timeout}s: {exc}",
+                        receipt={},
+                        cause=exc,
+                    ) from exc
+                except urllib.error.HTTPError as exc:
+                    attempt.mark_response_headers(status_code=int(exc.code))
+                    attempt.failure_phase = "HTTP_RESPONSE"
+                    detail = exc.read().decode("utf-8", errors="ignore")[:500]
+                    raise AppsResearchProviderGatewayError(
+                        f"Gemini HTTP {exc.code} {exc.reason}: {detail}",
+                        receipt={},
+                        cause=exc,
+                    ) from exc
+                except urllib.error.URLError as exc:
+                    attempt.failure_phase = "WAIT_RESPONSE_HEADERS"
+                    raise AppsResearchProviderGatewayError(
+                        f"Gemini HTTP URLError: {exc.reason}",
+                        receipt={},
+                        cause=exc,
+                    ) from exc
+                except OSError as exc:
+                    attempt.failure_phase = (
+                        "READ_RESPONSE_BODY"
+                        if attempt.response_headers_received
+                        else "WAIT_RESPONSE_HEADERS"
+                    )
+                    raise AppsResearchProviderGatewayError(
+                        f"Gemini transport failed: {type(exc).__name__}: {exc}",
+                        receipt={},
+                        cause=exc,
+                    ) from exc
+                try:
+                    parsed = json.loads(response_body.decode("utf-8"))
+                except (ValueError, UnicodeDecodeError) as exc:
+                    attempt.failure_phase = "RESPONSE_SCHEMA_VALIDATION"
+                    raise AppsResearchProviderGatewayError(
+                        f"Gemini response was not JSON: {exc}",
+                        receipt={},
+                        cause=exc,
+                    ) from exc
+                if not isinstance(parsed, Mapping):
+                    attempt.failure_phase = "RESPONSE_SCHEMA_VALIDATION"
+                    raise AppsResearchProviderGatewayError(
+                        "Gemini response JSON was not an object",
+                        receipt={},
+                    )
+                observed_model = str(parsed.get("modelVersion") or "").strip()
+                parsed_response_id = str(parsed.get("responseId") or "")
+                attempt.provider_response_id = parsed_response_id or attempt.provider_response_id
+                attempt.observed_model = observed_model
+                usage_raw = parsed.get("usageMetadata")
+                usage = dict(usage_raw) if isinstance(usage_raw, Mapping) else None
+                if not observed_model:
+                    attempt.failure_phase = "RESPONSE_SCHEMA_VALIDATION"
+                    raise AppsResearchProviderGatewayError(
+                        "Gemini response did not report modelVersion",
+                        receipt={},
+                    )
+                response_schema_valid = True
+                if observed_model != pin.model:
+                    attempt.failure_phase = "MODEL_PIN_VALIDATION"
+                    raise AppsResearchProviderGatewayError(
+                        f"Gemini model pin mismatch: requested={pin.model} observed={observed_model}",
+                        receipt={},
+                    )
+                model_pin_valid = True
+                try:
+                    output = application_validator(parsed)
+                except Exception as exc:
+                    attempt.failure_phase = "APPLICATION_OUTPUT_VALIDATION"
+                    raise AppsResearchProviderGatewayError(
+                        f"Gemini application output invalid: {type(exc).__name__}: {exc}",
+                        receipt={},
+                        cause=exc,
+                    ) from exc
+                application_output_valid = True
+        except AppsResearchProviderGatewayError as exc:
+            receipt = _terminal_receipt(
+                pin=pin,
+                attempt=attempt,
+                response_schema_valid=response_schema_valid,
+                model_pin_valid=model_pin_valid,
+                application_output_valid=application_output_valid,
+                validation_reason=attempt.failure_phase or "PROVIDER_GATEWAY_ERROR",
+                usage=usage,
+                transport_attempt_count=transport_attempt,
+                retry_count=transport_attempt - 1,
+            )
+            terminal_error = AppsResearchProviderGatewayError(
+                str(exc),
+                receipt=receipt,
+                cause=exc.cause or exc,
+            )
+            if transport_attempt < allowed_attempts and _is_retryable_gemini_transport_error(terminal_error):
+                retry_reason = _gemini_retry_reason(terminal_error)
+                delay = _gemini_retry_delay_seconds(
+                    transport_attempt=transport_attempt,
+                    base_seconds=retry_backoff_base_seconds,
+                    max_seconds=retry_backoff_max_seconds,
+                    uniform=uniform,
                 )
-                raise AppsResearchProviderGatewayError(
-                    f"Gemini transport failed: {type(exc).__name__}: {exc}",
-                    receipt={},
-                    cause=exc,
-                ) from exc
-            try:
-                parsed = json.loads(response_body.decode("utf-8"))
-            except (ValueError, UnicodeDecodeError) as exc:
-                attempt.failure_phase = "RESPONSE_SCHEMA_VALIDATION"
-                raise AppsResearchProviderGatewayError(
-                    f"Gemini response was not JSON: {exc}",
-                    receipt={},
-                    cause=exc,
-                ) from exc
-            if not isinstance(parsed, Mapping):
-                attempt.failure_phase = "RESPONSE_SCHEMA_VALIDATION"
-                raise AppsResearchProviderGatewayError(
-                    "Gemini response JSON was not an object",
-                    receipt={},
-                )
-            observed_model = str(parsed.get("modelVersion") or "").strip()
-            parsed_response_id = str(parsed.get("responseId") or "")
-            attempt.provider_response_id = parsed_response_id or attempt.provider_response_id
-            attempt.observed_model = observed_model
-            usage_raw = parsed.get("usageMetadata")
-            usage = dict(usage_raw) if isinstance(usage_raw, Mapping) else None
-            if not observed_model:
-                attempt.failure_phase = "RESPONSE_SCHEMA_VALIDATION"
-                raise AppsResearchProviderGatewayError(
-                    "Gemini response did not report modelVersion",
-                    receipt={},
-                )
-            response_schema_valid = True
-            if observed_model != pin.model:
-                attempt.failure_phase = "MODEL_PIN_VALIDATION"
-                raise AppsResearchProviderGatewayError(
-                    f"Gemini model pin mismatch: requested={pin.model} observed={observed_model}",
-                    receipt={},
-                )
-            model_pin_valid = True
-            try:
-                output = application_validator(parsed)
-            except Exception as exc:
-                attempt.failure_phase = "APPLICATION_OUTPUT_VALIDATION"
-                raise AppsResearchProviderGatewayError(
-                    f"Gemini application output invalid: {type(exc).__name__}: {exc}",
-                    receipt={},
-                    cause=exc,
-                ) from exc
-            application_output_valid = True
-    except AppsResearchProviderGatewayError as exc:
-        _raise_gateway_error(
-            str(exc),
+                if delay > 0:
+                    sleep(delay)
+                continue
+            receipt["transport_attempt_count"] = transport_attempt
+            receipt["retry_count"] = transport_attempt - 1
+            raise terminal_error from (exc.cause or exc)
+
+        receipt = _terminal_receipt(
             pin=pin,
             attempt=attempt,
-            response_schema_valid=response_schema_valid,
-            model_pin_valid=model_pin_valid,
-            application_output_valid=application_output_valid,
-            validation_reason=attempt.failure_phase or "PROVIDER_GATEWAY_ERROR",
+            response_schema_valid=True,
+            model_pin_valid=True,
+            application_output_valid=True,
+            validation_reason="ALL_VALIDATIONS_PASSED",
             usage=usage,
-            cause=exc.cause or exc,
+            transport_attempt_count=transport_attempt,
+            retry_count=transport_attempt - 1,
         )
+        return ApprovedProviderResult(output=output, receipt=receipt)
 
-    receipt = _terminal_receipt(
-        pin=pin,
-        attempt=attempt,
-        response_schema_valid=True,
-        model_pin_valid=True,
-        application_output_valid=True,
-        validation_reason="ALL_VALIDATIONS_PASSED",
-        usage=usage,
-    )
-    return ApprovedProviderResult(output=output, receipt=receipt)
+    raise AssertionError("Gemini transport retry loop exited without a terminal result")
 
 
 __all__ = [

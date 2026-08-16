@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import ast
+import io
 import json
+import socket
 import types
+import urllib.error
 from pathlib import Path
 
 import pytest
@@ -220,6 +223,220 @@ def test_gemini_response_body_transport_error_has_terminal_failure(
     terminal = [row for row in _ledger(tmp_path) if row.get("gateway_id")]
     assert len(terminal) == 1
     assert terminal[0]["outcome"] == "READ_RESPONSE_BODY"
+
+
+def test_gemini_retries_header_timeout_with_one_logical_attempt(tmp_path: Path) -> None:
+    pin = apps_rg_handoff_judge_pin()
+    calls = {"count": 0}
+    delays: list[float] = []
+
+    class _Response:
+        status = 200
+        headers = {"x-request-id": "gemini-retry-success"}
+
+        def read(self) -> bytes:
+            return json.dumps(
+                {
+                    "responseId": "gemini-retry-success",
+                    "modelVersion": pin.model,
+                    "usageMetadata": {"promptTokenCount": 4, "candidatesTokenCount": 1},
+                    "candidates": [{"content": {"parts": [{"text": "{\"ok\":true}"}]}}],
+                }
+            ).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args) -> bool:
+            return False
+
+    def flaky_urlopen(*_args, **_kwargs):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise socket.timeout("injected header timeout")
+        return _Response()
+
+    with external_model_usage_scope(
+        artifact_dir=tmp_path,
+        run_id="run-gemini-retry",
+        trace_id="trace-gemini-retry",
+        app_id="apps_research",
+        stage="X3",
+    ):
+        result = invoke_gemini_handoff_judge(
+            url="https://example.invalid/gemini",
+            body=b"{}",
+            method="POST",
+            headers={},
+            timeout=1.0,
+            urlopen=flaky_urlopen,
+            application_validator=lambda response: response["candidates"][0]["content"]["parts"][0]["text"],
+            max_transport_attempts=2,
+            retry_backoff_base_seconds=1.0,
+            retry_backoff_max_seconds=3.0,
+            sleep=delays.append,
+            uniform=lambda _low, high: high,
+        )
+
+    assert result.output == '{"ok":true}'
+    assert result.receipt["transport_attempt_count"] == 2
+    assert result.receipt["retry_count"] == 1
+    assert calls["count"] == 2
+    assert delays == [3.0]
+    terminal = [row for row in _ledger(tmp_path) if row.get("gateway_id")]
+    assert [row["transport_attempt"] for row in terminal] == [1, 2]
+    assert len({row["logical_attempt_id"] for row in terminal}) == 1
+    assert terminal[0]["remote_outcome"] == "REMOTE_OUTCOME_UNKNOWN"
+    assert terminal[0]["overall_success"] is False
+    assert terminal[1]["retry_reason"] == "retry_after_wait_response_headers"
+    assert terminal[1]["overall_success"] is True
+
+
+@pytest.mark.parametrize("status_code", [400, 401])
+def test_gemini_does_not_retry_request_or_authentication_failure(
+    tmp_path: Path,
+    status_code: int,
+) -> None:
+    calls = {"count": 0}
+
+    def unauthorized(*_args, **_kwargs):
+        calls["count"] += 1
+        raise urllib.error.HTTPError(
+            "https://example.invalid/gemini",
+            status_code,
+            "Bad Request" if status_code == 400 else "Unauthorized",
+            hdrs=None,
+            fp=io.BytesIO(b'{"error":"bad credential"}'),
+        )
+
+    with external_model_usage_scope(
+        artifact_dir=tmp_path,
+        run_id="run-gemini-auth",
+        trace_id="trace-gemini-auth",
+        app_id="apps_research",
+        stage="X3",
+    ):
+        with pytest.raises(AppsResearchProviderGatewayError) as raised:
+            invoke_gemini_handoff_judge(
+                url="https://example.invalid/gemini",
+                body=b"{}",
+                method="POST",
+                headers={},
+                timeout=1.0,
+                urlopen=unauthorized,
+                application_validator=lambda response: response,
+                max_transport_attempts=2,
+                sleep=lambda _delay: pytest.fail("authentication failures must not retry"),
+            )
+
+    assert calls["count"] == 1
+    assert raised.value.receipt["transport_attempt_count"] == 1
+    assert raised.value.receipt["retry_count"] == 0
+    terminal = [row for row in _ledger(tmp_path) if row.get("gateway_id")]
+    assert len(terminal) == 1
+    assert terminal[0]["validation_reason"] == "HTTP_RESPONSE"
+
+
+def test_gemini_exhausted_header_timeouts_remain_fail_closed(tmp_path: Path) -> None:
+    calls = {"count": 0}
+
+    def always_timeout(*_args, **_kwargs):
+        calls["count"] += 1
+        raise socket.timeout("injected persistent timeout")
+
+    with external_model_usage_scope(
+        artifact_dir=tmp_path,
+        run_id="run-gemini-timeout",
+        trace_id="trace-gemini-timeout",
+        app_id="apps_research",
+        stage="X3",
+    ):
+        with pytest.raises(AppsResearchProviderGatewayError) as raised:
+            invoke_gemini_handoff_judge(
+                url="https://example.invalid/gemini",
+                body=b"{}",
+                method="POST",
+                headers={},
+                timeout=1.0,
+                urlopen=always_timeout,
+                application_validator=lambda response: response,
+                max_transport_attempts=2,
+                retry_backoff_base_seconds=0.0,
+                retry_backoff_max_seconds=0.0,
+            )
+
+    assert calls["count"] == 2
+    assert raised.value.receipt["transport_attempt_count"] == 2
+    assert raised.value.receipt["retry_count"] == 1
+    terminal = [row for row in _ledger(tmp_path) if row.get("gateway_id")]
+    assert [row["transport_attempt"] for row in terminal] == [1, 2]
+    assert all(row["overall_success"] is False for row in terminal)
+    assert all(row["remote_outcome"] == "REMOTE_OUTCOME_UNKNOWN" for row in terminal)
+
+
+@pytest.mark.parametrize(
+    ("raw_body", "expected_reason"),
+    [
+        (
+            json.dumps(
+                {
+                    "responseId": "wrong-model",
+                    "modelVersion": "unexpected-model",
+                    "candidates": [{"content": {"parts": [{"text": "valid"}]}}],
+                }
+            ).encode("utf-8"),
+            "MODEL_PIN_VALIDATION",
+        ),
+        (b"not-json", "RESPONSE_SCHEMA_VALIDATION"),
+    ],
+)
+def test_gemini_never_retries_model_or_schema_validation_failure(
+    tmp_path: Path,
+    raw_body: bytes,
+    expected_reason: str,
+) -> None:
+    calls = {"count": 0}
+
+    class _Response:
+        status = 200
+        headers = {"x-request-id": "validation-failure"}
+
+        def read(self) -> bytes:
+            return raw_body
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args) -> bool:
+            return False
+
+    def invalid_response(*_args, **_kwargs):
+        calls["count"] += 1
+        return _Response()
+
+    with external_model_usage_scope(
+        artifact_dir=tmp_path,
+        run_id="run-gemini-validation",
+        trace_id="trace-gemini-validation",
+        app_id="apps_research",
+        stage="X3",
+    ):
+        with pytest.raises(AppsResearchProviderGatewayError) as raised:
+            invoke_gemini_handoff_judge(
+                url="https://example.invalid/gemini",
+                body=b"{}",
+                method="POST",
+                headers={},
+                timeout=1.0,
+                urlopen=invalid_response,
+                application_validator=lambda response: response,
+                max_transport_attempts=2,
+                sleep=lambda _delay: pytest.fail("validation failures must not retry"),
+            )
+
+    assert calls["count"] == 1
+    assert raised.value.receipt["validation_reason"] == expected_reason
+    assert raised.value.receipt["transport_attempt_count"] == 1
 
 
 def test_apps_research_model_calls_exist_only_in_the_approved_gateway() -> None:

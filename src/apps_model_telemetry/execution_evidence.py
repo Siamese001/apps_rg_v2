@@ -49,6 +49,7 @@ class ProviderAttempt:
     request_digest: str
     logical_attempt: int
     transport_attempt: int
+    retry_reason: str = ""
     attempt_id: str = field(default_factory=lambda: f"attempt-{uuid.uuid4().hex}")
     started_at_utc: str = field(default_factory=_now)
     local_dispatch_started: bool = False
@@ -100,6 +101,7 @@ class ProviderAttempt:
             section_id=self.section_id,
             logical_attempt=self.logical_attempt,
             transport_attempt=self.transport_attempt,
+            retry_reason=self.retry_reason,
             response_id=self.provider_response_id,
             evidence_event=phase,
             attempt_id=self.attempt_id,
@@ -228,6 +230,7 @@ class ProviderAttempt:
             "attempt.transport_id": self.transport_attempt_id,
             "attempt.logical_index": self.logical_attempt,
             "attempt.transport_index": self.transport_attempt,
+            "attempt.retry_reason": self.retry_reason,
             "app.id": self.app_id,
             "run.id": self.run_id,
             "trace.root": self.trace_id,
@@ -354,6 +357,7 @@ def provider_attempt(
     request_digest: str,
     logical_attempt: int = 1,
     transport_attempt: int = 1,
+    retry_reason: str = "",
 ) -> Iterator[ProviderAttempt]:
     attempt = ProviderAttempt(
         artifact_dir=artifact_dir,
@@ -367,6 +371,7 @@ def provider_attempt(
         request_digest=request_digest,
         logical_attempt=logical_attempt,
         transport_attempt=transport_attempt,
+        retry_reason=str(retry_reason or ""),
     )
     tracer = get_verified_tracer("apps_model_telemetry.provider_attempt")
     cm = (

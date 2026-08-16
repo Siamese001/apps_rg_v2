@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 import apps_rg.bare_pipeline as bare_pipeline
 from apps_rg.__main__ import main
 
@@ -16,6 +18,78 @@ def _run_deterministic(tmp_path: Path, name: str) -> dict[str, object]:
     )
     assert result["status"] == "SUCCESS"
     return result
+
+
+def _prepare_live_x3_failure(monkeypatch, tmp_path: Path) -> tuple[dict[str, object], dict[str, int]]:
+    """Produce a sealed X3-only failure without issuing a real provider call."""
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-openai-key")
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-google-key")
+    monkeypatch.setattr(
+        bare_pipeline,
+        "_retrieve_sources",
+        lambda _company, _role: (
+            [
+                {
+                    "family": "company",
+                    "query": "test query",
+                    "title": "Test source",
+                    "url": "https://example.test/source",
+                    "snippet": "Test source material.",
+                    "engines": [],
+                }
+            ],
+            [],
+        ),
+    )
+    resolved_resume = bare_pipeline.resolve_resume_for_lanes(
+        repo_root=bare_pipeline._repo_root(),
+        require_json_document=False,
+    )
+    tailored_resume = bare_pipeline._render_deterministic_resume(
+        resume_source=resolved_resume.raw_utf8,
+        company=bare_pipeline.DEFAULT_TARGET_COMPANY,
+        role=bare_pipeline.DEFAULT_TARGET_ROLE,
+    )
+    outreach_email = bare_pipeline._render_deterministic_email(
+        resume_source=resolved_resume.raw_utf8,
+        company=bare_pipeline.DEFAULT_TARGET_COMPANY,
+        role=bare_pipeline.DEFAULT_TARGET_ROLE,
+    )
+    calls = {"openai": 0}
+
+    def raw_openai_receipt() -> dict[str, object]:
+        return {
+            "provider": "external_openai",
+            "requested_model": "test-openai",
+            "observed_model": "test-openai",
+            "provider_response_id": "openai-response",
+            "terminal_status": "SUCCESS",
+            "usage": {},
+        }
+
+    def fake_openai(*, max_completion_tokens: int, **_kwargs):
+        calls["openai"] += 1
+        if max_completion_tokens == 2400:
+            return "Grounded research brief. " * 20, raw_openai_receipt()
+        return (
+            "<tailored_resume>\n"
+            + tailored_resume
+            + "\n</tailored_resume>\n<outreach_email>\n"
+            + outreach_email
+            + "\n</outreach_email>",
+            raw_openai_receipt(),
+        )
+
+    def failing_gemini(**_kwargs):
+        raise bare_pipeline.BarePipelineError("injected X3 transport failure")
+
+    monkeypatch.setattr(bare_pipeline, "_call_openai", fake_openai)
+    monkeypatch.setattr(bare_pipeline, "_run_gemini_evaluation", failing_gemini)
+    result = bare_pipeline.run_bare_live_e2e(artifact_root=str(tmp_path / "live-x3-failure"))
+    assert result["status"] == "FAIL"
+    assert result["failure_stage"] == "X3"
+    return result, calls
 
 
 def test_deterministic_mode_runs_full_contract_without_live_hooks(monkeypatch, tmp_path: Path) -> None:
@@ -238,6 +312,127 @@ def test_live_x3_provider_receipt_preserves_terminal_identity(monkeypatch, tmp_p
     x3_provider = result["providers"]["x3_gemini"]
     assert x3_provider["status"] == "SUCCESS"
     assert x3_provider["response_id"] == "gemini-response"
+
+
+def test_x3_uses_the_bounded_transport_retry_policy(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-google-key")
+    captured: dict[str, object] = {}
+
+    def fake_gateway(**kwargs):
+        captured.update(kwargs)
+        return type(
+            "Result",
+            (),
+            {
+                "output": '{"verdict":"PASS","score":1.0,"reasoning":"grounded"}',
+                "receipt": {
+                    "provider": "google_gemini",
+                    "requested_model": "gemini-3.6-flash",
+                    "observed_model": "gemini-3.6-flash",
+                    "provider_response_id": "gemini-policy",
+                    "terminal_status": "SUCCESS",
+                    "usage": {},
+                    "transport_attempt_count": 2,
+                    "retry_count": 1,
+                },
+            },
+        )()
+
+    monkeypatch.setattr(bare_pipeline, "invoke_gemini_handoff_judge", fake_gateway)
+    decision, receipt = bare_pipeline._run_gemini_evaluation(
+        run_dir=tmp_path,
+        jd_text="JD",
+        resume_source="Base resume",
+        research_brief="Research",
+        tailored_resume="Tailored resume",
+        outreach_email="Subject: Anthropic\nbody",
+        sources=[
+            {
+                "title": "Source",
+                "url": "https://example.test/source",
+                "snippet": "Evidence",
+            }
+        ],
+    )
+
+    assert decision["verdict"] == "PASS"
+    assert captured["timeout"] == bare_pipeline.X3_GEMINI_TIMEOUT_SECONDS == 90.0
+    assert captured["max_transport_attempts"] == bare_pipeline.X3_GEMINI_MAX_TRANSPORT_ATTEMPTS == 2
+    assert captured["retry_backoff_base_seconds"] == 1.0
+    assert captured["retry_backoff_max_seconds"] == 3.0
+    assert receipt["transport_attempt_count"] == 2
+    assert receipt["retry_count"] == 1
+    assert receipt["input_characters"] > 0
+
+
+def test_resume_x3_reuses_sealed_artifacts_without_replaying_openai(monkeypatch, tmp_path: Path) -> None:
+    failed, calls = _prepare_live_x3_failure(monkeypatch, tmp_path)
+    run_dir = Path(str(failed["artifact_dir"]))
+    assert (run_dir / bare_pipeline.X3_RESUME_MANIFEST_FILENAME).is_file()
+    assert (run_dir / bare_pipeline.X3_RESUME_JD_FILENAME).is_file()
+    assert (run_dir / bare_pipeline.X3_RESUME_BASE_RESUME_FILENAME).is_file()
+
+    def successful_gemini(*, run_dir: Path, **_kwargs):
+        bare_pipeline._write_text(
+            run_dir / "x3_raw.txt",
+            '{"verdict":"PASS","score":1.0,"reasoning":"grounded"}',
+        )
+        return (
+            {"verdict": "PASS", "score": 1.0, "reasoning": "grounded"},
+            {
+                "provider": "google_gemini",
+                "requested_model": "gemini-3.6-flash",
+                "observed_model": "gemini-3.6-flash",
+                "provider_response_id": "gemini-resume",
+                "terminal_status": "SUCCESS",
+                "usage": {},
+                "transport_attempt_count": 2,
+                "retry_count": 1,
+            },
+        )
+
+    monkeypatch.setattr(bare_pipeline, "_run_gemini_evaluation", successful_gemini)
+    resumed = bare_pipeline.run_bare_e2e(resume_run_dir=str(run_dir))
+
+    assert resumed["status"] == "SUCCESS"
+    assert resumed["outcome_label"] == "LIVE_PROVIDER_PASS_AFTER_X3_RESUME"
+    assert "failure_stage" not in resumed
+    assert "error" not in resumed
+    assert calls == {"openai": 2}
+    assert [stage["stage"] for stage in resumed["stages"]] == list(bare_pipeline.CANONICAL_STAGE_ORDER)
+    assert all(stage["status"] == "PASS" for stage in resumed["stages"])
+    assert resumed["providers"]["x3_gemini"]["transport_attempt_count"] == 2
+    assert resumed["providers"]["x3_gemini"]["retry_count"] == 1
+    assert resumed["resume_history"][-1]["prior_x3_stage"]["status"] == "FAIL"
+    assert (run_dir / "evaluation.json").is_file()
+    assert (run_dir / "resume.docx").is_file()
+
+
+def test_resume_x3_rejects_tampered_artifacts_without_provider_dispatch(monkeypatch, tmp_path: Path) -> None:
+    failed, _calls = _prepare_live_x3_failure(monkeypatch, tmp_path)
+    run_dir = Path(str(failed["artifact_dir"]))
+    (run_dir / "resume.md").write_text("tampered", encoding="utf-8")
+    dispatched = {"value": False}
+
+    def forbidden_gemini(**_kwargs):
+        dispatched["value"] = True
+        raise AssertionError("tampered X3 inputs must fail before provider dispatch")
+
+    monkeypatch.setattr(bare_pipeline, "_run_gemini_evaluation", forbidden_gemini)
+    with pytest.raises(bare_pipeline.BarePipelineError, match="digests do not match"):
+        bare_pipeline.run_bare_e2e(resume_run_dir=str(run_dir))
+    assert dispatched["value"] is False
+
+
+def test_terminal_x3_failure_never_emits_delivery_artifacts(monkeypatch, tmp_path: Path) -> None:
+    failed, _calls = _prepare_live_x3_failure(monkeypatch, tmp_path)
+    run_dir = Path(str(failed["artifact_dir"]))
+
+    assert failed["failure_stage"] == "X3"
+    assert [stage["stage"] for stage in failed["stages"]] == list(bare_pipeline.CANONICAL_STAGE_ORDER[:10])
+    assert not (run_dir / "x3_raw.txt").exists()
+    assert not (run_dir / "evaluation.json").exists()
+    assert not (run_dir / "resume.docx").exists()
 
 
 def test_deterministic_runs_compare_equal_after_documented_normalization(tmp_path: Path) -> None:

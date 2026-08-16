@@ -52,6 +52,14 @@ def _add_run_arguments(parser: argparse.ArgumentParser) -> None:
         help="Optional parent directory for this run's output directory.",
     )
     parser.add_argument(
+        "--resume-run-dir",
+        default="",
+        help=(
+            "Resume only X3 evaluation and DELIVERY from a sealed live run that failed at X3; "
+            "never regenerates research or L2 outputs."
+        ),
+    )
+    parser.add_argument(
         "--fresh-e2e",
         action="store_true",
         help=argparse.SUPPRESS,
@@ -253,6 +261,7 @@ def main(argv: list[str] | None = None) -> int:
                 jd=args.jd,
                 resume_path=args.resume,
                 artifact_root=args.artifact_dir,
+                resume_run_dir=args.resume_run_dir,
             )
             _print_result(result)
             return 0 if result.get("status") == "SUCCESS" else 1
