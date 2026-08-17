@@ -1,0 +1,483 @@
+{
+  "app_id": "apps_research",
+  "created_at": "2026-08-17T02:33:33.793734+00:00",
+  "eligible": true,
+  "gate_mesh_summary": {
+    "completed_gate_ids": [
+      "G5_ANSWER_PRESENT",
+      "G6_ANSWER_RELEVANT",
+      "G7_FACTUAL_CLAIMS_HAVE_EVIDENCE",
+      "G21_OUTPUT_SCHEMA",
+      "G24_REPLAY_ELIGIBLE",
+      "G26_EXIT_ELIGIBILITY"
+    ],
+    "deterministic_digest": "07cc505d2d82c89f62d67117bb9386b83f142f9d1173cf6759ccfee375aa68a3",
+    "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+    "evaluated_surface": "apps_rg_targeting_brief",
+    "gate_mesh_schema_version": "apps_rg.local_gate_mesh.v1",
+    "hard_fail_present": false,
+    "missing_gate_ids": [],
+    "recommended_disposition_summary": "All required gates passed; finish is eligible",
+    "recommended_next_owner": "exit::allow_finish",
+    "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+    "required_gate_ids": [
+      "G5_ANSWER_PRESENT",
+      "G6_ANSWER_RELEVANT",
+      "G7_FACTUAL_CLAIMS_HAVE_EVIDENCE",
+      "G21_OUTPUT_SCHEMA",
+      "G24_REPLAY_ELIGIBLE",
+      "G26_EXIT_ELIGIBILITY"
+    ],
+    "route_id": "apps_research.company_brief_v1",
+    "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+    "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+    "unknown_material_present": false,
+    "verdicts": [
+      {
+        "confidence": 1.0,
+        "created_at": "2026-08-17T02:33:33.793734+00:00",
+        "deterministic_digest": "2e6362f3b8b2a4ac6a5b4397cc6c1326ce9e85548d0b43537cf1f70a6e67c094",
+        "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+        "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+        "evaluated_stage": "Exit",
+        "evaluated_surface": "apps_rg_targeting_brief",
+        "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+        "evidence_digest": "cfb79909dce070058eaa03b947656f87d9347ee6885730d35eb827ef31dccbae",
+        "evidence_refs": [
+          "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+        ],
+        "gate_family": "apps_research_apps_rg_handoff",
+        "gate_id": "G5_ANSWER_PRESENT",
+        "is_hard_fail": false,
+        "is_material_unknown": false,
+        "is_not_applicable": false,
+        "is_pass": true,
+        "reason_codes": [
+          "brief_present_non_stub"
+        ],
+        "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+        "result": "PASS",
+        "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "schema_version": "apps_rg.local_gate_verdict.v1",
+        "score": 0.0,
+        "severity": "advisory",
+        "threshold": 0.0,
+        "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "unknown_reason": ""
+      },
+      {
+        "confidence": 1.0,
+        "created_at": "2026-08-17T02:33:33.793734+00:00",
+        "deterministic_digest": "a2b4a548bfe6a90a3cc935c0be431c9fbe3a006a3e7d737f59db78430875a8ef",
+        "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+        "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+        "evaluated_stage": "Exit",
+        "evaluated_surface": "apps_rg_targeting_brief",
+        "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+        "evidence_digest": "e8c0ce76f541d9eba1a16cbfa141b16dc378ddecd9a33fce4d29dba480c3e818",
+        "evidence_refs": [
+          "gemini-3.6-flash"
+        ],
+        "gate_family": "apps_research_apps_rg_handoff",
+        "gate_id": "G6_ANSWER_RELEVANT",
+        "is_hard_fail": false,
+        "is_material_unknown": false,
+        "is_not_applicable": false,
+        "is_pass": true,
+        "reason_codes": [
+          "model_backed_x2_pass"
+        ],
+        "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+        "result": "PASS",
+        "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "schema_version": "apps_rg.local_gate_verdict.v1",
+        "score": 1.0,
+        "severity": "advisory",
+        "threshold": 0.75,
+        "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "unknown_reason": ""
+      },
+      {
+        "confidence": 1.0,
+        "created_at": "2026-08-17T02:33:33.793734+00:00",
+        "deterministic_digest": "bac5d173833c79ba71c7a01bb6cda4d8cf8e5dd508a59f894a218f5ebf7b7d85",
+        "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+        "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+        "evaluated_stage": "Exit",
+        "evaluated_surface": "apps_rg_targeting_brief",
+        "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+        "evidence_digest": "5b6e157d4460d24794dbdd45f869584c4abb1f61cc24aab16835311018c14f12",
+        "evidence_refs": [
+          "adoption_motion",
+          "commercial_motion",
+          "company_basics",
+          "competitive_landscape",
+          "financials_and_growth",
+          "leadership_and_org",
+          "partner_ecosystem",
+          "recent_news_and_signals",
+          "role_context",
+          "tech_stack_and_tools"
+        ],
+        "gate_family": "apps_research_apps_rg_handoff",
+        "gate_id": "G7_FACTUAL_CLAIMS_HAVE_EVIDENCE",
+        "is_hard_fail": false,
+        "is_material_unknown": false,
+        "is_not_applicable": false,
+        "is_pass": true,
+        "reason_codes": [
+          "source_register_present"
+        ],
+        "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+        "result": "PASS",
+        "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "schema_version": "apps_rg.local_gate_verdict.v1",
+        "score": 0.0,
+        "severity": "advisory",
+        "threshold": 0.0,
+        "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "unknown_reason": ""
+      },
+      {
+        "confidence": 1.0,
+        "created_at": "2026-08-17T02:33:33.793734+00:00",
+        "deterministic_digest": "688b31a19fc1219a07f8a9c52224a71c4bbb36a4ae3f438017edd12c1c40bdb6",
+        "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+        "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+        "evaluated_stage": "Exit",
+        "evaluated_surface": "apps_rg_targeting_brief",
+        "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+        "evidence_digest": "8ad648e9f61e7ee02906abe477cf3fc7f359e207054b4baf90c3bbbccf437ceb",
+        "evidence_refs": [
+          "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+        ],
+        "gate_family": "apps_research_apps_rg_handoff",
+        "gate_id": "G21_OUTPUT_SCHEMA",
+        "is_hard_fail": false,
+        "is_material_unknown": false,
+        "is_not_applicable": false,
+        "is_pass": true,
+        "reason_codes": [
+          "targeting_brief_contract_valid"
+        ],
+        "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+        "result": "PASS",
+        "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "schema_version": "apps_rg.local_gate_verdict.v1",
+        "score": 0.0,
+        "severity": "advisory",
+        "threshold": 0.0,
+        "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "unknown_reason": ""
+      },
+      {
+        "confidence": 1.0,
+        "created_at": "2026-08-17T02:33:33.793734+00:00",
+        "deterministic_digest": "4c21426a77a1997e60e94ff3fa3236fa7be5306538920d01e977b6ecabf8ff88",
+        "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+        "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+        "evaluated_stage": "Exit",
+        "evaluated_surface": "apps_rg_targeting_brief",
+        "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+        "evidence_digest": "44496af0ff832a07720e1bd042d0c6c9c624edea0ca9204b7a9ed5cf0878cfac",
+        "evidence_refs": [
+          "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+          "7007d1c94751961bbca210c216339aaffe8a993bbce758b9fc86f43a68bac238",
+          "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+        ],
+        "gate_family": "apps_research_apps_rg_handoff",
+        "gate_id": "G24_REPLAY_ELIGIBLE",
+        "is_hard_fail": false,
+        "is_material_unknown": false,
+        "is_not_applicable": false,
+        "is_pass": true,
+        "reason_codes": [
+          "digest_lineage_bound"
+        ],
+        "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+        "result": "PASS",
+        "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "schema_version": "apps_rg.local_gate_verdict.v1",
+        "score": 0.0,
+        "severity": "advisory",
+        "threshold": 0.0,
+        "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "unknown_reason": ""
+      },
+      {
+        "confidence": 1.0,
+        "created_at": "2026-08-17T02:33:33.793734+00:00",
+        "deterministic_digest": "07801d7c124e6d22d16ef58f81e956fa82e136b2b06be157a655e718c7f8f011",
+        "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+        "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+        "evaluated_stage": "Exit",
+        "evaluated_surface": "apps_rg_targeting_brief",
+        "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+        "evidence_digest": "a212fd18dd50dd4266a7a8b41a13b6b3a30a8a87fe5e943ea8a2634b41b3eadd",
+        "evidence_refs": [
+          "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+        ],
+        "gate_family": "apps_research_apps_rg_handoff",
+        "gate_id": "G26_EXIT_ELIGIBILITY",
+        "is_hard_fail": false,
+        "is_material_unknown": false,
+        "is_not_applicable": false,
+        "is_pass": true,
+        "reason_codes": [
+          "handoff_sidecar_eligible"
+        ],
+        "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+        "result": "PASS",
+        "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "schema_version": "apps_rg.local_gate_verdict.v1",
+        "score": 0.0,
+        "severity": "advisory",
+        "threshold": 0.0,
+        "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+        "unknown_reason": ""
+      }
+    ],
+    "warn_material_present": false
+  },
+  "gate_results": [
+    {
+      "confidence": 1.0,
+      "created_at": "2026-08-17T02:33:33.793734+00:00",
+      "deterministic_digest": "2e6362f3b8b2a4ac6a5b4397cc6c1326ce9e85548d0b43537cf1f70a6e67c094",
+      "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+      "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+      "evaluated_stage": "Exit",
+      "evaluated_surface": "apps_rg_targeting_brief",
+      "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+      "evidence_digest": "cfb79909dce070058eaa03b947656f87d9347ee6885730d35eb827ef31dccbae",
+      "evidence_refs": [
+        "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+      ],
+      "gate_family": "apps_research_apps_rg_handoff",
+      "gate_id": "G5_ANSWER_PRESENT",
+      "is_hard_fail": false,
+      "is_material_unknown": false,
+      "is_not_applicable": false,
+      "is_pass": true,
+      "reason_codes": [
+        "brief_present_non_stub"
+      ],
+      "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+      "result": "PASS",
+      "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "schema_version": "apps_rg.local_gate_verdict.v1",
+      "score": 0.0,
+      "severity": "advisory",
+      "threshold": 0.0,
+      "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "unknown_reason": ""
+    },
+    {
+      "confidence": 1.0,
+      "created_at": "2026-08-17T02:33:33.793734+00:00",
+      "deterministic_digest": "a2b4a548bfe6a90a3cc935c0be431c9fbe3a006a3e7d737f59db78430875a8ef",
+      "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+      "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+      "evaluated_stage": "Exit",
+      "evaluated_surface": "apps_rg_targeting_brief",
+      "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+      "evidence_digest": "e8c0ce76f541d9eba1a16cbfa141b16dc378ddecd9a33fce4d29dba480c3e818",
+      "evidence_refs": [
+        "gemini-3.6-flash"
+      ],
+      "gate_family": "apps_research_apps_rg_handoff",
+      "gate_id": "G6_ANSWER_RELEVANT",
+      "is_hard_fail": false,
+      "is_material_unknown": false,
+      "is_not_applicable": false,
+      "is_pass": true,
+      "reason_codes": [
+        "model_backed_x2_pass"
+      ],
+      "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+      "result": "PASS",
+      "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "schema_version": "apps_rg.local_gate_verdict.v1",
+      "score": 1.0,
+      "severity": "advisory",
+      "threshold": 0.75,
+      "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "unknown_reason": ""
+    },
+    {
+      "confidence": 1.0,
+      "created_at": "2026-08-17T02:33:33.793734+00:00",
+      "deterministic_digest": "bac5d173833c79ba71c7a01bb6cda4d8cf8e5dd508a59f894a218f5ebf7b7d85",
+      "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+      "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+      "evaluated_stage": "Exit",
+      "evaluated_surface": "apps_rg_targeting_brief",
+      "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+      "evidence_digest": "5b6e157d4460d24794dbdd45f869584c4abb1f61cc24aab16835311018c14f12",
+      "evidence_refs": [
+        "adoption_motion",
+        "commercial_motion",
+        "company_basics",
+        "competitive_landscape",
+        "financials_and_growth",
+        "leadership_and_org",
+        "partner_ecosystem",
+        "recent_news_and_signals",
+        "role_context",
+        "tech_stack_and_tools"
+      ],
+      "gate_family": "apps_research_apps_rg_handoff",
+      "gate_id": "G7_FACTUAL_CLAIMS_HAVE_EVIDENCE",
+      "is_hard_fail": false,
+      "is_material_unknown": false,
+      "is_not_applicable": false,
+      "is_pass": true,
+      "reason_codes": [
+        "source_register_present"
+      ],
+      "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+      "result": "PASS",
+      "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "schema_version": "apps_rg.local_gate_verdict.v1",
+      "score": 0.0,
+      "severity": "advisory",
+      "threshold": 0.0,
+      "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "unknown_reason": ""
+    },
+    {
+      "confidence": 1.0,
+      "created_at": "2026-08-17T02:33:33.793734+00:00",
+      "deterministic_digest": "688b31a19fc1219a07f8a9c52224a71c4bbb36a4ae3f438017edd12c1c40bdb6",
+      "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+      "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+      "evaluated_stage": "Exit",
+      "evaluated_surface": "apps_rg_targeting_brief",
+      "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+      "evidence_digest": "8ad648e9f61e7ee02906abe477cf3fc7f359e207054b4baf90c3bbbccf437ceb",
+      "evidence_refs": [
+        "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+      ],
+      "gate_family": "apps_research_apps_rg_handoff",
+      "gate_id": "G21_OUTPUT_SCHEMA",
+      "is_hard_fail": false,
+      "is_material_unknown": false,
+      "is_not_applicable": false,
+      "is_pass": true,
+      "reason_codes": [
+        "targeting_brief_contract_valid"
+      ],
+      "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+      "result": "PASS",
+      "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "schema_version": "apps_rg.local_gate_verdict.v1",
+      "score": 0.0,
+      "severity": "advisory",
+      "threshold": 0.0,
+      "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "unknown_reason": ""
+    },
+    {
+      "confidence": 1.0,
+      "created_at": "2026-08-17T02:33:33.793734+00:00",
+      "deterministic_digest": "4c21426a77a1997e60e94ff3fa3236fa7be5306538920d01e977b6ecabf8ff88",
+      "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+      "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+      "evaluated_stage": "Exit",
+      "evaluated_surface": "apps_rg_targeting_brief",
+      "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+      "evidence_digest": "44496af0ff832a07720e1bd042d0c6c9c624edea0ca9204b7a9ed5cf0878cfac",
+      "evidence_refs": [
+        "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+        "7007d1c94751961bbca210c216339aaffe8a993bbce758b9fc86f43a68bac238",
+        "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+      ],
+      "gate_family": "apps_research_apps_rg_handoff",
+      "gate_id": "G24_REPLAY_ELIGIBLE",
+      "is_hard_fail": false,
+      "is_material_unknown": false,
+      "is_not_applicable": false,
+      "is_pass": true,
+      "reason_codes": [
+        "digest_lineage_bound"
+      ],
+      "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+      "result": "PASS",
+      "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "schema_version": "apps_rg.local_gate_verdict.v1",
+      "score": 0.0,
+      "severity": "advisory",
+      "threshold": 0.0,
+      "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "unknown_reason": ""
+    },
+    {
+      "confidence": 1.0,
+      "created_at": "2026-08-17T02:33:33.793734+00:00",
+      "deterministic_digest": "07801d7c124e6d22d16ef58f81e956fa82e136b2b06be157a655e718c7f8f011",
+      "evaluated_at": "2026-08-17T02:33:33.793734+00:00",
+      "evaluated_packet_ref": "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2",
+      "evaluated_stage": "Exit",
+      "evaluated_surface": "apps_rg_targeting_brief",
+      "evaluator_version": "apps_research.apps_rg_handoff_gate_mesh.v1",
+      "evidence_digest": "a212fd18dd50dd4266a7a8b41a13b6b3a30a8a87fe5e943ea8a2634b41b3eadd",
+      "evidence_refs": [
+        "085b422be4be1a1fd3ccf40e8879b84f1887101acb6c2bafa28834cbf9f322e2"
+      ],
+      "gate_family": "apps_research_apps_rg_handoff",
+      "gate_id": "G26_EXIT_ELIGIBILITY",
+      "is_hard_fail": false,
+      "is_material_unknown": false,
+      "is_not_applicable": false,
+      "is_pass": true,
+      "reason_codes": [
+        "handoff_sidecar_eligible"
+      ],
+      "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+      "result": "PASS",
+      "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "schema_version": "apps_rg.local_gate_verdict.v1",
+      "score": 0.0,
+      "severity": "advisory",
+      "threshold": 0.0,
+      "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+      "unknown_reason": ""
+    }
+  ],
+  "input_type": "sealed_l2_artifact",
+  "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+  "run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+  "schema_version": "apps_rg.local_exit_review.v1",
+  "task_class": "company_brief",
+  "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+  "x1_checkout_result": {
+    "blockers": [],
+    "checks": {
+      "X1_LOCAL_EXIT": {
+        "reason": "all required gates passed",
+        "status": "PASS"
+      }
+    },
+    "overall_pass": true
+  },
+  "x2_aggregation_result": {
+    "gate_verdicts": {
+      "FAIL": [],
+      "NOT_APPLICABLE": [],
+      "PASS": [
+        "G5_ANSWER_PRESENT",
+        "G6_ANSWER_RELEVANT",
+        "G7_FACTUAL_CLAIMS_HAVE_EVIDENCE",
+        "G21_OUTPUT_SCHEMA",
+        "G24_REPLAY_ELIGIBLE",
+        "G26_EXIT_ELIGIBILITY"
+      ],
+      "UNKNOWN": [],
+      "WARN": []
+    },
+    "x1_integration": {
+      "blockers": [],
+      "overall_pass": true
+    }
+  }
+}

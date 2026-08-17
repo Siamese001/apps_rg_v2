@@ -118,8 +118,6 @@ def main() -> None:
     )
 
 
-if __name__ == "__main__":
-    main()
 
 
 __all__ = ["validate_p1_w4_track_weighted_closeout", "main"]

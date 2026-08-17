@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -13,6 +11,7 @@ from apps_rg.evals.c03_ci_ratchet import (
     GATE_RECEIPT_SCHEMA_VERSION,
     REQUIRED_SCORE_GROUPS,
     build_ratchet_receipt,
+    main as run_ci_ratchet,
     seal_gate_receipt,
 )
 
@@ -187,7 +186,11 @@ def test_unexpected_baseline_signature_fails(junit_paths: tuple[Path, Path]) -> 
     assert "evaluation_receipt::retrieval_quality::unexpected_baseline_signature" in receipt["failure_codes"]
 
 
-def test_cli_consumes_sealed_receipt_bundle(junit_paths: tuple[Path, Path], tmp_path: Path) -> None:
+def test_library_command_consumes_sealed_receipt_bundle(
+    monkeypatch: pytest.MonkeyPatch,
+    junit_paths: tuple[Path, Path],
+    tmp_path: Path,
+) -> None:
     strict, baseline = junit_paths
     receipts_path = tmp_path / "receipts.json"
     baselines_path = tmp_path / "baselines.json"
@@ -198,12 +201,10 @@ def test_cli_consumes_sealed_receipt_bundle(junit_paths: tuple[Path, Path], tmp_
         json.dumps({name: value["baseline_signature"] for name, value in receipts.items()}),
         encoding="utf-8",
     )
-    env = dict(os.environ)
-    env["PYTHONPATH"] = str(Path(__file__).resolve().parents[3])
-    completed = subprocess.run(
+    monkeypatch.setattr(
+        sys,
+        "argv",
         [
-            sys.executable,
-            "-m",
             "apps_rg.evals.c03_ci_ratchet",
             "--strict-junit",
             str(strict),
@@ -220,10 +221,7 @@ def test_cli_consumes_sealed_receipt_bundle(junit_paths: tuple[Path, Path], tmp_
             "--out",
             str(out),
         ],
-        check=False,
-        capture_output=True,
-        text=True,
-        env=env,
     )
-    assert completed.returncode == 0, completed.stderr
+
+    assert run_ci_ratchet() == 0
     assert json.loads(out.read_text(encoding="utf-8"))["status"] == "PASS"

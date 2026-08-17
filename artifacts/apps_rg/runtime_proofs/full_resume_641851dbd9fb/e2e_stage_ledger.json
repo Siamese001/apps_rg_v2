@@ -1,0 +1,114 @@
+{
+  "created_at_utc": "2026-08-16T15:46:31.774360+00:00",
+  "e2e_run_id": "full_resume_641851dbd9fb",
+  "entries": [
+    {
+      "artifact_bindings": [],
+      "attempt": 1,
+      "authoritative_receipt_byte_length": 3049,
+      "authoritative_receipt_ref": "e2e_preflight_continuation_receipt.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_preflight.v1",
+      "authoritative_receipt_sha256": "sha256:c67cb29fc7caba07b07181dcddcbe2bb4a7bc68f3c61dcaff39fe4cd3a4468e4",
+      "child_run_id": "",
+      "e2e_run_id": "full_resume_641851dbd9fb",
+      "finished_at_utc": "2026-08-16T15:46:31.786871+00:00",
+      "input_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "input_refs": {},
+      "output_digest": "sha256:45e0596c75386d1090b498ef4da4aa11aae6cd073da065af23bd9a09341960fe",
+      "output_refs": {
+        "authoritative_receipt": "e2e_preflight_continuation_receipt.json",
+        "preflight_receipt": "e2e_preflight_continuation_receipt.json"
+      },
+      "previous_receipt_digest": "",
+      "reason_code": "ALL_NON_RETRIABLE_PREFLIGHT_CHECKS_PASSED",
+      "receipt_digest": "sha256:eaaffa8489111c5ceeb51224b993be1a2fea51c39f5edb6de446c4033c38e515",
+      "stage_id": "PREFLIGHT",
+      "started_at_utc": "2026-08-16T15:46:31.786871+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "attempt": 1,
+      "authoritative_receipt_byte_length": 0,
+      "authoritative_receipt_ref": "",
+      "authoritative_receipt_schema_version": "",
+      "authoritative_receipt_sha256": "",
+      "child_run_id": "",
+      "e2e_run_id": "full_resume_641851dbd9fb",
+      "finished_at_utc": "2026-08-16T15:47:24.403910+00:00",
+      "input_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "input_refs": {},
+      "output_digest": "sha256:7fe26cbaa84bc2f50d443ca541a33e8daf09c920367a8163f02ba7bbc308be23",
+      "output_refs": {
+        "delegated_briefing": "research/delegated_briefing.txt",
+        "research_bridge_response": "research_bridge_response.json"
+      },
+      "previous_receipt_digest": "sha256:eaaffa8489111c5ceeb51224b993be1a2fea51c39f5edb6de446c4033c38e515",
+      "reason_code": "ResumeBriefingReady",
+      "receipt_digest": "sha256:18961fa6f9b3e528d7d351c084b26eec2177304b892cf63e06a2be2dc213dbbf",
+      "stage_id": "RESEARCH",
+      "started_at_utc": "2026-08-16T15:47:24.403910+00:00",
+      "status": "PASS",
+      "status_derivation": "CALLER_ASSERTED_NON_PRODUCT_COMPATIBILITY"
+    },
+    {
+      "artifact_bindings": [],
+      "attempt": 1,
+      "authoritative_receipt_byte_length": 0,
+      "authoritative_receipt_ref": "",
+      "authoritative_receipt_schema_version": "",
+      "authoritative_receipt_sha256": "",
+      "child_run_id": "",
+      "e2e_run_id": "full_resume_641851dbd9fb",
+      "finished_at_utc": "2026-08-16T15:47:24.429660+00:00",
+      "input_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "input_refs": {},
+      "output_digest": "sha256:89b8c2e7fe7ec92e0792f3ec47a860d75bb7f78e175485fbecca02d8ff16e79d",
+      "output_refs": {
+        "rejection_detail": {
+          "missing_requirements": [
+            "job_description"
+          ],
+          "policy": "no_static_ssot_inputs_allowed_in_u0",
+          "validator": "u0_validate_apps_rg"
+        }
+      },
+      "previous_receipt_digest": "sha256:18961fa6f9b3e528d7d351c084b26eec2177304b892cf63e06a2be2dc213dbbf",
+      "reason_code": "U0_REJECTED:FIELD_TYPE_MISMATCH",
+      "receipt_digest": "sha256:879d71e335547c70f7d5177e3444fe61120a7ca48f49bf4b4ef56bd75497a740",
+      "stage_id": "U0",
+      "started_at_utc": "2026-08-16T15:47:24.429660+00:00",
+      "status": "FAIL",
+      "status_derivation": "CALLER_ASSERTED_NON_PRODUCT_COMPATIBILITY"
+    },
+    {
+      "artifact_bindings": [],
+      "attempt": 1,
+      "authoritative_receipt_byte_length": 0,
+      "authoritative_receipt_ref": "",
+      "authoritative_receipt_schema_version": "",
+      "authoritative_receipt_sha256": "",
+      "child_run_id": "",
+      "e2e_run_id": "full_resume_641851dbd9fb",
+      "finished_at_utc": "2026-08-16T15:47:24.487219+00:00",
+      "input_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "input_refs": {},
+      "output_digest": "sha256:52fea1da05703925fb5840c97d32c9a856ba2c1305241555c1b3984f28cde0f3",
+      "output_refs": {
+        "mandatory_run_output_json": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_641851dbd9fb\\APPS_RG_MANDATORY_RUN_OUTPUT.json"
+      },
+      "previous_receipt_digest": "sha256:879d71e335547c70f7d5177e3444fe61120a7ca48f49bf4b4ef56bd75497a740",
+      "reason_code": "U0_REJECTED:FIELD_TYPE_MISMATCH",
+      "receipt_digest": "sha256:d431d2cf3b8dc80940bd360495badb6a8c9c10eb01110a1f81b995a19a46f27f",
+      "stage_id": "CLOSEOUT",
+      "started_at_utc": "2026-08-16T15:47:24.487219+00:00",
+      "status": "FAIL",
+      "status_derivation": "CALLER_ASSERTED_NON_PRODUCT_COMPATIBILITY"
+    }
+  ],
+  "ledger_digest": "sha256:1e55e46905af5bd42a8ee88d03ed6068e5d186247924c5e8c4d3f9d1a2dba31a",
+  "schema_version": "apps_rg.e2e_stage_ledger.v1",
+  "stage_graph_digest": "sha256:e09deb3da710f1dc007b73ee8d1786fe0e7a4c276ad3331061991cad3b810566",
+  "stage_graph_ref": "C:\\Git\\apps_rg_v2\\src\\apps_rg\\config\\domain_contract\\e2e_stage_graph.resume_generation.v1.yaml"
+}

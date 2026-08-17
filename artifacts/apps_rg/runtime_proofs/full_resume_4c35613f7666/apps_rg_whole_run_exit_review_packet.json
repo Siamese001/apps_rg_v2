@@ -1,0 +1,1841 @@
+{
+  "aggregated_from_lane_x3": [
+    {
+      "lane": "competencies",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "unify_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "ibm_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "insurtech_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "ey_bullets",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "unify_narrative",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "ibm_narrative",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "insurtech_narrative",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "ey_narrative",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "executive_summary",
+      "x3_code": "X3_ALLOW"
+    },
+    {
+      "lane": "headline",
+      "x3_code": "X3_ALLOW"
+    }
+  ],
+  "block_reasons": [],
+  "blockers": [],
+  "decisive_reason": "WHOLE_RUN_ALLOW_FINISH: structural and final-release gates PASS, X1D PASS, all producer-owned lane X3 receipts are exact lane allow dispositions, and PA/C0 grounding checks are satisfied",
+  "deterministic_digest": "sha256:6e20bf368f804ec496d763fcaad598ebcb2c2cf488e46fc5090bb14d434c1137",
+  "exactly_one_x3": true,
+  "exit_review_packet_ref": "apps_rg_whole_run_exit_review_packet.json",
+  "generated_at_utc": "2026-08-17T02:29:28.564659+00:00",
+  "identity": {
+    "blueprint_hash": "sha256:a7f08177d75b419a70fadddc129c56aa2aaccc8e3801a9310f760cbcf4ff0e0c",
+    "brief_sha256": "sha256:8bda2cb1b384fae9dc991e0243a07151845dcf8223aa14ab5fd8c96304f5de37",
+    "child_run_id": "bridge:rg_research_bridge:1841358d:db58f566-4ced-4b4f-9d25-cd59db3b390b",
+    "consumer_app_id": "apps_rg",
+    "jd_sha256": "sha256:957c43a7df84e3c815b4b1e0284cb8c4132567f622d3124a21fcaeea979d4f01",
+    "parent_run_id": "9e359341-68dd-4a43-8218-d9265a4f4c6c",
+    "policy_hash": "sha256:9ab7764c2778fb8974d0359587a47f7593ef389ae5f8608abbea12b052d311f4",
+    "producer_app_id": "apps_research",
+    "request_id": "req-82e10c40610c4548af495098059f5f99",
+    "schema_version": "apps_research_rg_run_identity.v1",
+    "target_company": "Anthropic",
+    "target_role": "Manager of Applied AI Architecture, Partnerships",
+    "tenant_id": "default",
+    "trace_root": "db58f566-4ced-4b4f-9d25-cd59db3b390b"
+  },
+  "judge_reasons": [],
+  "lane_x3_reasons": [],
+  "producer_component": "apps_rg.runtime.whole_run_exit",
+  "review_reasons": [
+    "PRODUCT_R4_BYPASS_PRELOADED_CONTEXT"
+  ],
+  "schema_version": "apps_rg.whole_run_exit_review_packet.v1",
+  "signal_source_errors": [],
+  "signals": {
+    "authoritative_lane_contract_failed_lanes": [],
+    "authoritative_lane_contracts_pass": true,
+    "c0_evidence_item_count": 54,
+    "c0_support_status": "PASS",
+    "core_x3_non_authorizing_lanes": [],
+    "cross_app_leakage": false,
+    "direct_l4_write_bypass": false,
+    "duplicate_lane_ids": [],
+    "expected_lane_ids": [
+      "competencies",
+      "unify_bullets",
+      "ibm_bullets",
+      "insurtech_bullets",
+      "ey_bullets",
+      "unify_narrative",
+      "ibm_narrative",
+      "insurtech_narrative",
+      "ey_narrative",
+      "executive_summary",
+      "headline"
+    ],
+    "final_assembly_authority_failed_checks": [],
+    "final_assembly_product_release_eligible": true,
+    "final_materialized_acceptance_failed_lanes": [],
+    "final_resume_exists": true,
+    "final_resume_json_valid": true,
+    "final_resume_output_failed_gate_ids": [],
+    "final_resume_output_status": "PASS",
+    "final_resume_x2_all_pass": true,
+    "grounding_required": true,
+    "judge_execution_incomplete_lanes": [],
+    "judge_quorum_satisfied": true,
+    "l2_handoff_failed_lanes": [],
+    "l2_spine_failed_lanes": [],
+    "lane_authority_rows": [
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "competencies",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "claude-sonnet-5",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "anthropic",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/competencies/l2_handoff_receipt.json",
+            "byte_length": 812,
+            "present": true,
+            "sha256": "sha256:e6b69372237b3dac46f4bbc1750f5fdad786fe8d7f1f70594c2af4b6ab5b64ed"
+          },
+          {
+            "artifact_ref": "lanes/competencies/l2_spine_receipt.json",
+            "byte_length": 1274,
+            "present": true,
+            "sha256": "sha256:58102da9c2ec1376e13348c3f0898ed58121f3fafcf9f5a8ee995631618df498"
+          },
+          {
+            "artifact_ref": "lanes/competencies/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:5613b593dfd0121f85f20c7c62f874fd78f2d13e738239a3da5810126396bab5"
+          },
+          {
+            "artifact_ref": "lanes/competencies/x3_disposition.json",
+            "byte_length": 2229,
+            "present": true,
+            "sha256": "sha256:582f6830f1681032b0aa6bb63253bf188841b805262f94084f23c34bca9d3f98"
+          },
+          {
+            "artifact_ref": "lanes/competencies/exit_disposition_receipt.json",
+            "byte_length": 3856,
+            "present": true,
+            "sha256": "sha256:69cb390e8b3bf9d9047be5adc1e40c3e07910fb1879e6c82312c582d974cdbfc"
+          },
+          {
+            "artifact_ref": "lanes/competencies/x2_gate_outputs.json",
+            "byte_length": 39628,
+            "present": true,
+            "sha256": "sha256:fefe697fa2af8fec7fde385e7b25365942f9796ced4d275acfa36866ff615f4b"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 3488
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "unify_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "claude-sonnet-5",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "anthropic",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/unify_bullets/l2_handoff_receipt.json",
+            "byte_length": 813,
+            "present": true,
+            "sha256": "sha256:4cddbc68be1b282de279fa95b2a5a3a7e3b11cbde4a924d135b9606b9832d609"
+          },
+          {
+            "artifact_ref": "lanes/unify_bullets/l2_spine_receipt.json",
+            "byte_length": 1276,
+            "present": true,
+            "sha256": "sha256:3f84c3d44ecc70929d67fc51ac79fc86e77456b1be6fc61ecc53fd8e31696a25"
+          },
+          {
+            "artifact_ref": "lanes/unify_bullets/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:30cb8e96722244f53406461ec9b436db7244456f155ce19108f0c3cac7aa908f"
+          },
+          {
+            "artifact_ref": "lanes/unify_bullets/x3_disposition.json",
+            "byte_length": 2250,
+            "present": true,
+            "sha256": "sha256:30cb84bd46c10428aecfedf2872254971b9974062ac095decf322c78fd311958"
+          },
+          {
+            "artifact_ref": "lanes/unify_bullets/exit_disposition_receipt.json",
+            "byte_length": 3881,
+            "present": true,
+            "sha256": "sha256:e1e9c3ec2699093616ab0b3dde5e981fffdea526e79d7737919181e61aa3e06a"
+          },
+          {
+            "artifact_ref": "lanes/unify_bullets/x2_gate_outputs.json",
+            "byte_length": 35198,
+            "present": true,
+            "sha256": "sha256:8529ccd95b81f05780c8fbe8b6cf048c3bde67d4ff68ad2c3e1ab3dd33495313"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 3294
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "ibm_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "claude-sonnet-5",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "anthropic",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/ibm_bullets/l2_handoff_receipt.json",
+            "byte_length": 811,
+            "present": true,
+            "sha256": "sha256:4960efc3b36ec8c60c1f7ba203eb2be87ca51b930403f7854bdae29126dbb74a"
+          },
+          {
+            "artifact_ref": "lanes/ibm_bullets/l2_spine_receipt.json",
+            "byte_length": 1272,
+            "present": true,
+            "sha256": "sha256:16238db0d18f98018983951334b1aad02e66a61c2e86fa2abb18513b9276419e"
+          },
+          {
+            "artifact_ref": "lanes/ibm_bullets/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:62c7f41c245a288431ebbfe1dfe8e5148081ae2ae709fd3aae679d2bc218a66e"
+          },
+          {
+            "artifact_ref": "lanes/ibm_bullets/x3_disposition.json",
+            "byte_length": 2190,
+            "present": true,
+            "sha256": "sha256:0ba292b6c77c1c4829eeca0cb66d42112a5191f044a1b65c4b9e98d42c20495b"
+          },
+          {
+            "artifact_ref": "lanes/ibm_bullets/exit_disposition_receipt.json",
+            "byte_length": 3813,
+            "present": true,
+            "sha256": "sha256:b733b72aeafb6ef4f4bd506556399763a6d045497ebb9f5a54bebb1f1ced8fc6"
+          },
+          {
+            "artifact_ref": "lanes/ibm_bullets/x2_gate_outputs.json",
+            "byte_length": 27840,
+            "present": true,
+            "sha256": "sha256:4ee3f1ee4b9ede022cadc5a59fd66476a0bd0cc9cb7685bcee4c51055776f142"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 2862
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "insurtech_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "claude-sonnet-5",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "anthropic",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/insurtech_bullets/l2_handoff_receipt.json",
+            "byte_length": 816,
+            "present": true,
+            "sha256": "sha256:d0dc626561a446c87a8fb6974d151df3fc0237026f39fe7514f99e016722656a"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_bullets/l2_spine_receipt.json",
+            "byte_length": 1284,
+            "present": true,
+            "sha256": "sha256:abd050beb894a16e35fe48622fbc9c7cdc1b2f46a7fd67be0ad404fe0b4f972f"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_bullets/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:8107a10eb8ad0c029b4e71547ce078a8b0bf2d460a4bc3f6e5f05205b442f106"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_bullets/x3_disposition.json",
+            "byte_length": 2171,
+            "present": true,
+            "sha256": "sha256:66a0d222f8359694c52a9f4181111aafe62cb383bc36cbb9acbdcc48520ccbfc"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_bullets/exit_disposition_receipt.json",
+            "byte_length": 3801,
+            "present": true,
+            "sha256": "sha256:a64ce52950303bad3940f8234702f8ceaae3b532871addf752d0fcad2aa53449"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_bullets/x2_gate_outputs.json",
+            "byte_length": 5442,
+            "present": true,
+            "sha256": "sha256:52e04a83fe95a284be1ea0a061b4918fb31b159e87466bfbba801f8648aa5ec4"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 582
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "ey_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "claude-sonnet-5",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "anthropic",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/ey_bullets/l2_handoff_receipt.json",
+            "byte_length": 809,
+            "present": true,
+            "sha256": "sha256:106ca57fc2d97ff8d463cb05fa77bfb132a4074c5f8ccbb8e9e430cfcc5288d5"
+          },
+          {
+            "artifact_ref": "lanes/ey_bullets/l2_spine_receipt.json",
+            "byte_length": 1270,
+            "present": true,
+            "sha256": "sha256:21fe84638b98ffee332a589e56e6c710699d9b098e759d05813682cd1aee0e11"
+          },
+          {
+            "artifact_ref": "lanes/ey_bullets/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:ec7d9a6682cd3c679753aad30a000e8d66dc7f62bc91cc5478926d844c3b5242"
+          },
+          {
+            "artifact_ref": "lanes/ey_bullets/x3_disposition.json",
+            "byte_length": 2171,
+            "present": true,
+            "sha256": "sha256:45376f778269d2ba2b6c150c0a19865666c442b1c03cfc1b80637434b5e43b1e"
+          },
+          {
+            "artifact_ref": "lanes/ey_bullets/exit_disposition_receipt.json",
+            "byte_length": 3787,
+            "present": true,
+            "sha256": "sha256:acc34cfe84669af6f9422931468199ec30d9387c2995b580783879d56fb19ff6"
+          },
+          {
+            "artifact_ref": "lanes/ey_bullets/x2_gate_outputs.json",
+            "byte_length": 5330,
+            "present": true,
+            "sha256": "sha256:4b55487440564d6e0091f2a25557ebcaf0e3e4ea558189629783b97916fd2161"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 629
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "unify_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "gpt-5.6-luna",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "openai",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/unify_narrative/l2_handoff_receipt.json",
+            "byte_length": 809,
+            "present": true,
+            "sha256": "sha256:8b08e566e6ac1002c0dc36c32e6bdf874a42502dfeef76f5e98386e576b0ee9e"
+          },
+          {
+            "artifact_ref": "lanes/unify_narrative/l2_spine_receipt.json",
+            "byte_length": 1280,
+            "present": true,
+            "sha256": "sha256:ea49509313f0905e6cea22b0f956853138f771bd8260a1ea6c0e2792120aed35"
+          },
+          {
+            "artifact_ref": "lanes/unify_narrative/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:264b557355447cea043632644fadc1a1015b75643a9abea635a93eb4abd6118f"
+          },
+          {
+            "artifact_ref": "lanes/unify_narrative/x3_disposition.json",
+            "byte_length": 2206,
+            "present": true,
+            "sha256": "sha256:4dbd02713e8d67c6c54924102c03c11a8b7ec2218582d0df9bdef99a802dd320"
+          },
+          {
+            "artifact_ref": "lanes/unify_narrative/exit_disposition_receipt.json",
+            "byte_length": 3837,
+            "present": true,
+            "sha256": "sha256:57581953caba07c939e8d447388ffaa71441a0b55d225dd3f786d7ada83855ab"
+          },
+          {
+            "artifact_ref": "lanes/unify_narrative/x2_gate_outputs.json",
+            "byte_length": 31879,
+            "present": true,
+            "sha256": "sha256:92d4a874bf01f16e551c849d530eab3db9e0eeced3bd2212016c08cfac790c00"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 2348
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "ibm_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "gpt-5.6-luna",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "openai",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/ibm_narrative/l2_handoff_receipt.json",
+            "byte_length": 807,
+            "present": true,
+            "sha256": "sha256:8ee1ef477d5559005fba8223f3af3dcfd29002ec1b39b7e0e1f40193e2fc73ba"
+          },
+          {
+            "artifact_ref": "lanes/ibm_narrative/l2_spine_receipt.json",
+            "byte_length": 1276,
+            "present": true,
+            "sha256": "sha256:1e843e0c072e0cb9e60e4ee89ad42b979ac9de9ef91f73b9e3ba55608440cc7b"
+          },
+          {
+            "artifact_ref": "lanes/ibm_narrative/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:373ff23b600b4bd61ae9c90ae5cc6f5c7cdaa0d686cde31d02c090671621ac09"
+          },
+          {
+            "artifact_ref": "lanes/ibm_narrative/x3_disposition.json",
+            "byte_length": 2146,
+            "present": true,
+            "sha256": "sha256:281dd31600b87887240389fd3790a1e32789a25eb243457e2a7bfd2ca84d2781"
+          },
+          {
+            "artifact_ref": "lanes/ibm_narrative/exit_disposition_receipt.json",
+            "byte_length": 3769,
+            "present": true,
+            "sha256": "sha256:a060c23a9d6cf1eb1f62247a321fc3d2e6fba2d99cddd83919c77b29d57c6190"
+          },
+          {
+            "artifact_ref": "lanes/ibm_narrative/x2_gate_outputs.json",
+            "byte_length": 29995,
+            "present": true,
+            "sha256": "sha256:d20c91a143213973f002d0d26a9544cfc8318972b54fa256f778d3561bb039db"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 2464
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "insurtech_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "gpt-5.6-luna",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "openai",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/insurtech_narrative/l2_handoff_receipt.json",
+            "byte_length": 812,
+            "present": true,
+            "sha256": "sha256:4798c59dd4c33172c2a366629ee1b8a4970f95d42a59d5f00264f6db3aa28a3e"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_narrative/l2_spine_receipt.json",
+            "byte_length": 1288,
+            "present": true,
+            "sha256": "sha256:da2d1ee159bb13b44ca8e3f89062956e715a28defc7fdc8eb9d5553ab1a64ae6"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_narrative/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:249b9608d83b56c2e5d8f4d09e249903710e1196637f4df64cfa3343355108c6"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_narrative/x3_disposition.json",
+            "byte_length": 2146,
+            "present": true,
+            "sha256": "sha256:c1b684ec778d232582c114ba8820d52c1fb9c351602b4f3e78c2317a1e220d92"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_narrative/exit_disposition_receipt.json",
+            "byte_length": 3778,
+            "present": true,
+            "sha256": "sha256:e1019df6229f796761d7af1f78c6781ba92557c4ff5b349003254456f822bc7c"
+          },
+          {
+            "artifact_ref": "lanes/insurtech_narrative/x2_gate_outputs.json",
+            "byte_length": 4887,
+            "present": true,
+            "sha256": "sha256:7402125756f68aabc3ebac10e3c26e13141411467006858788978b66e083055f"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 270
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "ey_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "gpt-5.6-luna",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "openai",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/ey_narrative/l2_handoff_receipt.json",
+            "byte_length": 805,
+            "present": true,
+            "sha256": "sha256:c00a2052a2bc0c33e596d21e0e18cd2e15add68ce3c5ee46dda98c1723f4c4c3"
+          },
+          {
+            "artifact_ref": "lanes/ey_narrative/l2_spine_receipt.json",
+            "byte_length": 1274,
+            "present": true,
+            "sha256": "sha256:e9e75e555560afae53572143e510a7a69290ec51007d69732d3dfb8da49be780"
+          },
+          {
+            "artifact_ref": "lanes/ey_narrative/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:2d707aca0816a8090eee7e59d3060494b4e2b2c5a2494caa4c0c97ab109c88c0"
+          },
+          {
+            "artifact_ref": "lanes/ey_narrative/x3_disposition.json",
+            "byte_length": 2146,
+            "present": true,
+            "sha256": "sha256:67a64504055ac9bf722a5a9f96b45034010dae8e72a51d12daf5b0f9d2428909"
+          },
+          {
+            "artifact_ref": "lanes/ey_narrative/exit_disposition_receipt.json",
+            "byte_length": 3764,
+            "present": true,
+            "sha256": "sha256:9b9f5358a6fd31309e67b17865b0774f31caa38e0342d100e391ac68bfbe1a83"
+          },
+          {
+            "artifact_ref": "lanes/ey_narrative/x2_gate_outputs.json",
+            "byte_length": 4952,
+            "present": true,
+            "sha256": "sha256:fb65b426e3996a4429ca77ac2fb29d18f4ecbff47161d7f659ded3629ca5c3a4"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 352
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "executive_summary",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "claude-sonnet-5",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "anthropic",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/executive_summary/l2_handoff_receipt.json",
+            "byte_length": 817,
+            "present": true,
+            "sha256": "sha256:350232295e7a57651a07d9195684a095ab394da3b0eadd40bb860bbe81b44164"
+          },
+          {
+            "artifact_ref": "lanes/executive_summary/l2_spine_receipt.json",
+            "byte_length": 1284,
+            "present": true,
+            "sha256": "sha256:b56f0647fba13679b438b26f715de3e6dc96bbb33b77ce449afdf11b80508b6b"
+          },
+          {
+            "artifact_ref": "lanes/executive_summary/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:2862721d27d3498c9c0cfa59b575b17d449931add6df24cab88a8dabe6886375"
+          },
+          {
+            "artifact_ref": "lanes/executive_summary/x3_disposition.json",
+            "byte_length": 1939,
+            "present": true,
+            "sha256": "sha256:2f0389a09ac1933b7674006c354cee3530c5017f192a9a7352fcee4be3f70029"
+          },
+          {
+            "artifact_ref": "lanes/executive_summary/exit_disposition_receipt.json",
+            "byte_length": 3565,
+            "present": true,
+            "sha256": "sha256:e443fb73c9ac06f016560ba7b34fa706dbd0234402538532344e9cb648581da6"
+          },
+          {
+            "artifact_ref": "lanes/executive_summary/x2_gate_outputs.json",
+            "byte_length": 36273,
+            "present": true,
+            "sha256": "sha256:38a5e740f91133e87565a394d15179e6659b403211df2cdef09e8855d3a2eab1"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 1271
+      },
+      {
+        "authoritative_x3_code": "X3_ALLOW",
+        "authorized": true,
+        "budget_ceiling": 4096,
+        "checks": {
+          "all_required_artifacts_present": true,
+          "core_authority_contract_valid": true,
+          "core_authority_digest_valid": true,
+          "core_authority_outcome_authorized": true,
+          "core_authority_source_x3_bound": true,
+          "core_authority_spine_success": true,
+          "core_authority_x3_matches_producer": true,
+          "core_x3_exact_authorizing_code": true,
+          "core_x3_payload_hash_valid": true,
+          "core_x3_producer_exact": true,
+          "final_materialized_acceptance_pass": true,
+          "l2_handoff_checks_all_pass": true,
+          "l2_handoff_checks_complete": true,
+          "l2_handoff_schema_exact": true,
+          "l2_handoff_section_match": true,
+          "l2_handoff_status_pass": true,
+          "l2_spine_no_direct_l4_write": true,
+          "l2_spine_precondition_pass": true,
+          "l2_spine_schema_exact": true,
+          "l2_spine_section_match": true,
+          "l2_spine_status_pass": true,
+          "lane_exit_mirror_declared_nonauthoritative": true,
+          "lane_mirror_declared_nonauthoritative": true,
+          "lane_mirror_points_to_core_receipt": true,
+          "lane_x2_all_pass": true
+        },
+        "failed_checks": [],
+        "l2_handoff_status": "PASS",
+        "l2_spine_status": "PASS",
+        "lane": "headline",
+        "mirror_x3_code": "X3_ALLOW",
+        "model_id_used": "claude-sonnet-5",
+        "normalized_authoritative_x3_code": "",
+        "provider_lane_used": "anthropic",
+        "source_bindings": [
+          {
+            "artifact_ref": "lanes/headline/l2_handoff_receipt.json",
+            "byte_length": 808,
+            "present": true,
+            "sha256": "sha256:b44511d4b85b33a12edf57d13a95e25b86bf914c6ab2d75a50bc03980e7d296a"
+          },
+          {
+            "artifact_ref": "lanes/headline/l2_spine_receipt.json",
+            "byte_length": 1266,
+            "present": true,
+            "sha256": "sha256:125d9aa1397ee99eadc6ab89fb15f9e9f888e6d2b5bfd806712d4a738396759c"
+          },
+          {
+            "artifact_ref": "lanes/headline/x3_disposition_receipt.json",
+            "byte_length": 295,
+            "present": true,
+            "sha256": "sha256:a294a1533223ef18e77e40922cf2deb9faf88c3c923579f84f21a4a720d063b0"
+          },
+          {
+            "artifact_ref": "lanes/headline/x3_disposition.json",
+            "byte_length": 2169,
+            "present": true,
+            "sha256": "sha256:5567399d3e99570590cee2db28b514bcfaec3b7accdbb3bfb39c6bbf9ca72bec"
+          },
+          {
+            "artifact_ref": "lanes/headline/exit_disposition_receipt.json",
+            "byte_length": 3784,
+            "present": true,
+            "sha256": "sha256:929b95326e4740da5f1c7175ae69f51beaa0c0059f8a3c7a809a61ec9f1224fc"
+          },
+          {
+            "artifact_ref": "lanes/headline/x2_gate_outputs.json",
+            "byte_length": 43521,
+            "present": true,
+            "sha256": "sha256:f4f45ad170abf592acbe09e32d65983535ba1686a9d0e883a124bb06ba7a155b"
+          }
+        ],
+        "status": "PASS",
+        "tokens_emitted": 2021
+      }
+    ],
+    "lane_rows": [
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "competencies",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "unify_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "ibm_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "insurtech_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "ey_bullets",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "unify_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "ibm_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "insurtech_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "ey_narrative",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "executive_summary",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      },
+      {
+        "authoritative_contract_status": "PASS",
+        "lane": "headline",
+        "mirror_x3_code": "X3_ALLOW",
+        "product_quality_status": "PASS",
+        "runtime_generation_status": "REAL_LLM",
+        "x2_failed": 0,
+        "x2_failed_gate_ids": [],
+        "x3_code": "X3_ALLOW"
+      }
+    ],
+    "locked_sections_preserved": true,
+    "min_chroma_evidence_items": 11,
+    "mirror_authority_violation_lanes": [],
+    "mock_provider_pass": false,
+    "observed_lane_ids": [
+      "competencies",
+      "executive_summary",
+      "ey_bullets",
+      "ey_narrative",
+      "headline",
+      "ibm_bullets",
+      "ibm_narrative",
+      "insurtech_bullets",
+      "insurtech_narrative",
+      "unify_bullets",
+      "unify_narrative"
+    ],
+    "pa_consumed_c0": true,
+    "pa_evidence_data_only": true,
+    "pa_schema_bound": true,
+    "product_r4_bypass_documented": true,
+    "required_generated_sections_present": true,
+    "section_gates_overall": "PASS",
+    "x1d_aggregate_present": true,
+    "x1d_overall": "PASS",
+    "x1d_policy_valid": true,
+    "x2_unknown_lane": false
+  },
+  "source_bindings": [
+    {
+      "artifact_ref": "FINAL_RESUME_OUTPUT.json",
+      "byte_length": 11331,
+      "present": true,
+      "sha256": "sha256:a6775093fbeac6985971f271c090aee1e427d73dd27eb174292681ce8ffc34df"
+    },
+    {
+      "artifact_ref": "full_run_section_status.json",
+      "byte_length": 24710,
+      "present": true,
+      "sha256": "sha256:d01c7d7ce11501236264b0d34b0d6f7d7acec420e0aa81d6751bebb5ad528919"
+    },
+    {
+      "artifact_ref": "modular_r4/final_resume_assembly/final_resume.json",
+      "byte_length": 944546,
+      "present": true,
+      "sha256": "sha256:a0175e386116abdedac1e6e7fa2c45b58d25f83c37a3e806fc97b17c8bd3bd00"
+    },
+    {
+      "artifact_ref": "modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json",
+      "byte_length": 8144,
+      "present": true,
+      "sha256": "sha256:b7f62c39a0ef4bc97b6e0f1c4202a3b64a054b8ff2569cd2d0d611589866bb0a"
+    },
+    {
+      "artifact_ref": "modular_r4/final_resume_assembly/x1d_full_resume_judge_outputs.json",
+      "byte_length": 7957,
+      "present": true,
+      "sha256": "sha256:aab091a0ae89f1e9d115be76e9582ab2967a65d342b25dba58517ae0075d068a"
+    },
+    {
+      "artifact_ref": "lanes/competencies/l2_handoff_receipt.json",
+      "byte_length": 812,
+      "present": true,
+      "sha256": "sha256:e6b69372237b3dac46f4bbc1750f5fdad786fe8d7f1f70594c2af4b6ab5b64ed"
+    },
+    {
+      "artifact_ref": "lanes/competencies/l2_spine_receipt.json",
+      "byte_length": 1274,
+      "present": true,
+      "sha256": "sha256:58102da9c2ec1376e13348c3f0898ed58121f3fafcf9f5a8ee995631618df498"
+    },
+    {
+      "artifact_ref": "lanes/competencies/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:5613b593dfd0121f85f20c7c62f874fd78f2d13e738239a3da5810126396bab5"
+    },
+    {
+      "artifact_ref": "lanes/competencies/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/competencies/x3_disposition.json",
+      "byte_length": 2229,
+      "present": true,
+      "sha256": "sha256:582f6830f1681032b0aa6bb63253bf188841b805262f94084f23c34bca9d3f98"
+    },
+    {
+      "artifact_ref": "lanes/competencies/exit_disposition_receipt.json",
+      "byte_length": 3856,
+      "present": true,
+      "sha256": "sha256:69cb390e8b3bf9d9047be5adc1e40c3e07910fb1879e6c82312c582d974cdbfc"
+    },
+    {
+      "artifact_ref": "lanes/competencies/x2_gate_outputs.json",
+      "byte_length": 39628,
+      "present": true,
+      "sha256": "sha256:fefe697fa2af8fec7fde385e7b25365942f9796ced4d275acfa36866ff615f4b"
+    },
+    {
+      "artifact_ref": "lanes/competencies/c0_metrics.json",
+      "byte_length": 1896,
+      "present": true,
+      "sha256": "sha256:89bb774657ce31288c382435ee105844aba211b8b97a3986727c8041f66404fb"
+    },
+    {
+      "artifact_ref": "lanes/competencies/compiled_prompt_artifact.json",
+      "byte_length": 3518,
+      "present": true,
+      "sha256": "sha256:1fcad3936fbfa293f005c888595367cd591a524d3e0446ba6aca5fed9bafb211"
+    },
+    {
+      "artifact_ref": "lanes/competencies/c0_fec_compose_receipt.json",
+      "byte_length": 3231,
+      "present": true,
+      "sha256": "sha256:1910a42b33dbc2f858f18da96a33a60a4f40fa2d4b934020f958023adcbb15ee"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/l2_handoff_receipt.json",
+      "byte_length": 813,
+      "present": true,
+      "sha256": "sha256:4cddbc68be1b282de279fa95b2a5a3a7e3b11cbde4a924d135b9606b9832d609"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/l2_spine_receipt.json",
+      "byte_length": 1276,
+      "present": true,
+      "sha256": "sha256:3f84c3d44ecc70929d67fc51ac79fc86e77456b1be6fc61ecc53fd8e31696a25"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:30cb8e96722244f53406461ec9b436db7244456f155ce19108f0c3cac7aa908f"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/x3_disposition.json",
+      "byte_length": 2250,
+      "present": true,
+      "sha256": "sha256:30cb84bd46c10428aecfedf2872254971b9974062ac095decf322c78fd311958"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/exit_disposition_receipt.json",
+      "byte_length": 3881,
+      "present": true,
+      "sha256": "sha256:e1e9c3ec2699093616ab0b3dde5e981fffdea526e79d7737919181e61aa3e06a"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/x2_gate_outputs.json",
+      "byte_length": 35198,
+      "present": true,
+      "sha256": "sha256:8529ccd95b81f05780c8fbe8b6cf048c3bde67d4ff68ad2c3e1ab3dd33495313"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/c0_metrics.json",
+      "byte_length": 1456,
+      "present": true,
+      "sha256": "sha256:2608f9ee86d77d2a018bddf54c1bf223cb23be85699a860a60becd1eaa991489"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/compiled_prompt_artifact.json",
+      "byte_length": 1671,
+      "present": true,
+      "sha256": "sha256:9f1eb164fcaa08ec17052f33721ae139c7f556faede1d5e119fd3381bbeedb45"
+    },
+    {
+      "artifact_ref": "lanes/unify_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3232,
+      "present": true,
+      "sha256": "sha256:3b694524bcfd1770cac4d072169c30f11369aafe727d63b73cceacbe114bf72d"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/l2_handoff_receipt.json",
+      "byte_length": 811,
+      "present": true,
+      "sha256": "sha256:4960efc3b36ec8c60c1f7ba203eb2be87ca51b930403f7854bdae29126dbb74a"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/l2_spine_receipt.json",
+      "byte_length": 1272,
+      "present": true,
+      "sha256": "sha256:16238db0d18f98018983951334b1aad02e66a61c2e86fa2abb18513b9276419e"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:62c7f41c245a288431ebbfe1dfe8e5148081ae2ae709fd3aae679d2bc218a66e"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/x3_disposition.json",
+      "byte_length": 2190,
+      "present": true,
+      "sha256": "sha256:0ba292b6c77c1c4829eeca0cb66d42112a5191f044a1b65c4b9e98d42c20495b"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/exit_disposition_receipt.json",
+      "byte_length": 3813,
+      "present": true,
+      "sha256": "sha256:b733b72aeafb6ef4f4bd506556399763a6d045497ebb9f5a54bebb1f1ced8fc6"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/x2_gate_outputs.json",
+      "byte_length": 27840,
+      "present": true,
+      "sha256": "sha256:4ee3f1ee4b9ede022cadc5a59fd66476a0bd0cc9cb7685bcee4c51055776f142"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/c0_metrics.json",
+      "byte_length": 1250,
+      "present": true,
+      "sha256": "sha256:a666667acdab3e3e0dbd1de47ff003d2b8736786764e1b5cdc6aec8fa7e135e9"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/compiled_prompt_artifact.json",
+      "byte_length": 3340,
+      "present": true,
+      "sha256": "sha256:4a0c5f507ffb3a5b3c44371436277d5be499c3d5e99acb2cc8807ec16e1e2214"
+    },
+    {
+      "artifact_ref": "lanes/ibm_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3230,
+      "present": true,
+      "sha256": "sha256:48c149c38822553be2dc83a2516569c33279b55cdbc46ddb535afcdff91c3363"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/l2_handoff_receipt.json",
+      "byte_length": 816,
+      "present": true,
+      "sha256": "sha256:d0dc626561a446c87a8fb6974d151df3fc0237026f39fe7514f99e016722656a"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/l2_spine_receipt.json",
+      "byte_length": 1284,
+      "present": true,
+      "sha256": "sha256:abd050beb894a16e35fe48622fbc9c7cdc1b2f46a7fd67be0ad404fe0b4f972f"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:8107a10eb8ad0c029b4e71547ce078a8b0bf2d460a4bc3f6e5f05205b442f106"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/x3_disposition.json",
+      "byte_length": 2171,
+      "present": true,
+      "sha256": "sha256:66a0d222f8359694c52a9f4181111aafe62cb383bc36cbb9acbdcc48520ccbfc"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/exit_disposition_receipt.json",
+      "byte_length": 3801,
+      "present": true,
+      "sha256": "sha256:a64ce52950303bad3940f8234702f8ceaae3b532871addf752d0fcad2aa53449"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/x2_gate_outputs.json",
+      "byte_length": 5442,
+      "present": true,
+      "sha256": "sha256:52e04a83fe95a284be1ea0a061b4918fb31b159e87466bfbba801f8648aa5ec4"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/c0_metrics.json",
+      "byte_length": 962,
+      "present": true,
+      "sha256": "sha256:c95a3f3005fce4483b50191688f5564c20f83973ada87b97232d12deb70130ba"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/compiled_prompt_artifact.json",
+      "byte_length": 1678,
+      "present": true,
+      "sha256": "sha256:05a0d467ddd8f0ac99fa58ce94118c12d59a9ab5a64e11a32f4e94bff11f7e2a"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3236,
+      "present": true,
+      "sha256": "sha256:beb2f8b504b7e467a0b3105399052ee6078e0fc610e94e8070277123fbe0391b"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/l2_handoff_receipt.json",
+      "byte_length": 809,
+      "present": true,
+      "sha256": "sha256:106ca57fc2d97ff8d463cb05fa77bfb132a4074c5f8ccbb8e9e430cfcc5288d5"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/l2_spine_receipt.json",
+      "byte_length": 1270,
+      "present": true,
+      "sha256": "sha256:21fe84638b98ffee332a589e56e6c710699d9b098e759d05813682cd1aee0e11"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:ec7d9a6682cd3c679753aad30a000e8d66dc7f62bc91cc5478926d844c3b5242"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/x3_disposition.json",
+      "byte_length": 2171,
+      "present": true,
+      "sha256": "sha256:45376f778269d2ba2b6c150c0a19865666c442b1c03cfc1b80637434b5e43b1e"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/exit_disposition_receipt.json",
+      "byte_length": 3787,
+      "present": true,
+      "sha256": "sha256:acc34cfe84669af6f9422931468199ec30d9387c2995b580783879d56fb19ff6"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/x2_gate_outputs.json",
+      "byte_length": 5330,
+      "present": true,
+      "sha256": "sha256:4b55487440564d6e0091f2a25557ebcaf0e3e4ea558189629783b97916fd2161"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/c0_metrics.json",
+      "byte_length": 941,
+      "present": true,
+      "sha256": "sha256:17f6fa91cb804c85565175cb77d7f015476c7b2931325ceff3132efffbfb5f57"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/compiled_prompt_artifact.json",
+      "byte_length": 1657,
+      "present": true,
+      "sha256": "sha256:e1ae463d10318132cf7276c7fa613a7b603709cdf18d05c6715948c4834575c2"
+    },
+    {
+      "artifact_ref": "lanes/ey_bullets/c0_fec_compose_receipt.json",
+      "byte_length": 3229,
+      "present": true,
+      "sha256": "sha256:6642df7676100c02fed7ba80087366836922281e9aa4453a7595bf958b1b9a39"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/l2_handoff_receipt.json",
+      "byte_length": 809,
+      "present": true,
+      "sha256": "sha256:8b08e566e6ac1002c0dc36c32e6bdf874a42502dfeef76f5e98386e576b0ee9e"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/l2_spine_receipt.json",
+      "byte_length": 1280,
+      "present": true,
+      "sha256": "sha256:ea49509313f0905e6cea22b0f956853138f771bd8260a1ea6c0e2792120aed35"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:264b557355447cea043632644fadc1a1015b75643a9abea635a93eb4abd6118f"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/x3_disposition.json",
+      "byte_length": 2206,
+      "present": true,
+      "sha256": "sha256:4dbd02713e8d67c6c54924102c03c11a8b7ec2218582d0df9bdef99a802dd320"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/exit_disposition_receipt.json",
+      "byte_length": 3837,
+      "present": true,
+      "sha256": "sha256:57581953caba07c939e8d447388ffaa71441a0b55d225dd3f786d7ada83855ab"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/x2_gate_outputs.json",
+      "byte_length": 31879,
+      "present": true,
+      "sha256": "sha256:92d4a874bf01f16e551c849d530eab3db9e0eeced3bd2212016c08cfac790c00"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/c0_metrics.json",
+      "byte_length": 1564,
+      "present": true,
+      "sha256": "sha256:62b242471828b0fdd5d18622532dc1612ea7731081cd408a515e24e1c6658452"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/compiled_prompt_artifact.json",
+      "byte_length": 1678,
+      "present": true,
+      "sha256": "sha256:d5e2d98b28e6e987b36d69d53f78c8009757a3be638cdccf4c7f5af3dd7c67f0"
+    },
+    {
+      "artifact_ref": "lanes/unify_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3234,
+      "present": true,
+      "sha256": "sha256:73ed0bddb5555e563f6a46617bbc31de73ccf8b45866eb988354b50c38b35e94"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/l2_handoff_receipt.json",
+      "byte_length": 807,
+      "present": true,
+      "sha256": "sha256:8ee1ef477d5559005fba8223f3af3dcfd29002ec1b39b7e0e1f40193e2fc73ba"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/l2_spine_receipt.json",
+      "byte_length": 1276,
+      "present": true,
+      "sha256": "sha256:1e843e0c072e0cb9e60e4ee89ad42b979ac9de9ef91f73b9e3ba55608440cc7b"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:373ff23b600b4bd61ae9c90ae5cc6f5c7cdaa0d686cde31d02c090671621ac09"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/x3_disposition.json",
+      "byte_length": 2146,
+      "present": true,
+      "sha256": "sha256:281dd31600b87887240389fd3790a1e32789a25eb243457e2a7bfd2ca84d2781"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/exit_disposition_receipt.json",
+      "byte_length": 3769,
+      "present": true,
+      "sha256": "sha256:a060c23a9d6cf1eb1f62247a321fc3d2e6fba2d99cddd83919c77b29d57c6190"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/x2_gate_outputs.json",
+      "byte_length": 29995,
+      "present": true,
+      "sha256": "sha256:d20c91a143213973f002d0d26a9544cfc8318972b54fa256f778d3561bb039db"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/c0_metrics.json",
+      "byte_length": 1324,
+      "present": true,
+      "sha256": "sha256:17f31db41261473dc52850513c934668c476dc145f072308d8693954fee47d87"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/compiled_prompt_artifact.json",
+      "byte_length": 3211,
+      "present": true,
+      "sha256": "sha256:19d35d221da3f0be21b309e3481faf771efe44342630d74a562910247987dcef"
+    },
+    {
+      "artifact_ref": "lanes/ibm_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3232,
+      "present": true,
+      "sha256": "sha256:0a907b33a522fb02357fee0b2c82df0f303bf7510169ae443bf56509298cd5bf"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/l2_handoff_receipt.json",
+      "byte_length": 812,
+      "present": true,
+      "sha256": "sha256:4798c59dd4c33172c2a366629ee1b8a4970f95d42a59d5f00264f6db3aa28a3e"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/l2_spine_receipt.json",
+      "byte_length": 1288,
+      "present": true,
+      "sha256": "sha256:da2d1ee159bb13b44ca8e3f89062956e715a28defc7fdc8eb9d5553ab1a64ae6"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:249b9608d83b56c2e5d8f4d09e249903710e1196637f4df64cfa3343355108c6"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/x3_disposition.json",
+      "byte_length": 2146,
+      "present": true,
+      "sha256": "sha256:c1b684ec778d232582c114ba8820d52c1fb9c351602b4f3e78c2317a1e220d92"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/exit_disposition_receipt.json",
+      "byte_length": 3778,
+      "present": true,
+      "sha256": "sha256:e1019df6229f796761d7af1f78c6781ba92557c4ff5b349003254456f822bc7c"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/x2_gate_outputs.json",
+      "byte_length": 4887,
+      "present": true,
+      "sha256": "sha256:7402125756f68aabc3ebac10e3c26e13141411467006858788978b66e083055f"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/c0_metrics.json",
+      "byte_length": 1272,
+      "present": true,
+      "sha256": "sha256:e9e3161fc937e3c74010838a7f97707665d6f10fd9b40e40f4c3986e5a44176f"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/compiled_prompt_artifact.json",
+      "byte_length": 1677,
+      "present": true,
+      "sha256": "sha256:79034fcbb9406843b11137b1e531878cd1f09d666c285558039bcb58d6577938"
+    },
+    {
+      "artifact_ref": "lanes/insurtech_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3238,
+      "present": true,
+      "sha256": "sha256:f380814ee85296485f733cb4d10e1250d72483f767e07c9333f1a19319112b38"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/l2_handoff_receipt.json",
+      "byte_length": 805,
+      "present": true,
+      "sha256": "sha256:c00a2052a2bc0c33e596d21e0e18cd2e15add68ce3c5ee46dda98c1723f4c4c3"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/l2_spine_receipt.json",
+      "byte_length": 1274,
+      "present": true,
+      "sha256": "sha256:e9e75e555560afae53572143e510a7a69290ec51007d69732d3dfb8da49be780"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:2d707aca0816a8090eee7e59d3060494b4e2b2c5a2494caa4c0c97ab109c88c0"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/x3_disposition.json",
+      "byte_length": 2146,
+      "present": true,
+      "sha256": "sha256:67a64504055ac9bf722a5a9f96b45034010dae8e72a51d12daf5b0f9d2428909"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/exit_disposition_receipt.json",
+      "byte_length": 3764,
+      "present": true,
+      "sha256": "sha256:9b9f5358a6fd31309e67b17865b0774f31caa38e0342d100e391ac68bfbe1a83"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/x2_gate_outputs.json",
+      "byte_length": 4952,
+      "present": true,
+      "sha256": "sha256:fb65b426e3996a4429ca77ac2fb29d18f4ecbff47161d7f659ded3629ca5c3a4"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/c0_metrics.json",
+      "byte_length": 1193,
+      "present": true,
+      "sha256": "sha256:5df2f091202a930aaf0ecc14e813596b411be2c0462604adb7af351290078fc0"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/compiled_prompt_artifact.json",
+      "byte_length": 1656,
+      "present": true,
+      "sha256": "sha256:3d04f8b1b2e1d7a7ba10cc590ae891c98ac736d0cf959acfd42e4e706840c6ff"
+    },
+    {
+      "artifact_ref": "lanes/ey_narrative/c0_fec_compose_receipt.json",
+      "byte_length": 3231,
+      "present": true,
+      "sha256": "sha256:68ec6ea49aedfe03cfc88383e6a5124c897d0cc82295f76e9800aaa0cd47d7de"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/l2_handoff_receipt.json",
+      "byte_length": 817,
+      "present": true,
+      "sha256": "sha256:350232295e7a57651a07d9195684a095ab394da3b0eadd40bb860bbe81b44164"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/l2_spine_receipt.json",
+      "byte_length": 1284,
+      "present": true,
+      "sha256": "sha256:b56f0647fba13679b438b26f715de3e6dc96bbb33b77ce449afdf11b80508b6b"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:2862721d27d3498c9c0cfa59b575b17d449931add6df24cab88a8dabe6886375"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/x3_disposition.json",
+      "byte_length": 1939,
+      "present": true,
+      "sha256": "sha256:2f0389a09ac1933b7674006c354cee3530c5017f192a9a7352fcee4be3f70029"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/exit_disposition_receipt.json",
+      "byte_length": 3565,
+      "present": true,
+      "sha256": "sha256:e443fb73c9ac06f016560ba7b34fa706dbd0234402538532344e9cb648581da6"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/x2_gate_outputs.json",
+      "byte_length": 36273,
+      "present": true,
+      "sha256": "sha256:38a5e740f91133e87565a394d15179e6659b403211df2cdef09e8855d3a2eab1"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/c0_metrics.json",
+      "byte_length": 1296,
+      "present": true,
+      "sha256": "sha256:046328a9559b2e7f2491f6f31af24fcb3b7cd8bad63527467aad4fdad65ca6f0"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/compiled_prompt_artifact.json",
+      "byte_length": 2751,
+      "present": true,
+      "sha256": "sha256:2a704ca9d68738f3a00777f2a558c706ca74def1c61f088ef6efde44b4c621cd"
+    },
+    {
+      "artifact_ref": "lanes/executive_summary/c0_fec_compose_receipt.json",
+      "byte_length": 3236,
+      "present": true,
+      "sha256": "sha256:bba0e03e211dadbf0b21055438318e284653b6b0cecf88abcf9e8ee275471e8a"
+    },
+    {
+      "artifact_ref": "lanes/headline/l2_handoff_receipt.json",
+      "byte_length": 808,
+      "present": true,
+      "sha256": "sha256:b44511d4b85b33a12edf57d13a95e25b86bf914c6ab2d75a50bc03980e7d296a"
+    },
+    {
+      "artifact_ref": "lanes/headline/l2_spine_receipt.json",
+      "byte_length": 1266,
+      "present": true,
+      "sha256": "sha256:125d9aa1397ee99eadc6ab89fb15f9e9f888e6d2b5bfd806712d4a738396759c"
+    },
+    {
+      "artifact_ref": "lanes/headline/x3_disposition_receipt.json",
+      "byte_length": 295,
+      "present": true,
+      "sha256": "sha256:a294a1533223ef18e77e40922cf2deb9faf88c3c923579f84f21a4a720d063b0"
+    },
+    {
+      "artifact_ref": "lanes/headline/apps_rg_core_runtime_authority.json",
+      "byte_length": 0,
+      "present": false,
+      "sha256": ""
+    },
+    {
+      "artifact_ref": "lanes/headline/x3_disposition.json",
+      "byte_length": 2169,
+      "present": true,
+      "sha256": "sha256:5567399d3e99570590cee2db28b514bcfaec3b7accdbb3bfb39c6bbf9ca72bec"
+    },
+    {
+      "artifact_ref": "lanes/headline/exit_disposition_receipt.json",
+      "byte_length": 3784,
+      "present": true,
+      "sha256": "sha256:929b95326e4740da5f1c7175ae69f51beaa0c0059f8a3c7a809a61ec9f1224fc"
+    },
+    {
+      "artifact_ref": "lanes/headline/x2_gate_outputs.json",
+      "byte_length": 43521,
+      "present": true,
+      "sha256": "sha256:f4f45ad170abf592acbe09e32d65983535ba1686a9d0e883a124bb06ba7a155b"
+    },
+    {
+      "artifact_ref": "lanes/headline/c0_metrics.json",
+      "byte_length": 1282,
+      "present": true,
+      "sha256": "sha256:5596d96c72acc9427bb10cb6493277e503e6bc78bf180ff21aac2c52b6214215"
+    },
+    {
+      "artifact_ref": "lanes/headline/compiled_prompt_artifact.json",
+      "byte_length": 1666,
+      "present": true,
+      "sha256": "sha256:daa83fe7e979f9265fb5e09734d9f5f51d2be20aa7b97d35db02edefa2751427"
+    },
+    {
+      "artifact_ref": "lanes/headline/c0_fec_compose_receipt.json",
+      "byte_length": 3227,
+      "present": true,
+      "sha256": "sha256:0d9738495038db3284a44d6085e1b329154b37522a1df42a94de9af915fc796c"
+    },
+    {
+      "artifact_ref": "modular_r4/final_resume_assembly/final_resume_receipt.json",
+      "byte_length": 74412,
+      "present": true,
+      "sha256": "sha256:178549b13a8b26263aeae85efd92a0f853bcabc8839f87ba343ffaedf7179b8d"
+    }
+  ],
+  "status": "PASS",
+  "unknown_never_pass": true,
+  "unknowns": [],
+  "warnings": [],
+  "x1_result_ref": "modular_r4/final_resume_assembly/x1d_full_resume_judge_outputs.json",
+  "x2_result_ref": "modular_r4/final_resume_assembly/final_resume_x2_gate_outputs.json",
+  "x3_disposition": "X3D_ALLOW_FINISH"
+}

@@ -315,7 +315,3 @@ def main() -> int:
         f"new_revops_skills={len(minted)}"
     )
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

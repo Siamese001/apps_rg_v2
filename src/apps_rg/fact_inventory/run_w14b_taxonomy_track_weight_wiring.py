@@ -159,7 +159,3 @@ def main() -> int:
     OUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(json.dumps({"STATUS": receipt["STATUS"], "override_after": override_after}, indent=2))
     return 0 if receipt["STATUS"] == "PASS" and pytest_run.returncode == 0 else 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())

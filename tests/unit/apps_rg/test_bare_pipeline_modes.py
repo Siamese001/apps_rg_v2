@@ -1,4 +1,4 @@
-"""Focused tests for the sole Apps RG run/eval/show surface."""
+"""Focused tests for the compact internal pipeline."""
 
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ from pathlib import Path
 import pytest
 
 import apps_rg.bare_pipeline as bare_pipeline
-from apps_rg.__main__ import main
 
 
 def _run_deterministic(tmp_path: Path, name: str) -> dict[str, object]:
@@ -137,49 +136,6 @@ def test_deterministic_mode_runs_full_contract_without_live_hooks(monkeypatch, t
     assert delivery["details"]["docx_check"]["forbidden_headings"] == {
         "TECHNICAL EXPERTISE": True
     }
-
-
-def test_public_cli_deterministic_run_enforces_the_same_resume_shape(capsys, tmp_path: Path) -> None:
-    assert main(["run", "--mode", "deterministic", "--artifact-dir", str(tmp_path)]) == 0
-    output = capsys.readouterr().out
-    assert "APPS_RG status=SUCCESS mode=deterministic" in output
-    assert "FULL_RESUME\n```markdown\n# Amit Ayer" in output
-    assert "EVALS\n```json" in output
-    assert '"run_evaluation"' in output
-    assert "RUNTIME_DETAILS\n```json" in output
-    assert '"stages"' in output
-
-    run_dirs = [path for path in tmp_path.iterdir() if path.is_dir()]
-    assert len(run_dirs) == 1
-    summary = json.loads((run_dirs[0] / "run_summary.json").read_text(encoding="utf-8"))
-    resume_check = summary["section_checks"]["resume"]
-    assert resume_check["checks"]["core_competency_category_count"] is True
-    assert resume_check["checks"]["unify_bullet_count"] is True
-    assert resume_check["checks"]["ibm_bullet_count"] is True
-    assert resume_check["checks"]["technical_expertise_not_separate_section"] is True
-    assert resume_check["checks"]["outreach_email_not_embedded_in_resume"] is True
-
-
-def test_run_inline_outputs_are_mandatory_when_a_run_fails_before_artifacts(monkeypatch, capsys) -> None:
-    monkeypatch.setattr(
-        "apps_rg.__main__.run_bare_e2e",
-        lambda **_kwargs: {
-            "status": "FAIL",
-            "mode": "live",
-            "outcome_label": "LIVE_PROVIDER_FAIL",
-            "artifact_dir": "C:/not-a-real-run",
-            "stages": [],
-            "error": "injected failure",
-        },
-    )
-
-    assert main(["run"]) == 1
-    captured = capsys.readouterr()
-    assert "FULL_RESUME\n```markdown\nUNAVAILABLE: run artifact directory is unavailable" in captured.out
-    assert "EVALS\n```json" in captured.out
-    assert '"status": "UNAVAILABLE"' in captured.out
-    assert "RUNTIME_DETAILS\n```json" in captured.out
-    assert "APPS_RG_ERROR injected failure" in captured.err
 
 
 def test_live_provider_timeout_is_recorded_as_a_failed_attempt(monkeypatch, tmp_path: Path) -> None:
@@ -448,45 +404,13 @@ def test_deterministic_runs_compare_equal_after_documented_normalization(tmp_pat
     assert report["checks"]["deterministic_comparison"]["status"] == "PASS"
 
 
-def test_eval_and_show_actions_use_completed_artifacts_without_provider_calls(capsys, tmp_path: Path) -> None:
+def test_internal_eval_and_show_helpers_use_completed_artifacts_without_provider_calls(tmp_path: Path) -> None:
     result = _run_deterministic(tmp_path, "run")
     run_dir = str(result["artifact_dir"])
     expected_resume = (Path(run_dir) / "resume.md").read_text(encoding="utf-8")
 
-    assert main(["eval", "--run-dir", run_dir]) == 0
-    evaluation_output = capsys.readouterr().out
-    assert "APPS_RG_EVAL status=PASS" in evaluation_output
-
-    assert main(["show", "--run-dir", run_dir, "--artifact", "resume"]) == 0
-    assert capsys.readouterr().out == expected_resume
-
-
-def test_legacy_fresh_e2e_flag_remains_one_live_run_alias(monkeypatch) -> None:
-    captured: dict[str, object] = {}
-
-    def fake_run(**kwargs):
-        captured.update(kwargs)
-        return {"status": "SUCCESS", "mode": "live", "artifact_dir": "C:/Temp/run", "stages": []}
-
-    monkeypatch.setattr("apps_rg.__main__.run_bare_e2e", fake_run)
-
-    assert main(["--fresh-e2e"]) == 0
-    assert captured["mode"] == "live"
-
-
-def test_zero_argument_cli_routes_to_the_canonical_live_run(monkeypatch) -> None:
-    captured: dict[str, object] = {}
-
-    def fake_run(**kwargs):
-        captured.update(kwargs)
-        return {"status": "SUCCESS", "mode": "live", "artifact_dir": "C:/Temp/run", "stages": []}
-
-    monkeypatch.setattr("apps_rg.__main__.run_bare_e2e", fake_run)
-
-    assert main([]) == 0
-    assert captured["mode"] == "live"
-    assert captured["target_company"] == bare_pipeline.DEFAULT_TARGET_COMPANY
-    assert captured["target_role"] == bare_pipeline.DEFAULT_TARGET_ROLE
+    assert bare_pipeline.evaluate_bare_run(run_dir)["status"] == "PASS"
+    assert bare_pipeline.read_bare_artifact(run_dir, "resume") == expected_resume
 
 
 def test_replay_detects_tampered_resume_artifact(tmp_path: Path) -> None:

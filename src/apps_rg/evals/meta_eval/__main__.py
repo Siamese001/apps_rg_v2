@@ -18,7 +18,3 @@ def main() -> int:
     args.out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(receipt, sort_keys=True))
     return 0 if receipt["status"] == "PASS" else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

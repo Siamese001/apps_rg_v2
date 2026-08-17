@@ -270,7 +270,6 @@ def main() -> None:
         if args.output
         else artifact_dir / "candidate_skill_gap_report.json"
     )
-
     if not artifact_dir.is_dir():
         raise FileNotFoundError(f"artifact_dir not found: {artifact_dir}")
     if not ledger_path.is_file():
@@ -293,7 +292,3 @@ def main() -> None:
         f"uncited={s['uncited_fact_ids_count']} "
         f"suggested_links={s['suggested_fact_links_count']}"
     )
-
-
-if __name__ == "__main__":
-    main()

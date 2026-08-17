@@ -127,9 +127,9 @@ The following is intentionally not fabricated by this implementation:
 Run the narrow technical checks from the repository root:
 
 ```text
-python -m apps_rg.evals.pipeline_measurement_coverage
-python -m apps_rg.evals.pipeline_attempt_evaluation
-python -m apps_rg.evals.whole_resume.p1_blind_utility
+library API: apps_rg.evals.pipeline_measurement_coverage
+library API: apps_rg.evals.pipeline_attempt_evaluation
+library API: apps_rg.evals.whole_resume.p1_blind_utility
 python -m pytest -q src/apps_rg/evals/tests/test_pipeline_measurement_coverage.py src/apps_rg/evals/tests/test_pipeline_attempt_evaluation.py src/apps_rg/evals/tests/test_e2e_operational_evaluation.py src/apps_rg/evals/tests/test_finished_resume_outcome.py src/apps_rg/evals/tests/test_success_metrics.py src/apps_rg/evals/tests/test_receipt_catalog.py src/apps_rg/evals/whole_resume/tests/test_p1_blind_utility.py
 ```
 

@@ -1,0 +1,267 @@
+{
+  "run_id": "headline_20260817_022800",
+  "lane_id": "headline",
+  "prompt_id": "headline_section_v1",
+  "prompt_hash": "daa9444c67644774",
+  "input_payload_hash": "f0bcdf4953392111",
+  "output_payload_hash": null,
+  "claim_ledger_hash": null,
+  "runtime_generation_status": "REAL_LLM",
+  "product_quality_status": "PASS",
+  "x2_failed_gates": [],
+  "x3_code": "X3_ALLOW",
+  "proof_eligible": true,
+  "judge_proof_eligible": true,
+  "proof_authority_receipt": {
+    "proof_authority": "graph_skills_plus_linked_source_facts",
+    "base_resume_usage": "calibration_only",
+    "jd_usage": "targeting_only",
+    "e0_usage": "style_only",
+    "new_gates_wired": [
+      "x2_headline_no_narrowing_it_labels",
+      "x2_headline_positioning_family_preserved",
+      "x2_headline_e0_ngram_overlap",
+      "x2_headline_base_ngram_overlap"
+    ]
+  },
+  "proof_pool_type": "augmented_skills_graph",
+  "proof_pool_type_role": "receipt_label_not_authority_switch",
+  "evidence_authority": {
+    "authority": "augmented_skills_graph",
+    "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+    "ledger_ref": "artifacts/apps_rg/fact_inventory/master_candidate_skills_fact_ledger_20260518T1100Z.json",
+    "graph_digest": "fb6535f316fd5084bda14ae3cdb44ffc8d0740d34b868a20bd2d379607cd07e7",
+    "ledger_digest": "8d51311d531d3adbeda76e89540372c40e084d1069e5aa708b012fb10a9a44c7",
+    "skills_authority_status": "PASS",
+    "block_reason": null,
+    "forbidden_as_product_authority": [
+      "base_resume",
+      "base_resume_fallback",
+      "broad_skills_ledger",
+      "candidate_fact_ledger",
+      "fallback_pool",
+      "legacy_pool",
+      "prompt_pool",
+      "proof_pool",
+      "selected_role_fact_set",
+      "srfs",
+      "unknown"
+    ]
+  },
+  "selection_scope": {
+    "section_id": "headline",
+    "selection_method": "selected_graph_evidence_plan_headline",
+    "role_target_projection": "graph_ledger_substrate_with_optional_srfs_filter",
+    "jd_targeting_active": true,
+    "briefing_targeting_active": true,
+    "jd_ref": "targeting_only",
+    "briefing_ref": "targeting_only",
+    "section_slice": "headline",
+    "allowed_fact_ids_count": 14,
+    "is_proof_authority": false
+  },
+  "selected_role_fact_set_used": false,
+  "broad_skills_ledger_used_as_authority": false,
+  "base_resume_claim_authority": false,
+  "srfs_section_id": "headline",
+  "candidate_fact_pool_count": 4,
+  "allowed_fact_ids_count": 23,
+  "required_fact_ids_count": 3,
+  "fallback_used": false,
+  "fallback_reason": "",
+  "x2_srfs_gate_status": "NOT_APPLICABLE",
+  "srfs_allowed_fact_ids_count": 0,
+  "full_resume_srfs_supported": false,
+  "out_of_slice_fact_ids": [],
+  "claim_ledger_union_matches_required_fact_ids": true,
+  "graph_evidence_depth_report": {
+    "schema": "graph_evidence_depth_report_v1",
+    "section_id": "headline",
+    "packet_key": "headline_positioning_section_packet",
+    "packet_shape": "bundles",
+    "item_count": 4,
+    "rich_item_count": 4,
+    "unique_skill_count": 12,
+    "unique_detail_count": 7,
+    "detail_occurrence_count": 7,
+    "detail_reuse_count": 0,
+    "detail_reuse_ratio": 0.0,
+    "max_detail_frequency": 1,
+    "repeated_detail_ids": [],
+    "top_detail_frequencies": [
+      {
+        "detail_id": "fact_consulting_001",
+        "count": 1
+      },
+      {
+        "detail_id": "fact_engineering_platform_001",
+        "count": 1
+      },
+      {
+        "detail_id": "fact_engineering_platform_006",
+        "count": 1
+      },
+      {
+        "detail_id": "fact_exec_001",
+        "count": 1
+      },
+      {
+        "detail_id": "fact_partnerships_gtm_001",
+        "count": 1
+      }
+    ],
+    "item_rich_ratio": 1.0,
+    "skill_diversity_ratio": 1.0,
+    "detail_diversity_ratio": 1.0,
+    "semantic_coverage_pct": 1.0,
+    "axis_coverage_pct": 1.0,
+    "minimum_coverage_pct": 0.8,
+    "status": "judge_grade",
+    "thin_item_ids": [],
+    "items": [
+      {
+        "item_id": "hpb_svp_engineering_leadership",
+        "label": "SVP Engineering",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 2,
+        "linked_fact_count": 2,
+        "source_fact_ids": [
+          "fact_exec_001",
+          "fact_consulting_001"
+        ],
+        "linked_fact_ids": [
+          "fact_exec_001",
+          "fact_consulting_001"
+        ],
+        "skill_ids": [
+          "skill_svp_it_strategy_innovation",
+          "skill_commercial_board_level_stakeholder_alignment"
+        ]
+      },
+      {
+        "item_id": "hpb_enterprise_ai_architecture",
+        "label": "Enterprise AI Architecture",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 3,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_001"
+        ],
+        "skill_ids": [
+          "skill_layered_runtime_spine_design",
+          "skill_app_overlay_runtime_binding",
+          "skill_reusable_agentic_platform_architecture"
+        ]
+      },
+      {
+        "item_id": "hpb_partner_applied_ai_architecture",
+        "label": "Partner AI Architecture",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 4,
+        "linked_fact_count": 3,
+        "source_fact_ids": [
+          "fact_partnerships_gtm_001",
+          "fact_solutions_001",
+          "fact_solutions_002"
+        ],
+        "linked_fact_ids": [
+          "fact_partnerships_gtm_001",
+          "fact_solutions_001",
+          "fact_solutions_002"
+        ],
+        "skill_ids": [
+          "skill_partner_joint_solution_development",
+          "skill_sr_w12_joint_ai_solution_development",
+          "skill_sr_w12_industry_reference_architecture",
+          "skill_partner_solution_architecture"
+        ]
+      },
+      {
+        "item_id": "hpb_platform_productization",
+        "label": "Platform Productization",
+        "packet_shape": "bundles",
+        "rich": true,
+        "missing_axes": [],
+        "axis_hit_count": 2,
+        "axis_total": 2,
+        "skill_count": 3,
+        "linked_fact_count": 1,
+        "source_fact_ids": [
+          "fact_engineering_platform_006"
+        ],
+        "linked_fact_ids": [
+          "fact_engineering_platform_006"
+        ],
+        "skill_ids": [
+          "skill_agentic_platform_productization",
+          "skill_ai_platform_commercialization",
+          "skill_operating_model_for_agentic_ai"
+        ]
+      }
+    ],
+    "weakest_link": {
+      "item_id": "hpb_svp_engineering_leadership",
+      "label": "SVP Engineering",
+      "packet_shape": "bundles",
+      "rich": true,
+      "missing_axes": [],
+      "axis_hit_count": 2,
+      "axis_total": 2,
+      "skill_count": 2,
+      "linked_fact_count": 2,
+      "source_fact_ids": [
+        "fact_exec_001",
+        "fact_consulting_001"
+      ],
+      "linked_fact_ids": [
+        "fact_exec_001",
+        "fact_consulting_001"
+      ],
+      "skill_ids": [
+        "skill_svp_it_strategy_innovation",
+        "skill_commercial_board_level_stakeholder_alignment"
+      ]
+    },
+    "summary": "headline: 4/4 rich items, 12 unique skills, 7 unique linked_facts, 100% semantic coverage, 100% axis coverage"
+  },
+  "x2_active_proof_pool_gate_status": "PASS",
+  "out_of_pool_fact_ids": [],
+  "c0_metrics_ref": "c0_metrics.json",
+  "support_status": "PASS",
+  "support_target_met": true,
+  "canonical_evidence_set_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "fec_allowed_fact_ids_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "c07_runtime_bound_evidence_digest": "901b893524efe2536b8048b7c9211441d1319ca5ea5b44730f878bd1c6ef1fe2",
+  "pa_c0_slot_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "provider_request_allowed_ids_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "claim_ledger_source_fact_ids_digest": "901b893524efe2536b8048b7c9211441d1319ca5ea5b44730f878bd1c6ef1fe2",
+  "x2_active_pool_digest": "1e9f23e22072585eb40a502e69bcbefc40ab4b7efeeaaf406ffb9f42d27e4516",
+  "section_receipt_digest": "",
+  "canonical_evidence_digest_chain_ref": "canonical_evidence_digest_chain.json",
+  "canonical_evidence_invariants_pass": true,
+  "fact_id_namespace_mode": "srfs_canonical_with_alias_resolution",
+  "alias_resolution_used": true,
+  "unresolved_alias_count": 0,
+  "canonical_source_fact_ids": [
+    "reb_ibm_aws_alliance_partner_cosell_gtm",
+    "reb_ibm_revenue_sales_target_execution",
+    "reb_unify_runtime_reliability_governance"
+  ],
+  "raw_source_fact_aliases": [],
+  "fact_id_resolution_status": "PASS"
+}

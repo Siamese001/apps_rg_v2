@@ -212,7 +212,7 @@ def commit_brief_record(
             ReadSurfaceRefreshPlan(
                 refresh_plan_id=refresh_plan_id,
                 source_commit_receipt_ref="",
-                before_snapshot=gw.last_snapshot_id,
+                before_snapshot=str(getattr(gw, "last_snapshot_id", "") or ""),
                 expected_after_snapshot="",
                 stale_projection_policy="serve_with_warn",
                 retry_policy="exponential_backoff_max_3",
@@ -256,6 +256,9 @@ def commit_brief_record(
                 expected_read_surface_refreshes=(_L4_SURFACE,),
                 l5_certification_ref=_L5_CERTIFICATION_REF,
                 registry_digest_set=registry_digest_set,
+                capability_token_ref=(
+                    f"capability:apps_research:research-brief:{run_record.run_id}"
+                ),
                 clearance_proof_id=clearance_proof_id,
                 validator_receipt_id=(
                     f"validator:apps_research:research_brief:{replay_key}"

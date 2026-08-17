@@ -148,7 +148,3 @@ def main(argv: Sequence[str] | None = None) -> int:
     result = validate_shadow_canary_promotion(args.manifest)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if result["status"] == "PROMOTION_AUTHORIZED" else 2
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

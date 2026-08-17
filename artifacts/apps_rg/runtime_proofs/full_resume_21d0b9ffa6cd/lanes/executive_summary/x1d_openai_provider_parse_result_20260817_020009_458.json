@@ -1,0 +1,70 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 4.3,
+    "threshold": 4.0,
+    "pass": true,
+    "decisive_failure": false,
+    "findings": [
+      "S2's \"controls manifest lineage\" construction is grammatically opaque and reduces executive readability.",
+      "Judge-packet display-override parity failed for S3's supporting fact, although candidate support gates passed."
+    ],
+    "cited_sentence_indexes": [
+      2,
+      3
+    ],
+    "remediation_suggestions": [
+      "Clarify S2's lineage-control relationship without adding claims.",
+      "Restore the missing display_override_text for fact_engineering_platform_002 in the judge packet."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "OPAQUE_TECHNICAL_PHRASING"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DISPLAY_OVERRIDE_PACKET_PARITY_FAIL"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_21d0b9ffa6cd\\lanes\\executive_summary\\x1d_openai_provider_response_raw_20260817_020009_453.json",
+  "original_model": null,
+  "fallback_model": null
+}

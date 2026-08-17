@@ -1,0 +1,99 @@
+{
+  "authority_assertions": {
+    "controls_applied_emitted_by_l2_or_l3": true,
+    "does_not_authorize_route_or_exit": true,
+    "does_not_create_candidate_evidence": true,
+    "l1_requests_only": true
+  },
+  "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+  "c0_obligation_receipt_refs": [],
+  "control_observations": [
+    {
+      "control_name": "reflexion_loops",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "IGNORED",
+      "observed_value": null,
+      "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+      "receipt_required": true,
+      "requested_value": 2.0,
+      "required_for_certification": true,
+      "transport_support_status": "UNSUPPORTED"
+    },
+    {
+      "control_name": "self_consistency_samples",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "ADAPTED",
+      "observed_value": 0,
+      "reason_code": "L2_SECTION_PROVIDER_CALL_SELF_CONSISTENCY_OBSERVED",
+      "receipt_required": true,
+      "requested_value": 5.0,
+      "required_for_certification": true,
+      "transport_support_status": "SUPPORTED"
+    },
+    {
+      "control_name": "temperature",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "ADAPTED",
+      "observed_value": 0.45,
+      "reason_code": "L2_SECTION_PROVIDER_CALL_TEMPERATURE_OBSERVED",
+      "receipt_required": true,
+      "requested_value": 0.42,
+      "required_for_certification": false,
+      "transport_support_status": "SUPPORTED"
+    },
+    {
+      "control_name": "tot_branches",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "IGNORED",
+      "observed_value": null,
+      "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+      "receipt_required": true,
+      "requested_value": 3.0,
+      "required_for_certification": true,
+      "transport_support_status": "UNSUPPORTED"
+    },
+    {
+      "control_name": "tot_depth",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "IGNORED",
+      "observed_value": null,
+      "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+      "receipt_required": true,
+      "requested_value": 2.0,
+      "required_for_certification": true,
+      "transport_support_status": "UNSUPPORTED"
+    }
+  ],
+  "emitter_stage": "L2",
+  "execution_receipt_ref": "reasoning_control_execution/executive_summary.json",
+  "l2_l3_applied_controls": [
+    "self_consistency_samples",
+    "temperature"
+  ],
+  "plan_capsule_digest": "sha256:9c51df3f5c137dc4f7fa8af60c546cd34b4cd024d28e1b6034ed4deb09e4ad78",
+  "provider_configuration": {
+    "candidate_count": 0,
+    "model_ids": [
+      "claude-sonnet-5"
+    ],
+    "provider_profiles": [
+      "external_claude_section_lane"
+    ],
+    "selection_method": "L2_SECTION_PROVIDER_CALLS"
+  },
+  "quality_certification": {
+    "denied": true,
+    "eligible": false,
+    "required_control_failures": [
+      "reflexion_loops",
+      "tot_branches",
+      "tot_depth"
+    ]
+  },
+  "receipt_digest": "sha256:efc209285b2e5a244f8bb802e6a8b349a508c580efa214f2039646d704ddf1a7",
+  "request_id": "req-ea3b98f591e84e129374de5c35e54d13",
+  "run_id": "02dbfc7e-54bd-4cde-9e40-af561d97a53c",
+  "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+  "trace_id": "3c65e8b9-6b7f-4940-862b-031d5e7fb9b3",
+  "unit_id": "executive_summary"
+}

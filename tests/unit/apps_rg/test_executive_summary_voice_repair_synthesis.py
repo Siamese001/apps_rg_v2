@@ -675,6 +675,42 @@ def test_ai_partnership_judge_findings_are_repaired_before_x1d() -> None:
     assert mechanism_ok is True, mechanism_reason
 
 
+def test_graph_display_override_preserves_required_devsecops_brushstroke() -> None:
+    """The graph anchor must not overwrite a sealed source fact in the same sentence."""
+    parsed = {
+        "resume_display_text": (
+            "Engineering executive leads governed agentic AI platform architecture, translating control-plane design into enterprise-scale execution. "
+            "From that commercial base, dependency graph intelligence enables accelerated legacy-system analysis, reinforced by regulated release automation and security scanning embedded into modernization delivery paths. "
+            "The L0 route policy dispatch layer governs autonomous execution within defined policy-gated surfaces. "
+            "Tool sandbox egress boundaries contain agent actions while replay-key controls preserve runtime proof bundle lineage. "
+            "Human override escalation paths give operators a dependable checkpoint before autonomous actions proceed. "
+            "Platform productization generated $22M in IP-led revenue while expanding margins and scaling the practice."
+        ),
+        "claim_ledger": [],
+        "executive_summary_composition_plan": {
+            "brushstrokes": [
+                {
+                    "brushstroke_role": "B1_executive_identity",
+                    "required_fact_ids": ["reb_ibm_devsecops_release_resilience"],
+                }
+            ]
+        },
+    }
+
+    out, _receipt = polish_executive_summary_judge_alignment(
+        parsed,
+        selected_facts=[
+            {"fact_id": "fact_engineering_platform_002"},
+            {"fact_id": "reb_ibm_devsecops_release_resilience"},
+        ],
+    )
+
+    text = str(out.get("resume_display_text") or "").lower()
+    assert "dependency graph intelligence enables accelerated legacy-system analysis" in text
+    assert "release automation" in text
+    assert "security scanning" in text
+
+
 def test_ai_partnership_polish_bridges_dependency_graph_and_repairs_speculative_s6() -> None:
     display = (
         "Executive technology leader who turns alliance-led solution development into repeatable growth. "
@@ -698,7 +734,7 @@ def test_ai_partnership_polish_bridges_dependency_graph_and_repairs_speculative_
 
     text = out["resume_display_text"]
     assert receipt["applied"] is True
-    assert "Within that partner-platform model" in text
+    assert "Software dependency graph intelligence enables accelerated legacy-system analysis" in text
     assert "can guide future" not in text
     assert "converted applied-AI architectures" in text
 

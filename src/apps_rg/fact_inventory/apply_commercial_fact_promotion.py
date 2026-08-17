@@ -8,7 +8,3 @@ def main() -> int:
         "Commercial fact promotion into SelectedRoleFactSet is retired. "
         "Promote graph nodes/metrics in employer graph JSON instead."
     )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

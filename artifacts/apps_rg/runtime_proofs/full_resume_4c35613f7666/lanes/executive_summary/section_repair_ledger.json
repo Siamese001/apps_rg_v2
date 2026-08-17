@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "section_id": "executive_summary",
+  "run_id": "exec_summary_20260817_022603",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 2,
+  "authoritative_l2_source": "regen_llm",
+  "attempt_1_x2_failed": false,
+  "attempt_1_x2_failed_gate_ids": [],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "regen_llm",
+      "operation": "synthesis_regen",
+      "reason": "Sentence fragment(s) detected in resume_display_text: ['S5(no_finite_verb): That operating foundation also drove platform productization leadership generati']; DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor",
+      "replaced_l2": true
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "regen_llm",
+      "failed_gate_ids": [],
+      "passed": true
+    }
+  ],
+  "authoritative_attempt_reason": "synthesis_regen_shape_pass"
+}

@@ -1,0 +1,206 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_exec_summary",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_eec64f4d7ffc\\lanes\\executive_summary\\x1d_gemini_provider_response_raw_20260817_034120_619.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "b131ad31bbbe3a1d",
+      "output_hash": "3b98afa234f2e6cb",
+      "score": 4.6,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.9199999999999999,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Sentence 2 contains minor repetitive preposition phrasing ('through policy-gated dispatch through operating discipline')."
+      ],
+      "cited_sentence_indexes": [
+        2
+      ],
+      "remediation_suggestions": [
+        "Smooth prepositional phrasing in sentence 2 for improved cadence."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "b131ad31bbbe3a1d",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_eec64f4d7ffc\\lanes\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "minor",
+          "codes": [
+            "MINOR_PHRASING_REDUNDANCY"
+          ]
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_exec_summary",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_eec64f4d7ffc\\lanes\\executive_summary\\x1d_openai_provider_response_raw_20260817_034143_163.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "b131ad31bbbe3a1d",
+      "output_hash": "bae15706da85da00",
+      "score": 4.4,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.8800000000000001,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "S2's repeated use of “through” weakens executive cadence.",
+        "Judge-packet display-override parity failed, though candidate override compliance passed."
+      ],
+      "cited_sentence_indexes": [
+        2
+      ],
+      "remediation_suggestions": [
+        "Tighten S2 phrasing to remove the cadence issue.",
+        "Repair display-override visibility in the judge packet."
+      ],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": "b131ad31bbbe3a1d",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_eec64f4d7ffc\\lanes\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+  "graph_claim_binding_contract_digest": "3a5b86ba854311b191e2aa73e86070557a507afdddf03280c0374b557eb6f9c7",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json",
+  "resume_graph_claim_binding_active": true,
+  "resume_graph_claim_binding_pass": true
+}

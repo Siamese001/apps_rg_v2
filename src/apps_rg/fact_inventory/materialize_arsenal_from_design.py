@@ -505,7 +505,3 @@ def main() -> int:
         f"edges={payload['graph_metadata']['edge_count']}"
     )
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

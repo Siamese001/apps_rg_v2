@@ -1,0 +1,210 @@
+{
+  "judges": [
+    {
+      "judge_id": "x1d_gemini_pro_exec_summary",
+      "provider_name": "Google Gemini 3.6 Flash",
+      "provider_key": "gemini_pro",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gemini-3.6-flash",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_5862e3a2adf8\\lanes\\executive_summary\\x1d_gemini_provider_response_raw_20260817_032513_745.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "040e904847d8b76d",
+      "output_hash": "a8c3286766eb96bc",
+      "score": 4.6,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.9199999999999999,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "Deterministic gate x2_executive_summary_judge_packet_display_override_parity failed due to missing display override text for fact_engineering_platform_002."
+      ],
+      "cited_sentence_indexes": [
+        2
+      ],
+      "remediation_suggestions": [
+        "Ensure display_override_text for fact_engineering_platform_002 is present in the judge evidence packet."
+      ],
+      "model_requested": "gemini-3.6-flash",
+      "model_actual": "gemini-3.6-flash",
+      "reasoning_effort": "high",
+      "judge_packet_hash": "040e904847d8b76d",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_5862e3a2adf8\\lanes\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true,
+      "thinking_level": "high"
+    },
+    {
+      "judge_id": "x1d_openai_chatgpt_exec_summary",
+      "provider_name": "OpenAI ChatGPT",
+      "provider_key": "openai_chatgpt",
+      "evaluator_mode": "MODEL_BACKED",
+      "provider_status": "MODEL_BACKED_PASS",
+      "model_name": "gpt-5.6-sol",
+      "provider_available": true,
+      "provider_blocked": false,
+      "exact_provider_error": null,
+      "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_5862e3a2adf8\\lanes\\executive_summary\\x1d_openai_provider_response_raw_20260817_032534_656.json",
+      "original_model": null,
+      "fallback_model": null,
+      "rubric_version": "executive_summary_x1d_v1",
+      "input_hash": "040e904847d8b76d",
+      "output_hash": "289e52241dcce6ee",
+      "score": 4.2,
+      "score_scale": "0_to_5",
+      "normalized_score": 0.8400000000000001,
+      "threshold": 4.0,
+      "normalized_threshold": 0.8,
+      "decisive_failure": false,
+      "findings": [
+        "S2 is technically credible but dense, weakening executive readability.",
+        "S4's noun stack and subject-verb construction read awkwardly.",
+        "The judge packet fails display-override parity for fact_engineering_platform_002.",
+        "The summary otherwise delivers supported strategy, governance, and commercialization synthesis."
+      ],
+      "cited_sentence_indexes": [
+        2,
+        4
+      ],
+      "remediation_suggestions": [
+        "Reduce noun stacking in S2 while preserving authorized scope.",
+        "Correct S4's syntax without changing its supported claim.",
+        "Restore display_override_text parity in the judge packet."
+      ],
+      "model_requested": "gpt-5.6-sol",
+      "model_actual": "gpt-5.6-sol",
+      "reasoning_effort": null,
+      "judge_packet_hash": "040e904847d8b76d",
+      "judge_packet_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_5862e3a2adf8\\lanes\\executive_summary\\executive_summary_judge_packet_post_x2.json",
+      "candidate_output_ref": "candidate_output.resume_display_text",
+      "allowed_fact_packet_ref": "allowed_fact_packet",
+      "rubric_ref": "apps_rg/runtime/judges/executive_summary_judge_packet.py#GRAPH_ONLY_GRADE_ONLY_RUBRIC",
+      "rationale": null,
+      "fail_reasons": [],
+      "unsupported_claims": [],
+      "quality_flags": [],
+      "dimension_verdicts": {
+        "factual_support": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "executive_signal": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "resume_voice": {
+          "pass": false,
+          "severity": "minor",
+          "codes": [
+            "AWKWARD_TECHNICAL_SYNTAX"
+          ]
+        },
+        "ats_alignment_without_keyword_stuffing": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "anti_overfit": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "synthesis_quality": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "evidence_utilization": {
+          "pass": true,
+          "severity": "none",
+          "codes": []
+        },
+        "deterministic_alignment": {
+          "pass": false,
+          "severity": "major",
+          "codes": [
+            "x2_executive_summary_judge_packet_display_override_parity"
+          ]
+        }
+      },
+      "dimension_verdicts_inferred": false,
+      "mocked": false,
+      "advisory_only": false,
+      "model_tier": "enhanced_reasoning",
+      "proof_eligible_judge": true,
+      "fallback_used": false,
+      "section_id": "executive_summary",
+      "pass": true
+    }
+  ],
+  "resume_graph_allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+  "graph_claim_binding_contract_digest": "98ae033a1a656e4a7872a7c10968759360d5e9f170e339c9978fe1334631d2a4",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json",
+  "resume_graph_claim_binding_active": true,
+  "resume_graph_claim_binding_pass": true
+}

@@ -1,0 +1,73 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 4.2,
+    "threshold": 4.0,
+    "pass": true,
+    "decisive_failure": false,
+    "findings": [
+      "S2 is technically credible but dense, weakening executive readability.",
+      "S4's noun stack and subject-verb construction read awkwardly.",
+      "The judge packet fails display-override parity for fact_engineering_platform_002.",
+      "The summary otherwise delivers supported strategy, governance, and commercialization synthesis."
+    ],
+    "cited_sentence_indexes": [
+      2,
+      4
+    ],
+    "remediation_suggestions": [
+      "Reduce noun stacking in S2 while preserving authorized scope.",
+      "Correct S4's syntax without changing its supported claim.",
+      "Restore display_override_text parity in the judge packet."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "AWKWARD_TECHNICAL_SYNTAX"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DISPLAY_OVERRIDE_PACKET_PARITY_FAILED"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_5862e3a2adf8\\lanes\\executive_summary\\x1d_openai_provider_response_raw_20260817_032534_656.json",
+  "original_model": null,
+  "fallback_model": null
+}

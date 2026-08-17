@@ -39,7 +39,11 @@ _STAGE_ORDER = {
 }
 _PASSISH = {"PASS", "NOT_APPLICABLE"}
 _BLOCKING = {"FAIL", "UNKNOWN", "NOT_RUN"}
-_ALLOW_X3 = {"X3D_ALLOW_FINISH"}
+# A lane earns its local X3 gate as ``X3_ALLOW``.  The whole-resume exit is a
+# distinct, later gate and must be the canonical ``X3D_ALLOW_FINISH``.  Using
+# the final whole-run token for each lane incorrectly converts an authorized
+# product into eleven synthetic evaluation failures.
+_ALLOW_LANE_X3 = {"X3_ALLOW", "X3D_ALLOW_FINISH"}
 _PRESENCE_GATES = {
     "u0_run_bundle_index_present",
     "u0_runtime_package_present",
@@ -212,9 +216,9 @@ def _x3_verdict(payload: Any) -> tuple[str, str, Any, Any]:
         code = payload.strip()
     if not code or code.upper() == "UNKNOWN":
         return "UNKNOWN", "x3 code missing or UNKNOWN", code, "earned X3 code"
-    if code in _ALLOW_X3:
-        return "PASS", "x3 disposition is exact canonical allow-finish", code, "X3D_ALLOW_FINISH"
-    return "FAIL", f"x3 disposition is not exact X3D_ALLOW_FINISH: {code}", code, "X3D_ALLOW_FINISH"
+    if code in _ALLOW_LANE_X3:
+        return "PASS", "x3 disposition earned the local allow gate", code, "X3_ALLOW"
+    return "FAIL", f"x3 disposition is not a local allow code: {code}", code, "X3_ALLOW"
 
 
 def _l6_non_mutating_verdict(payload: Any) -> tuple[str, str, Any, Any]:

@@ -497,7 +497,3 @@ def main(argv: list[str] | None = None) -> int:
         write_reports(report, repo=repo)
     print(json.dumps(report.to_dict(), indent=2))
     return 0 if report.status == "PASS" else (2 if report.status == "BLOCKED" else 1)
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

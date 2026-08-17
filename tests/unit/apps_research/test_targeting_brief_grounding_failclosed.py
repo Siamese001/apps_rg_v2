@@ -356,6 +356,7 @@ def test_apps_rg_x2_google_request_uses_high_thinking_without_temperature() -> N
     payload = json.loads(request.body.decode("utf-8"))
     generation_config = payload["generationConfig"]
 
+    assert generation_config["responseMimeType"] == "application/json"
     assert generation_config["thinkingConfig"] == {
         "thinkingLevel": APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL
     }

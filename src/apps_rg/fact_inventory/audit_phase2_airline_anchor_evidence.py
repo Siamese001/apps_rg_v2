@@ -325,7 +325,3 @@ def main() -> int:
     OUT_MD.write_text(_render_md(payload), encoding="utf-8")
     print(f"AUDIT promotion_decision={promotion_decision} airline_hits={payload['repo_scan']['total_airline_hits_in_scan']}")
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

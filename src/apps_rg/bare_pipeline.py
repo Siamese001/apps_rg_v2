@@ -1203,7 +1203,7 @@ def run_bare_live_e2e(
         "pipeline": "apps_rg_bare_e2e.v2",
         "mode": "live",
         "outcome_label": "LIVE_PROVIDER_FAIL",
-        "command": "python -m apps_rg run --mode live",
+        "command": "internal: apps_rg.bare_pipeline.run_bare_e2e(mode=live)",
         "run_id": run_dir.name,
         "artifact_dir": str(run_dir),
         "repository": _repository_identity(repo),
@@ -1591,7 +1591,7 @@ def resume_bare_live_x3(*, resume_run_dir: str | Path) -> dict[str, Any]:
     )
     result.update(
         {
-            "command": f"python -m apps_rg run --resume-run-dir {run_dir}",
+            "command": "internal: apps_rg.bare_pipeline.resume_bare_x3",
             "repository": _repository_identity(repo),
             "status": "FAIL",
             "outcome_label": "LIVE_PROVIDER_FAIL_AFTER_X3_RESUME",
@@ -1841,7 +1841,7 @@ def run_bare_deterministic_e2e(
         "pipeline": "apps_rg_bare_e2e.v2",
         "mode": "deterministic",
         "outcome_label": "DETERMINISTIC_OFFLINE_FAIL",
-        "command": "python -m apps_rg run --mode deterministic",
+        "command": "internal: apps_rg.bare_pipeline.run_bare_e2e(mode=deterministic)",
         "run_id": run_dir.name,
         "artifact_dir": str(run_dir),
         "repository": _repository_identity(repo),

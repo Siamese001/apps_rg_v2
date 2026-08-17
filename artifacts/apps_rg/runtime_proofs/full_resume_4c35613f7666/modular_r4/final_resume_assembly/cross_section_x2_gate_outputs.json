@@ -1,0 +1,420 @@
+{
+  "gate_family": "final_resume_cross_section_x2",
+  "evaluated_at_utc": "2026-08-17T02:29:27.455729+00:00",
+  "all_pass": true,
+  "failed_gate_ids": [],
+  "gates": [
+    {
+      "gate_id": "x2_cross_section_exact_duplicate",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": "19 exact duplicate groups dispositioned in overlap ledger (provenance retained; L2 snapshots unchanged)",
+      "threshold": "advisory",
+      "observed": 19,
+      "evidence_refs": [
+        "kept_removed_claims.json",
+        "overlap_decisions.json"
+      ],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_near_duplicate",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": "jaccard>=0.85",
+      "observed": 0,
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_same_claim_different_wording",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": "18 same-fact-id wording variants dispositioned in overlap ledger (provenance retained)",
+      "threshold": null,
+      "observed": 18,
+      "evidence_refs": [
+        "kept_removed_claims.json",
+        "overlap_decisions.json"
+      ],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_repeated_metric",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": 3,
+      "observed": {},
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_unsupported_carryover",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": [],
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_section_intent_conflict",
+      "verdict": "WARN",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": "conflicts: ['insurtech_narrative_vs_insurtech_bullets_substring', 'ey_narrative_vs_ey_bullets_substring']",
+      "threshold": null,
+      "observed": [
+        "insurtech_narrative_vs_insurtech_bullets_substring",
+        "ey_narrative_vs_ey_bullets_substring"
+      ],
+      "evidence_refs": [],
+      "pass": false
+    },
+    {
+      "gate_id": "x2_cross_section_no_em_dash",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": null,
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_x3_review_present",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": [],
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_overlap_ledger_emitted",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": {
+        "kept": 35,
+        "removed": 37,
+        "rewritten": 0
+      },
+      "evidence_refs": [],
+      "pass": true
+    },
+    {
+      "gate_id": "x2_cross_section_graph_coherence",
+      "verdict": "WARN",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": "graph coherence warnings: 1",
+      "threshold": {
+        "min_active_sections": 3,
+        "min_unique_graph_skill_node_ids": 4
+      },
+      "observed": {
+        "schema": "apps_rg.cross_section_graph_coherence_receipt.v1",
+        "status": "WARN",
+        "active_section_count": 11,
+        "native_c03_section_count": 2,
+        "role_episode_section_count": 8,
+        "unique_graph_skill_node_count": 54,
+        "unique_source_fact_id_count": 57,
+        "unique_role_episode_bundle_count": 28,
+        "active_section_ids": [
+          "competencies",
+          "executive_summary",
+          "ey_bullets",
+          "ey_narrative",
+          "headline",
+          "ibm_bullets",
+          "ibm_narrative",
+          "insurtech_bullets",
+          "insurtech_narrative",
+          "unify_bullets",
+          "unify_narrative"
+        ],
+        "native_c03_section_ids": [
+          "competencies",
+          "executive_summary"
+        ],
+        "role_episode_section_ids": [
+          "ey_bullets",
+          "ey_narrative",
+          "ibm_bullets",
+          "ibm_narrative",
+          "insurtech_bullets",
+          "insurtech_narrative",
+          "unify_bullets",
+          "unify_narrative"
+        ],
+        "unique_graph_skill_node_ids": [
+          "skill_agentic_control_plane_design",
+          "skill_agentic_platform_productization",
+          "skill_ai_platform_commercialization",
+          "skill_audit_grade_observability",
+          "skill_capital_capital_modeling",
+          "skill_commercial_board_level_stakeholder_alignment",
+          "skill_context_engineering",
+          "skill_credit_adjudication_default_risk",
+          "skill_dense_sparse_exact_retrieval_design",
+          "skill_enterprise_workflow_adoption",
+          "skill_fail_closed_gate_semantics",
+          "skill_governed_agentic_systems_architecture",
+          "skill_graph_aware_relationship_grounding",
+          "skill_ibm_automated_release_pipelines",
+          "skill_ibm_devsecops_pipeline_security",
+          "skill_managed_workflow_orchestration",
+          "skill_output_quality_and_schema_gates",
+          "skill_p2_gtm_enterprise_deal_support",
+          "skill_p2_gtm_presales_delivery_handoff",
+          "skill_p2_gtm_solution_mapping",
+          "skill_p2_tech_aws_modernization_patterns",
+          "skill_p2_tech_reference_architecture",
+          "skill_partner_ai_architecture_advisory",
+          "skill_partner_alliance_gtm_execution",
+          "skill_partner_cloud_vendor_joint_gtm",
+          "skill_partner_customer_deal_support",
+          "skill_partner_enterprise_negotiations",
+          "skill_partner_joint_solution_development",
+          "skill_partner_partner_led_ai_solutions",
+          "skill_partner_pnl_oversight",
+          "skill_partner_pre_sales",
+          "skill_partner_sales_revenue_targets",
+          "skill_partner_solution_architecture",
+          "skill_policy_bound_runtime_design",
+          "skill_prompt_assembly_architecture",
+          "skill_provider_and_egress_governance",
+          "skill_regulated_cloud_adoption_guardrails",
+          "skill_replayable_runtime_design",
+          "skill_reusable_agentic_platform_architecture",
+          "skill_risk_greek_stress_testing",
+          "skill_runtime_gate_mesh_design",
+          "skill_runtime_resilience_controls",
+          "skill_soc2_zero_trust_security",
+          "skill_sr_cloud_data_platform_engineering",
+          "skill_sr_microservices_integration_platform",
+          "skill_sr_w12_databricks_lakehouse_fundamentals",
+          "skill_sr_w12_hyperscaler_alliance_co_sell",
+          "skill_sr_w12_industry_reference_architecture",
+          "skill_sr_w12_joint_ai_solution_development",
+          "skill_svp_it_strategy_innovation",
+          "skill_unify_agentic_l0_route_policy_dispatch",
+          "skill_unify_agentic_runtime_gate_verdict_contracts",
+          "skill_unify_agentic_runtime_proof_bundle_lineage",
+          "skill_x1_x2_x3_exit_control"
+        ],
+        "unique_role_episode_bundle_ids": [
+          "reb_ey_capital_optimization_solvency",
+          "reb_ey_ccar_capital_liquidity_stress_testing",
+          "reb_ey_erm_risk_governance",
+          "reb_ey_insurance_core_modernization",
+          "reb_ey_regulatory_analytics_modernization",
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_customer_success_value_realization",
+          "reb_ibm_data_modeling_bi_decision_support",
+          "reb_ibm_devsecops_release_resilience",
+          "reb_ibm_presales_solution_engineering",
+          "reb_ibm_revenue_sales_target_execution",
+          "reb_insurtech_aws_cloud_economics",
+          "reb_insurtech_aws_guidewire_core_modernization",
+          "reb_insurtech_aws_migration_execution",
+          "reb_insurtech_aws_shared_responsibility_operating_model",
+          "reb_insurtech_founder_led_market_creation",
+          "reb_insurtech_insurance_data_bi_decisioning",
+          "reb_insurtech_lean_delivery_operating_model",
+          "reb_insurtech_public_vs_private_cloud_strategy",
+          "reb_insurtech_regulated_aws_control_implementation",
+          "reb_insurtech_resilient_core_operations",
+          "reb_unify_agentic_platform_architecture",
+          "reb_unify_distributed_ecosystem_engineering",
+          "reb_unify_enterprise_adoption_revenue",
+          "reb_unify_partner_channel_cosell",
+          "reb_unify_platform_commercialization_leadership",
+          "reb_unify_production_adoption_lifecycle",
+          "reb_unify_runtime_reliability_governance"
+        ],
+        "sections": [
+          {
+            "section_id": "headline",
+            "status": "GRAPH_CONTEXT_PRESENT",
+            "native_c03_active": false,
+            "role_episode_active": false,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 6,
+            "role_episode_skill_intersection_count": 3,
+            "role_episode_fact_intersection_count": 6
+          },
+          {
+            "section_id": "executive_summary",
+            "status": "PASS",
+            "native_c03_active": true,
+            "role_episode_active": false,
+            "native_c03_cited_fact_count": 5,
+            "role_episode_bundle_intersection_count": 6,
+            "role_episode_skill_intersection_count": 3,
+            "role_episode_fact_intersection_count": 6
+          },
+          {
+            "section_id": "competencies",
+            "status": "PASS",
+            "native_c03_active": true,
+            "role_episode_active": false,
+            "native_c03_cited_fact_count": 3,
+            "role_episode_bundle_intersection_count": 9,
+            "role_episode_skill_intersection_count": 32,
+            "role_episode_fact_intersection_count": 14
+          },
+          {
+            "section_id": "unify_narrative",
+            "status": "PASS",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 7,
+            "role_episode_skill_intersection_count": 0,
+            "role_episode_fact_intersection_count": 12
+          },
+          {
+            "section_id": "unify_bullets",
+            "status": "PASS",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 7,
+            "role_episode_skill_intersection_count": 17,
+            "role_episode_fact_intersection_count": 12
+          },
+          {
+            "section_id": "ibm_narrative",
+            "status": "FAIL",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 0,
+            "role_episode_skill_intersection_count": 0,
+            "role_episode_fact_intersection_count": 2
+          },
+          {
+            "section_id": "ibm_bullets",
+            "status": "PASS",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 4,
+            "role_episode_skill_intersection_count": 5,
+            "role_episode_fact_intersection_count": 9
+          },
+          {
+            "section_id": "insurtech_narrative",
+            "status": "PASS",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 10,
+            "role_episode_skill_intersection_count": 3,
+            "role_episode_fact_intersection_count": 4
+          },
+          {
+            "section_id": "insurtech_bullets",
+            "status": "PASS",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 10,
+            "role_episode_skill_intersection_count": 3,
+            "role_episode_fact_intersection_count": 4
+          },
+          {
+            "section_id": "ey_narrative",
+            "status": "PASS",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 5,
+            "role_episode_skill_intersection_count": 3,
+            "role_episode_fact_intersection_count": 4
+          },
+          {
+            "section_id": "ey_bullets",
+            "status": "PASS",
+            "native_c03_active": false,
+            "role_episode_active": true,
+            "native_c03_cited_fact_count": 0,
+            "role_episode_bundle_intersection_count": 5,
+            "role_episode_skill_intersection_count": 3,
+            "role_episode_fact_intersection_count": 4
+          }
+        ],
+        "warnings": [
+          {
+            "section_id": "ibm_narrative",
+            "status": "FAIL",
+            "violations": [
+              {
+                "reason_code": "role_episode_metadata_without_bundle_use",
+                "detail": "role_episode_bundle_ids were not present in candidate output"
+              }
+            ]
+          }
+        ],
+        "thresholds": {
+          "min_active_sections": 3,
+          "min_unique_graph_skill_node_ids": 4
+        }
+      },
+      "evidence_refs": [
+        "cross_section_x2_gate_outputs.json::graph_coherence_receipt"
+      ],
+      "pass": false
+    },
+    {
+      "gate_id": "x2_whole_resume_graph_evidence_engineering",
+      "verdict": "PASS",
+      "authority_scope": "apps_rg_cross_section_product_quality_not_core_exit_matrix",
+      "core_x2_matrix_authority": false,
+      "decisive_reason": null,
+      "threshold": null,
+      "observed": {
+        "engineering_pass": true,
+        "release_pass": true,
+        "contract_digest": "16275a438afab52153b1d9de230fdfd1b4ce84bbe1b54f6b5b9fa16649659e2d"
+      },
+      "evidence_refs": [
+        "whole_resume_graph_evidence_contract.json"
+      ],
+      "pass": true
+    }
+  ],
+  "warn_policy": {
+    "schema": "apps_rg.aggregation_warn_policy.v1",
+    "evaluated_at_utc": "2026-08-17T02:29:27.373896+00:00",
+    "rules": {
+      "WARN_visible_but_nonblocking_for_product": true,
+      "WARN_permitted_for_structural_assembly": true,
+      "FAIL_and_UNKNOWN_block_structural_and_product": true
+    },
+    "warn_gate_ids": [
+      "x2_cross_section_section_intent_conflict",
+      "x2_cross_section_graph_coherence"
+    ],
+    "fail_gate_ids": [],
+    "unknown_gate_ids": [],
+    "structural_cross_section_eligible": true,
+    "product_allow_blocked_by_cross_section": false
+  }
+}

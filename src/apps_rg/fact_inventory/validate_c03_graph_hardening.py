@@ -139,7 +139,3 @@ def main(argv: list[str] | None = None) -> None:
     print(json.dumps(receipt, indent=2))
     if receipt["status"] != "PASS":
         raise SystemExit(2)
-
-
-if __name__ == "__main__":
-    main()

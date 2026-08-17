@@ -24,6 +24,7 @@ from apps_rg.runtime.authority_reconciliation import (
     LANE_X3_MIRROR_ARTIFACT,
     derive_final_assembly_authority,
     derive_lane_authority,
+    lane_artifact_root,
 )
 
 X3D_ALLOW_FINISH = "X3D_ALLOW_FINISH"
@@ -193,7 +194,7 @@ def build_whole_run_exit_signals(
             ):
                 judge_execution_incomplete_lanes.append(lane)
 
-        lane_root = root / "modular_r4" / "sections" / lane
+        lane_root = lane_artifact_root(root, lane)
         lane_authority = derive_lane_authority(root, lane)
         lane_authority_rows.append(lane_authority)
         for name in (
@@ -908,21 +909,23 @@ def compute_whole_run_exit(signals: Mapping[str, Any]) -> dict[str, Any]:
         if str(r.get("x3_code") or "").strip()
     ]
     uniq = sorted(set(codes))
-    mixed_lanes = (
+    non_allowing_lanes = (
         len(codes) != len(lanes)
         or len(uniq) > 1
-        or any(c != X3D_ALLOW_FINISH for c in codes)
+        or any(c not in {"X3_ALLOW", X3D_ALLOW_FINISH} for c in codes)
     )
 
-    if mixed_lanes:
+    if non_allowing_lanes:
         out["x3_disposition"] = X3B_ESCALATE_HITL
         if len(uniq) > 1:
             lane_x3_rc.append(RC_LANE_X3_MIXED)
-        if len(codes) != len(lanes) or any(c != X3D_ALLOW_FINISH for c in codes):
+        if len(codes) != len(lanes) or any(
+            c not in {"X3_ALLOW", X3D_ALLOW_FINISH} for c in codes
+        ):
             lane_x3_rc.append(RC_LANE_X3_NON_ALLOW)
         decisive_reason = (
             "WHOLE_RUN_REVIEW: producer-owned per-lane X3 codes differ, are missing, "
-            "or are not exact X3D_ALLOW_FINISH"
+            "or are not an exact lane allow disposition"
         )
         out["blockers"] = blockers
         out["warnings"] = warnings
@@ -982,7 +985,7 @@ def compute_whole_run_exit(signals: Mapping[str, Any]) -> dict[str, Any]:
     out["x3_disposition"] = X3D_ALLOW_FINISH
     decisive_reason = (
         "WHOLE_RUN_ALLOW_FINISH: structural and final-release gates PASS, X1D PASS, "
-        "all producer-owned lane X3 receipts are exact X3D_ALLOW_FINISH, and PA/C0 "
+        "all producer-owned lane X3 receipts are exact lane allow dispositions, and PA/C0 "
         "grounding checks are satisfied"
     )
     out["blockers"] = blockers

@@ -160,7 +160,6 @@ def _finite_number(value: Any) -> bool:
         and math.isfinite(float(value))
     )
 
-
 def _count_at_least(value: Any, minimum: Any) -> bool:
     return (
         isinstance(value, int)
@@ -539,7 +538,3 @@ def main() -> int:
         validate_artifact(artifact),
         fail_closed_env=FAIL_CLOSED_ENV,
     )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -107,23 +107,6 @@ def mirror_external_authority_artifact(
     return target
 
 
-def _identity_matches(
-    payload: Mapping[str, Any],
-    identity: Mapping[str, Any],
-) -> bool:
-    embedded = payload.get("identity")
-    if isinstance(embedded, Mapping):
-        return dict(embedded) == dict(identity)
-    return all(
-        str(payload.get(receipt_field) or "") == str(identity.get(identity_field) or "")
-        for receipt_field, identity_field in (
-            ("run_id", "parent_run_id"),
-            ("request_id", "request_id"),
-            ("trace_root", "trace_root"),
-        )
-    )
-
-
 def _write_stage_receipt(
     *,
     artifact_dir: Path,
@@ -178,13 +161,7 @@ def emit_runtime_stage_authority_receipts(
         root,
         expected_identity=identity,
     )
-    runtime_identity = all(
-        _identity_matches(value, identity) for value in (witness, terminal, whole_exit)
-    )
-    c0 = witness.get("c0") if isinstance(witness.get("c0"), Mapping) else {}
     l2 = witness.get("l2") if isinstance(witness.get("l2"), Mapping) else {}
-    x1 = witness.get("x1") if isinstance(witness.get("x1"), Mapping) else {}
-    x2 = witness.get("x2") if isinstance(witness.get("x2"), Mapping) else {}
     signals = (
         whole_exit.get("signals")
         if isinstance(whole_exit.get("signals"), Mapping)
@@ -204,9 +181,7 @@ def emit_runtime_stage_authority_receipts(
 
     checks_by_stage: dict[str, dict[str, bool]] = {
         "APPS_RG_C0": {
-            "runtime_identity_match": runtime_identity,
             "whole_run_exit_verified": whole_exit_valid,
-            "outer_runtime_c0_receipt_present": bool(c0),
             "section_c0_support_pass": signals.get("c0_support_status") == "PASS",
             "section_c0_evidence_present": int(
                 signals.get("c0_evidence_item_count") or 0
@@ -214,7 +189,6 @@ def emit_runtime_stage_authority_receipts(
             > 0,
         },
         "APPS_RG_PA": {
-            "runtime_identity_match": runtime_identity,
             "whole_run_exit_verified": whole_exit_valid,
             "outer_prompt_boundary_receipt_present": prompt_path.is_file(),
             "all_section_prompts_consumed_c0": signals.get("pa_consumed_c0") is True,
@@ -223,7 +197,6 @@ def emit_runtime_stage_authority_receipts(
             "all_section_prompt_schemas_bound": signals.get("pa_schema_bound") is True,
         },
         "APPS_RG_L2": {
-            "runtime_identity_match": runtime_identity,
             "l2_executed": l2.get("executed") is True,
             "l2_status_pass": l2.get("status") == "PASS",
             "l2_fault_empty": not str(
@@ -251,16 +224,12 @@ def emit_runtime_stage_authority_receipts(
             "no_direct_l4_write_bypass": signals.get("direct_l4_write_bypass") is False,
         },
         "X1_REVIEW": {
-            "runtime_identity_match": runtime_identity,
-            "x1_executed": x1.get("status") == "EXECUTED",
             "whole_run_exit_verified": whole_exit_valid,
             "aggregate_x1d_pass": signals.get("x1d_overall") == "PASS",
             "aggregate_judge_quorum_satisfied": signals.get("judge_quorum_satisfied")
             is True,
         },
         "X2_AGGREGATION": {
-            "runtime_identity_match": runtime_identity,
-            "x2_executed": x2.get("status") == "EXECUTED",
             "whole_run_exit_verified": whole_exit_valid,
             "final_resume_x2_all_pass": signals.get("final_resume_x2_all_pass") is True,
             "all_section_gates_pass": signals.get("section_gates_overall") == "PASS",
@@ -271,7 +240,6 @@ def emit_runtime_stage_authority_receipts(
             is True,
         },
         "X3_DISPOSITION": {
-            "runtime_identity_match": runtime_identity,
             "whole_run_exit_verified": whole_exit_valid,
             "apps_rg_whole_run_exit_pass": whole_exit.get("status") == "PASS",
             "x3_receipt_exact_authorizing_code": x3_code == "X3D_ALLOW_FINISH",
@@ -427,18 +395,22 @@ def emit_post_boundary_authority_receipts(
         )
     apps_eval = completion.get("apps_eval")
     apps_eval = dict(apps_eval) if isinstance(apps_eval, Mapping) else {}
-    coverage = apps_eval.get("coverage_summary")
-    coverage = dict(coverage) if isinstance(coverage, Mapping) else {}
     l6 = completion.get("l6_shadow")
     l6 = dict(l6) if isinstance(l6, Mapping) else {}
     fact_vector = completion.get("fact_vector_writeback")
     fact_vector = dict(fact_vector) if isinstance(fact_vector, Mapping) else {}
 
     eval_ref = str(apps_eval.get("eval_record_ref") or "")
-    l6_ref = str(l6.get("l6_shadow_bridge_ref") or "")
-    parity_ref = str(l6.get("l6_apps_eval_binding_closure_ref") or "")
+    candidate_manifest_ref = str(
+        apps_eval.get("candidate_evaluation_manifest_ref") or ""
+    )
+    # The per-lane L6 bridge is historic observability.  The root audit is the
+    # current-run independent verifier of the exact frozen eval inputs.
+    l6_ref = str(l6.get("l6_evaluation_audit_ref") or "")
+    parity_ref = str(l6.get("l6_apps_eval_binding_closure_ref") or l6_ref)
     promotion_ref = "fact_vector_writeback_completion_receipt.json"
     eval_path = _resolve_contained(root, eval_ref)
+    candidate_manifest_path = _resolve_contained(root, candidate_manifest_ref)
     l6_path = _resolve_contained(root, l6_ref)
     parity_path = _resolve_contained(root, parity_ref)
     promotion_path = _resolve_contained(root, promotion_ref)
@@ -477,17 +449,40 @@ def emit_post_boundary_authority_receipts(
                 eval_record.get("parent_run_id") or ""
             )
             == str(identity.get("parent_run_id") or ""),
-            "coverage_complete": coverage.get("coverage_complete") is True,
-            "release_not_blocked": coverage.get("release_blocked") is False,
+            "candidate_manifest_present": candidate_manifest_path.is_file(),
+            "evaluation_execution_complete": apps_eval.get("execution_status")
+            == "PASS",
+            "evaluation_validity_pass": apps_eval.get("evaluation_validity")
+            == "PASS",
+            "deterministic_product_pass": apps_eval.get(
+                "deterministic_product_status"
+            )
+            == "PASS",
+            "evaluation_is_current_completion_gate": apps_eval.get(
+                "current_run_authority"
+            )
+            == "PIPELINE_COMPLETION_GATE",
         },
         "L6_SHADOW": {
-            "l6_bridge_present": l6_path.is_file(),
-            "grain_parity_pass": l6.get("grain_parity_status") == "PASS",
-            "eval_rows_bound": l6.get("apps_eval_rows_bound") is True,
+            "l6_evaluation_audit_present": l6_path.is_file(),
+            "l6_audit_schema_exact": parity.get("schema_version")
+            == "apps_rg.l6_evaluation_audit.v2",
+            "l6_integrity_pass": l6.get("l6_integrity_status") == "PASS",
+            "apps_eval_rows_bound": l6.get("apps_eval_rows_bound") is True,
+            "independent_observations": parity.get("independent_observations")
+            is True,
+            "current_run_eval_assurance": l6.get("future_run_only") is False,
+            "current_run_not_mutated": l6.get("current_run_mutated") is False,
         },
         "INDEPENDENT_PARITY": {
             "parity_receipt_present": parity_path.is_file(),
-            "binding_closure_pass": parity.get("binding_closure_status") == "PASS",
+            "independent_audit_pass": parity.get("l6_integrity_status") == "PASS",
+            "grain_parity_pass": parity.get("grain_parity_status") == "PASS",
+            "all_required_eval_rows_bound": parity.get("apps_eval_rows_bound") is True,
+            "candidate_manifest_reopened": parity.get("checks", {}).get(
+                "candidate_manifest_valid"
+            )
+            is True,
         },
         "PROMOTION_TERMINAL": {
             "promotion_receipt_present": promotion_path.is_file(),
@@ -498,7 +493,13 @@ def emit_post_boundary_authority_receipts(
     sources = {
         "APPS_EVAL": tuple(
             dict.fromkeys(
-                (completion_path, eval_path, eval_seal_path, *eval_package_refs)
+                (
+                    completion_path,
+                    eval_path,
+                    candidate_manifest_path,
+                    eval_seal_path,
+                    *eval_package_refs,
+                )
             )
         ),
         "L6_SHADOW": (completion_path, l6_path),

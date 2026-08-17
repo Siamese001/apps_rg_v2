@@ -1,0 +1,76 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 4.2,
+    "threshold": 4.0,
+    "pass": true,
+    "decisive_failure": false,
+    "findings": [
+      "S2-S4 are technically dense, reducing fast executive readability.",
+      "S6 is more abstract than the evidence-led body.",
+      "Judge-packet display-override parity is unresolved for fact_engineering_platform_002."
+    ],
+    "cited_sentence_indexes": [
+      2,
+      3,
+      4,
+      6
+    ],
+    "remediation_suggestions": [
+      "Reduce jargon density in S2-S4 without changing claims.",
+      "Ground S6 more directly in already cited evidence.",
+      "Restore display_override_text parity for fact_engineering_platform_002."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "EXECUTIVE_READABILITY_JARGON"
+        ]
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "minor",
+        "codes": [
+          "ABSTRACT_CLOSE"
+        ]
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "DISPLAY_OVERRIDE_PACKET_PARITY"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_de1b62903cdb\\lanes\\executive_summary\\x1d_openai_provider_response_raw_20260817_035639_865.json",
+  "original_model": null,
+  "fallback_model": null
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "section_id": "competencies",
+  "run_id": "competencies_20260817_013422",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 1,
+  "authoritative_l2_source": "initial_llm",
+  "attempt_1_x2_failed": false,
+  "attempt_1_x2_failed_gate_ids": [],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "mechanical",
+      "operation": "competencies_pre_x2_deterministic_pipeline",
+      "reason": "sync_and_coerce",
+      "replaced_l2": false
+    },
+    {
+      "seq": 2,
+      "kind": "deterministic_rewrite",
+      "operation": "finalize_competencies_v3_output",
+      "reason": "capability_projection",
+      "replaced_l2": true
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "initial_llm",
+      "failed_gate_ids": [],
+      "passed": true
+    }
+  ]
+}

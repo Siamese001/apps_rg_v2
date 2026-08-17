@@ -994,26 +994,40 @@ def test_post_boundary_authority_reopens_eval_seal_and_rejects_tamper(
         },
     )
 
-    l6_bridge = tmp_path / "l6_shadow_bridge.json"
-    parity = tmp_path / "l6_apps_eval_binding_closure.json"
+    candidate_manifest = tmp_path / "candidate_evaluation_manifest.v2.json"
+    l6_audit = tmp_path / "l6_evaluation_audit.v2.json"
     promotion = tmp_path / "fact_vector_writeback_completion_receipt.json"
-    _write_json(l6_bridge, {"status": "PASS"})
-    _write_json(parity, {"binding_closure_status": "PASS"})
+    _write_json(candidate_manifest, {"schema_version": "test.candidate.v1"})
+    _write_json(
+        l6_audit,
+        {
+            "schema_version": "apps_rg.l6_evaluation_audit.v2",
+            "l6_integrity_status": "PASS",
+            "grain_parity_status": "PASS",
+            "apps_eval_rows_bound": True,
+            "independent_observations": True,
+            "checks": {"candidate_manifest_valid": True},
+        },
+    )
     _write_json(promotion, {"status": "PASS"})
     completion = {
         "apps_eval": {
             "record_id": "eval-001",
             "eval_record_ref": eval_record.relative_to(tmp_path).as_posix(),
-            "coverage_summary": {
-                "coverage_complete": True,
-                "release_blocked": False,
-            },
+            "candidate_evaluation_manifest_ref": candidate_manifest.name,
+            "current_run_authority": "PIPELINE_COMPLETION_GATE",
+            "execution_status": "PASS",
+            "evaluation_validity": "PASS",
+            "deterministic_product_status": "PASS",
         },
         "l6_shadow": {
-            "l6_shadow_bridge_ref": l6_bridge.name,
-            "l6_apps_eval_binding_closure_ref": parity.name,
+            "l6_evaluation_audit_ref": l6_audit.name,
+            "l6_apps_eval_binding_closure_ref": l6_audit.name,
             "grain_parity_status": "PASS",
+            "l6_integrity_status": "PASS",
             "apps_eval_rows_bound": True,
+            "future_run_only": False,
+            "current_run_mutated": False,
         },
         "fact_vector_writeback": {"status": "PASS"},
     }

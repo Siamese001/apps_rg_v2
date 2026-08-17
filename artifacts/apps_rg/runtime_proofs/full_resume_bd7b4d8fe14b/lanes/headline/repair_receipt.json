@@ -1,0 +1,68 @@
+{
+  "section_id": "headline",
+  "run_id": "headline_20260817_111054",
+  "retry_attempted": true,
+  "first_attempt_raw_schema_valid": true,
+  "final_raw_model_schema_valid": true,
+  "raw_model_schema_valid": true,
+  "raw_schema_failure_code": null,
+  "first_attempt_claim_ledger": [
+    {
+      "claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+      "source_fact_ids": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_sr_w12_hyperscaler_alliance_co_sell"
+      ]
+    },
+    {
+      "claim_text": "Runtime reliability, governance, telemetry, evaluation, rollback",
+      "source_fact_ids": [
+        "reb_unify_runtime_reliability_governance",
+        "skill_context_engineering"
+      ]
+    },
+    {
+      "claim_text": "Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions",
+      "source_fact_ids": [
+        "reb_ibm_revenue_sales_target_execution",
+        "skill_partner_pnl_oversight"
+      ]
+    }
+  ],
+  "final_snapshot_claim_ledger": [
+    {
+      "claim_text": "Hyperscaler Alliance Execution",
+      "source_fact_ids": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "skill_sr_w12_hyperscaler_alliance_co_sell"
+      ]
+    },
+    {
+      "claim_text": "Governed Runtime Reliability",
+      "source_fact_ids": [
+        "reb_unify_runtime_reliability_governance",
+        "skill_context_engineering"
+      ]
+    },
+    {
+      "claim_text": "Enterprise Revenue Portfolio",
+      "source_fact_ids": [
+        "reb_ibm_revenue_sales_target_execution",
+        "skill_partner_pnl_oversight"
+      ]
+    }
+  ],
+  "raw_observation": null,
+  "proof_eligible_repair": false,
+  "proof_eligible_repair_semantics": "false means retries did not fabricate proof-eligibility via a non-schema-compliant shortcut; post-run proof eligibility is recorded separately as proof_eligible_after_retry.",
+  "first_attempt_self_check_consistent": false,
+  "final_self_check_consistent": true,
+  "retry_reason": "word_count_self_check_mismatch",
+  "retry_policy": "same_authority_headline_proof_shape_retry",
+  "repair_did_not_mask_raw_schema_failure": true,
+  "deterministic_repair_classes": [
+    "headline_proof_shape_retry_llm"
+  ],
+  "note": "Normalized headline artifacts may coerce invalid raw shapes; proof-eligible REAL_RUNTIME requires final raw model snapshot PASS after optional same-authority retry. First-attempt failures remain recorded when retry_attempted=true.",
+  "proof_eligible_after_retry": true
+}

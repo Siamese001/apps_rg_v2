@@ -436,7 +436,3 @@ def main() -> int:
         f"new={len(minted)} wired_facts={len(wired_rows)}"
     )
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

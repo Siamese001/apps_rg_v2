@@ -4508,7 +4508,3 @@ __all__ = [
     "build_mandatory_run_output",
     "emit_mandatory_run_outputs",
 ]
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

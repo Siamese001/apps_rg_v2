@@ -19,7 +19,10 @@ from apps_rg.runtime.sections.executive_summary_synthesis_contract import (
     SENTENCE_ARC_SVP_STRATEGY,
 )
 from apps_rg.runtime.validators.executive_summary_x2 import (
+    brushstroke_required_groups_from_composition_plan,
+    check_exec_summary_allowed_fact_utilization,
     check_exec_summary_display_override_compliance,
+    check_exec_summary_no_mechanism_inventory,
     check_exec_summary_no_sentence_fragment,
     check_exec_summary_strategy_no_commercialization_thread,
 )
@@ -360,6 +363,109 @@ def test_polish_restores_graph_override_when_team_displaced_slot() -> None:
         for fid in (row.get("source_fact_ids") or [])
     }
     assert "fact_engineering_platform_002" in cited
+
+
+def test_graph_override_preserves_required_devsecops_brushstroke() -> None:
+    """A late graph display override cannot evict the composition's sole DevSecOps fact."""
+    parsed = {
+        "resume_display_text": (
+            "Technology strategy executive who leads governed agentic AI platform architecture. "
+            "Designs and operates the agentic platform control plane with bounded review. "
+            "Embedded release automation and security scanning into regulated modernization delivery paths. "
+            "Runtime proof-bundle lineage gives decisions a traceable evidentiary record. "
+            "Platform productization generated $22M in IP-led revenue. "
+            "Platform commercialization leadership integrates enterprise-scale outcomes."
+        ),
+        "claim_ledger": [
+            {"claim_text": "s1", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+            {"claim_text": "s2", "source_fact_ids": ["skill_unify_agentic_human_override_escalation_paths"]},
+            {"claim_text": "s3", "source_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+            {"claim_text": "s4", "source_fact_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"]},
+            {"claim_text": "s5", "source_fact_ids": ["metric_unify_22m_ip_led_revenue"]},
+            {"claim_text": "s6", "source_fact_ids": ["reb_unify_platform_commercialization_leadership"]},
+        ],
+        "executive_summary_composition_plan": {
+            "brushstrokes": [
+                {"required_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+                {"required_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+                {"required_fact_ids": []},
+                {"required_fact_ids": ["reb_unify_platform_commercialization_leadership"]},
+            ]
+        },
+    }
+    facts = [
+        {"fact_id": "reb_unify_agentic_platform_architecture", "claim_text": "Agentic platform"},
+        {"fact_id": "reb_ibm_devsecops_release_resilience", "claim_text": "DevSecOps release"},
+        {"fact_id": "fact_engineering_platform_002", "claim_text": "Dependency graph"},
+        {"fact_id": "reb_unify_platform_commercialization_leadership", "claim_text": "Commercialization"},
+    ]
+
+    polished, _receipt = polish_executive_summary_judge_alignment(parsed, selected_facts=facts)
+    text = str(polished.get("resume_display_text") or "").lower()
+    cited = {
+        fact_id
+        for row in polished.get("claim_ledger") or []
+        for fact_id in (row.get("source_fact_ids") or [])
+    }
+    plan = parsed["executive_summary_composition_plan"]
+    utilization_ok, reason, _ = check_exec_summary_allowed_fact_utilization(
+        list(polished.get("claim_ledger") or []),
+        {fact["fact_id"] for fact in facts},
+        required_brushstroke_groups=brushstroke_required_groups_from_composition_plan(plan),
+    )
+
+    assert "dependency graph intelligence enables accelerated" in text
+    assert "release automation and security scanning" in text
+    assert "reb_ibm_devsecops_release_resilience" in cited
+    assert utilization_ok is True, reason
+
+
+def test_graph_override_preserves_live_devsecops_pipeline_wording() -> None:
+    """The live provider wording must be recognized before an override selects a slot."""
+    parsed = {
+        "resume_display_text": (
+            "An engineering executive leads governed agentic AI platform architecture. "
+            "Designs the control plane for a multi-agent orchestration system, combining policy-gated routing, "
+            "human override escalation paths, and replay-key audit manifest lineage. "
+            "From that commercial base, embedding automated release pipelines and DevSecOps scanning into "
+            "modernization delivery paths gave platform teams a repeatable deployment blueprint. "
+            "Runtime proof-bundle lineage gives decisions a traceable evidentiary record. "
+            "Platform productization generated $22M in IP-led revenue. "
+            "Platform commercialization leadership integrates enterprise-scale outcomes."
+        ),
+        "claim_ledger": [],
+        "executive_summary_composition_plan": {
+            "brushstrokes": [
+                {"required_fact_ids": ["reb_ibm_devsecops_release_resilience"]},
+                {"required_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+                {"required_fact_ids": []},
+                {"required_fact_ids": ["reb_unify_platform_commercialization_leadership"]},
+            ]
+        },
+    }
+    facts = [
+        {"fact_id": "reb_unify_agentic_platform_architecture", "claim_text": "Agentic platform"},
+        {"fact_id": "reb_ibm_devsecops_release_resilience", "claim_text": "DevSecOps release"},
+        {"fact_id": "fact_engineering_platform_002", "claim_text": "Dependency graph"},
+        {"fact_id": "reb_unify_platform_commercialization_leadership", "claim_text": "Commercialization"},
+    ]
+
+    polished, _receipt = polish_executive_summary_judge_alignment(parsed, selected_facts=facts)
+    text = str(polished.get("resume_display_text") or "").lower()
+    cited = {
+        fact_id
+        for row in polished.get("claim_ledger") or []
+        for fact_id in (row.get("source_fact_ids") or [])
+    }
+
+    assert "dependency graph intelligence enables accelerated" in text
+    assert "automated release pipelines and devsecops scanning" in text
+    assert "reb_ibm_devsecops_release_resilience" in cited
+    mechanism_ok, mechanism_reason = check_exec_summary_no_mechanism_inventory(
+        str(polished.get("resume_display_text") or ""),
+        polished,
+    )
+    assert mechanism_ok is True, mechanism_reason
 
 
 def test_strategy_lane_blocks_commercialization_thread() -> None:

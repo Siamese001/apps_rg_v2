@@ -502,6 +502,16 @@ def test_unify_normalization_repairs_present_tense_ownership_for_seniority_floor
     assert check_bullet_seniority_floor("bul_unify_001", text).passed is True
 
 
+def test_commercialized_is_an_executive_seniority_verb() -> None:
+    result = check_bullet_seniority_floor(
+        "bul_unify_006",
+        "Commercialized reusable agentic platform IP while scaling the engineering team from 8 to 28.",
+    )
+
+    assert result.passed is True
+    assert "strong_verb:commercialized" in result.signals
+
+
 @pytest.mark.parametrize(
     ("present", "past"),
     [

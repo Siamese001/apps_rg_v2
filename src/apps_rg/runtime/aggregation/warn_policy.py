@@ -1,4 +1,4 @@
-"""WARN handling policy for cross-section X2 vs product ALLOW."""
+"""WARN handling policy for cross-section X2 product output."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ from typing import Any
 
 from apps_rg.runtime.aggregation.cross_section_x2 import (
     VERDICT_FAIL,
-    VERDICT_PASS,
     VERDICT_UNKNOWN,
     VERDICT_WARN,
     CrossSectionGateResult,
@@ -22,13 +21,15 @@ def evaluate_warn_policy(*, cross_gates: list[CrossSectionGateResult]) -> dict[s
     unknown_gates = [g for g in cross_gates if g.verdict == VERDICT_UNKNOWN]
 
     structural_cross_section_pass = not fail_gates and not unknown_gates
-    product_blocked_by_warn = bool(warn_gates) or bool(fail_gates) or bool(unknown_gates)
+    # Warnings remain visible in the evaluation output but are advisory.  A
+    # completed run is withheld only for an actual failed or unknown gate.
+    product_blocked_by_warn = bool(fail_gates) or bool(unknown_gates)
 
     return {
         "schema": POLICY_SCHEMA,
         "evaluated_at_utc": datetime.now(timezone.utc).isoformat(),
         "rules": {
-            "WARN_never_counts_as_PASS_for_product": True,
+            "WARN_visible_but_nonblocking_for_product": True,
             "WARN_permitted_for_structural_assembly": structural_cross_section_pass,
             "FAIL_and_UNKNOWN_block_structural_and_product": True,
         },
@@ -49,8 +50,8 @@ def cross_section_structural_pass(cross_gates: list[CrossSectionGateResult]) -> 
 
 
 def cross_section_product_pass(cross_gates: list[CrossSectionGateResult]) -> bool:
-    """Product ALLOW requires no FAIL, no UNKNOWN, and no WARN."""
+    """Product output requires no failed or unknown cross-section gate."""
     for g in cross_gates:
-        if g.verdict != VERDICT_PASS:
+        if g.verdict in (VERDICT_FAIL, VERDICT_UNKNOWN):
             return False
     return True

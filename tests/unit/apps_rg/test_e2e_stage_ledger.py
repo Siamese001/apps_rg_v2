@@ -153,7 +153,7 @@ def test_launch_receipt_binds_exact_run_directory_without_secret_value(tmp_path:
         output_root=output_root,
         run_dir=run_dir,
         e2e_run_id="e2e-run-launch",
-        command=("python", "-m", "apps_rg", "--fresh-e2e"),
+        command=("python", "-m", "apps_rg", "run"),
         route_signing_key_id="local-test-key",
         baseline_ref="baseline.json",
         created_at_utc="2026-07-10T00:00:00+00:00",
@@ -163,7 +163,7 @@ def test_launch_receipt_binds_exact_run_directory_without_secret_value(tmp_path:
     assert Path(payload["run_dir"]).resolve() == run_dir.resolve()
     assert payload["route_signing_key_id"] == "local-test-key"
     assert "secret" not in json.dumps(payload).lower()
-    assert payload["command"] == ["python", "-m", "apps_rg", "--fresh-e2e"]
+    assert payload["command"] == ["python", "-m", "apps_rg", "run"]
 
 
 def test_launch_receipt_records_missing_key_id_without_inventing_a_value(tmp_path: Path) -> None:
@@ -177,7 +177,7 @@ def test_launch_receipt_records_missing_key_id_without_inventing_a_value(tmp_pat
         output_root=output_root,
         run_dir=run_dir,
         e2e_run_id="e2e-run-launch",
-        command=("python", "-m", "apps_rg", "--fresh-e2e"),
+        command=("python", "-m", "apps_rg", "run"),
         route_signing_key_id="",
         baseline_ref="baseline.json",
     )

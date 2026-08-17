@@ -152,7 +152,3 @@ def main() -> None:
     for phase in (1, 2, 3, 4, 5, 6, None):
         label = f"P{phase}" if phase else "cross_career"
         print(f"    {label}: {phase_counts.get(phase, 0)}")
-
-
-if __name__ == "__main__":
-    main()

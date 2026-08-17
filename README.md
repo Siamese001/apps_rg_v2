@@ -9,13 +9,14 @@ python -m apps_rg run
 ```
 
 It defaults to the canonical Anthropic partnership JD and canonical base
-resume. Use `--mode deterministic` for a no-provider repeatability proof,
-`eval` to inspect a completed run without a provider call, and `show` to print
-an exact stored output. See
+resume. It always executes the full governed product flow, including Apps Eval,
+L6 shadow evidence, and terminal E2E sealing. `eval` verifies a completed
+full run without a provider call, and `show` prints an exact stored output. See
 [the canonical-entrypoint guide](docs/APPS_RG_V2_CANONICAL_ENTRYPOINTS.md).
 
-No legacy section, W6, cache, telemetry, or external-governance command is a
-required part of this resume run.
+No legacy section, cache, telemetry, or external-governance command is an
+alternate resume-run entrypoint. The full product route still fails closed when
+its governed runtime and authority gates are not satisfied.
 
 Local `main` integration target for the simplified `apps_rg` extraction.
 

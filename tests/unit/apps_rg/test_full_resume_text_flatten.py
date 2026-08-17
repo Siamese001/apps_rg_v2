@@ -47,3 +47,57 @@ def test_generated_role_omits_bullet_that_repeats_narrative_verbatim() -> None:
 
     assert text.count(narrative) == 1
     assert "• Built a governed migration delivery model." in text
+
+
+def test_flatten_compacts_graph_competencies_into_executive_display_clusters() -> None:
+    allocation_terms = (
+        "Buyer-specific solution mapping",
+        "Partner AI co-sell execution",
+        "Enterprise pursuit execution",
+        "Partner value realization",
+        "AI co-sell bundling",
+        "Agentic platform route-policy dispatch",
+        "Regulated DevSecOps release governance",
+        "Presales-to-delivery handoff cadence",
+    )
+    categories = [
+        ("cloud_partner_ecosystems", allocation_terms[:2]),
+        ("commercial_operating_impact", allocation_terms[2:5]),
+        ("ai_platform_leadership", allocation_terms[5:6]),
+        ("governance_risk_compliance", allocation_terms[6:7]),
+        ("llmops_reliability", ("evaluation assurance",)),
+        ("tech_strategy_innovation", ("relationship-grounded retrieval",)),
+        ("data_analytics_modernization", ("cloud-native data architecture",)),
+        ("engineering_delivery_leadership", allocation_terms[7:8]),
+    ]
+    snapshot = {
+        "competencies": [
+            {
+                "category_id": category_id,
+                "terms": [
+                    {
+                        "text": term,
+                        **(
+                            {"allocation_claim_unit_id": f"skill:{index}"}
+                            if term in allocation_terms
+                            else {}
+                        ),
+                    }
+                    for index, term in enumerate(terms)
+                ],
+            }
+            for category_id, terms in categories
+        ]
+    }
+    text = flatten_final_resume_to_text(
+        {
+            "candidate_identity": {"candidate_name": "Test Candidate", "header_contact": {}},
+            "sections": [{"section_id": "competencies", "l2_output_snapshot": snapshot}],
+        }
+    )
+
+    assert "Partner AI Architecture & Commercialization:" in text
+    assert "Governed AI Platforms & Reliability:" in text
+    assert "Enterprise Architecture & Delivery:" in text
+    assert "Cloud & Partner Ecosystems:" not in text
+    assert all(term in text for term in allocation_terms)

@@ -9,6 +9,7 @@ from apps_rg.runtime.section_display_labels import (
     CERTIFICATIONS_AND_CREDENTIALS_HEADING,
     ENGINEERING_PLATFORM_COMPETENCIES_HEADING,
 )
+from apps_rg.runtime.assembly.competencies_display import competency_display_rows
 
 _MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 
@@ -242,18 +243,7 @@ def _append_competencies(*, lines: list[str], by_id: dict[str, dict[str, Any]]) 
     display_text = str(comp.get("resume_display_text") or "").strip()
     lines.append(ENGINEERING_PLATFORM_COMPETENCIES_HEADING)
     if cats:
-        for cat in cats:
-            if not isinstance(cat, dict):
-                continue
-            label = str(cat.get("category_label") or "Capabilities").strip()
-            terms: list[str] = []
-            for t in cat.get("terms") or []:
-                if isinstance(t, dict):
-                    txt = str(t.get("text") or "").strip()
-                else:
-                    txt = str(t).strip()
-                if txt:
-                    terms.append(txt)
+        for label, terms in competency_display_rows(comp):
             if terms:
                 lines.append(f"{label}: {', '.join(terms)}")
         lines.append("")

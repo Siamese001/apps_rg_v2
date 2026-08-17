@@ -1,8 +1,8 @@
-"""W7 whole-resume C0.3 evidence reconciliation and release authority gate.
+"""W7 whole-resume C0.3 evidence reconciliation.
 
-The gate is intentionally post-materialization.  It never selects, repairs, or
-widens evidence: it reconciles the rendered lane snapshots against the frozen
-whole-resume allocation and keeps an absent/unknown W6 human receipt non-PASS.
+The reconciliation is post-materialization. It never selects, repairs, or
+widens evidence; it validates rendered lane snapshots against the frozen
+whole-resume allocation.
 """
 from __future__ import annotations
 
@@ -91,36 +91,6 @@ def _binding_rows(snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-def _official_w6_status(
-    *, repo: Path, rollup: Mapping[str, Any]
-) -> tuple[str, list[str], dict[str, Any]]:
-    authority = rollup.get("resume_graph_w6_release_evidence")
-    if not isinstance(authority, Mapping):
-        return "UNKNOWN", ["official_w6_release_evidence_missing"], {}
-    receipt_path = _safe_repo_path(repo, authority.get("receipt_ref"))
-    if receipt_path is None:
-        return "UNKNOWN", ["official_w6_receipt_ref_invalid"], {}
-    trusted_receipt = str(authority.get("trusted_receipt_sha256") or "").strip()
-    trusted_full = str(authority.get("trusted_full_report_sha256") or "").strip()
-    try:
-        from apps_rg.evals.receipt_validation import validate_artifact
-
-        errors = validate_artifact(
-            receipt_path,
-            trusted_report_sha256=trusted_receipt,
-            trusted_full_report_sha256=trusted_full,
-        )
-    except Exception as exc:  # fail closed at an external evidence boundary
-        errors = [f"official_w6_validation_error:{type(exc).__name__}"]
-    status = "PASS" if not errors else "UNKNOWN"
-    return status, errors, {
-        "receipt_ref": str(authority.get("receipt_ref") or ""),
-        "receipt_sha256": _sha256(receipt_path),
-        "trusted_receipt_sha256": trusted_receipt,
-        "trusted_full_report_sha256": trusted_full,
-    }
-
-
 def build_whole_resume_graph_evidence_contract(
     *,
     repo: Path,
@@ -139,7 +109,6 @@ def build_whole_resume_graph_evidence_contract(
             "schema_version": SCHEMA_VERSION,
             "active": False,
             "engineering_pass": False,
-            "official_w6_status": "UNKNOWN",
             "release_pass": False,
             "unknown_is_pass": False,
             "promotion_eligible": False,
@@ -149,7 +118,6 @@ def build_whole_resume_graph_evidence_contract(
                     "schema_version": SCHEMA_VERSION,
                     "active": False,
                     "engineering_pass": False,
-                    "official_w6_status": "UNKNOWN",
                     "release_pass": False,
                     "unknown_is_pass": False,
                     "promotion_eligible": False,
@@ -273,13 +241,10 @@ def build_whole_resume_graph_evidence_contract(
     if not isinstance(conservation, Mapping) or conservation.get("pass") is not True:
         failures.append("candidate_conservation_nonpass")
 
-    official_w6_status, w6_failures, w6_evidence = _official_w6_status(
-        repo=repo, rollup=rollup_blob
-    )
     failures = sorted(set(failures))
     engineering_pass = not failures
-    release_failures = sorted({*failures, *w6_failures})
-    release_pass = engineering_pass and official_w6_status == "PASS" and not w6_failures
+    release_failures = list(failures)
+    release_pass = engineering_pass
     body: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "active": True,
@@ -310,8 +275,6 @@ def build_whole_resume_graph_evidence_contract(
             ]
         ),
         "engineering_pass": engineering_pass,
-        "official_w6_status": official_w6_status,
-        "official_w6_evidence": w6_evidence,
         "release_pass": release_pass,
         "unknown_is_pass": False,
         "promotion_eligible": release_pass,

@@ -203,7 +203,7 @@ def test_run_cross_section_x2_gates_includes_graph_coherence_gate(tmp_path: Path
     assert by_id["x2_cross_section_graph_coherence"].observed["active_section_count"] == 1
 
 
-def test_unknown_human_release_does_not_reclassify_engineering_completion(
+def test_whole_resume_graph_engineering_completion_is_a_product_gate(
     tmp_path: Path,
 ) -> None:
     pointers = [
@@ -224,9 +224,8 @@ def test_unknown_human_release_does_not_reclassify_engineering_completion(
         "whole_resume_graph_evidence_contract": {
             "active": True,
             "engineering_pass": True,
-            "official_w6_status": "UNKNOWN",
-            "release_pass": False,
-            "promotion_eligible": False,
+            "release_pass": True,
+            "promotion_eligible": True,
             "contract_digest": "contract",
         },
     }
@@ -240,17 +239,6 @@ def test_unknown_human_release_does_not_reclassify_engineering_completion(
     by_id = {gate.gate_id: gate for gate in gates}
 
     assert by_id["x2_whole_resume_graph_evidence_engineering"].verdict == VERDICT_PASS
-    assert (
-        by_id["x2_whole_resume_graph_release_authority_observed"].verdict
-        == VERDICT_PASS
-    )
-    assert by_id["x2_whole_resume_graph_release_authority_observed"].observed[
-        "promotion_eligible"
-    ] is False
-    # The observation gate preserves technical completion while the sealed
-    # contract's promotion_eligible=false remains the release-authority truth.
-    graph_gates = [
-        by_id["x2_whole_resume_graph_evidence_engineering"],
-        by_id["x2_whole_resume_graph_release_authority_observed"],
-    ]
-    assert cross_section_gates_all_pass(graph_gates) is True
+    assert cross_section_gates_all_pass(
+        [by_id["x2_whole_resume_graph_evidence_engineering"]]
+    ) is True

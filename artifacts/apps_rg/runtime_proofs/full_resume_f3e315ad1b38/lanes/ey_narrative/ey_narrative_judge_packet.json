@@ -1,0 +1,916 @@
+{
+  "judge_packet_version": "apps_rg_grade_only_judge_packet_v2",
+  "section": "ey_narrative",
+  "judge_task": "GRADE_ONLY",
+  "candidate_output": {
+    "run_id": "ey_narrative_6da7475ecbb0",
+    "section_id": "ey_narrative",
+    "runtime_generation_status": "REAL_LLM",
+    "product_quality_status": "PASS",
+    "ey_header": {
+      "employer": "Ernst & Young",
+      "title": "Principal",
+      "location": "New York, NY",
+      "start_date": "2009-10",
+      "end_date": "2014-03",
+      "is_current": false,
+      "fact_id": "exp_ey_001"
+    },
+    "narrative_sentence": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+    "selected_fact_plan": {
+      "section_id": "ey_narrative",
+      "selection_method": "selected_graph_evidence_plan_ey_narrative",
+      "source_authority_contract": {
+        "schema_version": "c03_source_authority_contract_v1",
+        "authority_source": "augmented_skills_graph",
+        "graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "graph_digest": "fb6535f316fd5084bda14ae3cdb44ffc8d0740d34b868a20bd2d379607cd07e7",
+        "graph_version": "master_skills_arsenal_graph_v1",
+        "authority_evaluated_before_targeting": true,
+        "targeting_inputs_are_non_authority": true,
+        "missing_authority_fails_closed": true
+      },
+      "pretarget_authority_receipt": {
+        "schema_version": "c03_pretarget_authority_receipt_v1",
+        "section_id": "ey_narrative",
+        "candidate_count": 337,
+        "authority_pass_count": 62,
+        "authority_block_count": 275,
+        "targeting_consulted_count": 0,
+        "authority_before_targeting_pass": true,
+        "authority_decisions_digest": "729ad3230b90f9f837143b31d9c31d08fec34c13d9498d3a04278a8ffa551d98"
+      },
+      "target_role_profile": "ai_partnerships_gtm",
+      "role_family_key": "ai_partnerships_gtm",
+      "selected_employer_roots": {
+        "ey": [
+          "reb_ey_insurance_core_modernization",
+          "reb_ey_capital_optimization_solvency",
+          "reb_ey_ccar_capital_liquidity_stress_testing",
+          "reb_ey_erm_risk_governance",
+          "reb_ey_regulatory_analytics_modernization"
+        ]
+      },
+      "selected_nodes": [
+        "reb_ey_capital_optimization_solvency",
+        "reb_ey_ccar_capital_liquidity_stress_testing",
+        "reb_ey_erm_risk_governance"
+      ],
+      "selected_edges": [
+        {
+          "edge_id": "edge:21522502a463f4b5aff5bc4a",
+          "source": "reb_ey_capital_optimization_solvency",
+          "target": "",
+          "edge_type": "allocation_bound_graph_edge"
+        },
+        {
+          "edge_id": "edge:73af0bcd021d35143ff2d497",
+          "source": "reb_ey_capital_optimization_solvency",
+          "target": "",
+          "edge_type": "allocation_bound_graph_edge"
+        },
+        {
+          "edge_id": "edge:e24cbae5e8ad190863d8d707",
+          "source": "reb_ey_ccar_capital_liquidity_stress_testing",
+          "target": "",
+          "edge_type": "allocation_bound_graph_edge"
+        },
+        {
+          "edge_id": "edge:b4b4688de3805a3b4a8a945a",
+          "source": "reb_ey_ccar_capital_liquidity_stress_testing",
+          "target": "",
+          "edge_type": "allocation_bound_graph_edge"
+        },
+        {
+          "edge_id": "edge:3fa1e673304a8fd78be1480c",
+          "source": "reb_ey_erm_risk_governance",
+          "target": "",
+          "edge_type": "allocation_bound_graph_edge"
+        },
+        {
+          "edge_id": "edge:6edf96ca776e66b0a3962c90",
+          "source": "reb_ey_erm_risk_governance",
+          "target": "",
+          "edge_type": "allocation_bound_graph_edge"
+        }
+      ],
+      "selected_skills": [
+        {
+          "skill_id": "skill_risk_greek_stress_testing",
+          "skill_label": "",
+          "source_refs": [
+            "fact_quant_hpc_001",
+            "Deployed advanced Greek parameter stress-testing and scenario analyses",
+            "HPC simulations for stress testing, cutting scenario runtimes for regulatory constraints.",
+            "Cut HPC driven stress test simulations from weeks to hours, enabling rapid ROI demonstrations."
+          ],
+          "role_episode_bundle_id": "reb_ey_capital_optimization_solvency",
+          "employer_lane": "ey",
+          "root_weight": 0.1,
+          "root_weight_band": "context",
+          "proof_strength_raw": 1.4,
+          "target_alignment_score": 0.1,
+          "ranking_score": 1.5,
+          "claim_unit_id": "ey_narrative:derived:01"
+        },
+        {
+          "skill_id": "skill_capital_capital_modeling",
+          "role_episode_bundle_id": "reb_ey_ccar_capital_liquidity_stress_testing",
+          "employer_lane": "ey",
+          "proof_strength_raw": 1.4,
+          "target_alignment_score": 0.4,
+          "claim_unit_id": "ey_narrative:derived:02"
+        },
+        {
+          "skill_id": "skill_credit_adjudication_default_risk",
+          "skill_label": "",
+          "source_refs": [
+            "fact_credit_001",
+            "AI-driven credit adjudication project that cut default exposure by 15% through dynamic risk profiling and improved underwriting accuracy",
+            "Increased Portfolio Profitability Through Predictive Analytics: Introduced advanced deep learning risk models that lowered default exposure by up to 25%"
+          ],
+          "role_episode_bundle_id": "reb_ey_erm_risk_governance",
+          "employer_lane": "ey",
+          "root_weight": 0.1,
+          "root_weight_band": "context",
+          "proof_strength_raw": 1.3,
+          "target_alignment_score": 1.2,
+          "ranking_score": 2.5,
+          "claim_unit_id": "ey_narrative:derived:03"
+        }
+      ],
+      "selected_skill_ids": [
+        "skill_risk_greek_stress_testing",
+        "skill_capital_capital_modeling",
+        "skill_credit_adjudication_default_risk"
+      ],
+      "selected_metrics": [],
+      "selected_metrics_detail": [],
+      "selected_employer_lanes": [
+        "Ernst & Young"
+      ],
+      "selected_employer_lane_ids": [
+        "ey"
+      ],
+      "selected_headline_positioning_families": [
+        "svp_engineering_leadership",
+        "partner_applied_ai_architecture",
+        "platform_productization",
+        "enterprise_ai_architecture"
+      ],
+      "selected_competency_families": [
+        "partner_applied_ai_architecture",
+        "platform_productization",
+        "distributed_systems_engineering",
+        "engineering_leadership",
+        "cloud_hpc_modernization",
+        "data_governance_security",
+        "agentic_platforms",
+        "runtime_governance"
+      ],
+      "briefing_signal_packet": {
+        "schema": "briefing_signal_packet_v1",
+        "role_family_key": "ai_partnerships_gtm",
+        "section_count": 1,
+        "section_ids": [
+          "preamble"
+        ],
+        "theme_counts": {
+          "strategy": 0,
+          "operating_model": 0,
+          "commercial_motion": 0,
+          "partner_ecosystem": 0,
+          "adoption_motion": 0,
+          "leadership": 0,
+          "platform": 0,
+          "forward_looking": 0,
+          "urgency": 0
+        },
+        "dominant_themes": [],
+        "section_signals": [
+          {
+            "section_id": "preamble",
+            "themes": [],
+            "char_count": 178
+          }
+        ],
+        "signal_summary": ""
+      },
+      "allowed_graph_evidence_ids": [
+        "reb_ey_capital_optimization_solvency",
+        "skill_risk_greek_stress_testing",
+        "exp_ey_001",
+        "reb_ey_ccar_capital_liquidity_stress_testing",
+        "skill_risk_model_risk",
+        "skill_capital_capital_modeling",
+        "reb_ey_erm_risk_governance",
+        "skill_credit_adjudication_default_risk"
+      ],
+      "selection_rationale": "Authority and source lineage were evaluated before any target-role, JD, or briefing score. Every bounded root, skill, metric, and source-fact path received a terminal decision after full sibling ranking; targeting only ordered authority-passing candidates.",
+      "facts": [
+        {
+          "fact_id": "reb_ey_capital_optimization_solvency",
+          "candidate_fact_id": "reb_ey_capital_optimization_solvency",
+          "claim_text": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+          "role_episode_bundle_id": "reb_ey_capital_optimization_solvency",
+          "graph_evidence_type": "role_episode_bundle",
+          "employer": "Ernst & Young",
+          "employer_lane": "ey",
+          "employer_node_id": "employment_exp_ey_001",
+          "source_employment": "Ernst & Young",
+          "graph_skill_node_ids": [
+            "skill_risk_greek_stress_testing"
+          ],
+          "metric_outcome_ids": [],
+          "selected_metric_ids": [],
+          "allowed_graph_evidence_ids": [
+            "reb_ey_capital_optimization_solvency",
+            "skill_risk_greek_stress_testing",
+            "exp_ey_001"
+          ],
+          "linked_identity_fact_ids": [
+            "exp_ey_001"
+          ],
+          "linked_source_fact_ids": [
+            "exp_ey_001"
+          ],
+          "source_fact_ids": [
+            "reb_ey_capital_optimization_solvency"
+          ],
+          "confidence": "USER_CONFIRMED_DIRECT",
+          "support_level": "allocation_authority_pass",
+          "verification_status": "allocation_authority_pass",
+          "metric_values": [],
+          "technologies": [
+            "skill_risk_greek_stress_testing"
+          ],
+          "domain": "Quant Derivatives, Variable Annuity Hedging, and Insurance Capital",
+          "allocation_claim_unit_ids": [
+            "ey_narrative:derived:01"
+          ],
+          "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda"
+        },
+        {
+          "fact_id": "reb_ey_ccar_capital_liquidity_stress_testing",
+          "candidate_fact_id": "reb_ey_ccar_capital_liquidity_stress_testing",
+          "claim_text": "Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.",
+          "role_episode_bundle_id": "reb_ey_ccar_capital_liquidity_stress_testing",
+          "graph_evidence_type": "role_episode_bundle",
+          "employer": "Ernst & Young",
+          "employer_lane": "ey",
+          "employer_node_id": "employment_exp_ey_001",
+          "source_employment": "Ernst & Young",
+          "graph_skill_node_ids": [
+            "skill_capital_capital_modeling"
+          ],
+          "metric_outcome_ids": [],
+          "selected_metric_ids": [],
+          "allowed_graph_evidence_ids": [
+            "reb_ey_ccar_capital_liquidity_stress_testing",
+            "skill_risk_model_risk",
+            "exp_ey_001",
+            "skill_capital_capital_modeling"
+          ],
+          "linked_identity_fact_ids": [
+            "exp_ey_001"
+          ],
+          "linked_source_fact_ids": [
+            "exp_ey_001"
+          ],
+          "source_fact_ids": [
+            "reb_ey_ccar_capital_liquidity_stress_testing"
+          ],
+          "confidence": "USER_CONFIRMED_DIRECT",
+          "support_level": "allocation_authority_pass",
+          "verification_status": "allocation_authority_pass",
+          "metric_values": [],
+          "technologies": [
+            "skill_capital_capital_modeling"
+          ],
+          "domain": "CCAR Capital, Liquidity, Stress Testing, and Model Validation",
+          "allocation_claim_unit_ids": [
+            "ey_narrative:derived:02"
+          ],
+          "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda"
+        },
+        {
+          "fact_id": "reb_ey_erm_risk_governance",
+          "candidate_fact_id": "reb_ey_erm_risk_governance",
+          "claim_text": "Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.",
+          "role_episode_bundle_id": "reb_ey_erm_risk_governance",
+          "graph_evidence_type": "role_episode_bundle",
+          "employer": "Ernst & Young",
+          "employer_lane": "ey",
+          "employer_node_id": "employment_exp_ey_001",
+          "source_employment": "Ernst & Young",
+          "graph_skill_node_ids": [
+            "skill_credit_adjudication_default_risk"
+          ],
+          "metric_outcome_ids": [],
+          "selected_metric_ids": [],
+          "allowed_graph_evidence_ids": [
+            "reb_ey_erm_risk_governance",
+            "skill_credit_adjudication_default_risk",
+            "exp_ey_001"
+          ],
+          "linked_identity_fact_ids": [
+            "exp_ey_001"
+          ],
+          "linked_source_fact_ids": [
+            "exp_ey_001"
+          ],
+          "source_fact_ids": [
+            "reb_ey_erm_risk_governance"
+          ],
+          "confidence": "USER_CONFIRMED_DIRECT",
+          "support_level": "allocation_authority_pass",
+          "verification_status": "allocation_authority_pass",
+          "metric_values": [],
+          "technologies": [
+            "skill_credit_adjudication_default_risk"
+          ],
+          "domain": "Enterprise Risk Management Operating Model and Risk-Data Aggregation",
+          "allocation_claim_unit_ids": [
+            "ey_narrative:derived:03"
+          ],
+          "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda"
+        }
+      ],
+      "required_fact_ids": [
+        "reb_ey_capital_optimization_solvency",
+        "skill_risk_greek_stress_testing",
+        "exp_ey_001",
+        "reb_ey_ccar_capital_liquidity_stress_testing",
+        "skill_risk_model_risk",
+        "skill_capital_capital_modeling",
+        "reb_ey_erm_risk_governance",
+        "skill_credit_adjudication_default_risk"
+      ],
+      "graph_candidate_receipt": {
+        "schema_version": "graph_candidate_receipt_v1",
+        "section_id": "ey_narrative",
+        "candidate_decision_count": 337,
+        "selected_candidate_count": 15,
+        "rejected_candidate_count": 322,
+        "unexplained_candidate_count": 0,
+        "duplicate_candidate_path_ids": [],
+        "candidate_conservation_pass": true,
+        "decision_ledger_digest": "75c14de896b126a3e6c95452e7201e6b16e5da28656f595457a4ec692d6a34bf",
+        "plan_id": "ey_narrative:fd41e506a2c2714d",
+        "plan_digest": "fd41e506a2c2714dfc6066bd385688916655b5e9a6089a33f5994f2e2dfceb75"
+      },
+      "graph_evidence_depth_status": "insufficient_depth",
+      "graph_evidence_semantic_coverage_pct": 0.0,
+      "schema_version": "c03_canonical_section_graph_plan_v1",
+      "allocation_scope": "WHOLE_RESUME",
+      "allocation_plan_id": "resume_graph_allocation:86b518ae7a25da010c2b",
+      "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+      "allocation_assignments": [
+        {
+          "candidate_id": "derived:ey_narrative:alloc-cand:0bf93068dab038fb9cc82bd1",
+          "section_id": "ey_narrative",
+          "claim_unit_id": "ey_narrative:derived:01",
+          "skill_id": "skill_risk_greek_stress_testing",
+          "skill_label": "",
+          "fact_id": "exp_ey_001",
+          "metric_outcome_id": "",
+          "metric_text": "",
+          "metric_value": "",
+          "metric_unit": "",
+          "normalized_metric_signature": "",
+          "root_id": "reb_ey_capital_optimization_solvency",
+          "employer_lane": "ey",
+          "source_family": "ey",
+          "proof_strength_raw": 1.4,
+          "target_alignment_score": 0.45,
+          "claim_entailment_score": 1.0,
+          "metric_binding_score": 0.0,
+          "path_confidence_raw": 1.0,
+          "source_independence_score": 1.0,
+          "selection_margin": 0.05,
+          "selection_margin_available": true,
+          "selection_margin_basis": "target_alignment_score",
+          "best_eligible_rejected_candidate_id": "alloc-cand:225fa68fd320022fcbde94eb",
+          "graph_path_ids": [
+            "root:reb_ey_capital_optimization_solvency",
+            "root:reb_ey_capital_optimization_solvency/skill:skill_risk_greek_stress_testing",
+            "root:reb_ey_capital_optimization_solvency/fact:exp_ey_001"
+          ],
+          "edge_ids": [
+            "edge:21522502a463f4b5aff5bc4a",
+            "edge:73af0bcd021d35143ff2d497"
+          ],
+          "citation_refs": [
+            "exp_ey_001"
+          ],
+          "root_bundle_theme": "Quant Derivatives, Variable Annuity Hedging, and Insurance Capital",
+          "root_claim_text": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+          "root_claim_action": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+          "root_claim_scope": "Insurance and capital-markets work requiring derivatives pricing, VA guarantee modeling, hedge design, Greek stress testing, and capital adequacy under insurance regulatory regimes.",
+          "root_claim_outcome": "Use only role_episode_bundle_id-bound graph evidence; metric_outcome_nodes are the approved metric surface.",
+          "metric_required": false,
+          "metric_outcome_required": false,
+          "counts_toward_global_uniqueness": false,
+          "derived_from_section_id": "ey_bullets",
+          "derived_from_claim_unit_id": "ey_bullets:bul_ey_001"
+        },
+        {
+          "candidate_id": "derived:ey_narrative:alloc-cand:0d755ffa5ab7afe0f17678f1",
+          "section_id": "ey_narrative",
+          "claim_unit_id": "ey_narrative:derived:02",
+          "skill_id": "skill_capital_capital_modeling",
+          "skill_label": "",
+          "fact_id": "exp_ey_001",
+          "metric_outcome_id": "",
+          "metric_text": "",
+          "metric_value": "",
+          "metric_unit": "",
+          "normalized_metric_signature": "",
+          "root_id": "reb_ey_ccar_capital_liquidity_stress_testing",
+          "employer_lane": "ey",
+          "source_family": "ey",
+          "proof_strength_raw": 1.4,
+          "target_alignment_score": 0.4,
+          "claim_entailment_score": 1.0,
+          "metric_binding_score": 0.0,
+          "path_confidence_raw": 1.0,
+          "source_independence_score": 1.0,
+          "selection_margin": -0.05,
+          "selection_margin_available": true,
+          "selection_margin_basis": "target_alignment_score",
+          "best_eligible_rejected_candidate_id": "alloc-cand:b12693369dd48a516c9eb4fe",
+          "graph_path_ids": [
+            "root:reb_ey_ccar_capital_liquidity_stress_testing",
+            "root:reb_ey_ccar_capital_liquidity_stress_testing/skill:skill_capital_capital_modeling",
+            "root:reb_ey_ccar_capital_liquidity_stress_testing/fact:exp_ey_001"
+          ],
+          "edge_ids": [
+            "edge:e24cbae5e8ad190863d8d707",
+            "edge:b4b4688de3805a3b4a8a945a"
+          ],
+          "citation_refs": [
+            "exp_ey_001"
+          ],
+          "root_bundle_theme": "CCAR Capital, Liquidity, Stress Testing, and Model Validation",
+          "root_claim_text": "Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.",
+          "root_claim_action": "Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.",
+          "root_claim_scope": "Post-crisis financial services consulting environment where capital planning, liquidity risk, stress testing, model governance, and auditability were board/regulator priorities.",
+          "root_claim_outcome": "Use only role_episode_bundle_id-bound graph evidence; metric_outcome_nodes are the approved metric surface.",
+          "metric_required": false,
+          "metric_outcome_required": false,
+          "counts_toward_global_uniqueness": false,
+          "derived_from_section_id": "ey_bullets",
+          "derived_from_claim_unit_id": "ey_bullets:bul_ey_002"
+        },
+        {
+          "candidate_id": "derived:ey_narrative:alloc-cand:fa1df88852065c9c0cb3ae2f",
+          "section_id": "ey_narrative",
+          "claim_unit_id": "ey_narrative:derived:03",
+          "skill_id": "skill_credit_adjudication_default_risk",
+          "skill_label": "",
+          "fact_id": "exp_ey_001",
+          "metric_outcome_id": "",
+          "metric_text": "",
+          "metric_value": "",
+          "metric_unit": "",
+          "normalized_metric_signature": "",
+          "root_id": "reb_ey_erm_risk_governance",
+          "employer_lane": "ey",
+          "source_family": "ey",
+          "proof_strength_raw": 1.3,
+          "target_alignment_score": 1.0,
+          "claim_entailment_score": 1.0,
+          "metric_binding_score": 0.0,
+          "path_confidence_raw": 1.0,
+          "source_independence_score": 1.0,
+          "selection_margin": -0.1,
+          "selection_margin_available": true,
+          "selection_margin_basis": "proof_strength_raw",
+          "best_eligible_rejected_candidate_id": "alloc-cand:be69f0884c8801fdc27bb947",
+          "graph_path_ids": [
+            "root:reb_ey_erm_risk_governance",
+            "root:reb_ey_erm_risk_governance/skill:skill_credit_adjudication_default_risk",
+            "root:reb_ey_erm_risk_governance/fact:exp_ey_001"
+          ],
+          "edge_ids": [
+            "edge:3fa1e673304a8fd78be1480c",
+            "edge:6edf96ca776e66b0a3962c90"
+          ],
+          "citation_refs": [
+            "exp_ey_001"
+          ],
+          "root_bundle_theme": "Enterprise Risk Management Operating Model and Risk-Data Aggregation",
+          "root_claim_text": "Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.",
+          "root_claim_action": "Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.",
+          "root_claim_scope": "Enterprise risk management transformation for regulated banking and insurance clients, emphasizing operating model, risk-data aggregation, lineage, and governance controls.",
+          "root_claim_outcome": "Use only role_episode_bundle_id-bound graph evidence; metric_outcome_nodes are the approved metric surface.",
+          "metric_required": false,
+          "metric_outcome_required": false,
+          "counts_toward_global_uniqueness": false,
+          "derived_from_section_id": "ey_bullets",
+          "derived_from_claim_unit_id": "ey_bullets:bul_ey_003"
+        }
+      ],
+      "final_graph_evidence_contract": {
+        "schema_version": "section_final_graph_evidence_contract_v1",
+        "section_id": "ey_narrative",
+        "allocation_scope": "WHOLE_RESUME",
+        "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+        "source_section_plan_id": "ey_narrative:6a4d89171955258e",
+        "source_section_plan_digest": "6a4d89171955258e915a431b1022de221d063f4eb953e254e484db60f68600da",
+        "graph_digest": "fb6535f316fd5084bda14ae3cdb44ffc8d0740d34b868a20bd2d379607cd07e7",
+        "assignments": [
+          {
+            "candidate_id": "derived:ey_narrative:alloc-cand:0bf93068dab038fb9cc82bd1",
+            "section_id": "ey_narrative",
+            "claim_unit_id": "ey_narrative:derived:01",
+            "skill_id": "skill_risk_greek_stress_testing",
+            "skill_label": "",
+            "fact_id": "exp_ey_001",
+            "metric_outcome_id": "",
+            "metric_text": "",
+            "metric_value": "",
+            "metric_unit": "",
+            "normalized_metric_signature": "",
+            "root_id": "reb_ey_capital_optimization_solvency",
+            "employer_lane": "ey",
+            "source_family": "ey",
+            "proof_strength_raw": 1.4,
+            "target_alignment_score": 0.45,
+            "claim_entailment_score": 1.0,
+            "metric_binding_score": 0.0,
+            "path_confidence_raw": 1.0,
+            "source_independence_score": 1.0,
+            "selection_margin": 0.05,
+            "selection_margin_available": true,
+            "selection_margin_basis": "target_alignment_score",
+            "best_eligible_rejected_candidate_id": "alloc-cand:225fa68fd320022fcbde94eb",
+            "graph_path_ids": [
+              "root:reb_ey_capital_optimization_solvency",
+              "root:reb_ey_capital_optimization_solvency/skill:skill_risk_greek_stress_testing",
+              "root:reb_ey_capital_optimization_solvency/fact:exp_ey_001"
+            ],
+            "edge_ids": [
+              "edge:21522502a463f4b5aff5bc4a",
+              "edge:73af0bcd021d35143ff2d497"
+            ],
+            "citation_refs": [
+              "exp_ey_001"
+            ],
+            "root_bundle_theme": "Quant Derivatives, Variable Annuity Hedging, and Insurance Capital",
+            "root_claim_text": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+            "root_claim_action": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+            "root_claim_scope": "Insurance and capital-markets work requiring derivatives pricing, VA guarantee modeling, hedge design, Greek stress testing, and capital adequacy under insurance regulatory regimes.",
+            "root_claim_outcome": "Use only role_episode_bundle_id-bound graph evidence; metric_outcome_nodes are the approved metric surface.",
+            "metric_required": false,
+            "metric_outcome_required": false,
+            "counts_toward_global_uniqueness": false,
+            "derived_from_section_id": "ey_bullets",
+            "derived_from_claim_unit_id": "ey_bullets:bul_ey_001"
+          },
+          {
+            "candidate_id": "derived:ey_narrative:alloc-cand:0d755ffa5ab7afe0f17678f1",
+            "section_id": "ey_narrative",
+            "claim_unit_id": "ey_narrative:derived:02",
+            "skill_id": "skill_capital_capital_modeling",
+            "skill_label": "",
+            "fact_id": "exp_ey_001",
+            "metric_outcome_id": "",
+            "metric_text": "",
+            "metric_value": "",
+            "metric_unit": "",
+            "normalized_metric_signature": "",
+            "root_id": "reb_ey_ccar_capital_liquidity_stress_testing",
+            "employer_lane": "ey",
+            "source_family": "ey",
+            "proof_strength_raw": 1.4,
+            "target_alignment_score": 0.4,
+            "claim_entailment_score": 1.0,
+            "metric_binding_score": 0.0,
+            "path_confidence_raw": 1.0,
+            "source_independence_score": 1.0,
+            "selection_margin": -0.05,
+            "selection_margin_available": true,
+            "selection_margin_basis": "target_alignment_score",
+            "best_eligible_rejected_candidate_id": "alloc-cand:b12693369dd48a516c9eb4fe",
+            "graph_path_ids": [
+              "root:reb_ey_ccar_capital_liquidity_stress_testing",
+              "root:reb_ey_ccar_capital_liquidity_stress_testing/skill:skill_capital_capital_modeling",
+              "root:reb_ey_ccar_capital_liquidity_stress_testing/fact:exp_ey_001"
+            ],
+            "edge_ids": [
+              "edge:e24cbae5e8ad190863d8d707",
+              "edge:b4b4688de3805a3b4a8a945a"
+            ],
+            "citation_refs": [
+              "exp_ey_001"
+            ],
+            "root_bundle_theme": "CCAR Capital, Liquidity, Stress Testing, and Model Validation",
+            "root_claim_text": "Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.",
+            "root_claim_action": "Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.",
+            "root_claim_scope": "Post-crisis financial services consulting environment where capital planning, liquidity risk, stress testing, model governance, and auditability were board/regulator priorities.",
+            "root_claim_outcome": "Use only role_episode_bundle_id-bound graph evidence; metric_outcome_nodes are the approved metric surface.",
+            "metric_required": false,
+            "metric_outcome_required": false,
+            "counts_toward_global_uniqueness": false,
+            "derived_from_section_id": "ey_bullets",
+            "derived_from_claim_unit_id": "ey_bullets:bul_ey_002"
+          },
+          {
+            "candidate_id": "derived:ey_narrative:alloc-cand:fa1df88852065c9c0cb3ae2f",
+            "section_id": "ey_narrative",
+            "claim_unit_id": "ey_narrative:derived:03",
+            "skill_id": "skill_credit_adjudication_default_risk",
+            "skill_label": "",
+            "fact_id": "exp_ey_001",
+            "metric_outcome_id": "",
+            "metric_text": "",
+            "metric_value": "",
+            "metric_unit": "",
+            "normalized_metric_signature": "",
+            "root_id": "reb_ey_erm_risk_governance",
+            "employer_lane": "ey",
+            "source_family": "ey",
+            "proof_strength_raw": 1.3,
+            "target_alignment_score": 1.0,
+            "claim_entailment_score": 1.0,
+            "metric_binding_score": 0.0,
+            "path_confidence_raw": 1.0,
+            "source_independence_score": 1.0,
+            "selection_margin": -0.1,
+            "selection_margin_available": true,
+            "selection_margin_basis": "proof_strength_raw",
+            "best_eligible_rejected_candidate_id": "alloc-cand:be69f0884c8801fdc27bb947",
+            "graph_path_ids": [
+              "root:reb_ey_erm_risk_governance",
+              "root:reb_ey_erm_risk_governance/skill:skill_credit_adjudication_default_risk",
+              "root:reb_ey_erm_risk_governance/fact:exp_ey_001"
+            ],
+            "edge_ids": [
+              "edge:3fa1e673304a8fd78be1480c",
+              "edge:6edf96ca776e66b0a3962c90"
+            ],
+            "citation_refs": [
+              "exp_ey_001"
+            ],
+            "root_bundle_theme": "Enterprise Risk Management Operating Model and Risk-Data Aggregation",
+            "root_claim_text": "Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.",
+            "root_claim_action": "Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.",
+            "root_claim_scope": "Enterprise risk management transformation for regulated banking and insurance clients, emphasizing operating model, risk-data aggregation, lineage, and governance controls.",
+            "root_claim_outcome": "Use only role_episode_bundle_id-bound graph evidence; metric_outcome_nodes are the approved metric surface.",
+            "metric_required": false,
+            "metric_outcome_required": false,
+            "counts_toward_global_uniqueness": false,
+            "derived_from_section_id": "ey_bullets",
+            "derived_from_claim_unit_id": "ey_bullets:bul_ey_003"
+          }
+        ],
+        "assignment_count": 3,
+        "representation_mode": "DERIVED_ALTERNATIVE",
+        "derived_from_section_id": "ey_bullets",
+        "counts_toward_global_uniqueness": false,
+        "traversal_receipt_digest": "3510617969ac2ae80068d175ec414eaefff69ea2e661aed461c71388795bfe4c",
+        "traversal_conservation_pass": true,
+        "pass": true,
+        "contract_digest": "5bce5973d32e419c7f9f8ee45d87f4ce76013fa1efb4b34e86d7cf675f4c14a5"
+      },
+      "global_uniqueness_claimed": true,
+      "durable_graph_state_mutated": false,
+      "plan_digest": "fd41e506a2c2714dfc6066bd385688916655b5e9a6089a33f5994f2e2dfceb75",
+      "plan_id": "ey_narrative:fd41e506a2c2714d",
+      "judge_projection": {
+        "projection_version": "selected_fact_plan_judge_projection_v1",
+        "source_sha256": "880d1ea0177b7352ff8f20d6ec716e3806ff274fa5acbe3d4aeb02344fc4e379",
+        "omitted_non_authoritative_fields": [
+          "allocation_source_traversal_evidence",
+          "concentration_policy",
+          "employer_root_weights",
+          "excluded_due_to_metric_cap",
+          "excluded_due_to_root_cap",
+          "graph_candidate_decision_ledger",
+          "graph_evidence_depth_comparison_report",
+          "graph_evidence_depth_post_report",
+          "graph_evidence_depth_pre_report",
+          "graph_evidence_depth_report",
+          "graph_traversal_receipt",
+          "graph_weight_profile",
+          "metric_caps_by_root",
+          "root_weight_bands",
+          "skew_diagnostics",
+          "skill_caps_by_root",
+          "unify_bullet_slot_bundle_map_resolved"
+        ]
+      }
+    },
+    "claim_ledger": [
+      {
+        "claim_text": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+        "source_fact_ids": [
+          "reb_ey_capital_optimization_solvency",
+          "reb_ey_ccar_capital_liquidity_stress_testing"
+        ]
+      }
+    ],
+    "jd_alignment": {
+      "targeting_only": true,
+      "jd_used_as_proof": false
+    },
+    "prompt_hash": "ee1bf5665f8eb9fe",
+    "generation_method": "llm_selected_proof_render",
+    "llm_generation_status": "usable_output",
+    "llm_output_used": false,
+    "llm_selection_used": true,
+    "model_display_text_discarded": true,
+    "display_text_authority": "selected_fact_plan_claim_text",
+    "selection_source": "llm_source_fact_ids",
+    "evidence_authority": "augmented_skills_graph",
+    "source_fact_ids": [
+      "reb_ey_capital_optimization_solvency",
+      "reb_ey_ccar_capital_liquidity_stress_testing"
+    ],
+    "graph_packet_digest": "fd41e506a2c2714dfc6066bd385688916655b5e9a6089a33f5994f2e2dfceb75",
+    "renderer_version": "proof_authorized_fact_claim_render.v2",
+    "lane_contract_allows_deterministic_graph_render": false,
+    "allowed_graph_packet_fact_count": 8,
+    "rendered_source_fact_ids_within_allowed_packet": true,
+    "source_fact_binding_repair": {
+      "operation": "role_episode_narrative_material_claim_source_reconciliation",
+      "added_source_fact_ids": [
+        "reb_ey_ccar_capital_liquidity_stress_testing"
+      ]
+    },
+    "generation_receipt": {
+      "generation_method": "llm_selected_proof_render",
+      "llm_generation_status": "usable_output",
+      "llm_output_used": false,
+      "llm_selection_used": true,
+      "model_display_text_discarded": true,
+      "display_text_authority": "selected_fact_plan_claim_text",
+      "selection_source": "llm_source_fact_ids",
+      "evidence_authority": "augmented_skills_graph",
+      "source_fact_ids": [
+        "reb_ey_capital_optimization_solvency",
+        "reb_ey_ccar_capital_liquidity_stress_testing"
+      ],
+      "graph_packet_digest": "fd41e506a2c2714dfc6066bd385688916655b5e9a6089a33f5994f2e2dfceb75",
+      "renderer_version": "proof_authorized_fact_claim_render.v2",
+      "lane_contract_allows_deterministic_graph_render": false,
+      "allowed_graph_packet_fact_count": 8,
+      "rendered_source_fact_ids_within_allowed_packet": true,
+      "source_fact_binding_repair": {
+        "operation": "role_episode_narrative_material_claim_source_reconciliation",
+        "added_source_fact_ids": [
+          "reb_ey_ccar_capital_liquidity_stress_testing"
+        ]
+      },
+      "lane_status": "PASS"
+    },
+    "role_episode_bundle_consumed": true,
+    "product_quality_reason": "x2_pass",
+    "lane_status": "PASS"
+  },
+  "claim_ledger": [
+    {
+      "claim_text": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.",
+      "source_fact_ids": [
+        "reb_ey_capital_optimization_solvency",
+        "reb_ey_ccar_capital_liquidity_stress_testing"
+      ]
+    }
+  ],
+  "source_fact_ids": [],
+  "allowed_fact_packet": {
+    "allowed_fact_ids": [
+      "reb_ey_capital_optimization_solvency",
+      "skill_risk_greek_stress_testing",
+      "exp_ey_001",
+      "reb_ey_ccar_capital_liquidity_stress_testing",
+      "skill_risk_model_risk",
+      "skill_capital_capital_modeling",
+      "reb_ey_erm_risk_governance",
+      "skill_credit_adjudication_default_risk"
+    ]
+  },
+  "targeting_context": {
+    "target_title": "",
+    "target_company": "",
+    "jd_text": "",
+    "briefing": ""
+  },
+  "proof_boundary": {
+    "jd_is_targeting_context_only": true,
+    "briefing_is_targeting_context_only": true,
+    "claims_must_be_supported_by_allowed_fact_packet": true,
+    "judges_must_not_rewrite": true,
+    "metadata_only_graph_context_is_insufficient": true
+  },
+  "graph_binding_materiality_summary": {},
+  "deterministic_gate_summary": {
+    "x2_gates": [
+      {
+        "gate_id": "x2_ey_narrative_allowed_fact_ids_non_empty",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": 8
+      },
+      {
+        "gate_id": "x2_ey_narrative_source_fact_ids_supported",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": {
+          "bad": [],
+          "cited_count": 2
+        }
+      },
+      {
+        "gate_id": "x2_claim_ledger_claim_text_non_empty",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": 1
+      },
+      {
+        "gate_id": "x2_ey_narrative_display_text_proof_authorized",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": {
+          "status": "PASS",
+          "display_text_authority": "selected_fact_plan_claim_text",
+          "rows": [
+            {
+              "row_id": "narrative_sentence",
+              "source_fact_ids": [
+                "reb_ey_capital_optimization_solvency",
+                "reb_ey_ccar_capital_liquidity_stress_testing"
+              ],
+              "source_fact_ids_allowed": true,
+              "text_matches_selected_fact_claim_text": true
+            }
+          ]
+        }
+      },
+      {
+        "gate_id": "x2_ey_narrative_runtime_real_llm",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": "REAL_LLM"
+      },
+      {
+        "gate_id": "x2_no_first_person",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": null
+      },
+      {
+        "gate_id": "x2_no_em_dash",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": null
+      },
+      {
+        "gate_id": "x2_ey_narrative_targeting_only_not_experience_claim",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": []
+      },
+      {
+        "gate_id": "x2_ey_narrative_exactly_one_sentence",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": {
+          "sentence_count": 1,
+          "text": "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design."
+        }
+      },
+      {
+        "gate_id": "x2_ey_narrative_word_budget",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": 19
+      },
+      {
+        "gate_id": "x2_ey_narrative_char_budget",
+        "gate_type": "deterministic",
+        "pass": true,
+        "failure_reason": null,
+        "observed_value": 169
+      }
+    ]
+  },
+  "section_specific_rubric": "You are evaluating a proof-bound InsurTech or EY role episode lane: either exactly 3 bullets\nor exactly one narrative sentence. Return JSON only with: score_scale, score, threshold,\npass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n- threshold is 0.80 unless policy overrides it.\n\nRubric dimensions:\n1. factual_support: every material claim maps to claim_ledger and source_fact_ids from the allowed proof pool.\n2. claim_ledger_grounding: claim_ledger rows have non-empty claim_text and cite only role_episode_bundle_id graph evidence.\n3. jd_briefing_targeting_discipline: JD and briefing are targeting only; never JD-as-proof or briefing-as-proof.\n4. role_fit_targeting: targeting may shape emphasis without becoming proof of experience.\n\nRole-lane product shape:\n- Bullet lanes: exactly 3 bullets, one high-impact thought per bullet, no embedded newline.\n- Narrative lanes: exactly one sentence, no more than 58 words and 360 characters.\n- Source namespaces: InsurTech uses bul_insurtech_* source_fact_ids with reb_insurtech_* graph bundle ids;\n  EY uses bul_ey_* source_fact_ids with reb_ey_* graph bundle ids.\n- No first-person voice and no em dash in display text.\n\nDecisive failure triggers:\n- unsupported claim, missing source_fact_ids, or claim_ledger omission\n- JD, briefing, or target company used as proof of experience\n- wrong source namespace, cross-employer leakage, mixed InsurTech/EY graph evidence, or missing bul_insurtech_*/bul_ey_* source_fact_ids\n- keyword stuffing, copied JD phrases, or ATS laundry-list phrasing\n- wrong output shape: not 3 bullets for bullet lanes or not exactly one sentence for narrative lanes",
+  "grading_only_instructions": "You are grading a generated resume section candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write replacement section content.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (when provided), and candidate_output.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).",
+  "required_judge_output_schema": "Return ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[]}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.",
+  "rubric_ref": "apps_rg/runtime/judges/role_episode_x1d.py#ROLE_EPISODE_RUBRIC",
+  "judge_tier": "STANDARD_REASONING",
+  "judge_packet_required": true,
+  "judge_packet_hash": "e66fd0b82ce39379"
+}

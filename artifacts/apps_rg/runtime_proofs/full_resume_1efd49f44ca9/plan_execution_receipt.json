@@ -1,0 +1,1179 @@
+{
+  "authority_class": "OBSERVABILITY_ONLY_W0",
+  "contract_type": "PlanExecutionReceipt",
+  "emission": {
+    "emitter": "apps_rg.runtime.contracts.plan_execution_reconciliation",
+    "observation_only": true,
+    "schema_version": "apps_rg.plan_execution_reconciliation.v2",
+    "terminal_reason": "",
+    "w3_control_reconciliation": true,
+    "wave": "W1"
+  },
+  "execution_authority_assertions": {
+    "does_not_authorize_route_or_exit": true,
+    "does_not_execute_work_units": true,
+    "does_not_select_retries": true
+  },
+  "plan": {
+    "capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+    "planning_profile_digest": "75b8b40fcd92257a8334701b4cc0cc9fcf40d52fd9e6fb8a1c98e17daaabe16a",
+    "planning_profile_ref": "apps_rg/profiles/rg_planning_profile.yaml",
+    "planning_status": "READY"
+  },
+  "receipt_digest": "sha256:03304fdbcc67d3a7df3076b771c23cbb23ff7439823a58f20825a64acde4bb85",
+  "request_id": "req-4808b4dc507b453987c5951be246a96b",
+  "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+  "schema_version": "apps_rg.plan_execution_receipt.v1",
+  "summary": {
+    "all_planned_units_reconciled": true,
+    "by_disposition": {
+      "BLOCKED": 5,
+      "COMPLETED": 2,
+      "FAILED": 0,
+      "SKIPPED": 0
+    },
+    "failure_code_counts": {
+      "REQUIRED_PROOF_ABSENT": 5
+    },
+    "planned_unit_count": 7,
+    "reconciled_unit_count": 7
+  },
+  "taxonomy_digest": "sha256:004dfd58bcc059c3ffe88911b0eeddfb721ced48bca9fb1191dac2f4e5290a34",
+  "taxonomy_ref": "apps_rg/runtime/contracts/plan_execution_failure_taxonomy.yaml",
+  "unit_observations": [
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [
+        "modular_r4/locked_copy/locked_copy_manifest.json"
+      ],
+      "attempted": true,
+      "c0_obligation_receipt_refs": [],
+      "disposition": "COMPLETED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_certifications_block",
+        "support_target": "preserve_verbatim_certification_facts",
+        "unit_id": "certifications_block"
+      },
+      "l2_fault": "",
+      "l2_l3_applied_controls": [],
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "quality_certification_eligible": true,
+      "reasoning_control_execution_receipt": {
+        "authority_assertions": {
+          "controls_applied_emitted_by_l2_or_l3": true,
+          "does_not_authorize_route_or_exit": true,
+          "does_not_create_candidate_evidence": true,
+          "l1_requests_only": true
+        },
+        "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+        "c0_obligation_receipt_refs": [],
+        "control_observations": [
+          {
+            "control_name": "reflexion_loops",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 0.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "self_consistency_samples",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "BLOCKED",
+            "observed_value": null,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_ABSENT",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNKNOWN"
+          },
+          {
+            "control_name": "temperature",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "BLOCKED",
+            "observed_value": null,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_ABSENT",
+            "receipt_required": true,
+            "requested_value": 0.15,
+            "required_for_certification": false,
+            "transport_support_status": "UNKNOWN"
+          },
+          {
+            "control_name": "tot_branches",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "tot_depth",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          }
+        ],
+        "emitter_stage": "L2",
+        "execution_receipt_ref": "reasoning_control_execution/certifications_block.json",
+        "l2_l3_applied_controls": [],
+        "plan_capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+        "provider_configuration": {
+          "candidate_count": 0,
+          "model_ids": [
+            "NOT_OBSERVED"
+          ],
+          "provider_profiles": [
+            "NOT_OBSERVED"
+          ],
+          "selection_method": "L2_SECTION_PROVIDER_CALLS_NOT_OBSERVED"
+        },
+        "quality_certification": {
+          "denied": false,
+          "eligible": true,
+          "required_control_failures": []
+        },
+        "receipt_digest": "sha256:a08ee2ea22daf502cad6dff0da4429b52beb87ce709db12c5ae7ce4bd2e09ddd",
+        "request_id": "req-4808b4dc507b453987c5951be246a96b",
+        "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+        "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+        "trace_id": "f5e35281-af84-41df-9ea7-2ecbda84fea5",
+        "unit_id": "certifications_block"
+      },
+      "reasoning_control_execution_receipt_digest": "sha256:a08ee2ea22daf502cad6dff0da4429b52beb87ce709db12c5ae7ce4bd2e09ddd",
+      "reasoning_control_execution_receipt_ref": "reasoning_control_execution/certifications_block.json",
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 1.0,
+        "temperature": 0.15,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "locked_copy"
+      ],
+      "unit_id": "certifications_block"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "c0_obligation_receipt_refs": [],
+      "disposition": "BLOCKED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [
+          "jdob-466fa78e55c95212",
+          "jdob-ce8048cc63129099"
+        ],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_competencies",
+        "support_target": "jd_anchor_coverage",
+        "unit_id": "competencies"
+      },
+      "l2_fault": "",
+      "l2_l3_applied_controls": [
+        "self_consistency_samples",
+        "temperature"
+      ],
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "quality_certification_eligible": true,
+      "reasoning_control_execution_receipt": {
+        "authority_assertions": {
+          "controls_applied_emitted_by_l2_or_l3": true,
+          "does_not_authorize_route_or_exit": true,
+          "does_not_create_candidate_evidence": true,
+          "l1_requests_only": true
+        },
+        "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+        "c0_obligation_receipt_refs": [],
+        "control_observations": [
+          {
+            "control_name": "reflexion_loops",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 0.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "self_consistency_samples",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": 0,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_SELF_CONSISTENCY_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 2.0,
+            "required_for_certification": true,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "temperature",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "APPLIED",
+            "observed_value": 0.38,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_TEMPERATURE_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 0.38,
+            "required_for_certification": false,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "tot_branches",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "tot_depth",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          }
+        ],
+        "emitter_stage": "L2",
+        "execution_receipt_ref": "reasoning_control_execution/competencies.json",
+        "l2_l3_applied_controls": [
+          "self_consistency_samples",
+          "temperature"
+        ],
+        "plan_capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+        "provider_configuration": {
+          "candidate_count": 0,
+          "model_ids": [
+            "claude-sonnet-5"
+          ],
+          "provider_profiles": [
+            "external_claude_section_lane"
+          ],
+          "selection_method": "L2_SECTION_PROVIDER_CALLS"
+        },
+        "quality_certification": {
+          "denied": false,
+          "eligible": true,
+          "required_control_failures": []
+        },
+        "receipt_digest": "sha256:ad391fe93ab0f73e9d938846233fa8645363247690a32440284fadb748076395",
+        "request_id": "req-4808b4dc507b453987c5951be246a96b",
+        "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+        "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+        "trace_id": "f5e35281-af84-41df-9ea7-2ecbda84fea5",
+        "unit_id": "competencies"
+      },
+      "reasoning_control_execution_receipt_digest": "sha256:ad391fe93ab0f73e9d938846233fa8645363247690a32440284fadb748076395",
+      "reasoning_control_execution_receipt_ref": "reasoning_control_execution/competencies.json",
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 2.0,
+        "temperature": 0.38,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "competencies"
+      ],
+      "unit_id": "competencies"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [
+        "modular_r4/locked_copy/locked_copy_manifest.json"
+      ],
+      "attempted": true,
+      "c0_obligation_receipt_refs": [],
+      "disposition": "COMPLETED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_education_block",
+        "support_target": "preserve_verbatim_education_facts",
+        "unit_id": "education_block"
+      },
+      "l2_fault": "",
+      "l2_l3_applied_controls": [],
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "quality_certification_eligible": true,
+      "reasoning_control_execution_receipt": {
+        "authority_assertions": {
+          "controls_applied_emitted_by_l2_or_l3": true,
+          "does_not_authorize_route_or_exit": true,
+          "does_not_create_candidate_evidence": true,
+          "l1_requests_only": true
+        },
+        "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+        "c0_obligation_receipt_refs": [],
+        "control_observations": [
+          {
+            "control_name": "reflexion_loops",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 0.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "self_consistency_samples",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "BLOCKED",
+            "observed_value": null,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_ABSENT",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNKNOWN"
+          },
+          {
+            "control_name": "temperature",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "BLOCKED",
+            "observed_value": null,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_ABSENT",
+            "receipt_required": true,
+            "requested_value": 0.15,
+            "required_for_certification": false,
+            "transport_support_status": "UNKNOWN"
+          },
+          {
+            "control_name": "tot_branches",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "tot_depth",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          }
+        ],
+        "emitter_stage": "L2",
+        "execution_receipt_ref": "reasoning_control_execution/education_block.json",
+        "l2_l3_applied_controls": [],
+        "plan_capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+        "provider_configuration": {
+          "candidate_count": 0,
+          "model_ids": [
+            "NOT_OBSERVED"
+          ],
+          "provider_profiles": [
+            "NOT_OBSERVED"
+          ],
+          "selection_method": "L2_SECTION_PROVIDER_CALLS_NOT_OBSERVED"
+        },
+        "quality_certification": {
+          "denied": false,
+          "eligible": true,
+          "required_control_failures": []
+        },
+        "receipt_digest": "sha256:30aaa2759a5a4987f18b7724a62ac6e9ea5121f87644d682fcfacb818debba51",
+        "request_id": "req-4808b4dc507b453987c5951be246a96b",
+        "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+        "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+        "trace_id": "f5e35281-af84-41df-9ea7-2ecbda84fea5",
+        "unit_id": "education_block"
+      },
+      "reasoning_control_execution_receipt_digest": "sha256:30aaa2759a5a4987f18b7724a62ac6e9ea5121f87644d682fcfacb818debba51",
+      "reasoning_control_execution_receipt_ref": "reasoning_control_execution/education_block.json",
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 1.0,
+        "temperature": 0.15,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "locked_copy"
+      ],
+      "unit_id": "education_block"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "c0_obligation_receipt_refs": [],
+      "disposition": "BLOCKED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [
+          "jdob-466fa78e55c95212",
+          "jdob-ce8048cc63129099",
+          "jdob-24d3bf1644d0bf58"
+        ],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_executive_summary",
+        "support_target": "source_backed_executive_positioning",
+        "unit_id": "executive_summary"
+      },
+      "l2_fault": "",
+      "l2_l3_applied_controls": [
+        "self_consistency_samples",
+        "temperature"
+      ],
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "quality_certification_eligible": false,
+      "reasoning_control_execution_receipt": {
+        "authority_assertions": {
+          "controls_applied_emitted_by_l2_or_l3": true,
+          "does_not_authorize_route_or_exit": true,
+          "does_not_create_candidate_evidence": true,
+          "l1_requests_only": true
+        },
+        "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+        "c0_obligation_receipt_refs": [],
+        "control_observations": [
+          {
+            "control_name": "reflexion_loops",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 2.0,
+            "required_for_certification": true,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "self_consistency_samples",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": 0,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_SELF_CONSISTENCY_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 5.0,
+            "required_for_certification": true,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "temperature",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": 0.45,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_TEMPERATURE_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 0.42,
+            "required_for_certification": false,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "tot_branches",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 3.0,
+            "required_for_certification": true,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "tot_depth",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 2.0,
+            "required_for_certification": true,
+            "transport_support_status": "UNSUPPORTED"
+          }
+        ],
+        "emitter_stage": "L2",
+        "execution_receipt_ref": "reasoning_control_execution/executive_summary.json",
+        "l2_l3_applied_controls": [
+          "self_consistency_samples",
+          "temperature"
+        ],
+        "plan_capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+        "provider_configuration": {
+          "candidate_count": 0,
+          "model_ids": [
+            "claude-sonnet-5"
+          ],
+          "provider_profiles": [
+            "external_claude_section_lane"
+          ],
+          "selection_method": "L2_SECTION_PROVIDER_CALLS"
+        },
+        "quality_certification": {
+          "denied": true,
+          "eligible": false,
+          "required_control_failures": [
+            "reflexion_loops",
+            "tot_branches",
+            "tot_depth"
+          ]
+        },
+        "receipt_digest": "sha256:e60c6f350ce91350e29871719008849021acdd49873a38efeb99f57e35e89e63",
+        "request_id": "req-4808b4dc507b453987c5951be246a96b",
+        "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+        "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+        "trace_id": "f5e35281-af84-41df-9ea7-2ecbda84fea5",
+        "unit_id": "executive_summary"
+      },
+      "reasoning_control_execution_receipt_digest": "sha256:e60c6f350ce91350e29871719008849021acdd49873a38efeb99f57e35e89e63",
+      "reasoning_control_execution_receipt_ref": "reasoning_control_execution/executive_summary.json",
+      "requested_controls": {
+        "reflexion_loops": 2.0,
+        "self_consistency_samples": 5.0,
+        "temperature": 0.42,
+        "tot_branches": 3.0,
+        "tot_depth": 2.0
+      },
+      "required_execution_lanes": [
+        "executive_summary"
+      ],
+      "unit_id": "executive_summary"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "c0_obligation_receipt_refs": [],
+      "disposition": "BLOCKED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [
+          "jdob-466fa78e55c95212",
+          "jdob-ce8048cc63129099",
+          "jdob-24d3bf1644d0bf58"
+        ],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_experience_block",
+        "support_target": "metric_preserving_experience",
+        "unit_id": "experience_block"
+      },
+      "l2_fault": "",
+      "l2_l3_applied_controls": [
+        "self_consistency_samples",
+        "temperature"
+      ],
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "quality_certification_eligible": false,
+      "reasoning_control_execution_receipt": {
+        "authority_assertions": {
+          "controls_applied_emitted_by_l2_or_l3": true,
+          "does_not_authorize_route_or_exit": true,
+          "does_not_create_candidate_evidence": true,
+          "l1_requests_only": true
+        },
+        "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+        "c0_obligation_receipt_refs": [],
+        "control_observations": [
+          {
+            "control_name": "reflexion_loops",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": true,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "self_consistency_samples",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "reason_code": "L2_SECTION_PROVIDER_CALL_SELF_CONSISTENCY_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 3.0,
+            "required_for_certification": true,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "temperature",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": 0.45,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_TEMPERATURE_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 0.32,
+            "required_for_certification": false,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "tot_branches",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 2.0,
+            "required_for_certification": true,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "tot_depth",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 2.0,
+            "required_for_certification": true,
+            "transport_support_status": "UNSUPPORTED"
+          }
+        ],
+        "emitter_stage": "L2",
+        "execution_receipt_ref": "reasoning_control_execution/experience_block.json",
+        "l2_l3_applied_controls": [
+          "self_consistency_samples",
+          "temperature"
+        ],
+        "plan_capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+        "provider_configuration": {
+          "candidate_count": 0,
+          "model_ids": [
+            "claude-sonnet-5",
+            "gpt-5.6-luna"
+          ],
+          "provider_profiles": [
+            "external_claude_section_lane",
+            "external_openai_section_lane"
+          ],
+          "selection_method": "L2_SECTION_PROVIDER_CALLS"
+        },
+        "quality_certification": {
+          "denied": true,
+          "eligible": false,
+          "required_control_failures": [
+            "reflexion_loops",
+            "tot_branches",
+            "tot_depth"
+          ]
+        },
+        "receipt_digest": "sha256:82e6c53bf917698c9897b91e58cda08960c426a200d2569ae2db91098ba4fb0c",
+        "request_id": "req-4808b4dc507b453987c5951be246a96b",
+        "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+        "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+        "trace_id": "f5e35281-af84-41df-9ea7-2ecbda84fea5",
+        "unit_id": "experience_block"
+      },
+      "reasoning_control_execution_receipt_digest": "sha256:82e6c53bf917698c9897b91e58cda08960c426a200d2569ae2db91098ba4fb0c",
+      "reasoning_control_execution_receipt_ref": "reasoning_control_execution/experience_block.json",
+      "requested_controls": {
+        "reflexion_loops": 1.0,
+        "self_consistency_samples": 3.0,
+        "temperature": 0.32,
+        "tot_branches": 2.0,
+        "tot_depth": 2.0
+      },
+      "required_execution_lanes": [
+        "unify_bullets",
+        "ibm_bullets",
+        "insurtech_bullets",
+        "ey_bullets",
+        "unify_narrative",
+        "ibm_narrative",
+        "insurtech_narrative",
+        "ey_narrative"
+      ],
+      "unit_id": "experience_block"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "c0_obligation_receipt_refs": [],
+      "disposition": "BLOCKED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [
+          "jdob-466fa78e55c95212",
+          "jdob-ce8048cc63129099",
+          "jdob-24d3bf1644d0bf58"
+        ],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_headline",
+        "support_target": "concise_role_positioning",
+        "unit_id": "headline"
+      },
+      "l2_fault": "",
+      "l2_l3_applied_controls": [
+        "self_consistency_samples",
+        "temperature"
+      ],
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "quality_certification_eligible": true,
+      "reasoning_control_execution_receipt": {
+        "authority_assertions": {
+          "controls_applied_emitted_by_l2_or_l3": true,
+          "does_not_authorize_route_or_exit": true,
+          "does_not_create_candidate_evidence": true,
+          "l1_requests_only": true
+        },
+        "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+        "c0_obligation_receipt_refs": [],
+        "control_observations": [
+          {
+            "control_name": "reflexion_loops",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 0.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "self_consistency_samples",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": 0,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_SELF_CONSISTENCY_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "temperature",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": 0.55,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_TEMPERATURE_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 0.15,
+            "required_for_certification": false,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "tot_branches",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "tot_depth",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          }
+        ],
+        "emitter_stage": "L2",
+        "execution_receipt_ref": "reasoning_control_execution/headline.json",
+        "l2_l3_applied_controls": [
+          "self_consistency_samples",
+          "temperature"
+        ],
+        "plan_capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+        "provider_configuration": {
+          "candidate_count": 0,
+          "model_ids": [
+            "claude-sonnet-5"
+          ],
+          "provider_profiles": [
+            "external_claude_section_lane"
+          ],
+          "selection_method": "L2_SECTION_PROVIDER_CALLS"
+        },
+        "quality_certification": {
+          "denied": false,
+          "eligible": true,
+          "required_control_failures": []
+        },
+        "receipt_digest": "sha256:aae73efb4ded87559e062326aece584a0f5c055467e1c65e5ec8e3720068edd1",
+        "request_id": "req-4808b4dc507b453987c5951be246a96b",
+        "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+        "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+        "trace_id": "f5e35281-af84-41df-9ea7-2ecbda84fea5",
+        "unit_id": "headline"
+      },
+      "reasoning_control_execution_receipt_digest": "sha256:aae73efb4ded87559e062326aece584a0f5c055467e1c65e5ec8e3720068edd1",
+      "reasoning_control_execution_receipt_ref": "reasoning_control_execution/headline.json",
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 1.0,
+        "temperature": 0.15,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "headline"
+      ],
+      "unit_id": "headline"
+    },
+    {
+      "actual_attempt_refs": [
+        "runtime_execution_witness.json",
+        "modular_r4/section_provider_calls.json"
+      ],
+      "artifact_refs": [],
+      "attempted": true,
+      "c0_obligation_receipt_refs": [],
+      "disposition": "BLOCKED",
+      "evidence_plan": {
+        "allowed_source_classes": [
+          "source_resume",
+          "job_description",
+          "approved_research_brief",
+          "candidate_profile"
+        ],
+        "authority_class": "C0_EXECUTES_RETRIEVAL",
+        "contradiction_scan_expected": true,
+        "jd_obligation_ids": [
+          "jdob-466fa78e55c95212",
+          "jdob-ce8048cc63129099"
+        ],
+        "jd_obligation_targeting_only": true,
+        "query_intent": "collect_support_for_skills_block",
+        "support_target": "jd_keyword_and_truth_alignment",
+        "unit_id": "skills_block"
+      },
+      "l2_fault": "",
+      "l2_l3_applied_controls": [
+        "self_consistency_samples",
+        "temperature"
+      ],
+      "observed_lane_artifacts": {},
+      "planned_inputs": [
+        "jd_hash",
+        "resume_hash"
+      ],
+      "quality_certification_eligible": true,
+      "reasoning_control_execution_receipt": {
+        "authority_assertions": {
+          "controls_applied_emitted_by_l2_or_l3": true,
+          "does_not_authorize_route_or_exit": true,
+          "does_not_create_candidate_evidence": true,
+          "l1_requests_only": true
+        },
+        "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+        "c0_obligation_receipt_refs": [],
+        "control_observations": [
+          {
+            "control_name": "reflexion_loops",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 0.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "self_consistency_samples",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "ADAPTED",
+            "observed_value": 0,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_SELF_CONSISTENCY_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 2.0,
+            "required_for_certification": true,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "temperature",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "APPLIED",
+            "observed_value": 0.38,
+            "reason_code": "L2_SECTION_PROVIDER_CALL_TEMPERATURE_OBSERVED",
+            "receipt_required": true,
+            "requested_value": 0.38,
+            "required_for_certification": false,
+            "transport_support_status": "SUPPORTED"
+          },
+          {
+            "control_name": "tot_branches",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          },
+          {
+            "control_name": "tot_depth",
+            "evidence_ref": "modular_r4/section_provider_calls.json",
+            "execution_status": "IGNORED",
+            "observed_value": null,
+            "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+            "receipt_required": true,
+            "requested_value": 1.0,
+            "required_for_certification": false,
+            "transport_support_status": "UNSUPPORTED"
+          }
+        ],
+        "emitter_stage": "L2",
+        "execution_receipt_ref": "reasoning_control_execution/skills_block.json",
+        "l2_l3_applied_controls": [
+          "self_consistency_samples",
+          "temperature"
+        ],
+        "plan_capsule_digest": "sha256:2eace5a61c4534301e85f4cb6277827c27c8039429f00cdb2d6ad27690947906",
+        "provider_configuration": {
+          "candidate_count": 0,
+          "model_ids": [
+            "claude-sonnet-5"
+          ],
+          "provider_profiles": [
+            "external_claude_section_lane"
+          ],
+          "selection_method": "L2_SECTION_PROVIDER_CALLS"
+        },
+        "quality_certification": {
+          "denied": false,
+          "eligible": true,
+          "required_control_failures": []
+        },
+        "receipt_digest": "sha256:de4717fb92ee21923c5f23b1d56b5742ff8c852e2483c86c27785008435fdf10",
+        "request_id": "req-4808b4dc507b453987c5951be246a96b",
+        "run_id": "6aade1ce-83e8-457b-8ca9-50fe7509051a",
+        "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+        "trace_id": "f5e35281-af84-41df-9ea7-2ecbda84fea5",
+        "unit_id": "skills_block"
+      },
+      "reasoning_control_execution_receipt_digest": "sha256:de4717fb92ee21923c5f23b1d56b5742ff8c852e2483c86c27785008435fdf10",
+      "reasoning_control_execution_receipt_ref": "reasoning_control_execution/skills_block.json",
+      "requested_controls": {
+        "reflexion_loops": 0.0,
+        "self_consistency_samples": 2.0,
+        "temperature": 0.38,
+        "tot_branches": 1.0,
+        "tot_depth": 1.0
+      },
+      "required_execution_lanes": [
+        "competencies"
+      ],
+      "unit_id": "skills_block"
+    }
+  ],
+  "unit_outcomes": [
+    {
+      "artifact_refs": [
+        "modular_r4/locked_copy/locked_copy_manifest.json"
+      ],
+      "attempted": true,
+      "control_receipt_refs": [
+        "reasoning_control_execution/certifications_block.json"
+      ],
+      "disposition": "COMPLETED",
+      "failure_class": "",
+      "failure_code": "",
+      "unit_id": "certifications_block",
+      "w2_replan_hint": ""
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "reasoning_control_execution/competencies.json"
+      ],
+      "disposition": "BLOCKED",
+      "failure_class": "UPSTREAM_EVIDENCE",
+      "failure_code": "REQUIRED_PROOF_ABSENT",
+      "unit_id": "competencies",
+      "w2_replan_hint": "REPLAN_EVIDENCE"
+    },
+    {
+      "artifact_refs": [
+        "modular_r4/locked_copy/locked_copy_manifest.json"
+      ],
+      "attempted": true,
+      "control_receipt_refs": [
+        "reasoning_control_execution/education_block.json"
+      ],
+      "disposition": "COMPLETED",
+      "failure_class": "",
+      "failure_code": "",
+      "unit_id": "education_block",
+      "w2_replan_hint": ""
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "reasoning_control_execution/executive_summary.json"
+      ],
+      "disposition": "BLOCKED",
+      "failure_class": "UPSTREAM_EVIDENCE",
+      "failure_code": "REQUIRED_PROOF_ABSENT",
+      "unit_id": "executive_summary",
+      "w2_replan_hint": "REPLAN_EVIDENCE"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "reasoning_control_execution/experience_block.json"
+      ],
+      "disposition": "BLOCKED",
+      "failure_class": "UPSTREAM_EVIDENCE",
+      "failure_code": "REQUIRED_PROOF_ABSENT",
+      "unit_id": "experience_block",
+      "w2_replan_hint": "REPLAN_EVIDENCE"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "reasoning_control_execution/headline.json"
+      ],
+      "disposition": "BLOCKED",
+      "failure_class": "UPSTREAM_EVIDENCE",
+      "failure_code": "REQUIRED_PROOF_ABSENT",
+      "unit_id": "headline",
+      "w2_replan_hint": "REPLAN_EVIDENCE"
+    },
+    {
+      "artifact_refs": [],
+      "attempted": true,
+      "control_receipt_refs": [
+        "reasoning_control_execution/skills_block.json"
+      ],
+      "disposition": "BLOCKED",
+      "failure_class": "UPSTREAM_EVIDENCE",
+      "failure_code": "REQUIRED_PROOF_ABSENT",
+      "unit_id": "skills_block",
+      "w2_replan_hint": "REPLAN_EVIDENCE"
+    }
+  ]
+}

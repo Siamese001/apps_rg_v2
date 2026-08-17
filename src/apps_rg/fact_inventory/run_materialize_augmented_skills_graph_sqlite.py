@@ -180,7 +180,3 @@ def main() -> int:
     receipt = run_closeout(skip_parity=skip)
     print(json.dumps({"STATUS": receipt["STATUS"], "SQLITE_DB_PATH": receipt["SQLITE_DB_PATH"]}, indent=2))
     return 0 if receipt["STATUS"] == "PASS" else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

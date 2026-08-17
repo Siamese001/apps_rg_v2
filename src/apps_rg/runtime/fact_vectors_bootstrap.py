@@ -1011,7 +1011,3 @@ __all__ = [
     "run_bootstrap_cli",
     "run_bootstrap_fact_vectors",
 ]
-
-
-if __name__ == "__main__":
-    raise SystemExit(run_bootstrap_cli(sys.argv[1:]))

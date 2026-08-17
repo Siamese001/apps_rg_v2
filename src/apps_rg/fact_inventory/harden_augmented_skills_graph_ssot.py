@@ -491,7 +491,3 @@ def main() -> int:
     )
     print(json.dumps({"STATUS": receipt["STATUS"], "receipt": str(OUT_RECEIPT_JSON)}, indent=2))
     return 0 if receipt["STATUS"] == "PASS" else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -719,7 +719,7 @@ def _patch_embedding_preflight(
     )
 
 
-def test_patch_run_restores_persisted_whole_resume_graph_authority(tmp_path: Path) -> None:
+def test_patch_run_restores_persisted_whole_resume_graph_bindings(tmp_path: Path) -> None:
     from apps_rg.runtime.c0.resume_graph_allocation import (
         ALL_CLAIM_BEARING_SECTIONS,
         finalize_resume_graph_allocation_plan,
@@ -757,20 +757,6 @@ def test_patch_run_restores_persisted_whole_resume_graph_authority(tmp_path: Pat
     }
     for name, payload in artifacts.items():
         _write_json(allocation_dir / name, payload)
-    prior_w6 = {
-        "receipt_ref": "artifacts/calibration/official_w6.json",
-        "receipt_sha256": "sha256:" + "a" * 64,
-        "trusted_receipt_sha256": "sha256:" + "b" * 64,
-        "trusted_full_report_sha256": "sha256:" + "c" * 64,
-    }
-    _write_json(
-        run_dir
-        / "modular_r4"
-        / "generated_lane_rollup"
-        / "generated_lane_rollup.json",
-        {"resume_graph_w6_release_evidence": prior_w6},
-    )
-
     bindings = pr._whole_resume_graph_env_for_patch(run_dir)
 
     assert Path(bindings["APPS_RG_RESUME_GRAPH_ALLOCATION_PLAN"]).name == (
@@ -803,7 +789,6 @@ def test_patch_run_restores_persisted_whole_resume_graph_authority(tmp_path: Pat
             "run/modular_r4/resume_graph_allocation/c03_section_graph_plans.json"
         ),
     }
-    assert authority["resume_graph_w6_release_evidence"] == prior_w6
     assert Path(bindings["APPS_RG_SECTION_GRAPH_SOURCE_PLANS"]).name == (
         "c03_section_graph_plans.json"
     )

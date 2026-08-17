@@ -9,6 +9,27 @@ from types import SimpleNamespace
 from apps_rg.runtime.spine.section_cli_runners import run_section_competencies_spine
 
 
+def test_competencies_lane_keeps_intermediate_transcript_out_of_public_stdout(
+    monkeypatch,
+) -> None:
+    """The sole public CLI prints final outputs only; lane detail stays in artifacts."""
+    from apps_rg.runtime.sections import competencies_lane
+
+    captured: dict[str, object] = {}
+
+    def fake_execute(args, **kwargs):
+        captured["args"] = args
+        captured.update(kwargs)
+        return {"output_text": "persisted only"}
+
+    monkeypatch.setattr(competencies_lane, "_execute_competencies_lane", fake_execute)
+
+    result = competencies_lane.run_competencies_lane_execution(SimpleNamespace())
+
+    assert result["output_text"] == "persisted only"
+    assert captured["print_output"] is False
+
+
 def test_competencies_spine_uses_generated_raw_request_brief(tmp_path: Path, monkeypatch) -> None:
     generated = tmp_path / "briefing.md"
     generated.write_text("Generated company brief for Acme.", encoding="utf-8")

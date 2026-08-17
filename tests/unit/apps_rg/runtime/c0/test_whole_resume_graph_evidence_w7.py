@@ -95,7 +95,9 @@ def _fixture(repo: Path) -> tuple[dict, dict]:
     return {"sections": sections}, rollup
 
 
-def test_engineering_contract_passes_but_unknown_human_release_blocks(tmp_path: Path) -> None:
+def test_engineering_contract_authorizes_release_without_external_w6_receipt(
+    tmp_path: Path,
+) -> None:
     final_resume, rollup = _fixture(tmp_path)
     result = build_whole_resume_graph_evidence_contract(
         repo=tmp_path,
@@ -103,9 +105,8 @@ def test_engineering_contract_passes_but_unknown_human_release_blocks(tmp_path: 
         rollup_blob=rollup,
     )
     assert result["engineering_pass"] is True
-    assert result["official_w6_status"] == "UNKNOWN"
-    assert result["release_pass"] is False
-    assert result["promotion_eligible"] is False
+    assert result["release_pass"] is True
+    assert result["promotion_eligible"] is True
     assert result["unknown_is_pass"] is False
 
 

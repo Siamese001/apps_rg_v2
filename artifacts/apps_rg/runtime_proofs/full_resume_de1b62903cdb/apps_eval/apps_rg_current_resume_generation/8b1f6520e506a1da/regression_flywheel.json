@@ -1,0 +1,49 @@
+{
+  "baseline_digest": "",
+  "baseline_failure_family_counts": {},
+  "baseline_failure_mode_counts": {},
+  "baseline_path": "",
+  "baseline_score": 0.0,
+  "compared": false,
+  "current_failure_family_counts": {
+    "contract": 1,
+    "determinism": 1,
+    "grounding": 1,
+    "policy": 1
+  },
+  "current_failure_mode_counts": {
+    "contract.artifact.required_artifacts_missing": 1,
+    "determinism.snapshot_drift": 1,
+    "grounding.claims_unsupported": 1,
+    "policy.x3_disposition_mismatch": 1
+  },
+  "current_score": 0.0,
+  "delta": 0.0,
+  "dominant_failure_family": "contract",
+  "dominant_failure_mode": "contract.artifact.required_artifacts_missing",
+  "new_failure_modes": [
+    "contract.artifact.required_artifacts_missing",
+    "determinism.snapshot_drift",
+    "grounding.claims_unsupported",
+    "policy.x3_disposition_mismatch"
+  ],
+  "recovered_failure_modes": [],
+  "repeated_failure_modes": [],
+  "scenario_hotspots": [
+    {
+      "block_failures": 4,
+      "dominant_failure_family": "contract",
+      "dominant_failure_mode": "contract.artifact.required_artifacts_missing",
+      "failed_findings": 4,
+      "failure_modes": [
+        "contract.artifact.required_artifacts_missing",
+        "determinism.snapshot_drift",
+        "grounding.claims_unsupported",
+        "policy.x3_disposition_mismatch"
+      ],
+      "scenario_id": "apps_rg_current_run_post_x3"
+    }
+  ],
+  "schema_version": "apps_eval.regression_flywheel.v1",
+  "verdict": "not_compared"
+}

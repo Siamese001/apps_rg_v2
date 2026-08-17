@@ -47,7 +47,3 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     )
     return _EXIT_CODES[receipt["status"]]
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

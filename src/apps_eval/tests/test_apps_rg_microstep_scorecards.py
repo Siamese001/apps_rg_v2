@@ -236,11 +236,11 @@ def test_lane_identity_may_have_distinct_child_attempt_and_exhaust() -> None:
     assert identity == lane_identity
 
 
-def test_x3_alias_and_noncanonical_exit_fail_closed(tmp_path: Path) -> None:
+def test_lane_x3_allow_is_distinct_from_noncanonical_whole_run_exit(tmp_path: Path) -> None:
     lane_root = tmp_path / "lanes" / "headline"
     lane_root.mkdir(parents=True)
     (lane_root / "x3_disposition.json").write_text(
-        '{"x3_code":"X3D"}',
+        '{"x3_code":"X3_ALLOW"}',
         encoding="utf-8",
     )
     (tmp_path / "whole_run_exit_review_packet.json").write_text(
@@ -265,9 +265,9 @@ def test_x3_alias_and_noncanonical_exit_fail_closed(tmp_path: Path) -> None:
     x3_row = next(row for row in evaluation["rows"] if row.gate_id == "x3_disposition_earned" and row.lane_id == "headline")
     exit_row = next(row for row in evaluation["rows"] if row.gate_id == "exit_exactly_one_x3")
 
-    assert x3_row.verdict == "FAIL"
+    assert x3_row.verdict == "PASS"
     assert exit_row.verdict == "FAIL"
-    assert x3_row.threshold == "X3D_ALLOW_FINISH"
+    assert x3_row.threshold == "X3_ALLOW"
     assert exit_row.threshold == "X3D_ALLOW_FINISH"
 
 

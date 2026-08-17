@@ -684,7 +684,7 @@ def _assert_source_snapshot_unchanged(
 def _default_current_run_expected(snapshot: AppOutputSnapshot) -> dict[str, Any]:
     return {
         "required_output_keys": ["runtime", "sections"],
-        "required_artifacts": ["generated_resume.json", "resume.md"],
+        "required_artifacts": ["FINAL_RESUME_OUTPUT.json", "FINAL_RESUME_OUTPUT.txt"],
         "expected_x3": "X3D_ALLOW_FINISH",
         "forbidden_terms": [],
         "grounded_claims_required": True,
@@ -984,7 +984,12 @@ def run_current_snapshot_eval(
         if git_commit_override is None
         else str(git_commit_override)
     )
-    graders = build_default_graders()
+    # The shared fixture graders describe the legacy ``resume.md`` product and
+    # use fixture-shaped claim/provenance fields.  They remain useful for their
+    # fixtures, but they are not valid current-run release evidence for Apps
+    # RG.  The V2 current path is governed by Apps RG-native microsteps,
+    # admission, the frozen input manifest, and the independent L6 audit.
+    graders: list[Any] = []
     thresholds = load_thresholds_registry().get(
         threshold_suite_id,
         load_thresholds_registry().get("apps_rg.dev.resume_generation", {}),

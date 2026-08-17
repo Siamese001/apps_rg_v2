@@ -57,26 +57,26 @@ Freeze the six real allocator cases from a clean checkout, then build and
 validate the unlabeled W6 packet:
 
 ```bash
-python -m apps_rg.evals.c03_human_eval freeze-source \
+library API: apps_rg.evals.c03_human_eval freeze-source \
   --source-commit-sha "$(git rev-parse HEAD)" \
   --out /path/to/source_bundle.v1.json \
   --receipt-out /controlled/receipts/source_freeze_receipt.v1.json
-python -m apps_rg.evals.c03_human_eval readiness \
+library API: apps_rg.evals.c03_human_eval readiness \
   --source-bundle /path/to/source_bundle.v1.json \
   --freeze-receipt /controlled/receipts/source_freeze_receipt.v1.json \
   --expected-freeze-receipt-digest "$TRUSTED_FREEZE_RECEIPT_DIGEST" \
   --blinding-nonce-file /controlled/secrets/c03_blinding_nonce.hex
-python -m apps_rg.evals.c03_human_eval build \
+library API: apps_rg.evals.c03_human_eval build \
   --source-bundle /path/to/source_bundle.v1.json \
   --freeze-receipt /controlled/receipts/source_freeze_receipt.v1.json \
   --expected-freeze-receipt-digest "$TRUSTED_FREEZE_RECEIPT_DIGEST" \
   --blinding-nonce-file /controlled/secrets/c03_blinding_nonce.hex \
   --out /path/to/c03_resume_graph_v1
-python -m apps_rg.evals.c03_human_eval validate \
+library API: apps_rg.evals.c03_human_eval validate \
   --packet /path/to/c03_resume_graph_v1 \
   --phase prelabel \
   --expected-freeze-receipt-digest "$TRUSTED_FREEZE_RECEIPT_DIGEST"
-python -m apps_rg.evals.c03_human_eval seal-prelabel \
+library API: apps_rg.evals.c03_human_eval seal-prelabel \
   --packet /path/to/c03_resume_graph_v1 \
   --receipt-out /controlled/receipts/c03_prelabel_packet_receipt.v1.json \
   --expected-freeze-receipt-digest "$TRUSTED_FREEZE_RECEIPT_DIGEST"
@@ -106,7 +106,7 @@ and validation only after all six real baseline and hardened resume pairs exist.
 Validate returned human labels and adjudications:
 
 ```bash
-python -m apps_rg.evals.c03_human_eval validate \
+library API: apps_rg.evals.c03_human_eval validate \
   --packet /path/to/c03_resume_graph_v1 \
   --phase completed \
   --labels-dir /path/to/returned_labels \

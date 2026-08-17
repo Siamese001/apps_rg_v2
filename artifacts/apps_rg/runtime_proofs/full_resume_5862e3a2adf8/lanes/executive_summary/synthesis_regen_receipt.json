@@ -1,0 +1,122 @@
+{
+  "schema": "executive_summary_synthesis_regen_v2",
+  "triggered": true,
+  "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; Executive summary meta or filler scaffolding: ['this leadership profile', 'leadership profile']; sentence 3: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+  "initial_candidate_digest": "af77793c0ac8e61c",
+  "initial_defects": [
+    "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence",
+    "Executive summary meta or filler scaffolding: ['this leadership profile', 'leadership profile']",
+    "sentence 3: mechanism_comma_list",
+    "dominant_source_fact=unknown",
+    "claim_support_graph_refs=[]",
+    "suppressed_skills=[]"
+  ],
+  "first_pass_resume_word_count": 136,
+  "first_pass_claim_ledger_rows": 6,
+  "max_attempts": 3,
+  "acceptance_semantics": {
+    "monotonicity_accepted": "candidate improved relative to the prior draft; full pre-X2 shape closure is not implied",
+    "receipt_accepted": "the selected candidate cleared every pre-X2 synthesis-shape check",
+    "transport_accepted": "the provider call completed and parsed; product acceptance is not implied"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; Executive summary meta or filler scaffolding: ['this leadership profile', 'leadership profile']; sentence 3: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "call_id": "synthesis_regen-00-01-a5d43b71",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "6791585487aef3a6",
+      "regen_resume_word_count": 134,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [
+        "resume_display_text must have exactly 6 sentences",
+        "found 7 (legacy 4–5 and 5–6 bands retired)"
+      ],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": false,
+        "failed_reasons": [
+          "resume_display_text must have exactly 6 sentences",
+          "found 7 (legacy 4–5 and 5–6 bands retired)"
+        ]
+      },
+      "shape_failure_count": 2,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 136,
+        "post_resume_word_count": 134,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 12,
+        "post_unique_source_fact_ids": 10,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": true,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": false,
+        "rejection_reasons": [
+          "sentence_count_regressed"
+        ],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "REJECTED",
+      "advanced_to_next_attempt": false,
+      "skipped": "monotonicity_rejected",
+      "best_candidate": true
+    },
+    {
+      "attempt": 2,
+      "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; Executive summary meta or filler scaffolding: ['this leadership profile', 'leadership profile']; sentence 3: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "call_id": "synthesis_regen-00-02-2874ffab",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "0ad110bdfcf7f513",
+      "regen_resume_word_count": 132,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": true,
+        "failed_reasons": []
+      },
+      "shape_failure_count": 0,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 136,
+        "post_resume_word_count": 132,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 12,
+        "post_unique_source_fact_ids": 9,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": true,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "FULL_PRE_X2_SHAPE_PASS",
+      "advanced_to_next_attempt": false,
+      "best_candidate": true
+    }
+  ],
+  "accepted": true,
+  "accepted_via": "shape_pass",
+  "final_resume_word_count": 132
+}

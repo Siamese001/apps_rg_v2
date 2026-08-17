@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 from jsonschema import Draft202012Validator
 
 from apps_rg.evals.meta_eval import run_meta_evaluation
+from apps_rg.evals.meta_eval.__main__ import main as run_meta_eval
 from apps_rg.evals.resume_graph.reporting import canonical_digest
 
 
@@ -69,16 +69,12 @@ def test_receipt_digest_and_repeated_score_are_stable() -> None:
     assert receipt["metrics"]["score_stability"] == 1.0
 
 
-def test_meta_eval_cli(tmp_path: Path) -> None:
+def test_meta_eval_library_command_writes_a_receipt(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     output = tmp_path / "meta.json"
-    env = dict(os.environ)
-    env["PYTHONPATH"] = str(Path(__file__).resolve().parents[4])
-    completed = subprocess.run(
-        [sys.executable, "-m", "apps_rg.evals.meta_eval", "--out", str(output)],
-        check=False,
-        capture_output=True,
-        text=True,
-        env=env,
-    )
-    assert completed.returncode == 0, completed.stderr
+    monkeypatch.setattr(sys, "argv", ["apps_rg.evals.meta_eval", "--out", str(output)])
+
+    assert run_meta_eval() == 0
     assert json.loads(output.read_text(encoding="utf-8"))["status"] == "PASS"

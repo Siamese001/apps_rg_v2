@@ -433,7 +433,3 @@ def main() -> None:
         receipt["backup_path"] = str(backup_path.relative_to(root) if backup_path.is_relative_to(root) else backup_path)
     _write_json(report_path, receipt)
     print(json.dumps(receipt, indent=2))
-
-
-if __name__ == "__main__":
-    main()

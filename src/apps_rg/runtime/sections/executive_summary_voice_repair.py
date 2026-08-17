@@ -777,12 +777,30 @@ def _selected_fact_authority_ids(
     return ids
 
 
+def _required_brushstroke_fact_ids(parsed: dict[str, Any]) -> set[str]:
+    """Return facts that the sealed composition plan requires in the six-sentence arc."""
+    plan = parsed.get("executive_summary_composition_plan")
+    if not isinstance(plan, dict):
+        return set()
+    required: set[str] = set()
+    for brushstroke in plan.get("brushstrokes") or []:
+        if not isinstance(brushstroke, dict):
+            continue
+        required.update(
+            str(fact_id).strip()
+            for fact_id in (brushstroke.get("required_fact_ids") or [])
+            if str(fact_id).strip()
+        )
+    return required
+
+
 def _ensure_dependency_graph_display_override(
     sentences: list[str],
     *,
     selected_facts: list[dict[str, Any]] | None,
+    required_brushstroke_fact_ids: set[str] | None = None,
 ) -> list[str]:
-    """Keep DISPLAY_OVERRIDE graph prose (fact_engineering_platform_002) in the six-sentence arc."""
+    """Keep graph prose without displacing a required composition brushstroke."""
     from apps_rg.runtime.sections.executive_summary_synthesis_contract import (
         DEPENDENCY_GRAPH_FACT_ID,
         FACT_C0_DISPLAY_OVERRIDES,
@@ -800,14 +818,31 @@ def _ensure_dependency_graph_display_override(
     if _GRAPH_OVERRIDE_ANCHOR in blob:
         for idx, sent in enumerate(out):
             if "dependency graph" in sent.lower():
+                # A model may already satisfy the graph-display anchor in the
+                # same sentence that materializes a sealed brushstroke. The
+                # canonical rewrite is optional once the anchor is present;
+                # replacing that sentence would erase the required evidence.
+                existing_fact_ids = set(_source_fact_ids_for_display_sentence(sent))
+                if existing_fact_ids & set(required_brushstroke_fact_ids or set()):
+                    continue
                 out[idx] = override
         return out
 
     insert_at = 2 if len(out) > 2 else max(0, len(out) - 1)
-    if insert_at < len(out) and "basel iii" in out[insert_at].lower():
-        insert_at = min(insert_at + 1, len(out) - 1)
-    if insert_at < len(out):
-        out[insert_at] = override
+    required = set(required_brushstroke_fact_ids or set())
+    # The former fixed-slot injection could replace the only sentence citing a
+    # required fact (live: DevSecOps release resilience).  Prefer the usual
+    # S3 slot, but select another non-required sentence when it would erase a
+    # sealed brushstroke; keep the six-sentence budget unchanged.
+    candidate_indices = [insert_at] + [
+        idx for idx in range(1, len(out)) if idx != insert_at
+    ]
+    for idx in candidate_indices:
+        existing_fact_ids = set(_source_fact_ids_for_display_sentence(out[idx]))
+        if existing_fact_ids & required:
+            continue
+        out[idx] = override
+        return out
     return out
 
 
@@ -909,6 +944,38 @@ def _repair_ai_partnership_judge_findings(
         and out[5].lower().startswith("future partner-led platform decisions")
     ):
         out[5] = _AI_PARTNERSHIP_EVIDENCE_LED_S6
+    return out
+
+
+def _repair_control_evidence_mechanism_inventory(
+    sentences: list[str],
+    *,
+    selected_facts: list[dict[str, Any]] | None,
+) -> list[str]:
+    """Turn the live proof-bundle mechanism list into one outcome-led evidence sentence."""
+    from apps_rg.runtime.sections.executive_summary_composition import (
+        is_mechanism_inventory_sentence,
+    )
+
+    allowed = _selected_fact_authority_ids(selected_facts)
+    evidence_ids = {
+        "skill_unify_agentic_runtime_proof_bundle_lineage",
+        "metric_unify_agentic_tool_sandbox_egress_policy_surface",
+        "metric_unify_policy_gated_agent_execution_surface",
+    }
+    if not (allowed & evidence_ids):
+        return sentences
+    out = list(sentences)
+    for idx, sentence in enumerate(out):
+        low = sentence.lower()
+        inventory, _reason = is_mechanism_inventory_sentence(sentence)
+        if inventory and (
+            "proof-bundle lineage" in low or "sandboxed tool egress" in low
+        ):
+            out[idx] = (
+                "Established auditable agent controls that gave governance teams clear "
+                "evidence of every action without slowing delivery."
+            )
     return out
 
 
@@ -1118,6 +1185,23 @@ def _source_fact_ids_for_display_sentence(sentence: str) -> list[str]:
             "skill_partner_joint_solution_development",
         ]
     if low.startswith("regulated devsecops release governance strengthened"):
+        return ["reb_ibm_devsecops_release_resilience"]
+    if (
+        ("release automation" in low or "automated release pipeline" in low)
+        and ("security scanning" in low or "devsecops" in low)
+    ):
+        return ["reb_ibm_devsecops_release_resilience"]
+    if (
+        "auditable agent controls" in low
+        and "evidence of every action" in low
+        and "without slowing delivery" in low
+    ):
+        return [
+            "skill_unify_agentic_runtime_proof_bundle_lineage",
+            "metric_unify_agentic_tool_sandbox_egress_policy_surface",
+            "metric_unify_policy_gated_agent_execution_surface",
+        ]
+    if "release automation" in low and "security scanning" in low:
         return ["reb_ibm_devsecops_release_resilience"]
     if low.startswith("together, partner solution architecture, regulated delivery"):
         return [
@@ -1855,6 +1939,7 @@ def polish_executive_summary_judge_alignment(
 
     text = str(parsed.get("resume_display_text") or "").strip()
     sentences = split_sentences(text)
+    required_brushstroke_fact_ids = _required_brushstroke_fact_ids(parsed)
     if len(sentences) < 1:
         return parsed, receipt
 
@@ -1872,7 +1957,9 @@ def polish_executive_summary_judge_alignment(
         (
             "ensure_dependency_graph_override",
             lambda s: _ensure_dependency_graph_display_override(
-                s, selected_facts=selected_facts
+                s,
+                selected_facts=selected_facts,
+                required_brushstroke_fact_ids=required_brushstroke_fact_ids,
             ),
         ),
         (
@@ -1884,6 +1971,12 @@ def polish_executive_summary_judge_alignment(
         (
             "repair_ai_partnership_judge_findings",
             lambda s: _repair_ai_partnership_judge_findings(
+                s, selected_facts=selected_facts
+            ),
+        ),
+        (
+            "repair_control_evidence_mechanism_inventory",
+            lambda s: _repair_control_evidence_mechanism_inventory(
                 s, selected_facts=selected_facts
             ),
         ),

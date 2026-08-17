@@ -222,7 +222,3 @@ def main() -> int:
     OUT_MD.write_text(render_markdown(payload), encoding="utf-8")
     print(f"WROTE {OUT_JSON.relative_to(ROOT)}")
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

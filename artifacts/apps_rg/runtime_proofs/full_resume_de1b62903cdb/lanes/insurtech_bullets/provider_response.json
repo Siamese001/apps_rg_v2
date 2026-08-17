@@ -1,0 +1,204 @@
+{
+  "apps_rg_last_probe_snapshot": null,
+  "apps_rg_provider_preflight_blocked": false,
+  "exact_provider_error": null,
+  "generation_meta": {
+    "adaptive_sc_enabled": false,
+    "claude_selection_count": 3,
+    "configured_max_regen_rounds": 1,
+    "expansion_events": [],
+    "generation_mode": "model_employment_pool_claude_top_n_regen",
+    "initial_path_count": 2,
+    "max_path_count": 2,
+    "max_regen_rounds_allowed": 1,
+    "min_selection_score": 0.72,
+    "regen_rounds_executed": 0,
+    "section_lane": "insurtech_bullets",
+    "selection_gate": {
+      "bullets_in_merged": 3,
+      "duplicate_source_fact_ids": [],
+      "final_bullet_count": 3,
+      "min_score_threshold": 0.72,
+      "ok": true,
+      "proof_unique_source_fact_gate_active": true,
+      "section_lane": "insurtech_bullets",
+      "slots_below_threshold": [],
+      "slots_missing": [],
+      "slots_missing_source_fact_ids": [],
+      "slots_passing": [
+        "bul_insurtech_001",
+        "bul_insurtech_002",
+        "bul_insurtech_003"
+      ],
+      "unique_source_fact_count": 3,
+      "unique_source_fact_ids": [
+        "bul_insurtech_001",
+        "bul_insurtech_002",
+        "bul_insurtech_003"
+      ]
+    },
+    "selection_mode": "anthropic_claude_employment_top_n_pass",
+    "selector_bullets_in_merged": 3,
+    "selector_empty": false,
+    "selector_selection_count": 3,
+    "selector_selection_mode": "anthropic_claude_employment_top_n_pass",
+    "selector_subthreshold_scores": [
+      0.83,
+      0.82,
+      0.8
+    ],
+    "source_path_by_slot": {
+      "bul_insurtech_001": 0,
+      "bul_insurtech_002": 0,
+      "bul_insurtech_003": 0
+    },
+    "stop_reason": "selection_gate_passed",
+    "total_paths_executed": 2
+  },
+  "model": "claude-sonnet-5",
+  "prompt_cache_receipt": {
+    "c0_prefix_hash": "",
+    "cache_creation_input_tokens": null,
+    "cache_enabled": false,
+    "cache_hit_ratio": null,
+    "cache_marker_count": 0,
+    "cache_read_input_tokens": null,
+    "cache_savings_estimate_source": "not_estimated_cache_disabled",
+    "cache_strategy": "disabled",
+    "estimated_cached_input_tokens": null,
+    "estimated_uncached_input_tokens": null,
+    "input_tokens": null,
+    "model": "claude-sonnet-5",
+    "output_tokens": null,
+    "provider": "external_claude",
+    "section_id": "insurtech_bullets",
+    "stable_prefix_hash": "",
+    "volatile_tail_hash": ""
+  },
+  "provider_attempted": true,
+  "provider_available": true,
+  "provider_requested": "external_claude",
+  "provider_response": {
+    "anthropic_cache_receipt_seed": null,
+    "attempt_completed_at_utc": "2026-08-17T03:52:07.179627+00:00",
+    "attempt_started_at_utc": "2026-08-17T03:52:02.165648+00:00",
+    "effective_timeout_seconds": 90.0,
+    "logical_attempt": 1,
+    "model": "claude-sonnet-5",
+    "provider_attempt_spans": [
+      {
+        "attempt_index": 1,
+        "attempt_kind": "requested",
+        "completed_at_utc": "2026-08-17T03:52:07.179627+00:00",
+        "duration_seconds": 5.013979,
+        "exact_provider_error": null,
+        "model": "claude-sonnet-5",
+        "provider": "external_claude",
+        "provider_attempted": true,
+        "provider_available": true,
+        "request_digest": "cc77e0db53b8a3a1045e349d31ec25c5eebbc4f5270170746c4d5d48b7e9e401",
+        "runtime_generation_status": "REAL_LLM",
+        "schema_version": "apps_rg_provider_attempt_span_v1",
+        "span_kind": "provider_attempt",
+        "started_at_utc": "2026-08-17T03:52:02.165648+00:00",
+        "temperature": 0.52,
+        "timeout_seconds": 90.0,
+        "token_budget": 2200,
+        "transport_timing": {
+          "chunk_count": 14,
+          "completed_after_s": 5.0,
+          "first_byte_after_s": 1.109,
+          "last_progress_after_s": 5.0,
+          "raw_output_chars": 1365,
+          "read_iterations": 14,
+          "started_at": "2026-08-17T03:52:02.165648+00:00",
+          "stream": true
+        }
+      }
+    ],
+    "provider_attempt_timing_summary": {
+      "accepted_output_model": "claude-sonnet-5",
+      "accepted_output_provider": "external_claude",
+      "attempted_count": 1,
+      "fallback_attempt_count": 0,
+      "fallback_attempted": false,
+      "models": [
+        "claude-sonnet-5"
+      ],
+      "providers": [
+        "external_claude"
+      ],
+      "runtime_generation_statuses": [
+        "REAL_LLM"
+      ],
+      "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+      "span_count": 1,
+      "total_duration_seconds": 5.013979
+    },
+    "provider_cache_receipt": {
+      "c0_prefix_hash": "",
+      "cache_creation_input_tokens": null,
+      "cache_enabled": false,
+      "cache_hit_ratio": null,
+      "cache_marker_count": 0,
+      "cache_read_input_tokens": null,
+      "cache_savings_estimate_source": "not_estimated_cache_disabled",
+      "cache_strategy": "disabled",
+      "estimated_cached_input_tokens": null,
+      "estimated_uncached_input_tokens": null,
+      "input_tokens": null,
+      "model": "claude-sonnet-5",
+      "output_tokens": null,
+      "provider": "external_claude",
+      "section_id": "insurtech_bullets",
+      "stable_prefix_hash": "",
+      "volatile_tail_hash": ""
+    },
+    "provider_profile": "external_claude",
+    "reasoning_effort": "low",
+    "request_digest": "cc77e0db53b8a3a1045e349d31ec25c5eebbc4f5270170746c4d5d48b7e9e401",
+    "transport_attempt": 1,
+    "transport_attempt_ids": [
+      "attempt-f69f22ed9c1a4bb98e891e9e133479f6"
+    ],
+    "transport_response": {
+      "model": "claude-sonnet-5",
+      "raw_response": {
+        "byte_length": 2154,
+        "content_type": "structured",
+        "redacted": true,
+        "sha256": "e9431f088f5bcb4c4ae1e796058e3101c5829977bbee73caa90b95eabec925c4"
+      },
+      "text": "```json\n{\n  \"bullets\": [\n    {\n      \"bullet_id\": \"b1\",\n      \"bullet_text\": \"Implemented SOC 2-aligned AWS controls enabling regulated insurers to safely adopt analytics and ML capabilities.\",\n      \"source_fact_ids\": [\"bul_insurtech_001\"]\n    },\n    {\n      \"bullet_id\": \"b2\",\n      \"bullet_text\": \"Established a shared-responsibility operating model clarifying insurer-owned versus AWS-owned controls to protect safety and compliance standards.\",\n      \"source_fact_ids\": [\"bul_insurtech_002\"]\n    },\n    {\n      \"bullet_id\": \"b3\",\n      \"bullet_text\": \"Led AWS modernization execution to migrate monolithic policy administration and insurance platform workloads.\",\n      \"source_fact_ids\": [\"bul_insurtech_003\"]\n    }\n  ],\n  \"claim_ledger\": [\n    {\n      \"claim_text\": \"Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.\",\n      \"source_fact_ids\": [\"bul_insurtech_001\"]\n    },\n    {\n      \"claim_text\": \"Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.\",\n      \"source_fact_ids\": [\"bul_insurtech_002\"]\n    },\n    {\n      \"claim_text\": \"Led AWS modernization execution for monolithic policy administration and insurance platform workloads.\",\n      \"source_fact_ids\": [\"bul_insurtech_003\"]\n    }\n  ],\n  \"jd_alignment\": {\"targeting_only\": true, \"jd_used_as_proof\": false}\n}\n```",
+      "transport_timing": {
+        "chunk_count": 14,
+        "completed_after_s": 5.0,
+        "first_byte_after_s": 1.109,
+        "last_progress_after_s": 5.0,
+        "raw_output_chars": 1365,
+        "read_iterations": 14,
+        "started_at": "2026-08-17T03:52:02.165648+00:00",
+        "stream": true
+      }
+    },
+    "transport_timing": {
+      "chunk_count": 14,
+      "completed_after_s": 5.0,
+      "first_byte_after_s": 1.109,
+      "last_progress_after_s": 5.0,
+      "raw_output_chars": 1365,
+      "read_iterations": 14,
+      "started_at": "2026-08-17T03:52:02.165648+00:00",
+      "stream": true
+    }
+  },
+  "raw_model_output": {
+    "byte_length": 1365,
+    "content_type": "text",
+    "redacted": true,
+    "sha256": "348acc8063867877ae0e39aaaaf562407927baf8892967d89425a4bc70eacc5e"
+  },
+  "reasoning_execution_receipt": null,
+  "runtime_generation_status": "REAL_LLM",
+  "stub": false
+}

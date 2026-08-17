@@ -230,6 +230,25 @@ def test_normalize_repairs_runtime_spine_and_short_cosell_headline() -> None:
     assert any(e.get("operation") == "headline_word_count_deterministic_expand" for e in out["change_log"])
 
 
+def test_word_count_expansion_repairs_live_hyphenated_alliance_cosell_candidate() -> None:
+    """Keep the runtime word counter authoritative when a model splits Co-Sell."""
+    candidate = (
+        "SVP Engineering | Alliance Co-Sell | Runtime Governance | "
+        "Enterprise Sales Leadership"
+    )
+
+    assert headline_word_count(candidate) == 9
+    expanded = headline_lane.deterministic_headline_word_count_expand(candidate)
+    assert expanded == (
+        "SVP Engineering | Alliance Co-Sell Motions | Runtime Governance | "
+        "Enterprise Sales Leadership"
+    )
+    assert headline_word_count(expanded) == 10
+    assert headline_executive_abstraction_report(expanded)[
+        "segments_missing_executive_abstraction"
+    ] == []
+
+
 def test_normalize_repairs_governed_data_infrastructure_headline_segment() -> None:
     hl = (
         "SVP Engineering | Governed Data Infrastructure | "
@@ -779,6 +798,40 @@ class TestHeadlineContentSignalRepairRung:
             "shape_invalid",
             None,
         ]
+
+    def test_live_hyphenated_cosell_repair_is_expanded_before_shape_acceptance(
+        self, tmp_path, monkeypatch
+    ):
+        """A model's Co-Sell word count must not discard an otherwise accepted repair."""
+        from apps_rg.runtime.section_repair_ledger import init_ledger
+
+        initial = (
+            "SVP Engineering | Alliance Co-Sell Motions | Runtime Governance Telemetry | "
+            "Quota Aligned Solution Pursuits"
+        )
+        candidate = (
+            "SVP Engineering | Alliance Co-Sell | Runtime Governance | "
+            "Enterprise Sales Leadership"
+        )
+        init_ledger(tmp_path, section_id="headline", run_id="csr-test")
+        provider = _RecordingProvider("REAL_LLM", _regen_json(candidate))
+
+        _raw, out, snap, accepted = _run_content_signal_rung(
+            tmp_path,
+            monkeypatch,
+            provider=provider,
+            parsed=_attempt1_parsed(initial),
+        )
+
+        expected = (
+            "SVP Engineering | Alliance Co-Sell Motions | Runtime Governance | "
+            "Enterprise Sales Leadership"
+        )
+        assert provider.calls == 1
+        assert accepted is True
+        assert out["headline_line"] == expected
+        assert snap is not None and snap["headline_line"] == candidate
+        assert _read_receipt(tmp_path)["rejected_reason"] is None
 
     def test_third_attempt_repairs_retry8_opaque_noun_stack(self, tmp_path, monkeypatch):
         from apps_rg.runtime.section_repair_ledger import init_ledger

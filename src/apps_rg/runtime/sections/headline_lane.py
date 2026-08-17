@@ -885,6 +885,13 @@ def deterministic_headline_word_count_expand(headline_line: str) -> str:
         return hl
 
     targeted_expansions: tuple[tuple[int, str, str], ...] = (
+        # A live Anthropic repair emitted ``Alliance Co-Sell`` and counted the
+        # hyphenated phrase as two words in its self-check.  The canonical
+        # runtime counter (correctly) treats it as one token, leaving the
+        # otherwise valid headline at nine words.  ``Motions`` is literal to
+        # the cited co-sell fact and preserves the executive-abstraction
+        # predicate while closing the product shape.
+        (1, r"\balliance\s+co-?sell\b", "Motions"),
         (3, r"\bpartner\s+co-?sell\b", "Motions"),
         (1, r"\bruntime\s+governance\b", "Architecture"),
         (2, r"\bdatabricks\s+lakehouse\b", "Platform"),

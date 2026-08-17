@@ -109,9 +109,9 @@ raw provider outputs / provider ledger
 The only public entrypoint is `python -m apps_rg`. It has three actions:
 
 ```text
-python -m apps_rg run [--mode live|deterministic] [optional overrides]
+python -m apps_rg run [optional full-product overrides]
 python -m apps_rg eval --run-dir <dir>
-python -m apps_rg show --run-dir <dir> --artifact resume|email|research|summary
+python -m apps_rg show --run-dir <dir> --artifact resume|research|summary|evaluation
 ```
 
 There are no other supported pipeline launch commands. Library modules remain

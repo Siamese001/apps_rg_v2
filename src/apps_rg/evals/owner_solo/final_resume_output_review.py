@@ -21,6 +21,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from apps_rg.runtime.assembly.competencies_display import render_competencies
+
 
 OWNER_IDENTITY = "human-reviewer://amit-owner"
 SCOPE = "OWNER_SOLO_PROVISIONAL_FINAL_RESUME_OUTPUT"
@@ -250,22 +252,7 @@ def _competency_text(snapshot: Mapping[str, Any]) -> str:
     direct = str(snapshot.get("resume_display_text") or "").strip()
     if direct:
         return direct
-    rows: list[str] = []
-    for category in snapshot.get("competencies") or []:
-        if not isinstance(category, dict):
-            continue
-        label = str(
-            category.get("resume_display_label") or category.get("category_label") or ""
-        ).strip()
-        terms = [
-            str(term.get("text") or term.get("term") or "").strip()
-            for term in category.get("terms") or []
-            if isinstance(term, dict)
-            and str(term.get("text") or term.get("term") or "").strip()
-        ]
-        if label and terms:
-            rows.append(f"{label}: {', '.join(terms)}")
-    return "\n".join(rows)
+    return render_competencies(dict(snapshot))
 
 
 def _locked_role_headers(final_resume: Mapping[str, Any]) -> dict[str, dict[str, Any]]:

@@ -1,0 +1,65 @@
+{
+  "authority_contract_id": "apps_research_rg_e2e_authority",
+  "checks": {
+    "all_authoritative_lane_contracts_pass": false,
+    "all_core_lane_x3_authorizing": false,
+    "all_section_l2_and_quality_gates_pass": false,
+    "l2_executed": false,
+    "l2_fault_empty": false,
+    "l2_status_pass": false,
+    "no_direct_l4_write_bypass": true,
+    "no_l2_handoff_failed_lanes": false,
+    "no_l2_spine_failed_lanes": false,
+    "no_mock_provider_pass": false,
+    "runtime_identity_match": false,
+    "whole_run_exit_verified": true
+  },
+  "failed_checks": [
+    "all_authoritative_lane_contracts_pass",
+    "all_core_lane_x3_authorizing",
+    "all_section_l2_and_quality_gates_pass",
+    "l2_executed",
+    "l2_fault_empty",
+    "l2_status_pass",
+    "no_l2_handoff_failed_lanes",
+    "no_l2_spine_failed_lanes",
+    "no_mock_provider_pass",
+    "runtime_identity_match"
+  ],
+  "identity": {
+    "blueprint_hash": "sha256:a7f08177d75b419a70fadddc129c56aa2aaccc8e3801a9310f760cbcf4ff0e0c",
+    "brief_sha256": "sha256:7ed372145c3110e40fe1769ceca4cd1f59337dee479bbb4e4443ecc8cfda2483",
+    "child_run_id": "bridge:rg_research_bridge:b1940741:74ec0a11-f6cd-4ba5-a694-e8714aba0323",
+    "consumer_app_id": "apps_rg",
+    "jd_sha256": "sha256:957c43a7df84e3c815b4b1e0284cb8c4132567f622d3124a21fcaeea979d4f01",
+    "parent_run_id": "711a0258-32e5-4cdd-8099-861749839b73",
+    "policy_hash": "sha256:9ab7764c2778fb8974d0359587a47f7593ef389ae5f8608abbea12b052d311f4",
+    "producer_app_id": "apps_research",
+    "request_id": "req-e062c0810661481e9cf23d848f8c2f0a",
+    "schema_version": "apps_research_rg_run_identity.v1",
+    "target_company": "Anthropic",
+    "target_role": "Manager of Applied AI Architecture, Partnerships",
+    "tenant_id": "default",
+    "trace_root": "74ec0a11-f6cd-4ba5-a694-e8714aba0323"
+  },
+  "schema_version": "apps_rg.e2e_stage_authority.apps_rg_l2.v1",
+  "source_bindings": [
+    {
+      "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+      "byte_length": 97484,
+      "sha256": "sha256:d6dfece775670b7c1c48dafe17d8001565fe61d4200b389fdbde6e470151a3d5"
+    },
+    {
+      "artifact_ref": "runtime_execution_witness.json",
+      "byte_length": 961,
+      "sha256": "sha256:1c3d37e22066c8030047ac2b727cd42d2513183bf47a1057d322f533d1493604"
+    },
+    {
+      "artifact_ref": "terminal_ret_packet.json",
+      "byte_length": 484,
+      "sha256": "sha256:d0df7450a0799a89e3e96256b828cca1ea7abb74a1140af2298b23c973544ee4"
+    }
+  ],
+  "stage_id": "APPS_RG_L2",
+  "status": "BLOCKED"
+}

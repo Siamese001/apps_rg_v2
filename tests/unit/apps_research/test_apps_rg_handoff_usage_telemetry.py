@@ -63,6 +63,37 @@ def test_x2_blocks_an_oversize_input_before_calling_the_judge(monkeypatch) -> No
     assert receipt["model_usage_attempts"] == []
 
 
+def test_x2_default_google_judge_receives_the_resolved_api_key(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class _CapturingJudge:
+        observed_model = _JUDGE_PIN.model
+        model_usage_attempts: list[dict[str, object]] = []
+        provider_evidence: dict[str, object] = {}
+
+        def __init__(self, **kwargs: object) -> None:
+            captured.update(kwargs)
+
+        def judge(self, _dimension, _context):
+            return JudgeResponse(score=0.91, abstain=False, reasoning="supported")
+
+    monkeypatch.setenv("GOOGLE_API_KEY", "google-test-key")
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setattr(
+        "apps_research.integrations.apps_rg_handoff._AppsRgTargetingBriefGoogleJudge",
+        _CapturingJudge,
+    )
+
+    receipt = run_apps_rg_handoff_x2_judge(
+        brief_text="## Company Thesis\n- Proven evidence.",
+        jd_text="Lead partner architecture.",
+        research_notes="Verified partner motion.",
+    )
+
+    assert receipt["status"] == "PASS"
+    assert captured["api_key"] == "google-test-key"
+
+
 def test_google_x2_usage_is_appended_to_a_bound_run_ledger(
     monkeypatch,
     tmp_path: Path,

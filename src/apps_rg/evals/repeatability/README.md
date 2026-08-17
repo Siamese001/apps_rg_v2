@@ -14,7 +14,7 @@ not require exact prose equality.
 Run:
 
 ```text
-python -m apps_rg.evals.repeatability --run-set sealed-runs.json --out g5-receipt.json
+library API: apps_rg.evals.repeatability --run-set sealed-runs.json --out g5-receipt.json
 ```
 
 `PASS` exits 0; `FAIL` or `UNKNOWN` exits 1. Every receipt is future-run-only

@@ -23,7 +23,7 @@ inflation defects, and all three human no-worse rates at 1.0.
 Run:
 
 ```text
-python -m apps_rg.evals.whole_resume \
+library API: apps_rg.evals.whole_resume \
   --input sealed-whole-resume-input.json \
   --output whole-resume-evaluation-receipt.json
 ```

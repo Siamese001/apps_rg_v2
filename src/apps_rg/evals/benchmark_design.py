@@ -322,7 +322,3 @@ def main(argv: Sequence[str] | None = None) -> int:
     summary = validate_benchmark_manifest(args.manifest)
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if summary["status"] == "PASS" else 2
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

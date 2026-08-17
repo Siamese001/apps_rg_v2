@@ -1,0 +1,95 @@
+{
+  "authority_gate_receipts": [
+    {
+      "checked_fields": [
+        "canonical_provider",
+        "target_model",
+        "registry_digest_set"
+      ],
+      "decisive_reason_code": "MODEL_REGISTRY_BOUND",
+      "evidence_refs": [
+        "l2_packet:00fd43f7de409c8dc90d0490288980f92ae8c91af1dd312b3cd642220fb797e1"
+      ],
+      "gate_id": "G11",
+      "status": "PASS"
+    },
+    {
+      "checked_fields": [
+        "signature_chain",
+        "request_id",
+        "run_id",
+        "route_id"
+      ],
+      "decisive_reason_code": "SIGNED_ARGS_AND_IDENTITY_BOUND",
+      "evidence_refs": [
+        "l2_packet:00fd43f7de409c8dc90d0490288980f92ae8c91af1dd312b3cd642220fb797e1"
+      ],
+      "gate_id": "G12",
+      "status": "PASS"
+    },
+    {
+      "checked_fields": [
+        "final_evidence_contract_ref",
+        "prompt_hash"
+      ],
+      "decisive_reason_code": "EVIDENCE_AND_SCHEMA_BOUND",
+      "evidence_refs": [
+        "l2_packet:00fd43f7de409c8dc90d0490288980f92ae8c91af1dd312b3cd642220fb797e1"
+      ],
+      "gate_id": "G13",
+      "status": "PASS"
+    },
+    {
+      "checked_fields": [
+        "sandbox_envelope_digest",
+        "allowed_networks",
+        "allowed_file_roots"
+      ],
+      "decisive_reason_code": "SANDBOX_ENVELOPE_BOUND",
+      "evidence_refs": [
+        "l2_packet:00fd43f7de409c8dc90d0490288980f92ae8c91af1dd312b3cd642220fb797e1"
+      ],
+      "gate_id": "G15",
+      "status": "PASS"
+    },
+    {
+      "checked_fields": [
+        "attempt_number",
+        "retry_ceiling",
+        "repair_ceiling"
+      ],
+      "decisive_reason_code": "RETRY_BUDGET_BOUND",
+      "evidence_refs": [
+        "l2_packet:00fd43f7de409c8dc90d0490288980f92ae8c91af1dd312b3cd642220fb797e1"
+      ],
+      "gate_id": "G19",
+      "status": "PASS"
+    },
+    {
+      "checked_fields": [
+        "max_tokens",
+        "timeout_ms",
+        "max_output_bytes"
+      ],
+      "decisive_reason_code": "EXECUTION_BUDGET_BOUND",
+      "evidence_refs": [
+        "l2_packet:00fd43f7de409c8dc90d0490288980f92ae8c91af1dd312b3cd642220fb797e1"
+      ],
+      "gate_id": "G20",
+      "status": "PASS"
+    }
+  ],
+  "gate_refs": [
+    "G11:PASS:MODEL_REGISTRY_BOUND",
+    "G12:PASS:SIGNED_ARGS_AND_IDENTITY_BOUND",
+    "G13:PASS:EVIDENCE_AND_SCHEMA_BOUND",
+    "G15:PASS:SANDBOX_ENVELOPE_BOUND",
+    "G19:PASS:RETRY_BUDGET_BOUND",
+    "G20:PASS:EXECUTION_BUDGET_BOUND"
+  ],
+  "packet_digest": "00fd43f7de409c8dc90d0490288980f92ae8c91af1dd312b3cd642220fb797e1",
+  "schema_version": "apps_rg.section_l2_validation.v2",
+  "section_id": "ey_narrative",
+  "unknown_never_pass": true,
+  "validation_status": "PASS"
+}

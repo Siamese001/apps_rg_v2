@@ -74,7 +74,7 @@ UNIFY_BULLET_ONLY_DIMENSIONS: Final[tuple[BulletJudgeDimension, ...]] = (
     ),
     BulletJudgeDimension(
         "protected_metric_anchor",
-        "bul_unify_006 preserves locked commercial metrics ($22M / margin / team scale) and approved metric_outcome_id anchors without splitting or diluting.",
+        "bul_unify_006 preserves each commercial or scale metric explicitly assigned by its sealed metric_outcome_ids, without splitting or diluting the assigned outcome.",
     ),
     BulletJudgeDimension(
         "mechanism_inventory_cap",
@@ -161,7 +161,7 @@ def grade_only_rubric_text(section_id: str, *, bullet_count: int, bullet_id_rang
             "- unsupported metric or cross-employer fact leakage (IBM/InsurTech/EY)\n"
             "- first-person language\n"
             f"- wrong bullet count (expected {bullet_count})\n"
-            "- protected bul_unify_006 metrics missing or split incorrectly\n"
+            "- a metric outcome explicitly assigned to bul_unify_006 is missing or split incorrectly\n"
             "- JD phrase copied as proof (>4 consecutive words)\n"
             "- generic filler that loses Unify-specific mechanisms or protected metrics"
         )

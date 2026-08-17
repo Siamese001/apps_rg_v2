@@ -1,0 +1,76 @@
+{
+  "bullets": [
+    {
+      "bullet_id": "bul_ibm_001",
+      "bullet_text": "Led AWS modernization architecture for regulated financial-services workloads, designing migration waves and microservices decomposition to convert legacy on-prem platforms into reusable reference architectures.",
+      "has_metric": false,
+      "metric_raw": null,
+      "source_fact_ids": ["bul_ibm_001"]
+    },
+    {
+      "bullet_id": "bul_ibm_002",
+      "bullet_text": "Directed cognitive decision-support architecture across risk, finance, and portfolio teams, connecting HPC-driven scenario analytics to executive business review workflows for enterprise financial clients.",
+      "has_metric": false,
+      "metric_raw": null,
+      "source_fact_ids": ["bul_ibm_002"]
+    },
+    {
+      "bullet_id": "bul_ibm_003",
+      "bullet_text": "Led enterprise technical discovery and pre-sales solution mapping across cross-functional pursuit teams, converting buyer architecture tradeoffs into delivery-ready handoff packages for regulated client pursuits.",
+      "has_metric": false,
+      "metric_raw": null,
+      "source_fact_ids": ["fact_revenue_ops_001", "bul_ibm_003"]
+    },
+    {
+      "bullet_id": "bul_ibm_004",
+      "bullet_text": "Owned enterprise data modeling and BI platform governance across the modernization portfolio, building budget, cost-assumption, and delivery-status views that gave executives traceable operating visibility.",
+      "has_metric": true,
+      "metric_raw": "budget, cost-assumption, and delivery-status BI views",
+      "source_fact_ids": ["fact_revenue_ops_005", "bul_ibm_004"]
+    },
+    {
+      "bullet_id": "bul_ibm_005",
+      "bullet_text": "Drove the IBM-AWS alliance co-sell operating cadence across joint account planning and AI-driven sales frameworks, architecting partner solution alignment that delivered 20% joint revenue growth on financial-services modernization pursuits.",
+      "has_metric": true,
+      "metric_raw": "20% joint revenue growth",
+      "source_fact_ids": ["fact_partnerships_gtm_002", "metric_ibm_20pct_joint_revenue_growth", "bul_ibm_005"]
+    }
+  ],
+  "selected_fact_plan": {
+    "bul_ibm_001": {"role_episode_bundle_id": "reb_ibm_aws_modernization_architecture", "facts": ["bul_ibm_001"]},
+    "bul_ibm_002": {"role_episode_bundle_id": "reb_ibm_cognitive_business_decision_support", "facts": ["bul_ibm_002"]},
+    "bul_ibm_003": {"role_episode_bundle_id": "reb_ibm_presales_solution_engineering", "facts": ["fact_revenue_ops_001", "bul_ibm_003"]},
+    "bul_ibm_004": {"role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support", "facts": ["fact_revenue_ops_005", "bul_ibm_004"]},
+    "bul_ibm_005": {"role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "facts": ["fact_partnerships_gtm_002", "metric_ibm_20pct_joint_revenue_growth", "bul_ibm_005"]}
+  },
+  "claim_ledger": [
+    {"claim_text": "Led AWS modernization architecture converting legacy on-prem financial-services platforms into migration-ready reference architectures.", "source_fact_ids": ["bul_ibm_001"]},
+    {"claim_text": "Directed cognitive decision-support architecture connecting HPC stress-test analytics to executive decision workflows.", "source_fact_ids": ["bul_ibm_002"]},
+    {"claim_text": "Led enterprise pre-sales discovery and solution mapping converting buyer requirements into delivery-ready architecture handoffs.", "source_fact_ids": ["fact_revenue_ops_001", "bul_ibm_003"]},
+    {"claim_text": "Owned data modeling and BI views providing budget, cost-assumption, and delivery-status transparency for the modernization portfolio.", "source_fact_ids": ["fact_revenue_ops_005", "bul_ibm_004"]},
+    {"claim_text": "Drove IBM-AWS alliance co-sell cadence and AI-driven sales frameworks delivering 20% joint revenue growth.", "source_fact_ids": ["fact_partnerships_gtm_002", "metric_ibm_20pct_joint_revenue_growth", "bul_ibm_005"]}
+  ],
+  "jd_alignment": {
+    "selected_jd_themes": ["partner-led pre-sales enablement", "joint solution development", "reference architecture reuse", "alliance/ecosystem GTM cadence"],
+    "selected_briefing_themes": ["repeatable technical operating models", "architecture depth with executive communication", "governed solution patterns"],
+    "targeting_rationale": "Ordered bullets to foreground pre-sales/solution architecture and alliance co-sell cadence matching the Applied AI Architecture Partnerships role, using JD/briefing only for emphasis.",
+    "targeting_only": true,
+    "jd_used_as_proof": false,
+    "briefing_used_as_proof": false
+  },
+  "gap_notes": [
+    "No approved metric available for bul_ibm_001, bul_ibm_002, bul_ibm_003; written qualitatively per gated-metric ban."
+  ],
+  "change_log": [
+    {"bullet_id": "bul_ibm_001", "role_episode_bundle_id": "reb_ibm_aws_modernization_architecture", "graph_skill_node_ids": ["skill_p2_tech_reference_architecture", "skill_sr_cloud_data_platform_engineering"], "fact_ids_used": ["bul_ibm_001"], "metric_outcome_ids": []},
+    {"bullet_id": "bul_ibm_002", "role_episode_bundle_id": "reb_ibm_cognitive_business_decision_support", "graph_skill_node_ids": ["skill_sr_cloud_data_platform_engineering"], "fact_ids_used": ["bul_ibm_002"], "metric_outcome_ids": []},
+    {"bullet_id": "bul_ibm_003", "role_episode_bundle_id": "reb_ibm_presales_solution_engineering", "graph_skill_node_ids": ["skill_p2_gtm_discovery_qualification", "skill_p2_gtm_solution_mapping", "skill_partner_pre_sales"], "fact_ids_used": ["fact_revenue_ops_001", "bul_ibm_003"], "metric_outcome_ids": []},
+    {"bullet_id": "bul_ibm_004", "role_episode_bundle_id": "reb_ibm_data_modeling_bi_decision_support", "graph_skill_node_ids": ["skill_sr_enterprise_portfolio_data_governance", "skill_sr_cloud_data_platform_engineering"], "fact_ids_used": ["fact_revenue_ops_005", "bul_ibm_004"], "metric_outcome_ids": ["metric_ibm_budget_portfolio_bi_views"]},
+    {"bullet_id": "bul_ibm_005", "role_episode_bundle_id": "reb_ibm_aws_alliance_partner_cosell_gtm", "graph_skill_node_ids": ["skill_partner_ibm_aws_alliance_joint_revenue", "skill_sr_w12_hyperscaler_alliance_co_sell", "skill_partner_alliance_gtm_execution"], "fact_ids_used": ["fact_partnerships_gtm_002", "bul_ibm_005"], "metric_outcome_ids": ["metric_ibm_20pct_joint_revenue_growth"]}
+  ],
+  "self_check": {
+    "bullets_composed_from_role_episode_bundles": true,
+    "no_verbatim_base_resume_copy": true,
+    "no_archive_prose_copy": true
+  }
+}

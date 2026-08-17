@@ -1510,7 +1510,3 @@ def main() -> None:
     else:
         out = run_full_closeout(skip_live=args.skip_live)
         print(json.dumps({"status": out["status"], "closeout": str(CLOSEOUT_JSON)}, indent=2))
-
-
-if __name__ == "__main__":
-    main()

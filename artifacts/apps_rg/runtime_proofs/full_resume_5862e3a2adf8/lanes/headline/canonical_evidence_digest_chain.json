@@ -1,0 +1,70 @@
+{
+  "schema_version": "canonical_evidence_digest_chain_v1",
+  "section_id": "headline",
+  "run_dir": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_5862e3a2adf8/lanes/headline",
+  "c05_canonical_evidence_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "c06_final_evidence_contract_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "c07_runtime_bound_evidence_digest": "901b893524efe2536b8048b7c9211441d1319ca5ea5b44730f878bd1c6ef1fe2",
+  "pa_c0_slot_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "provider_request_allowed_ids_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+  "claim_ledger_source_fact_ids_digest": "901b893524efe2536b8048b7c9211441d1319ca5ea5b44730f878bd1c6ef1fe2",
+  "x2_active_pool_digest": "725ec80f1e3f8b1256b6acd0ea726ddbdeea8e5f6338b95ecf4595fc574a49d0",
+  "section_receipt_digest": "",
+  "c05_canonical_evidence_ids": [
+    "fact_engineering_platform_003",
+    "fact_partnerships_gtm_002",
+    "fact_revenue_ops_003",
+    "metric_ibm_20pct_joint_revenue_growth",
+    "metric_ibm_ai_driven_sales_frameworks",
+    "reb_ibm_aws_alliance_partner_cosell_gtm",
+    "reb_ibm_revenue_sales_target_execution",
+    "reb_unify_runtime_reliability_governance",
+    "skill_context_engineering",
+    "skill_partner_alliance_gtm_execution",
+    "skill_partner_hyperscaler_cosell",
+    "skill_partner_ibm_aws_alliance_joint_revenue",
+    "skill_partner_pnl_oversight",
+    "skill_sr_w12_hyperscaler_alliance_co_sell"
+  ],
+  "c06_fec_ids": [
+    "fact_engineering_platform_003",
+    "fact_partnerships_gtm_002",
+    "fact_revenue_ops_003",
+    "metric_ibm_20pct_joint_revenue_growth",
+    "metric_ibm_ai_driven_sales_frameworks",
+    "reb_ibm_aws_alliance_partner_cosell_gtm",
+    "reb_ibm_revenue_sales_target_execution",
+    "reb_unify_runtime_reliability_governance",
+    "skill_context_engineering",
+    "skill_partner_alliance_gtm_execution",
+    "skill_partner_hyperscaler_cosell",
+    "skill_partner_ibm_aws_alliance_joint_revenue",
+    "skill_partner_pnl_oversight",
+    "skill_sr_w12_hyperscaler_alliance_co_sell"
+  ],
+  "c07_bound_ids": [
+    "reb_ibm_aws_alliance_partner_cosell_gtm",
+    "reb_ibm_revenue_sales_target_execution",
+    "reb_unify_runtime_reliability_governance"
+  ],
+  "invariants": {
+    "c06_fec_ids_subset_of_c05_canonical_evidence_ids": true,
+    "c07_bound_ids_subset_of_c06_fec_ids": true,
+    "pa_c0_subset_of_fec": true,
+    "provider_subset_of_fec": true,
+    "claim_ledger_subset_of_fec": true,
+    "digest_match_or_explicit_narrowing_receipt": true,
+    "no_namespace_split_without_alias": true,
+    "x2_namespace_gate_pass": true,
+    "violations": {
+      "fec_widening": [],
+      "c07_widening": [],
+      "pa_widening": [],
+      "provider_widening": [],
+      "ledger_widening": [],
+      "namespace_split_ids": []
+    },
+    "fec_narrowed_from_pool": true,
+    "all_pass": true
+  }
+}

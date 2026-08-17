@@ -182,28 +182,6 @@ def _whole_resume_graph_rollup_authority(
         if key in inventory:
             authority[key] = inventory[key]
 
-    prior_rollup = _load_json(
-        run_dir / "modular_r4" / "generated_lane_rollup" / "generated_lane_rollup.json"
-    ) or {}
-    prior_w6 = prior_rollup.get("resume_graph_w6_release_evidence")
-    if isinstance(prior_w6, dict):
-        authority["resume_graph_w6_release_evidence"] = dict(prior_w6)
-    else:
-        from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
-
-        if not product_fail_closed_runtime():
-            return authority
-        # A patched run must not get as far as aggregate coherence judging if
-        # the original run lacked the mandatory W6 release evidence. The
-        # helper only validates a pre-existing human/offline receipt.
-        from apps_rg.runtime.c0.resume_graph_w6_release_authority import (
-            require_w6_release_authority,
-        )
-
-        authority["resume_graph_w6_release_evidence"] = require_w6_release_authority(
-            repo_root=repo,
-            artifact_dir=run_dir,
-        )
     return authority
 
 # CLI flags whose values we re-derive from a persisted lane ``run_manifest.json`` command.

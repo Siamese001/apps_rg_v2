@@ -109,6 +109,29 @@ def _payload_for_verified_path(path: Path) -> tuple[Any, str]:
     return payload, ""
 
 
+def _with_index_source_identity(payload: Any, index_value: Any) -> Any:
+    """Retain the frozen manifest identity supplied by the live adapter.
+
+    The resolver re-opens a file after validating an artifact-index entry.
+    That re-open previously discarded the lane identity injected into the
+    entry, reverting every lane row to whole-run identity.  The injected
+    identity is a byte-bound manifest assertion, not a mutable product claim.
+    """
+
+    if not isinstance(payload, dict) or not isinstance(index_value, dict):
+        return payload
+    indexed_payload = index_value.get("payload")
+    indexed_payload = (
+        indexed_payload if isinstance(indexed_payload, dict) else {}
+    )
+    identity = indexed_payload.get("source_identity")
+    if not isinstance(identity, dict):
+        return payload
+    enriched = dict(payload)
+    enriched["source_identity"] = dict(identity)
+    return enriched
+
+
 def _missing(
     *,
     role: str,
@@ -270,7 +293,7 @@ def resolve_apps_rg_artifact(
             artifact_ref=candidate.as_posix(),
             evidence_ref=rel,
             evidence_digest=observed_digest,
-            payload=payload,
+            payload=_with_index_source_identity(payload, first),
             resolution_source="snapshot_artifact_index",
             source_artifact_schema=source_schema,
             expected_refs=expected_refs,

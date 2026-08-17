@@ -1,0 +1,177 @@
+{
+  "provider_requested": "external_claude",
+  "provider_attempted": true,
+  "provider_available": true,
+  "exact_provider_error": null,
+  "runtime_generation_status": "REAL_LLM",
+  "model": "claude-sonnet-5",
+  "raw_model_output": "```json\n{\n  \"bullets\": [\n    {\n      \"bullet_id\": \"bul_ibm_001\",\n      \"bullet_text\": \"Led AWS modernization architecture for regulated financial-services clients, converting legacy on-prem platforms into microservices-based reference architectures across the modernization portfolio.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"bul_ibm_001\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_002\",\n      \"bullet_text\": \"Directed cloud-native decision-support data pipelines that translated HPC-driven scenario analysis into executive-level risk and portfolio decision workflows for regulated financial clients.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"bul_ibm_002\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_003\",\n      \"bullet_text\": \"Owned enterprise pre-sales solution engineering, leading cross-functional technical discovery and architecture mapping that converted buyer pain points into delivery-ready solution handoffs for financial-services pursuits.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_004\",\n      \"bullet_text\": \"Architected governed BI data models and portfolio dashboards spanning budget, cost-assumption, and delivery-status views to guide executive operating decisions across enterprise modernization programs.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_005\",\n      \"bullet_text\": \"Drove the IBM-AWS alliance co-sell motion across the financial-services partner ecosystem, aligning joint account planning and solution architecture to deliver 20% joint revenue growth.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"20% joint revenue growth\",\n      \"source_fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]\n    }\n  ],\n  \"selected_fact_plan\": {\n    \"bul_ibm_001\": {\"role_episode_bundle_id\": \"reb_ibm_aws_modernization_architecture\", \"fact_ids\": [\"bul_ibm_001\"]},\n    \"bul_ibm_002\": {\"role_episode_bundle_id\": \"reb_ibm_cognitive_business_decision_support\", \"fact_ids\": [\"bul_ibm_002\"]},\n    \"bul_ibm_003\": {\"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\", \"fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]},\n    \"bul_ibm_004\": {\"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\", \"fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]},\n    \"bul_ibm_005\": {\"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\", \"fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]}\n  },\n  \"claim_ledger\": [\n    {\"claim_text\": \"Led AWS modernization architecture converting legacy on-prem financial-services platforms into microservices reference architectures.\", \"source_fact_ids\": [\"bul_ibm_001\"]},\n    {\"claim_text\": \"Directed cloud-native decision-support pipelines translating HPC scenario analysis into executive risk decision workflows.\", \"source_fact_ids\": [\"bul_ibm_002\"]},\n    {\"claim_text\": \"Owned enterprise pre-sales discovery and solution mapping converting buyer needs into delivery-ready architecture handoffs.\", \"source_fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]},\n    {\"claim_text\": \"Architected governed BI data models and portfolio dashboards for budget, cost, and delivery-status visibility.\", \"source_fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]},\n    {\"claim_text\": \"Drove IBM-AWS alliance co-sell motion delivering 20% joint revenue growth across financial-services partner ecosystem.\", \"source_fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]}\n  ],\n  \"jd_alignment\": {\n    \"selected_jd_themes\": [\"partner-led pre-sales enablement\", \"technical alliance leadership\", \"joint solution architecture\", \"indirect revenue GTM motions\"],\n    \"selected_briefing_themes\": [\"reusable architecture patterns\", \"ecosystem discipline\", \"partner-led enterprise outcomes\"],\n    \"targeting_rationale\": \"Ordered bullets to foreground architecture leadership, decision-support platform work, pre-sales solution engineering, BI governance, and alliance co-sell to mirror Anthropic's partner-facing applied AI architecture role emphasis.\",\n    \"targeting_only\": true,\n    \"jd_used_as_proof\": false,\n    \"briefing_used_as_proof\": false\n  },\n  \"gap_notes\": [\n    \"No approved metrics available for bul_ibm_001-004; written qualitatively per gated-metric ban.\",\n    \"Only bul_ibm_005 carries a promotable metric (20% joint revenue growth).\"\n  ],\n  \"change_log\": [\n    {\"bullet_id\": \"bul_ibm_001\", \"role_episode_bundle_id\": \"reb_ibm_aws_modernization_architecture\", \"graph_skill_node_ids\": [\"skill_p2_tech_reference_architecture\", \"skill_sr_cloud_data_platform_engineering\"], \"fact_ids_used\": [\"bul_ibm_001\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_002\", \"role_episode_bundle_id\": \"reb_ibm_cognitive_business_decision_support\", \"graph_skill_node_ids\": [\"skill_sr_cloud_data_platform_engineering\"], \"fact_ids_used\": [\"bul_ibm_002\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_003\", \"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\", \"graph_skill_node_ids\": [\"skill_p2_gtm_discovery_qualification\", \"skill_p2_gtm_solution_mapping\", \"skill_partner_pre_sales\"], \"fact_ids_used\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_004\", \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\", \"graph_skill_node_ids\": [\"skill_sr_enterprise_portfolio_data_governance\", \"skill_p2_tech_reference_architecture\"], \"fact_ids_used\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_005\", \"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\", \"graph_skill_node_ids\": [\"skill_partner_ibm_aws_alliance_joint_revenue\", \"skill_partner_hyperscaler_cosell\", \"skill_sr_w12_hyperscaler_alliance_co_sell\"], \"fact_ids_used\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\"], \"metric_outcome_ids\": [\"metric_ibm_20pct_joint_revenue_growth\"]}\n  ],\n  \"self_check\": {\n    \"bullets_composed_from_role_episode_bundles\": true,\n    \"no_verbatim_base_resume_copy\": true,\n    \"no_archive_prose_copy\": true\n  }\n}\n```",
+  "provider_response": {
+    "provider_profile": "external_claude",
+    "model": "claude-sonnet-5",
+    "request_digest": "3437d6a08d02338455ad2d892aa1ebb6edc2d14c8ac91e5bdce023873265412e",
+    "effective_timeout_seconds": 90.0,
+    "transport_timing": {
+      "started_at": "2026-08-17T11:05:12.480767+00:00",
+      "first_byte_after_s": 1.938,
+      "last_progress_after_s": 20.906,
+      "completed_after_s": 20.906,
+      "chunk_count": 45,
+      "read_iterations": 45,
+      "raw_output_chars": 6349,
+      "stream": true
+    },
+    "transport_response": {
+      "text": "```json\n{\n  \"bullets\": [\n    {\n      \"bullet_id\": \"bul_ibm_001\",\n      \"bullet_text\": \"Led AWS modernization architecture for regulated financial-services clients, converting legacy on-prem platforms into microservices-based reference architectures across the modernization portfolio.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"bul_ibm_001\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_002\",\n      \"bullet_text\": \"Directed cloud-native decision-support data pipelines that translated HPC-driven scenario analysis into executive-level risk and portfolio decision workflows for regulated financial clients.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"bul_ibm_002\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_003\",\n      \"bullet_text\": \"Owned enterprise pre-sales solution engineering, leading cross-functional technical discovery and architecture mapping that converted buyer pain points into delivery-ready solution handoffs for financial-services pursuits.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_004\",\n      \"bullet_text\": \"Architected governed BI data models and portfolio dashboards spanning budget, cost-assumption, and delivery-status views to guide executive operating decisions across enterprise modernization programs.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_005\",\n      \"bullet_text\": \"Drove the IBM-AWS alliance co-sell motion across the financial-services partner ecosystem, aligning joint account planning and solution architecture to deliver 20% joint revenue growth.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"20% joint revenue growth\",\n      \"source_fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]\n    }\n  ],\n  \"selected_fact_plan\": {\n    \"bul_ibm_001\": {\"role_episode_bundle_id\": \"reb_ibm_aws_modernization_architecture\", \"fact_ids\": [\"bul_ibm_001\"]},\n    \"bul_ibm_002\": {\"role_episode_bundle_id\": \"reb_ibm_cognitive_business_decision_support\", \"fact_ids\": [\"bul_ibm_002\"]},\n    \"bul_ibm_003\": {\"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\", \"fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]},\n    \"bul_ibm_004\": {\"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\", \"fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]},\n    \"bul_ibm_005\": {\"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\", \"fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]}\n  },\n  \"claim_ledger\": [\n    {\"claim_text\": \"Led AWS modernization architecture converting legacy on-prem financial-services platforms into microservices reference architectures.\", \"source_fact_ids\": [\"bul_ibm_001\"]},\n    {\"claim_text\": \"Directed cloud-native decision-support pipelines translating HPC scenario analysis into executive risk decision workflows.\", \"source_fact_ids\": [\"bul_ibm_002\"]},\n    {\"claim_text\": \"Owned enterprise pre-sales discovery and solution mapping converting buyer needs into delivery-ready architecture handoffs.\", \"source_fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]},\n    {\"claim_text\": \"Architected governed BI data models and portfolio dashboards for budget, cost, and delivery-status visibility.\", \"source_fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]},\n    {\"claim_text\": \"Drove IBM-AWS alliance co-sell motion delivering 20% joint revenue growth across financial-services partner ecosystem.\", \"source_fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]}\n  ],\n  \"jd_alignment\": {\n    \"selected_jd_themes\": [\"partner-led pre-sales enablement\", \"technical alliance leadership\", \"joint solution architecture\", \"indirect revenue GTM motions\"],\n    \"selected_briefing_themes\": [\"reusable architecture patterns\", \"ecosystem discipline\", \"partner-led enterprise outcomes\"],\n    \"targeting_rationale\": \"Ordered bullets to foreground architecture leadership, decision-support platform work, pre-sales solution engineering, BI governance, and alliance co-sell to mirror Anthropic's partner-facing applied AI architecture role emphasis.\",\n    \"targeting_only\": true,\n    \"jd_used_as_proof\": false,\n    \"briefing_used_as_proof\": false\n  },\n  \"gap_notes\": [\n    \"No approved metrics available for bul_ibm_001-004; written qualitatively per gated-metric ban.\",\n    \"Only bul_ibm_005 carries a promotable metric (20% joint revenue growth).\"\n  ],\n  \"change_log\": [\n    {\"bullet_id\": \"bul_ibm_001\", \"role_episode_bundle_id\": \"reb_ibm_aws_modernization_architecture\", \"graph_skill_node_ids\": [\"skill_p2_tech_reference_architecture\", \"skill_sr_cloud_data_platform_engineering\"], \"fact_ids_used\": [\"bul_ibm_001\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_002\", \"role_episode_bundle_id\": \"reb_ibm_cognitive_business_decision_support\", \"graph_skill_node_ids\": [\"skill_sr_cloud_data_platform_engineering\"], \"fact_ids_used\": [\"bul_ibm_002\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_003\", \"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\", \"graph_skill_node_ids\": [\"skill_p2_gtm_discovery_qualification\", \"skill_p2_gtm_solution_mapping\", \"skill_partner_pre_sales\"], \"fact_ids_used\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_004\", \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\", \"graph_skill_node_ids\": [\"skill_sr_enterprise_portfolio_data_governance\", \"skill_p2_tech_reference_architecture\"], \"fact_ids_used\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_005\", \"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\", \"graph_skill_node_ids\": [\"skill_partner_ibm_aws_alliance_joint_revenue\", \"skill_partner_hyperscaler_cosell\", \"skill_sr_w12_hyperscaler_alliance_co_sell\"], \"fact_ids_used\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\"], \"metric_outcome_ids\": [\"metric_ibm_20pct_joint_revenue_growth\"]}\n  ],\n  \"self_check\": {\n    \"bullets_composed_from_role_episode_bundles\": true,\n    \"no_verbatim_base_resume_copy\": true,\n    \"no_archive_prose_copy\": true\n  }\n}\n```",
+      "model": "claude-sonnet-5",
+      "transport_timing": {
+        "started_at": "2026-08-17T11:05:12.480767+00:00",
+        "first_byte_after_s": 1.938,
+        "last_progress_after_s": 20.906,
+        "completed_after_s": 20.906,
+        "chunk_count": 45,
+        "read_iterations": 45,
+        "raw_output_chars": 6349,
+        "stream": true
+      },
+      "raw_response": {
+        "model": "claude-sonnet-5",
+        "usage": {
+          "input_tokens": 19382,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "output_tokens": 2870,
+          "service_tier": "standard",
+          "inference_geo": "global",
+          "output_tokens_details": {
+            "thinking_tokens": 15
+          }
+        },
+        "stop_reason": "end_turn",
+        "stop_details": null,
+        "stream": true,
+        "transport_timing": {
+          "started_at": "2026-08-17T11:05:12.480767+00:00",
+          "first_byte_after_s": 1.938,
+          "last_progress_after_s": 20.906,
+          "completed_after_s": 20.906,
+          "chunk_count": 45,
+          "read_iterations": 45,
+          "raw_output_chars": 6349,
+          "stream": true
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "```json\n{\n  \"bullets\": [\n    {\n      \"bullet_id\": \"bul_ibm_001\",\n      \"bullet_text\": \"Led AWS modernization architecture for regulated financial-services clients, converting legacy on-prem platforms into microservices-based reference architectures across the modernization portfolio.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"bul_ibm_001\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_002\",\n      \"bullet_text\": \"Directed cloud-native decision-support data pipelines that translated HPC-driven scenario analysis into executive-level risk and portfolio decision workflows for regulated financial clients.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"bul_ibm_002\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_003\",\n      \"bullet_text\": \"Owned enterprise pre-sales solution engineering, leading cross-functional technical discovery and architecture mapping that converted buyer pain points into delivery-ready solution handoffs for financial-services pursuits.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_004\",\n      \"bullet_text\": \"Architected governed BI data models and portfolio dashboards spanning budget, cost-assumption, and delivery-status views to guide executive operating decisions across enterprise modernization programs.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]\n    },\n    {\n      \"bullet_id\": \"bul_ibm_005\",\n      \"bullet_text\": \"Drove the IBM-AWS alliance co-sell motion across the financial-services partner ecosystem, aligning joint account planning and solution architecture to deliver 20% joint revenue growth.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"20% joint revenue growth\",\n      \"source_fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]\n    }\n  ],\n  \"selected_fact_plan\": {\n    \"bul_ibm_001\": {\"role_episode_bundle_id\": \"reb_ibm_aws_modernization_architecture\", \"fact_ids\": [\"bul_ibm_001\"]},\n    \"bul_ibm_002\": {\"role_episode_bundle_id\": \"reb_ibm_cognitive_business_decision_support\", \"fact_ids\": [\"bul_ibm_002\"]},\n    \"bul_ibm_003\": {\"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\", \"fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]},\n    \"bul_ibm_004\": {\"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\", \"fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]},\n    \"bul_ibm_005\": {\"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\", \"fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]}\n  },\n  \"claim_ledger\": [\n    {\"claim_text\": \"Led AWS modernization architecture converting legacy on-prem financial-services platforms into microservices reference architectures.\", \"source_fact_ids\": [\"bul_ibm_001\"]},\n    {\"claim_text\": \"Directed cloud-native decision-support pipelines translating HPC scenario analysis into executive risk decision workflows.\", \"source_fact_ids\": [\"bul_ibm_002\"]},\n    {\"claim_text\": \"Owned enterprise pre-sales discovery and solution mapping converting buyer needs into delivery-ready architecture handoffs.\", \"source_fact_ids\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"]},\n    {\"claim_text\": \"Architected governed BI data models and portfolio dashboards for budget, cost, and delivery-status visibility.\", \"source_fact_ids\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"]},\n    {\"claim_text\": \"Drove IBM-AWS alliance co-sell motion delivering 20% joint revenue growth across financial-services partner ecosystem.\", \"source_fact_ids\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\", \"metric_ibm_20pct_joint_revenue_growth\"]}\n  ],\n  \"jd_alignment\": {\n    \"selected_jd_themes\": [\"partner-led pre-sales enablement\", \"technical alliance leadership\", \"joint solution architecture\", \"indirect revenue GTM motions\"],\n    \"selected_briefing_themes\": [\"reusable architecture patterns\", \"ecosystem discipline\", \"partner-led enterprise outcomes\"],\n    \"targeting_rationale\": \"Ordered bullets to foreground architecture leadership, decision-support platform work, pre-sales solution engineering, BI governance, and alliance co-sell to mirror Anthropic's partner-facing applied AI architecture role emphasis.\",\n    \"targeting_only\": true,\n    \"jd_used_as_proof\": false,\n    \"briefing_used_as_proof\": false\n  },\n  \"gap_notes\": [\n    \"No approved metrics available for bul_ibm_001-004; written qualitatively per gated-metric ban.\",\n    \"Only bul_ibm_005 carries a promotable metric (20% joint revenue growth).\"\n  ],\n  \"change_log\": [\n    {\"bullet_id\": \"bul_ibm_001\", \"role_episode_bundle_id\": \"reb_ibm_aws_modernization_architecture\", \"graph_skill_node_ids\": [\"skill_p2_tech_reference_architecture\", \"skill_sr_cloud_data_platform_engineering\"], \"fact_ids_used\": [\"bul_ibm_001\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_002\", \"role_episode_bundle_id\": \"reb_ibm_cognitive_business_decision_support\", \"graph_skill_node_ids\": [\"skill_sr_cloud_data_platform_engineering\"], \"fact_ids_used\": [\"bul_ibm_002\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_003\", \"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\", \"graph_skill_node_ids\": [\"skill_p2_gtm_discovery_qualification\", \"skill_p2_gtm_solution_mapping\", \"skill_partner_pre_sales\"], \"fact_ids_used\": [\"fact_revenue_ops_001\", \"bul_ibm_003\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_004\", \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\", \"graph_skill_node_ids\": [\"skill_sr_enterprise_portfolio_data_governance\", \"skill_p2_tech_reference_architecture\"], \"fact_ids_used\": [\"fact_revenue_ops_005\", \"bul_ibm_004\"], \"metric_outcome_ids\": []},\n    {\"bullet_id\": \"bul_ibm_005\", \"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\", \"graph_skill_node_ids\": [\"skill_partner_ibm_aws_alliance_joint_revenue\", \"skill_partner_hyperscaler_cosell\", \"skill_sr_w12_hyperscaler_alliance_co_sell\"], \"fact_ids_used\": [\"fact_partnerships_gtm_002\", \"bul_ibm_005\"], \"metric_outcome_ids\": [\"metric_ibm_20pct_joint_revenue_growth\"]}\n  ],\n  \"self_check\": {\n    \"bullets_composed_from_role_episode_bundles\": true,\n    \"no_verbatim_base_resume_copy\": true,\n    \"no_archive_prose_copy\": true\n  }\n}\n```"
+          }
+        ]
+      }
+    },
+    "anthropic_cache_receipt_seed": null,
+    "reasoning_effort": "low",
+    "attempt_started_at_utc": "2026-08-17T11:05:12.480767+00:00",
+    "attempt_completed_at_utc": "2026-08-17T11:05:33.395737+00:00",
+    "provider_attempt_spans": [
+      {
+        "schema_version": "apps_rg_provider_attempt_span_v1",
+        "span_kind": "provider_attempt",
+        "attempt_kind": "requested",
+        "attempt_index": 1,
+        "provider": "external_claude",
+        "model": "claude-sonnet-5",
+        "provider_attempted": true,
+        "provider_available": true,
+        "runtime_generation_status": "REAL_LLM",
+        "started_at_utc": "2026-08-17T11:05:12.480767+00:00",
+        "completed_at_utc": "2026-08-17T11:05:33.395737+00:00",
+        "duration_seconds": 20.91497,
+        "exact_provider_error": null,
+        "timeout_seconds": 90.0,
+        "token_budget": 8000,
+        "temperature": 0.52,
+        "request_digest": "3437d6a08d02338455ad2d892aa1ebb6edc2d14c8ac91e5bdce023873265412e",
+        "transport_timing": {
+          "started_at": "2026-08-17T11:05:12.480767+00:00",
+          "first_byte_after_s": 1.938,
+          "last_progress_after_s": 20.906,
+          "completed_after_s": 20.906,
+          "chunk_count": 45,
+          "read_iterations": 45,
+          "raw_output_chars": 6349,
+          "stream": true
+        }
+      }
+    ],
+    "provider_attempt_timing_summary": {
+      "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+      "span_count": 1,
+      "attempted_count": 1,
+      "fallback_attempt_count": 0,
+      "fallback_attempted": false,
+      "providers": [
+        "external_claude"
+      ],
+      "models": [
+        "claude-sonnet-5"
+      ],
+      "runtime_generation_statuses": [
+        "REAL_LLM"
+      ],
+      "total_duration_seconds": 20.91497,
+      "accepted_output_provider": "external_claude",
+      "accepted_output_model": "claude-sonnet-5"
+    },
+    "logical_attempt": 1,
+    "transport_attempt": 1,
+    "transport_attempt_ids": [
+      "attempt-c0c14a9fe2624299b5f8dced0ec5b7b9"
+    ],
+    "provider_cache_receipt": {
+      "provider": "external_claude",
+      "model": "claude-sonnet-5",
+      "section_id": "ibm_bullets",
+      "cache_enabled": false,
+      "cache_strategy": "disabled",
+      "stable_prefix_hash": "",
+      "c0_prefix_hash": "",
+      "volatile_tail_hash": "",
+      "cache_marker_count": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_creation_input_tokens": null,
+      "cache_read_input_tokens": null,
+      "cache_hit_ratio": null,
+      "estimated_uncached_input_tokens": null,
+      "estimated_cached_input_tokens": null,
+      "cache_savings_estimate_source": "not_estimated_cache_disabled"
+    }
+  },
+  "prompt_cache_receipt": {
+    "provider": "external_claude",
+    "model": "claude-sonnet-5",
+    "section_id": "ibm_bullets",
+    "cache_enabled": false,
+    "cache_strategy": "disabled",
+    "stable_prefix_hash": "",
+    "c0_prefix_hash": "",
+    "volatile_tail_hash": "",
+    "cache_marker_count": 0,
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_creation_input_tokens": null,
+    "cache_read_input_tokens": null,
+    "cache_hit_ratio": null,
+    "estimated_uncached_input_tokens": null,
+    "estimated_cached_input_tokens": null,
+    "cache_savings_estimate_source": "not_estimated_cache_disabled"
+  },
+  "reasoning_execution_receipt": null,
+  "stub": false,
+  "apps_rg_provider_preflight_blocked": false,
+  "apps_rg_last_probe_snapshot": null
+}

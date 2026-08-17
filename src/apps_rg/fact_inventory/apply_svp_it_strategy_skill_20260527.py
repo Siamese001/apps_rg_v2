@@ -248,7 +248,3 @@ def main() -> int:
         f"created_new_row={result['created_new_row']} grade={result['promoted']['confidence_grade']}"
     )
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

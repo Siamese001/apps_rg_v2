@@ -1,0 +1,1271 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_headline_exactly_one_line",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "none",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_exactly_one_line",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_pipe_four_segments",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "SVP Engineering | X | Y | Z",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_pipe_four_segments",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_segments_quality",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "segments 2–4: 2–5 words, low comma load, no duplicate/overlapping themes, no banned fillers",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_segments_quality",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_standalone_vendor_architecture",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "display_tier": "executive_positioning",
+        "raw_vendor_architecture_as_segment": "forbid_by_default",
+        "preferred_abstractions": [
+          "Enterprise AI Platforms",
+          "Cloud Data Platforms",
+          "Runtime Governance Architecture",
+          "Partner AI Ecosystems",
+          "Platform Commercialization",
+          "Regulated AI Systems"
+        ],
+        "segments": [
+          {
+            "segment_index": 2,
+            "segment": "Alliance Co-Sell Motions",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          },
+          {
+            "segment_index": 3,
+            "segment": "Governed Runtime Telemetry",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          },
+          {
+            "segment_index": 4,
+            "segment": "Enterprise Portfolio Expansion",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          }
+        ],
+        "standalone_vendor_architecture_segments": [],
+        "segments_missing_executive_abstraction": [],
+        "vendor_terms_without_executive_abstraction": []
+      },
+      "threshold": "raw vendor/tool architecture not used as X/Y/Z segment",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_standalone_vendor_architecture",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_executive_abstraction_floor",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "display_tier": "executive_positioning",
+        "raw_vendor_architecture_as_segment": "forbid_by_default",
+        "preferred_abstractions": [
+          "Enterprise AI Platforms",
+          "Cloud Data Platforms",
+          "Runtime Governance Architecture",
+          "Partner AI Ecosystems",
+          "Platform Commercialization",
+          "Regulated AI Systems"
+        ],
+        "segments": [
+          {
+            "segment_index": 2,
+            "segment": "Alliance Co-Sell Motions",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          },
+          {
+            "segment_index": 3,
+            "segment": "Governed Runtime Telemetry",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          },
+          {
+            "segment_index": 4,
+            "segment": "Enterprise Portfolio Expansion",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          }
+        ],
+        "standalone_vendor_architecture_segments": [],
+        "segments_missing_executive_abstraction": [],
+        "vendor_terms_without_executive_abstraction": []
+      },
+      "threshold": "each X/Y/Z segment names an executive operating pattern",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_executive_abstraction_floor",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_vendor_terms_proof_only",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "display_tier": "executive_positioning",
+        "raw_vendor_architecture_as_segment": "forbid_by_default",
+        "preferred_abstractions": [
+          "Enterprise AI Platforms",
+          "Cloud Data Platforms",
+          "Runtime Governance Architecture",
+          "Partner AI Ecosystems",
+          "Platform Commercialization",
+          "Regulated AI Systems"
+        ],
+        "segments": [
+          {
+            "segment_index": 2,
+            "segment": "Alliance Co-Sell Motions",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          },
+          {
+            "segment_index": 3,
+            "segment": "Governed Runtime Telemetry",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          },
+          {
+            "segment_index": 4,
+            "segment": "Enterprise Portfolio Expansion",
+            "vendor_or_product_terms": [],
+            "has_executive_abstraction": true,
+            "standalone_vendor_architecture": false
+          }
+        ],
+        "standalone_vendor_architecture_segments": [],
+        "segments_missing_executive_abstraction": [],
+        "vendor_terms_without_executive_abstraction": []
+      },
+      "threshold": "vendor/product terms require executive abstraction in display",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_vendor_terms_proof_only",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_digit_tokens",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no ASCII digits",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_digit_tokens",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_currency_percent_literals",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "none",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_currency_percent_literals",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_hype_markers",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no Fortune 500 / 10x / 24x7 patterns",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_hype_markers",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_keyword_stuffing_heuristic",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no banned filler patterns",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_keyword_stuffing_heuristic",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_word_count_10_to_13",
+      "gate_type": "deterministic",
+      "observed_value": 11,
+      "threshold": "10..13",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_word_count_10_to_13",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_metrics",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "none",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_metrics",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_unsupported_employer_names",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no employers",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_unsupported_employer_names",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_candidate_name_tokens",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no personal-name tokens",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_candidate_name_tokens",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_first_person",
+      "gate_type": "deterministic",
+      "observed_value": "absent",
+      "threshold": "absent",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_first_person",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_em_dash",
+      "gate_type": "deterministic",
+      "observed_value": "absent",
+      "threshold": "absent",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_em_dash",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_inline_source_tags",
+      "gate_type": "deterministic",
+      "observed_value": "absent",
+      "threshold": "absent",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_inline_source_tags",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_target_company_as_experience",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "not in headline",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_target_company_as_experience",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_jd_only_claims",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no jd-only",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_jd_only_claims",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_claim_ledger_rows_present",
+      "gate_type": "deterministic",
+      "observed_value": 3,
+      "threshold": ">=1 dict rows with non-empty source_fact_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_claim_ledger_rows_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_claim_ledger_segment_decomposition",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "matched_segments": [
+          "alliance co-sell motions",
+          "enterprise portfolio expansion",
+          "governed runtime telemetry"
+        ],
+        "expected_segments": [
+          "Alliance Co-Sell Motions",
+          "Governed Runtime Telemetry",
+          "Enterprise Portfolio Expansion"
+        ],
+        "row_count": 3
+      },
+      "threshold": ">=3 rows with claim_text matching X/Y/Z segments",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_claim_ledger_segment_decomposition",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_claim_ledger_no_silent_row_drop",
+      "gate_type": "deterministic",
+      "observed_value": 0,
+      "threshold": 0,
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_claim_ledger_no_silent_row_drop",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_text_claim_coverage_integrity",
+      "gate_type": "deterministic",
+      "observed_value": [
+        {
+          "segment_index": 2,
+          "segment_text": "Alliance Co-Sell Motions",
+          "pass": true,
+          "matching_claim_count": 1,
+          "source_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "reb_ibm_revenue_sales_target_execution",
+            "reb_unify_runtime_reliability_governance",
+            "skill_context_engineering",
+            "skill_partner_pnl_oversight"
+          ]
+        },
+        {
+          "segment_index": 3,
+          "segment_text": "Governed Runtime Telemetry",
+          "pass": true,
+          "matching_claim_count": 1,
+          "source_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "reb_ibm_revenue_sales_target_execution",
+            "reb_unify_runtime_reliability_governance",
+            "skill_context_engineering",
+            "skill_partner_pnl_oversight"
+          ]
+        },
+        {
+          "segment_index": 4,
+          "segment_text": "Enterprise Portfolio Expansion",
+          "pass": true,
+          "matching_claim_count": 1,
+          "source_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "reb_ibm_revenue_sales_target_execution",
+            "reb_unify_runtime_reliability_governance",
+            "skill_context_engineering",
+            "skill_partner_pnl_oversight"
+          ]
+        }
+      ],
+      "threshold": "each X/Y/Z segment has matching claim_ledger support",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_text_claim_coverage_integrity",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_source_supported",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_revenue_sales_target_execution",
+        "reb_unify_runtime_reliability_governance",
+        "skill_context_engineering",
+        "skill_partner_pnl_oversight"
+      ],
+      "threshold": "source_fact_ids subset of active allowed_fact_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_source_supported",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_xyz_literal_grounding",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "segments": [
+          {
+            "segment": "Alliance Co-Sell Motions",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_context_engineering",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [
+                  "alliance",
+                  "co-sell",
+                  "motion",
+                  "motions"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [
+                  "motion",
+                  "motions"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_context_engineering",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "alliance",
+              "co-sell",
+              "motion",
+              "motions"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Governed Runtime Telemetry",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_context_engineering",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [
+                  "telemetry"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_context_engineering",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "telemetry"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Enterprise Portfolio Expansion",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance",
+              "skill_context_engineering",
+              "skill_partner_pnl_oversight"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [
+                  "expansion",
+                  "portfolio"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_context_engineering",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "skill_partner_pnl_oversight",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "expansion",
+              "portfolio"
+            ],
+            "majority_grounded": true
+          }
+        ],
+        "checked": 3
+      },
+      "threshold": "each X/Y/Z segment shares >=1 content noun with its cited fact's claim_text",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_xyz_literal_grounding",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_selected_fact_plan_matches_ledger",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "required_fact_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_revenue_sales_target_execution",
+          "reb_unify_runtime_reliability_governance",
+          "skill_context_engineering",
+          "skill_partner_pnl_oversight"
+        ],
+        "ledger_union": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_revenue_sales_target_execution",
+          "reb_unify_runtime_reliability_governance",
+          "skill_context_engineering",
+          "skill_partner_pnl_oversight"
+        ],
+        "cited_but_not_selected": []
+      },
+      "threshold": "claim_ledger union is a non-empty subset of selected required_fact_ids (no fabricated citation)",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_selected_fact_plan_matches_ledger",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_json_parse_valid",
+      "gate_type": "deterministic",
+      "observed_value": null,
+      "threshold": null,
+      "failure_reason": null,
+      "evidence_ref": "x2_json_parse_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_prompt_reasoning_receipt_clean",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no_aggregate_blocked_no_quality_denial",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_prompt_reasoning_receipt_clean",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_raw_model_schema_valid",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "dict_rows_with_claim_text_and_source_fact_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_raw_model_schema_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_self_check_consistent",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "runtime": {
+          "word_count": 11,
+          "segment_count": 4,
+          "separator_count": 3,
+          "word_count_in_range": true,
+          "fixed_prefix": true,
+          "no_metrics": true,
+          "no_employer_names": true,
+          "no_company_names": true
+        },
+        "model": {
+          "fixed_prefix": true,
+          "segment_count": 4,
+          "separator_count": 3,
+          "word_count": 11,
+          "word_count_in_range": true,
+          "no_metrics": true,
+          "no_employer_names": true,
+          "no_company_names": true
+        }
+      },
+      "threshold": {
+        "word_count": 11,
+        "segment_count": 4,
+        "separator_count": 3,
+        "word_count_in_range": true,
+        "fixed_prefix": true,
+        "no_metrics": true,
+        "no_employer_names": true,
+        "no_company_names": true
+      },
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_self_check_consistent",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_schema_valid",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": [
+        "change_log",
+        "claim_ledger",
+        "gap_notes",
+        "headline_line",
+        "jd_alignment",
+        "selected_fact_plan",
+        "self_check"
+      ],
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_schema_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_provider_requested_attempted",
+      "gate_type": "deterministic",
+      "observed_value": "external_claude->external_claude",
+      "threshold": "match",
+      "failure_reason": "Provider mismatch.",
+      "evidence_ref": "x2_provider_requested_attempted",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_silent_mock_fallback",
+      "gate_type": "deterministic",
+      "observed_value": "REAL_LLM",
+      "threshold": "REAL_LLM",
+      "failure_reason": "Silent mock fallback detected.",
+      "evidence_ref": "x2_no_silent_mock_fallback",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_x1d_required_judges_present",
+      "gate_type": "deterministic",
+      "observed_value": null,
+      "threshold": [
+        "gemini_pro",
+        "openai_chatgpt"
+      ],
+      "failure_reason": null,
+      "evidence_ref": "x2_x1d_required_judges_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_x1d_schema_valid",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": "Blocked judges invalid schema: []",
+      "evidence_ref": "x2_x1d_schema_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_executive_length",
+      "gate_type": "deterministic",
+      "observed_value": 104,
+      "threshold": "<=140 chars",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_executive_length",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_title_inflation",
+      "gate_type": "deterministic",
+      "observed_value": "ok",
+      "threshold": "no SVP at target framing",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_title_inflation",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_jd_context_not_proof",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "targeting_only": true,
+        "jd_used_as_proof": false,
+        "briefing_used_as_proof": false,
+        "companion_used_as_proof": false,
+        "selected_theme": "Alliance co-sell execution paired with governed runtime reliability and enterprise portfolio ownership, ranked for a partner-facing applied AI architecture leadership role",
+        "anti_stuffing_check": "No JD phrases lifted verbatim; segments built from candidate claim_text nouns (alliance, co-sell, runtime, telemetry, governance, enterprise, portfolio, expansion) rather than JD/briefing vocabulary"
+      },
+      "threshold": "jd_used_as_proof key present and false",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_jd_context_not_proof",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_briefing_context_not_proof",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "targeting_only": true,
+        "jd_used_as_proof": false,
+        "briefing_used_as_proof": false,
+        "companion_used_as_proof": false,
+        "selected_theme": "Alliance co-sell execution paired with governed runtime reliability and enterprise portfolio ownership, ranked for a partner-facing applied AI architecture leadership role",
+        "anti_stuffing_check": "No JD phrases lifted verbatim; segments built from candidate claim_text nouns (alliance, co-sell, runtime, telemetry, governance, enterprise, portfolio, expansion) rather than JD/briefing vocabulary"
+      },
+      "threshold": "briefing_used_as_proof key present and false",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_briefing_context_not_proof",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_companion_context_not_proof",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "targeting_only": true,
+        "jd_used_as_proof": false,
+        "briefing_used_as_proof": false,
+        "companion_used_as_proof": false,
+        "selected_theme": "Alliance co-sell execution paired with governed runtime reliability and enterprise portfolio ownership, ranked for a partner-facing applied AI architecture leadership role",
+        "anti_stuffing_check": "No JD phrases lifted verbatim; segments built from candidate claim_text nouns (alliance, co-sell, runtime, telemetry, governance, enterprise, portfolio, expansion) rather than JD/briefing vocabulary"
+      },
+      "threshold": "companion_used_as_proof key present and false",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_companion_context_not_proof",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_active_proof_pool_source_fact_ids",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "section": "headline",
+        "proof_source": "augmented_skills_graph",
+        "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "proof_pool_digest": "9c69b603d7ece2bbbfb581dde9f3e46d89015385a04ee6da4cfbd6fb9940874b",
+        "canonical_evidence_set_digest": "9c69b603d7ece2bbbfb581dde9f3e46d89015385a04ee6da4cfbd6fb9940874b",
+        "id_alias_map": {},
+        "claim_evidence_source_type": "augmented_skills_graph",
+        "claim_evidence_source_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "skills_authority_source_type": "augmented_skills_graph",
+        "skills_authority_status": "PASS",
+        "skills_authority_graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "legacy_broad_skills_ledger_skills_authority": false,
+        "broad_skills_ledger_claim_evidence_only": null,
+        "allowed_source_fact_ids_count": 14,
+        "source_fact_ids_checked": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_revenue_sales_target_execution",
+          "reb_unify_runtime_reliability_governance",
+          "skill_context_engineering",
+          "skill_partner_pnl_oversight"
+        ],
+        "unsupported_source_fact_ids": [],
+        "rejected_non_proof_source_ids": [],
+        "jd_or_briefing_ids_rejected": [],
+        "x2_source_fact_pool_status": "PASS",
+        "decisive_reason": null,
+        "validator_name": "evaluate_proof_pool_source_fact_gate",
+        "skills_authority_x2_boundary": "PASS",
+        "x2_srfs_gate_status": "NOT_APPLICABLE",
+        "out_of_slice_fact_ids": [],
+        "srfs_allowed_fact_ids_count": 14,
+        "selected_role_fact_set_used": false,
+        "broad_skills_ledger_used": false,
+        "broad_skills_ledger_used_as_authority": false,
+        "base_resume_fallback_used": false,
+        "srfs_section_id": "headline"
+      },
+      "threshold": "active_proof_pool_allowlist_exact",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_active_proof_pool_source_fact_ids",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_input_usage_ledger_present",
+      "gate_type": "deterministic",
+      "observed_value": "section_input_usage_ledger_v1",
+      "threshold": "section_input_usage_ledger_v1",
+      "failure_reason": null,
+      "evidence_ref": "x2_section_input_usage_ledger_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_jd_used_as_required_targeting_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "required": true,
+        "used": true,
+        "authority": "TARGETING_INPUT",
+        "used_for": []
+      },
+      "threshold": "required_used_TARGETING_INPUT",
+      "failure_reason": null,
+      "evidence_ref": "x2_jd_used_as_required_targeting_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_briefing_used_as_required_context_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "required": true,
+        "used": true,
+        "authority": "CONTEXT_INPUT",
+        "used_for": []
+      },
+      "threshold": "required_used_CONTEXT_INPUT",
+      "failure_reason": null,
+      "evidence_ref": "x2_briefing_used_as_required_context_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_title_company_used_as_required_positioning_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "target_title": {
+          "required": true,
+          "used": true,
+          "authority": "POSITIONING_INPUT",
+          "used_for": []
+        },
+        "target_company": {
+          "required": true,
+          "used": true,
+          "authority": "POSITIONING_INPUT",
+          "used_for": []
+        }
+      },
+      "threshold": "required_used_POSITIONING_INPUT_both",
+      "failure_reason": null,
+      "evidence_ref": "x2_title_company_used_as_required_positioning_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_non_evidence_inputs_as_claim_evidence",
+      "gate_type": "deterministic",
+      "observed_value": false,
+      "threshold": false,
+      "failure_reason": null,
+      "evidence_ref": "x2_no_non_evidence_inputs_as_claim_evidence",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_non_evidence_inputs_in_source_fact_ids",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "row_scan_found_reserved_non_resume_ids": false,
+        "ledger_non_evidence_inputs_in_source_fact_ids": false
+      },
+      "threshold": "reserved_non_resume_ids_absent_in_source_fact_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_non_evidence_inputs_in_source_fact_ids",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_selected_fact_ids_only",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": "subset_of_ALLOWED_SOURCE_FACT_IDS",
+      "failure_reason": null,
+      "evidence_ref": "x2_selected_fact_ids_only",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_claims_supported_by_base_resume",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "displayed_claim_count": 3,
+        "claims_supported_by_selected_resume_facts": 3,
+        "claims_with_targeting_input_in_source_fact_ids": 0,
+        "claims_with_context_input_in_source_fact_ids": 0,
+        "unsupported_claim_count": 0,
+        "orphan_source_fact_id_count": 0
+      },
+      "threshold": "no_unsupported_and_no_non_evidence_source_fact_id_claim_rows",
+      "failure_reason": null,
+      "evidence_ref": "x2_section_claims_supported_by_base_resume",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_input_usage_accounting_consistent",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "ledger_summary": {
+          "displayed_claim_count": 3,
+          "claims_supported_by_selected_resume_facts": 3,
+          "claims_with_targeting_input_in_source_fact_ids": 0,
+          "claims_with_context_input_in_source_fact_ids": 0,
+          "unsupported_claim_count": 0,
+          "orphan_source_fact_id_count": 0
+        },
+        "runtime_summary": {
+          "displayed_claim_count": 3,
+          "claims_supported_by_selected_resume_facts": 3,
+          "claims_with_targeting_input_in_source_fact_ids": 0,
+          "claims_with_context_input_in_source_fact_ids": 0,
+          "unsupported_claim_count": 0,
+          "orphan_source_fact_id_count": 0
+        },
+        "coverage_overall_pass": true
+      },
+      "threshold": "ledger_matches_claim_scan_and_coverage_pass",
+      "failure_reason": null,
+      "evidence_ref": "x2_input_usage_accounting_consistent",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_no_narrowing_it_labels",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "zero narrowing IT labels",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_no_narrowing_it_labels",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_positioning_family_preserved",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "runtime_governance",
+        "enterprise_ai_architecture",
+        "partner_applied_ai_architecture"
+      ],
+      "threshold": ">=2 positioning families",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_positioning_family_preserved",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_e0_ngram_overlap",
+      "gate_type": "deterministic",
+      "observed_value": 0.0,
+      "threshold": "<=20% 4-gram overlap with E0 examples (WARN=Y)",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_e0_ngram_overlap",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_base_ngram_overlap",
+      "gate_type": "deterministic",
+      "observed_value": 0.0,
+      "threshold": "<=25% 4-gram overlap with base headline",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_base_ngram_overlap",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_positioning_bundles_in_proof_pool",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "bundles_present": true,
+        "mode": "headline_positioning_bundle_required"
+      },
+      "threshold": "headline_positioning_bundles in proof_pool_metadata",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_positioning_bundles_in_proof_pool",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_positioning_bundle_id_required",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_revenue_sales_target_execution",
+        "reb_unify_runtime_reliability_governance"
+      ],
+      "threshold": ">=1 headline_positioning_bundle_id bound in output",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_positioning_bundle_id_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_graph_skill_node_ids_required",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "skill_context_engineering",
+        "skill_partner_pnl_oversight",
+        "skill_sr_w12_hyperscaler_alliance_co_sell"
+      ],
+      "threshold": ">=1 graph_skill_node_id bound in output",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_graph_skill_node_ids_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_source_fact_or_graph_lineage_required",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_revenue_sales_target_execution",
+        "reb_unify_runtime_reliability_governance",
+        "skill_context_engineering",
+        "skill_partner_pnl_oversight"
+      ],
+      "threshold": ">=1 source_fact_id or graph_lineage_ref bound in output",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_source_fact_or_graph_lineage_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_svp_engineering_seniority_required",
+      "gate_type": "deterministic",
+      "observed_value": "SVP Engineering",
+      "threshold": "SVP Engineering",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_svp_engineering_seniority_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_seniority_floor_met",
+      "gate_type": "deterministic",
+      "observed_value": "SVP Engineering",
+      "threshold": "segment 0 == 'SVP Engineering'",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_seniority_floor_met",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_platform_or_runtime_signal_required",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "runtime_governance",
+        "enterprise_ai_architecture"
+      ],
+      "threshold": ">=1 platform/runtime positioning family in headline",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_platform_or_runtime_signal_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_governance_or_regulated_ai_signal_required",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "runtime_governance"
+      ],
+      "threshold": ">=1 governance/regulated-AI positioning family in headline",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_governance_or_regulated_ai_signal_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_generic_it_strategy_demote_forbidden",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "zero narrowing IT labels",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_generic_it_strategy_demote_forbidden",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_jd_only_phrase_forbidden",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "no >=4-token verbatim JD lift in headline",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_jd_only_phrase_forbidden",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_technical_specificity_floor_met",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "runtime_governance",
+        "enterprise_ai_architecture",
+        "partner_applied_ai_architecture"
+      ],
+      "threshold": ">=2 positioning families",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_technical_specificity_floor_met",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_e0_ngram_overlap_forbidden",
+      "gate_type": "deterministic",
+      "observed_value": 0.0,
+      "threshold": "<=20% 4-gram overlap with E0 examples (WARN=N)",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_e0_ngram_overlap_forbidden",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_headline_base_ngram_overlap_forbidden_or_warn",
+      "gate_type": "deterministic",
+      "observed_value": 0.0,
+      "threshold": "<=25% 4-gram overlap with base headline",
+      "failure_reason": null,
+      "evidence_ref": "x2_headline_base_ngram_overlap_forbidden_or_warn",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_c0_metrics_artifact_present",
+      "pass": true,
+      "reason": "c0_metrics artifact structurally valid",
+      "observed_value": {
+        "schema_version": "c0_metrics.v1",
+        "required_keys_present": [
+          "blocked_source_refs",
+          "briefing_source_type",
+          "citation_map",
+          "company_brief_provenance",
+          "evidence_counts",
+          "excluded_evidence_refs",
+          "final_evidence_digest",
+          "freshness_receipts",
+          "retrieval_mode",
+          "retrieval_sources",
+          "route_id",
+          "run_id",
+          "schema_version",
+          "source_class_coverage",
+          "support_score_profile",
+          "support_status",
+          "support_target_met"
+        ]
+      },
+      "expected_value": "c0_metrics.v1"
+    },
+    {
+      "gate_id": "x2_c0_support_status_gate",
+      "pass": true,
+      "reason": "support_status='PASS' support_target_met=True enum_ok=True minimum_safe=True",
+      "observed_value": {
+        "support_status": "PASS",
+        "support_target_met": true,
+        "c0_minimum_safe": true,
+        "canonical_enum": true
+      },
+      "expected_value": "non-blocking canonical support_status with evidence target"
+    },
+    {
+      "gate_id": "x2_fec_subset_of_canonical_evidence_pool",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "fec_count": 14,
+        "violations": []
+      },
+      "threshold": "fec_ids_subset_of_pool",
+      "failure_reason": null,
+      "evidence_ref": "x2_fec_subset_of_canonical_evidence_pool"
+    },
+    {
+      "gate_id": "x2_prompt_c0_ids_subset_of_fec",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "prompt_c0_count": 14,
+        "violations": []
+      },
+      "threshold": "prompt_c0_subset_of_fec",
+      "failure_reason": null,
+      "evidence_ref": "x2_prompt_c0_ids_subset_of_fec"
+    },
+    {
+      "gate_id": "x2_claim_ledger_source_fact_ids_subset_of_fec",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "ledger_id_count": 5,
+        "violations": []
+      },
+      "threshold": "claim_ledger_subset_of_fec",
+      "failure_reason": null,
+      "evidence_ref": "x2_claim_ledger_source_fact_ids_subset_of_fec"
+    },
+    {
+      "gate_id": "X2_BLOCK_ID_NAMESPACE_SPLIT",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "disjoint_without_alias": [],
+        "alias_map_size": 0
+      },
+      "threshold": "explicit_alias_map_or_unified_namespace",
+      "failure_reason": null,
+      "evidence_ref": "X2_BLOCK_ID_NAMESPACE_SPLIT"
+    },
+    {
+      "gate_id": "x2_active_pool_digest_matches_fec_digest",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "canonical_evidence_set_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+        "fec_allowed_fact_ids_digest": "4aaead2d9f0caceb17b603d9c0cac93825d756a5af8dc442202f7dc50e04ff2b",
+        "fec_narrowed_from_pool": true
+      },
+      "threshold": "digest_equal_or_explicit_narrowing_receipt",
+      "failure_reason": null,
+      "evidence_ref": "x2_active_pool_digest_matches_fec_digest"
+    },
+    {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority",
+      "pass": true,
+      "observed_value": {
+        "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+        "claim_count": 3,
+        "bound_claim_count": 3,
+        "binding_coverage": 1.0,
+        "metric_exactness_pass": true,
+        "orphan_allocation_claim_unit_ids": [],
+        "failure_reasons": []
+      },
+      "threshold": {
+        "binding_coverage": 1.0,
+        "metric_exactness": 1.0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "",
+      "evidence_ref": "graph_claim_bindings.json"
+    }
+  ],
+  "failed_gates": [],
+  "x2_passed": 75,
+  "x2_failed": 0,
+  "total_x2_gates": 75,
+  "rigor_convergence_audit": {
+    "status": "PASS",
+    "missing_rigor_critical_gates": []
+  },
+  "final_materialized_input_binding": {
+    "schema_version": "apps_rg.final_materialized_input_binding.v1",
+    "section_id": "headline",
+    "final_materialized_output_ref": "headline_output.txt",
+    "final_materialized_output_present": true,
+    "final_materialized_output_char_count": 104,
+    "final_materialized_output_sha256": "2bc4b5d51c50036e65df1fd2aa42f307e6a53306d3b9d0399864ea603add5202",
+    "l2_output_present": false,
+    "l2_output_sha256": "",
+    "final_claim_ledger_present": true,
+    "final_claim_ledger_row_count": 3,
+    "final_claim_ledger_sha256": "4bd62dbe4f8e37d2ed41f017a5ac5a1a63e87aae68324f701992a97591c6fd22"
+  },
+  "final_materialized_output_sha256": "2bc4b5d51c50036e65df1fd2aa42f307e6a53306d3b9d0399864ea603add5202",
+  "final_claim_ledger_sha256": "4bd62dbe4f8e37d2ed41f017a5ac5a1a63e87aae68324f701992a97591c6fd22",
+  "l2_output_sha256": "",
+  "resume_graph_allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+  "graph_claim_binding_contract_digest": "771197b38b1e0e061235063cbc078ca482903232f532aeb0c6750a6607d6298a",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

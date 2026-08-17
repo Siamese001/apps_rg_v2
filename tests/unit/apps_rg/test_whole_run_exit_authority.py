@@ -176,7 +176,7 @@ def _build_all_pass_run(root: Path) -> None:
             lane_root / "x3_disposition_receipt.json",
             {
                 "producer_component": (
-                    "apps_rg_runtime.runtime.entrypoints."
+                    "apps_rg.runtime.entrypoints."
                     "integrated_single_action_spine_run"
                 ),
                 "artifact_hash": _digest(core_payload),
@@ -368,6 +368,37 @@ def test_whole_run_exit_authorizes_complete_app_artifacts(tmp_path: Path) -> Non
     assert errors == ()
 
 
+def test_whole_run_exit_authorizes_current_public_lane_layout(tmp_path: Path) -> None:
+    _build_all_pass_run(tmp_path)
+    legacy_lanes = tmp_path / "modular_r4" / "sections"
+    legacy_lanes.rename(tmp_path / "lanes")
+    for lane in GENERATED_LANES:
+        lane_root = tmp_path / "lanes" / lane
+        (lane_root / "apps_rg_core_runtime_authority.json").unlink()
+        lane_payload = {"x3_disposition": "X3_ALLOW", "disposition": "X3_ALLOW"}
+        _write(
+            lane_root / "x3_disposition_receipt.json",
+            {
+                "producer_component": "apps_rg.runtime.orchestration.app_single_action_spine",
+                "artifact_hash": _digest(lane_payload),
+                "payload": lane_payload,
+            },
+        )
+
+    packet = emit_whole_run_exit_review_packet(
+        artifact_dir=tmp_path,
+        identity=_identity(),
+    )
+
+    assert packet["status"] == "PASS"
+    assert packet["x3_disposition"] == "X3D_ALLOW_FINISH"
+    assert any(
+        row["artifact_ref"] == "lanes/competencies/l2_handoff_receipt.json"
+        and row["present"] is True
+        for row in packet["source_bindings"]
+    )
+
+
 def test_whole_run_exit_detects_source_tamper_and_reemits_blocked(
     tmp_path: Path,
 ) -> None:
@@ -531,6 +562,48 @@ def test_stage_authority_uses_app_exit_not_outer_core_x3(tmp_path: Path) -> None
     }
 
 
+def test_stage_authority_accepts_single_runtime_witness_shape(tmp_path: Path) -> None:
+    """Whole-run evidence is authoritative over retired outer-core witness fields."""
+
+    _build_all_pass_run(tmp_path)
+    identity = _identity()
+    _write(
+        tmp_path / "runtime_execution_witness.json",
+        {
+            "payload": {
+                "run_id": "apps-rg-local-run",
+                "request_id": "apps-rg-local-run",
+                "trace_root": identity["trace_root"],
+                "c0": {"status": "OBSERVED"},
+                "l2": {"executed": True, "status": "PASS", "fault": ""},
+                "x2": {"disposition": "OBSERVED"},
+            }
+        },
+    )
+    _write(
+        tmp_path / "terminal_ret_packet.json",
+        {
+            "payload": {
+                "run_id": "apps-rg-local-run",
+                "status": "PASS",
+                "fault": "",
+            }
+        },
+    )
+    _write(tmp_path / "prompt_assembly_bypass_receipt.json", {"status": "OBSERVED"})
+    emit_whole_run_exit_review_packet(artifact_dir=tmp_path, identity=identity)
+
+    receipts = emit_runtime_stage_authority_receipts(
+        artifact_dir=tmp_path,
+        identity=identity,
+    )
+
+    assert all(
+        json.loads(path.read_text(encoding="utf-8"))["status"] == "PASS"
+        for path in receipts.values()
+    )
+
+
 def test_producer_core_x3_denial_overrides_allowing_app_mirror(
     tmp_path: Path,
 ) -> None:
@@ -544,7 +617,7 @@ def test_producer_core_x3_denial_overrides_allowing_app_mirror(
         lane_root / "x3_disposition_receipt.json",
         {
             "producer_component": (
-                "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run"
+                "apps_rg.runtime.entrypoints.integrated_single_action_spine_run"
             ),
             "artifact_hash": _digest(core_payload),
             "payload": core_payload,
@@ -650,7 +723,7 @@ def test_w1_emits_additive_correction_and_parallel_replay_proof(
         lane_root / "x3_disposition_receipt.json",
         {
             "producer_component": (
-                "apps_rg_runtime.runtime.entrypoints.integrated_single_action_spine_run"
+                    "apps_rg.runtime.entrypoints.integrated_single_action_spine_run"
             ),
             "artifact_hash": _digest(core_payload),
             "payload": core_payload,

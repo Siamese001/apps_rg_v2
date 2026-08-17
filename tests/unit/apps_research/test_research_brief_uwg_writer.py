@@ -21,8 +21,6 @@ def test_commit_brief_record_supplies_l5_certification_ref() -> None:
         commit_receipt_id = "receipt-research-brief-test"
 
     class _Gateway:
-        last_snapshot_id = "snapshot-before"
-
         def commit(self, *, commit_request, state_diffs, rollback_plan, refresh_plan):
             captured["commit_request"] = commit_request
             captured["state_diffs"] = state_diffs
@@ -58,6 +56,8 @@ def test_commit_brief_record_supplies_l5_certification_ref() -> None:
     assert brief.commit_receipt_ref == "receipt-research-brief-test"
     request = captured["commit_request"]
     assert request.l5_certification_ref
+    assert request.capability_token_ref == "capability:apps_research:research-brief:research-run-test"
+    assert captured["refresh_plan"].before_snapshot == ""
     assert request.clearance_proof_id == request.cleared_exit_review_packet_ref
     assert request.registry_digest_set == (
         f"registry:policy:{_POLICY_REF}",

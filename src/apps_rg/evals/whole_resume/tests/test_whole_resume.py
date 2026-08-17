@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import subprocess
-import sys
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Mapping
@@ -14,6 +12,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from apps_rg.evals.c03_w9_closeout import build_w9_closeout
 from apps_rg.evals.resume_graph.reporting import canonical_digest
 from apps_rg.evals.whole_resume.constants import METRIC_NAMES, RUBRIC_ID, W9_DIMENSIONS
+from apps_rg.evals.whole_resume.__main__ import main as evaluate_whole_resume_command
 from apps_rg.evals.whole_resume.evaluation import evaluate_whole_resume
 from apps_rg.evals.whole_resume.reporting import receipt_digest_is_valid
 from apps_rg.evals.whole_resume.validation import (
@@ -543,31 +542,20 @@ def test_closeout_rejects_a_malformed_receipt_without_crashing() -> None:
     assert "whole_resume_evaluation_receipt_invalid" in closeout["failure_codes"]
 
 
-def test_cli_writes_a_deterministic_receipt(tmp_path: Path) -> None:
+def test_library_command_writes_a_deterministic_receipt(tmp_path: Path) -> None:
     input_path = tmp_path / "input.json"
     output_path = tmp_path / "receipt.json"
     input_path.write_text(json.dumps(_bundle(), sort_keys=True), encoding="utf-8")
 
-    completed = subprocess.run(
+    assert evaluate_whole_resume_command(
         [
-            sys.executable,
-            "-m",
-            "apps_rg.evals.whole_resume",
             "--input",
             str(input_path),
             "--output",
             str(output_path),
             "--compact",
-        ],
-        check=False,
-        capture_output=True,
-        cwd=EVALS_ROOT.parents[1],
-        shell=False,
-        text=True,
-        timeout=30,
-    )
-    assert completed.returncode == 0, completed.stderr
-    assert json.loads(completed.stdout)["status"] == "PASS"
+        ]
+    ) == 0
     written = json.loads(output_path.read_text(encoding="utf-8"))
     assert written == evaluate_whole_resume(_bundle())
     assert receipt_digest_is_valid(written)

@@ -8,7 +8,7 @@ defects must fail or, for invalid provenance, be rejected fail-closed as
 Run:
 
 ```text
-python -m apps_rg.evals.meta_eval --out g6-receipt.json
+library API: apps_rg.evals.meta_eval --out g6-receipt.json
 ```
 
 The machine-critical receipt measures mutation recall, clean-control false

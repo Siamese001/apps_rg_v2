@@ -719,7 +719,3 @@ def main() -> None:
     args = parser.parse_args()
     result = run_materialize(write=not args.dry_run)
     print(json.dumps(result["verify"], indent=2))
-
-
-if __name__ == "__main__":
-    main()

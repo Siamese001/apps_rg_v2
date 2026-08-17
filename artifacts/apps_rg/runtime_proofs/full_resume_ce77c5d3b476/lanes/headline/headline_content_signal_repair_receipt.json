@@ -1,0 +1,365 @@
+{
+  "section_id": "headline",
+  "run_id": "headline_20260817_031144",
+  "gate_id": "headline_pre_x1d_resume_native_clarity",
+  "trigger_arm": "resume_native_clarity",
+  "trigger": {
+    "required_families": [
+      "runtime_governance",
+      "regulated_ai_systems"
+    ],
+    "specificity_floor": 2,
+    "families_matched_pre": {
+      "governance_signal": [
+        "runtime_governance"
+      ],
+      "specificity_floor": [
+        "runtime_governance",
+        "enterprise_ai_architecture",
+        "partner_applied_ai_architecture"
+      ],
+      "narrowing_labels": [],
+      "segments_missing_executive_abstraction": [],
+      "literal_grounding": {
+        "segments": [
+          {
+            "segment": "Hyperscaler Alliance Co-Sell",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [
+                  "alliance",
+                  "co-sell"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [
+              "hyperscaler"
+            ],
+            "grounded_tokens": [
+              "alliance",
+              "co-sell"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Runtime Telemetry Governance",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [
+                  "telemetry"
+                ],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "telemetry"
+            ],
+            "majority_grounded": true
+          },
+          {
+            "segment": "Enterprise Portfolio Expansion Leadership",
+            "ground_pass": true,
+            "cited_fact_ids": [
+              "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "reb_ibm_revenue_sales_target_execution",
+              "reb_unify_runtime_reliability_governance"
+            ],
+            "evidence": [
+              {
+                "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+                "shared_tokens": [],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_ibm_revenue_sales_target_execution",
+                "shared_tokens": [
+                  "expansion",
+                  "portfolio"
+                ],
+                "fact_text_known": true
+              },
+              {
+                "fact_id": "reb_unify_runtime_reliability_governance",
+                "shared_tokens": [],
+                "fact_text_known": true
+              }
+            ],
+            "ungrounded_tokens": [],
+            "grounded_tokens": [
+              "expansion",
+              "portfolio"
+            ],
+            "majority_grounded": true
+          }
+        ],
+        "checked": 3
+      },
+      "resume_native_clarity": {
+        "pass": false,
+        "shape_valid": true,
+        "opaque_segments": [
+          "Enterprise Portfolio Expansion Leadership"
+        ],
+        "semantic_overlap_issues": [],
+        "segment_observations": [
+          {
+            "segment": "Hyperscaler Alliance Co-Sell",
+            "word_count": 3,
+            "familiar_positioning_phrases": [],
+            "pass": true
+          },
+          {
+            "segment": "Runtime Telemetry Governance",
+            "word_count": 3,
+            "familiar_positioning_phrases": [],
+            "pass": true
+          },
+          {
+            "segment": "Enterprise Portfolio Expansion Leadership",
+            "word_count": 4,
+            "familiar_positioning_phrases": [],
+            "pass": false
+          }
+        ]
+      },
+      "resume_graph_claim_binding": {
+        "gate_id": "x2_resume_graph_claim_binding",
+        "gate_type": "deterministic_graph_authority_pre_x2",
+        "pass": true,
+        "observed_value": {
+          "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+          "claim_count": 3,
+          "allocation_assignment_count": 3,
+          "failure_reasons": []
+        },
+        "threshold": {
+          "binding_failures": 0,
+          "orphan_allocations": 0
+        },
+        "failure_reason": "",
+        "evidence_ref": "selected_fact_plan.json#allocation_assignments"
+      },
+      "unbound_graph_allocations": []
+    },
+    "headline_pre": "SVP Engineering | Hyperscaler Alliance Co-Sell | Runtime Telemetry Governance | Enterprise Portfolio Expansion Leadership"
+  },
+  "attempted": true,
+  "regen_call_made": true,
+  "accepted": true,
+  "headline_post": "SVP Engineering | Hyperscaler Alliance Co-Sell | Runtime Telemetry Governance | Enterprise Portfolio Expansion",
+  "families_matched_post": {
+    "governance_signal": [
+      "runtime_governance"
+    ],
+    "specificity_floor": [
+      "runtime_governance",
+      "enterprise_ai_architecture",
+      "partner_applied_ai_architecture"
+    ],
+    "narrowing_labels": [],
+    "segments_missing_executive_abstraction": [],
+    "literal_grounding": {
+      "segments": [
+        {
+          "segment": "Hyperscaler Alliance Co-Sell",
+          "ground_pass": true,
+          "cited_fact_ids": [
+            "reb_ibm_aws_alliance_partner_cosell_gtm"
+          ],
+          "evidence": [
+            {
+              "fact_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+              "shared_tokens": [
+                "alliance",
+                "co-sell"
+              ],
+              "fact_text_known": true
+            }
+          ],
+          "ungrounded_tokens": [
+            "hyperscaler"
+          ],
+          "grounded_tokens": [
+            "alliance",
+            "co-sell"
+          ],
+          "majority_grounded": true
+        },
+        {
+          "segment": "Runtime Telemetry Governance",
+          "ground_pass": true,
+          "cited_fact_ids": [
+            "reb_unify_runtime_reliability_governance"
+          ],
+          "evidence": [
+            {
+              "fact_id": "reb_unify_runtime_reliability_governance",
+              "shared_tokens": [
+                "telemetry"
+              ],
+              "fact_text_known": true
+            }
+          ],
+          "ungrounded_tokens": [],
+          "grounded_tokens": [
+            "telemetry"
+          ],
+          "majority_grounded": true
+        },
+        {
+          "segment": "Enterprise Portfolio Expansion",
+          "ground_pass": true,
+          "cited_fact_ids": [
+            "reb_ibm_revenue_sales_target_execution"
+          ],
+          "evidence": [
+            {
+              "fact_id": "reb_ibm_revenue_sales_target_execution",
+              "shared_tokens": [
+                "expansion",
+                "portfolio"
+              ],
+              "fact_text_known": true
+            }
+          ],
+          "ungrounded_tokens": [],
+          "grounded_tokens": [
+            "expansion",
+            "portfolio"
+          ],
+          "majority_grounded": true
+        }
+      ],
+      "checked": 3
+    },
+    "resume_native_clarity": {
+      "pass": true,
+      "shape_valid": true,
+      "opaque_segments": [],
+      "semantic_overlap_issues": [],
+      "segment_observations": [
+        {
+          "segment": "Hyperscaler Alliance Co-Sell",
+          "word_count": 3,
+          "familiar_positioning_phrases": [],
+          "pass": true
+        },
+        {
+          "segment": "Runtime Telemetry Governance",
+          "word_count": 3,
+          "familiar_positioning_phrases": [],
+          "pass": true
+        },
+        {
+          "segment": "Enterprise Portfolio Expansion",
+          "word_count": 3,
+          "familiar_positioning_phrases": [],
+          "pass": true
+        }
+      ]
+    },
+    "resume_graph_claim_binding": {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority_pre_x2",
+      "pass": true,
+      "observed_value": {
+        "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+        "claim_count": 3,
+        "allocation_assignment_count": 3,
+        "failure_reasons": []
+      },
+      "threshold": {
+        "binding_failures": 0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "",
+      "evidence_ref": "selected_fact_plan.json#allocation_assignments"
+    }
+  },
+  "rejected_reason": null,
+  "bounded": {
+    "max_attempts": 3,
+    "attempts_used": 2
+  },
+  "env_kill_switch_state": "unset",
+  "attempts": [
+    {
+      "attempt": 1,
+      "headline": "SVP Engineering | Hyperscaler Alliance Co-Sell | Runtime Telemetry Governance | Portfolio Expansion Leadership",
+      "trigger_arm": "resume_native_clarity",
+      "trigger_reason": "headline_pre_x1d_resume_native_clarity:Enterprise Portfolio Expansion Leadership",
+      "rejected_reason": "signal_still_missing",
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_claude",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "claude-sonnet-5",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_1.json"
+      }
+    },
+    {
+      "attempt": 2,
+      "headline": "SVP Engineering | Hyperscaler Alliance Co-Sell | Runtime Telemetry Governance | Enterprise Portfolio Expansion",
+      "trigger_arm": "executive_abstraction",
+      "trigger_reason": "x2_headline_executive_abstraction_floor:Portfolio Expansion Leadership",
+      "rejected_reason": null,
+      "provider_result": {
+        "runtime_generation_status": "REAL_LLM",
+        "provider_requested": "external_claude",
+        "provider_attempted": true,
+        "provider_available": true,
+        "model": "claude-sonnet-5",
+        "exact_provider_error": "",
+        "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_2.json"
+      }
+    }
+  ],
+  "regen_provider_result": {
+    "runtime_generation_status": "REAL_LLM",
+    "provider_requested": "external_claude",
+    "provider_attempted": true,
+    "provider_available": true,
+    "model": "claude-sonnet-5",
+    "exact_provider_error": "",
+    "provider_response_ref": "headline_content_signal_repair_provider_response_attempt_2.json"
+  },
+  "regen_provider_response_ref": "headline_content_signal_repair_provider_response_attempt_2.json"
+}

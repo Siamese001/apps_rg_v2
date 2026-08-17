@@ -1,0 +1,64 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 4.5,
+    "threshold": 4.0,
+    "pass": true,
+    "decisive_failure": false,
+    "findings": [
+      "Strong, supported leadership synthesis across architecture, governance, delivery, and commercialization.",
+      "Judge-packet display-override parity failed, although candidate display compliance passed."
+    ],
+    "cited_sentence_indexes": [],
+    "remediation_suggestions": [
+      "Restore missing display_override_text in the judge packet; do not alter candidate text."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "evidence_utilization": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "JUDGE_PACKET_DISPLAY_OVERRIDE_PARITY"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_ff337a0f42e4\\lanes\\executive_summary\\x1d_openai_provider_response_raw_20260817_024116_669.json",
+  "original_model": null,
+  "fallback_model": null
+}

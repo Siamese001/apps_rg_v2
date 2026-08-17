@@ -140,7 +140,3 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="Print changes without writing")
     args = parser.parse_args()
     run(dry_run=args.dry_run)
-
-
-if __name__ == "__main__":
-    main()

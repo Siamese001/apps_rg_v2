@@ -39,7 +39,7 @@ the report records that fact explicitly.
 ## Run
 
 ```text
-python -m apps_rg.evals.section_quality_benchmark \
+library API: apps_rg.evals.section_quality_benchmark \
   --input sealed-section-input.json \
   --reviews sealed-section-reviews.json \
   --output section-quality-report.json

@@ -1,0 +1,81 @@
+{
+  "schema": "executive_summary_dimension_upstream_triangulation_v1",
+  "consensus_failed_dimensions": [
+    "resume_voice",
+    "deterministic_alignment"
+  ],
+  "l2_upstream_failed_dimensions": [
+    "resume_voice"
+  ],
+  "dimension_remediation_lines": [
+    "resume_voice (1/1 judges FAIL): S2_SYNTACTIC_OPACITY",
+    "deterministic_alignment (2/2 judges FAIL): x2_executive_summary_judge_packet_display_override_parity"
+  ],
+  "per_dimension": [
+    {
+      "dimension_id": "resume_voice",
+      "fail_count": 1,
+      "consensus_fail": true,
+      "primary_surface": "l2_PROVIDER_MODEL",
+      "related_x2_gate": "x2_exec_summary_meta_filler_zero",
+      "x2_gate_failed_in_run": false,
+      "PROVIDER_MODEL_prompt_surfaces": [
+        "compiled_prompt.txt (Y0 / voice guards)",
+        "executive_summary_finalize_coherence.json"
+      ],
+      "retired_provider_prompt_surfaces": [
+        "compiled_prompt.txt (Y0 / voice guards)",
+        "executive_summary_finalize_coherence.json"
+      ],
+      "upstream_actions": [
+        "Remove recruiter filler and passive stacks; third person only."
+      ]
+    },
+    {
+      "dimension_id": "deterministic_alignment",
+      "fail_count": 2,
+      "consensus_fail": true,
+      "primary_surface": "x2_or_judge_packet",
+      "related_x2_gate": "x2_gate_snapshot_authoritative",
+      "x2_gate_failed_in_run": false,
+      "PROVIDER_MODEL_prompt_surfaces": [
+        "x2_gate_outputs.json",
+        "executive_summary_judge_packet_post_x2.json (deterministic_gate_summary)"
+      ],
+      "retired_provider_prompt_surfaces": [
+        "x2_gate_outputs.json",
+        "executive_summary_judge_packet_post_x2.json (deterministic_gate_summary)"
+      ],
+      "upstream_actions": [
+        "Fix X2 failures before re-spending on judges; judges mirror gate snapshot."
+      ]
+    }
+  ],
+  "PROVIDER_MODEL_prompt_refs": {
+    "compiled_prompt": "compiled_prompt.txt",
+    "compiled_prompt_artifact": "compiled_prompt_artifact.json",
+    "provider_request": "provider_request.json",
+    "provider_response": "provider_response.json",
+    "raw_model_output": "raw_model_output.txt",
+    "composition_plan": "executive_summary_composition_plan.json",
+    "generation_grade_contract_manifest": "generation_grade_contract_manifest.json"
+  },
+  "retired_provider_prompt_refs": {
+    "compiled_prompt": "compiled_prompt.txt",
+    "compiled_prompt_artifact": "compiled_prompt_artifact.json",
+    "provider_request": "provider_request.json",
+    "provider_response": "provider_response.json",
+    "raw_model_output": "raw_model_output.txt",
+    "composition_plan": "executive_summary_composition_plan.json",
+    "generation_grade_contract_manifest": "generation_grade_contract_manifest.json"
+  },
+  "judge_cost_controls": {
+    "post_regen_judge_rescore_mode": "full_panel",
+    "judge_regen_max_cycles_configured": 0,
+    "judge_regen_cycles_consumed": 0,
+    "note": "Post-regen should rescore soft-failed judges only unless APPS_RG_EXEC_SUMMARY_POST_REGEN_JUDGE_MODE=full_panel."
+  },
+  "generation_manifest_digest": null,
+  "recommended_next_step": "L2/PROVIDER_MODEL upstream fix recommended for: resume_voice. Review PROVIDER_MODEL_prompt_surfaces; use DIMENSION_VERDICTS in judge_remediation_cycles before paying for more judge panels (post_regen mode=full_panel).",
+  "run_id": "exec_summary_20260817_015759"
+}

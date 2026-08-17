@@ -1,0 +1,110 @@
+{
+  "authority_assertions": {
+    "controls_applied_emitted_by_l2_or_l3": true,
+    "does_not_authorize_route_or_exit": true,
+    "does_not_create_candidate_evidence": true,
+    "l1_requests_only": true
+  },
+  "authority_class": "L2_L3_EXECUTION_OBSERVATION_ONLY",
+  "c0_obligation_receipt_refs": [],
+  "control_observations": [
+    {
+      "control_name": "reflexion_loops",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "IGNORED",
+      "observed_value": null,
+      "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+      "receipt_required": true,
+      "requested_value": 1.0,
+      "required_for_certification": true,
+      "transport_support_status": "UNSUPPORTED"
+    },
+    {
+      "control_name": "self_consistency_samples",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "ADAPTED",
+      "observed_value": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "reason_code": "L2_SECTION_PROVIDER_CALL_SELF_CONSISTENCY_OBSERVED",
+      "receipt_required": true,
+      "requested_value": 3.0,
+      "required_for_certification": true,
+      "transport_support_status": "SUPPORTED"
+    },
+    {
+      "control_name": "temperature",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "ADAPTED",
+      "observed_value": 0.45,
+      "reason_code": "L2_SECTION_PROVIDER_CALL_TEMPERATURE_OBSERVED",
+      "receipt_required": true,
+      "requested_value": 0.32,
+      "required_for_certification": false,
+      "transport_support_status": "SUPPORTED"
+    },
+    {
+      "control_name": "tot_branches",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "IGNORED",
+      "observed_value": null,
+      "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+      "receipt_required": true,
+      "requested_value": 2.0,
+      "required_for_certification": true,
+      "transport_support_status": "UNSUPPORTED"
+    },
+    {
+      "control_name": "tot_depth",
+      "evidence_ref": "modular_r4/section_provider_calls.json",
+      "execution_status": "IGNORED",
+      "observed_value": null,
+      "reason_code": "L2_LANE_RECORD_HAS_NO_TRANSPORT_CONTROL_OBSERVATION",
+      "receipt_required": true,
+      "requested_value": 2.0,
+      "required_for_certification": true,
+      "transport_support_status": "UNSUPPORTED"
+    }
+  ],
+  "emitter_stage": "L2",
+  "execution_receipt_ref": "reasoning_control_execution/experience_block.json",
+  "l2_l3_applied_controls": [
+    "self_consistency_samples",
+    "temperature"
+  ],
+  "plan_capsule_digest": "sha256:c975f4be4237565ff3401f357e8217a26e5e8e224c103ef81e2573db52d4c27a",
+  "provider_configuration": {
+    "candidate_count": 0,
+    "model_ids": [
+      "claude-sonnet-5",
+      "gpt-5.6-luna"
+    ],
+    "provider_profiles": [
+      "external_claude_section_lane",
+      "external_openai_section_lane"
+    ],
+    "selection_method": "L2_SECTION_PROVIDER_CALLS"
+  },
+  "quality_certification": {
+    "denied": true,
+    "eligible": false,
+    "required_control_failures": [
+      "reflexion_loops",
+      "tot_branches",
+      "tot_depth"
+    ]
+  },
+  "receipt_digest": "sha256:3c2bca74b030100c79587c2300daf9a1c06e58591416731059337766149efd9b",
+  "request_id": "req-def1d45f319745bfa4e7db8ca04e4ce8",
+  "run_id": "5af358ee-26e2-48dd-bab9-b77fed78f2c0",
+  "schema_version": "apps_rg.reasoning_control_execution_receipt.v1",
+  "trace_id": "326c1dba-c962-4eed-a818-7b89cf877f6a",
+  "unit_id": "experience_block"
+}

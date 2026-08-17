@@ -1,0 +1,54 @@
+{
+  "blocker": "EXECUTED_X3A_DENY_REROUTE",
+  "dispatch_result": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_98dc3360ff23\\lanes\\competencies",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "SectionFrontSpinePreconditionError:whole-run canonical ValidatedRequest is unavailable: cannot read ValidatedRequest contract C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\apps_rg_u0_validated_request.json: [Errno 2] No such file or directory: 'C:\\\\Git\\\\apps_rg_v2\\\\artifacts\\\\apps_rg\\\\runtime_proofs\\\\apps_rg_u0_validated_request.json'",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "apps-rg-b60af0847a22",
+    "run_id": "apps-rg-b60af0847a22",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "downstream_consequences": [
+    {
+      "code": "LANE_RUN_POINTER_NOT_FOUND",
+      "exception_class": "FileNotFoundError",
+      "exception_message": "no resolvable run_dir pointer for lane 'competencies' under C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_98dc3360ff23\\lanes",
+      "operation": "resolve_latest_lane_run_dir",
+      "stage": "PHASE1_LANE_MATERIALIZATION"
+    }
+  ],
+  "expected_run_dir_pattern": "artifacts/apps_rg/runtime_proofs/full_resume_98dc3360ff23/modular_r4/sections/competencies/real/<run_id>/",
+  "generated_at_utc": "2026-08-17T01:31:34.922145+00:00",
+  "integrated_run_id": "full_resume_98dc3360ff23",
+  "lane_exec_status": "dispatch_error:SectionFrontSpinePreconditionError:whole-run canonical ValidatedRequest is unavailable: cannot read ValidatedRequest contract C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\apps_rg_u0_validated_request.json: [Errno 2] No such file or directory: 'C:\\\\Git\\\\apps_rg_v2\\\\artifacts\\\\apps_rg\\\\runtime_proofs\\\\apps_rg_u0_validated_request.json'",
+  "lane_id": "competencies",
+  "primary_failure": {
+    "artifact_dir": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_98dc3360ff23\\lanes\\competencies",
+    "authority_classification": "NON_PRODUCT_SECTION_EXECUTION",
+    "execution_status": "failed",
+    "exit_status": "error",
+    "fault": "SectionFrontSpinePreconditionError:whole-run canonical ValidatedRequest is unavailable: cannot read ValidatedRequest contract C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\apps_rg_u0_validated_request.json: [Errno 2] No such file or directory: 'C:\\\\Git\\\\apps_rg_v2\\\\artifacts\\\\apps_rg\\\\runtime_proofs\\\\apps_rg_u0_validated_request.json'",
+    "l7_how_trace_emitted": false,
+    "outcome_authorized": false,
+    "pipeline_complete": false,
+    "product_authorized": false,
+    "request_id": "apps-rg-b60af0847a22",
+    "run_id": "apps-rg-b60af0847a22",
+    "section_result_blocked": false,
+    "section_wrapper_x3_disposition": "X3A_DENY_REROUTE",
+    "terminal_r5": false,
+    "x3_disposition": "X3A_DENY_REROUTE"
+  },
+  "schema_version": "integrated_lane_pre_run_failure_v2",
+  "sections_root_rel": "artifacts/apps_rg/runtime_proofs/full_resume_98dc3360ff23/lanes",
+  "status": "PRE_RUN_BLOCKED"
+}

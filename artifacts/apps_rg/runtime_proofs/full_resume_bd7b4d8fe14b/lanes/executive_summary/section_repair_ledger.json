@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "section_id": "executive_summary",
+  "run_id": "exec_summary_20260817_110932",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 2,
+  "authoritative_l2_source": "regen_llm",
+  "attempt_1_x2_failed": true,
+  "attempt_1_x2_failed_gate_ids": [
+    "x2_exec_summary_allowed_fact_utilization"
+  ],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "regen_llm",
+      "operation": "synthesis_regen",
+      "reason": "DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'; sentence 2: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph",
+      "replaced_l2": true
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "regen_llm",
+      "failed_gate_ids": [
+        "x2_exec_summary_allowed_fact_utilization"
+      ],
+      "passed": false
+    }
+  ],
+  "authoritative_attempt_reason": "synthesis_regen_shape_pass"
+}

@@ -801,7 +801,3 @@ def apply_graphdb_capability_sqlite_hardening(
 
 def main() -> None:
     print(json.dumps(apply_graphdb_capability_sqlite_hardening(), indent=2, ensure_ascii=False))
-
-
-if __name__ == "__main__":
-    main()

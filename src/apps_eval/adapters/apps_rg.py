@@ -296,8 +296,18 @@ def _result_x3(result: dict[str, Any], artifact_dir: Path) -> str:
 
 
 def _generated_resume_path(artifact_dir: Path) -> Path | None:
+    final_output = _json_object(artifact_dir / "FINAL_RESUME_OUTPUT.json")
+    final_binding = final_output.get("final_resume_json")
+    if isinstance(final_binding, Mapping):
+        bound = _contained_source_path(
+            str(final_binding.get("relpath") or ""), artifact_dir
+        )
+        if bound is not None and bound.is_file():
+            return bound
     candidates = [
         artifact_dir / "outputs" / "generated_resume.json",
+        artifact_dir / "final_resume.json",
+        artifact_dir / "modular_r4" / "final_resume_assembly" / "final_resume.json",
         artifact_dir / "modular_r4" / "outputs" / "generated_resume.json",
         artifact_dir / "modular_r4" / "outputs" / "final_resume.json",
     ]
@@ -323,6 +333,40 @@ def _stringify_section(value: Any) -> str:
 def _normalize_sections(generated_resume: dict[str, Any]) -> dict[str, str]:
     raw_sections = generated_resume.get("sections")
     sections = raw_sections if isinstance(raw_sections, dict) else {}
+    if isinstance(raw_sections, list):
+        section_rows = [row for row in raw_sections if isinstance(row, Mapping)]
+        by_id = {
+            str(row.get("section_id") or ""): dict(row)
+            for row in section_rows
+            if str(row.get("section_id") or "")
+        }
+
+        def rendered_lane(section_id: str) -> str:
+            row = by_id.get(section_id, {})
+            snapshot = row.get("l2_output_snapshot")
+            snapshot = snapshot if isinstance(snapshot, Mapping) else {}
+            return _stringify_section(snapshot)
+
+        experience_parts = [
+            rendered_lane(section_id)
+            for section_id in (
+                "unify_narrative",
+                "unify_bullets",
+                "ibm_narrative",
+                "ibm_bullets",
+                "insurtech_narrative",
+                "insurtech_bullets",
+                "ey_narrative",
+                "ey_bullets",
+            )
+            if rendered_lane(section_id)
+        ]
+        normalized = {
+            "executive_summary": rendered_lane("executive_summary"),
+            "experience": " ".join(experience_parts).strip(),
+            "skills": rendered_lane("competencies"),
+        }
+        return {key: value for key, value in normalized.items() if value}
     executive_summary = _stringify_section(
         sections.get("executive_summary")
         or sections.get("summary")
@@ -446,6 +490,13 @@ def _artifact_names(artifact_dir: Path) -> list[str]:
         names.add("resume.md")
     if _generated_resume_path(artifact_dir) is not None:
         names.add("generated_resume.json")
+        names.add("final_resume.json")
+    final_json = _contained_source_path("FINAL_RESUME_OUTPUT.json", artifact_dir)
+    if final_json is not None and final_json.is_file():
+        names.add("FINAL_RESUME_OUTPUT.json")
+    final_text = _contained_source_path("FINAL_RESUME_OUTPUT.txt", artifact_dir)
+    if final_text is not None and final_text.is_file():
+        names.add("FINAL_RESUME_OUTPUT.txt")
     docx = _contained_source_path("outputs/resume.docx", artifact_dir)
     if docx is not None and docx.is_file():
         names.add("resume.docx")
@@ -481,8 +532,13 @@ def _lane_artifact_index(
     artifact_dir: Path,
     source_manifest: list[dict[str, Any]],
     source_identity: Mapping[str, str],
+    candidate_manifest: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    sections_root = artifact_dir / "modular_r4" / "sections"
+    # ``lanes`` is the public whole-resume layout.  ``modular_r4`` remains a
+    # compatibility reader for historical proof bundles only.
+    sections_root = artifact_dir / "lanes"
+    if not sections_root.is_dir():
+        sections_root = artifact_dir / "modular_r4" / "sections"
     if not sections_root.is_dir():
         return {}
     manifest_by_ref = {
@@ -490,9 +546,40 @@ def _lane_artifact_index(
         for row in source_manifest
         if row.get("artifact_ref")
     }
+    candidate_bindings = (
+        candidate_manifest.get("artifact_bindings")
+        if isinstance(candidate_manifest, Mapping)
+        else []
+    )
+    # A historical run may have no v2 frozen-input manifest.  The current
+    # run path validates a candidate manifest before indexing it; compatibility
+    # readers simply have no candidate bindings in that case.
+    candidate_bindings = (
+        candidate_bindings if isinstance(candidate_bindings, list) else []
+    )
+    candidate_by_key: dict[tuple[str, str], Mapping[str, Any]] = {
+        (str(row.get("lane_id") or ""), str(row.get("role") or "")): row
+        for row in candidate_bindings
+        if isinstance(row, Mapping)
+        and str(row.get("lane_id") or "")
+        and str(row.get("role") or "")
+        and row.get("missing") is not True
+    }
     index: dict[str, Any] = {}
     for lane_dir in sorted(path for path in sections_root.iterdir() if path.is_dir()):
-        lane_identity: dict[str, str] = {}
+        lane_identity = next(
+            (
+                {
+                    key: _as_text(row["identity"].get(key))
+                    for key in _IDENTITY_KEYS
+                }
+                for (lane_id, _role), row in candidate_by_key.items()
+                if lane_id == lane_dir.name
+                and isinstance(row.get("identity"), Mapping)
+                and all(_as_text(row["identity"].get(key)) for key in _IDENTITY_KEYS)
+            ),
+            {},
+        )
         package_entry = _artifact_index_entry(
             (lane_dir / "l6_v40_shadow_eval_package.json").as_posix(),
             artifact_dir,
@@ -511,22 +598,22 @@ def _lane_artifact_index(
         closure_payload = (
             dict(closure_payload) if isinstance(closure_payload, Mapping) else {}
         )
-        candidate_identity = {
+        package_identity = {
             key: _as_text(package_payload.get(key)) for key in _IDENTITY_KEYS
         }
         lane_identity_valid = bool(
             package_payload.get("section_id") == lane_dir.name
-            and all(candidate_identity.values())
-            and candidate_identity["parent_run_id"]
+            and all(package_identity.values())
+            and package_identity["parent_run_id"]
             == _as_text(source_identity.get("parent_run_id"))
             and closure_payload.get("observability_closure_status") == "PASS"
             and all(
                 _as_text(closure_payload.get(key)) == value
-                for key, value in candidate_identity.items()
+                for key, value in package_identity.items()
             )
         )
-        if lane_identity_valid:
-            lane_identity = candidate_identity
+        if lane_identity_valid and not lane_identity:
+            lane_identity = package_identity
         pointer = next(
             (
                 contained
@@ -558,7 +645,12 @@ def _lane_artifact_index(
                 if isinstance(raw_links, dict):
                     links.update(raw_links)
         for file_name, role in _LANE_ARTIFACT_ROLE_BY_NAME.items():
-            refs = [lane_dir / file_name, _as_text(links.get(file_name))]
+            candidate_binding = candidate_by_key.get((lane_dir.name, role), {})
+            refs = [
+                _as_text(candidate_binding.get("artifact_ref")),
+                lane_dir / file_name,
+                _as_text(links.get(file_name)),
+            ]
             for ref in refs:
                 if not _as_text(ref):
                     continue
@@ -905,6 +997,24 @@ def _normalize_live_snapshot(
     _bootstrap_apps_rg_env_for_live_replay()
     source_manifest_before = build_source_artifact_manifest(artifact_dir)
     source_digest_before = source_artifact_manifest_digest(source_manifest_before)
+    candidate_manifest: dict[str, Any] = {}
+    candidate_manifest_errors: list[str] = []
+    candidate_manifest_ref = ""
+    candidate_manifest_path = artifact_dir / "candidate_evaluation_manifest.v2.json"
+    if candidate_manifest_path.is_file():
+        from apps_rg.runtime.evaluation_manifest import (
+            validate_candidate_evaluation_manifest,
+        )
+
+        candidate_manifest, candidate_manifest_errors = (
+            validate_candidate_evaluation_manifest(artifact_dir)
+        )
+        candidate_manifest_ref = candidate_manifest_path.name
+        if candidate_manifest_errors:
+            raise ValueError(
+                "apps_rg_candidate_evaluation_manifest_invalid:"
+                + ",".join(candidate_manifest_errors)
+            )
     (
         product_authorization,
         authoritative_identity,
@@ -947,11 +1057,63 @@ def _normalize_live_snapshot(
         artifact_dir,
         authoritative_identity=authoritative_identity,
     )
+    if candidate_manifest:
+        candidate_identity = candidate_manifest.get("product_identity")
+        candidate_identity = (
+            dict(candidate_identity)
+            if isinstance(candidate_identity, Mapping)
+            else {}
+        )
+        identity["parent_run_id"] = _as_text(candidate_identity.get("parent_run_id"))
+        identity["child_run_id"] = _as_text(candidate_identity.get("child_run_id"))
+        identity["section_attempt_id"] = (
+            f"whole_resume:{identity['child_run_id']}" if identity["child_run_id"] else ""
+        )
+        identity["runtime_exhaust_bundle_id"] = _as_text(
+            candidate_identity.get("runtime_exhaust_bundle_id")
+        )
     artifact_index = _lane_artifact_index(
         artifact_dir,
         source_manifest_before,
         identity,
+        candidate_manifest,
     )
+    # Use the frozen manifest for whole-run roles too.  Without this index the
+    # resolver follows compatibility-order paths (for example an old generated
+    # resume rather than the final assembly), so L6 cannot reproduce the
+    # scorecard's declared source bytes.
+    candidate_bindings = candidate_manifest.get("artifact_bindings", [])
+    candidate_bindings = (
+        candidate_bindings if isinstance(candidate_bindings, list) else []
+    )
+    manifest_by_ref = {
+        str(row.get("artifact_ref") or ""): row
+        for row in source_manifest_before
+        if row.get("artifact_ref")
+    }
+    for binding in candidate_bindings:
+        if not isinstance(binding, Mapping) or binding.get("missing") is True:
+            continue
+        if str(binding.get("lane_id") or ""):
+            continue
+        role = str(binding.get("role") or "")
+        entry = _artifact_index_entry(
+            str(binding.get("artifact_ref") or ""),
+            artifact_dir,
+            manifest_by_ref,
+        )
+        if not role or not entry:
+            continue
+        payload = entry.get("payload")
+        payload = dict(payload) if isinstance(payload, Mapping) else {}
+        binding_identity = binding.get("identity")
+        if isinstance(binding_identity, Mapping):
+            payload["source_identity"] = {
+                key: _as_text(binding_identity.get(key))
+                for key in _IDENTITY_KEYS
+            }
+        entry["payload"] = payload
+        artifact_index[role] = entry
     output: dict[str, Any] = {
         "runtime": {
             "exit_status": _as_text(result.get("exit_status")),
@@ -1020,6 +1182,10 @@ def _normalize_live_snapshot(
                 for ref in claim.get("source_ids", [])
             ),
             "lane_artifact_index_count": len(artifact_index),
+            "candidate_evaluation_manifest_ref": candidate_manifest_ref,
+            "candidate_evaluation_manifest_sha256": _as_text(
+                candidate_manifest.get("manifest_sha256")
+            ),
             "resolved_inputs": verified_preflight.get("resolved_inputs", {}),
             "source_digest_before": source_digest_before,
             "source_digest_after": source_digest_after,

@@ -486,6 +486,7 @@ class _AppsRgTargetingBriefGoogleJudge(GoogleJudge):
         payload = json.loads(request.body.decode("utf-8"))
         generation_config = payload.setdefault("generationConfig", {})
         generation_config.pop("temperature", None)
+        generation_config["responseMimeType"] = "application/json"
         generation_config["thinkingConfig"] = {
             "thinkingLevel": APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL
         }
@@ -597,6 +598,10 @@ def run_apps_rg_handoff_x2_judge(
     }
     resolved_judge = judge or _AppsRgTargetingBriefGoogleJudge(
         model=APPS_RG_HANDOFF_JUDGE_MODEL,
+        api_key=(
+            os.environ.get("GOOGLE_API_KEY", "").strip()
+            or os.environ.get("GEMINI_API_KEY", "").strip()
+        ),
         timeout=30.0,
         max_tokens=APPS_RG_HANDOFF_JUDGE_MAX_TOKENS,
         usage_artifact_dir=usage_artifact_dir,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -248,6 +249,7 @@ def _eval_record(tmp_path: Path, *, coverage_complete: bool = True) -> SimpleNam
     )
     return SimpleNamespace(
         record_id="eval-1",
+        eval_execution_complete=True,
         snapshot_digest=_SNAPSHOT_DIGEST,
         registry_digest=_CONTRACT_DIGEST,
         artifact_paths={
@@ -320,12 +322,78 @@ def _install_fakes(
         return _eval_record(tmp_path, coverage_complete=coverage_complete)
 
     monkeypatch.setattr(subject, "_run_current_eval", fake_eval)
+    # These tests isolate post-X3 sequencing and terminal policy.  The
+    # manifest/audit itself is tested separately against a complete 11-lane
+    # bundle, so provide an already-qualified independent audit here.
+    from apps_rg.runtime import evaluation_assurance
+
+    def fake_l6_audit(**kwargs):
+        audit = tmp_path / "l6_evaluation_audit.v2.json"
+        _write_json(audit, {"l6_integrity_status": "PASS"})
+        return {
+            "artifact_ref": audit.name,
+            "artifact_sha256": "sha256:" + hashlib.sha256(audit.read_bytes()).hexdigest(),
+            "l6_integrity_status": "PASS",
+            "apps_eval_rows_bound": True,
+            "evidence_class": "APPS_EVAL_BOUND_PROOF",
+            "grain_parity_status": "PASS",
+            "checks": {"eval_package_seal_present": True},
+        }
+
+    def fake_decision(*, eval_record, l6_audit):
+        passed = bool(eval_record.scorecard.coverage_summary["coverage_complete"])
+        return {
+            "execution_status": "PASS",
+            "package_integrity_status": "PASS",
+            "evaluation_validity": "PASS" if passed else "INVALID",
+            "deterministic_product_status": "PASS",
+            "semantic_factuality_status": "PENDING_CALIBRATION",
+            "quality_advisory_status": "PENDING_CALIBRATION",
+            "l6_integrity_status": "PASS",
+            "invalid_row_count": 0 if passed else 1,
+            "product_failure_row_count": 0,
+            "evaluation_status": "PASS" if passed else "EVALUATION_INVALID",
+        }
+
+    monkeypatch.setattr(evaluation_assurance, "run_l6_evaluation_audit", fake_l6_audit)
+    monkeypatch.setattr(evaluation_assurance, "derive_evaluation_decision", fake_decision)
     monkeypatch.setattr(
         subject,
         "_complete_fact_vector_writeback_after_x3",
         lambda **kwargs: {"status": "EMPTY", "reason": "none", "promotions": []},
     )
     monkeypatch.setattr(subject, "_bind_completion_artifacts", lambda **kwargs: None)
+
+
+def test_uwg_commit_receipt_is_schema_versioned_for_e2e_ledger(tmp_path: Path) -> None:
+    @dataclass
+    class _Record:
+        commit_request_id: str = "cr-1"
+        state_diff_id: str = "sd-1"
+        rollback_plan_id: str = "rp-1"
+        refresh_plan_id: str = "rfp-1"
+        commit_receipt_id: str = "ucr-1"
+        uwg_validation_receipt_ref: str = "uvr-1"
+
+    generated = tmp_path / "outputs" / "generated_resume.json"
+    _write_json(generated, {"schema_version": "master_resume_v2.16"})
+    paths = subject._write_uwg_artifacts(
+        artifact_dir=tmp_path,
+        commit_request=_Record(),
+        state_diff=_Record(),
+        rollback_plan=_Record(),
+        refresh_plan=_Record(),
+        validation=_Record(),
+        commit_receipt=_Record(),
+        refresh_receipts=[_Record()],
+        generated_resume=generated,
+        output_hash="a" * 64,
+        ids={"run_id": "run-1", "request_id": "req-1", "trace_root": "trace-1"},
+    )
+
+    receipt = json.loads((tmp_path / paths["uwg_commit_receipt"]).read_text())
+    assert receipt["schema_version"] == "apps_rg.uwg_commit_receipt.v1"
+    assert receipt["commit_status"] == "COMMITTED"
 
 
 def test_uwg_closes_before_apps_eval_and_l6(tmp_path: Path, monkeypatch) -> None:
@@ -353,18 +421,17 @@ def test_uwg_closes_before_apps_eval_and_l6(tmp_path: Path, monkeypatch) -> None
     assert result["authority_order"]["uwg_closed_before_l6"] is True
     assert result["authority_order"]["l6_influenced_current_uwg_decision"] is False
     assert (
-        result["l6_shadow"]["alignment_source"] == "independent_persisted_observations"
+        result["l6_shadow"]["alignment_source"]
+        == "independent_candidate_evaluation_manifest"
     )
     assert result["l6_shadow"]["apps_eval_rows_bound"] is True
     assert result["l6_shadow"]["evidence_class"] == "APPS_EVAL_BOUND_PROOF"
     assert result["l6_shadow"]["grain_parity_status"] == "PASS"
     assert (tmp_path / subject.POST_X3_AUTHORITY_ORDER_RECEIPT).is_file()
-    assert (
-        tmp_path / result["l6_shadow"]["l6_section_apps_eval_bindings_ref"]
-    ).is_file()
+    assert (tmp_path / result["l6_shadow"]["l6_evaluation_audit_ref"]).is_file()
 
 
-def test_post_boundary_eval_failure_does_not_veto_current_uwg(
+def test_post_boundary_eval_failure_vetoes_pipeline_completion(
     tmp_path: Path,
     monkeypatch,
 ) -> None:
@@ -389,7 +456,9 @@ def test_post_boundary_eval_failure_does_not_veto_current_uwg(
     assert result["product_authorized"] is True
     assert result["pipeline_complete"] is False
     assert result["observability_repair_required"] is True
-    assert result["failure_stage"] == "apps_eval_post_boundary"
+    assert result["failure_stage"] == "apps_eval_invalid"
+    assert result["apps_eval"]["compatibility_status"] == "FAIL"
+    assert result["l6_shadow"]["compatibility_status"] == "PASS"
     assert result["durable_promotion_committed"] is True
     assert (
         result["authority_order"]["apps_eval_influenced_current_uwg_decision"] is False

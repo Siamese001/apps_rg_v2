@@ -256,7 +256,3 @@ def main() -> int:
         f"rejected={len(promo['rejected'])} draft {draft_before}->{draft_after}"
     )
     return 0 if status == "PASS" else 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

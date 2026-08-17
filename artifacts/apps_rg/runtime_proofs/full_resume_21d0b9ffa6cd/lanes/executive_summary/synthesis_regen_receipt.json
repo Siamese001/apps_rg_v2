@@ -1,0 +1,119 @@
+{
+  "schema": "executive_summary_synthesis_regen_v2",
+  "triggered": true,
+  "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'; sentence 1: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+  "initial_candidate_digest": "753c0bbcdabfad04",
+  "initial_defects": [
+    "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence",
+    "DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'",
+    "sentence 1: mechanism_comma_list",
+    "dominant_source_fact=unknown",
+    "claim_support_graph_refs=[]",
+    "suppressed_skills=[]"
+  ],
+  "first_pass_resume_word_count": 133,
+  "first_pass_claim_ledger_rows": 6,
+  "max_attempts": 3,
+  "acceptance_semantics": {
+    "monotonicity_accepted": "candidate improved relative to the prior draft; full pre-X2 shape closure is not implied",
+    "receipt_accepted": "the selected candidate cleared every pre-X2 synthesis-shape check",
+    "transport_accepted": "the provider call completed and parsed; product acceptance is not implied"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; DISPLAY_OVERRIDE compliance failed: fact_engineering_platform_002 missing anchor 'dependency graph intelligence enables accelerated legacy-system analysis'; sentence 1: mechanism_comma_list; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "call_id": "synthesis_regen-00-01-3763b8b4",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "b4c4599a2e4c9153",
+      "regen_resume_word_count": 133,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [
+        "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence",
+        "Executive summary meta or filler scaffolding: ['governance discipline']"
+      ],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": false,
+        "failed_reasons": [
+          "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence",
+          "Executive summary meta or filler scaffolding: ['governance discipline']"
+        ]
+      },
+      "shape_failure_count": 2,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 133,
+        "post_resume_word_count": 133,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 18,
+        "post_unique_source_fact_ids": 17,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": true,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "MONOTONIC_IMPROVEMENT_ONLY",
+      "advanced_to_next_attempt": true,
+      "best_candidate": true
+    },
+    {
+      "attempt": 2,
+      "reject_reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; Executive summary meta or filler scaffolding: ['governance discipline']",
+      "call_id": "synthesis_regen-00-02-72e6bfaa",
+      "dispatch_allowed": true,
+      "block_reason": null,
+      "runtime_status": "REAL_LLM",
+      "parse_ok": true,
+      "candidate_digest": "42f6f27a9b68a578",
+      "regen_resume_word_count": 137,
+      "regen_claim_ledger_rows": 6,
+      "defects_after": [],
+      "shape_gate_snapshot": {
+        "scope": "PRE_X2_SYNTHESIS_SHAPE",
+        "pass": true,
+        "failed_reasons": []
+      },
+      "shape_failure_count": 0,
+      "monotonicity": {
+        "repair_context": "synthesis_regen",
+        "failed_gate_ids": [],
+        "pre_resume_word_count": 133,
+        "post_resume_word_count": 137,
+        "pre_claim_ledger_rows": 6,
+        "post_claim_ledger_rows": 6,
+        "pre_unique_source_fact_ids": 17,
+        "post_unique_source_fact_ids": 14,
+        "prior_failed_sentence_count": false,
+        "prior_needs_evidence_weave": false,
+        "prior_needs_prose_tighten": true,
+        "prior_needs_density_reduction": true,
+        "judge_x2_shape_repair": false,
+        "allow_substance_regression": true,
+        "ledger_rows_gained": false,
+        "facts_gained": false,
+        "accepted": true,
+        "rejection_reasons": [],
+        "shrink_waived": true
+      },
+      "acceptance_scope": "FULL_PRE_X2_SHAPE_PASS",
+      "advanced_to_next_attempt": false,
+      "best_candidate": true
+    }
+  ],
+  "accepted": true,
+  "accepted_via": "shape_pass",
+  "final_resume_word_count": 137
+}

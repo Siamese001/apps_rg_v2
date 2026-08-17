@@ -1,0 +1,204 @@
+{
+  "apps_rg_last_probe_snapshot": null,
+  "apps_rg_provider_preflight_blocked": false,
+  "exact_provider_error": null,
+  "generation_meta": {
+    "adaptive_sc_enabled": false,
+    "claude_selection_count": 3,
+    "configured_max_regen_rounds": 1,
+    "expansion_events": [],
+    "generation_mode": "model_employment_pool_claude_top_n_regen",
+    "initial_path_count": 2,
+    "max_path_count": 2,
+    "max_regen_rounds_allowed": 1,
+    "min_selection_score": 0.72,
+    "regen_rounds_executed": 0,
+    "section_lane": "ey_bullets",
+    "selection_gate": {
+      "bullets_in_merged": 3,
+      "duplicate_source_fact_ids": [],
+      "final_bullet_count": 3,
+      "min_score_threshold": 0.72,
+      "ok": true,
+      "proof_unique_source_fact_gate_active": true,
+      "section_lane": "ey_bullets",
+      "slots_below_threshold": [],
+      "slots_missing": [],
+      "slots_missing_source_fact_ids": [],
+      "slots_passing": [
+        "bul_ey_001",
+        "bul_ey_002",
+        "bul_ey_003"
+      ],
+      "unique_source_fact_count": 3,
+      "unique_source_fact_ids": [
+        "bul_ey_001",
+        "bul_ey_002",
+        "bul_ey_003"
+      ]
+    },
+    "selection_mode": "anthropic_claude_employment_top_n_pass",
+    "selector_bullets_in_merged": 3,
+    "selector_empty": false,
+    "selector_selection_count": 3,
+    "selector_selection_mode": "anthropic_claude_employment_top_n_pass",
+    "selector_subthreshold_scores": [
+      0.78,
+      0.8,
+      0.77
+    ],
+    "source_path_by_slot": {
+      "bul_ey_001": 0,
+      "bul_ey_002": 1,
+      "bul_ey_003": 0
+    },
+    "stop_reason": "selection_gate_passed",
+    "total_paths_executed": 2
+  },
+  "model": "claude-sonnet-5",
+  "prompt_cache_receipt": {
+    "c0_prefix_hash": "",
+    "cache_creation_input_tokens": null,
+    "cache_enabled": false,
+    "cache_hit_ratio": null,
+    "cache_marker_count": 0,
+    "cache_read_input_tokens": null,
+    "cache_savings_estimate_source": "not_estimated_cache_disabled",
+    "cache_strategy": "disabled",
+    "estimated_cached_input_tokens": null,
+    "estimated_uncached_input_tokens": null,
+    "input_tokens": null,
+    "model": "claude-sonnet-5",
+    "output_tokens": null,
+    "provider": "external_claude",
+    "section_id": "ey_bullets",
+    "stable_prefix_hash": "",
+    "volatile_tail_hash": ""
+  },
+  "provider_attempted": true,
+  "provider_available": true,
+  "provider_requested": "external_claude",
+  "provider_response": {
+    "anthropic_cache_receipt_seed": null,
+    "attempt_completed_at_utc": "2026-08-17T03:38:15.537078+00:00",
+    "attempt_started_at_utc": "2026-08-17T03:38:10.486888+00:00",
+    "effective_timeout_seconds": 90.0,
+    "logical_attempt": 1,
+    "model": "claude-sonnet-5",
+    "provider_attempt_spans": [
+      {
+        "attempt_index": 1,
+        "attempt_kind": "requested",
+        "completed_at_utc": "2026-08-17T03:38:15.537078+00:00",
+        "duration_seconds": 5.05019,
+        "exact_provider_error": null,
+        "model": "claude-sonnet-5",
+        "provider": "external_claude",
+        "provider_attempted": true,
+        "provider_available": true,
+        "request_digest": "37678fb71a5889961dfb4d3451b1e472134fbb7ab2b5bda846a0f888d57b4d6e",
+        "runtime_generation_status": "REAL_LLM",
+        "schema_version": "apps_rg_provider_attempt_span_v1",
+        "span_kind": "provider_attempt",
+        "started_at_utc": "2026-08-17T03:38:10.486888+00:00",
+        "temperature": 0.52,
+        "timeout_seconds": 90.0,
+        "token_budget": 2200,
+        "transport_timing": {
+          "chunk_count": 18,
+          "completed_after_s": 5.031,
+          "first_byte_after_s": 1.0,
+          "last_progress_after_s": 5.031,
+          "raw_output_chars": 1574,
+          "read_iterations": 18,
+          "started_at": "2026-08-17T03:38:10.494235+00:00",
+          "stream": true
+        }
+      }
+    ],
+    "provider_attempt_timing_summary": {
+      "accepted_output_model": "claude-sonnet-5",
+      "accepted_output_provider": "external_claude",
+      "attempted_count": 1,
+      "fallback_attempt_count": 0,
+      "fallback_attempted": false,
+      "models": [
+        "claude-sonnet-5"
+      ],
+      "providers": [
+        "external_claude"
+      ],
+      "runtime_generation_statuses": [
+        "REAL_LLM"
+      ],
+      "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+      "span_count": 1,
+      "total_duration_seconds": 5.05019
+    },
+    "provider_cache_receipt": {
+      "c0_prefix_hash": "",
+      "cache_creation_input_tokens": null,
+      "cache_enabled": false,
+      "cache_hit_ratio": null,
+      "cache_marker_count": 0,
+      "cache_read_input_tokens": null,
+      "cache_savings_estimate_source": "not_estimated_cache_disabled",
+      "cache_strategy": "disabled",
+      "estimated_cached_input_tokens": null,
+      "estimated_uncached_input_tokens": null,
+      "input_tokens": null,
+      "model": "claude-sonnet-5",
+      "output_tokens": null,
+      "provider": "external_claude",
+      "section_id": "ey_bullets",
+      "stable_prefix_hash": "",
+      "volatile_tail_hash": ""
+    },
+    "provider_profile": "external_claude",
+    "reasoning_effort": "low",
+    "request_digest": "37678fb71a5889961dfb4d3451b1e472134fbb7ab2b5bda846a0f888d57b4d6e",
+    "transport_attempt": 1,
+    "transport_attempt_ids": [
+      "attempt-40c81a0140b74b6fbb60668f6bcdb389"
+    ],
+    "transport_response": {
+      "model": "claude-sonnet-5",
+      "raw_response": {
+        "byte_length": 2331,
+        "content_type": "structured",
+        "redacted": true,
+        "sha256": "ed0c26e70622c78ec2754a07ff1998a770d934356e10c4b77d6614d113cdf063"
+      },
+      "text": "{\"bullets\":[{\"bullet_id\":\"b1\",\"bullet_text\":\"Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.\",\"source_fact_ids\":[\"bul_ey_001\"]},{\"bullet_id\":\"b2\",\"bullet_text\":\"Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.\",\"source_fact_ids\":[\"bul_ey_002\"]},{\"bullet_id\":\"b3\",\"bullet_text\":\"Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.\",\"source_fact_ids\":[\"bul_ey_003\"]}],\"claim_ledger\":[{\"claim_text\":\"Led quantitative derivatives, variable-annuity hedging, and insurance-capital work using exotic pricing, liability Greeks, higher-order stress testing, and hedge design.\",\"source_fact_ids\":[\"bul_ey_001\"]},{\"claim_text\":\"Led CCAR-era capital, liquidity, stress testing, and model-validation work by structuring traceable scenarios, challenger variants, model-risk remediation, and governance evidence for regulated financial institutions.\",\"source_fact_ids\":[\"bul_ey_002\"]},{\"claim_text\":\"Architected ERM operating models and BCBS 239-aligned risk-data aggregation by defining three-lines-of-defense accountability, metadata standards, and auditable risk metrics.\",\"source_fact_ids\":[\"bul_ey_003\"]}],\"jd_alignment\":{\"targeting_only\":true,\"jd_used_as_proof\":false}}",
+      "transport_timing": {
+        "chunk_count": 18,
+        "completed_after_s": 5.031,
+        "first_byte_after_s": 1.0,
+        "last_progress_after_s": 5.031,
+        "raw_output_chars": 1574,
+        "read_iterations": 18,
+        "started_at": "2026-08-17T03:38:10.494235+00:00",
+        "stream": true
+      }
+    },
+    "transport_timing": {
+      "chunk_count": 18,
+      "completed_after_s": 5.031,
+      "first_byte_after_s": 1.0,
+      "last_progress_after_s": 5.031,
+      "raw_output_chars": 1574,
+      "read_iterations": 18,
+      "started_at": "2026-08-17T03:38:10.494235+00:00",
+      "stream": true
+    }
+  },
+  "raw_model_output": {
+    "byte_length": 1574,
+    "content_type": "text",
+    "redacted": true,
+    "sha256": "9a13a889252825c946e424b212a66226ce1a9357777fbc67fcc1f45ed106faaa"
+  },
+  "reasoning_execution_receipt": null,
+  "runtime_generation_status": "REAL_LLM",
+  "stub": false
+}

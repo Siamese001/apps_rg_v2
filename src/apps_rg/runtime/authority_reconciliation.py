@@ -58,11 +58,12 @@ GENERATED_LANES: tuple[str, ...] = (
 )
 
 _CORE_PRODUCER = "apps_rg.runtime.entrypoints.integrated_single_action_spine_run"
+_CURRENT_LANE_X3_PRODUCER = "apps_rg.runtime.orchestration.app_single_action_spine"
+_AUTHORIZING_LANE_X3_CODES = frozenset({"X3_ALLOW", X3D_ALLOW_FINISH})
 _LANE_REQUIRED_ARTIFACTS: tuple[str, ...] = (
     "l2_handoff_receipt.json",
     "l2_spine_receipt.json",
     CORE_X3_DISPOSITION_ARTIFACT,
-    CORE_RUNTIME_AUTHORITY_ARTIFACT,
     LANE_X3_MIRROR_ARTIFACT,
     LANE_EXIT_MIRROR_ARTIFACT,
     "x2_gate_outputs.json",
@@ -146,12 +147,28 @@ def _x2_pass(payload: Mapping[str, Any]) -> bool:
     )
 
 
+def lane_artifact_root(source_run: Path | str, lane: str) -> Path:
+    """Return the persisted artifact directory for a generated lane.
+
+    Public whole-resume runs write lane evidence to ``lanes/<lane>``.  Older
+    proof bundles used ``modular_r4/sections/<lane>``; retain that fallback so
+    historical zero-provider reconciliation stays readable.
+    """
+
+    root = Path(source_run).resolve()
+    lane_id = str(lane).strip()
+    live_root = root / "lanes" / lane_id
+    if live_root.is_dir():
+        return live_root
+    return root / "modular_r4" / "sections" / lane_id
+
+
 def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
     """Recompute one lane's authority without trusting app X3 mirrors."""
 
     root = Path(source_run).resolve()
     lane_id = str(lane).strip()
-    lane_root = root / "modular_r4" / "sections" / lane_id
+    lane_root = lane_artifact_root(root, lane_id)
     paths = {name: lane_root / name for name in _LANE_REQUIRED_ARTIFACTS}
     docs = {name: _read_json(path) for name, path in paths.items()}
 
@@ -161,7 +178,11 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
     l2_spine = docs["l2_spine_receipt.json"]
     core_envelope = docs[CORE_X3_DISPOSITION_ARTIFACT]
     core_payload = _payload(core_envelope)
-    core_authority = docs[CORE_RUNTIME_AUTHORITY_ARTIFACT]
+    # The public lane runner now emits its signed X3 receipt directly.  The
+    # old core-authority sidecar is optional historical evidence, not a
+    # precondition for authorizing a current lane.
+    core_authority_path = lane_root / CORE_RUNTIME_AUTHORITY_ARTIFACT
+    core_authority = _read_json(core_authority_path)
     normalized = core_authority.get("normalized_contract")
     normalized = dict(normalized) if isinstance(normalized, Mapping) else {}
     normalized_x3 = normalized.get("x3")
@@ -211,21 +232,32 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
         "l2_spine_precondition_pass": l2_spine.get("precondition_status") == "PASS",
         "l2_spine_no_direct_l4_write": l2_spine.get("direct_l4_write_allowed") is False,
         "core_x3_producer_exact": core_envelope.get("producer_component")
-        == _CORE_PRODUCER,
+        in {_CORE_PRODUCER, _CURRENT_LANE_X3_PRODUCER},
         "core_x3_payload_hash_valid": bool(core_payload_digest)
         and core_envelope.get("artifact_hash") == core_payload_digest,
-        "core_x3_exact_authorizing_code": core_code == X3D_ALLOW_FINISH,
-        "core_authority_digest_valid": bool(stored_core_authority_digest)
-        and stored_core_authority_digest == canonical_digest(core_authority_body),
-        "core_authority_contract_valid": normalized.get("valid") is True,
-        "core_authority_source_x3_bound": bool(core_x3_binding)
-        and core_x3_binding.get("present") is True
-        and core_x3_binding.get("hash_matches") is True,
-        "core_authority_x3_matches_producer": bool(core_code)
-        and normalized_code == core_code,
-        "core_authority_spine_success": normalized_spine.get("success") is True,
-        "core_authority_outcome_authorized": core_authority.get("status") == "PASS"
-        and core_authority.get("outcome_authorized") is True,
+        "core_x3_exact_authorizing_code": core_code in _AUTHORIZING_LANE_X3_CODES,
+        "core_authority_digest_valid": not core_authority
+        or (
+            bool(stored_core_authority_digest)
+            and stored_core_authority_digest == canonical_digest(core_authority_body)
+        ),
+        "core_authority_contract_valid": not core_authority
+        or normalized.get("valid") is True,
+        "core_authority_source_x3_bound": not core_authority
+        or (
+            bool(core_x3_binding)
+            and core_x3_binding.get("present") is True
+            and core_x3_binding.get("hash_matches") is True
+        ),
+        "core_authority_x3_matches_producer": not core_authority
+        or (bool(core_code) and normalized_code == core_code),
+        "core_authority_spine_success": not core_authority
+        or normalized_spine.get("success") is True,
+        "core_authority_outcome_authorized": not core_authority
+        or (
+            core_authority.get("status") == "PASS"
+            and core_authority.get("outcome_authorized") is True
+        ),
         "lane_x2_all_pass": _x2_pass(lane_x2),
         "lane_mirror_declared_nonauthoritative": mirror.get("section_x3_authoritative")
         is False
@@ -261,7 +293,14 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
         "budget_ceiling": int(handoff.get("budget_ceiling") or 0),
         "checks": checks,
         "failed_checks": failures,
-        "source_bindings": [_binding(root, path) for path in paths.values()],
+        "source_bindings": [
+            *[_binding(root, path) for path in paths.values()],
+            *(
+                [_binding(root, core_authority_path)]
+                if core_authority_path.is_file()
+                else []
+            ),
+        ],
     }
 
 
@@ -467,7 +506,7 @@ def run_l0_parallel_artifact_replay(
 
     def replay_lane(lane: str) -> dict[str, Any]:
         nonlocal active, max_active
-        lane_root = root / "modular_r4" / "sections" / lane
+        lane_root = lane_artifact_root(root, lane)
         bindings = [
             _binding(root, lane_root / name) for name in _LANE_REQUIRED_ARTIFACTS
         ]
@@ -690,5 +729,6 @@ __all__ = [
     "derive_lane_authority",
     "derive_run_authority",
     "emit_w1_authority_reconciliation",
+    "lane_artifact_root",
     "run_l0_parallel_artifact_replay",
 ]

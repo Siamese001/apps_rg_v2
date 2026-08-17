@@ -1,0 +1,957 @@
+{
+  "schema_version": "1",
+  "run_id": "unify_narrative_20260817_023840",
+  "correlation_id": null,
+  "created_at": "2026-08-17T02:38:59.578382+00:00",
+  "bundle_kind": "lane_runtime_proof",
+  "lane": "unify_narrative",
+  "root_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative",
+  "artifact_namespace": "artifacts/apps_rg/runs",
+  "log_namespace": "apps_rg/pipeline_logs",
+  "entries": [
+    {
+      "role": "lane_run_manifest",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/run_manifest.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "runtime_proof_layout.finalize_runtime_proof_run",
+      "notes": "lane=unify_narrative"
+    },
+    {
+      "role": "lane_l2_output",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l2_output.json",
+      "content_type": "application/json",
+      "required": true,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "lane=unify_narrative"
+    },
+    {
+      "role": "lane_runtime_payload",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/runtime_payload.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "prompt_compiled_text",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/compiled_prompt.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "prompt_compiled_artifact",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/compiled_prompt_artifact.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "prompt_selection_trace",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/prompt_selection_trace.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "provider_request",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/provider_request.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "provider_response",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/provider_response.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "judge_x1d_outputs",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/x1d_llm_judge_outputs.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "gate_x2_outputs",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/x2_gate_outputs.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "disposition_x3",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/x3_disposition.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "l6_shadow_eval_package",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_shadow_eval_package.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "fact_check_result",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/fact_check_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "repair_receipt",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/repair_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "section_metric_receipt",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_metric_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "lane_c0_metrics",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c0_metrics.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg.runtime.bindings.section_lane_c0_metrics"
+    },
+    {
+      "role": "claim_ledger",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/claim_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "text_claim_coverage",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/text_claim_coverage.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "selected_fact_plan",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/selected_fact_plan.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "stage_sequence",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/stage_sequence.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "artifact_inventory",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/artifact_inventory.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "runtime_exhaust_bundle",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/runtime_exhaust_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "section_runtime_proof_bundle",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_runtime_proof_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": false,
+      "producer": "apps_rg_canonical_section_runtime"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_attempt_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/attempt_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c01_retrieval_plan.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c01_retrieval_plan.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c02_atoms.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c02_atoms.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c02_fact_vector_index_preflight.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c02_fact_vector_index_preflight.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c02_semantic_cache_payload.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c02_semantic_cache_payload.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c02_vector_query.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c02_vector_query.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c06_weak_refine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c06_weak_refine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c0_evidence_room_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c0_evidence_room_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c0_fec_compose_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c0_fec_compose_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_c0_graph_lane_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/c0_graph_lane_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_canonical_claim_ledger_v2.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/canonical_claim_ledger_v2.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_canonical_evidence_digest_chain.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/canonical_evidence_digest_chain.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_command_output.txt",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/command_output.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_companion_unify_bullets_context.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/companion_unify_bullets_context.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_companion_unify_bullets_context.txt",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/companion_unify_bullets_context.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_exit_disposition_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/exit_disposition_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_exit_review_packet.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/exit_review_packet.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_exit_spine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/exit_spine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_external_model_token_reservations.jsonl",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/external_model_token_reservations.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_external_model_usage_ledger.jsonl",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/external_model_usage_ledger.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_final_evidence_contract.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/final_evidence_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_final_evidence_contract_bridge.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/final_evidence_contract_bridge.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_final_materialized_acceptance_contract.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/final_materialized_acceptance_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_frozen_execution_context.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/frozen_execution_context.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_graph_claim_bindings.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/graph_claim_bindings.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_graph_selection_rationale.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/graph_selection_rationale.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_judge_attempt_ledger.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/judge_attempt_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l1_cognitive_output_disposition.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l1_cognitive_output_disposition.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l1_cognitive_output_projection.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l1_cognitive_output_projection.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l1_evidence_obligation_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l1_evidence_obligation_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l1_plan_contract.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l1_plan_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l2_execution_packet.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l2_execution_packet.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l2_handoff_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l2_handoff_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l2_receipt_bundle.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l2_receipt_bundle.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l2_spine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l2_spine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_apps_eval_alignment.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_apps_eval_alignment.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_apps_eval_grain_parity.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_apps_eval_grain_parity.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_eval_before_learn_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_eval_before_learn_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_microstep_coverage.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_microstep_coverage.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_microstep_future_run_proposals.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_microstep_future_run_proposals.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_microstep_observations.jsonl",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_microstep_observations.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_microstep_patterns.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_microstep_patterns.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_microstep_rca.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_microstep_rca.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_observability_closure_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_observability_closure_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_shadow_handoff_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_shadow_handoff_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_shadow_learning.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_shadow_learning.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_trace_observability_summary.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_trace_observability_summary.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_v40_shadow_eval_package.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_v40_shadow_eval_package.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_v40_shadow_eval_spans.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_v40_shadow_eval_spans.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_l6_v40_shadow_eval_spans.jsonl",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/l6_v40_shadow_eval_spans.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_lane_dispatch_attempt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/lane_dispatch_attempt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_latest_real_run.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/latest_real_run.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_latest_successful_real_run.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/latest_successful_real_run.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_one_spine_certification_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/one_spine_certification_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_otel_trace_snapshot.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/otel_trace_snapshot.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_parsed_output.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/parsed_output.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_prep_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/prep_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_product_certification_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/product_certification_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_proof_eligibility_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/proof_eligibility_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_raw_model_output.txt",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/raw_model_output.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_real_l2_generation_result.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/real_l2_generation_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_route_contract.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/route_contract.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_runtime_exhaust_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/runtime_exhaust_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_seal_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/seal_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_sealed_l2_artifact.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/sealed_l2_artifact.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_section_exit_x1_result.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_exit_x1_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_section_exit_x2_result.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_exit_x2_result.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_section_front_spine_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_front_spine_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_section_input_usage_ledger.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_input_usage_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_section_repair_ledger.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_repair_ledger.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_section_spine_c0_retrieve_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/section_spine_c0_retrieve_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_spine_span_coverage_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/spine_span_coverage_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_spine_span_emit_receipt.jsonl",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/spine_span_emit_receipt.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_trace_reconciliation.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/trace_reconciliation.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_trace_reconciliation_rows.jsonl",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/trace_reconciliation_rows.jsonl",
+      "content_type": "application/octet-stream",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_unify_narrative_judge_packet.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/unify_narrative_judge_packet.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_unify_narrative_output.txt",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/unify_narrative_output.txt",
+      "content_type": "text/plain",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_validated_request.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/validated_request.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_validation_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/validation_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_x1d_gemini_provider_parse_result_20260817_023858_737.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/x1d_gemini_provider_parse_result_20260817_023858_737.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_x1d_gemini_provider_request_20260817_023853_657.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/x1d_gemini_provider_request_20260817_023853_657.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_x1d_gemini_provider_response_raw_20260817_023858_737.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/x1d_gemini_provider_response_raw_20260817_023858_737.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    },
+    {
+      "role": "lane_unify_narrative_emitted_x2_source_fact_pool_receipt.json",
+      "relative_path": "artifacts/apps_rg/runtime_proofs/full_resume_ff337a0f42e4/lanes/unify_narrative/x2_source_fact_pool_receipt.json",
+      "content_type": "application/json",
+      "required": false,
+      "exists": true,
+      "producer": "apps_rg_canonical_section_runtime",
+      "notes": "discovered_at_index_time"
+    }
+  ],
+  "evidence_package_index_ref": null,
+  "verified_external_refs": [],
+  "imported_core_evidence_snapshots": [],
+  "proof_eligible": true,
+  "proof_scope": "product_quality",
+  "proof_status": "PROOF_ELIGIBLE",
+  "runtime_proof_placement_bucket": "real",
+  "judge_proof_eligible": true,
+  "provider_proof_eligible": true,
+  "test_only_mock_judges": false,
+  "runtime_generation_status": "REAL_LLM"
+}

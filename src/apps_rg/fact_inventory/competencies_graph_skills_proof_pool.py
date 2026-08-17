@@ -614,7 +614,6 @@ def write_p2_w1a_default_graph_authority_receipt(
         if out_dir is not None
         else P2_W1_RECEIPT_REF
     )
-
     receipt = {
         "schema": "competencies_graph_proof_pool_p2_w1a_default_graph_authority_receipt_v1",
         "generated_at": ts,
@@ -703,7 +702,3 @@ def main() -> None:
             indent=2,
         )
     )
-
-
-if __name__ == "__main__":
-    main()

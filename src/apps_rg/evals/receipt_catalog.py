@@ -334,7 +334,3 @@ def main(argv: Sequence[str] | None = None) -> int:
             handle.write(encoded)
     print(encoded, end="")
     return 0 if summary["status"] == "PASS" else 2
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

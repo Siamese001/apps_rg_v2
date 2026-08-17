@@ -1,0 +1,171 @@
+{
+  "schema": "apps_rg.review_lane_policy.v1",
+  "evaluated_at_utc": "2026-08-17T01:44:27.224439+00:00",
+  "policy_rules": {
+    "ALLOW": "X3_ALLOW + REAL_LLM — eligible for product ALLOW rollup",
+    "REVIEW": "X3_REVIEW* — structural package permitted; product_review_required=true; not product ALLOW",
+    "BLOCKED": "X3_BLOCK* / BLOCKED — fails structural assembly",
+    "MOCK_PLUMBING_ONLY": "mock/plumbing-only — not product ALLOW; product_review_required=true"
+  },
+  "per_lane": [
+    {
+      "lane": "headline",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "executive_summary",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "unify_narrative",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "unify_bullets",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "ibm_narrative",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "ibm_bullets",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "insurtech_narrative",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "insurtech_bullets",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "ey_narrative",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "ey_bullets",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    },
+    {
+      "lane": "competencies",
+      "disposition_class": "ALLOW",
+      "x3_code": "X3_ALLOW",
+      "runtime_generation_status": "REAL_LLM",
+      "authorization_scope": "PRODUCT_QUALITY",
+      "product_quality_status": "PASS",
+      "can_structural_package": true,
+      "product_review_required": false,
+      "supports_product_allow": true,
+      "reason": "x3_allow_real_llm"
+    }
+  ],
+  "summary": {
+    "allow_lanes": [
+      "headline",
+      "executive_summary",
+      "unify_narrative",
+      "unify_bullets",
+      "ibm_narrative",
+      "ibm_bullets",
+      "insurtech_narrative",
+      "insurtech_bullets",
+      "ey_narrative",
+      "ey_bullets",
+      "competencies"
+    ],
+    "review_lanes": [],
+    "blocked_lanes": [],
+    "mock_plumbing_lanes": [],
+    "all_lanes_allow": true,
+    "product_review_required": false,
+    "structural_package_ok": true,
+    "product_allow_claimed": true
+  },
+  "explicit_non_claims": [
+    "REVIEW lanes are not hidden; they are labeled product_review_required.",
+    "MOCK/plumbing-only lanes cannot support product ALLOW.",
+    "JD/briefing remain targeting-only; not proof."
+  ]
+}

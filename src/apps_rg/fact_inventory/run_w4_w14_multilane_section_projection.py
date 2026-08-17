@@ -8,7 +8,3 @@ def main() -> int:
         "W4/W14 SRFS multilane projection is retired. "
         "Use graph role episode selection and selected_graph_evidence_plan."
     )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

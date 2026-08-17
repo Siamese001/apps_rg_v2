@@ -8,7 +8,3 @@ def main() -> int:
         "exec_summary_graph_projection_w4b is retired. "
         "Use selected_graph_evidence_plan built from graph role episode bundles."
     )
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

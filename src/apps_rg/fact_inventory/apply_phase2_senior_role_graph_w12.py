@@ -616,7 +616,3 @@ def main() -> int:
         f"skill_rows {before['skill_row_count']}->{after['skill_row_count']}"
     )
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

@@ -1,0 +1,88 @@
+{
+  "authority_class": "PLANNING_ADVISORY_ONLY",
+  "contract_type": "FailureAwareReplanDecision",
+  "decision_digest": "sha256:3bec5c3543891794242f7787f2baa40e63fd14af757e3b724b8190db31d3ca95",
+  "emitter": "apps_rg.runtime.contracts.failure_aware_replan",
+  "execution_authority_assertions": {
+    "does_not_authorize_exit": true,
+    "does_not_change_route": true,
+    "does_not_execute_work_units": true,
+    "does_not_select_retries": true
+  },
+  "failure_classifications": [
+    {
+      "classification": "TERMINAL_BLOCKED",
+      "failure_class": "POLICY",
+      "failure_code": "POLICY_BLOCKED",
+      "replan_hint": "TERMINAL_BLOCK",
+      "source_disposition": "SKIPPED",
+      "unit_id": "certifications_block"
+    },
+    {
+      "classification": "TERMINAL_BLOCKED",
+      "failure_class": "POLICY",
+      "failure_code": "POLICY_BLOCKED",
+      "replan_hint": "TERMINAL_BLOCK",
+      "source_disposition": "SKIPPED",
+      "unit_id": "competencies"
+    },
+    {
+      "classification": "TERMINAL_BLOCKED",
+      "failure_class": "POLICY",
+      "failure_code": "POLICY_BLOCKED",
+      "replan_hint": "TERMINAL_BLOCK",
+      "source_disposition": "SKIPPED",
+      "unit_id": "education_block"
+    },
+    {
+      "classification": "TERMINAL_BLOCKED",
+      "failure_class": "POLICY",
+      "failure_code": "POLICY_BLOCKED",
+      "replan_hint": "TERMINAL_BLOCK",
+      "source_disposition": "SKIPPED",
+      "unit_id": "executive_summary"
+    },
+    {
+      "classification": "TERMINAL_BLOCKED",
+      "failure_class": "POLICY",
+      "failure_code": "POLICY_BLOCKED",
+      "replan_hint": "TERMINAL_BLOCK",
+      "source_disposition": "SKIPPED",
+      "unit_id": "experience_block"
+    },
+    {
+      "classification": "TERMINAL_BLOCKED",
+      "failure_class": "POLICY",
+      "failure_code": "POLICY_BLOCKED",
+      "replan_hint": "TERMINAL_BLOCK",
+      "source_disposition": "SKIPPED",
+      "unit_id": "headline"
+    },
+    {
+      "classification": "TERMINAL_BLOCKED",
+      "failure_class": "POLICY",
+      "failure_code": "POLICY_BLOCKED",
+      "replan_hint": "TERMINAL_BLOCK",
+      "source_disposition": "SKIPPED",
+      "unit_id": "skills_block"
+    }
+  ],
+  "parent_plan": {
+    "capsule_digest": "sha256:cc66e94e8c35ca6ccd341cd306527c6b6b35e7403ba2ed46f0bf5f3ef7d7ef18",
+    "capsule_ref": "l1_planning_capsule.json",
+    "planning_profile_digest": "75b8b40fcd92257a8334701b4cc0cc9fcf40d52fd9e6fb8a1c98e17daaabe16a",
+    "planning_profile_ref": "apps_rg/profiles/rg_planning_profile.yaml",
+    "planning_status": "READY"
+  },
+  "replan_actions": [],
+  "replan_revision": null,
+  "replan_status": "NO_ACTIONABLE_REPLAN",
+  "request_id": "req-ffe268ccf2dd45bfb38c1357429dc98a",
+  "run_id": "b8beefaf-318c-4ef6-940f-86dfe6173d41",
+  "schema_version": "apps_rg.failure_aware_replan.v1",
+  "trigger_receipt": {
+    "receipt_digest": "sha256:bb24f18639903e4d4dbcf331dd7c732801ffd07e516a3becb9cbdea951a50c94",
+    "receipt_ref": "plan_execution_receipt.json",
+    "schema_version": "apps_rg.plan_execution_receipt.v1"
+  }
+}

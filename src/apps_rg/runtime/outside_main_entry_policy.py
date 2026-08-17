@@ -1,26 +1,17 @@
-"""SSOT for which ``apps_rg`` modules may be executed outside ``python -m apps_rg``.
+"""SSOT for executable ``apps_rg`` command surfaces.
 
-The complete resume product must enter through [apps_rg/__main__.py](../__main__.py).
-Legacy shadow dotted paths (``dispatch.*_dispatch``, ``_offline.*``, moved
-orchestrate/package paths) are deleted — ``python -m`` must raise
-``ModuleNotFoundError``. Internal helpers live under ``apps_rg.runtime.internal``
-and ``apps_rg.runtime.sections.*_lane``; they are library-only (``ImportError``
-if executed as ``__main__``).
+The complete product and every product-owned inspection action enter only
+through [apps_rg/__main__.py](../__main__.py): ``python -m apps_rg``. Nested
+modules are import-only libraries. They must not retain ``__main__`` launch
+blocks, including evaluation, graph-maintenance, validation, or bootstrap
+helpers.
 """
 from __future__ import annotations
 
-# Read-only validators / audit helpers (no provider, no resume generation).
-ALLOWED_OUTSIDE_MAIN_MODULE_CLI: frozenset[str] = frozenset(
-    {
-        "apps_rg.runtime.integrated_product_proof_gate",
-        "apps_rg.runtime.validators.validate_exec_summary_graph_only_generation",
-    }
-)
-
-# Prefixes for offline fact-inventory materializers (no product spine).
-ALLOWED_OUTSIDE_MAIN_MODULE_PREFIXES: tuple[str, ...] = (
-    "apps_rg.fact_inventory.",
-)
+# No package submodule may be an executable CLI. These exported empty values
+# remain only for compatibility with callers that import the policy constants.
+ALLOWED_OUTSIDE_MAIN_MODULE_CLI: frozenset[str] = frozenset()
+ALLOWED_OUTSIDE_MAIN_MODULE_PREFIXES: tuple[str, ...] = ()
 
 # Shadow ``python -m`` targets — module paths physically removed.
 DELETED_RUNTIME_MODULE_CLI: frozenset[str] = frozenset(
@@ -84,7 +75,7 @@ def is_deleted_runtime_module_cli(module_name: str) -> bool:
 
 
 def is_forbidden_runtime_module_cli(module_name: str) -> bool:
-    return False
+    return str(module_name).strip() != "apps_rg.__main__"
 
 
 __all__ = [

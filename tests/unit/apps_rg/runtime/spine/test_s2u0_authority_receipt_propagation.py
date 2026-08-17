@@ -85,8 +85,11 @@ def test_whole_run_section_front_reuses_canonical_u0_without_minting(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     original = _validated_request()
-    run_root = tmp_path / "run"
-    sections_root = run_root / "modular_r4" / "sections"
+    # The public full-resume runner stores section lanes directly beneath the
+    # active run directory.  The canonical U0 contract must be resolved from
+    # that same run, not its shared runtime-proofs parent.
+    run_root = tmp_path / "runtime_proofs" / "full_resume_live"
+    sections_root = run_root / "lanes"
     sections_root.mkdir(parents=True)
     write_validated_request_contract(
         run_root / CANONICAL_APPS_RG_VALIDATED_REQUEST_FILENAME,

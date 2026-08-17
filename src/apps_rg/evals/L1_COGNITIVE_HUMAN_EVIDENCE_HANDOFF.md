@@ -53,7 +53,7 @@ For each source pair, a separately sealed `holdout_case_bindings` record gives t
 After each Apps RG-local `capture-pair` operation has written its one-pair receipt, create new combined artifacts without overwriting any capture:
 
 ```powershell
-python -m apps_rg.evals.l1_cognitive_evaluation_cli assemble-paired-cohort `
+library API: apps_rg.evals.l1_cognitive_evaluation_cli assemble-paired-cohort `
   --source-paired-receipt <case-1-pair.json> `
   --source-paired-receipt <case-2-pair.json> `
   --source-paired-receipt <case-3-pair.json> `
@@ -68,7 +68,7 @@ This command joins only already-valid Apps RG capture receipts. It does not laun
 Create the substantive human record first. To add only its canonical integrity digest, write a new output file rather than overwriting the authored input:
 
 ```powershell
-python -m apps_rg.evals.l1_cognitive_evaluation_cli seal-evidence `
+library API: apps_rg.evals.l1_cognitive_evaluation_cli seal-evidence `
   --input <authored-record.json> `
   --digest-field record_digest `
   --output <sealed-record.json>
@@ -79,7 +79,7 @@ Use `plan_digest` for a rollout plan and `approval_digest` for a release approva
 After all authored evidence is sealed, run:
 
 ```powershell
-python -m apps_rg.evals.l1_cognitive_evaluation_cli rollout-gate `
+library API: apps_rg.evals.l1_cognitive_evaluation_cli rollout-gate `
   --paired-receipt <paired.json> `
   --paired-cohort-manifest <cohort-manifest.json> `
   --blind-review-packet <packet.json> `

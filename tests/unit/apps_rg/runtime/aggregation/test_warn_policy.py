@@ -1,8 +1,7 @@
 """Wave 4.2 — unit tests for apps_rg.runtime.aggregation.warn_policy.
 
-Covers the WARN-handling policy for cross-section X2 vs product ALLOW:
-structural assembly tolerates WARN but blocks FAIL/UNKNOWN, while product ALLOW
-requires every gate PASS.
+Covers the WARN-handling policy for cross-section X2 vs product output:
+WARN remains visible but only FAIL/UNKNOWN block the result.
 """
 
 from __future__ import annotations
@@ -47,8 +46,8 @@ class TestCrossSectionProductPass:
     def test_all_pass(self) -> None:
         assert cross_section_product_pass([_g("a", VERDICT_PASS)]) is True
 
-    def test_warn_blocks_product(self) -> None:
-        assert cross_section_product_pass([_g("a", VERDICT_WARN)]) is False
+    def test_warn_is_advisory_for_product(self) -> None:
+        assert cross_section_product_pass([_g("a", VERDICT_WARN)]) is True
 
     def test_fail_blocks_product(self) -> None:
         assert cross_section_product_pass([_g("a", VERDICT_FAIL)]) is False
@@ -64,15 +63,15 @@ class TestEvaluateWarnPolicy:
     def test_schema_and_static_rules(self) -> None:
         out = evaluate_warn_policy(cross_gates=[])
         assert out["schema"] == POLICY_SCHEMA
-        assert out["rules"]["WARN_never_counts_as_PASS_for_product"] is True
+        assert out["rules"]["WARN_visible_but_nonblocking_for_product"] is True
         assert out["rules"]["FAIL_and_UNKNOWN_block_structural_and_product"] is True
 
-    def test_warn_only_structural_eligible_product_blocked(self) -> None:
+    def test_warn_only_is_advisory_for_product(self) -> None:
         out = evaluate_warn_policy(cross_gates=[_g("w1", VERDICT_WARN)])
         assert out["warn_gate_ids"] == ["w1"]
         assert out["structural_cross_section_eligible"] is True
         assert out["rules"]["WARN_permitted_for_structural_assembly"] is True
-        assert out["product_allow_blocked_by_cross_section"] is True
+        assert out["product_allow_blocked_by_cross_section"] is False
 
     def test_fail_blocks_structural_and_product(self) -> None:
         out = evaluate_warn_policy(cross_gates=[_g("f1", VERDICT_FAIL)])

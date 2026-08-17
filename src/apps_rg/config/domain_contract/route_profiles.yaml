@@ -149,10 +149,12 @@
   version: "1.0.0"
   status: active
   selection_order: 60
-  production_enabled: false
-  test_only: true
-  required_activation_flags:
-    - APPS_RG_ENABLE_MANAGED_WORKFLOW_L0
+  # This is the governed product path for a full-resume run.  Keep the
+  # scratch route test-gated, but make the public product entrypoint select
+  # this managed route without an operator-only environment flag.
+  production_enabled: true
+  test_only: false
+  required_activation_flags: []
   conditions:
     merge_required_hint: true
   spine:

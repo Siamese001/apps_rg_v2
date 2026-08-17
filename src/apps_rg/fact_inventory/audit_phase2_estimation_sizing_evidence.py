@@ -364,7 +364,3 @@ def main() -> int:
     OUT_MD.write_text(_render_md(payload), encoding="utf-8")
     print(f"AUDIT promotion_decision={promotion_decision} candidates={len(CANDIDATE_TABLE)}")
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

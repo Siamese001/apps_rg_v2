@@ -1,0 +1,423 @@
+{
+  "authority_contract_id": "apps_research_rg_e2e_authority",
+  "entries": [
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "e2e_preflight_continuation_receipt.json",
+          "byte_length": 3049,
+          "sha256": "sha256:527e1514fca3060e229c60b2e2df86e31c2ffaa7f743309c8127a3aa010b230d"
+        },
+        {
+          "artifact_ref": "e2e_preflight_continuation_consumption_receipt.json",
+          "byte_length": 600,
+          "sha256": "sha256:b8bb89536c95f4aa054d7213ab2c4aa1cb9d97073075edbd8c91de0d4334d49c"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0000_fresh_preflight.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_preflight_product_entry.v1",
+      "authoritative_receipt_sha256": "sha256:69ed9d6c34c8e9fc06bd20d581f53addb67ff14bb5a4ab569d4a82a11712b8c7",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:34.460779+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RESEARCH_U0",
+      "sequence": 0,
+      "stage_id": "FRESH_PREFLIGHT",
+      "started_at_utc": "2026-08-17T02:33:34.460779+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0001_apps_research_u0.json",
+      "authoritative_receipt_schema_version": "apps_research.u0_receipt.v1",
+      "authoritative_receipt_sha256": "sha256:396837c7699dfaf283a31f082f671d6edbed12b239fb7b31997aa797ccadef0e",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:34.479520+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RESEARCH_RUNTIME",
+      "sequence": 1,
+      "stage_id": "APPS_RESEARCH_U0",
+      "started_at_utc": "2026-08-17T02:33:34.479520+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0002_apps_research_runtime.json",
+      "authoritative_receipt_schema_version": "apps_rg.local_runtime_exhaust.v1",
+      "authoritative_receipt_sha256": "sha256:93576798e005e1258381da289676a4a79e456484557dfa4ed538f6b94e8e2c1c",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:34.479520+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RESEARCH_EXIT",
+      "sequence": 2,
+      "stage_id": "APPS_RESEARCH_RUNTIME",
+      "started_at_utc": "2026-08-17T02:33:34.479520+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0003_apps_research_exit.json",
+      "authoritative_receipt_schema_version": "apps_rg.local_exit_receipt.v1",
+      "authoritative_receipt_sha256": "sha256:5ccc9a07cac3d2d23fd4f73f098432128dd49fe9b1379edb391e423f29ba4a46",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:34.479520+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "HANDOFF_BUNDLE_COMMIT",
+      "sequence": 3,
+      "stage_id": "APPS_RESEARCH_EXIT",
+      "started_at_utc": "2026-08-17T02:33:34.479520+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "e2e_authority_sources/apps_research/bundle_commit_manifest.json",
+          "byte_length": 453,
+          "sha256": "sha256:f226dbfedbecf257a37fff1cd8d8608a099432d12ed5fd1c3e7a9348324fb452"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0004_handoff_bundle_commit.json",
+      "authoritative_receipt_schema_version": "apps_research.apps_rg_handoff.v2",
+      "authoritative_receipt_sha256": "sha256:aa2891b4dc927ed4278e0a71220b166eec0d886b291227fc76608c20708c717d",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:33.793734+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RG_U0",
+      "sequence": 4,
+      "stage_id": "HANDOFF_BUNDLE_COMMIT",
+      "started_at_utc": "2026-08-17T02:33:33.793734+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0005_apps_rg_u0.json",
+      "authoritative_receipt_schema_version": "apps_rg.apps_research_handoff_validation_receipt.v2",
+      "authoritative_receipt_sha256": "sha256:268c0963f39b7008489bca438e64b7bf6bfedf8fa3421e3937354da15fe512da",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:34.494192+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RG_L1",
+      "sequence": 5,
+      "stage_id": "APPS_RG_U0",
+      "started_at_utc": "2026-08-17T02:33:34.494192+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0006_apps_rg_l1.json",
+      "authoritative_receipt_schema_version": "apps_rg.l1_plan_contract.v1",
+      "authoritative_receipt_sha256": "sha256:3d482ef6bc3a2ec5236d449648ae2a8e2bde668f7c270173689101edf1171109",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:34.499893+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RG_L0",
+      "sequence": 6,
+      "stage_id": "APPS_RG_L1",
+      "started_at_utc": "2026-08-17T02:33:34.499893+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0007_apps_rg_l0.json",
+      "authoritative_receipt_schema_version": "apps_rg.route_contract.v1",
+      "authoritative_receipt_sha256": "sha256:c7a405278e5c806c1e40c992aa774e0ebbcc22c8b60e5f06482569ff5dd9c35f",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:33:34.499893+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RG_C0",
+      "sequence": 7,
+      "stage_id": "APPS_RG_L0",
+      "started_at_utc": "2026-08-17T02:33:34.499893+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+          "byte_length": 71580,
+          "sha256": "sha256:a2fb143478a8ca9e9c49395076121002c48bd0e55b55a7036ec94ff98655c3b8"
+        },
+        {
+          "artifact_ref": "runtime_execution_witness.json",
+          "byte_length": 39090,
+          "sha256": "sha256:d22f2123ddaaed73b7cbbaab14c55096292e3a7d8306f0ebe757c37082d9f0f3"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0008_apps_rg_c0.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_stage_authority.apps_rg_c0.v1",
+      "authoritative_receipt_sha256": "sha256:0ca2ab6d4e6d384275581b898e68d39616b19fe605985e66ba5ff56b8dc40f04",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:43:32.679937+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RG_PA",
+      "sequence": 8,
+      "stage_id": "APPS_RG_C0",
+      "started_at_utc": "2026-08-17T02:43:32.679937+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+          "byte_length": 71580,
+          "sha256": "sha256:a2fb143478a8ca9e9c49395076121002c48bd0e55b55a7036ec94ff98655c3b8"
+        },
+        {
+          "artifact_ref": "prompt_assembly_bypass_receipt.json",
+          "byte_length": 289,
+          "sha256": "sha256:cf16162e1013c5120be16ab6b667f276ab15c86903889bbe26b0663a7e72ce05"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0009_apps_rg_pa.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_stage_authority.apps_rg_pa.v1",
+      "authoritative_receipt_sha256": "sha256:8e99c8a3da90a7cb627da76769a126767f8734d53583754fe0233917c21969fb",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:43:32.693125+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "APPS_RG_L2",
+      "sequence": 9,
+      "stage_id": "APPS_RG_PA",
+      "started_at_utc": "2026-08-17T02:43:32.693125+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+          "byte_length": 71580,
+          "sha256": "sha256:a2fb143478a8ca9e9c49395076121002c48bd0e55b55a7036ec94ff98655c3b8"
+        },
+        {
+          "artifact_ref": "runtime_execution_witness.json",
+          "byte_length": 39090,
+          "sha256": "sha256:d22f2123ddaaed73b7cbbaab14c55096292e3a7d8306f0ebe757c37082d9f0f3"
+        },
+        {
+          "artifact_ref": "terminal_ret_packet.json",
+          "byte_length": 283,
+          "sha256": "sha256:b79b4b7a13b83bbeccd92ba8ffc8f104c2b198ff0b1df6a23871bcb514a50433"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0010_apps_rg_l2.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_stage_authority.apps_rg_l2.v1",
+      "authoritative_receipt_sha256": "sha256:7c757376e9baca0c9730638633d2dbb8b1adea61183a9fdb25e249faf32b564f",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:43:32.700857+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "X1_REVIEW",
+      "sequence": 10,
+      "stage_id": "APPS_RG_L2",
+      "started_at_utc": "2026-08-17T02:43:32.700857+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+          "byte_length": 71580,
+          "sha256": "sha256:a2fb143478a8ca9e9c49395076121002c48bd0e55b55a7036ec94ff98655c3b8"
+        },
+        {
+          "artifact_ref": "runtime_execution_witness.json",
+          "byte_length": 39090,
+          "sha256": "sha256:d22f2123ddaaed73b7cbbaab14c55096292e3a7d8306f0ebe757c37082d9f0f3"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0011_x1_review.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_stage_authority.x1_review.v1",
+      "authoritative_receipt_sha256": "sha256:199ad69010721a836d6ad084976f3c180fc9aaefa1942a90ee0629d234749e7c",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:43:32.709663+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "X2_AGGREGATION",
+      "sequence": 11,
+      "stage_id": "X1_REVIEW",
+      "started_at_utc": "2026-08-17T02:43:32.709663+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+          "byte_length": 71580,
+          "sha256": "sha256:a2fb143478a8ca9e9c49395076121002c48bd0e55b55a7036ec94ff98655c3b8"
+        },
+        {
+          "artifact_ref": "runtime_execution_witness.json",
+          "byte_length": 39090,
+          "sha256": "sha256:d22f2123ddaaed73b7cbbaab14c55096292e3a7d8306f0ebe757c37082d9f0f3"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0012_x2_aggregation.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_stage_authority.x2_aggregation.v1",
+      "authoritative_receipt_sha256": "sha256:13fed0edba00226f8c8405040c155175a92791476ce53e61216ebffefc2d9d39",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:43:32.711248+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "X3_DISPOSITION",
+      "sequence": 12,
+      "stage_id": "X2_AGGREGATION",
+      "started_at_utc": "2026-08-17T02:43:32.711248+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+          "byte_length": 71580,
+          "sha256": "sha256:a2fb143478a8ca9e9c49395076121002c48bd0e55b55a7036ec94ff98655c3b8"
+        },
+        {
+          "artifact_ref": "runtime_execution_witness.json",
+          "byte_length": 39090,
+          "sha256": "sha256:d22f2123ddaaed73b7cbbaab14c55096292e3a7d8306f0ebe757c37082d9f0f3"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0013_x3_disposition.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_stage_authority.x3_disposition.v1",
+      "authoritative_receipt_sha256": "sha256:b28923ba33995b6a59e4305ee0972cba3829b4a0aaebe00627f30996f8ff3835",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:43:32.726308+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "PRODUCT_ELIGIBILITY",
+      "sequence": 13,
+      "stage_id": "X3_DISPOSITION",
+      "started_at_utc": "2026-08-17T02:43:32.726308+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    },
+    {
+      "artifact_bindings": [
+        {
+          "artifact_ref": "apps_rg_output_manifest.json",
+          "byte_length": 877,
+          "sha256": "sha256:4b47d96ed7277b8d5ccbd93f37c363d3ea2aaac193a320132f8ab688b64666ba"
+        },
+        {
+          "artifact_ref": "outputs/generated_resume.json",
+          "byte_length": 12847,
+          "sha256": "sha256:1bf74db5732ea83f462363a64328f4a76443364b449d868cdf567e2fc500a6f6"
+        },
+        {
+          "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+          "byte_length": 71580,
+          "sha256": "sha256:a2fb143478a8ca9e9c49395076121002c48bd0e55b55a7036ec94ff98655c3b8"
+        },
+        {
+          "artifact_ref": "e2e_preflight_product_entry_receipt.json",
+          "byte_length": 1897,
+          "sha256": "sha256:69ed9d6c34c8e9fc06bd20d581f53addb67ff14bb5a4ab569d4a82a11712b8c7"
+        },
+        {
+          "artifact_ref": "u0_receipt.json",
+          "byte_length": 1532,
+          "sha256": "sha256:9f1fa642a25b69ec7dbcd112824f667ec55898589f21904e43f58d76c40d12cd"
+        },
+        {
+          "artifact_ref": "modular_r4/final_resume_assembly/final_resume_receipt.json",
+          "byte_length": 72533,
+          "sha256": "sha256:8d18b746d704a767be38af640cd9c78362a36db66291919bf5f5fa09a400c3e7"
+        },
+        {
+          "artifact_ref": "e2e_ledger_receipts/0006_apps_rg_l1.json",
+          "byte_length": 1191,
+          "sha256": "sha256:3d482ef6bc3a2ec5236d449648ae2a8e2bde668f7c270173689101edf1171109"
+        },
+        {
+          "artifact_ref": "e2e_ledger_receipts/0007_apps_rg_l0.json",
+          "byte_length": 2359,
+          "sha256": "sha256:c7a405278e5c806c1e40c992aa774e0ebbcc22c8b60e5f06482569ff5dd9c35f"
+        },
+        {
+          "artifact_ref": "apps_research/runs/bridge_rg_research_bridge_a7c4c601_12e3d55d-133a-43f4-952c-8e4a0acfc9e9/apps_research_apps_rg_handoff_v2.json",
+          "byte_length": 14282,
+          "sha256": "sha256:aa2891b4dc927ed4278e0a71220b166eec0d886b291227fc76608c20708c717d"
+        },
+        {
+          "artifact_ref": "apps_research/runs/bridge_rg_research_bridge_a7c4c601_12e3d55d-133a-43f4-952c-8e4a0acfc9e9/exit_disposition_receipt.json",
+          "byte_length": 1349,
+          "sha256": "sha256:5ccc9a07cac3d2d23fd4f73f098432128dd49fe9b1379edb391e423f29ba4a46"
+        }
+      ],
+      "authoritative_receipt_ref": "e2e_ledger_receipts/0014_product_eligibility.json",
+      "authoritative_receipt_schema_version": "apps_rg.e2e_stage_authority.product_eligibility.v1",
+      "authoritative_receipt_sha256": "sha256:3aeda517cd1f6c62f8e901faee9770a393b09e7f41fbe784437ccb64d12fddc8",
+      "authority_plane": "current_run",
+      "completed_at_utc": "2026-08-17T02:43:32.827068+00:00",
+      "identity_sha256": "sha256:6e929147ce023ad2270f2873b708007e8d493fee7620f577ffe96dc336e2edd0",
+      "next_stage_id": "UWG_COMMIT",
+      "sequence": 14,
+      "stage_id": "PRODUCT_ELIGIBILITY",
+      "started_at_utc": "2026-08-17T02:43:32.827068+00:00",
+      "status": "PASS",
+      "status_derivation": "AUTHORITATIVE_RECEIPT_BYTES"
+    }
+  ],
+  "identity": {
+    "blueprint_hash": "sha256:a7f08177d75b419a70fadddc129c56aa2aaccc8e3801a9310f760cbcf4ff0e0c",
+    "brief_sha256": "sha256:f02dc9e10d698044d05ae57d091978bcbb52dc93d5366702e598f08f5a923a40",
+    "child_run_id": "bridge:rg_research_bridge:a7c4c601:12e3d55d-133a-43f4-952c-8e4a0acfc9e9",
+    "consumer_app_id": "apps_rg",
+    "jd_sha256": "sha256:957c43a7df84e3c815b4b1e0284cb8c4132567f622d3124a21fcaeea979d4f01",
+    "parent_run_id": "6e36a54f-a5e5-4cad-b196-517d27bc72fa",
+    "policy_hash": "sha256:9ab7764c2778fb8974d0359587a47f7593ef389ae5f8608abbea12b052d311f4",
+    "producer_app_id": "apps_research",
+    "request_id": "req-dc7f35de79fd4ee680e848c3f29a9e1e",
+    "schema_version": "apps_research_rg_run_identity.v1",
+    "target_company": "Anthropic",
+    "target_role": "Manager of Applied AI Architecture, Partnerships",
+    "tenant_id": "default",
+    "trace_root": "12e3d55d-133a-43f4-952c-8e4a0acfc9e9"
+  },
+  "schema_version": "apps_rg.e2e_stage_ledger.v2",
+  "stage_graph": {
+    "contract_ref": "config/certification/apps_research_rg_e2e_authority_contract.v1.json",
+    "contract_sha256": "sha256:9ab7764c2778fb8974d0359587a47f7593ef389ae5f8608abbea12b052d311f4",
+    "stage_ids": [
+      "FRESH_PREFLIGHT",
+      "APPS_RESEARCH_U0",
+      "APPS_RESEARCH_RUNTIME",
+      "APPS_RESEARCH_EXIT",
+      "HANDOFF_BUNDLE_COMMIT",
+      "APPS_RG_U0",
+      "APPS_RG_L1",
+      "APPS_RG_L0",
+      "APPS_RG_C0",
+      "APPS_RG_PA",
+      "APPS_RG_L2",
+      "X1_REVIEW",
+      "X2_AGGREGATION",
+      "X3_DISPOSITION",
+      "PRODUCT_ELIGIBILITY",
+      "UWG_COMMIT",
+      "PRODUCT_AUTHORIZATION_CLOSE",
+      "APPS_EVAL",
+      "L6_SHADOW",
+      "INDEPENDENT_PARITY",
+      "PROMOTION_TERMINAL",
+      "MANDATORY_OUTPUTS",
+      "STAGE_LEDGER_SEAL",
+      "TERMINAL_MANIFEST_SEAL",
+      "PIPELINE_COMPLETION_CLOSE",
+      "TERMINAL_NON_PRODUCT"
+    ]
+  },
+  "terminal_state": {
+    "observability_repair_required": false,
+    "pipeline_complete": false,
+    "product_authorized": false
+  }
+}

@@ -814,7 +814,3 @@ def main(argv: list[str] | None = None) -> int:
     if result.status == "BLOCKED":
         return 3
     return 1
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

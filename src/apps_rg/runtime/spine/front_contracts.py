@@ -190,7 +190,7 @@ def build_section_front_spine_from_args(
                 "whole-run section dispatch requires MODULAR_R4_SECTIONS_ROOT"
             )
         canonical_path = (
-            Path(sections_root_raw).expanduser().resolve().parent.parent
+            Path(sections_root_raw).expanduser().resolve().parent
             / CANONICAL_APPS_RG_VALIDATED_REQUEST_FILENAME
         )
         try:

@@ -1,0 +1,58 @@
+{
+  "schema": "executive_summary_dimension_upstream_triangulation_v1",
+  "consensus_failed_dimensions": [
+    "deterministic_alignment"
+  ],
+  "l2_upstream_failed_dimensions": [],
+  "dimension_remediation_lines": [
+    "deterministic_alignment (2/2 judges FAIL): x2_executive_summary_judge_packet_display_override_parity"
+  ],
+  "per_dimension": [
+    {
+      "dimension_id": "deterministic_alignment",
+      "fail_count": 2,
+      "consensus_fail": true,
+      "primary_surface": "x2_or_judge_packet",
+      "related_x2_gate": "x2_gate_snapshot_authoritative",
+      "x2_gate_failed_in_run": false,
+      "PROVIDER_MODEL_prompt_surfaces": [
+        "x2_gate_outputs.json",
+        "executive_summary_judge_packet_post_x2.json (deterministic_gate_summary)"
+      ],
+      "retired_provider_prompt_surfaces": [
+        "x2_gate_outputs.json",
+        "executive_summary_judge_packet_post_x2.json (deterministic_gate_summary)"
+      ],
+      "upstream_actions": [
+        "Fix X2 failures before re-spending on judges; judges mirror gate snapshot."
+      ]
+    }
+  ],
+  "PROVIDER_MODEL_prompt_refs": {
+    "compiled_prompt": "compiled_prompt.txt",
+    "compiled_prompt_artifact": "compiled_prompt_artifact.json",
+    "provider_request": "provider_request.json",
+    "provider_response": "provider_response.json",
+    "raw_model_output": "raw_model_output.txt",
+    "composition_plan": "executive_summary_composition_plan.json",
+    "generation_grade_contract_manifest": "generation_grade_contract_manifest.json"
+  },
+  "retired_provider_prompt_refs": {
+    "compiled_prompt": "compiled_prompt.txt",
+    "compiled_prompt_artifact": "compiled_prompt_artifact.json",
+    "provider_request": "provider_request.json",
+    "provider_response": "provider_response.json",
+    "raw_model_output": "raw_model_output.txt",
+    "composition_plan": "executive_summary_composition_plan.json",
+    "generation_grade_contract_manifest": "generation_grade_contract_manifest.json"
+  },
+  "judge_cost_controls": {
+    "post_regen_judge_rescore_mode": "full_panel",
+    "judge_regen_max_cycles_configured": 0,
+    "judge_regen_cycles_consumed": 0,
+    "note": "Post-regen should rescore soft-failed judges only unless APPS_RG_EXEC_SUMMARY_POST_REGEN_JUDGE_MODE=full_panel."
+  },
+  "generation_manifest_digest": null,
+  "recommended_next_step": "Address consensus_failed_dimensions before additional judge cycles.",
+  "run_id": "exec_summary_20260817_035433"
+}

@@ -1,0 +1,164 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_ey_bullets_allowed_fact_ids_non_empty",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 11
+    },
+    {
+      "gate_id": "x2_ey_bullets_source_fact_ids_supported",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "bad": [],
+        "cited_count": 3
+      }
+    },
+    {
+      "gate_id": "x2_claim_ledger_claim_text_non_empty",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 3
+    },
+    {
+      "gate_id": "x2_ey_bullets_display_text_proof_authorized",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": {
+        "status": "PASS",
+        "display_text_authority": "selected_fact_plan_claim_text",
+        "rows": [
+          {
+            "row_id": "bul_ey_001",
+            "source_fact_ids": [
+              "bul_ey_001"
+            ],
+            "source_fact_ids_allowed": true,
+            "text_matches_selected_fact_claim_text": true
+          },
+          {
+            "row_id": "bul_ey_002",
+            "source_fact_ids": [
+              "bul_ey_002"
+            ],
+            "source_fact_ids_allowed": true,
+            "text_matches_selected_fact_claim_text": true
+          },
+          {
+            "row_id": "bul_ey_003",
+            "source_fact_ids": [
+              "bul_ey_003"
+            ],
+            "source_fact_ids_allowed": true,
+            "text_matches_selected_fact_claim_text": true
+          }
+        ]
+      }
+    },
+    {
+      "gate_id": "x2_ey_bullets_runtime_real_llm",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": "REAL_LLM"
+    },
+    {
+      "gate_id": "x2_no_first_person",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_no_em_dash",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_ey_bullets_targeting_only_not_experience_claim",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": []
+    },
+    {
+      "gate_id": "x2_ey_bullets_graph_role_episode_bundle_consumed",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": true
+    },
+    {
+      "gate_id": "x2_ey_bullets_bullet_count_3",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": 3
+    },
+    {
+      "gate_id": "x2_ey_bullets_bullet_single_thought",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_ey_bullets_bullet_no_embedded_newline",
+      "gate_type": "deterministic",
+      "pass": true,
+      "failure_reason": null,
+      "observed_value": null
+    },
+    {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority",
+      "pass": true,
+      "observed_value": {
+        "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+        "claim_count": 3,
+        "bound_claim_count": 3,
+        "binding_coverage": 1.0,
+        "metric_exactness_pass": true,
+        "orphan_allocation_claim_unit_ids": [],
+        "failure_reasons": []
+      },
+      "threshold": {
+        "binding_coverage": 1.0,
+        "metric_exactness": 1.0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "",
+      "evidence_ref": "graph_claim_bindings.json"
+    }
+  ],
+  "x2_failed": 0,
+  "x2_passed": 13,
+  "failed_gates": [],
+  "final_materialized_input_binding": {
+    "schema_version": "apps_rg.final_materialized_input_binding.v1",
+    "section_id": "ey_bullets",
+    "final_materialized_output_ref": "command_output.txt",
+    "final_materialized_output_present": true,
+    "final_materialized_output_char_count": 568,
+    "final_materialized_output_sha256": "1631fc3126e3f25a9e8d675995140059ec4f4a6e06fce96dee1bb45d7d233123",
+    "l2_output_present": true,
+    "l2_output_sha256": "616257ec0085d9a370c9b0d13e4569b9407ad934e5e0042d88c6796aa46609a4",
+    "final_claim_ledger_present": true,
+    "final_claim_ledger_row_count": 3,
+    "final_claim_ledger_sha256": "0144e50e4cf1ad4b1738199529ab137968a59942645eb1ccbf217a7c96f9832e"
+  },
+  "final_materialized_output_sha256": "1631fc3126e3f25a9e8d675995140059ec4f4a6e06fce96dee1bb45d7d233123",
+  "final_claim_ledger_sha256": "0144e50e4cf1ad4b1738199529ab137968a59942645eb1ccbf217a7c96f9832e",
+  "l2_output_sha256": "616257ec0085d9a370c9b0d13e4569b9407ad934e5e0042d88c6796aa46609a4",
+  "total_x2_gates": 13,
+  "resume_graph_allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+  "graph_claim_binding_contract_digest": "9d2aad64400c7cf619c3793ee6468678735361b85fd48ab88b893f6883cd6fd5",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

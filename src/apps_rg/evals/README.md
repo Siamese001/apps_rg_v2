@@ -1,5 +1,9 @@
 # Apps RG evaluation contracts
 
+This directory is import-only. It does not expose a `library API: apps_rg.evals.*`
+CLI; the sole product command is `python -m apps_rg run`, which invokes the
+current-run Apps Eval integration as part of full E2E completion.
+
 `apps_rg/evals` evaluates sealed Apps RG artifacts. It does not launch the
 resume-generation runtime, change retrieval, or authorize a release merely by
 producing a score.
@@ -69,7 +73,7 @@ non-promoting, and keeps G1-G6 diagnostic-only.
 
 ## W1 receipt catalog
 
-`python -m apps_rg.evals.receipt_catalog` reads the tracked
+`library API: apps_rg.evals.receipt_catalog` reads the tracked
 `receipt_catalog_manifest.v1.json` and emits one fail-closed qualification
 summary. The catalog keys every entry by input digest, evaluator version, data
 split, runtime-configuration digest, and authority tier. It requires one
@@ -84,7 +88,7 @@ receipts emit `BLOCKED`.
 
 ## W2 benchmark and holdout design
 
-`python -m apps_rg.evals.benchmark_design` validates the tracked W2 case
+`library API: apps_rg.evals.benchmark_design` validates the tracked W2 case
 manifest without loading any holdout case identity. Calibration cases must use
 distinct source bundles, target requests, and expected outputs; cover every
 runtime-generated lane and each declared role, target-profile, evidence-density,
@@ -109,7 +113,7 @@ source-byte and graph-path grounding evaluator. An omitted rendered statement,
 duplicate locator, altered claim text, or incomplete evidence binding fails
 closed.
 
-`python -m apps_rg.evals.material_claim_authority` also reads the tracked W3
+`library API: apps_rg.evals.material_claim_authority` also reads the tracked W3
 human-truth manifest. QREL and proof review each require two independent human
 reviews and one adjudication per item, and synthetic grades are forbidden. The
 tracked manifest deliberately remains `NOT_MEASURED` pending externally pinned
@@ -118,7 +122,7 @@ inventory reconciliation creates human qualification or release authority.
 
 ## W4 finished-resume outcome
 
-`python -m apps_rg.evals.finished_resume_outcome` enforces P1 at the complete
+`library API: apps_rg.evals.finished_resume_outcome` enforces P1 at the complete
 finished-resume level. It requires a frozen baseline, blinded pairs, two
 independent primary reviews and one adjudication per pair, all 11 runtime lanes,
 strictly positive utility effect and lower confidence bound, and more candidate
@@ -132,7 +136,7 @@ authority and completed-review receipts are independently verified.
 
 ## W5 evaluator criterion validity
 
-`python -m apps_rg.evals.evaluator_validity_registry` inventories every
+`library API: apps_rg.evals.evaluator_validity_registry` inventories every
 release-affecting evaluator: G1-G5, ATS/document, Apps Research-to-U0, privacy,
 fairness, operational, and the post-Exit judge. Each versioned card requires a
 mutation-suite version, declared slices, an externally referenced authorized
@@ -146,7 +150,7 @@ does not independently authorize human qualification, release, or production.
 
 ## W6 source-bound operational and document evidence
 
-`python -m apps_rg.evals.e2e_operational_evaluation` reads a ledger of actual
+`library API: apps_rg.evals.e2e_operational_evaluation` reads a ledger of actual
 Apps Research-to-U0-to-Exit attempts. Every attempt has a pinned Apps Research
 handoff receipt, runtime/provider identity, ordered stage lineage, retry/token/
 cost/latency fields, and either a complete all-lane result or an explicit failed
@@ -164,7 +168,7 @@ production authority.
 
 ## W7 frozen protected-holdout qualification
 
-`python -m apps_rg.evals.protected_holdout_qualification` validates the sealed
+`library API: apps_rg.evals.protected_holdout_qualification` validates the sealed
 W7 receipt. Before protected-holdout access it fingerprints source commit,
 metric/data files, provider-model pins, candidate and baseline configuration,
 decision rules, and the holdout index. A changed file or source commit produces
@@ -178,7 +182,7 @@ no holdout result, human label, or release authorization is supplied by code.
 
 ## W8 shadow, canary, rollback, and promotion
 
-`python -m apps_rg.evals.shadow_canary_promotion` validates source/model/
+`library API: apps_rg.evals.shadow_canary_promotion` validates source/model/
 provider/graph identity against the W7 receipt before it evaluates shadow or
 bounded-canary observations. Identity drift emits `STALE_SCOPE` and requires a
 new qualification. The receipt measures traffic and window coverage, P1/P2

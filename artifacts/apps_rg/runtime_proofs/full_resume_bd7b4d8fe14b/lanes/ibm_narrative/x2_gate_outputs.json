@@ -1,0 +1,846 @@
+{
+  "gates": [
+    {
+      "gate_id": "x2_ibm_narrative_exactly_one_sentence",
+      "gate_type": "deterministic",
+      "observed_value": 1,
+      "threshold": 1,
+      "failure_reason": "Must be exactly one sentence.",
+      "evidence_ref": "x2_ibm_narrative_exactly_one_sentence",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_exactly_one_sentence_mechanical",
+      "gate_type": "deterministic",
+      "observed_value": 1,
+      "threshold": 1,
+      "failure_reason": "single sentence required",
+      "evidence_ref": "x2_ibm_narrative_exactly_one_sentence_mechanical",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_forbidden_opener",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "no mechanical opener",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_forbidden_opener",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_metric_cap",
+      "gate_type": "deterministic",
+      "observed_value": 0,
+      "threshold": "<=2",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_metric_cap",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_bullet_overlap_threshold",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": ">=5 word prefix",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_bullet_overlap_threshold",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_word_budget",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "word_count": 23,
+        "char_len": 178
+      },
+      "threshold": "<=58 words and <=360 chars",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_word_budget",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_no_candidate_name_tokens",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "absent",
+      "failure_reason": "Candidate name must not appear in the role narrative sentence.",
+      "evidence_ref": "x2_ibm_narrative_no_candidate_name_tokens",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_no_meta_disclaimer_in_display",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "absent",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_no_meta_disclaimer_in_display",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_source_supported",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "bul_ibm_001",
+        "bul_ibm_002"
+      ],
+      "threshold": "bul_ibm_*",
+      "failure_reason": "claim_ledger must map to IBM bullet facts only.",
+      "evidence_ref": "x2_ibm_narrative_source_supported",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_claim_ledger_source_fact_ids_allow_list",
+      "gate_type": "deterministic",
+      "observed_value": "all_tokens_in_allowed_fact_ids",
+      "threshold": [
+        "bul_ibm_001",
+        "bul_ibm_002",
+        "fact_partnerships_gtm_002",
+        "fact_revenue_ops_001",
+        "fact_revenue_ops_003",
+        "fact_revenue_ops_005",
+        "metric_ibm_20pct_joint_revenue_growth",
+        "metric_ibm_ai_driven_sales_frameworks",
+        "metric_ibm_alliance_cosell_operating_cadence",
+        "metric_ibm_budget_portfolio_bi_views",
+        "metric_ibm_executive_buyer_architecture_alignment",
+        "metric_ibm_modeling_delivery_cost_assumption_traceability",
+        "metric_ibm_presales_discovery_to_solution_handoff",
+        "metric_ibm_quota_aligned_solution_cadence",
+        "metric_ibm_revenue_target_solution_validation",
+        "reb_ibm_aws_alliance_partner_cosell_gtm",
+        "reb_ibm_data_modeling_bi_decision_support",
+        "reb_ibm_presales_solution_engineering",
+        "reb_ibm_revenue_sales_target_execution",
+        "skill_p2_gtm_discovery_qualification",
+        "skill_p2_gtm_enterprise_deal_support",
+        "skill_p2_gtm_executive_buyer_alignment",
+        "skill_p2_gtm_solution_mapping",
+        "skill_p2_tech_reference_architecture",
+        "skill_partner_alliance_gtm_execution",
+        "skill_partner_cloud_vendor_joint_gtm",
+        "skill_partner_enterprise_negotiations",
+        "skill_partner_hyperscaler_cosell",
+        "skill_partner_ibm_aws_alliance_joint_revenue",
+        "skill_partner_pnl_oversight",
+        "skill_partner_pre_sales",
+        "skill_partner_sales_revenue_targets",
+        "skill_sr_cloud_data_platform_engineering",
+        "skill_sr_enterprise_portfolio_data_governance",
+        "skill_sr_w12_hyperscaler_alliance_co_sell"
+      ],
+      "failure_reason": null,
+      "evidence_ref": "x2_claim_ledger_source_fact_ids_allow_list",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_claim_ledger_claim_text_non_empty",
+      "gate_type": "deterministic",
+      "observed_value": "all_rows_non_empty",
+      "threshold": "non_empty_claim_text_each_row",
+      "failure_reason": null,
+      "evidence_ref": "x2_claim_ledger_claim_text_non_empty",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_role_episode_bundles_in_proof_pool",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "bundles_present": true,
+        "flat_skill_only": false
+      },
+      "threshold": "role_episode_bundles required for IBM narrative",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_role_episode_bundles_in_proof_pool",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_role_episode_bundle_id_required",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "change_log_bundle_ids": [
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_data_modeling_bi_decision_support",
+          "reb_ibm_presales_solution_engineering",
+          "reb_ibm_offering_accelerator_management",
+          "reb_ibm_aws_alliance_partner_cosell_gtm",
+          "reb_ibm_presales_solution_engineering",
+          "reb_ibm_data_modeling_bi_decision_support",
+          "reb_ibm_revenue_sales_target_execution"
+        ],
+        "pool_bundle_ids": [
+          "reb_ibm_aws_modernization_architecture",
+          "reb_ibm_cognitive_business_decision_support",
+          "reb_ibm_presales_solution_engineering",
+          "reb_ibm_offering_accelerator_management",
+          "reb_ibm_revenue_sales_target_execution",
+          "reb_ibm_nlp_ml_decision_support"
+        ]
+      },
+      "threshold": "narrative binds to role_episode_bundle_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_role_episode_bundle_id_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_hold_metric_forbidden",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "no HOLD/DO_NOT_PROMOTE metrics in narrative",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_hold_metric_forbidden",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_ibm_only_fact_scope",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "bul_ibm_001",
+        "bul_ibm_002"
+      ],
+      "threshold": "bul_ibm_*",
+      "failure_reason": "Non-IBM fact scope in payload.",
+      "evidence_ref": "x2_ibm_narrative_ibm_only_fact_scope",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_unify_fact_leakage",
+      "gate_type": "deterministic",
+      "observed_value": "bul_unify_",
+      "threshold": "absent",
+      "failure_reason": "Unify bullet fact leakage detected.",
+      "evidence_ref": "x2_no_unify_fact_leakage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_insurtech_fact_leakage",
+      "gate_type": "deterministic",
+      "observed_value": "bul_insurtech_",
+      "threshold": "absent",
+      "failure_reason": "InsurTech leakage.",
+      "evidence_ref": "x2_no_insurtech_fact_leakage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_ey_fact_leakage",
+      "gate_type": "deterministic",
+      "observed_value": "bul_ey_",
+      "threshold": "absent",
+      "failure_reason": "EY leakage.",
+      "evidence_ref": "x2_no_ey_fact_leakage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_jd_only_claims",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "no long JD copy",
+      "failure_reason": "JD phrase copied as proof.",
+      "evidence_ref": "x2_no_jd_only_claims",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_weak_resume_jargon_phrases",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "absent_durable_weak_phrases",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_weak_resume_jargon_phrases",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_claim_theme_coverage",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "themes_detected": [],
+        "missing_in_ledger_union": []
+      },
+      "threshold": "ledger_covers_all_detected_themes",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_claim_theme_coverage",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "mechanisms": [
+          "aws",
+          "bi"
+        ],
+        "cited_companion_ids": [
+          "bul_ibm_001",
+          "bul_ibm_002"
+        ],
+        "unsupported_mechanisms": [],
+        "support_by_mechanism": {
+          "aws": [
+            "bul_ibm_001"
+          ],
+          "bi": [
+            "bul_ibm_002"
+          ]
+        },
+        "checked": true
+      },
+      "threshold": "every visible mechanism occurs in a cited finalized companion bullet",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_mechanisms_supported_by_cited_companion_bullets",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_claim_ledger_clause_decomposition",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "reason": "ok",
+        "ledger_rows": 2
+      },
+      "threshold": "per-clause rows; max 2 bul_ibm roots per row; no career-bridge phrasing",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_claim_ledger_clause_decomposition",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_requires_finalized_bullets",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "status": "ACCEPTED_FINALIZED",
+        "reason": "ok",
+        "has_companion_text": true
+      },
+      "threshold": "ACCEPTED_FINALIZED",
+      "failure_reason": "IBM narrative must run after ACCEPTED_FINALIZED IBM bullets when companion-aware.",
+      "evidence_ref": "x2_ibm_narrative_requires_finalized_bullets",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_metric_repetition_unless_justified",
+      "gate_type": "deterministic",
+      "observed_value": "no companion IBM bullets artifact",
+      "threshold": "skipped",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_metric_repetition_unless_justified",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_bullet_sentence_structure_copy",
+      "gate_type": "deterministic",
+      "observed_value": false,
+      "threshold": false,
+      "failure_reason": "Narrative copies a bullet-leading phrase.",
+      "evidence_ref": "x2_no_bullet_sentence_structure_copy",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_five_bullet_roll_up_tone",
+      "gate_type": "deterministic",
+      "observed_value": 1,
+      "threshold": "<5 commas",
+      "failure_reason": "Reads like stacked bullet summary.",
+      "evidence_ref": "x2_no_five_bullet_roll_up_tone",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_inline_source_tags",
+      "gate_type": "deterministic",
+      "observed_value": "tags",
+      "threshold": "absent",
+      "failure_reason": "Inline source tags in narrative.",
+      "evidence_ref": "x2_no_inline_source_tags",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_first_person",
+      "gate_type": "deterministic",
+      "observed_value": "first person",
+      "threshold": "absent",
+      "failure_reason": "First person in narrative.",
+      "evidence_ref": "x2_no_first_person",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_em_dash",
+      "gate_type": "deterministic",
+      "observed_value": "em dash",
+      "threshold": "absent",
+      "failure_reason": "Em dash found.",
+      "evidence_ref": "x2_no_em_dash",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_generic_filler",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "absent",
+      "failure_reason": "Generic filler.",
+      "evidence_ref": "x2_no_generic_filler",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_unify_runtime_terms",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": "Unify runtime vocabulary leaked into IBM narrative.",
+      "evidence_ref": "x2_no_unify_runtime_terms",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_json_parse_valid",
+      "gate_type": "deterministic",
+      "observed_value": null,
+      "threshold": null,
+      "failure_reason": null,
+      "evidence_ref": "x2_json_parse_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_provider_requested_attempted",
+      "gate_type": "deterministic",
+      "observed_value": "external_openai->external_openai",
+      "threshold": "match",
+      "failure_reason": "Provider mismatch.",
+      "evidence_ref": "x2_provider_requested_attempted",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_silent_mock_fallback",
+      "gate_type": "deterministic",
+      "observed_value": "REAL_LLM",
+      "threshold": "REAL_LLM",
+      "failure_reason": "Silent mock fallback detected.",
+      "evidence_ref": "x2_no_silent_mock_fallback",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_x1d_required_judges_present",
+      "gate_type": "deterministic",
+      "observed_value": null,
+      "threshold": [
+        "gemini_pro"
+      ],
+      "failure_reason": null,
+      "evidence_ref": "x2_x1d_required_judges_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_x1d_schema_valid",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": [],
+      "failure_reason": "Blocked judges invalid schema: []",
+      "evidence_ref": "x2_x1d_schema_valid",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_mock_or_plumbing_language_in_real_l2_output",
+      "gate_type": "deterministic",
+      "observed_value": "no_stale_mock_terms_detected",
+      "threshold": "no_mock_plumbing_lexicon_tokens",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_mock_or_plumbing_language_in_real_l2_output",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_ibm_narrative_active_proof_pool_source_fact_ids",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "section": "ibm_narrative",
+        "proof_source": "augmented_skills_graph",
+        "proof_pool_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "proof_pool_digest": "b85869c19dbf43ce1fa87fc59cd3f6bdacc05d24d7740e87fc5fc69d239f3fea",
+        "canonical_evidence_set_digest": "b85869c19dbf43ce1fa87fc59cd3f6bdacc05d24d7740e87fc5fc69d239f3fea",
+        "id_alias_map": {},
+        "claim_evidence_source_type": "augmented_skills_graph",
+        "claim_evidence_source_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "skills_authority_source_type": "augmented_skills_graph",
+        "skills_authority_status": "PASS",
+        "skills_authority_graph_ref": "apps_rg/fact_inventory/master_skills_arsenal_ledger.json",
+        "legacy_broad_skills_ledger_skills_authority": false,
+        "broad_skills_ledger_claim_evidence_only": null,
+        "allowed_source_fact_ids_count": 35,
+        "source_fact_ids_checked": [
+          "bul_ibm_001",
+          "bul_ibm_002"
+        ],
+        "unsupported_source_fact_ids": [],
+        "rejected_non_proof_source_ids": [],
+        "jd_or_briefing_ids_rejected": [],
+        "x2_source_fact_pool_status": "PASS",
+        "decisive_reason": null,
+        "validator_name": "evaluate_proof_pool_source_fact_gate",
+        "skills_authority_x2_boundary": "PASS",
+        "x2_srfs_gate_status": "NOT_APPLICABLE",
+        "out_of_slice_fact_ids": [],
+        "srfs_allowed_fact_ids_count": 35,
+        "selected_role_fact_set_used": false,
+        "broad_skills_ledger_used": false,
+        "broad_skills_ledger_used_as_authority": false,
+        "base_resume_fallback_used": false,
+        "srfs_section_id": "ibm_narrative"
+      },
+      "threshold": "active_proof_pool_allowlist_exact",
+      "failure_reason": null,
+      "evidence_ref": "x2_ibm_narrative_active_proof_pool_source_fact_ids",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_input_usage_ledger_present",
+      "gate_type": "deterministic",
+      "observed_value": "section_input_usage_ledger_v1",
+      "threshold": "section_input_usage_ledger_v1",
+      "failure_reason": null,
+      "evidence_ref": "x2_section_input_usage_ledger_present",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_jd_used_as_required_targeting_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "required": true,
+        "used": true,
+        "authority": "TARGETING_INPUT",
+        "used_for": []
+      },
+      "threshold": "required_used_TARGETING_INPUT",
+      "failure_reason": null,
+      "evidence_ref": "x2_jd_used_as_required_targeting_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_briefing_used_as_required_context_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "required": true,
+        "used": true,
+        "authority": "CONTEXT_INPUT",
+        "used_for": []
+      },
+      "threshold": "required_used_CONTEXT_INPUT",
+      "failure_reason": null,
+      "evidence_ref": "x2_briefing_used_as_required_context_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_title_company_used_as_required_positioning_input",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "target_title": {
+          "required": true,
+          "used": true,
+          "authority": "POSITIONING_INPUT",
+          "used_for": []
+        },
+        "target_company": {
+          "required": true,
+          "used": true,
+          "authority": "POSITIONING_INPUT",
+          "used_for": []
+        }
+      },
+      "threshold": "required_used_POSITIONING_INPUT_both",
+      "failure_reason": null,
+      "evidence_ref": "x2_title_company_used_as_required_positioning_input",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_non_evidence_inputs_as_claim_evidence",
+      "gate_type": "deterministic",
+      "observed_value": false,
+      "threshold": false,
+      "failure_reason": null,
+      "evidence_ref": "x2_no_non_evidence_inputs_as_claim_evidence",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_no_non_evidence_inputs_in_source_fact_ids",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "row_scan_found_reserved_non_resume_ids": false,
+        "ledger_non_evidence_inputs_in_source_fact_ids": false
+      },
+      "threshold": "reserved_non_resume_ids_absent_in_source_fact_ids",
+      "failure_reason": null,
+      "evidence_ref": "x2_no_non_evidence_inputs_in_source_fact_ids",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_selected_fact_ids_only",
+      "gate_type": "deterministic",
+      "observed_value": [],
+      "threshold": "subset_of_ALLOWED_SOURCE_FACT_IDS",
+      "failure_reason": null,
+      "evidence_ref": "x2_selected_fact_ids_only",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_section_claims_supported_by_base_resume",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "displayed_claim_count": 2,
+        "claims_supported_by_selected_resume_facts": 2,
+        "claims_with_targeting_input_in_source_fact_ids": 0,
+        "claims_with_context_input_in_source_fact_ids": 0,
+        "unsupported_claim_count": 0,
+        "orphan_source_fact_id_count": 0
+      },
+      "threshold": "no_unsupported_and_no_non_evidence_source_fact_id_claim_rows",
+      "failure_reason": null,
+      "evidence_ref": "x2_section_claims_supported_by_base_resume",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_input_usage_accounting_consistent",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "ledger_summary": {
+          "displayed_claim_count": 2,
+          "claims_supported_by_selected_resume_facts": 2,
+          "claims_with_targeting_input_in_source_fact_ids": 0,
+          "claims_with_context_input_in_source_fact_ids": 0,
+          "unsupported_claim_count": 0,
+          "orphan_source_fact_id_count": 0
+        },
+        "runtime_summary": {
+          "displayed_claim_count": 2,
+          "claims_supported_by_selected_resume_facts": 2,
+          "claims_with_targeting_input_in_source_fact_ids": 0,
+          "claims_with_context_input_in_source_fact_ids": 0,
+          "unsupported_claim_count": 0,
+          "orphan_source_fact_id_count": 0
+        },
+        "coverage_overall_pass": true
+      },
+      "threshold": "ledger_matches_claim_scan_and_coverage_pass",
+      "failure_reason": null,
+      "evidence_ref": "x2_input_usage_accounting_consistent",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_narrative_seniority_floor",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "strong_verbs": [
+          "championed"
+        ],
+        "authority": [
+          "architecture",
+          "operating"
+        ],
+        "issues": []
+      },
+      "threshold": "≥1 strong verb + ≥1 authority scope signal, no weak opener",
+      "failure_reason": null,
+      "evidence_ref": "x2_narrative_seniority_floor",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_narrative_no_consulting_language",
+      "gate_type": "deterministic",
+      "observed_value": "none",
+      "threshold": "zero consulting phrases",
+      "failure_reason": null,
+      "evidence_ref": "x2_narrative_no_consulting_language",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_narrative_technical_specificity_floor",
+      "gate_type": "deterministic",
+      "observed_value": [
+        "bi",
+        "aws"
+      ],
+      "threshold": "≥1 named mechanism/technology token",
+      "failure_reason": null,
+      "evidence_ref": "x2_narrative_technical_specificity_floor",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_narrative_not_bullet_recap",
+      "gate_type": "deterministic",
+      "observed_value": {
+        "max_5gram_overlap": 0.0,
+        "est_shared_ngrams": 0
+      },
+      "threshold": "<=3 shared 5-grams (WARN=Y)",
+      "failure_reason": null,
+      "evidence_ref": "x2_narrative_not_bullet_recap",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_narrative_upstream_graph_proof_required",
+      "gate_type": "deterministic",
+      "observed_value": "upstream_gate_not_found",
+      "threshold": "upstream x2_bullet_graph_skill_node_ids_required == PASS (WARN=Y)",
+      "failure_reason": "Upstream gate 'x2_bullet_graph_skill_node_ids_required' did not pass. Narrative proof authority depends on bullet graph_skill_node_ids being validated. Resolve bullet X2 gates before promoting narrative to HARD FAIL.",
+      "evidence_ref": "x2_narrative_upstream_graph_proof_required",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_narrative_base_prose_ngram_overlap",
+      "gate_type": "deterministic",
+      "observed_value": 0.0,
+      "threshold": "<=25% 4-gram overlap with base role_narrative",
+      "failure_reason": null,
+      "evidence_ref": "x2_narrative_base_prose_ngram_overlap",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_narrative_e0_ngram_overlap",
+      "gate_type": "deterministic",
+      "observed_value": 0.0,
+      "threshold": "<=20% 4-gram overlap with E0 examples",
+      "failure_reason": null,
+      "evidence_ref": "x2_narrative_e0_ngram_overlap",
+      "pass": true
+    },
+    {
+      "gate_id": "x2_c0_metrics_artifact_present",
+      "pass": true,
+      "reason": "c0_metrics artifact structurally valid",
+      "observed_value": {
+        "schema_version": "c0_metrics.v1",
+        "required_keys_present": [
+          "blocked_source_refs",
+          "briefing_source_type",
+          "citation_map",
+          "company_brief_provenance",
+          "evidence_counts",
+          "excluded_evidence_refs",
+          "final_evidence_digest",
+          "freshness_receipts",
+          "retrieval_mode",
+          "retrieval_sources",
+          "route_id",
+          "run_id",
+          "schema_version",
+          "source_class_coverage",
+          "support_score_profile",
+          "support_status",
+          "support_target_met"
+        ]
+      },
+      "expected_value": "c0_metrics.v1"
+    },
+    {
+      "gate_id": "x2_c0_support_status_gate",
+      "pass": true,
+      "reason": "support_status='PASS' support_target_met=True enum_ok=True minimum_safe=True",
+      "observed_value": {
+        "support_status": "PASS",
+        "support_target_met": true,
+        "c0_minimum_safe": true,
+        "canonical_enum": true
+      },
+      "expected_value": "non-blocking canonical support_status with evidence target"
+    },
+    {
+      "gate_id": "x2_fec_subset_of_canonical_evidence_pool",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "fec_count": 33,
+        "violations": []
+      },
+      "threshold": "fec_ids_subset_of_pool",
+      "failure_reason": null,
+      "evidence_ref": "x2_fec_subset_of_canonical_evidence_pool"
+    },
+    {
+      "gate_id": "x2_prompt_c0_ids_subset_of_fec",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "prompt_c0_count": 33,
+        "violations": []
+      },
+      "threshold": "prompt_c0_subset_of_fec",
+      "failure_reason": null,
+      "evidence_ref": "x2_prompt_c0_ids_subset_of_fec"
+    },
+    {
+      "gate_id": "x2_claim_ledger_source_fact_ids_subset_of_fec",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "ledger_id_count": 2,
+        "violations": []
+      },
+      "threshold": "claim_ledger_subset_of_fec",
+      "failure_reason": null,
+      "evidence_ref": "x2_claim_ledger_source_fact_ids_subset_of_fec"
+    },
+    {
+      "gate_id": "X2_BLOCK_ID_NAMESPACE_SPLIT",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "disjoint_without_alias": [],
+        "alias_map_size": 5
+      },
+      "threshold": "explicit_alias_map_or_unified_namespace",
+      "failure_reason": null,
+      "evidence_ref": "X2_BLOCK_ID_NAMESPACE_SPLIT"
+    },
+    {
+      "gate_id": "x2_active_pool_digest_matches_fec_digest",
+      "gate_type": "deterministic",
+      "pass": true,
+      "observed_value": {
+        "canonical_evidence_set_digest": "30c7fa712daefec2cd34ba879c41ccf689b401e867275ee2a0196eedd15a3352",
+        "fec_allowed_fact_ids_digest": "30c7fa712daefec2cd34ba879c41ccf689b401e867275ee2a0196eedd15a3352",
+        "fec_narrowed_from_pool": true
+      },
+      "threshold": "digest_equal_or_explicit_narrowing_receipt",
+      "failure_reason": null,
+      "evidence_ref": "x2_active_pool_digest_matches_fec_digest"
+    },
+    {
+      "gate_id": "x2_resume_graph_claim_binding",
+      "gate_type": "deterministic_graph_authority",
+      "pass": true,
+      "observed_value": {
+        "allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+        "claim_count": 2,
+        "bound_claim_count": 2,
+        "binding_coverage": 1.0,
+        "metric_exactness_pass": true,
+        "orphan_allocation_claim_unit_ids": [],
+        "failure_reasons": []
+      },
+      "threshold": {
+        "binding_coverage": 1.0,
+        "metric_exactness": 1.0,
+        "orphan_allocations": 0
+      },
+      "failure_reason": "",
+      "evidence_ref": "graph_claim_bindings.json"
+    }
+  ],
+  "failed_gates": [],
+  "x2_passed": 63,
+  "x2_failed": 0,
+  "total_x2_gates": 63,
+  "rigor_convergence_audit": {
+    "status": "PASS",
+    "missing_rigor_critical_gates": []
+  },
+  "final_materialized_input_binding": {
+    "schema_version": "apps_rg.final_materialized_input_binding.v1",
+    "section_id": "ibm_narrative",
+    "final_materialized_output_ref": "ibm_narrative_output.txt",
+    "final_materialized_output_present": true,
+    "final_materialized_output_char_count": 178,
+    "final_materialized_output_sha256": "56c77c9e397ed031cacf80af3dfed659c6dd93bebdec828591feceb8a59ffe7e",
+    "l2_output_present": false,
+    "l2_output_sha256": "",
+    "final_claim_ledger_present": true,
+    "final_claim_ledger_row_count": 2,
+    "final_claim_ledger_sha256": "f7ec31595db06d98f86ac195d2124d094990967efcd8972b5164923f3e531a76"
+  },
+  "final_materialized_output_sha256": "56c77c9e397ed031cacf80af3dfed659c6dd93bebdec828591feceb8a59ffe7e",
+  "final_claim_ledger_sha256": "f7ec31595db06d98f86ac195d2124d094990967efcd8972b5164923f3e531a76",
+  "l2_output_sha256": "",
+  "resume_graph_allocation_plan_digest": "86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda",
+  "graph_claim_binding_contract_digest": "7b3d1da283b642032c5e4d65bd6d38733f7396c6e571489618b79b9360c68886",
+  "graph_claim_bindings_ref": "graph_claim_bindings.json"
+}

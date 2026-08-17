@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 
-def test_whole_resume_cli_refuses_to_bypass_fresh_e2e(
-    capsys,
-) -> None:
-    from apps_rg.__main__ import main
+def test_whole_resume_cli_does_not_expose_a_fresh_e2e_bypass() -> None:
+    from apps_rg.__main__ import _build_parser
 
-    assert main([]) == 2
-    assert "whole-resume product runs require --fresh-e2e" in capsys.readouterr().err
+    parser = _build_parser()
+    run = parser.parse_args(["run"])
+
+    assert not hasattr(run, "fresh_e2e")

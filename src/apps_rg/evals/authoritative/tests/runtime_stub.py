@@ -10,7 +10,3 @@ def main() -> None:
     source = Path(os.environ["APPS_RG_EVAL_INPUT"])
     target = Path(os.environ["APPS_RG_EVAL_OUTPUT"])
     target.write_bytes(source.read_bytes())
-
-
-if __name__ == "__main__":
-    main()

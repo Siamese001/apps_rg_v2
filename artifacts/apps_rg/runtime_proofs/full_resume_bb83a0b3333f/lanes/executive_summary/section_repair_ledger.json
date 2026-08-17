@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "section_id": "executive_summary",
+  "run_id": "exec_summary_20260817_025541",
+  "product_fail_closed": true,
+  "scored_attempt_number": 1,
+  "authoritative_attempt_number": 1,
+  "authoritative_l2_source": "initial_llm",
+  "attempt_1_x2_failed": true,
+  "attempt_1_x2_failed_gate_ids": [
+    "x2_exec_summary_allowed_fact_utilization",
+    "x2_exec_summary_no_mechanism_inventory"
+  ],
+  "repairs": [
+    {
+      "seq": 1,
+      "kind": "regen_llm",
+      "operation": "synthesis_regen",
+      "reason": "cross_fact_display_conflation:too_many_source_fact_ids_in_one_sentence; sentence 1: mechanism_inventory:5_terms; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "replaced_l2": false
+    },
+    {
+      "seq": 2,
+      "kind": "deterministic_rewrite",
+      "operation": "repair_exec_summary_mechanism_inventory_sentence",
+      "reason": "sentence_4_mechanism_inventory_compacted",
+      "replaced_l2": true
+    },
+    {
+      "seq": 3,
+      "kind": "deterministic_rewrite",
+      "operation": "repair_exec_summary_cross_fact_conflation_row",
+      "reason": "sentence_2_source_fact_ids_compacted_to_3",
+      "replaced_l2": true
+    },
+    {
+      "seq": 4,
+      "kind": "blocked_deterministic_rewrite",
+      "operation": "graph_only_display_authority_fallback",
+      "reason": "sentence 1: mechanism_inventory:5_terms; dominant_source_fact=unknown; claim_support_graph_refs=[]; suppressed_skills=[]",
+      "replaced_l2": false
+    }
+  ],
+  "x2_runs": [
+    {
+      "run": 1,
+      "after_l2_source": "initial_llm",
+      "failed_gate_ids": [
+        "x2_exec_summary_allowed_fact_utilization",
+        "x2_exec_summary_no_mechanism_inventory"
+      ],
+      "passed": false
+    }
+  ]
+}

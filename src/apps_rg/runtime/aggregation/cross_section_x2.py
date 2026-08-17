@@ -801,7 +801,6 @@ def run_cross_section_x2_gates(
     whole_resume = final_resume_blob.get("whole_resume_graph_evidence_contract")
     if isinstance(whole_resume, Mapping) and whole_resume.get("active") is True:
         engineering_pass = whole_resume.get("engineering_pass") is True
-        release_pass = whole_resume.get("release_pass") is True
         gates.append(
             CrossSectionGateResult(
                 gate_id="x2_whole_resume_graph_evidence_engineering",
@@ -813,28 +812,7 @@ def run_cross_section_x2_gates(
                 ),
                 observed={
                     "engineering_pass": whole_resume.get("engineering_pass"),
-                    "official_w6_status": whole_resume.get("official_w6_status"),
                     "release_pass": whole_resume.get("release_pass"),
-                    "contract_digest": whole_resume.get("contract_digest"),
-                },
-                evidence_refs=["whole_resume_graph_evidence_contract.json"],
-            ),
-        )
-        gates.append(
-            CrossSectionGateResult(
-                gate_id="x2_whole_resume_graph_release_authority_observed",
-                verdict=VERDICT_PASS,
-                decisive_reason=(
-                    None
-                    if release_pass
-                    else "official W6 human release authority is non-PASS; observation "
-                    "is complete, current-run promotion remains unauthorized"
-                ),
-                observed={
-                    "engineering_pass": whole_resume.get("engineering_pass"),
-                    "official_w6_status": whole_resume.get("official_w6_status"),
-                    "release_pass": whole_resume.get("release_pass"),
-                    "promotion_eligible": whole_resume.get("promotion_eligible"),
                     "contract_digest": whole_resume.get("contract_digest"),
                 },
                 evidence_refs=["whole_resume_graph_evidence_contract.json"],

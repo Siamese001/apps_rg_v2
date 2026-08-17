@@ -321,7 +321,7 @@ Promotion requires:
 
 ### Apps RG-only evidence handoff
 
-Use `python -m apps_rg.evals.l1_cognitive_evaluation_cli` to freeze the
+Use `library API: apps_rg.evals.l1_cognitive_evaluation_cli` to freeze the
 non-secret input/configuration receipts, capture an already-completed pair,
 build separately routed blinded-review material, seal exactly human-authored
 records, and evaluate W6 readiness. The CLI has no runtime-launch,

@@ -1,0 +1,94 @@
+{
+  "schema_version": "graph_fact_concentration_receipt_v1",
+  "producer": "apps_rg.runtime.sections.competencies_lane_execution",
+  "section_id": "competencies",
+  "input_artifact_paths": [
+    "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_ce77c5d3b476/lanes/competencies/competencies_graph_sufficiency_receipt.json"
+  ],
+  "source_fact_usage": {
+    "exp_unify_001": {
+      "category_count": 1,
+      "category_labels": [
+        "commercial & operating impact"
+      ]
+    },
+    "fact_engineering_platform_001": {
+      "category_count": 2,
+      "category_labels": [
+        "ai platform leadership",
+        "governance, risk & compliance"
+      ]
+    },
+    "fact_engineering_platform_002": {
+      "category_count": 2,
+      "category_labels": [
+        "governance, risk & compliance",
+        "data & analytics modernization"
+      ]
+    },
+    "fact_partnerships_gtm_002": {
+      "category_count": 1,
+      "category_labels": [
+        "cloud & partner ecosystems"
+      ]
+    },
+    "fact_revenue_ops_001": {
+      "category_count": 1,
+      "category_labels": [
+        "cloud & partner ecosystems"
+      ]
+    },
+    "fact_revenue_ops_002": {
+      "category_count": 2,
+      "category_labels": [
+        "commercial & operating impact",
+        "llmops & reliability"
+      ]
+    },
+    "fact_revenue_ops_004": {
+      "category_count": 2,
+      "category_labels": [
+        "commercial & operating impact",
+        "engineering & delivery leadership"
+      ]
+    },
+    "reb_ibm_aws_alliance_partner_cosell_gtm": {
+      "category_count": 1,
+      "category_labels": [
+        "cloud & partner ecosystems"
+      ]
+    },
+    "reb_ibm_presales_solution_engineering": {
+      "category_count": 2,
+      "category_labels": [
+        "cloud & partner ecosystems",
+        "engineering & delivery leadership"
+      ]
+    },
+    "reb_ibm_revenue_sales_target_execution": {
+      "category_count": 1,
+      "category_labels": [
+        "llmops & reliability"
+      ]
+    },
+    "reb_unify_agentic_platform_architecture": {
+      "category_count": 1,
+      "category_labels": [
+        "technology strategy & innovation"
+      ]
+    },
+    "reb_unify_partner_channel_cosell": {
+      "category_count": 1,
+      "category_labels": [
+        "cloud & partner ecosystems"
+      ]
+    }
+  },
+  "dominant_source_fact_id": "reb_ibm_presales_solution_engineering",
+  "dominant_source_fact_category_share": 0.25,
+  "threshold": 0.75,
+  "deterministic_gate_id": "x2_competencies_source_fact_concentration_limit",
+  "deterministic_gate_verdict": "PASS",
+  "failure_reason": null,
+  "pass": true
+}

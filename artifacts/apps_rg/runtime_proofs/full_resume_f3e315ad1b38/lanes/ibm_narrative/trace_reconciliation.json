@@ -1,0 +1,199 @@
+{
+  "generated_at_utc": "2026-08-17T02:12:51.062804+00:00",
+  "local_artifact_refs": {
+    "commit_request.json": null,
+    "exit_review_packet.json": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_f3e315ad1b38/lanes/ibm_narrative/exit_review_packet.json",
+    "l6_v40_shadow_eval_package.json": null,
+    "provider_response.json": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_f3e315ad1b38/lanes/ibm_narrative/provider_response.json",
+    "state_commit_receipt.json": null,
+    "uwg_block_receipt.json": null,
+    "uwg_commit_receipt.json": null,
+    "uwg_validation_receipt.json": null,
+    "x1d_llm_judge_outputs.json": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_f3e315ad1b38/lanes/ibm_narrative/x1d_llm_judge_outputs.json",
+    "x2_gate_outputs.json": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_f3e315ad1b38/lanes/ibm_narrative/x2_gate_outputs.json",
+    "x3_disposition.json": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_f3e315ad1b38/lanes/ibm_narrative/x3_disposition.json"
+  },
+  "local_json_load_issues": [],
+  "local_provider_attempt_span_count": 1,
+  "local_provider_attempt_span_source": "provider_response.provider_attempt_spans",
+  "local_provider_attempt_timing_summary": {
+    "accepted_output_model": "gpt-5.6-luna",
+    "accepted_output_provider": "external_openai",
+    "attempted_count": 1,
+    "fallback_attempt_count": 0,
+    "fallback_attempted": false,
+    "models": [
+      "gpt-5.6-luna"
+    ],
+    "providers": [
+      "external_openai"
+    ],
+    "runtime_generation_statuses": [
+      "REAL_LLM"
+    ],
+    "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+    "span_count": 1,
+    "total_duration_seconds": 12.243803
+  },
+  "otel_provider_attempt_span_count": 0,
+  "otel_snapshot_available": false,
+  "otel_snapshot_ref": "provided_unavailable",
+  "otel_span_count": 0,
+  "producer": "apps_rg.runtime.observability.trace_reconciliation",
+  "require_otel_for_live": false,
+  "row_export_digest": "sha256:069865955dc26236a840c62ec95244db8fca7f77a623ece45ee161a885f28f2e",
+  "row_export_ref": "trace_reconciliation_rows.jsonl",
+  "rows": [
+    {
+      "check_id": "otel_snapshot.available",
+      "expected_value": "bounded OTel trace snapshot or explicit unavailable receipt",
+      "future_run_only": true,
+      "observed_value": {
+        "snapshot_ref": "provided_unavailable",
+        "span_count": 0
+      },
+      "reason": "OTel snapshot unavailable; local receipts remain authoritative",
+      "row_id": "961892b254040e648f65",
+      "run_id": "ibm_narrative_20260817_021219",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "ibm_narrative",
+      "severity": "WARN",
+      "source_refs": {
+        "otel_snapshot_ref": "provided_unavailable"
+      },
+      "stage_id": "L7",
+      "verdict": "WARN"
+    },
+    {
+      "check_id": "l7_provider_attempts.local_receipts",
+      "expected_value": "apps_rg_provider_attempt_timing_summary_v1",
+      "future_run_only": true,
+      "observed_value": {
+        "accepted_output_model": "gpt-5.6-luna",
+        "accepted_output_provider": "external_openai",
+        "attempted_count": 1,
+        "fallback_attempt_count": 0,
+        "fallback_attempted": false,
+        "models": [
+          "gpt-5.6-luna"
+        ],
+        "providers": [
+          "external_openai"
+        ],
+        "runtime_generation_statuses": [
+          "REAL_LLM"
+        ],
+        "schema_version": "apps_rg_provider_attempt_timing_summary_v1",
+        "span_count": 1,
+        "total_duration_seconds": 12.243803
+      },
+      "reason": "local provider-attempt receipts present",
+      "row_id": "181a6cc56d383a8f3d37",
+      "run_id": "ibm_narrative_20260817_021219",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "ibm_narrative",
+      "severity": "WARN",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "PASS"
+    },
+    {
+      "check_id": "l7_provider_attempts.otel_mirror",
+      "expected_value": "same provider attempt identity/order",
+      "future_run_only": true,
+      "observed_value": {
+        "local_provider_keys": [
+          [
+            "1",
+            "external_openai",
+            "gpt-5.6-luna"
+          ]
+        ],
+        "otel_provider_keys": []
+      },
+      "reason": "OTel unavailable; provider-attempt mirror could not be checked",
+      "row_id": "f9352ab4d41f7765d371",
+      "run_id": "ibm_narrative_20260817_021219",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "ibm_narrative",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "WARN"
+    },
+    {
+      "check_id": "l7_provider_attempts.timing_drift",
+      "expected_value": "<=0.25s duration drift when both sides expose timing",
+      "future_run_only": true,
+      "observed_value": [],
+      "reason": "provider-attempt timing drift not observed or not applicable",
+      "row_id": "71029478ef0d3081da79",
+      "run_id": "ibm_narrative_20260817_021219",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "ibm_narrative",
+      "severity": "MAJOR",
+      "source_refs": {
+        "provider_attempt_span_source": "provider_response.provider_attempt_spans"
+      },
+      "stage_id": "L7",
+      "verdict": "NOT_APPLICABLE"
+    },
+    {
+      "check_id": "x3_disposition.otel_mirror",
+      "expected_value": "local X3 code present in OTel span attributes",
+      "future_run_only": true,
+      "observed_value": {
+        "local_x3": "X3_ALLOW",
+        "otel_x3_values": []
+      },
+      "reason": "OTel unavailable; X3 span mirror could not be checked",
+      "row_id": "db0099b87a7e49f95ea5",
+      "run_id": "ibm_narrative_20260817_021219",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "ibm_narrative",
+      "severity": "MAJOR",
+      "source_refs": {
+        "x3_disposition_ref": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_f3e315ad1b38/lanes/ibm_narrative/x3_disposition.json"
+      },
+      "stage_id": "X3",
+      "verdict": "WARN"
+    },
+    {
+      "check_id": "uwg_handoff.otel_mirror",
+      "expected_value": "UWG local receipt plus optional mirrored OTel span",
+      "future_run_only": true,
+      "observed_value": {
+        "uwg_local_refs": {},
+        "uwg_otel_spans": []
+      },
+      "reason": "no UWG refs in this artifact directory",
+      "row_id": "79a26c4345f4bf33344e",
+      "run_id": "ibm_narrative_20260817_021219",
+      "schema_version": "apps_rg.trace_reconciliation.row.v1",
+      "section_id": "ibm_narrative",
+      "severity": "WARN",
+      "source_refs": {},
+      "stage_id": "UWG",
+      "verdict": "NOT_APPLICABLE"
+    }
+  ],
+  "rows_digest": "sha256:069865955dc26236a840c62ec95244db8fca7f77a623ece45ee161a885f28f2e",
+  "run_id": "ibm_narrative_20260817_021219",
+  "schema_version": "apps_rg.trace_reconciliation.v1",
+  "section_id": "ibm_narrative",
+  "summary": {
+    "current_run_mutation_assertion": false,
+    "fail_count": 0,
+    "future_run_only": true,
+    "not_applicable_count": 2,
+    "proof_authority": "local_receipts",
+    "row_count": 6,
+    "warn_count": 3
+  },
+  "trace_root": "",
+  "trace_verdict": "TRACE_UNAVAILABLE"
+}

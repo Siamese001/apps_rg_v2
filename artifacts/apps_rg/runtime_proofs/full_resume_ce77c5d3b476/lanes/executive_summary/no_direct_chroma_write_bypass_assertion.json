@@ -1,0 +1,100 @@
+{
+  "schema_version": "no_direct_chroma_write_bypass_assertion_v1",
+  "generated_at_utc": "2026-08-17T03:11:40.400980+00:00",
+  "producer": "apps_rg_semantic_cache_persistence_quarantine",
+  "section_id": "executive_summary",
+  "run_id": "exec_summary_20260817_031010",
+  "culprit_path": [
+    "apps_rg/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
+    "apps_rg/L4_state/utils/memory/semantic_cache_manager.py::promote_to_long_term",
+    "apps_rg/L4_state/cache/gptcache_client.py::NativePersistentCacheClient.store",
+    "apps_rg/L4_state/cache/gptcache_client.py::_chroma_collection.upsert"
+  ],
+  "primary_culprit": "apps_rg/L0_routing/reasoning/execution_orchestrator.py::_populate_d2_cache_promote",
+  "promote_to_long_term_callers": [
+    {
+      "caller": "apps_rg/L0_routing/reasoning/execution_orchestrator.py",
+      "symbol": "_populate_d2_cache_promote → promote_to_long_term",
+      "runtime_active": "yes",
+      "uwg_gated": "no",
+      "classification": "NON_DURABLE_INDEX_WRITE"
+    },
+    {
+      "caller": "apps_rg/mixins/semantic_cache_mixin.py",
+      "symbol": "promote_to_long_term",
+      "runtime_active": "optional",
+      "uwg_gated": "no",
+      "classification": "NON_DURABLE_INDEX_WRITE"
+    },
+    {
+      "caller": "apps_rg/utils/meta_learning_storage_util.py",
+      "symbol": "promote_to_long_term",
+      "runtime_active": "optional",
+      "uwg_gated": "no",
+      "classification": "NON_DURABLE_INDEX_WRITE"
+    },
+    {
+      "caller": "apps_rg/L4_state/utils/memory/semantic_cache_manager.py",
+      "symbol": "promote_to_long_term (internal DNA path)",
+      "runtime_active": "yes",
+      "uwg_gated": "no",
+      "classification": "NON_DURABLE_INDEX_WRITE"
+    },
+    {
+      "caller": "apps_rg/cache/r1b_uwg_promotion.py",
+      "symbol": "promote_r1b_cache_via_uwg",
+      "runtime_active": "post_exit_whole_run_only",
+      "uwg_gated": "yes",
+      "classification": "UWG_FILE_PROJECTION_NOT_CHROMA"
+    }
+  ],
+  "chroma_upsert_paths": [
+    {
+      "path": "apps_rg/L4_state/cache/gptcache_client.py",
+      "operation": "NativePersistentCacheClient.store → _chroma_collection.upsert",
+      "uwg_routed": "no",
+      "classification": "NON_DURABLE_INDEX_WRITE"
+    },
+    {
+      "path": "apps_rg/L4_state/utils/memory/semantic_cache_manager.py",
+      "operation": "_gptcache._chroma_collection.query/delete",
+      "uwg_routed": "no",
+      "classification": "NON_DURABLE_INDEX_WRITE"
+    }
+  ],
+  "uwg_path_present": true,
+  "durable_proof_present": false,
+  "durable_persistence_claim_allowed": false,
+  "chroma_semantic_cache_classification": "NON_DURABLE_INDEX_WRITE",
+  "write_classifications": {
+    "transient_or_test_index_chroma_upsert": {
+      "allowed": true,
+      "classification": "NON_DURABLE_INDEX_WRITE",
+      "notes": "Core D2 promote may upsert Chroma for L2 recall; not durable proof"
+    },
+    "governed_read_surface_refresh_after_uwg_commit": {
+      "allowed": true,
+      "classification": "GOVERNED_READ_SURFACE_REFRESH_AFTER_UWG_COMMIT",
+      "requires_chain": [
+        "Exit X3C",
+        "CommitRequest",
+        "StateDiffValidationResult",
+        "StateCommitReceipt or BlockedWriteReceipt",
+        "L4",
+        "read_surface_refresh_receipt.json"
+      ],
+      "proven_in_this_run": false
+    },
+    "prohibited_durable_persistence_claim": {
+      "allowed": false,
+      "classification": "PROHIBITED_DURABLE_PERSISTENCE_CLAIM",
+      "notes": "Direct Chroma collection existence or upsert without UWG chain is not persistence proof"
+    }
+  },
+  "explicit_non_claims": [
+    "direct Chroma upsert on core D2 promote path is not durable semantic-cache persistence",
+    "Chroma collection presence is not persistence proof",
+    "vector persistence not claimed for this section run",
+    "99 RuntimeProofBundle not claimed"
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "artifact_hash": "sha256:62b20720b1b7fb223cd2d2dcef0a5e9f37a1f25d65e6564694736bd9b43df107",
+  "payload": {
+    "request_id": "apps-rg-c15aec2e731e",
+    "route_contract": {
+      "action_required": false,
+      "allowed_file_roots": [],
+      "allowed_models": [],
+      "allowed_networks": [],
+      "allowed_next_stage": "frozenset({'L3'})",
+      "allowed_tools": [],
+      "app_id": "apps_rg",
+      "apps_research_call_required": false,
+      "audit_refs": [],
+      "cache_eligibility": {
+        "r1a_exact": false,
+        "r1b_semantic": false,
+        "r3_grounded": true,
+        "r4_action": false
+      },
+      "cache_lookup_r1a_receipt": "",
+      "cache_lookup_r1b_receipt": "",
+      "cache_lookup_r5_receipt": "",
+      "egress_policy_ref": "",
+      "execution_form": "MANAGED_WORKFLOW",
+      "gate_verdict_refs": [],
+      "graph_traverse_policy": {
+        "allowed_relation_types": [
+          "DERIVED_FROM",
+          "IMPLEMENTS",
+          "CONTRADICTS",
+          "SOURCE_VERSION",
+          "EVIDENCE",
+          "SUPPORTS",
+          "REQUIRES",
+          "RELATED_TO"
+        ],
+        "contradiction_scan_enabled": true,
+        "graph_adapter_ref": "apps_rg.integrations.c0_graph_adapter",
+        "graph_expansion_allowed": true,
+        "live_wiring_deferred": false,
+        "max_edges": 64,
+        "max_hops": 1,
+        "max_nodes": 32,
+        "supersession_scan_enabled": false,
+        "wiring_gate": "LIVE"
+      },
+      "grounding_required": true,
+      "hmac_sig": "9f0bcd63e0bbaad20e1708026918a14ac88eb06579c5cf661a500d67b9e4e487",
+      "l3_required": true,
+      "l5_certification_ref": "l5:apps_rg:u0:7817c2c0770fcf26f35f9c2e",
+      "model_generation_required": true,
+      "otel_span_refs": [
+        "span:l0:route_decision:0dfcac04-9185-4835-bfd1-81a9f6028664:0244d9da-f6e5-4253-a554-344d502ff0e8:2d401e9ab2a1b072"
+      ],
+      "personalization_required": true,
+      "posture": {
+        "external_call": false,
+        "hitl_required": false,
+        "posture_class": "read_only",
+        "read_only": true,
+        "write_intent": false
+      },
+      "provider_model_requirement_ref": "apps_rg::provider_model::resume_generation::v1",
+      "r1a_lookup_receipt_ref": "",
+      "r1b_lookup_receipt_ref": "",
+      "r5_fallback_receipt_ref": "",
+      "reason_codes": [
+        "execution_form=MANAGED_WORKFLOW",
+        "canonical_route_id=R3R4_MANAGED_WORKFLOW",
+        "app_route_id=R4_MANAGED_DRAFT",
+        "route_gate_status=PASS",
+        "hitl_posture=low",
+        "route_signing_posture=signed",
+        "l1_plan_ready=PASS",
+        "l1_capsule_digest:sha256:8ed8a7fb7bd1bee9a",
+        "l1_profile_digest:75b8b40fcd92257a8334701b",
+        "l1_route_features:6f9a3ae3abf18e92",
+        "l1_work_units:bd591127e4038dc9",
+        "l1_completion_criteria:554a72ba3dba4244",
+        "l1_evidence_plan_ref:904cdfe202cfad8e",
+        "l1_planning_status:READY",
+        "l1_work_shape:full_resume_generation",
+        "l1_task_shape:strategic_tailor",
+        "l1_v2_capsule_digest:sha256:5ddacf810ce5fa662",
+        "l1_v2_decision_ledger:sha256:6ac2ab826",
+        "l1_v2_evidence_obligation_ledger:sha256:9e9d053d0",
+        "l1_v2_work_dag:sha256:ef0c729cf",
+        "l1_v2_planning_status:READY"
+      ],
+      "registry_resolution_receipt_ref": "",
+      "replay_key": "Anthropic:Manager of Applied AI Architecture, Partnerships:cf540d3573aba733:e35fe5dbda126c40::v1",
+      "request_id": "req-67401fd1d59f4291a2a8d1c5430c798a",
+      "route_digest": "0ca08444b26d6ffdbb63a73ee8b436a19feeae25333cf9ee8bcccdbf33b254e5",
+      "route_family": "R3R4_MANAGED_WORKFLOW",
+      "route_gate_receipts": [
+        {
+          "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+          "facts_present": true,
+          "gate_id": "G07_GROUNDING_READINESS",
+          "reason": "jd_hash+resume_hash required for grounding PASS",
+          "score": 1.0,
+          "verdict": "PASS"
+        },
+        {
+          "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+          "facts_present": true,
+          "gate_id": "G08_PERSONALIZATION",
+          "reason": "support_expectation must be present for personalization policy",
+          "score": 1.0,
+          "verdict": "PASS"
+        },
+        {
+          "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+          "facts_present": false,
+          "gate_id": "G10_BUDGET",
+          "reason": "budget enforcement disabled in route profile",
+          "score": 0.0,
+          "verdict": "NOT_APPLICABLE"
+        },
+        {
+          "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+          "facts_present": false,
+          "gate_id": "G20_ROUTE_BUDGET",
+          "reason": "budget profile not enforced",
+          "score": 0.0,
+          "verdict": "NOT_APPLICABLE"
+        },
+        {
+          "adapter_kind": "TEMPORARY_THIN_ADAPTER",
+          "facts_present": true,
+          "gate_id": "G_L1_PLAN_READY",
+          "reason": "verified L1 capsule is READY and bound to planning profile bytes",
+          "score": 1.0,
+          "verdict": "PASS"
+        }
+      ],
+      "route_gate_refs": [
+        "G07_GROUNDING_READINESS:PASS:1.000000",
+        "G08_PERSONALIZATION:PASS:1.000000",
+        "G10_BUDGET:NOT_APPLICABLE:0.000000",
+        "G20_ROUTE_BUDGET:NOT_APPLICABLE:0.000000",
+        "G_L1_PLAN_READY:PASS:1.000000"
+      ],
+      "route_id": "R3R4_MANAGED_WORKFLOW",
+      "route_policy_ref": "apps_rg/config/domain_contract/route_profiles.yaml#arpf::apps_rg::resume_generation::full_resume_managed::v1",
+      "route_profile_ref": "arpf::apps_rg::resume_generation::full_resume_managed::v1",
+      "routing_timestamp": "2026-08-17T02:49:36.195975+00:00",
+      "run_id": "0244d9da-f6e5-4253-a554-344d502ff0e8",
+      "sandbox_required": false,
+      "schema_version": "W6.0",
+      "signature": "9f0bcd63e0bbaad20e1708026918a14ac88eb06579c5cf661a500d67b9e4e487",
+      "snapshot_refs": [
+        "policy_hash:ce0aaa8c313e652bc264bb22972a83bb3bbadfbfc26ac790b5aa8c71a750c0fe",
+        "blueprint_hash:6fc1a27b31a9bc05ba040516b54358d5ec923910f893de87b5f8360cc1f7a5e7",
+        "registry_digest_set:route_profiles=6fc1a27b31a9bc05ba040516b54358d5ec923910f893de87b5f8360cc1f7a5e7|route_registry=69f32842f3c5a28f2b334f6379290b6e29af1aecb85ef5ba77c75cc9c1f1c313",
+        "l1_capsule_digest:sha256:8ed8a7fb7bd1bee9a45822455e4e7906222e9726a399774ea5677759e407dc76",
+        "l1_planning_profile_digest:75b8b40fcd92257a8334701b4cc0cc9fcf40d52fd9e6fb8a1c98e17daaabe16a",
+        "l1_plan_binding_digest:3aa5087007aac7c8137ca20c7cbed0db7969747dfe30e9125fca04562f767b44",
+        "l1_v2_capsule_digest:sha256:5ddacf810ce5fa6623433ceb98a1b630ea9c1c43bc30783eb8853399806f4954",
+        "l1_v2_evidence_obligation_ledger:sha256:9e9d053d0baf4a9b8393037fab4d9e357f827ca937abfd6282aaa8c986f77191",
+        "l1_v2_work_dag:sha256:ef0c729cf8e23e79eedc60cf0c451962d223bc1d8060a33cbf3e38289dec6f4b",
+        "l1_v2_plan_binding_digest:6328dabbf202e577e5ce6e86f0a13f80b450aeeac67bcf965f913d003e06cde1"
+      ],
+      "task_shape": "strategic_tailor",
+      "tenant_id": "default",
+      "trace_id": "0dfcac04-9185-4835-bfd1-81a9f6028664",
+      "work_shape": "full_resume_generation",
+      "workflow_manifest_ref": "wfm::apps_rg::resume_generation::v1",
+      "workflow_ref": "wfm::apps_rg::resume_generation::v1",
+      "workflow_registry_ref": "apps_rg/config/route_registry.yaml",
+      "write_authority_present": false
+    },
+    "route_family": "R4_SINGLE_ACTION",
+    "route_id": "apps_rg.resume_generation_v1",
+    "trace_root": "0dfcac04-9185-4835-bfd1-81a9f6028664"
+  },
+  "producer_component": "apps_rg.runtime.orchestration.app_single_action_spine"
+}

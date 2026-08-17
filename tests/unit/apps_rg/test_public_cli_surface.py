@@ -24,20 +24,29 @@ def test_public_cli_exposes_only_run_eval_and_show_actions() -> None:
     subparsers = next(action for action in parser._actions if action.dest == "action")
 
     assert set(subparsers.choices) == {"run", "eval", "show"}
-    assert parser.parse_args(["run", "--mode", "deterministic"]).action == "run"
+    assert parser.parse_args(["run"]).action == "run"
     with pytest.raises(SystemExit) as excinfo:
-        parser.parse_args(["run", "--section", "executive_summary"])
+        parser.parse_args(["run", "--mode", "deterministic"])
     assert excinfo.value.code == 2
 
 
 def test_only_public_module_cli_invokes_the_whole_resume_runner() -> None:
-    executable_whole_resume_modules: list[Path] = []
+    text = PUBLIC_CLI_MODULE.read_text(encoding="utf-8")
+    assert "run_canonical_apps_rg_from_cli_primitives(" in text
+    assert "run_bare_e2e(" not in text
+    assert "evaluate_full_run(" in text
+
+
+def test_apps_rg_has_one_executable_module_cli() -> None:
+    executable_modules: list[Path] = []
     for path in (REPO_ROOT / "src" / "apps_rg").rglob("*.py"):
         text = path.read_text(encoding="utf-8")
-        if 'if __name__ == "__main__"' in text and "run_bare_e2e(" in text:
-            executable_whole_resume_modules.append(path)
+        if 'if __name__ == "__main__":' not in text:
+            continue
+        if "raise SystemExit(" in text or "\n    main()" in text or "\n    sys.exit(main())" in text:
+            executable_modules.append(path)
 
-    assert executable_whole_resume_modules == [PUBLIC_CLI_MODULE]
+    assert executable_modules == [PUBLIC_CLI_MODULE]
 
 
 def test_retired_pre_run_cli_is_physically_absent() -> None:
@@ -48,4 +57,6 @@ def test_public_documentation_contains_no_retired_top_level_command_shape() -> N
     for path in PUBLIC_DOCUMENTS:
         text = path.read_text(encoding="utf-8")
         assert "python -m apps_rg --" not in text, path.as_posix()
+        assert "python -m apps_rg run --mode" not in text, path.as_posix()
+        assert "python -m apps_rg run --resume-run-dir" not in text, path.as_posix()
         assert "python -m apps_rg.runtime.prepare_orchestrator_inputs" not in text, path.as_posix()

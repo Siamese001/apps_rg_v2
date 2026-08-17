@@ -1,0 +1,1130 @@
+{
+  "schema_version": "apps_rg.mandatory_run_output.v1",
+  "generated_at_utc": "2026-08-16T15:45:06Z",
+  "run_root_abs": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650",
+  "run_root": "artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650",
+  "result_summary": {
+    "exit_status": "error",
+    "execution_status": "failed",
+    "outcome_authorized": false,
+    "decisive_status": "",
+    "all_lanes_authorized": null,
+    "x3_disposition": "X3_BLOCK",
+    "completion_disposition": "X3_BLOCK",
+    "completion_status": "BLOCKED",
+    "completion_fault": "",
+    "fault": "APPS_RESEARCH_BLOCKED",
+    "run_id": "",
+    "request_id": "",
+    "proof_gate_status": "",
+    "proof_classification": "",
+    "decisive_reason": "",
+    "operational_failure": {},
+    "research_artifact_dir": "",
+    "research_briefing_path": "",
+    "research_company_brief_path": "",
+    "research_handoff_v2_path": "",
+    "apps_eval_record_ref": "",
+    "l6_shadow_bridge_ref": "",
+    "l7_audit_status": "",
+    "product_authorized": false,
+    "pipeline_complete": false,
+    "observability_repair_required": false
+  },
+  "section_counts": {
+    "total": 0,
+    "ran_real_llm": 0,
+    "allowed": 0,
+    "blocked": 0,
+    "pre_run_blocked": 0,
+    "not_run": 0,
+    "unknown": 0
+  },
+  "sections": [],
+  "section_lane_table": [
+    {
+      "order": 0,
+      "section": "research_briefing_input",
+      "research_source_class": "FRESH_APPS_RESEARCH",
+      "r1a": "NOT_OBSERVED",
+      "r1b": "NOT_OBSERVED",
+      "lane_record": "NO",
+      "provider_call_attempted": true,
+      "primary_provider": "NOT_OBSERVED",
+      "primary_model_observed": "MODEL_NOT_OBSERVED",
+      "pooling_selector_llm": "N/A",
+      "secondary_provider": "N/A",
+      "secondary_model_observed": "N/A",
+      "generation_status": "MISSING_BRIEFING",
+      "judges_run": "N/A",
+      "judge_models_scores": "N/A",
+      "judge_retry_fallback": "N/A",
+      "x2": "NOT_OBSERVED; blocker=no_apps_research_handoff_present",
+      "x3": "FAIL",
+      "past_fail_blocker": "auto_research_internal=True; research_delegation_executed=True; source=NOT_OBSERVED; briefing missing",
+      "display_output": "MISSING",
+      "l6_evidence": "N/A"
+    }
+  ],
+  "final_resume_output": {
+    "schema_version": "apps_rg.final_resume_output.v1",
+    "generated_at_utc": "2026-08-16T15:45:06Z",
+    "required": true,
+    "status": "FAIL",
+    "failed_gate_ids": [
+      "final_resume_no_gap_markers"
+    ],
+    "run_root": "artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650",
+    "final_resume_json": {
+      "relpath": "modular_r4/final_resume_assembly/final_resume.json",
+      "exists": true,
+      "bytes": 6988,
+      "sha256": "49ecf1ec905ffca1521c07d1a2cd9867c717076d1d3dae61ae687fffabf4629d"
+    },
+    "rendered_resume_text": {
+      "relpath": "FINAL_RESUME_OUTPUT.txt",
+      "exists": true,
+      "bytes": 2059,
+      "sha256": "c421c11523a9a0230e0db27c5a167b3603cfff9b26d34372f175d7982e12fb60"
+    },
+    "resume_docx": {
+      "relpath": "outputs/resume.docx",
+      "exists": true,
+      "bytes": 2948,
+      "sha256": "b8def5ce7c976515148f50ee5c373bf13004e3345165c1a9bfc61ca58061a60d"
+    },
+    "rendered_order": [
+      "candidate_header",
+      "headline",
+      "executive_summary",
+      "competencies",
+      "professional_experience",
+      "education",
+      "certifications"
+    ],
+    "base_resume_role_facts": [
+      {
+        "role_key": "unify",
+        "employer": "Unify Consulting",
+        "title": "SVP Engineering, Agentic AI Platforms",
+        "location": "Boca Raton, FL",
+        "start_date": "2023-02",
+        "end_date": "present",
+        "is_current": true
+      },
+      {
+        "role_key": "ibm",
+        "employer": "IBM",
+        "title": "Partner",
+        "location": "Edgewater, NJ",
+        "start_date": "2017-04",
+        "end_date": "2022-10",
+        "is_current": false
+      },
+      {
+        "role_key": "insurtech",
+        "employer": "InsurTech Cloud Solutions",
+        "title": "Chief Technology Officer",
+        "location": "New York, NY",
+        "start_date": "2014-04",
+        "end_date": "2017-03",
+        "is_current": false
+      },
+      {
+        "role_key": "ey",
+        "employer": "Ernst & Young",
+        "title": "Principal",
+        "location": "New York, NY",
+        "start_date": "2009-10",
+        "end_date": "2014-03",
+        "is_current": false
+      },
+      {
+        "role_key": "early_career",
+        "employer": "Early Career Roles",
+        "title": "Actuarial Consultant and Quantitative Roles",
+        "location": "Philadelphia, PA",
+        "start_date": "2002-10",
+        "end_date": "2009-09",
+        "is_current": false
+      }
+    ],
+    "content_sources": {
+      "identity_contact_source": "base_resume_locked_profile",
+      "role_header_source": "final_resume.locked_copy_invariants",
+      "generated_content_source": "final_resume.sections[].l2_output_snapshot",
+      "education_certification_source": "final_resume.sections[].copied_text_exact",
+      "locked_copy_source": "final_resume.sections[].copied_text_exact"
+    },
+    "gates": [
+      {
+        "gate_id": "final_resume_json_spine_present",
+        "pass": true,
+        "observed_value": "artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/modular_r4/final_resume_assembly/final_resume.json",
+        "threshold": "modular_r4/final_resume_assembly/final_resume.json",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_rendered_text_present",
+        "pass": true,
+        "observed_value": {
+          "relpath": "FINAL_RESUME_OUTPUT.txt",
+          "exists": true,
+          "bytes": 2059,
+          "sha256": "c421c11523a9a0230e0db27c5a167b3603cfff9b26d34372f175d7982e12fb60"
+        },
+        "threshold": "nonempty text output",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_present_nonempty",
+        "pass": true,
+        "observed_value": {
+          "relpath": "outputs/resume.docx",
+          "exists": true,
+          "bytes": 2948,
+          "sha256": "b8def5ce7c976515148f50ee5c373bf13004e3345165c1a9bfc61ca58061a60d"
+        },
+        "threshold": "nonempty DOCX output",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_rendered_order_valid",
+        "pass": true,
+        "observed_value": {
+          "EXECUTIVE SUMMARY": 182,
+          "ENGINEERING & PLATFORM COMPETENCIES": 273,
+          "PROFESSIONAL EXPERIENCE": 392,
+          "EDUCATION": 1524,
+          "CERTIFICATIONS": 1688
+        },
+        "threshold": [
+          "candidate_header",
+          "headline",
+          "executive_summary",
+          "competencies",
+          "professional_experience",
+          "education",
+          "certifications"
+        ],
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_order_valid",
+        "pass": true,
+        "observed_value": {
+          "EXECUTIVE SUMMARY": 180,
+          "ENGINEERING & PLATFORM COMPETENCIES": 270,
+          "PROFESSIONAL EXPERIENCE": 388,
+          "EDUCATION": 1514,
+          "CERTIFICATIONS": 1677
+        },
+        "threshold": [
+          "candidate_header",
+          "headline",
+          "executive_summary",
+          "competencies",
+          "professional_experience",
+          "education",
+          "certifications"
+        ],
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_base_role_headers_preserved",
+        "pass": true,
+        "observed_value": {
+          "role_headers": {
+            "unify": [
+              "Unify Consulting \u2014 SVP Engineering, Agentic AI Platforms",
+              "Boca Raton, FL | Feb 2023 \u2013 Present"
+            ],
+            "ibm": [
+              "IBM \u2014 Partner",
+              "Edgewater, NJ | Apr 2017 \u2013 Oct 2022"
+            ],
+            "insurtech": [
+              "InsurTech Cloud Solutions \u2014 Chief Technology Officer",
+              "New York, NY | Apr 2014 \u2013 Mar 2017"
+            ],
+            "ey": [
+              "Ernst & Young \u2014 Principal",
+              "New York, NY | Oct 2009 \u2013 Mar 2014"
+            ],
+            "early_career": [
+              "Early Career Roles \u2014 Actuarial Consultant and Quantitative Roles",
+              "Philadelphia, PA | Oct 2002 \u2013 Sep 2009"
+            ]
+          },
+          "positions": {
+            "unify": [
+              417,
+              474
+            ],
+            "ibm": [
+              604,
+              618
+            ],
+            "insurtech": [
+              742,
+              795
+            ],
+            "ey": [
+              922,
+              948
+            ],
+            "early_career": [
+              1068,
+              1133
+            ]
+          }
+        },
+        "threshold": "base resume employer/title/location/date headers in order",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_base_role_headers_preserved",
+        "pass": true,
+        "observed_value": {
+          "role_headers": {
+            "unify": [
+              "Unify Consulting \u2014 SVP Engineering, Agentic AI Platforms",
+              "Boca Raton, FL | Feb 2023 \u2013 Present"
+            ],
+            "ibm": [
+              "IBM \u2014 Partner",
+              "Edgewater, NJ | Apr 2017 \u2013 Oct 2022"
+            ],
+            "insurtech": [
+              "InsurTech Cloud Solutions \u2014 Chief Technology Officer",
+              "New York, NY | Apr 2014 \u2013 Mar 2017"
+            ],
+            "ey": [
+              "Ernst & Young \u2014 Principal",
+              "New York, NY | Oct 2009 \u2013 Mar 2014"
+            ],
+            "early_career": [
+              "Early Career Roles \u2014 Actuarial Consultant and Quantitative Roles",
+              "Philadelphia, PA | Oct 2002 \u2013 Sep 2009"
+            ]
+          },
+          "positions": {
+            "unify": [
+              412,
+              469
+            ],
+            "ibm": [
+              598,
+              612
+            ],
+            "insurtech": [
+              735,
+              788
+            ],
+            "ey": [
+              914,
+              940
+            ],
+            "early_career": [
+              1059,
+              1124
+            ]
+          }
+        },
+        "threshold": "base resume employer/title/location/date headers in order",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_education_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "education",
+          "expected_lines": [
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+          ],
+          "positions": {
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 1534,
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 1619
+          }
+        },
+        "threshold": "base resume education lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_education_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "education",
+          "expected_lines": [
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)",
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)"
+          ],
+          "positions": {
+            "Master of Science in Biostatistics, Columbia University (Graduated with Distinction)": 1524,
+            "Bachelor of Arts in Biology, Brown University (Graduated Cum Laude)": 1609
+          }
+        },
+        "threshold": "base resume education lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_certifications_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "certifications",
+          "expected_lines": [
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025",
+            "Databricks Lakehouse Fundamentals Accreditation, 2023",
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023",
+            "Fellow of the Society of Actuaries, 2010"
+          ],
+          "positions": {
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025": 1717,
+            "Databricks Lakehouse Fundamentals Accreditation, 2023": 1776,
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023": 1830,
+            "Fellow of the Society of Actuaries, 2010": 1886
+          }
+        },
+        "threshold": "base resume certification lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_docx_certifications_copied_from_base",
+        "pass": true,
+        "observed_value": {
+          "section_id": "certifications",
+          "expected_lines": [
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025",
+            "Databricks Lakehouse Fundamentals Accreditation, 2023",
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023",
+            "Fellow of the Society of Actuaries, 2010"
+          ],
+          "positions": {
+            "Certified Machine Learning Engineer \u2013 Associate, AWS, 2025": 1706,
+            "Databricks Lakehouse Fundamentals Accreditation, 2023": 1765,
+            "Certified Solutions Architect \u2013 Professional, AWS, 2023": 1819,
+            "Fellow of the Society of Actuaries, 2010": 1875
+          }
+        },
+        "threshold": "base resume certification lines",
+        "failure_reason": ""
+      },
+      {
+        "gate_id": "final_resume_no_gap_markers",
+        "pass": false,
+        "observed_value": {
+          "not_completed": true,
+          "not_generated_by_run": true
+        },
+        "threshold": false,
+        "failure_reason": "rendered resume contains generated-content gap markers"
+      }
+    ]
+  },
+  "rca_findings": [],
+  "section_failure_forensics": {
+    "gate_id": "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+    "pass": true,
+    "required": true,
+    "failed_section_count": 1,
+    "artifact_dir": "artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics",
+    "artifacts": [
+      {
+        "section_id": "whole_run",
+        "json_path": "artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics/whole_run.json",
+        "md_path": "artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics/whole_run.md",
+        "complete": true,
+        "errors": [],
+        "failure_type": "mandatory_output_authorization_block",
+        "baseline_confidence": "pinned_contract_invalid"
+      }
+    ],
+    "missing_or_incomplete": [],
+    "failure_reason": "",
+    "baseline_confidence": "pinned_contract_invalid",
+    "baseline_run_dir": ""
+  },
+  "operational_failure_forensics": {},
+  "output_bisect": {
+    "required": true,
+    "sections": [
+      {
+        "schema_version": "apps_rg.output_bisect.v1",
+        "section_id": "whole_run",
+        "scope": "NO_PRIOR_BASELINE",
+        "first_observed_divergence": {
+          "order": 1,
+          "stage": "u0_ingress",
+          "prior_value": "NOT_OBSERVED",
+          "current_value": "NOT_OBSERVED",
+          "prior_detail": "NOT_OBSERVED",
+          "current_detail": "NOT_OBSERVED",
+          "match": false,
+          "classification": "EVIDENCE_GAP",
+          "reason": "Neither run recorded evidence for this stage.",
+          "prior_evidence_ref": "",
+          "current_evidence_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\ingress_raw.json"
+        },
+        "first_causally_relevant_divergence": {},
+        "ingestion_to_outcome_lineage": [
+          {
+            "order": 1,
+            "stage": "u0_ingress",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "NOT_OBSERVED",
+            "current_detail": "NOT_OBSERVED",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\ingress_raw.json"
+          },
+          {
+            "order": 2,
+            "stage": "u0_payload",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\u0_receipt.json"
+          },
+          {
+            "order": 3,
+            "stage": "jd_material",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 4,
+            "stage": "briefing_material",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 5,
+            "stage": "targeting_bundle",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 6,
+            "stage": "proof_pool",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 7,
+            "stage": "selected_fact_plan",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 8,
+            "stage": "provider_request",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 9,
+            "stage": "initial_candidate",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 10,
+            "stage": "retry_loop",
+            "prior_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+            "current_value": "2304adee64d3547ac7581f6a70b659a88418aac4c0a78a1ce7cd6b0a4a973fd5",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": true,
+            "classification": "RULED_OUT",
+            "reason": "The evidence is identical at this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 11,
+            "stage": "deterministic_finalization",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 12,
+            "stage": "final_x2",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 13,
+            "stage": "judges",
+            "prior_value": "NO_JUDGE_ROWS",
+            "current_value": "NO_JUDGE_ROWS",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": true,
+            "classification": "RULED_OUT",
+            "reason": "The evidence is identical at this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          },
+          {
+            "order": 14,
+            "stage": "x3",
+            "prior_value": "NOT_OBSERVED",
+            "current_value": "NOT_OBSERVED",
+            "prior_detail": "",
+            "current_detail": "",
+            "match": false,
+            "classification": "EVIDENCE_GAP",
+            "reason": "Neither run recorded evidence for this stage.",
+            "prior_evidence_ref": "",
+            "current_evidence_ref": ""
+          }
+        ],
+        "prior_attempt_timeline": [
+          {
+            "run": "prior_passing",
+            "sequence": 1,
+            "phase": "lane_resolution",
+            "attempt": "-",
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "no prior passing lane was found",
+            "repair_or_action": "none",
+            "gate_scope": "NONE",
+            "gate_result": "NOT_APPLICABLE",
+            "failed_gate_ids": [],
+            "judge_result": "NO_PRIOR_PASSING_RUN",
+            "disposition": "NO_BASELINE",
+            "acceptance_scope": "NOT_APPLICABLE",
+            "evidence_ref": "",
+            "complete": true
+          }
+        ],
+        "current_attempt_timeline": [
+          {
+            "run": "current_failure",
+            "sequence": 1,
+            "phase": "lane_resolution",
+            "attempt": "-",
+            "candidate_digest": "",
+            "word_count": 0,
+            "trigger_or_input": "lane artifact directory not found",
+            "repair_or_action": "none",
+            "gate_scope": "NONE",
+            "gate_result": "EVIDENCE_NOT_RECORDED",
+            "failed_gate_ids": [],
+            "judge_result": "EVIDENCE_NOT_RECORDED",
+            "disposition": "EVIDENCE_GAP",
+            "acceptance_scope": "NOT_APPLICABLE",
+            "evidence_ref": "",
+            "complete": false
+          }
+        ],
+        "gate_matrix": [],
+        "judge_matrix": [
+          {
+            "judge": "configured_panel",
+            "prior": "NOT_OBSERVED",
+            "current": "JUDGES_NOT_REACHED",
+            "reason": "No current judge rows were emitted because X2 failed first."
+          }
+        ],
+        "code_cause_status": "NOT_APPLICABLE_NO_PRIOR_BASELINE",
+        "code_bindings": [
+          {
+            "role": "revision comparison",
+            "file": "",
+            "symbol": "",
+            "baseline_symbol_hash": "",
+            "current_symbol_hash": "",
+            "changed_between_revisions": false,
+            "status": "NOT_APPLICABLE_NO_PRIOR_BASELINE"
+          }
+        ],
+        "underlying_root_cause": {
+          "downstream_root_cause": {
+            "status": "ISOLATED_TO_UPSTREAM_SECTION",
+            "conclusion": "This section was blocked downstream of the executive-summary product-authorization failure."
+          }
+        },
+        "layperson_explanation": [
+          "No prior passing same-scenario run was available, so this report does not claim a before-versus-after recovery result.",
+          "The runs first differ at ingestion: the prior run used NOT_OBSERVED, while the current run used NOT_OBSERVED; later targeting, fact-selection, and provider-request evidence also changed, so the initial text difference cannot be attributed to the code revision alone.",
+          "The current run then made 0 pre-judge repair attempt(s), but the recorded defects were not cleared; it reverted to its first candidate, the final deterministic check still failed (failed gates not recorded), so the judges were not reached and the resume remained blocked."
+        ]
+      }
+    ]
+  },
+  "mandatory_artifacts": {
+    "bcg_executive_output_md": "01_BCG_executive_output.md",
+    "output_bisect_md": "02_output_bisect.md",
+    "mandatory_run_output_md": "02_section_lane_summary_table.md",
+    "mandatory_run_output_json": "APPS_RG_MANDATORY_RUN_OUTPUT.json",
+    "section_failure_forensics_dir": "section_failure_forensics",
+    "final_resume_output_txt": "FINAL_RESUME_OUTPUT.txt",
+    "final_resume_output_json": "FINAL_RESUME_OUTPUT.json",
+    "final_resume_docx": "outputs/resume.docx",
+    "canonical_final_resume_json": "modular_r4/final_resume_assembly/final_resume.json"
+  },
+  "inline_required_output": {
+    "schema_version": "apps_rg.inline_required_output.v1",
+    "immutable_section_order": [
+      "bcg",
+      "section_lane_summary_table",
+      "resume_docx_full_version_inline"
+    ],
+    "bcg": {
+      "title": "BCG Executive Output - apps_rg Run",
+      "section_order": [
+        "executive_answer",
+        "p0_p1_px_recommendations",
+        "board_level_readout",
+        "issue_tree",
+        "recommended_next_move",
+        "evidence_map"
+      ],
+      "executive_answer": "The run is blocked and must not authorize a final resume. Required generation and/or final product gates did not clear. The source X3 decision was X3_BLOCK, but completion ended BLOCKED because APPS_RESEARCH_BLOCKED. Use the P0/P1/PX recommendations below as the repair order.",
+      "p0_p1_px_recommendations": {
+        "columns": [
+          "priority",
+          "recommendation",
+          "evidence",
+          "gate_outcome"
+        ],
+        "rows": [
+          {
+            "priority": "P0",
+            "recommendation": "Keep final resume product gate failed while generated-section gap markers exist.",
+            "evidence": "final_resume_no_gap_markers",
+            "gate_outcome": "Final resume unauthorized."
+          }
+        ]
+      },
+      "board_level_readout": {
+        "columns": [
+          "question",
+          "answer"
+        ],
+        "rows": [
+          {
+            "question": "Did apps_research run?",
+            "answer": "Yes"
+          },
+          {
+            "question": "Research source class",
+            "answer": "FRESH_APPS_RESEARCH"
+          },
+          {
+            "question": "Research input used",
+            "answer": "NOT_OBSERVED"
+          },
+          {
+            "question": "Briefing evidence",
+            "answer": "auto_research_internal=True; research_delegation_executed=True; source=NOT_OBSERVED; briefing missing"
+          },
+          {
+            "question": "Did resume generation run?",
+            "answer": "0 REAL_LLM section(s)"
+          },
+          {
+            "question": "Source X3 decision",
+            "answer": "X3_BLOCK"
+          },
+          {
+            "question": "Completion status",
+            "answer": "BLOCKED"
+          },
+          {
+            "question": "Completion fault",
+            "answer": "NONE"
+          },
+          {
+            "question": "Final product authorized?",
+            "answer": "False"
+          },
+          {
+            "question": "Primary blocker",
+            "answer": "Keep final resume product gate failed while generated-section gap markers exist. Evidence: final_resume_no_gap_markers"
+          },
+          {
+            "question": "Decision",
+            "answer": "Do not authorize; fix P0 gates first."
+          }
+        ]
+      },
+      "issue_tree": [],
+      "recommended_next_move": [
+        "Resolve P0: Keep final resume product gate failed while generated-section gap markers exist. Evidence: final_resume_no_gap_markers.",
+        "Rerun the integrated apps_rg path only after the listed P0 evidence clears.",
+        "Treat final assembly as valid only when every required section and product output is product-authorized."
+      ],
+      "evidence_map": [
+        {
+          "label": "Mandatory run ledger",
+          "path": "@C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\02_section_lane_summary_table.md"
+        },
+        {
+          "label": "Machine-readable ledger",
+          "path": "@C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\APPS_RG_MANDATORY_RUN_OUTPUT.json"
+        },
+        {
+          "label": "Final resume text",
+          "path": "@C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\FINAL_RESUME_OUTPUT.txt"
+        },
+        {
+          "label": "Final resume output contract",
+          "path": "@C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\FINAL_RESUME_OUTPUT.json"
+        },
+        {
+          "label": "Resume DOCX",
+          "path": "@C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\\outputs/resume.docx"
+        },
+        {
+          "label": "Section failure forensics index",
+          "path": "@artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics/index.json; @artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics/index.md"
+        },
+        {
+          "label": "Section forensic RCA: whole_run",
+          "path": "@artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics/whole_run.json; @artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics/whole_run.md"
+        }
+      ]
+    },
+    "section_lane_summary_table": {
+      "title": "Section Lane Summary Table",
+      "columns": [
+        "order",
+        "section",
+        "research_source_class",
+        "r1a",
+        "r1b",
+        "lane_record",
+        "provider_call_attempted",
+        "primary_provider",
+        "primary_model_observed",
+        "pooling_selector_llm",
+        "secondary_provider",
+        "secondary_model_observed",
+        "generation_status",
+        "judges_run",
+        "judge_models_scores",
+        "judge_retry_fallback",
+        "x2",
+        "x3",
+        "past_fail_blocker",
+        "display_output",
+        "l6_evidence"
+      ],
+      "rows": [
+        {
+          "order": 0,
+          "section": "research_briefing_input",
+          "research_source_class": "FRESH_APPS_RESEARCH",
+          "r1a": "NOT_OBSERVED",
+          "r1b": "NOT_OBSERVED",
+          "lane_record": "NO",
+          "provider_call_attempted": true,
+          "primary_provider": "NOT_OBSERVED",
+          "primary_model_observed": "MODEL_NOT_OBSERVED",
+          "pooling_selector_llm": "N/A",
+          "secondary_provider": "N/A",
+          "secondary_model_observed": "N/A",
+          "generation_status": "MISSING_BRIEFING",
+          "judges_run": "N/A",
+          "judge_models_scores": "N/A",
+          "judge_retry_fallback": "N/A",
+          "x2": "NOT_OBSERVED; blocker=no_apps_research_handoff_present",
+          "x3": "FAIL",
+          "past_fail_blocker": "auto_research_internal=True; research_delegation_executed=True; source=NOT_OBSERVED; briefing missing",
+          "display_output": "MISSING",
+          "l6_evidence": "N/A"
+        }
+      ]
+    },
+    "resume_docx_full_version_inline": {
+      "title": "Resume DOCX Full Version Inline",
+      "source": "No authorized resume text emitted; this block is derived only from the current E2E run ledger and final-resume output contract.",
+      "text": "NO_AUTHORIZED_RESUME_OUTPUT\nsource_of_truth=current_e2e_run_artifacts_only\nrun_root=C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_d9ae65232650\nstatus=BLOCKED\nreason=outcome_authorized_false; final_resume_output_status=FAIL; failed_final_resume_gates=final_resume_no_gap_markers\npolicy=do_not_inline_FINAL_RESUME_OUTPUT_txt_unless_current_run_authorized"
+    }
+  },
+  "mandatory_inline_output_gates": [
+    {
+      "gate_id": "mandatory_bcg_inline_output_present",
+      "pass": true,
+      "observed_value": "01_BCG_executive_output.md",
+      "threshold": "BCG executive markdown rendered inline",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_section_lane_table_inline_present",
+      "pass": true,
+      "observed_value": 1,
+      "threshold": ">=1 lane table row",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_resume_text_inline_present",
+      "pass": false,
+      "observed_value": {
+        "artifact": {
+          "relpath": "FINAL_RESUME_OUTPUT.txt",
+          "exists": true,
+          "bytes": 2059,
+          "sha256": "c421c11523a9a0230e0db27c5a167b3603cfff9b26d34372f175d7982e12fb60"
+        },
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "final_resume_output_status=FAIL",
+          "failed_final_resume_gates=final_resume_no_gap_markers"
+        ]
+      },
+      "threshold": "current-run authorized nonempty FINAL_RESUME_OUTPUT.txt",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "mandatory_final_resume_json_present",
+      "pass": false,
+      "observed_value": {
+        "artifact": {
+          "relpath": "modular_r4/final_resume_assembly/final_resume.json",
+          "exists": true,
+          "bytes": 6988,
+          "sha256": "49ecf1ec905ffca1521c07d1a2cd9867c717076d1d3dae61ae687fffabf4629d"
+        },
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "final_resume_output_status=FAIL",
+          "failed_final_resume_gates=final_resume_no_gap_markers"
+        ]
+      },
+      "threshold": "current-run authorized modular_r4/final_resume_assembly/final_resume.json",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "mandatory_resume_docx_present",
+      "pass": false,
+      "observed_value": {
+        "artifact": {
+          "relpath": "outputs/resume.docx",
+          "exists": true,
+          "bytes": 2948,
+          "sha256": "b8def5ce7c976515148f50ee5c373bf13004e3345165c1a9bfc61ca58061a60d"
+        },
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "final_resume_output_status=FAIL",
+          "failed_final_resume_gates=final_resume_no_gap_markers"
+        ]
+      },
+      "threshold": "current-run authorized outputs/resume.docx",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "mandatory_inline_required_json_shape_locked",
+      "pass": true,
+      "observed_value": {
+        "schema_version": "apps_rg.inline_required_output.v1",
+        "immutable_section_order": [
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ],
+        "shape_errors": []
+      },
+      "threshold": {
+        "schema_version": "apps_rg.inline_required_output.v1",
+        "immutable_section_order": [
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ],
+        "top_level_keys": [
+          "schema_version",
+          "immutable_section_order",
+          "bcg",
+          "section_lane_summary_table",
+          "resume_docx_full_version_inline"
+        ]
+      },
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_bcg_p0_p1_px_recommendations_locked",
+      "pass": true,
+      "observed_value": {
+        "title": "BCG Executive Output - apps_rg Run",
+        "section_order": [
+          "executive_answer",
+          "p0_p1_px_recommendations",
+          "board_level_readout",
+          "issue_tree",
+          "recommended_next_move",
+          "evidence_map"
+        ],
+        "priorities": [
+          "P0"
+        ],
+        "truth_errors": []
+      },
+      "threshold": "BCG title + section order + evidence-backed recommendations and next moves",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_research_briefing_input_row0_locked",
+      "pass": true,
+      "observed_value": {
+        "order": 0,
+        "section": "research_briefing_input",
+        "generation_status": "MISSING_BRIEFING"
+      },
+      "threshold": "row 0 research_briefing_input",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_apps_research_row0_x1_x2_x3_gates_locked",
+      "pass": true,
+      "observed_value": {
+        "research_source_class": "FRESH_APPS_RESEARCH",
+        "x2": "NOT_OBSERVED; blocker=no_apps_research_handoff_present",
+        "x3": "FAIL"
+      },
+      "threshold": "row 0 research_source_class plus compact X2/X3 handoff cells",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "mandatory_resume_docx_inline_json_present",
+      "pass": false,
+      "observed_value": {
+        "title": "Resume DOCX Full Version Inline",
+        "text_chars": 369,
+        "current_run_authorized": false,
+        "blockers": [
+          "outcome_authorized_false",
+          "final_resume_output_status=FAIL",
+          "failed_final_resume_gates=final_resume_no_gap_markers"
+        ]
+      },
+      "threshold": "resume_docx_full_version_inline.text is current-run authorized resume content",
+      "failure_reason": "mandatory post-run inline output missing"
+    },
+    {
+      "gate_id": "E2E_FAIL_WITHOUT_SECTION_FORENSICS",
+      "pass": true,
+      "observed_value": {
+        "required": true,
+        "failed_section_count": 1,
+        "artifact_dir": "artifacts/apps_rg/runtime_proofs/full_resume_d9ae65232650/section_failure_forensics",
+        "missing_or_incomplete": []
+      },
+      "threshold": "every non-X3_ALLOW, cascaded, or aggregation-failed section has complete section_failure_forensics/<section>.json and .md",
+      "failure_reason": ""
+    },
+    {
+      "gate_id": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE",
+      "required": true,
+      "pass": true,
+      "errors": [],
+      "required_artifacts": [
+        "01_BCG_executive_output.md",
+        "02_output_bisect.md",
+        "02_section_lane_summary_table.md",
+        "03_L7_audit_ability_output.md",
+        "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+      ],
+      "product_artifacts_required": false,
+      "failed_section_comparison_required": true,
+      "operational_failure_comparison_required": false,
+      "failure_reason": ""
+    }
+  ],
+  "mandatory_output_hard_stop": {
+    "gate_id": "APPS_RG_MANDATORY_OUTPUTS_INCOMPLETE",
+    "required": true,
+    "pass": true,
+    "errors": [],
+    "required_artifacts": [
+      "01_BCG_executive_output.md",
+      "02_output_bisect.md",
+      "02_section_lane_summary_table.md",
+      "03_L7_audit_ability_output.md",
+      "APPS_RG_MANDATORY_RUN_OUTPUT.json"
+    ],
+    "product_artifacts_required": false,
+    "failed_section_comparison_required": true,
+    "operational_failure_comparison_required": false,
+    "failure_reason": ""
+  }
+}

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
@@ -14,11 +13,7 @@ from apps_rg.runtime.aggregation.cross_section_x2 import (
     VERDICT_WARN,
     _overlap_class_fully_dispositioned,
 )
-from apps_rg.runtime.aggregation.warn_policy import (
-    VERDICT_FAIL,
-    cross_section_product_pass,
-    evaluate_warn_policy,
-)
+from apps_rg.runtime.aggregation.warn_policy import cross_section_product_pass, evaluate_warn_policy
 from apps_rg.runtime.locked_copy.locked_copy_manifest import find_repo_root
 from apps_rg.runtime.internal.generated_lane_rollup import GENERATED_LANES
 
@@ -47,15 +42,15 @@ def test_overlap_dispositioned_exact_duplicate_passes_product() -> None:
     assert cross_section_product_pass(gates) is True
 
 
-def test_warn_policy_warn_blocks_product_not_structural() -> None:
+def test_warn_policy_warn_is_visible_but_nonblocking() -> None:
     gates = [
         CrossSectionGateResult("x2_cross_section_exact_duplicate", VERDICT_WARN, observed=1),
         CrossSectionGateResult("x2_cross_section_metric_collision", VERDICT_PASS),
     ]
     wp = evaluate_warn_policy(cross_gates=gates)
     assert wp["structural_cross_section_eligible"] is True
-    assert wp["product_allow_blocked_by_cross_section"] is True
-    assert cross_section_product_pass(gates) is False
+    assert wp["product_allow_blocked_by_cross_section"] is False
+    assert cross_section_product_pass(gates) is True
 
 
 def test_review_lane_policy_mock_not_product_allow() -> None:

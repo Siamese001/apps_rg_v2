@@ -25,6 +25,25 @@ def _allow_local_runtime_independence(
     )
 
 
+def test_product_entry_default_baseline_uses_the_source_package_layout(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime import product_entry
+
+    monkeypatch.delenv("APPS_RG_E2E_BASELINE_REF", raising=False)
+    expected = (
+        tmp_path
+        / "src"
+        / "apps_rg"
+        / "config"
+        / "e2e_baselines"
+        / "anthropic_partnership.v1.json"
+    )
+
+    assert product_entry._baseline_ref(tmp_path) == expected
+
+
 def test_product_entry_mints_preflight_before_whole_run(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -85,6 +104,55 @@ def test_product_entry_mints_preflight_before_whole_run(
     assert result["authority_contract_id"] == "apps_research_rg_e2e_authority"
     assert Path(str(result["validated_input_bundle_ref"])).is_file()
     assert "APPS_RG_WHOLE_RUN_ENVELOPE" not in os.environ
+
+
+def test_product_entry_materializes_owned_defaults_before_u0(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from apps_rg.runtime import product_entry
+
+    run_dir = tmp_path / "full_resume_defaults"
+    captured: dict[str, object] = {}
+    monkeypatch.setattr(product_entry, "find_repo_root", lambda: tmp_path)
+    monkeypatch.setattr(
+        product_entry,
+        "allocate_product_full_resume_artifact_dir",
+        lambda repo, explicit: run_dir,
+    )
+    _allow_local_runtime_independence(monkeypatch, run_dir)
+    monkeypatch.setattr(
+        product_entry,
+        "_canonical_anthropic_jd_text",
+        lambda: "owned Anthropic JD",
+    )
+    monkeypatch.setattr(
+        product_entry,
+        "_canonical_base_resume_text",
+        lambda: "owned base resume",
+    )
+    monkeypatch.setattr(
+        "apps_rg.runtime.e2e_preflight.run_fresh_e2e_preflight",
+        lambda **kwargs: SimpleNamespace(
+            passed=True,
+            result={},
+            receipt={},
+            bootstrap_receipt={},
+        ),
+    )
+    monkeypatch.setattr(
+        "apps_rg.runtime.orchestration.r3r4_whole_run_orchestration."
+        "run_whole_run_with_route_governance",
+        lambda **kwargs: captured.update(kwargs) or {},
+    )
+
+    product_entry.run_product_whole_run_from_primitives(
+        target_company="Anthropic",
+        target_role="Manager",
+    )
+
+    assert captured["job_description_text"] == "owned Anthropic JD"
+    assert captured["source_resume_text"] == "owned base resume"
 
 
 def test_product_entry_restores_prior_envelope_after_orchestrator_error(

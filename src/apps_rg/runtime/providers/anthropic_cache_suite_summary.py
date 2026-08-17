@@ -252,7 +252,3 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.require_live_cache_read and int(summary.get("cache_read_input_tokens") or 0) <= 0:
         return 2
     return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

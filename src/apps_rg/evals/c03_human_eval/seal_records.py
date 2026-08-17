@@ -200,8 +200,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
 
 
 __all__ = ["canonical_record_digest", "main", "seal_file", "validate_file"]

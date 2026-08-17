@@ -77,4 +77,9 @@ def run_competencies_lane_execution(
     return _execute_competencies_lane(
         args,
         artifact_dir_override=artifact_dir_override,
+        # The public full-run CLI owns stdout and emits only its three
+        # operator-facing outputs after the sealed product result exists.
+        # Keep the detailed lane transcript in command_output.txt instead of
+        # streaming the large competency JSON during orchestration.
+        print_output=False,
     )

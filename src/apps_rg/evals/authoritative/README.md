@@ -60,7 +60,7 @@ The principal APIs are:
 Set the standalone source root on `PYTHONPATH`, then validate a manifest:
 
 ```text
-python -m apps_rg.evals.authoritative validate-manifest \
+library API: apps_rg.evals.authoritative validate-manifest \
   --manifest evaluation-manifest.json \
   --expected-digest <owner-pinned-canonical-digest>
 ```
@@ -68,7 +68,7 @@ python -m apps_rg.evals.authoritative validate-manifest \
 Run an actual repeatability controller plan:
 
 ```text
-python -m apps_rg.evals.authoritative run-controller \
+library API: apps_rg.evals.authoritative run-controller \
   --plan controller-plan.json \
   --expected-plan-digest <owner-pinned-canonical-digest> \
   --output-root <new-empty-output-directory>
@@ -82,7 +82,7 @@ stdout/stderr, and semantic results.
 All source-bound evaluators are available through one request envelope:
 
 ```text
-python -m apps_rg.evals.authoritative evaluate \
+library API: apps_rg.evals.authoritative evaluate \
   --lane retrieval \
   --request retrieval-request.json \
   --output retrieval-receipt.json

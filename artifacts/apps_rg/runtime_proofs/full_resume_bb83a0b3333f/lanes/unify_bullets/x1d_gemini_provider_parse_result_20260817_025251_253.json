@@ -1,0 +1,67 @@
+{
+  "result": {
+    "score_scale": "0_to_5",
+    "score": 3.0,
+    "threshold": 4.0,
+    "pass": false,
+    "decisive_failure": true,
+    "findings": [
+      "bul_unify_006 omits protected commercial metrics ($22M ARR / margin)."
+    ],
+    "cited_sentence_indexes": [
+      6
+    ],
+    "remediation_suggestions": [
+      "Integrate the protected $22M ARR and margin metrics into bul_unify_006 alongside team scaling."
+    ],
+    "dimension_verdicts": {
+      "factual_support": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "executive_signal": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "resume_voice": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "ats_alignment_without_keyword_stuffing": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "anti_overfit": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "synthesis_quality": {
+        "pass": true,
+        "severity": "none",
+        "codes": []
+      },
+      "evidence_utilization": {
+        "pass": false,
+        "severity": "minor",
+        "codes": [
+          "UNUTILIZED_PROTECTED_METRIC"
+        ]
+      },
+      "deterministic_alignment": {
+        "pass": false,
+        "severity": "major",
+        "codes": [
+          "MISSING_PROTECTED_METRIC_ANCHOR"
+        ]
+      }
+    }
+  },
+  "raw_response_ref": "C:\\Git\\apps_rg_v2\\artifacts\\apps_rg\\runtime_proofs\\full_resume_bb83a0b3333f\\lanes\\unify_bullets\\x1d_gemini_provider_response_raw_20260817_025251_243.json",
+  "original_model": null,
+  "fallback_model": null
+}

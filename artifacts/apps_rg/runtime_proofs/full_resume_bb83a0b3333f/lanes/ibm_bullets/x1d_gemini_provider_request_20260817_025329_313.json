@@ -1,0 +1,355 @@
+{
+  "payload": {
+    "contents": [
+      {
+        "parts": [
+          {
+            "text": "You are grading a generated resume section candidate produced by a separate generator.\njudge_task: GRADE_ONLY\n\nMandatory rules:\n- Do NOT write replacement section content.\n- Do NOT rewrite or edit the candidate text.\n- Do NOT add claims, metrics, credentials, or facts.\n- JD_TEXT and BRIEFING are targeting context only — never proof.\n- Grade only against the rubric, allowed_fact_packet (when provided), and candidate_output.\n- Return ONLY the required structured judge JSON schema (no markdown fences, no prose).\n\nSECTION: ibm_bullets\n\nRUBRIC_REF: apps_rg/runtime/judges/employment_bullet_judge_rubric.py#ibm_bullets\n\nYou are evaluating exactly 5 employment bullets (bul_ibm_001..005).\nThis is a BULLET-LINE lane — not an executive summary paragraph.\nReturn JSON only with: score_scale, score, threshold, pass, decisive_failure, findings, cited_sentence_indexes, remediation_suggestions.\n\nScore contract:\n- score_scale must be \"0_to_1\" or \"0_to_5\" only.\n- Keep score and threshold within the declared scale.\n- Employment pool lanes: min_selection_score is the pass floor for Claude pool selection.\n\nRubric dimensions (employment bullets — not executive summary):\n1. claim_ledger_grounding: each bullet maps to bul_* source_fact_ids in the claim ledger; metrics match allowed facts verbatim.\n2. bullet_line_discipline: one high-impact resume bullet per slot — concise line, no narrative paragraph or multi-sentence block.\n3. jd_briefing_targeting_discipline: JD and briefing shape emphasis only — never JD-as-proof, briefing-as-proof, or target company as experience.\n4. keyword_discipline_without_stuffing: role-relevant phrasing without ATS keyword bags or copied JD phrases as proof.\n5. cross_bullet_outcome_diversity: each bullet answers a distinct outcome spine — not six restatements of the same mechanism stack.\n6. employer_scope_purity: no cross-employer fact leakage, wrong-company names, or facts from other employment slices.\n7. foundation_enterprise_credibility: IBM bullets prove enterprise/platform foundation — not ownership of current agentic runtime product lines.\n8. ibm_fact_scope_only: bul_ibm_* facts only — no Unify, InsurTech, EY, education, or early-career contamination.\n9. no_unify_runtime_vocabulary: no Unify-era agentic runtime vocabulary (agentic AI, GraphRAG, multi-agent orchestration, etc.).\n10. narrative_slot_reservation: bullets deliver KPI lines; they do not preempt the IBM one-sentence narrative capstone.\n\nDecisive failure triggers:\n- unsupported metric or cross-employer fact leakage (bul_unify_*, InsurTech, EY, etc.)\n- first-person language\n- wrong bullet count (expected 5)\n- JD phrase copied as proof (>4 consecutive words)\n- Unify runtime vocabulary in bullet text\n\nReturn ONLY one compact JSON object:\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\n \"findings\":[\"short strings\"],\"cited_sentence_indexes\":[1],\n \"remediation_suggestions\":[],\"rationale\":\"one short paragraph\",\n \"fail_reasons\":[],\"unsupported_claims\":[],\"quality_flags\":[]}\nscore_scale must be 0_to_5 or 0_to_1 with in-range score/threshold.\n\nCANDIDATE_OUTPUT:\n{\n  \"bullets\": [\n    {\n      \"bullet_id\": \"bul_ibm_001\",\n      \"bullet_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\",\n      \"has_metric\": true,\n      \"metric_raw\": \"20% joint revenue growth\",\n      \"source_fact_ids\": [\n        \"bul_ibm_001\"\n      ],\n      \"bullet_theme\": \"aws_modernization_architecture\"\n    },\n    {\n      \"bullet_id\": \"bul_ibm_002\",\n      \"bullet_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\n        \"bul_ibm_002\"\n      ],\n      \"bullet_theme\": \"decision_support_bi\"\n    },\n    {\n      \"bullet_id\": \"bul_ibm_003\",\n      \"bullet_text\": \"Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\n        \"bul_ibm_003\"\n      ],\n      \"bullet_theme\": \"presales_solution_engineering\"\n    },\n    {\n      \"bullet_id\": \"bul_ibm_004\",\n      \"bullet_text\": \"Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, and buyer readiness, connecting technical validation to executive deal support.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\n        \"bul_ibm_004\"\n      ],\n      \"bullet_theme\": \"portfolio_data_governance\"\n    },\n    {\n      \"bullet_id\": \"bul_ibm_005\",\n      \"bullet_text\": \"Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.\",\n      \"has_metric\": false,\n      \"metric_raw\": null,\n      \"source_fact_ids\": [\n        \"bul_ibm_005\"\n      ],\n      \"bullet_theme\": \"aws_alliance_cosell_gtm\"\n    }\n  ],\n  \"resume_display_text\": \"[1] bul_ibm_001: Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\\n[2] bul_ibm_002: Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\\n[3] bul_ibm_003: Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.\\n[4] bul_ibm_004: Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, and buyer readiness, connecting technical validation to executive deal support.\\n[5] bul_ibm_005: Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.\"\n}\n\nALLOWED_FACT_PACKET:\n[\n  {\n    \"fact_id\": \"bul_ibm_001\",\n    \"candidate_fact_id\": \"fact_partnerships_gtm_002\",\n    \"claim_text\": \"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities\",\n    \"role_episode_bundle_id\": \"reb_ibm_aws_alliance_partner_cosell_gtm\",\n    \"graph_evidence_type\": \"role_episode_bundle\",\n    \"employer\": \"IBM\",\n    \"employer_lane\": \"ibm\",\n    \"employer_node_id\": \"employment_exp_ibm_001\",\n    \"source_employment\": \"IBM\",\n    \"graph_skill_node_ids\": [\n      \"skill_partner_alliance_gtm_execution\"\n    ],\n    \"metric_outcome_ids\": [\n      \"metric_ibm_20pct_joint_revenue_growth\"\n    ],\n    \"selected_metric_ids\": [\n      \"metric_ibm_20pct_joint_revenue_growth\"\n    ],\n    \"allowed_graph_evidence_ids\": [\n      \"reb_ibm_aws_alliance_partner_cosell_gtm\",\n      \"skill_partner_hyperscaler_cosell\",\n      \"skill_partner_ibm_aws_alliance_joint_revenue\",\n      \"skill_partner_alliance_gtm_execution\",\n      \"skill_partner_cloud_vendor_joint_gtm\",\n      \"skill_sr_w12_hyperscaler_alliance_co_sell\",\n      \"metric_ibm_ai_driven_sales_frameworks\",\n      \"metric_ibm_20pct_joint_revenue_growth\",\n      \"metric_ibm_alliance_cosell_operating_cadence\",\n      \"bul_ibm_001\",\n      \"fact_partnerships_gtm_002\"\n    ],\n    \"linked_identity_fact_ids\": [\n      \"fact_partnerships_gtm_002\"\n    ],\n    \"linked_source_fact_ids\": [\n      \"fact_partnerships_gtm_002\"\n    ],\n    \"source_fact_ids\": [\n      \"bul_ibm_001\"\n    ],\n    \"confidence\": \"approved_by_graph_presence\",\n    \"support_level\": \"allocation_authority_pass\",\n    \"verification_status\": \"allocation_authority_pass\",\n    \"metric_values\": [\n      \"20% joint revenue growth\"\n    ],\n    \"technologies\": [\n      \"skill_partner_alliance_gtm_execution\"\n    ],\n    \"domain\": \"AWS partnership, alliance co-sell, and joint GTM execution\",\n    \"has_metric\": true,\n    \"metric_raw\": \"20% joint revenue growth\",\n    \"allocation_claim_unit_ids\": [\n      \"ibm_bullets:bul_ibm_001\"\n    ],\n    \"allocation_plan_digest\": \"86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda\"\n  },\n  {\n    \"fact_id\": \"bul_ibm_002\",\n    \"candidate_fact_id\": \"fact_revenue_ops_005\",\n    \"claim_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions\",\n    \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\",\n    \"graph_evidence_type\": \"role_episode_bundle\",\n    \"employer\": \"IBM\",\n    \"employer_lane\": \"ibm\",\n    \"employer_node_id\": \"employment_exp_ibm_001\",\n    \"source_employment\": \"IBM\",\n    \"graph_skill_node_ids\": [\n      \"skill_sr_cloud_data_platform_engineering\"\n    ],\n    \"metric_outcome_ids\": [],\n    \"selected_metric_ids\": [],\n    \"allowed_graph_evidence_ids\": [\n      \"reb_ibm_data_modeling_bi_decision_support\",\n      \"skill_sr_enterprise_portfolio_data_governance\",\n      \"metric_ibm_modeling_delivery_cost_assumption_traceability\",\n      \"metric_ibm_budget_portfolio_bi_views\",\n      \"bul_ibm_002\",\n      \"fact_revenue_ops_005\",\n      \"skill_sr_cloud_data_platform_engineering\"\n    ],\n    \"linked_identity_fact_ids\": [\n      \"fact_revenue_ops_004\",\n      \"fact_revenue_ops_005\"\n    ],\n    \"linked_source_fact_ids\": [\n      \"fact_revenue_ops_004\",\n      \"fact_revenue_ops_005\"\n    ],\n    \"source_fact_ids\": [\n      \"bul_ibm_002\"\n    ],\n    \"confidence\": \"approved_by_graph_presence\",\n    \"support_level\": \"allocation_authority_pass\",\n    \"verification_status\": \"allocation_authority_pass\",\n    \"metric_values\": [],\n    \"technologies\": [\n      \"skill_sr_cloud_data_platform_engineering\"\n    ],\n    \"domain\": \"Data warehousing, modeling, and BI decision support\",\n    \"has_metric\": false,\n    \"metric_raw\": \"\",\n    \"allocation_claim_unit_ids\": [\n      \"ibm_bullets:bul_ibm_002\"\n    ],\n    \"allocation_plan_digest\": \"86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda\"\n  },\n  {\n    \"fact_id\": \"bul_ibm_003\",\n    \"candidate_fact_id\": \"fact_revenue_ops_001\",\n    \"claim_text\": \"Led technical discovery and solution mapping for enterprise financial-services pursuits\",\n    \"role_episode_bundle_id\": \"reb_ibm_presales_solution_engineering\",\n    \"graph_evidence_type\": \"role_episode_bundle\",\n    \"employer\": \"IBM\",\n    \"employer_lane\": \"ibm\",\n    \"employer_node_id\": \"employment_exp_ibm_001\",\n    \"source_employment\": \"IBM\",\n    \"graph_skill_node_ids\": [\n      \"skill_p2_gtm_solution_mapping\"\n    ],\n    \"metric_outcome_ids\": [],\n    \"selected_metric_ids\": [],\n    \"allowed_graph_evidence_ids\": [\n      \"reb_ibm_presales_solution_engineering\",\n      \"skill_p2_gtm_executive_buyer_alignment\",\n      \"skill_p2_gtm_solution_mapping\",\n      \"skill_p2_gtm_discovery_qualification\",\n      \"skill_partner_pre_sales\",\n      \"metric_ibm_presales_discovery_to_solution_handoff\",\n      \"metric_ibm_executive_buyer_architecture_alignment\",\n      \"bul_ibm_003\",\n      \"fact_revenue_ops_001\"\n    ],\n    \"linked_identity_fact_ids\": [\n      \"fact_revenue_ops_001\",\n      \"fact_revenue_ops_004\"\n    ],\n    \"linked_source_fact_ids\": [\n      \"fact_revenue_ops_001\",\n      \"fact_revenue_ops_004\"\n    ],\n    \"source_fact_ids\": [\n      \"bul_ibm_003\"\n    ],\n    \"confidence\": \"approved_by_graph_presence\",\n    \"support_level\": \"allocation_authority_pass\",\n    \"verification_status\": \"allocation_authority_pass\",\n    \"metric_values\": [],\n    \"technologies\": [\n      \"skill_p2_gtm_solution_mapping\"\n    ],\n    \"domain\": \"Technical pre-sales solution engineering and buyer-specific architecture mapping\",\n    \"has_metric\": false,\n    \"metric_raw\": \"\",\n    \"allocation_claim_unit_ids\": [\n      \"ibm_bullets:bul_ibm_003\"\n    ],\n    \"allocation_plan_digest\": \"86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda\"\n  },\n  {\n    \"fact_id\": \"bul_ibm_004\",\n    \"candidate_fact_id\": \"fact_revenue_ops_003\",\n    \"claim_text\": \"Owned quota-aligned solution leadership across enterprise pursuits and client portfolio expansion motions\",\n    \"role_episode_bundle_id\": \"reb_ibm_revenue_sales_target_execution\",\n    \"graph_evidence_type\": \"role_episode_bundle\",\n    \"employer\": \"IBM\",\n    \"employer_lane\": \"ibm\",\n    \"employer_node_id\": \"employment_exp_ibm_001\",\n    \"source_employment\": \"IBM\",\n    \"graph_skill_node_ids\": [\n      \"skill_p2_gtm_enterprise_deal_support\"\n    ],\n    \"metric_outcome_ids\": [],\n    \"selected_metric_ids\": [],\n    \"allowed_graph_evidence_ids\": [\n      \"reb_ibm_revenue_sales_target_execution\",\n      \"skill_partner_sales_revenue_targets\",\n      \"skill_p2_gtm_enterprise_deal_support\",\n      \"skill_partner_pnl_oversight\",\n      \"skill_partner_enterprise_negotiations\",\n      \"metric_ibm_revenue_target_solution_validation\",\n      \"metric_ibm_quota_aligned_solution_cadence\",\n      \"bul_ibm_004\",\n      \"fact_revenue_ops_003\"\n    ],\n    \"linked_identity_fact_ids\": [\n      \"fact_revenue_ops_001\",\n      \"fact_revenue_ops_002\",\n      \"fact_revenue_ops_003\"\n    ],\n    \"linked_source_fact_ids\": [\n      \"fact_revenue_ops_001\",\n      \"fact_revenue_ops_002\",\n      \"fact_revenue_ops_003\"\n    ],\n    \"source_fact_ids\": [\n      \"bul_ibm_004\"\n    ],\n    \"confidence\": \"approved_by_graph_presence\",\n    \"support_level\": \"allocation_authority_pass\",\n    \"verification_status\": \"allocation_authority_pass\",\n    \"metric_values\": [],\n    \"technologies\": [\n      \"skill_p2_gtm_enterprise_deal_support\"\n    ],\n    \"domain\": \"Revenue target execution and quota-aligned solution leadership\",\n    \"has_metric\": false,\n    \"metric_raw\": \"\",\n    \"allocation_claim_unit_ids\": [\n      \"ibm_bullets:bul_ibm_004\"\n    ],\n    \"allocation_plan_digest\": \"86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda\"\n  },\n  {\n    \"fact_id\": \"bul_ibm_005\",\n    \"candidate_fact_id\": \"fact_revenue_ops_005\",\n    \"claim_text\": \"Built decision-support data models and BI views that connected modernization programs to executive operating decisions\",\n    \"role_episode_bundle_id\": \"reb_ibm_data_modeling_bi_decision_support\",\n    \"graph_evidence_type\": \"role_episode_bundle\",\n    \"employer\": \"IBM\",\n    \"employer_lane\": \"ibm\",\n    \"employer_node_id\": \"employment_exp_ibm_001\",\n    \"source_employment\": \"IBM\",\n    \"graph_skill_node_ids\": [\n      \"skill_p2_tech_reference_architecture\"\n    ],\n    \"metric_outcome_ids\": [],\n    \"selected_metric_ids\": [],\n    \"allowed_graph_evidence_ids\": [\n      \"reb_ibm_data_modeling_bi_decision_support\",\n      \"skill_sr_enterprise_portfolio_data_governance\",\n      \"metric_ibm_modeling_delivery_cost_assumption_traceability\",\n      \"metric_ibm_budget_portfolio_bi_views\",\n      \"bul_ibm_005\",\n      \"fact_revenue_ops_005\",\n      \"skill_p2_tech_reference_architecture\"\n    ],\n    \"linked_identity_fact_ids\": [\n      \"fact_revenue_ops_004\",\n      \"fact_revenue_ops_005\"\n    ],\n    \"linked_source_fact_ids\": [\n      \"fact_revenue_ops_004\",\n      \"fact_revenue_ops_005\"\n    ],\n    \"source_fact_ids\": [\n      \"bul_ibm_005\"\n    ],\n    \"confidence\": \"approved_by_graph_presence\",\n    \"support_level\": \"allocation_authority_pass\",\n    \"verification_status\": \"allocation_authority_pass\",\n    \"metric_values\": [],\n    \"technologies\": [\n      \"skill_p2_tech_reference_architecture\"\n    ],\n    \"domain\": \"Data warehousing, modeling, and BI decision support\",\n    \"has_metric\": false,\n    \"metric_raw\": \"\",\n    \"allocation_claim_unit_ids\": [\n      \"ibm_bullets:bul_ibm_005\"\n    ],\n    \"allocation_plan_digest\": \"86b518ae7a25da010c2bb8999c5fd5936c1090c9f703aa825124188c8937dfda\"\n  },\n  {\n    \"fact_id\": \"metric_ibm_onprem_to_aws_modernization_waves\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"IBM modernization work converted on-prem estate constraints into AWS migration waves.\",\n    \"metric_raw\": \"on-prem to AWS modernization migration waves\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_onprem_to_aws_modernization_waves\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_onprem_to_aws_modernization_waves\",\n    \"surface_tokens\": [\n      \"on-prem to AWS\",\n      \"migration waves\",\n      \"modernization waves\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_aws_modernization_architecture\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_regulated_reference_architecture_reuse\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Reusable regulated reference architectures supported repeatable client pursuits.\",\n    \"metric_raw\": \"regulated reference architecture reuse across client pursuits\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_regulated_reference_architecture_reuse\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_regulated_reference_architecture_reuse\",\n    \"surface_tokens\": [\n      \"reference architecture reuse\",\n      \"regulated reference architectures\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_aws_modernization_architecture\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_stress_test_cycle_weeks_to_hours\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"HPC stress-test modernization compressed risk scenario cycles from weeks to hours.\",\n    \"metric_raw\": \"stress-test cycle compressed from weeks to hours\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_stress_test_cycle_weeks_to_hours\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_stress_test_cycle_weeks_to_hours\",\n    \"surface_tokens\": [\n      \"weeks to hours\",\n      \"stress-test cycle\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_cognitive_business_decision_support\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_decision_support_scenario_traceability\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Scenario outputs were packaged into traceable business decision-support workflows.\",\n    \"metric_raw\": \"risk scenario traceability into business decision support\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_decision_support_scenario_traceability\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_decision_support_scenario_traceability\",\n    \"surface_tokens\": [\n      \"scenario traceability\",\n      \"decision support workflows\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_cognitive_business_decision_support\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_presales_discovery_to_solution_handoff\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Technical pre-sales work converted buyer discovery into target architecture and delivery handoff packages.\",\n    \"metric_raw\": \"discovery-to-solution handoff from buyer problem to target architecture\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_presales_discovery_to_solution_handoff\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_presales_discovery_to_solution_handoff\",\n    \"surface_tokens\": [\n      \"discovery-to-solution handoff\",\n      \"target architecture\",\n      \"delivery handoff\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_presales_solution_engineering\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_executive_buyer_architecture_alignment\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Executive buyer alignment connected architecture tradeoffs, adoption path, and implementation assumptions.\",\n    \"metric_raw\": \"executive buyer alignment around architecture tradeoffs and adoption path\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_executive_buyer_architecture_alignment\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_executive_buyer_architecture_alignment\",\n    \"surface_tokens\": [\n      \"executive buyer alignment\",\n      \"architecture tradeoffs\",\n      \"adoption path\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_presales_solution_engineering\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_offering_accelerator_package_reuse\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"IBM offering work packaged reusable accelerators across cloud, data, and AI modernization pursuits.\",\n    \"metric_raw\": \"reusable accelerator packaging across cloud, data, and AI modernization\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_offering_accelerator_package_reuse\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_offering_accelerator_package_reuse\",\n    \"surface_tokens\": [\n      \"reusable accelerator packaging\",\n      \"cloud, data, and AI modernization\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_offering_accelerator_management\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_client_facing_modernization_playbooks\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Client-facing playbooks made modernization scope, assumptions, and adoption risks repeatable.\",\n    \"metric_raw\": \"client-facing modernization playbooks for repeatable delivery\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_client_facing_modernization_playbooks\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_client_facing_modernization_playbooks\",\n    \"surface_tokens\": [\n      \"client-facing modernization playbooks\",\n      \"repeatable delivery\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_offering_accelerator_management\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_quota_aligned_solution_cadence\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Revenue target execution was managed through pipeline review, solution validation, and executive sponsorship cadence.\",\n    \"metric_raw\": \"quota-aligned pipeline, validation, and executive sponsorship cadence\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_quota_aligned_solution_cadence\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_quota_aligned_solution_cadence\",\n    \"surface_tokens\": [\n      \"quota-aligned cadence\",\n      \"pipeline review\",\n      \"solution validation\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_revenue_sales_target_execution\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_revenue_target_solution_validation\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Solution validation tied commercial assumptions to delivery scope and platform adoption path.\",\n    \"metric_raw\": \"revenue-targeted solution validation before enterprise pursuit commitment\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_revenue_target_solution_validation\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_revenue_target_solution_validation\",\n    \"surface_tokens\": [\n      \"solution validation\",\n      \"revenue-targeted\",\n      \"delivery scope\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_revenue_sales_target_execution\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_text_signal_to_review_queue\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"NLP/ML-era workflow support converted text-heavy signals into reviewable business action queues.\",\n    \"metric_raw\": \"text-heavy operational signals converted into reviewable action queues\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_text_signal_to_review_queue\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_text_signal_to_review_queue\",\n    \"surface_tokens\": [\n      \"text-heavy operational signals\",\n      \"reviewable action queues\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_nlp_ml_decision_support\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_ml_output_business_action_packaging\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"ML outputs were packaged for business stakeholders as human-reviewable actions.\",\n    \"metric_raw\": \"model outputs packaged for human-reviewable business action\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_ml_output_business_action_packaging\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_ml_output_business_action_packaging\",\n    \"surface_tokens\": [\n      \"model outputs\",\n      \"human-reviewable business action\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_nlp_ml_decision_support\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_budget_portfolio_bi_views\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"BI views connected budget, cost assumptions, and delivery status for executive operating decisions.\",\n    \"metric_raw\": \"budget, cost-assumption, and delivery-status BI views\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_budget_portfolio_bi_views\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_budget_portfolio_bi_views\",\n    \"surface_tokens\": [\n      \"budget views\",\n      \"cost assumptions\",\n      \"delivery-status BI\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_data_modeling_bi_decision_support\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_modeling_delivery_cost_assumption_traceability\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Data models made delivery cost and portfolio assumptions traceable for finance and delivery leaders.\",\n    \"metric_raw\": \"traceable data models for delivery cost and portfolio assumptions\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_modeling_delivery_cost_assumption_traceability\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_modeling_delivery_cost_assumption_traceability\",\n    \"surface_tokens\": [\n      \"traceable data models\",\n      \"portfolio assumptions\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_data_modeling_bi_decision_support\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_value_realization_account_reviews\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Customer success reviews linked adoption progress, stakeholder alignment, and value realization.\",\n    \"metric_raw\": \"value-realization account reviews linking adoption progress to outcomes\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_value_realization_account_reviews\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_value_realization_account_reviews\",\n    \"surface_tokens\": [\n      \"value-realization account reviews\",\n      \"adoption progress\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_customer_success_value_realization\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_adoption_risk_to_expansion_readiness\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Adoption risk tracking supported expansion readiness and executive account review narratives.\",\n    \"metric_raw\": \"adoption-risk removal tied to expansion readiness\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_adoption_risk_to_expansion_readiness\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_adoption_risk_to_expansion_readiness\",\n    \"surface_tokens\": [\n      \"adoption-risk removal\",\n      \"expansion readiness\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_customer_success_value_realization\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_20pct_joint_revenue_growth\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"IBM-AWS alliance motion produced 20% joint revenue growth.\",\n    \"metric_raw\": \"20% joint revenue growth\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_20pct_joint_revenue_growth\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_20pct_joint_revenue_growth\",\n    \"surface_tokens\": [\n      \"20%\",\n      \"20% joint revenue\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_aws_alliance_partner_cosell_gtm\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_alliance_cosell_operating_cadence\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"IBM-AWS co-sell work established joint account planning, sponsorship, and opportunity progression cadence.\",\n    \"metric_raw\": \"joint IBM-AWS account planning and co-sell operating cadence\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_alliance_cosell_operating_cadence\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_alliance_cosell_operating_cadence\",\n    \"surface_tokens\": [\n      \"joint account planning\",\n      \"co-sell operating cadence\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_aws_alliance_partner_cosell_gtm\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_ai_driven_sales_frameworks\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"AI-driven sales frameworks supported IBM-AWS cloud transformation pursuits in financial services.\",\n    \"metric_raw\": \"AI-driven sales frameworks for IBM-AWS cloud transformation pursuits\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_ai_driven_sales_frameworks\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_ai_driven_sales_frameworks\",\n    \"surface_tokens\": [\n      \"AI-driven sales frameworks\",\n      \"cloud transformation pursuits\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_aws_alliance_partner_cosell_gtm\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_release_gate_security_scanning_coverage\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"DevSecOps delivery work embedded security scanning and release gates into the modernization delivery path.\",\n    \"metric_raw\": \"security scanning and release-gate coverage across delivery path\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_release_gate_security_scanning_coverage\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_release_gate_security_scanning_coverage\",\n    \"surface_tokens\": [\n      \"security scanning\",\n      \"release-gate coverage\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_devsecops_release_resilience\"\n    ]\n  },\n  {\n    \"fact_id\": \"metric_ibm_deployment_blueprint_repeatability\",\n    \"kind\": \"approved_metric_outcome\",\n    \"claim_text\": \"Deployment pipeline blueprints made regulated cloud releases more repeatable.\",\n    \"metric_raw\": \"repeatable deployment pipeline blueprints for regulated workloads\",\n    \"has_metric\": true,\n    \"metric_outcome_ids\": [\n      \"metric_ibm_deployment_blueprint_repeatability\"\n    ],\n    \"metric_outcome_id\": \"metric_ibm_deployment_blueprint_repeatability\",\n    \"surface_tokens\": [\n      \"deployment pipeline blueprints\",\n      \"repeatable releases\"\n    ],\n    \"approval_status\": \"APPROVED_GRAPH_SSOT\",\n    \"bundle_bindings\": [\n      \"reb_ibm_devsecops_release_resilience\"\n    ]\n  },\n  {\n    \"fact_id\": \"exp_ibm_001\",\n    \"kind\": \"employment_header\",\n    \"employer\": \"IBM\",\n    \"title\": \"Partner\",\n    \"location\": \"Edgewater, NJ\",\n    \"start_date\": \"2017-04\",\n    \"end_date\": \"2022-10\"\n  },\n  {\n    \"fact_id\": \"__proof_pool_anchor__\",\n    \"kind\": \"proof_pool_anchor\",\n    \"proof_pool_ref\": \"apps_rg/fact_inventory/master_skills_arsenal_ledger.json\",\n    \"proof_pool_digest\": \"2ef28406faa565a1b6608e8574bef9978cb987a1b5e8a3d91ba61ba321bad3ca\"\n  }\n]\n\nCLAIM_LEDGER:\n[{\"claim_text\":\"Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities, delivering 20% joint revenue growth.\",\"source_fact_ids\":[\"bul_ibm_001\"]},{\"claim_text\":\"Built decision-support data models and BI views that connected modernization programs to executive operating decisions.\",\"source_fact_ids\":[\"bul_ibm_002\"]},{\"claim_text\":\"Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.\",\"source_fact_ids\":[\"bul_ibm_003\"]},{\"claim_text\":\"Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, and buyer readiness, connecting technical validation to executive deal support.\",\"source_fact_ids\":[\"bul_ibm_004\"]},{\"claim_text\":\"Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.\",\"source_fact_ids\":[\"bul_ibm_005\"]}]\n\nTARGETING_CONTEXT (not proof):\n{\n  \"target_title\": \"Manager of Applied AI Architecture, Partnerships\",\n  \"target_company\": \"Anthropic\",\n  \"jd_text\": \"Manager of Applied AI Architecture, Partnerships\\nSan Francisco, CA | New York City, NY | Seattle, WA\\n\\nAbout Anthropic\\n\\nAnthropic's mission is to create reliable, interpretable, and steerable AI systems. We want AI to be safe and beneficial for our users and for society as a whole. Our team is a quickly growing group of committed researchers, engineers, policy experts, and business leaders working together to build beneficial AI systems.\\n\\nAbout the role\\n\\nAs the Manager of the Partnerships Applied AI Solutions Architect team, you will drive adoption of frontier AI by enabling deployment of Anthropic's products (Claude for Enterprise, Claude Code, API) through our Global and Regional System Integrators, cloud partners (AWS, GCP, Azure), and strategic technology partners.\\n\\nYou will build and lead a team of Partner Solutions Architects, establish processes and best practices for partner-led pre-sales engagements, and represent Anthropic as the technical lead on its most important partnerships. In collaboration with Sales, Partnerships, Product, and Engineering, you will help partners incorporate leading-edge AI into their practices, accelerate indirect revenue, and execute long-term GTM strategy while maintaining our best-in-class safety standards.\\n\\nResponsibilities\\n\\n    Team Leadership & Development: Hire, manage, and mentor a team of Partner Solutions Architects. Set goals, run reviews, and coach each team member toward high productivity and career growth.\\n    Strategic Technical Partnership: Act as the senior technical thought partner to Anthropic's GTM partnerships team. Co-build partner strategy with aligned GTM leadership, drive key programs, and align cross-functional stakeholders (Sales, Product, Engineering) behind partner outcomes.\\n    Partner Enablement & Ecosystem: Embed your team with GSI and cloud partner technical teams to enable their AI practices, troubleshoot, and evangelize Anthropic in their developer communities. Represent Anthropic at partner events (GSI workshops, AWS/GCP summits, hackathons) and contribute technical content and thought leadership.\\n    Joint Solution Development: Lead partners in identifying high-value, industry-specific GenAI applications. Develop joint solutions and codify reference architectures and best practices to accelerate time to deployment.\\n    Customer Deal Support: Own the technical portion of partner-led pre-sales engagements. Intervene directly on strategic deals where partners are the primary delivery vehicle, providing deep solution architecture guidance.\\n    Product Feedback: Gather and validate feedback on Anthropic's products from partner deployments and deliver it to Product and Engineering to inform roadmap and partner strategy.\\n\\nYou may be a good fit if you have\\n\\n    7+ years in technical customer-facing or partner-facing roles (Solutions Architect, Sales Engineer, Partner SE, TAM).\\n    3+ years managing pre-sales or partner-facing technical teams; comfortable building foundational teams in ambiguous, fast-moving environments.\\n    Track record building and scaling partnerships with GSIs (e.g., Accenture, Deloitte, TCS, Infosys) and/or cloud providers (AWS, GCP, Azure).\\n    Deep understanding of partner-led selling and delivery: indirect revenue models, enablement at scale, and joint GTM motions.\\n    Technical depth in enterprise AI deployments: LLM architecture, prompt engineering, evaluation, API integrations, and production use cases.\\n    Exceptional communication and executive presence; able to build trusted relationships with C-suite, partner leadership, and engineering teams alike.\\n    A love of teaching and mentoring, and a passion for advancing safe, beneficial AI.\\n\\nStrong candidates may also have\\n\\n    5+ years leading partner-facing SA teams through hypergrowth, including developing both senior and junior talent.\\n    Direct experience helping GSIs or consultancies build their AI/ML practice - enablement programs, certification paths, joint solution development.\\n\\nCompensation\\n\\nThe annual compensation range for this role is listed below.\\n\\nFor sales roles, the range provided is the role's On Target Earnings (\\\"OTE\\\") range, meaning that the range includes both the sales commissions/sales bonuses target and annual base salary for the role.\\n\\nAnnual Salary: $315,000 - $380,000 USD\",\n  \"briefing\": \"# Anthropic - Manager of Applied AI Architecture, Partnerships briefing packet\\n| Manager of Applied AI Architecture, Partnerships | $315,000-$380,000 OTE | Reports to Partnerships (GTM partnerships context) |\\n\\n## JD Complement\\nThis is an ecosystem-scale technical leadership opportunity, not a conventional architecture management post. The central challenge is helping external delivery organizations turn frontier-model capability into dependable enterprise\\noutcomes.\\n\\nAnthropic’s market position makes implementation quality part of the commercial proposition. As more enterprise work moves through partners, the company must expand reach while keeping customer expectations, deployment practices, and\\nresponsible-use standards coherent.\\n\\nThe strongest framing is therefore technical leverage: build a partner-facing architecture function that increases ecosystem capacity without creating an uncontrolled layer of bespoke delivery.\\n\\n## Company DNA & Operating Model\\nAnthropic presents itself as an AI safety and research company focused on systems that are dependable, understandable, and controllable. That orientation gives its commercial organization a distinctive constraint: growth must reinforce,\\nrather than weaken, trust in how its technology is used.\\n\\nIts model spans end-user business offerings, developer access, and enterprise-oriented adoption. The company also publicly positions cloud, technology, and services organizations as important routes through which customers can solve AI\\nproblems.\\n\\nThis creates an operating model in which product experience, technical implementation, organizational adoption, and partner capability are tightly connected. A weak deployment can affect not only an account outcome but also the market’s\\nperception of the platform’s reliability and enterprise readiness.\\n\\n## Company Strategy & Operating Pressure\\nClaude is positioned for knowledge-intensive work such as analysis, software development, writing, and complex problem solving. That creates a broad opportunity set, but broad applicability also raises the burden of identifying where a\\nsolution has clear value, appropriate controls, and a credible path to sustained use.\\n\\nAnthropic’s enterprise materials treat rollout as a multi-stage process involving technical setup, organizational launch, change adoption, and continuing use. This signals that the company sees value realization as an implementation\\ndiscipline, not merely a model-selection decision.\\n\\nThe practical pressure is to make high-quality adoption easier at scale. Partners need latitude to address vertical workflows and customer context, while Anthropic needs common patterns that make security, governance, usability, and\\nfeedback collection repeatable.\\n\\n## Leadership & Stakeholder Map\\nAnthropic was founded by Dario Amodei and Daniela Amodei. Its public-benefit-corporation identity reinforces an expectation that commercial decisions remain connected to beneficial-AI commitments.\\n\\nThe practical stakeholder map likely centers on:\\n- Partnerships leaders accountable for ecosystem strategy, coverage, and shared commercial outcomes.\\n- Sales and enterprise teams that rely on partner capability during complex customer evaluations and transformations.\\n- Product and engineering groups that need structured deployment evidence to distinguish reusable needs from isolated requests.\\n- Customer technology and business sponsors who must align architecture, governance, adoption, and measurable workflow value.\\n\\n## AI, Data, Platform, Architecture Signals\\nAnthropic’s platform discussion extends beyond prompting or model selection. Enterprise architecture must connect workflow design, integration choices, access controls, evaluation practices, operational monitoring, and adoption\\nmechanisms.\\n\\nIts business offering is presented with security and compliance considerations for both business users and developers. That suggests successful partner solutions must account for technical controls and organizational operating models from\\nthe beginning rather than adding governance after a pilot gains traction.\\n\\nThe company’s emphasis on dependable, steerable behavior is also an architecture signal. Reusable patterns should help partners establish appropriate boundaries, validate outcomes, and communicate realistic expectations about model-enabled\\nworkflows.\\n\\n## Partnership / Ecosystem Motion\\nAnthropic publicly identifies services firms, cloud providers, and technology companies as part of its partner network. The ecosystem appears integral to enterprise distribution and implementation capacity rather than simply a source of\\nintroductions.\\n\\nThe publicly described relationship with Accenture illustrates the strategic importance of large services organizations in bringing enterprise-grade AI into customer environments. Such relationships can multiply technical reach, but they\\nalso increase the need for clear readiness standards and repeatable delivery assets.\\n\\nThe ecosystem challenge is to turn partner enthusiasm into consistent execution:\\n- Build practical learning paths that help technical practitioners identify viable, responsible AI opportunities.\\n- Establish reusable architectures and solution blueprints that reduce avoidable reinvention.\\n- Improve technical confidence during important customer pursuits while preserving partner ownership of the delivery relationship.\\n- Convert recurring field observations into actionable platform, product, and program insight.\\n- Set a clear quality bar for security, user experience, and deployment discipline across a growing set of implementers.\\n- Differentiate between scalable enablement needs and account-specific work that should not become a permanent operating burden.\\n\\n## Recent Events & Urgency\\nAnthropic’s public enterprise guidance emphasizes organizational rollout alongside technical configuration. That is an important market signal: enterprise buyers increasingly need help moving from experimentation to durable operating\\nuse.\\n\\nIts partner-facing presence likewise indicates that ecosystem capacity is becoming a material adoption lever. A capable partner can extend Claude into many customer teams and engagements; uneven partner capability can create the opposite\\neffect.\\n\\nUrgency is heightened by a competitive AI market in which buyers can assess multiple providers. Anthropic’s advantage will depend not only on model performance, but also on how confidently customers can integrate, govern, deploy, and gain\\nvalue from the platform in real operating conditions.\\n\\n## apps_rg Positioning Themes (targeting only, not proof)\\n- Scaling enterprise AI adoption through services, cloud, and technology partner ecosystems.\\n- Establishing technical enablement systems that improve partner readiness and delivery consistency.\\n- Converting platform capabilities into repeatable workflow and industry solution patterns.\\n- Connecting technical evaluation, implementation design, customer adoption, and long-term value realization.\\n- Building disciplined feedback loops between customer deployments and internal product teams.\\n- Leading technical customer-facing organizations through ambiguity, growth, and changing market expectations.\\n- Combining senior stakeholder communication with practical enterprise architecture judgment.\\n- Designing AI operating patterns that address governance, security, evaluation, and organizational change.\\n- Increasing ecosystem technical capacity without allowing strategic work to become unbounded custom services.\\n\\n## apps_lic Outreach Angles (targeting only, not proof)\\n- Anthropic appears to view partner delivery capacity as a major multiplier for enterprise Claude adoption.\\n- The role appears to sit where ecosystem growth, technical customer confidence, and responsible production use converge.\\n\\n## Do Not Use As Proof\\nThe JD and this briefing are targeting inputs only. Candidate claims, achievements, scope, metrics, leadership experience, and technical expertise must come from the governed resume/proof graph.\\n\"\n}\n\nPROOF_BOUNDARY:\n{\n  \"jd_is_targeting_context_only\": true,\n  \"briefing_is_targeting_context_only\": true,\n  \"claims_must_be_supported_by_allowed_fact_packet\": true,\n  \"judges_must_not_rewrite\": true,\n  \"metadata_only_graph_context_is_insufficient\": true\n}\n\nGRAPH_BINDING_MATERIALITY_SUMMARY:\n{}\n\nDETERMINISTIC_GATE_SUMMARY:\n{\n  \"x2_judge_snapshot_pending\": {\n    \"pass\": true,\n    \"detail\": \"Pre-X2 GRADE_ONLY for ibm_bullets: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys.\"\n  }\n}"
+          }
+        ]
+      }
+    ],
+    "systemInstruction": {
+      "parts": [
+        {
+          "text": "You are a strict executive resume judge. Output a single compact JSON object only. No markdown fences, no explanatory prose, no nested finding objects.\n\nGRADE_ONLY authority (all providers — Gemini, OpenAI, Anthropic):\n- Do NOT rewrite, replace, or edit candidate_output.resume_display_text.\n- deterministic_gate_summary is authoritative: if a gate shows \"pass\": true, do NOT fail or cite that axis.\n- Do NOT apply retired SRFS slot mandates as decisive failures: five-part S1–S5 arc, mandatory S5 credibility\n  sentence, S2 mechanism-only / S4 outcomes slot shapes, srfs_sentence_responsibility.\n- When x2_exec_summary_evidence_utilization.pass is true, unused_fact_ids are optional weave targets, not defects.\n\nReturn ONLY one compact JSON object. No markdown fences, no prose before or after, no nested objects.\nRequired shape (findings and remediation_suggestions must be arrays of short strings only):\n{\"score_scale\":\"0_to_5\",\"score\":0.0,\"threshold\":4.0,\"pass\":true,\"decisive_failure\":false,\"findings\":[\"...\"],\"cited_sentence_indexes\":[1],\"remediation_suggestions\":[],\"dimension_verdicts\":{...8 rubric keys...}}\nAt most 6 short strings in findings and 4 in remediation_suggestions.\ncited_sentence_indexes: 1-based indexes (S1=1 … S6=6) for every sentence your findings ask to change.\nInclude dimension_verdicts with all eight rubric dimension ids (pass/severity/codes per dimension).\n\nScore contract (mandatory - every judge response MUST comply):\n- Include score_scale as exactly one of: \"0_to_1\" or \"0_to_5\". Do not omit score_scale.\n- If score_scale is \"0_to_1\": score and threshold MUST each be a number from 0.0 through 1.0 inclusive.\n- If score_scale is \"0_to_5\": score and threshold MUST each be a number from 0.0 through 5.0 inclusive.\n- Forbidden: 0_to_10 scales, percentage scores (0–100), or values like score=9.2 with threshold=8.0.\n- Do not infer scale from magnitude; declare score_scale explicitly and keep score/threshold within that scale."
+        }
+      ]
+    },
+    "generationConfig": {
+      "thinkingConfig": {
+        "thinkingLevel": "high"
+      },
+      "maxOutputTokens": 4096,
+      "responseMimeType": "application/json",
+      "responseSchema": {
+        "type": "object",
+        "properties": {
+          "score_scale": {
+            "type": "string",
+            "enum": [
+              "0_to_1",
+              "0_to_5"
+            ]
+          },
+          "score": {
+            "type": "number"
+          },
+          "threshold": {
+            "type": "number"
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "decisive_failure": {
+            "type": "boolean"
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cited_sentence_indexes": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "remediation_suggestions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dimension_verdicts": {
+            "type": "object",
+            "properties": {
+              "factual_support": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "executive_signal": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "resume_voice": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "ats_alignment_without_keyword_stuffing": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "anti_overfit": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "synthesis_quality": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "evidence_utilization": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              },
+              "deterministic_alignment": {
+                "type": "object",
+                "properties": {
+                  "pass": {
+                    "type": "boolean"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "minor",
+                      "major"
+                    ]
+                  },
+                  "codes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "pass",
+                  "severity",
+                  "codes"
+                ]
+              }
+            },
+            "required": [
+              "factual_support",
+              "executive_signal",
+              "resume_voice",
+              "ats_alignment_without_keyword_stuffing",
+              "anti_overfit",
+              "synthesis_quality",
+              "evidence_utilization",
+              "deterministic_alignment"
+            ]
+          }
+        },
+        "required": [
+          "score_scale",
+          "score",
+          "threshold",
+          "pass",
+          "decisive_failure",
+          "findings",
+          "cited_sentence_indexes",
+          "remediation_suggestions",
+          "dimension_verdicts"
+        ]
+      }
+    }
+  },
+  "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+  "resolved_model": "gemini-3.6-flash",
+  "resolved_model_source": "yaml_judge_models",
+  "model_requested": "gemini-3.6-flash",
+  "model_actual": "gemini-3.6-flash",
+  "thinking_level": "high",
+  "provider_key": "gemini_pro",
+  "request_timeout_seconds": 60,
+  "gemini_max_retries_configured": 4,
+  "judge_max_attempts": 2,
+  "input_hash": "800242076f1e0d46",
+  "timestamp": "2026-08-17T02:53:29.313816+00:00",
+  "judge_attempt": 1,
+  "gemini_thinking_config": {
+    "thinkingLevel": "high"
+  },
+  "gemini_thinking_optimization_enabled": true,
+  "provider_name": "gemini",
+  "model_env_source": "yaml_judge_models",
+  "canonical_contract_hash": "cfcb928e28be80395872ad08b4bec0396bf4c2893022d3247ada192804c554f9",
+  "packet_hash": "800242076f1e0d46",
+  "schema_hash": "2d3f3d956b325217",
+  "max_tokens": 4096,
+  "temperature": null,
+  "response_format": "responseSchema",
+  "judge_receipt": {
+    "judge_packet_hash": "800242076f1e0d46",
+    "packet_hash": "800242076f1e0d46",
+    "canonical_contract_hash": "cfcb928e28be80395872ad08b4bec0396bf4c2893022d3247ada192804c554f9",
+    "judge_packet_ref": "C:/Git/apps_rg_v2/artifacts/apps_rg/runtime_proofs/full_resume_bb83a0b3333f/lanes/ibm_bullets/ibm_bullets_judge_packet.json",
+    "candidate_output_ref": "candidate_output.resume_display_text",
+    "allowed_fact_packet_ref": "allowed_fact_packet",
+    "rubric_ref": "apps_rg/runtime/judges/employment_bullet_judge_rubric.py#ibm_bullets",
+    "deterministic_gate_summary": {
+      "x2_judge_snapshot_pending": {
+        "pass": true,
+        "detail": "Pre-X2 GRADE_ONLY for ibm_bullets: lane runs X2 after judges; grade on rubric, allowed_fact_packet, and candidate_output only — do not fail on missing x2_* keys."
+      }
+    },
+    "gate_closure_map_version": "executive_summary_gate_closure_v2"
+  },
+  "redacted_query_param_names": [
+    "key"
+  ]
+}

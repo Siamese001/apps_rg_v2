@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 from jsonschema import Draft202012Validator
 
 from apps_rg.evals.repeatability.evaluation import (
@@ -15,6 +14,7 @@ from apps_rg.evals.repeatability.evaluation import (
     scenario_registry_digest,
     seal_run_set,
 )
+from apps_rg.evals.repeatability.__main__ import main as run_repeatability
 from apps_rg.evals.resume_graph.reporting import canonical_digest
 
 
@@ -131,18 +131,18 @@ def test_malformed_execution_identity_fails_closed_without_exception() -> None:
     assert "EXECUTION_RECEIPT_DIGEST_INVALID" in receipt["unknown_reasons"]
 
 
-def test_repeatability_cli_reads_stored_run_set(tmp_path: Path) -> None:
+def test_repeatability_library_command_reads_stored_run_set(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "runs.json"
     output = tmp_path / "receipt.json"
     source.write_text(json.dumps(_run_set()), encoding="utf-8")
-    env = dict(os.environ)
-    env["PYTHONPATH"] = str(Path(__file__).resolve().parents[4])
-    completed = subprocess.run(
-        [sys.executable, "-m", "apps_rg.evals.repeatability", "--run-set", str(source), "--out", str(output)],
-        check=False,
-        capture_output=True,
-        text=True,
-        env=env,
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["apps_rg.evals.repeatability", "--run-set", str(source), "--out", str(output)],
     )
-    assert completed.returncode == 0, completed.stderr
+
+    assert run_repeatability() == 0
     assert json.loads(output.read_text(encoding="utf-8"))["status"] == "PASS"

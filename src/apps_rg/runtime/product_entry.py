@@ -11,12 +11,59 @@ from apps_rg.runtime.runtime_proof_layout import (
     find_repo_root,
 )
 
+_PACKAGE_ROOT = Path(__file__).resolve().parent.parent
+_CANONICAL_ANTHROPIC_JD = (
+    _PACKAGE_ROOT
+    / "config"
+    / "targeting"
+    / "anthropic_manager_applied_ai_architecture_partnerships_jd.txt"
+)
+_CANONICAL_BASE_RESUME = _PACKAGE_ROOT / "resume" / "base" / "amit_ayer_base_resume_v1.json"
+
+
+def _owned_default_text(path: Path, *, label: str) -> str:
+    try:
+        text = path.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        raise RuntimeError(f"canonical {label} is unavailable: {path}: {exc}") from exc
+    if not text:
+        raise RuntimeError(f"canonical {label} is empty: {path}")
+    return text
+
+
+def _canonical_anthropic_jd_text() -> str:
+    return _owned_default_text(_CANONICAL_ANTHROPIC_JD, label="Anthropic JD")
+
+
+def _canonical_base_resume_text() -> str:
+    return _owned_default_text(_CANONICAL_BASE_RESUME, label="base resume")
+
+
+def _resolve_product_input_defaults(
+    *,
+    jd: str,
+    job_description_ref: str,
+    job_description_text: str,
+    resume_path: str,
+    source_resume_text: str,
+) -> tuple[str, str, str]:
+    """Supply owned zero-argument defaults as immutable product input bytes."""
+
+    effective_jd = str(jd or "")
+    effective_jd_text = str(job_description_text or "")
+    effective_resume_text = str(source_resume_text or "")
+    if not (effective_jd.strip() or effective_jd_text.strip() or str(job_description_ref).strip()):
+        effective_jd_text = _canonical_anthropic_jd_text()
+    if not (effective_resume_text.strip() or str(resume_path).strip()):
+        effective_resume_text = _canonical_base_resume_text()
+    return effective_jd, effective_jd_text, effective_resume_text
+
 
 def _baseline_ref(repo_root: Path) -> Path:
     raw = Path(
         str(
             os.environ.get("APPS_RG_E2E_BASELINE_REF")
-            or "apps_rg/config/e2e_baselines/anthropic_partnership.v1.json"
+            or "src/apps_rg/config/e2e_baselines/anthropic_partnership.v1.json"
         )
     )
     return raw.resolve() if raw.is_absolute() else (repo_root / raw).resolve()
@@ -118,6 +165,17 @@ def run_product_whole_run_from_primitives(
     if art.exists() and any(art.iterdir()):
         return _non_fresh_artifact_dir_result(art)
     art.mkdir(parents=True, exist_ok=True)
+
+    try:
+        jd, job_description_text, source_resume_text = _resolve_product_input_defaults(
+            jd=jd,
+            job_description_ref=job_description_ref,
+            job_description_text=job_description_text,
+            resume_path=resume_path,
+            source_resume_text=source_resume_text,
+        )
+    except RuntimeError as exc:
+        return _input_bundle_blocked_result(artifact_dir=art, detail=str(exc))
 
     from apps_rg.runtime.immutable_input_bundle import (
         ProductInputBundleError,
