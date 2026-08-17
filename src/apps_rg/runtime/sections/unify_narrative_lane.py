@@ -333,6 +333,14 @@ _UNIFY_METRIC_REWRITE_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
 )
 
 _UNIFY_COMPANION_COPY_REWRITE_RULES: tuple[tuple[re.Pattern[str], str], ...] = (
+    # A live Anthropic completion copied ``a governed agentic AI`` from the
+    # companion architecture bullet.  Preserve the selected root's governance
+    # meaning while ensuring the narrative is a higher-level role arc rather
+    # than a pasted bullet fragment.
+    (
+        re.compile(r"\ba\s+governed\s+agentic\s+ai\s+capability\b", re.IGNORECASE),
+        "a policy-bound AI retrieval capability",
+    ),
     # Retry32: the model copied the finalized companion's exact four-gram
     # ``a repeatable operating model`` into the narrative.  The selected Unify
     # commercial/adoption facts support operating discipline, so preserve that

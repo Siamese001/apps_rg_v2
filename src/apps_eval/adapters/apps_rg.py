@@ -282,7 +282,11 @@ def _read_receipt_x3(artifact_dir: Path) -> str:
         return ""
     receipt = _json_object(path)
     payload = receipt.get("payload") if isinstance(receipt.get("payload"), dict) else receipt
-    return _as_text(payload.get("disposition") or payload.get("x3_code"))
+    return _as_text(
+        payload.get("disposition")
+        or payload.get("x3_code")
+        or payload.get("x3_disposition")
+    )
 
 
 def _canonical_x3(raw: str) -> str:
@@ -416,6 +420,13 @@ def _claims_from_resume(
     artifact_dir: Path,
     source_manifest: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
+    current_lane_claims = _claims_from_current_lane_ledgers(
+        generated_resume,
+        artifact_dir=artifact_dir,
+        source_manifest=source_manifest,
+    )
+    if current_lane_claims is not None:
+        return current_lane_claims
     manifest_by_ref = {str(row.get("artifact_ref") or ""): row for row in source_manifest}
     expected_by_ref: dict[str, set[str]] = {}
     for ref, expected_digest in _collect_source_claims(generated_resume):
@@ -473,6 +484,168 @@ def _claims_from_resume(
                 "expected_evidence_digest": normalized_expected,
                 "containment_verified": bool(rel and manifest_row),
                 "digest_verified": supported,
+            }
+        )
+    return claims
+
+
+def _claims_from_current_lane_ledgers(
+    generated_resume: dict[str, Any],
+    *,
+    artifact_dir: Path,
+    source_manifest: list[dict[str, Any]],
+) -> list[dict[str, Any]] | None:
+    """Byte-bind assembled resume bullets to their sealed lane claim ledgers.
+
+    The public resume intentionally carries graph fact IDs such as
+    ``bul_unify_001`` rather than filesystem paths.  Treating those IDs as
+    paths makes every real assembled bullet appear ungrounded.  In a current
+    Apps RG run, the lane's sealed claim ledger is the authoritative bridge
+    from that ID to the permitted evidence.  This function verifies that
+    bridge without modifying the product run.
+    """
+
+    lanes_root = artifact_dir / "lanes"
+    if not lanes_root.is_dir():
+        return None
+
+    manifest_by_ref = {
+        str(row.get("artifact_ref") or ""): row
+        for row in source_manifest
+        if row.get("artifact_ref")
+    }
+    source_to_ledger: dict[str, tuple[str, str, str, list[str]]] = {}
+    for lane_dir in sorted(path for path in lanes_root.iterdir() if path.is_dir()):
+        ledger_path = lane_dir / "claim_ledger.json"
+        ledger_rel = ledger_path.relative_to(artifact_dir).as_posix()
+        ledger_row = manifest_by_ref.get(ledger_rel)
+        if not isinstance(ledger_row, Mapping):
+            continue
+        try:
+            ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError, TypeError):
+            continue
+        rows = ledger.get("claims") if isinstance(ledger, Mapping) else ledger
+        if not isinstance(rows, list):
+            continue
+        digest = _as_text(ledger_row.get("sha256"))
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            claim_text = _as_text(row.get("claim_text") or row.get("text"))
+            source_fact_ids = [
+                _as_text(value)
+                for value in row.get("source_fact_ids", [])
+                if _as_text(value)
+            ]
+            for source_id in source_fact_ids:
+                # Source IDs are globally unique in the sealed resume graph.
+                # Do not overwrite an earlier binding if malformed evidence
+                # reuses one: the first byte-bound ledger remains the only
+                # candidate and text containment below still fails closed.
+                source_to_ledger.setdefault(
+                    source_id,
+                    (ledger_rel, digest, claim_text, source_fact_ids),
+                )
+
+    # Locked sections never pass through a generated lane.  Their provenance
+    # is the byte-for-byte locked-copy manifest, which is equally sealed and
+    # must be considered before declaring a preserved bullet unsupported.
+    locked_path = artifact_dir / "modular_r4" / "locked_copy" / "locked_copy_manifest.json"
+    locked_rel = locked_path.relative_to(artifact_dir).as_posix()
+    locked_row = manifest_by_ref.get(locked_rel)
+    if isinstance(locked_row, Mapping):
+        locked = _json_object(locked_path)
+        sections = locked.get("sections") if isinstance(locked.get("sections"), list) else []
+        locked_digest = _as_text(locked_row.get("sha256"))
+        for section in sections:
+            if not isinstance(section, Mapping):
+                continue
+            try:
+                copied = json.loads(_as_text(section.get("copied_text")))
+            except json.JSONDecodeError:
+                continue
+            bullets = copied.get("bullets") if isinstance(copied, Mapping) else []
+            if not isinstance(bullets, list):
+                continue
+            source_fact_ids = [
+                _as_text(value)
+                for value in section.get("source_fact_ids", [])
+                if _as_text(value)
+            ]
+            for bullet in bullets:
+                if not isinstance(bullet, Mapping):
+                    continue
+                source_id = _as_text(bullet.get("bullet_id"))
+                claim_text = _as_text(bullet.get("text"))
+                if source_id:
+                    source_to_ledger.setdefault(
+                        source_id,
+                        (locked_rel, locked_digest, claim_text, source_fact_ids),
+                    )
+
+    raw_sections = generated_resume.get("sections")
+    sections = raw_sections if isinstance(raw_sections, Mapping) else {}
+    experience = sections.get("experience") or generated_resume.get("experience")
+    experience_rows = experience if isinstance(experience, list) else []
+    resume_bullets: dict[str, str] = {}
+    for role in experience_rows:
+        if not isinstance(role, Mapping):
+            continue
+        bullets = role.get("bullets")
+        if not isinstance(bullets, list):
+            continue
+        for bullet in bullets:
+            if not isinstance(bullet, Mapping):
+                continue
+            source_id = _as_text(bullet.get("source_id"))
+            text = _as_text(bullet.get("text") or bullet.get("bullet"))
+            if source_id:
+                resume_bullets.setdefault(source_id, text)
+
+    if not resume_bullets:
+        return []
+    claims: list[dict[str, Any]] = []
+    for idx, (source_id, text) in enumerate(sorted(resume_bullets.items()), start=1):
+        binding = source_to_ledger.get(source_id)
+        if binding is None:
+            claims.append(
+                {
+                    "id": f"apps_rg_live_claim_{idx}",
+                    "source_ids": [source_id],
+                    "source_fact_ids": [source_id],
+                    "supported": False,
+                    "text": text or source_id,
+                    "source_resolution_status": "SEALED_LANE_LEDGER_BINDING_MISSING",
+                    "evidence_ref": "",
+                    "evidence_digest": "",
+                    "expected_evidence_digest": "",
+                    "containment_verified": False,
+                    "digest_verified": False,
+                }
+            )
+            continue
+        ledger_ref, digest, claim_text, source_fact_ids = binding
+        text_matches = " ".join(text.split()) == " ".join(claim_text.split())
+        digest_valid = len(digest) == 64 and digest == digest.lower()
+        supported = bool(text_matches and digest_valid)
+        claims.append(
+            {
+                "id": f"apps_rg_live_claim_{idx}",
+                "source_ids": [ledger_ref],
+                "source_fact_ids": source_fact_ids,
+                "supported": supported,
+                "text": text or source_id,
+                "source_resolution_status": (
+                    "RESOLVED_BYTE_BOUND"
+                    if supported
+                    else "SEALED_LANE_LEDGER_TEXT_OR_DIGEST_MISMATCH"
+                ),
+                "evidence_ref": ledger_ref,
+                "evidence_digest": digest,
+                "expected_evidence_digest": digest,
+                "containment_verified": text_matches,
+                "digest_verified": digest_valid,
             }
         )
     return claims

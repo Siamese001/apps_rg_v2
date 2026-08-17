@@ -1433,6 +1433,7 @@ def _complete_apps_rg_post_x3(
         post_boundary_stage = "fact_vector_writeback_post_boundary"
     elif terminal_identity_gap:
         post_boundary_stage = "terminal_identity_reconciliation"
+    l6_observation_status = "PASS" if l6_pass else "ADVISORY_GAP"
 
     apps_eval_payload = {
         "record_id": eval_record.record_id,
@@ -1460,13 +1461,24 @@ def _complete_apps_rg_post_x3(
     payload = {
         "schema_version": "apps_rg.post_x3_completion.v3",
         "generated_at_utc": _utc_now_iso(),
-        "status": "PASS" if pipeline_complete else "PASS_WITH_POST_BOUNDARY_GAPS",
+        "status": (
+            "PASS"
+            if pipeline_complete and l6_pass
+            else "PASS_WITH_ADVISORY_L6_GAP"
+            if pipeline_complete
+            else "PASS_WITH_POST_BOUNDARY_GAPS"
+        ),
         "completed": True,
         "x3_to_uwg_completed": True,
-        "x3_to_uwg_to_eval_to_l6_completed": bool(post_boundary_pass),
+        "x3_to_uwg_to_eval_completed": bool(post_boundary_pass),
+        "x3_to_uwg_to_eval_to_l6_completed": bool(post_boundary_pass and l6_pass),
         "product_authorized": True,
         "pipeline_complete": pipeline_complete,
         "observability_repair_required": terminal_state.observability_repair_required,
+        "advisory_observability_repair_required": not l6_pass,
+        "advisory_observability_stage": (
+            "l6_binding_post_boundary" if not l6_pass else ""
+        ),
         "product_authorization_receipt_ref": product_authorization_receipt_ref,
         "terminal_identity_gap": terminal_identity_gap,
         "failure_stage": post_boundary_stage,
@@ -1497,7 +1509,7 @@ def _complete_apps_rg_post_x3(
         "authority_order": authority,
         "fact_vector_writeback": fact_vector_writeback,
         "apps_eval": apps_eval_payload,
-        "l6_shadow": l6_shadow_payload,
+        "l6_shadow": {**l6_shadow_payload, "observation_status": l6_observation_status},
     }
     _write_json(receipt_path, payload)
     receipt_hash = _sha256_file(receipt_path)

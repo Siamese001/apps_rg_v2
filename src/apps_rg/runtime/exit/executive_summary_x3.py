@@ -117,6 +117,19 @@ def _blocked_judge_detail_rows(judges: list[dict[str, Any]]) -> list[dict[str, A
     return rows
 
 
+def _required_final_prose_judges(judges: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return X1D rows that are allowed to control the X3 final-prose decision.
+
+    Pool selectors are model calls, but they select evidence before the final prose
+    exists.  Their rows are retained in the X1D artifact for observability and are
+    deliberately stamped ``advisory_only``/``proof_eligible_judge=False``.  They
+    must not be promoted into a final-prose judge failure after the rendered output
+    has independently passed its deterministic and final-prose judge checks.
+    """
+
+    return [judge for judge in judges if not bool(judge.get("advisory_only"))]
+
+
 def aggregate_x3(
     *,
     resume_display_text: str,
@@ -174,22 +187,26 @@ def aggregate_x3(
                 "claim_support_summary claims_with_context_input_in_source_fact_ids must be 0"
             )
 
-    blocked_detail_rows = _blocked_judge_detail_rows(x1d_judges)
-    mb_pass_keys = _model_backed_pass_provider_keys(x1d_judges)
+    # Keep advisory model rows in the persisted X1D evidence, but exclude them
+    # from every X3 authority calculation.  In particular, an employment-pool
+    # selector is not a judge of the final bullet text.
+    required_judges = _required_final_prose_judges(x1d_judges)
+    blocked_detail_rows = _blocked_judge_detail_rows(required_judges)
+    mb_pass_keys = _model_backed_pass_provider_keys(required_judges)
 
-    blocked = [j["provider_key"] for j in x1d_judges if _is_blocked_judge(j)]
-    mocked = [j["provider_key"] for j in x1d_judges if _is_mocked_judge(j)]
+    blocked = [j["provider_key"] for j in required_judges if _is_blocked_judge(j)]
+    mocked = [j["provider_key"] for j in required_judges if _is_mocked_judge(j)]
     decisive = [
         j["provider_key"]
-        for j in x1d_judges
+        for j in required_judges
         if j.get("evaluator_mode") == "MODEL_BACKED" and j.get("decisive_failure")
     ]
-    soft_failed = [j["provider_key"] for j in x1d_judges if _is_model_backed_soft_fail(j)]
+    soft_failed = [j["provider_key"] for j in required_judges if _is_model_backed_soft_fail(j)]
 
-    if not x1d_judges:
+    if not required_judges:
         x1d_mode = NO_JUDGE_ROWS_EMITTED
     else:
-        modes = {j.get("evaluator_mode") for j in x1d_judges}
+        modes = {j.get("evaluator_mode") for j in required_judges}
         if modes == {"MODEL_BACKED"}:
             x1d_mode = "MODEL_BACKED"
         elif "MOCKED" in modes:
@@ -313,7 +330,7 @@ def aggregate_x3(
             review_reason = ""
             scope = "PRODUCT_QUALITY"
             allowed = True
-        elif not x1d_judges:
+        elif not required_judges:
             code = "X3_REVIEW_JUDGE_SOFT_FAIL"
             reason = "No X1D judge rows present for a section that requires judges."
             review_reason = reason
@@ -330,7 +347,7 @@ def aggregate_x3(
                     or j.get("normalized_threshold") is None
                     or float(j["normalized_score"]) >= float(j["normalized_threshold"])
                 )
-                for j in x1d_judges
+                for j in required_judges
             )
             if all_model_backed_pass:
                 code = "X3_ALLOW"
@@ -346,7 +363,7 @@ def aggregate_x3(
                 allowed = False
                 soft_failed = [
                     j["provider_key"]
-                    for j in x1d_judges
+                    for j in required_judges
                     if j.get("provider_key") not in soft_failed and _is_model_backed_soft_fail(j)
                 ] or soft_failed
 

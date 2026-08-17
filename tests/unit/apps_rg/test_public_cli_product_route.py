@@ -31,6 +31,29 @@ def _write_completed_product_run(run_dir: Path) -> None:
     )
 
 
+def _write_current_layout_product_run(run_dir: Path) -> None:
+    run_dir.mkdir(parents=True)
+    (run_dir / "FINAL_RESUME_OUTPUT.txt").write_text("# Final resume\n", encoding="utf-8")
+    (run_dir / "apps_rg_post_x3_completion_receipt.json").write_text(
+        json.dumps({"pipeline_complete": True}), encoding="utf-8"
+    )
+    (run_dir / "apps_rg_product_authorization_receipt.json").write_text(
+        json.dumps({"authorized": True}), encoding="utf-8"
+    )
+    (run_dir / "x3_disposition_receipt.json").write_text(
+        json.dumps({"payload": {"x3_disposition": "X3D_ALLOW_FINISH"}}),
+        encoding="utf-8",
+    )
+    (run_dir / "apps_rg_whole_run_exit_review_packet.json").write_text(
+        json.dumps({"x3_disposition": "X3D_ALLOW_FINISH"}), encoding="utf-8"
+    )
+    eval_dir = run_dir / "apps_eval" / "current"
+    eval_dir.mkdir(parents=True)
+    (eval_dir / "eval_record.json").write_text(
+        json.dumps({"status": "PASS", "evaluation_id": "test-eval"}), encoding="utf-8"
+    )
+
+
 def test_run_uses_governed_product_route_and_prints_required_inline_outputs(
     monkeypatch,
     tmp_path: Path,
@@ -110,3 +133,64 @@ def test_eval_and_show_read_governed_product_artifacts(tmp_path: Path, capsys) -
 
     assert cli.main(["show", "--run-dir", str(run_dir), "--artifact", "resume"]) == 0
     assert capsys.readouterr().out == "# Final resume\n"
+
+
+def test_public_cli_evaluation_reads_current_post_x3_artifact_layout(tmp_path: Path) -> None:
+    run_dir = tmp_path / "current_product_run"
+    _write_current_layout_product_run(run_dir)
+
+    report = cli._evaluate_product_run(run_dir)
+
+    assert report["status"] == "PASS"
+    assert report["completion_receipt_ref"] == "apps_rg_post_x3_completion_receipt.json"
+    assert report["x3_receipt_ref"] == "x3_disposition_receipt.json"
+    assert report["x3_disposition"] == "X3D_ALLOW_FINISH"
+
+
+def test_run_accepts_current_product_receipts_with_advisory_l6_gap(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "current_product_run"
+    _write_current_layout_product_run(run_dir)
+    monkeypatch.setattr(
+        cli,
+        "run_canonical_apps_rg_from_cli_primitives",
+        lambda **kwargs: {
+            "exit_status": "success",
+            "outcome_authorized": True,
+            "artifact_dir": str(run_dir),
+        },
+    )
+
+    result = cli._run_product_from_cli(
+        cli._build_parser().parse_args(["run"])
+    )
+
+    assert result["status"] == "SUCCESS"
+    assert result["outcome_label"] == "GOVERNED_PRODUCT_AUTHORIZED"
+
+
+def test_run_uses_final_product_receipts_when_dispatch_keeps_an_earlier_state(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    run_dir = tmp_path / "current_product_run"
+    _write_current_layout_product_run(run_dir)
+    monkeypatch.setattr(
+        cli,
+        "run_canonical_apps_rg_from_cli_primitives",
+        lambda **kwargs: {
+            "exit_status": "error",
+            "outcome_authorized": False,
+            "artifact_dir": str(run_dir),
+        },
+    )
+
+    result = cli._run_product_from_cli(cli._build_parser().parse_args(["run"]))
+
+    assert result["status"] == "SUCCESS"
+    assert result["outcome_authorized"] is True
+    assert result["canonical_exit_status"] == "error"
+    assert result["canonical_outcome_authorized"] is False
+    assert result["authority_source"] == "post_x3_completion_and_apps_eval"

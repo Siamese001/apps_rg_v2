@@ -5,10 +5,13 @@ reopened inside :class:`ZeroProviderReplayGuard` without importing the apps_rg
 package (whose normal runtime import graph may include provider SDKs).
 
 The app-owned lane ``x3_disposition.json`` and
-``exit_disposition_receipt.json`` are evidence mirrors.  Product authority is
-derived from the L2 handoff/spine receipts plus the producer-owned
-``x3_disposition_receipt.json`` and its content-bound
-``apps_rg_core_runtime_authority.json`` normalization.
+``exit_disposition_receipt.json`` are evidence mirrors.  Current section lanes
+are authorized by their sealed producer-owned
+``x3_disposition_receipt.json`` plus final-materialization and one-spine
+receipts.  The whole-resume exit, rather than an individual section, owns
+``X3D_ALLOW_FINISH``.  A content-bound
+``apps_rg_core_runtime_authority.json`` remains supported only for historical
+lane bundles that emitted it.
 """
 
 from __future__ import annotations
@@ -42,6 +45,7 @@ WHOLE_RUN_EXIT_ARTIFACT = "apps_rg_whole_run_exit_review_packet.json"
 
 X3D_ALLOW_FINISH = "X3D_ALLOW_FINISH"
 X3A_DENY_REROUTE = "X3A_DENY_REROUTE"
+X3_ALLOW = "X3_ALLOW"
 
 GENERATED_LANES: tuple[str, ...] = (
     "headline",
@@ -57,16 +61,32 @@ GENERATED_LANES: tuple[str, ...] = (
     "competencies",
 )
 
-_CORE_PRODUCER = "apps_rg.runtime.entrypoints.integrated_single_action_spine_run"
-_CURRENT_LANE_X3_PRODUCER = "apps_rg.runtime.orchestration.app_single_action_spine"
-_AUTHORIZING_LANE_X3_CODES = frozenset({"X3_ALLOW", X3D_ALLOW_FINISH})
-_LANE_REQUIRED_ARTIFACTS: tuple[str, ...] = (
+_LEGACY_CORE_PRODUCER = "apps_rg.runtime.entrypoints.integrated_single_action_spine_run"
+_SEALED_LANE_PRODUCER = "apps_rg.runtime.orchestration.app_single_action_spine"
+_COMMON_LANE_REQUIRED_ARTIFACTS: tuple[str, ...] = (
     "l2_handoff_receipt.json",
     "l2_spine_receipt.json",
     CORE_X3_DISPOSITION_ARTIFACT,
     LANE_X3_MIRROR_ARTIFACT,
     LANE_EXIT_MIRROR_ARTIFACT,
     "x2_gate_outputs.json",
+)
+_SEALED_LANE_REQUIRED_ARTIFACTS: tuple[str, ...] = (
+    *_COMMON_LANE_REQUIRED_ARTIFACTS,
+    "final_materialized_acceptance_contract.json",
+    "one_spine_certification_receipt.json",
+    "product_certification_receipt.json",
+)
+_MODULAR_LANE_REQUIRED_ARTIFACTS: tuple[str, ...] = (
+    *_COMMON_LANE_REQUIRED_ARTIFACTS,
+    "final_materialized_acceptance_contract.json",
+    "section_front_spine_receipt.json",
+    "exit_spine_receipt.json",
+    "apps_rg_spine_proof.json",
+)
+_LEGACY_LANE_REQUIRED_ARTIFACTS: tuple[str, ...] = (
+    *_COMMON_LANE_REQUIRED_ARTIFACTS,
+    CORE_RUNTIME_AUTHORITY_ARTIFACT,
 )
 
 
@@ -147,19 +167,19 @@ def _x2_pass(payload: Mapping[str, Any]) -> bool:
     )
 
 
-def lane_artifact_root(source_run: Path | str, lane: str) -> Path:
-    """Return the persisted artifact directory for a generated lane.
+def resolve_lane_artifact_root(source_run: Path | str, lane: str) -> Path:
+    """Resolve a lane's artifact directory within either supported run layout.
 
-    Public whole-resume runs write lane evidence to ``lanes/<lane>``.  Older
-    proof bundles used ``modular_r4/sections/<lane>``; retain that fallback so
-    historical zero-provider reconciliation stays readable.
+    The canonical whole-resume CLI owns flat ``lanes/<lane>`` directories.
+    Standalone modular R4 runs retain ``modular_r4/sections/<lane>``.  Prefer
+    the flat directory whenever it exists so an integrated run cannot silently
+    read stale or nonexistent modular paths.
     """
-
     root = Path(source_run).resolve()
     lane_id = str(lane).strip()
-    live_root = root / "lanes" / lane_id
-    if live_root.is_dir():
-        return live_root
+    flat_lane_root = root / "lanes" / lane_id
+    if flat_lane_root.is_dir():
+        return flat_lane_root
     return root / "modular_r4" / "sections" / lane_id
 
 
@@ -168,8 +188,20 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
 
     root = Path(source_run).resolve()
     lane_id = str(lane).strip()
-    lane_root = lane_artifact_root(root, lane_id)
-    paths = {name: lane_root / name for name in _LANE_REQUIRED_ARTIFACTS}
+    lane_root = resolve_lane_artifact_root(root, lane_id)
+    legacy_core_authority_path = lane_root / CORE_RUNTIME_AUTHORITY_ARTIFACT
+    legacy_core_contract = legacy_core_authority_path.is_file()
+    one_spine_contract = (lane_root / "one_spine_certification_receipt.json").is_file()
+    required_artifacts = (
+        _LEGACY_LANE_REQUIRED_ARTIFACTS
+        if legacy_core_contract
+        else (
+            _SEALED_LANE_REQUIRED_ARTIFACTS
+            if one_spine_contract
+            else _MODULAR_LANE_REQUIRED_ARTIFACTS
+        )
+    )
+    paths = {name: lane_root / name for name in required_artifacts}
     docs = {name: _read_json(path) for name, path in paths.items()}
 
     handoff = docs["l2_handoff_receipt.json"]
@@ -178,11 +210,7 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
     l2_spine = docs["l2_spine_receipt.json"]
     core_envelope = docs[CORE_X3_DISPOSITION_ARTIFACT]
     core_payload = _payload(core_envelope)
-    # The public lane runner now emits its signed X3 receipt directly.  The
-    # old core-authority sidecar is optional historical evidence, not a
-    # precondition for authorizing a current lane.
-    core_authority_path = lane_root / CORE_RUNTIME_AUTHORITY_ARTIFACT
-    core_authority = _read_json(core_authority_path)
+    core_authority = docs.get(CORE_RUNTIME_AUTHORITY_ARTIFACT, {})
     normalized = core_authority.get("normalized_contract")
     normalized = dict(normalized) if isinstance(normalized, Mapping) else {}
     normalized_x3 = normalized.get("x3")
@@ -205,6 +233,14 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
     mirror = docs[LANE_X3_MIRROR_ARTIFACT]
     exit_mirror = docs[LANE_EXIT_MIRROR_ARTIFACT]
     lane_x2 = docs["x2_gate_outputs.json"]
+    final_acceptance = docs.get("final_materialized_acceptance_contract.json", {})
+    one_spine = docs.get("one_spine_certification_receipt.json", {})
+    product_certification = docs.get("product_certification_receipt.json", {})
+    front_spine = docs.get("section_front_spine_receipt.json", {})
+    exit_spine = docs.get("exit_spine_receipt.json", {})
+    spine_proof_envelope = docs.get("apps_rg_spine_proof.json", {})
+    spine_proof = _payload(spine_proof_envelope)
+    spine_proof_digest = canonical_digest(spine_proof) if spine_proof else ""
     core_code = _extract_core_x3(core_envelope)
     normalized_code = str(normalized_x3.get("x3_disposition") or "")
 
@@ -231,33 +267,8 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
         "l2_spine_status_pass": l2_spine.get("l2_spine_status") == "PASS",
         "l2_spine_precondition_pass": l2_spine.get("precondition_status") == "PASS",
         "l2_spine_no_direct_l4_write": l2_spine.get("direct_l4_write_allowed") is False,
-        "core_x3_producer_exact": core_envelope.get("producer_component")
-        in {_CORE_PRODUCER, _CURRENT_LANE_X3_PRODUCER},
         "core_x3_payload_hash_valid": bool(core_payload_digest)
         and core_envelope.get("artifact_hash") == core_payload_digest,
-        "core_x3_exact_authorizing_code": core_code in _AUTHORIZING_LANE_X3_CODES,
-        "core_authority_digest_valid": not core_authority
-        or (
-            bool(stored_core_authority_digest)
-            and stored_core_authority_digest == canonical_digest(core_authority_body)
-        ),
-        "core_authority_contract_valid": not core_authority
-        or normalized.get("valid") is True,
-        "core_authority_source_x3_bound": not core_authority
-        or (
-            bool(core_x3_binding)
-            and core_x3_binding.get("present") is True
-            and core_x3_binding.get("hash_matches") is True
-        ),
-        "core_authority_x3_matches_producer": not core_authority
-        or (bool(core_code) and normalized_code == core_code),
-        "core_authority_spine_success": not core_authority
-        or normalized_spine.get("success") is True,
-        "core_authority_outcome_authorized": not core_authority
-        or (
-            core_authority.get("status") == "PASS"
-            and core_authority.get("outcome_authorized") is True
-        ),
         "lane_x2_all_pass": _x2_pass(lane_x2),
         "lane_mirror_declared_nonauthoritative": mirror.get("section_x3_authoritative")
         is False
@@ -277,11 +288,129 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
         )
         is True,
     }
+    if legacy_core_contract:
+        checks.update(
+            {
+                "core_x3_producer_exact": core_envelope.get("producer_component")
+                == _LEGACY_CORE_PRODUCER,
+                "core_x3_exact_authorizing_code": core_code == X3D_ALLOW_FINISH,
+                "lane_x3_exact_authorizing_code": core_code == X3D_ALLOW_FINISH,
+                "core_authority_digest_valid": bool(stored_core_authority_digest)
+                and stored_core_authority_digest
+                == canonical_digest(core_authority_body),
+                "core_authority_contract_valid": normalized.get("valid") is True,
+                "core_authority_source_x3_bound": bool(core_x3_binding)
+                and core_x3_binding.get("present") is True
+                and core_x3_binding.get("hash_matches") is True,
+                "core_authority_x3_matches_producer": bool(core_code)
+                and normalized_code == core_code,
+                "core_authority_spine_success": normalized_spine.get("success")
+                is True,
+                "core_authority_outcome_authorized": core_authority.get("status")
+                == "PASS"
+                and core_authority.get("outcome_authorized") is True,
+            }
+        )
+    elif one_spine_contract:
+        checks.update(
+            {
+                "sealed_lane_x3_producer_exact": core_envelope.get(
+                    "producer_component"
+                )
+                == _SEALED_LANE_PRODUCER,
+                "lane_x3_exact_authorizing_code": core_code == X3_ALLOW,
+                # Keep the existing field as a compatibility alias for callers
+                # that report this check, while making its section-level meaning
+                # explicit in the canonical lane_x3_* field above.
+                "core_x3_exact_authorizing_code": core_code == X3_ALLOW,
+                "sealed_lane_final_materialization_pass": final_acceptance.get(
+                    "pass"
+                )
+                is True
+                and final_acceptance.get("x3_authorizes") is True
+                and final_acceptance.get("x2_final_materialized_binding_pass")
+                is True
+                and final_acceptance.get("section_id") == lane_id,
+                "sealed_lane_one_spine_certified": one_spine.get(
+                    "certification_status"
+                )
+                == "PASS"
+                and one_spine.get("required_chain_complete") is True
+                and one_spine.get("all_required_artifacts_present") is True
+                and one_spine.get("all_required_refs_valid") is True,
+                "sealed_lane_product_certified": product_certification.get(
+                    "product_certification"
+                )
+                == "ONE_SPINE_SECTION_CERTIFIED"
+                and product_certification.get("proof_eligible") is True
+                and product_certification.get("x3_code") == core_code,
+                "lane_mirror_x3_matches_sealed_receipt": mirror.get("x3_code")
+                == core_code,
+            }
+        )
+    else:
+        checks.update(
+            {
+                "sealed_lane_x3_producer_exact": core_envelope.get(
+                    "producer_component"
+                )
+                == _SEALED_LANE_PRODUCER,
+                "lane_x3_exact_authorizing_code": core_code == X3_ALLOW,
+                "core_x3_exact_authorizing_code": core_code == X3_ALLOW,
+                "sealed_lane_final_materialization_pass": final_acceptance.get(
+                    "pass"
+                )
+                is True
+                and final_acceptance.get("x3_authorizes") is True
+                and final_acceptance.get("x2_final_materialized_binding_pass")
+                is True
+                and final_acceptance.get("section_id") == lane_id,
+                "modular_lane_front_spine_pass": front_spine.get(
+                    "schema_version"
+                )
+                == "section_front_spine_receipt_v1"
+                and front_spine.get("section_id") == lane_id
+                and front_spine.get("front_spine_status") == "PASS"
+                and front_spine.get("precondition_status") == "PASS"
+                and front_spine.get("product_visible") is True
+                and front_spine.get("fixture_dev_only") is False,
+                "modular_lane_exit_spine_pass": exit_spine.get("schema_version")
+                == "exit_spine_receipt_v1"
+                and exit_spine.get("section_id") == lane_id
+                and exit_spine.get("exit_spine_status") == "PASS"
+                and exit_spine.get("canonical_exit_authority_ref")
+                == CORE_X3_DISPOSITION_ARTIFACT
+                and exit_spine.get("section_x3_authoritative") is False
+                and exit_spine.get("canonical_exit_claimed_on_exit_receipt") is False,
+                "modular_lane_spine_proof_valid": spine_proof_envelope.get(
+                    "producer_component"
+                )
+                == _SEALED_LANE_PRODUCER
+                and bool(spine_proof_digest)
+                and spine_proof_envelope.get("artifact_hash") == spine_proof_digest
+                and spine_proof.get("schema_version") == "apps_rg.spine_proof.v1"
+                and spine_proof.get("success") is True
+                and spine_proof.get("exit_code") == 0
+                and not list(spine_proof.get("blocking_gaps") or ()),
+                "lane_mirror_x3_matches_sealed_receipt": mirror.get("x3_code")
+                == core_code,
+            }
+        )
     failures = _failed_checks(checks)
     return {
         "lane": lane_id,
         "status": "PASS" if not failures else "BLOCKED",
         "authorized": not failures,
+        "authority_contract_kind": (
+            "legacy_core_normalization"
+            if legacy_core_contract
+            else (
+                "sealed_section_lane"
+                if one_spine_contract
+                else "sealed_modular_lane"
+            )
+        ),
+        "required_artifacts": list(required_artifacts),
         "authoritative_x3_code": core_code,
         "normalized_authoritative_x3_code": normalized_code,
         "mirror_x3_code": str(mirror.get("x3_code") or ""),
@@ -506,9 +635,14 @@ def run_l0_parallel_artifact_replay(
 
     def replay_lane(lane: str) -> dict[str, Any]:
         nonlocal active, max_active
-        lane_root = lane_artifact_root(root, lane)
+        lane_root = resolve_lane_artifact_root(root, lane)
+        lane_authority = derive_lane_authority(root, lane)
+        required_artifacts = lane_authority.get("required_artifacts")
+        required_artifacts = (
+            required_artifacts if isinstance(required_artifacts, list) else []
+        )
         bindings = [
-            _binding(root, lane_root / name) for name in _LANE_REQUIRED_ARTIFACTS
+            _binding(root, lane_root / str(name)) for name in required_artifacts
         ]
         with lock:
             active += 1

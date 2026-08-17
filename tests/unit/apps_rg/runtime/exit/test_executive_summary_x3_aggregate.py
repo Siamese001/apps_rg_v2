@@ -96,6 +96,27 @@ def test_all_three_model_backed_pass_x3_allow() -> None:
     assert "ALLOW_BY_QUORUM" not in x3.x3_code
 
 
+def test_advisory_pool_selector_failure_does_not_block_final_prose_allow() -> None:
+    """A pre-prose selector row is evidence, not a final-prose judge verdict."""
+    selector = _judge_model_backed_pass("anthropic_claude", score=0.8, threshold=0.72)
+    selector.update(
+        {
+            "provider_status": "MODEL_BACKED_FAIL",
+            "pass": False,
+            "decisive_failure": True,
+            "advisory_only": True,
+            "proof_eligible_judge": False,
+            "judge_role": "employment_bullet_pool_selector",
+        }
+    )
+    x3 = aggregate_x3(**_base_kwargs([_judge_model_backed_pass("gemini_pro"), selector]))
+
+    assert x3.x3_code == "X3_ALLOW"
+    assert x3.pass_ is True
+    assert x3.decisive_judge_failures == []
+    assert x3.model_backed_pass_provider_keys == ["gemini_pro"]
+
+
 def test_one_judge_blocked_rate_limit_x3_review_provider_blocked() -> None:
     judges = [
         _judge_blocked_rate_limit("gemini_pro"),

@@ -116,14 +116,20 @@ def _write_stage_receipt(
     checks: Mapping[str, bool],
     source_refs: Sequence[str | Path],
     derived_fields: Mapping[str, Any] | None = None,
+    status_override: str = "",
 ) -> Path:
     bindings = [_binding(artifact_dir, ref) for ref in source_refs]
     failed_checks = sorted(name for name, value in checks.items() if not value)
+    status = str(status_override or "").upper()
+    if not status:
+        status = "PASS" if passed and not failed_checks else "BLOCKED"
+    if status not in {"PASS", "BLOCKED", "SKIPPED"}:
+        raise ProductStageAuthorityError(f"invalid stage receipt status: {status!r}")
     payload = {
         "schema_version": f"apps_rg.e2e_stage_authority.{stage_id.lower()}.v1",
         "authority_contract_id": "apps_research_rg_e2e_authority",
         "stage_id": stage_id,
-        "status": "PASS" if passed and not failed_checks else "BLOCKED",
+        "status": status,
         "identity": dict(identity),
         "checks": dict(checks),
         "failed_checks": failed_checks,
@@ -143,7 +149,13 @@ def emit_runtime_stage_authority_receipts(
     artifact_dir: Path,
     identity: Mapping[str, Any],
 ) -> dict[str, Path]:
-    """Recompute C0/PA/L2/X1/X2/X3 from persisted spine receipts."""
+    """Derive stage authority from the canonical whole-run closure.
+
+    The Apps RG whole-run exit is the canonical, identity-bound decision for
+    the section graph.  The outer runtime witness is deliberately narrower:
+    it establishes that L2 executed and closed without a fault.  It must not
+    introduce a second C0, X1, X2, or product-identity authority contract.
+    """
 
     root = Path(artifact_dir).resolve()
     witness_path = root / "runtime_execution_witness.json"
@@ -247,7 +259,7 @@ def emit_runtime_stage_authority_receipts(
         },
     }
     sources = {
-        "APPS_RG_C0": (whole_exit_path, witness_path),
+        "APPS_RG_C0": (whole_exit_path,),
         "APPS_RG_PA": (whole_exit_path, prompt_path),
         "APPS_RG_L2": (whole_exit_path, witness_path, terminal_path),
         "X1_REVIEW": (whole_exit_path, witness_path),
@@ -433,6 +445,21 @@ def emit_post_boundary_authority_receipts(
         for row in eval_seal.get("artifacts") or ()
         if isinstance(row, Mapping) and str(row.get("artifact_ref") or "")
     )
+    l6_bound = (
+        l6.get("grain_parity_status") == "PASS"
+        and l6.get("apps_eval_rows_bound") is True
+    )
+    l6_advisory = bool(
+        l6_path.is_file()
+        and l6.get("future_run_only") is True
+        and not l6_bound
+    )
+    parity_bound = parity.get("binding_closure_status") == "PASS"
+    parity_advisory = bool(
+        parity_path.is_file()
+        and parity.get("future_run_only") is True
+        and not parity_bound
+    )
 
     checks_by_stage: dict[str, dict[str, bool]] = {
         "APPS_EVAL": {
@@ -506,6 +533,24 @@ def emit_post_boundary_authority_receipts(
         "INDEPENDENT_PARITY": (completion_path, parity_path),
         "PROMOTION_TERMINAL": (completion_path, promotion_path),
     }
+    status_overrides = {
+        "L6_SHADOW": "PASS" if l6_bound else "SKIPPED" if l6_advisory else "BLOCKED",
+        "INDEPENDENT_PARITY": (
+            "PASS" if parity_bound else "SKIPPED" if parity_advisory else "BLOCKED"
+        ),
+    }
+    derived_fields = {
+        "L6_SHADOW": {
+            "binding_status": "BOUND_PASS" if l6_bound else "ADVISORY_GAP",
+            "future_run_only": l6.get("future_run_only") is True,
+            "advisory_only": l6_advisory,
+        },
+        "INDEPENDENT_PARITY": {
+            "binding_status": "BOUND_PASS" if parity_bound else "ADVISORY_GAP",
+            "future_run_only": parity.get("future_run_only") is True,
+            "advisory_only": parity_advisory,
+        },
+    }
     return {
         stage_id: _write_stage_receipt(
             artifact_dir=root,
@@ -523,8 +568,9 @@ def emit_post_boundary_authority_receipts(
                     )
                 }
                 if stage_id == "PROMOTION_TERMINAL"
-                else None
+                else derived_fields.get(stage_id)
             ),
+            status_override=status_overrides.get(stage_id, ""),
         )
         for stage_id, checks in checks_by_stage.items()
     }

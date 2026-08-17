@@ -201,10 +201,33 @@ def _final_claim_ledger_rows(artifact_dir: Path) -> list[dict[str, Any]]:
 
 
 def _final_x1d_judge_rows(artifact_dir: Path) -> list[dict[str, Any]]:
+    """Read final-prose X1D verdicts, excluding pre-prose advisory selectors.
+
+    Selector model rows remain in ``x1d_llm_judge_outputs.json`` for auditability,
+    but their ``advisory_only`` marker means they cannot decide whether the
+    materialized resume text is acceptable.
+    """
     doc = _load_json(artifact_dir / "x1d_llm_judge_outputs.json")
     rows = doc.get("judges")
     if isinstance(rows, list):
-        return [dict(r) for r in rows if isinstance(r, dict)]
+        return [
+            dict(row)
+            for row in rows
+            if isinstance(row, dict) and not bool(row.get("advisory_only"))
+        ]
+    return []
+
+
+def _advisory_x1d_judge_rows(artifact_dir: Path) -> list[dict[str, Any]]:
+    """Return persisted X1D diagnostics excluded from final-prose acceptance."""
+    doc = _load_json(artifact_dir / "x1d_llm_judge_outputs.json")
+    rows = doc.get("judges")
+    if isinstance(rows, list):
+        return [
+            dict(row)
+            for row in rows
+            if isinstance(row, dict) and bool(row.get("advisory_only"))
+        ]
     return []
 
 
@@ -309,6 +332,7 @@ def build_final_materialized_acceptance_contract(
     final_claim_ledger_present = bool(final_claim_ledger)
     x1d_doc = _load_json(artifact_dir / "x1d_llm_judge_outputs.json")
     final_x1d_judges = _final_x1d_judge_rows(artifact_dir)
+    advisory_x1d_judges = _advisory_x1d_judge_rows(artifact_dir)
     final_x1d_model_backed_judges = [
         j for j in final_x1d_judges if j.get("evaluator_mode") == "MODEL_BACKED"
     ]
@@ -384,6 +408,11 @@ def build_final_materialized_acceptance_contract(
         ).is_file(),
         "x1d_judge_outputs_sha256": _sha256_json(x1d_doc) if x1d_doc else "",
         "x1d_judge_count": len(final_x1d_judges),
+        "x1d_advisory_judge_count": len(advisory_x1d_judges),
+        "x1d_advisory_judge_ids": [
+            str(judge.get("judge_id") or judge.get("provider_key") or "")
+            for judge in advisory_x1d_judges
+        ],
         "x1d_model_backed_judge_count": len(final_x1d_model_backed_judges),
         "x1d_model_backed_pass_provider_keys": final_x1d_pass_keys,
         "x1d_all_model_backed_judges_pass": x1d_all_model_backed_judges_pass,

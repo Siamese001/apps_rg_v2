@@ -116,6 +116,44 @@ def test_competencies_shared_lane_depth_floor_eliminates_thin_ey_node_for_anthro
     assert comparison["delta"]["semantic_coverage_pp"] > 0.0
 
 
+def test_executive_summary_depth_floor_eliminates_thin_ey_node_for_anthropic_jd() -> None:
+    jd_text = ANTHROPIC_JD.read_text(encoding="utf-8")
+    brief_text = ANTHROPIC_BRIEF.read_text(encoding="utf-8")
+    plan = _build_plan(
+        "executive_summary",
+        target_role=jd_text.split("\n", 1)[0],
+        jd_text=jd_text,
+        briefing_text=brief_text,
+    )
+
+    pre = plan["graph_evidence_depth_pre_report"]
+    post = plan["graph_evidence_depth_report"]
+    ey_fact = next(
+        fact
+        for fact in plan["facts"]
+        if fact["fact_id"] == "reb_ey_insurance_core_modernization"
+    )
+
+    assert pre["thin_item_ids"] == ["reb_ey_insurance_core_modernization"]
+    assert post["status"] == "judge_grade"
+    assert post["thin_item_ids"] == []
+    assert len(ey_fact["metric_outcome_ids"]) >= 2
+
+
+def test_ey_bullet_plan_keeps_a_graph_bound_outcome_for_every_visible_bullet() -> None:
+    jd_text = ANTHROPIC_JD.read_text(encoding="utf-8")
+    brief_text = ANTHROPIC_BRIEF.read_text(encoding="utf-8")
+    plan = _build_plan(
+        "ey_bullets",
+        target_role=jd_text.split("\n", 1)[0],
+        jd_text=jd_text,
+        briefing_text=brief_text,
+    )
+
+    assert plan["metric_caps_by_root"]["reb_ey_capital_optimization_solvency"] >= 1
+    assert all(fact["metric_outcome_ids"] for fact in plan["facts"])
+
+
 def test_shared_lane_uses_global_requirement_coverage_slots_for_anthropic_jd() -> None:
     jd_text = ANTHROPIC_JD.read_text(encoding="utf-8")
     brief_text = ANTHROPIC_BRIEF.read_text(encoding="utf-8")

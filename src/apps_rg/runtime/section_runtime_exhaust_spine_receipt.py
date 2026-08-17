@@ -5,6 +5,7 @@ post-run exhaust only; no current-run rescue. Not product certification or durab
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from datetime import datetime, timezone
@@ -268,7 +269,7 @@ def build_runtime_exhaust_bundle_for_section(
         p = artifact_dir / name
         trace_refs[name] = _repo_rel(repo_root, p) if p.is_file() else None
 
-    return {
+    bundle = {
         "schema_version": "section_runtime_exhaust_bundle_v1",
         "generated_at_utc": _utc_now(),
         "contract_type": "RuntimeExhaustBundle",
@@ -310,6 +311,20 @@ def build_runtime_exhaust_bundle_for_section(
             "not durable UWG/L4 commit",
         ],
     }
+    identity_seed = {
+        "section_id": section_id,
+        "parent_run_id": identity["parent_run_id"],
+        "child_run_id": identity["child_run_id"],
+        "section_attempt_id": identity["section_attempt_id"],
+    }
+    identity_digest = hashlib.sha256(
+        json.dumps(identity_seed, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    bundle["runtime_exhaust_bundle_id"] = f"reb:{identity_digest[:24]}"
+    bundle["runtime_exhaust_bundle_digest"] = "sha256:" + hashlib.sha256(
+        json.dumps(bundle, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return bundle
 
 
 def build_runtime_exhaust_receipt(
@@ -423,6 +438,15 @@ def emit_section_runtime_exhaust_spine_artifacts(
     )
     p_handoff = artifact_dir / L6_SHADOW_HANDOFF_RECEIPT_ARTIFACT
     p_handoff.write_text(json.dumps(handoff, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    # The outer app spine later writes its own transport receipt with the
+    # legacy filename.  Preserve the lane-owned, identity-complete exhaust
+    # record before that happens so L6 and Apps Eval bind the correct source.
+    from apps_rg.runtime.section_evidence_package import (
+        mirror_preferred_section_shim_names,
+    )
+
+    mirror_preferred_section_shim_names(artifact_dir)
 
     runtime_payload["runtime_exhaust_bundle_ref"] = RUNTIME_EXHAUST_BUNDLE_ARTIFACT
     runtime_payload["runtime_exhaust_receipt_ref"] = RUNTIME_EXHAUST_RECEIPT_ARTIFACT

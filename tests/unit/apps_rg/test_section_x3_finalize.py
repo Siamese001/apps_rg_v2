@@ -129,6 +129,66 @@ def test_finalize_section_lane_x3_writes_passing_final_materialized_contract(tmp
     assert x3_doc["final_materialized_acceptance_contract_ref"] == FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT
 
 
+def test_finalize_section_lane_x3_excludes_advisory_selector_from_final_text_judges(
+    tmp_path: Path,
+) -> None:
+    """A failed evidence selector cannot invalidate passing materialized prose."""
+    x3 = SimpleNamespace(x3_code="X3_ALLOW", pass_=True)
+    x3.to_dict = lambda: {"x3_code": "X3_ALLOW", "pass": True}  # type: ignore[method-assign]
+    (tmp_path / "command_output.txt").write_text("Final section text.\n", encoding="utf-8")
+    (tmp_path / "claim_ledger.json").write_text(
+        json.dumps([{"claim_text": "Final section text.", "source_fact_ids": ["f1"]}]),
+        encoding="utf-8",
+    )
+    (tmp_path / "l2_output.json").write_text('{"section_id":"ey_bullets"}\n', encoding="utf-8")
+    _write_bound_x2_payload(tmp_path, section_id="ey_bullets")
+    (tmp_path / "x1d_llm_judge_outputs.json").write_text(
+        json.dumps(
+            {
+                "judges": [
+                    {
+                        "provider_key": "gemini_pro",
+                        "evaluator_mode": "MODEL_BACKED",
+                        "provider_status": "MODEL_BACKED_PASS",
+                        "pass": True,
+                    },
+                    {
+                        "judge_id": "x1d_anthropic_claude_bullet_pool_selector",
+                        "provider_key": "anthropic_claude",
+                        "evaluator_mode": "MODEL_BACKED",
+                        "provider_status": "MODEL_BACKED_FAIL",
+                        "pass": False,
+                        "decisive_failure": True,
+                        "advisory_only": True,
+                        "proof_eligible_judge": False,
+                    },
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    finalize_section_lane_x3(
+        artifact_dir=tmp_path,
+        section_id="ey_bullets",
+        runtime_payload={"run_id": "r1"},
+        x3_result=x3,
+    )
+
+    contract = json.loads(
+        (tmp_path / FINAL_MATERIALIZED_ACCEPTANCE_CONTRACT).read_text(encoding="utf-8")
+    )
+    x3_doc = json.loads((tmp_path / "x3_disposition.json").read_text(encoding="utf-8"))
+    assert contract["pass"] is True
+    assert contract["x1d_judge_count"] == 1
+    assert contract["x1d_advisory_judge_count"] == 1
+    assert contract["x1d_advisory_judge_ids"] == [
+        "x1d_anthropic_claude_bullet_pool_selector"
+    ]
+    assert contract["x1d_all_model_backed_judges_pass"] is True
+    assert x3_doc["x3_code"] == "X3_ALLOW"
+
+
 def test_finalize_section_lane_x3_blocks_allow_without_final_x1d_judges(tmp_path: Path) -> None:
     x3 = SimpleNamespace(x3_code="X3_ALLOW", pass_=True)
     x3.to_dict = lambda: {"x3_code": "X3_ALLOW", "pass": True}  # type: ignore[method-assign]

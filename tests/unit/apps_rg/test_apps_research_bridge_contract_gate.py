@@ -52,7 +52,10 @@ def test_mock_bridge_default_brief_cannot_pass_contract_gate(tmp_path: Path) -> 
         )
     )
     assert result.is_blocked
-    assert "G26_EXIT_ELIGIBILITY" in result.block_reason
+    # The mock has no canonical X3 allow receipt, so persistence may fail at
+    # the canonical exit before the legacy G26 eligibility label is emitted.
+    assert "apps_research_artifact_persistence_failed" in result.block_reason
+    assert "X3D_BLOCKED" in result.block_reason
     assert result.briefing_artifact_path == ""
     assert result.apps_research_handoff_envelope is None
 

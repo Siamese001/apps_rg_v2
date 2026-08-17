@@ -27,6 +27,7 @@ from apps_rg.runtime.c0.constants import C0_SECTIONS_ENABLED
 from apps_rg.runtime.section_graph_skills_proof_pool import (
     bind_selector_selected_skills_to_section_plan,
 )
+from apps_rg.runtime.proof_pool_resolver import resolve_section_proof_pool
 
 
 def _candidate(
@@ -461,6 +462,65 @@ def test_whole_resume_bullet_lanes_use_frozen_root_plans_and_keep_visible_slots(
                 assignments[f"unify_bullets:{slot_id}"].get("metric_outcome_id")
                 for slot_id in slot_map
             )
+
+
+def test_whole_resume_shared_lanes_consume_sealed_source_plans_before_retrieval(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Phase-one shared lanes may not re-run selection after C0.3 seals it."""
+
+    repo = Path(__file__).resolve().parents[5]
+    jd_text = (repo / "src/apps_rg/config/targeting" / "anthropic_manager_applied_ai_architecture_partnerships_jd.txt").read_text(
+        encoding="utf-8"
+    )
+    briefing_text = (
+        repo
+        / "tests/fixtures/apps_rg"
+        / "anthropic_manager_applied_ai_architecture_partnerships_briefing.md"
+    ).read_text(encoding="utf-8")
+    target_role = jd_text.split("\n", 1)[0]
+    bundle = build_whole_resume_graph_allocation(
+        repo_root=repo,
+        target_role=target_role,
+        jd_text=jd_text,
+        briefing_text=briefing_text,
+    )
+    refs = write_whole_resume_graph_allocation_bundle(
+        bundle,
+        output_dir=tmp_path / "frozen_whole_resume",
+    )
+    monkeypatch.setenv(ALLOCATION_PLAN_ENV, refs["allocation_plan"])
+    monkeypatch.setenv(
+        SECTION_EVIDENCE_CONTRACTS_ENV,
+        refs["section_final_evidence_contracts"],
+    )
+    monkeypatch.setenv(SECTION_SOURCE_PLANS_ENV, refs["section_plans"])
+
+    def _selector_must_not_run(*args: object, **kwargs: object) -> None:
+        raise AssertionError("whole-resume execution must use its sealed C0.3 source plan")
+
+    monkeypatch.setattr(
+        "apps_rg.runtime.sections.graph_role_episode_selector."
+        "build_selected_graph_evidence_plan_for_section",
+        _selector_must_not_run,
+    )
+
+    for section_id in ("executive_summary", "headline"):
+        pool = resolve_section_proof_pool(
+            section=section_id,
+            repo_root=repo,
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+            product_visible=False,
+        )
+        frozen_source_digest = bundle["section_plans"][section_id]["plan_digest"]
+        final_contract = pool.proof_pool_metadata["final_graph_evidence_contract"]
+        assert final_contract["source_section_plan_digest"] == frozen_source_digest
+        assert pool.selected_fact_plan["allocation_plan_digest"] == bundle[
+            "allocation_plan"
+        ]["allocation_plan_digest"]
 
 
 def test_c0_authority_lane_set_matches_whole_resume_allocator() -> None:

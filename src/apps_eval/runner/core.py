@@ -588,7 +588,6 @@ def _seal_apps_rg_eval_package(
 def _snapshot_deterministic_hash(snapshot: AppOutputSnapshot) -> str:
     data = snapshot.to_dict()
     data.pop("deterministic_hash", None)
-    data.pop("snapshot_digest", None)
     return _canonical_digest(data)
 
 

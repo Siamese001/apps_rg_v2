@@ -204,6 +204,124 @@ def test_retry10_graph_allocation_shape_repairs_before_x2() -> None:
     assert failures == []
 
 
+def test_final_coherence_reclamps_causal_graph_roots_after_ledger_rebuild(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The final ledger rebuild must not undo a graph-root attribution repair."""
+    from apps_rg.runtime.c0.resume_graph_claim_binding import (
+        validate_claim_rows_against_resume_graph_allocation,
+    )
+    platform_root = "reb_unify_agentic_platform_architecture"
+    commercialization_root = "reb_unify_platform_commercialization_leadership"
+    platform_fact = "fact_engineering_platform_001"
+    commercialization_fact = "fact_engineering_platform_006"
+    revenue_metric = "metric_unify_22m_ip_led_revenue"
+    roots = [
+        {
+            "fact_id": platform_root,
+            "role_episode_bundle_id": platform_root,
+            "claim_text": "Governed agentic AI platform control-plane architecture",
+            "linked_source_fact_ids": [platform_fact],
+            "allowed_graph_evidence_ids": [platform_root, platform_fact],
+        },
+        {
+            "fact_id": commercialization_root,
+            "role_episode_bundle_id": commercialization_root,
+            "claim_text": "Platform productization generated $22M in IP-led revenue",
+            "linked_source_fact_ids": [commercialization_fact],
+            "metric_outcome_ids": [revenue_metric],
+            "allowed_graph_evidence_ids": [
+                commercialization_root,
+                commercialization_fact,
+                revenue_metric,
+            ],
+        },
+    ]
+    allocation = {
+        "allocation_plan_digest": "a" * 64,
+        "facts": roots,
+        "allocation_assignments": [
+            {
+                "section_id": "executive_summary",
+                "claim_unit_id": "executive_summary:claim:01",
+                "root_id": platform_root,
+                "fact_id": platform_fact,
+                "root_claim_text": "Governed agentic AI platform control-plane architecture",
+            },
+            {
+                "section_id": "executive_summary",
+                "claim_unit_id": "executive_summary:claim:02",
+                "root_id": commercialization_root,
+                "fact_id": commercialization_fact,
+                "metric_outcome_id": revenue_metric,
+                "metric_value": "22",
+                "metric_unit": "USD_M",
+                "root_claim_text": "Platform productization generated $22M in IP-led revenue",
+            },
+        ],
+    }
+    sentences = [
+        "Technology executive leads governed platform delivery for regulated enterprises.",
+        "Control-plane discipline keeps decisions traceable across delivery workflows.",
+        "Engineering teams apply that discipline to complex modernization programs.",
+        "Human oversight remains embedded as automated capability expands.",
+        "Release controls keep regulated delivery paths dependable and auditable.",
+        "That same platform discipline underpins productization work that generated $22M in IP-led platform revenue, an outcome that positions this operating model for new enterprise delivery contexts.",
+    ]
+    parsed = {
+        "resume_display_text": " ".join(sentences),
+        "claim_ledger": [
+            {"claim_text": sentence, "source_fact_ids": [platform_root]}
+            for sentence in sentences[:5]
+        ]
+        + [
+            {
+                "claim_text": sentences[5],
+                "source_fact_ids": [platform_root, commercialization_root],
+            }
+        ],
+        "selected_fact_plan": allocation,
+        "change_log": [],
+    }
+    from apps_rg.runtime.sections import executive_summary_voice_repair as voice_repair
+
+    def rebuild_with_cross_root(value: dict[str, object]) -> dict[str, object]:
+        """Replay the final display-to-ledger rebind that previously restored both roots."""
+        rebuilt = dict(value)
+        rows = [dict(row) for row in value["claim_ledger"]]  # type: ignore[index]
+        rows[-1]["source_fact_ids"] = [platform_root, commercialization_root]
+        rebuilt["claim_ledger"] = rows
+        return rebuilt
+
+    monkeypatch.setattr(
+        voice_repair,
+        "_rebuild_claim_ledger_from_display",
+        rebuild_with_cross_root,
+    )
+    allowed = {
+        value
+        for root in roots
+        for value in root["allowed_graph_evidence_ids"]
+    }
+
+    final, receipt = voice_repair.finalize_executive_summary_coherence(
+        parsed,
+        selected_facts=roots,
+        allowed_fact_ids=allowed,
+    )
+
+    assert receipt["graph_claim_binding_repairs"]
+    assert final["claim_ledger"][-1]["source_fact_ids"] == [commercialization_root]
+    assert not any(
+        "causal_claim_merges_unrelated_graph_roots" in failure
+        for failure in validate_claim_rows_against_resume_graph_allocation(
+        section_id="executive_summary",
+        claim_rows=final["claim_ledger"],
+        selected_fact_plan=allocation,
+        )
+    )
+
+
 def test_r4_causal_multi_metric_repair_keeps_only_reserved_metric_path() -> None:
     """Replay r4's final executive-summary failure without another model call."""
     from apps_rg.runtime.c0.resume_graph_claim_binding import (

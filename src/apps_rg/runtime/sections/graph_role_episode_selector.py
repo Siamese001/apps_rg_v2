@@ -327,7 +327,18 @@ def _caps_for(*, section_id: str, weight: float) -> tuple[int, int, str]:
 
 
 def _metric_floor_for_section(section_id: str) -> int:
-    return 2 if section_id == "competencies" else 0
+    # Shared profile lanes are judged on evidence density, not just topical
+    # relevance.  Reserve enough approved outcome evidence for every selected
+    # item before a lower employer weight can collapse its metric cap to zero.
+    if section_id in {"competencies", "executive_summary"}:
+        return 2
+    # Every visible employment bullet must have an approved outcome surface.
+    # A single linked graph outcome is enough to guide a concise bullet without
+    # turning it into a metrics dump; zero leaves the generator unable to meet
+    # the universal action-detail-outcome quality bar.
+    if section_id.endswith("_bullets"):
+        return 1
+    return 0
 
 
 def _section_allowed(section_id: str, eligibility: Any) -> bool:

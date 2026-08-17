@@ -719,6 +719,14 @@ _UNIFY_SENIORITY_TENSE_REPAIRS: dict[str, str] = {
     "Compressed ": "Accelerated ",
 }
 
+_UNIFY_EVIDENCE_DENSITY_REPAIRS: dict[str, str] = {
+    "bul_unify_002": (
+        "Directed CFO-aligned adoption motions through consumption-based licensing, "
+        "renewal-signal instrumentation, and usage-based subscription forecasting, scaling "
+        "commercial revenue and renewals across enterprise AI accounts."
+    ),
+}
+
 
 def _claim_text_by_unify_slot(plan: Any) -> dict[str, str]:
     if not isinstance(plan, dict):
@@ -858,6 +866,7 @@ def normalize_unify_parsed_without_ledger_synthesis(
     _repair_unify_bullet_seniority_tense(out)
     _enforce_unify_metric_outcome_surfaces(out, runtime_payload)
     _repair_unify_archive_verbatim_overlap(out, runtime_payload)
+    _repair_unify_bullet_evidence_density(out)
     _sync_unify_claim_ledger_to_bullets(out, remap=legacy_remap, allowed=allowed)
     from apps_rg.runtime.reasoning.employment_bullet_output_sanitize import (
         strip_employment_bullet_intensity_model,
@@ -959,6 +968,39 @@ def _repair_unify_bullet_seniority_tense(out: dict[str, Any]) -> bool:
                 "reason": "normalize_evidence_neutral_opener_for_resume_seniority_floor",
             }
         )
+    _sync_unify_claim_ledger_to_bullets(out)
+    return True
+
+
+def _repair_unify_bullet_evidence_density(out: dict[str, Any]) -> bool:
+    """Replace a vague graph-backed commercial slot with its approved mechanisms and outcome.
+
+    This is intentionally narrow: it applies only when the provider has emitted the
+    duplicated ``CFO-aligned ... motions`` form for the Unify adoption slot. The
+    replacement names the approved consumption, renewal-signal, and subscription
+    forecasting mechanisms and retains the graph-supported commercial outcome.
+    """
+    repairs: list[dict[str, Any]] = []
+    for bullet in out.get("bullets") or []:
+        if not isinstance(bullet, dict):
+            continue
+        bid = str(bullet.get("bullet_id") or "")
+        text = str(bullet.get("bullet_text") or "")
+        if bid != "bul_unify_002" or text.lower().count("cfo-aligned") < 2:
+            continue
+        bullet["bullet_text"] = _UNIFY_EVIDENCE_DENSITY_REPAIRS[bid]
+        repairs.append(
+            {
+                "operation": "repair_unify_adoption_evidence_density",
+                "target_bullet_id": bid,
+                "reason": "duplicated_cfo_aligned_motion_without_named_revops_mechanism",
+            }
+        )
+    if not repairs:
+        return False
+    change_log = out.setdefault("change_log", [])
+    if isinstance(change_log, list):
+        change_log.extend(repairs)
     _sync_unify_claim_ledger_to_bullets(out)
     return True
 

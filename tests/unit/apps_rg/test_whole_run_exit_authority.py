@@ -54,7 +54,7 @@ def _identity() -> dict[str, str]:
     }
 
 
-def _build_all_pass_run(root: Path) -> None:
+def _build_all_pass_run(root: Path, *, flat_lane_layout: bool = False) -> None:
     status_rows: list[dict[str, Any]] = []
     for lane in GENERATED_LANES:
         status_rows.append(
@@ -74,7 +74,11 @@ def _build_all_pass_run(root: Path) -> None:
                 ],
             }
         )
-        lane_root = root / "modular_r4" / "sections" / lane
+        lane_root = (
+            root / "lanes" / lane
+            if flat_lane_layout
+            else root / "modular_r4" / "sections" / lane
+        )
         _write(
             lane_root / "c0_metrics.json",
             {
@@ -346,6 +350,59 @@ def _write_product_entry(root: Path, identity: dict[str, str]) -> dict[str, Any]
     return manifest
 
 
+def _replace_with_sealed_lane_contracts(
+    root: Path,
+    *,
+    flat_lane_layout: bool,
+) -> None:
+    """Make the fixture match the public CLI's current section-lane receipts."""
+
+    for lane in GENERATED_LANES:
+        lane_root = (
+            root / "lanes" / lane
+            if flat_lane_layout
+            else root / "modular_r4" / "sections" / lane
+        )
+        (lane_root / "apps_rg_core_runtime_authority.json").unlink()
+        payload = {"x3_disposition": "X3_ALLOW", "run_id": f"run-{lane}"}
+        _write(
+            lane_root / "x3_disposition_receipt.json",
+            {
+                "producer_component": (
+                    "apps_rg.runtime.orchestration.app_single_action_spine"
+                ),
+                "artifact_hash": _digest(payload),
+                "payload": payload,
+            },
+        )
+        _write(
+            lane_root / "final_materialized_acceptance_contract.json",
+            {
+                "section_id": lane,
+                "pass": True,
+                "x3_authorizes": True,
+                "x2_final_materialized_binding_pass": True,
+            },
+        )
+        _write(
+            lane_root / "one_spine_certification_receipt.json",
+            {
+                "certification_status": "PASS",
+                "required_chain_complete": True,
+                "all_required_artifacts_present": True,
+                "all_required_refs_valid": True,
+            },
+        )
+        _write(
+            lane_root / "product_certification_receipt.json",
+            {
+                "product_certification": "ONE_SPINE_SECTION_CERTIFIED",
+                "proof_eligible": True,
+                "x3_code": "X3_ALLOW",
+            },
+        )
+
+
 def test_whole_run_exit_authorizes_complete_app_artifacts(tmp_path: Path) -> None:
     _build_all_pass_run(tmp_path)
     identity = _identity()
@@ -368,22 +425,13 @@ def test_whole_run_exit_authorizes_complete_app_artifacts(tmp_path: Path) -> Non
     assert errors == ()
 
 
-def test_whole_run_exit_authorizes_current_public_lane_layout(tmp_path: Path) -> None:
-    _build_all_pass_run(tmp_path)
-    legacy_lanes = tmp_path / "modular_r4" / "sections"
-    legacy_lanes.rename(tmp_path / "lanes")
-    for lane in GENERATED_LANES:
-        lane_root = tmp_path / "lanes" / lane
-        (lane_root / "apps_rg_core_runtime_authority.json").unlink()
-        lane_payload = {"x3_disposition": "X3_ALLOW", "disposition": "X3_ALLOW"}
-        _write(
-            lane_root / "x3_disposition_receipt.json",
-            {
-                "producer_component": "apps_rg.runtime.orchestration.app_single_action_spine",
-                "artifact_hash": _digest(lane_payload),
-                "payload": lane_payload,
-            },
-        )
+def test_whole_run_exit_authorizes_flat_whole_resume_lane_layout(tmp_path: Path) -> None:
+    """The public whole-resume CLI stores authoritative lane receipts in lanes/.
+
+    Whole-run exit must resolve that layout rather than look for a second,
+    nonexistent modular_r4/sections copy of the same live evidence.
+    """
+    _build_all_pass_run(tmp_path, flat_lane_layout=True)
 
     packet = emit_whole_run_exit_review_packet(
         artifact_dir=tmp_path,
@@ -392,10 +440,35 @@ def test_whole_run_exit_authorizes_current_public_lane_layout(tmp_path: Path) ->
 
     assert packet["status"] == "PASS"
     assert packet["x3_disposition"] == "X3D_ALLOW_FINISH"
+    assert not any("modular_r4/sections" in reason for reason in packet["blockers"])
     assert any(
-        row["artifact_ref"] == "lanes/competencies/l2_handoff_receipt.json"
-        and row["present"] is True
-        for row in packet["source_bindings"]
+        binding["artifact_ref"] == "lanes/executive_summary/x2_gate_outputs.json"
+        and binding["present"] is True
+        for binding in packet["source_bindings"]
+    )
+
+
+def test_whole_run_exit_authorizes_current_sealed_lane_contracts(
+    tmp_path: Path,
+) -> None:
+    """Only the whole run may emit X3D; current lane receipts emit X3_ALLOW."""
+
+    _build_all_pass_run(tmp_path, flat_lane_layout=True)
+    _replace_with_sealed_lane_contracts(tmp_path, flat_lane_layout=True)
+
+    packet = emit_whole_run_exit_review_packet(
+        artifact_dir=tmp_path,
+        identity=_identity(),
+    )
+
+    assert packet["status"] == "PASS"
+    assert packet["x3_disposition"] == "X3D_ALLOW_FINISH"
+    assert {
+        row["x3_code"] for row in packet["signals"]["lane_rows"]
+    } == {"X3_ALLOW"}
+    assert not any(
+        binding["artifact_ref"].endswith("apps_rg_core_runtime_authority.json")
+        for binding in packet["source_bindings"]
     )
 
 
@@ -537,10 +610,22 @@ def test_upstream_x2_failure_is_not_mislabeled_as_malformed_judge_policy(
     ) in packet["blockers"]
 
 
-def test_stage_authority_uses_app_exit_not_outer_core_x3(tmp_path: Path) -> None:
+def test_stage_authority_uses_canonical_whole_exit_not_outer_c0_receipt(
+    tmp_path: Path,
+) -> None:
     _build_all_pass_run(tmp_path)
     identity = _identity()
     _write_outer_core_transport(tmp_path, identity)
+    witness_path = tmp_path / "runtime_execution_witness.json"
+    witness = json.loads(witness_path.read_text(encoding="utf-8"))
+    witness["payload"].pop("c0")
+    witness["payload"]["run_id"] = "apps-rg-inner-runtime"
+    witness["payload"]["request_id"] = "apps-rg-inner-request"
+    _write(witness_path, witness)
+    terminal_path = tmp_path / "terminal_ret_packet.json"
+    terminal = json.loads(terminal_path.read_text(encoding="utf-8"))
+    terminal["payload"]["run_id"] = "apps-rg-inner-runtime"
+    _write(terminal_path, terminal)
     emit_whole_run_exit_review_packet(artifact_dir=tmp_path, identity=identity)
 
     receipts = emit_runtime_stage_authority_receipts(
@@ -560,6 +645,17 @@ def test_stage_authority_uses_app_exit_not_outer_core_x3(tmp_path: Path) -> None
         "X2_AGGREGATION": "PASS",
         "X3_DISPOSITION": "PASS",
     }
+    c0_receipt = json.loads(receipts["APPS_RG_C0"].read_text(encoding="utf-8"))
+    assert "outer_runtime_c0_receipt_present" not in c0_receipt["checks"]
+    assert c0_receipt["source_bindings"] == [
+        {
+            "artifact_ref": "apps_rg_whole_run_exit_review_packet.json",
+            "byte_length": (tmp_path / "apps_rg_whole_run_exit_review_packet.json").stat().st_size,
+            "sha256": "sha256:" + hashlib.sha256(
+                (tmp_path / "apps_rg_whole_run_exit_review_packet.json").read_bytes()
+            ).hexdigest(),
+        }
+    ]
 
 
 def test_stage_authority_accepts_single_runtime_witness_shape(tmp_path: Path) -> None:

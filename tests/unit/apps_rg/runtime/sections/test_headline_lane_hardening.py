@@ -54,6 +54,48 @@ def test_internal_normalize_calls_only_pass_supported_keywords() -> None:
             if keyword.arg is not None and keyword.arg not in supported
         )
     assert invalid == []
+
+
+def test_machine_phrase_repair_compacts_live_keyword_stack_without_new_claims() -> None:
+    headline = (
+        "SVP Engineering | Hyperscaler Alliance Co-Sell | "
+        "Runtime Governance Telemetry Controls | Enterprise Solution Portfolio Expansion"
+    )
+
+    repaired, changes = headline_lane._rewrite_machine_headline_segments(headline)
+
+    assert repaired == (
+        "SVP Engineering | Hyperscaler Alliance Co-Sell | Runtime Governance | "
+        "Enterprise Portfolio Expansion"
+    )
+    assert headline_word_count(repaired) == 10
+    assert [change["from"] for change in changes] == [
+        "Runtime Governance Telemetry Controls",
+        "Enterprise Solution Portfolio Expansion",
+    ]
+
+
+def test_machine_phrase_repair_lifts_quota_label_to_enterprise_scope() -> None:
+    headline = (
+        "SVP Engineering | Hyperscaler Alliance Co-Sell | Runtime Governance | "
+        "Portfolio Quota Leadership"
+    )
+
+    repaired, changes = headline_lane._rewrite_machine_headline_segments(headline)
+
+    assert repaired == (
+        "SVP Engineering | Hyperscaler Alliance Co-Sell | Runtime Governance | "
+        "Enterprise Portfolio Leadership"
+    )
+    assert headline_executive_abstraction_report(repaired)[
+        "segments_missing_executive_abstraction"
+    ] == []
+    assert changes == [
+        {
+            "from": "Portfolio Quota Leadership",
+            "to": "Enterprise Portfolio Leadership",
+        }
+    ]
 METRIC_ID = "fact_engineering_platform_001_metric_deadbeef"
 BASE_ID = "fact_engineering_platform_001"
 

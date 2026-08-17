@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import apps_rg.runtime.sections.executive_summary_voice_repair as voice_repair
+
 from apps_rg.runtime.sections.exec_summary_graph_only_quality import (
     _flags_display_metric_echo_only,
     _sanitize_deprecated_commercialization_thread,
@@ -10,8 +12,14 @@ from apps_rg.runtime.sections.exec_summary_graph_only_quality import (
     apply_graph_only_generation_quality_repair,
 )
 from apps_rg.runtime.sections.executive_summary_voice_repair import (
+    _repair_ai_partnership_judge_findings,
+    _source_fact_ids_for_display_sentence,
     ensure_required_allowed_fact_utilization,
+    finalize_executive_summary_coherence,
     polish_executive_summary_judge_alignment,
+)
+from apps_rg.runtime.sections.executive_summary_composition import (
+    is_mechanism_inventory_sentence,
 )
 from apps_rg.runtime.sections.executive_summary_synthesis_contract import (
     FACT_C0_DISPLAY_OVERRIDES,
@@ -25,6 +33,8 @@ from apps_rg.runtime.validators.executive_summary_x2 import (
     check_exec_summary_no_mechanism_inventory,
     check_exec_summary_no_sentence_fragment,
     check_exec_summary_strategy_no_commercialization_thread,
+    check_synthesis_quality,
+    check_synthesis_quality,
 )
 
 
@@ -33,6 +43,61 @@ def test_s3_guidance_no_literal_22m_or_20_percent() -> None:
     assert "$22m" not in guidance
     assert "20%" not in guidance
     assert "metric_raw" in guidance
+
+
+def test_platform_control_repair_removes_live_mechanism_catalog() -> None:
+    sentences = [
+        "Engineering executive leads regulated modernization delivery.",
+        "From that foundation, the leader architects an agentic AI platform control plane with policy-gated routing that dispatches decisions through explicit route and policy logic rather than ad hoc handling.",
+        "Software dependency graph intelligence enables accelerated analysis.",
+        "Runtime governance keeps execution traceable.",
+        "Platform commercialization created IP-led revenue growth.",
+        "The platform foundation supports enterprise adoption.",
+    ]
+    repaired = _repair_ai_partnership_judge_findings(
+        sentences,
+        selected_facts=[
+            {"fact_id": "reb_unify_agentic_platform_architecture"},
+        ],
+    )
+
+    is_inventory, _ = is_mechanism_inventory_sentence(sentences[1])
+    repaired_inventory, reason = is_mechanism_inventory_sentence(repaired[1])
+    assert is_inventory is True
+    assert repaired_inventory is False, reason
+    assert _source_fact_ids_for_display_sentence(repaired[1]) == [
+        "reb_unify_agentic_platform_architecture"
+    ]
+
+
+def test_ai_partnership_coherence_repair_removes_repeated_internal_surface_jargon() -> None:
+    sentences = [
+        "Engineering executive leading governed agentic AI platform delivery, embedding release automation and security scanning into regulated modernization delivery paths as the foundation for enterprise-scale platform architecture.",
+        "From that release-discipline base, the leader architects a governed agentic AI platform control plane, productizing route-policy dispatch and proof-bundle lineage into a scalable execution surface.",
+        "Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity.",
+        "In parallel, gate-verdict contracts and human override escalation paths anchor control and evidence discipline, ensuring every policy-gated agent execution surface carries auditable proof-bundle lineage.",
+        "That governance foundation also underpins platform productization leadership, generating $22M in IP-led revenue growth alongside expansion of the policy-gated agent execution surface across enterprise programs.",
+        "That combined discipline positions governed agentic systems architecture to extend across new enterprise engagements, scaling execution surfaces while sustaining proof-bundle lineage and gate-verdict rigor.",
+    ]
+
+    repaired = _repair_ai_partnership_judge_findings(
+        sentences,
+        selected_facts=[
+            {"fact_id": "reb_ibm_devsecops_release_resilience"},
+            {"fact_id": "reb_unify_agentic_platform_architecture"},
+            {"fact_id": "reb_unify_platform_commercialization_leadership"},
+        ],
+    )
+
+    text = " ".join(repaired).lower()
+    synthesis_ok, synthesis_reason = check_synthesis_quality(" ".join(repaired))
+    assert repaired[1].startswith("On that foundation, architected an agentic AI platform")
+    assert "$22M" in repaired[4]
+    assert "the leader" not in text
+    assert "proof-bundle" not in text
+    assert "execution surface" not in text
+    assert "gate-verdict" not in text
+    assert synthesis_ok, synthesis_reason
 
 
 def test_fsa_display_override_has_strategic_connector() -> None:
@@ -289,6 +354,131 @@ def test_ensure_unify_commercialization_fact_utilization_inserts_b4_sentence() -
         for fid in (row.get("source_fact_ids") or [])
     }
     assert "reb_unify_platform_commercialization_leadership" in cited
+
+
+def test_ensure_devsecops_brushstroke_survives_dependency_graph_override() -> None:
+    """A required IBM delivery root must not be lost to the graph display anchor."""
+    parsed = {
+        "resume_display_text": (
+            "Engineering executive leads governed agentic AI platform architecture for regulated enterprises. "
+            "Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity. "
+            "The agentic platform control plane keeps autonomous execution traceable end to end. "
+            "Human override paths keep autonomous execution reviewable. "
+            "Platform productization converted governed architecture into $22M in IP-led revenue. "
+            "That productized footing extends applied AI partner architecture into enterprise ecosystems."
+        ),
+        "claim_ledger": [
+            {"claim_text": "s1", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+            {"claim_text": "s2", "source_fact_ids": ["fact_engineering_platform_002"]},
+            {"claim_text": "s3", "source_fact_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"]},
+            {"claim_text": "s4", "source_fact_ids": ["skill_unify_agentic_human_override_escalation_paths"]},
+            {"claim_text": "s5", "source_fact_ids": ["reb_unify_platform_commercialization_leadership"]},
+            {"claim_text": "s6", "source_fact_ids": ["fact_engineering_platform_006"]},
+        ],
+    }
+    facts = [
+        {"fact_id": "reb_unify_agentic_platform_architecture", "claim_text": "Agentic platform architecture"},
+        {"fact_id": "fact_engineering_platform_002", "claim_text": "Dependency graph intelligence"},
+        {"fact_id": "reb_ibm_devsecops_release_resilience", "claim_text": "Embedded release automation and security scanning"},
+        {"fact_id": "reb_unify_platform_commercialization_leadership", "claim_text": "Platform productization"},
+    ]
+
+    patched, receipt = ensure_required_allowed_fact_utilization(parsed, selected_facts=facts)
+
+    assert "reb_ibm_devsecops_release_resilience" in receipt["patched_fact_ids"]
+    assert "regulated devsecops release governance" in str(patched["resume_display_text"]).lower()
+    ok, reason, _ = check_exec_summary_allowed_fact_utilization(
+        patched["claim_ledger"],
+        {str(f["fact_id"]) for f in facts},
+        required_brushstroke_groups=[
+            ["reb_unify_agentic_platform_architecture"],
+            ["reb_ibm_devsecops_release_resilience"],
+            ["reb_unify_platform_commercialization_leadership"],
+        ],
+    )
+    assert ok, reason
+
+
+def test_finalize_reapplies_required_fact_utilization_after_terminal_polish(
+    monkeypatch,
+) -> None:
+    """Later polish must not erase a final required graph binding."""
+    parsed = {
+        "resume_display_text": (
+            "Engineering executive leads governed agentic AI platform architecture for regulated enterprises. "
+            "Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity. "
+            "The agentic platform control plane keeps autonomous execution traceable end to end. "
+            "Human override paths keep autonomous execution reviewable. "
+            "Platform productization converted governed architecture into $22M in IP-led revenue. "
+            "That productized footing extends applied AI partner architecture into enterprise ecosystems."
+        ),
+        "claim_ledger": [
+            {"claim_text": "s1", "source_fact_ids": ["reb_unify_agentic_platform_architecture"]},
+            {"claim_text": "s2", "source_fact_ids": ["fact_engineering_platform_002"]},
+            {"claim_text": "s3", "source_fact_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"]},
+            {"claim_text": "s4", "source_fact_ids": ["skill_unify_agentic_human_override_escalation_paths"]},
+            {"claim_text": "s5", "source_fact_ids": ["reb_unify_platform_commercialization_leadership"]},
+            {"claim_text": "s6", "source_fact_ids": ["fact_engineering_platform_006"]},
+        ],
+    }
+    facts = [
+        {"fact_id": "reb_unify_agentic_platform_architecture", "claim_text": "Agentic platform architecture"},
+        {"fact_id": "fact_engineering_platform_002", "claim_text": "Dependency graph intelligence"},
+        {"fact_id": "reb_ibm_devsecops_release_resilience", "claim_text": "Embedded release automation and security scanning"},
+        {"fact_id": "reb_unify_platform_commercialization_leadership", "claim_text": "Platform productization"},
+    ]
+
+    def _erase_required_bindings_after_initial_repair(value, **_kwargs):
+        out = dict(value)
+        out["resume_display_text"] = str(out["resume_display_text"]).replace(
+            "Regulated DevSecOps release governance strengthened modernization delivery with controlled deployment discipline.",
+            "In parallel, proof-bundle lineage preserves accountable intervention across the runtime.",
+        )
+        out["resume_display_text"] = str(out["resume_display_text"]).replace(
+            "From that foundation, the leader architects an agentic AI platform control plane with explicit decision rules.",
+            "Engineering leadership sets regulated enterprise direction.",
+        )
+        ledger = [dict(row) for row in out.get("claim_ledger") or []]
+        ledger[0] = {
+            "claim_text": "Engineering leadership sets regulated enterprise direction.",
+            "source_fact_ids": ["fact_engineering_platform_002"],
+        }
+        ledger[3] = {
+            "claim_text": "In parallel, proof-bundle lineage preserves accountable intervention across the runtime.",
+            "source_fact_ids": ["skill_unify_agentic_runtime_proof_bundle_lineage"],
+        }
+        out["claim_ledger"] = ledger
+        return out, {"applied": True}
+
+    monkeypatch.setattr(
+        voice_repair,
+        "polish_executive_summary_judge_alignment",
+        _erase_required_bindings_after_initial_repair,
+    )
+
+    finalized, receipt = finalize_executive_summary_coherence(
+        parsed,
+        selected_facts=facts,
+        allowed_fact_ids={str(fact["fact_id"]) for fact in facts},
+        target_role="Manager of Applied AI Architecture, Partnerships",
+    )
+
+    repaired_ids = receipt["final_allowed_fact_utilization"]["patched_fact_ids"]
+    assert "reb_ibm_devsecops_release_resilience" in repaired_ids
+    assert "reb_unify_agentic_platform_architecture" in repaired_ids
+    assert "regulated devsecops release governance" in str(
+        finalized["resume_display_text"]
+    ).lower()
+    assert "agentic ai platform control plane" in str(
+        finalized["resume_display_text"]
+    ).lower()
+    cited = {
+        str(fact_id)
+        for row in finalized["claim_ledger"]
+        for fact_id in row.get("source_fact_ids") or []
+    }
+    assert "reb_ibm_devsecops_release_resilience" in cited
+    assert "reb_unify_agentic_platform_architecture" in cited
 
 
 def test_polish_dedupes_dependency_graph_and_weaves_team_metric() -> None:

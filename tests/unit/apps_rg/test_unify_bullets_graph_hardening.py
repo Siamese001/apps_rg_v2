@@ -32,12 +32,16 @@ from apps_rg.runtime.sections.unify_bullets_graph_evidence import (
     is_legacy_six_pack_ledger_order,
     max_consecutive_word_overlap,
 )
-from apps_rg.runtime.sections.unify_bullets_lane import normalize_unify_parsed_without_ledger_synthesis
+from apps_rg.runtime.sections.unify_bullets_lane import (
+    _repair_unify_bullet_evidence_density,
+    normalize_unify_parsed_without_ledger_synthesis,
+)
 from apps_rg.runtime.spine.front_contracts import (
     activate_fixture_dev_bypass,
     deactivate_fixture_dev_bypass,
 )
 from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+    check_experience_bullet_evidence_density,
     check_bullet_seniority_floor,
     check_bullet_technical_specificity_floor,
 )
@@ -344,6 +348,55 @@ def test_normalizer_drops_graph_provenance_outside_each_slot_bound_source() -> N
         row.get("operation") == "normalize_source_fact_ids_to_slot_bound_evidence"
         for row in out["change_log"]
     )
+
+
+def test_unify_adoption_repair_replaces_repeated_motion_with_mechanism_and_outcome() -> None:
+    out = {
+        "bullets": [
+            {
+                "bullet_id": "bul_unify_002",
+                "bullet_text": (
+                    "Directed CFO-aligned enterprise adoption motions through consumption-based "
+                    "licensing across enterprise accounts using CFO-aligned adoption motions."
+                ),
+                "source_fact_ids": ["bul_unify_002", "exp_unify_001"],
+            }
+        ],
+        "change_log": [],
+    }
+
+    assert _repair_unify_bullet_evidence_density(out) is True
+    repaired = out["bullets"][0]["bullet_text"]
+    assert "cfo-aligned adoption motions" in repaired.lower()
+    assert "usage-based subscription forecasting" in repaired.lower()
+    assert "commercial revenue and renewals" in repaired.lower()
+    assert check_bullet_technical_specificity_floor("bul_unify_002", repaired).passed
+    assert check_experience_bullet_evidence_density("bul_unify_002", repaired).passed
+    assert any(
+        row.get("operation") == "repair_unify_adoption_evidence_density"
+        for row in out["change_log"]
+    )
+
+
+def test_unify_adoption_repair_preserves_required_metric_outcome_surface() -> None:
+    bullets, parsed, meta = _partner_metric_surface_payload()
+    duplicate_motion = (
+        "Directed CFO-aligned enterprise adoption motions through consumption-based licensing "
+        "across enterprise accounts using CFO-aligned adoption motions."
+    )
+    bullets[1]["bullet_text"] = duplicate_motion
+    parsed["claim_ledger"][1]["claim_text"] = duplicate_motion
+
+    assert _repair_unify_bullet_evidence_density(parsed) is True
+    gates = run_unify_bullets_role_episode_x2_gates(
+        bullets=parsed["bullets"],
+        parsed_output=parsed,
+        proof_pool_metadata=meta,
+        jd_text=JD,
+    )
+    by_id = {gate.gate_id: gate for gate in gates}
+    assert by_id["x2_unify_each_bullet_metric_outcome_surface_visible"].passed is True
+    assert by_id["x2_unify_metric_outcomes_distributed_by_slot"].passed is True
 
 
 def test_brown_allocation_not_legacy_six_pack() -> None:

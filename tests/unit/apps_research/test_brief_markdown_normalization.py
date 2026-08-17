@@ -10,6 +10,7 @@ from apps_research.config.model_pins import (
     company_brief_generation_pin,
 )
 from apps_research.types.apps_rg_targeting_brief_contract import (
+    BRIEFING_PROFILES,
     normalize_markdown_brief_text,
     normalize_targeting_brief_text,
     validate_targeting_brief_text,
@@ -121,6 +122,48 @@ def test_targeting_synthesis_repairs_jd_dense_bullet(monkeypatch) -> None:
     assert synthesized["targeting_brief_disposition"] == "SEALED"
     assert len(calls) == 2
     assert "hard 8,000-character ceiling" in calls[1]
+
+
+def test_targeting_synthesis_fits_provider_budget_overrun_before_regeneration(
+    monkeypatch,
+) -> None:
+    """A narrow provider overrun must not force a second model call or a block."""
+    engine = CompanyBriefEngine()
+    engine._last_targeting_generation_model_observed = _GENERATION_PIN.model
+    provider_overrun = _VALID_TARGETING_BRIEF + "\n" + "\n".join(
+        "- Grounded company signal supports targeting context and operating decisions. " * 4
+        for _ in range(60)
+    )
+    calls: list[str] = []
+
+    def _fake_llm(prompt: str) -> str:
+        calls.append(prompt)
+        return provider_overrun
+
+    monkeypatch.setattr(engine, "_call_llm_plain_markdown", _fake_llm)
+    monkeypatch.setattr(
+        engine,
+        "_run_apps_rg_handoff_x2_judge",
+        lambda **_kwargs: dict(_PASS_X2_RECEIPT),
+    )
+
+    synthesized = engine._synthesize_apps_rg_targeting_brief(
+        topic="Acme Co",
+        findings={"overview": "Acme is a mid-cap insurer with verified scale."},
+        jd_context={
+            **_TARGETING_JD_CONTEXT,
+            "jd_text": "Lead enterprise data platform strategy for the insurance division.",
+        },
+        jd_anchor=None,
+    )
+
+    sidecar = synthesized["apps_rg_targeting_brief_sidecar"]
+    budget_repair = sidecar["budget_repair"]
+    assert synthesized["targeting_brief_disposition"] == "SEALED"
+    assert len(calls) == 1
+    assert synthesized["targeting_brief_char_count"] <= BRIEFING_PROFILES["apps_rg"].max_total_chars
+    assert budget_repair["applied"] is True
+    assert budget_repair["before_char_count"] > budget_repair["after_char_count"]
 
 
 def test_consumer_brief_path_normalizes_output(monkeypatch) -> None:

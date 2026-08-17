@@ -1059,6 +1059,48 @@ def test_post_boundary_authority_reopens_eval_seal_and_rejects_tamper(
     assert sealed_refs <= bound_refs
     assert "apps_eval/run/apps_rg_eval_package_seal.json" in bound_refs
 
+    advisory_completion = {
+        **completion,
+        "l6_shadow": {
+            "l6_shadow_bridge_ref": l6_bridge.name,
+            "l6_apps_eval_binding_closure_ref": parity.name,
+            "grain_parity_status": "FAIL",
+            "apps_eval_rows_bound": False,
+            "future_run_only": True,
+            "current_run_mutated": False,
+        },
+    }
+    _write_json(l6_bridge, {"future_run_only": True, "current_run_mutated": False})
+    _write_json(
+        parity,
+        {
+            "binding_closure_status": "FAIL",
+            "future_run_only": True,
+            "current_run_mutation_assertion": False,
+        },
+    )
+    _write_json(tmp_path / "apps_rg_post_x3_completion_receipt.json", advisory_completion)
+    advisory_receipts = emit_post_boundary_authority_receipts(
+        artifact_dir=tmp_path,
+        identity=identity,
+        post_x3_completion=advisory_completion,
+    )
+    advisory_l6 = json.loads(
+        advisory_receipts["L6_SHADOW"].read_text(encoding="utf-8")
+    )
+    advisory_parity = json.loads(
+        advisory_receipts["INDEPENDENT_PARITY"].read_text(encoding="utf-8")
+    )
+
+    assert advisory_l6["status"] == "SKIPPED"
+    assert advisory_l6["advisory_only"] is True
+    assert advisory_parity["status"] == "SKIPPED"
+    assert advisory_parity["advisory_only"] is True
+
+    _write_json(l6_bridge, {"status": "PASS"})
+    _write_json(parity, {"binding_closure_status": "PASS"})
+    _write_json(tmp_path / "apps_rg_post_x3_completion_receipt.json", completion)
+
     coverage_matrix.write_text(
         "row_id,status\nrow-1,FAIL\n",
         encoding="utf-8",

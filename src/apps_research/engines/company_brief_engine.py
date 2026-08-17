@@ -1213,17 +1213,48 @@ class CompanyBriefEngine(BaseResearchEngine):
             normalized,
             research_notes=research_notes,
         )
+        brief_for_seal = normalized
+        budget_repair: dict[str, Any] = {
+            "applied": False,
+            "strategy": "preserve_whole_bullets_per_section",
+            "before_char_count": len(brief_for_seal),
+            "after_char_count": len(brief_for_seal),
+        }
         sealed = seal_targeting_brief(
-            normalized,
+            brief_for_seal,
             company_name=company_name,
             jd_text=jd_text,
             profile="apps_rg",
         )
         if not sealed.is_sealed:
-            scrubbed = self._drop_jd_restatement_bullets(normalized, sealed.violations)
-            if scrubbed != normalized:
+            scrubbed = self._drop_jd_restatement_bullets(brief_for_seal, sealed.violations)
+            if scrubbed != brief_for_seal:
+                brief_for_seal = scrubbed
                 sealed = seal_targeting_brief(
-                    scrubbed,
+                    brief_for_seal,
+                    company_name=company_name,
+                    jd_text=jd_text,
+                    profile="apps_rg",
+                )
+        # A provider can narrowly overrun the hard consumer limit while still
+        # producing structurally valid markdown.  Remove only surplus whole
+        # bullets before asking the model to regenerate; this preserves every
+        # section and makes the bounded repair explicit in the handoff sidecar.
+        if not sealed.is_sealed:
+            fitted = fit_targeting_brief_to_budget(
+                brief_for_seal,
+                profile="apps_rg",
+            )
+            if fitted != brief_for_seal:
+                budget_repair = {
+                    "applied": True,
+                    "strategy": "preserve_whole_bullets_per_section",
+                    "before_char_count": len(brief_for_seal),
+                    "after_char_count": len(fitted),
+                }
+                brief_for_seal = fitted
+                sealed = seal_targeting_brief(
+                    brief_for_seal,
                     company_name=company_name,
                     jd_text=jd_text,
                     profile="apps_rg",
@@ -1231,7 +1262,7 @@ class CompanyBriefEngine(BaseResearchEngine):
         if not sealed.is_sealed:
             repaired = self._repair_apps_rg_targeting_brief_markdown(
                 company_name=company_name,
-                draft_markdown=normalized,
+                draft_markdown=brief_for_seal,
                 jd_text=jd_text,
                 research_notes=research_notes,
                 gate_verdict=gate_verdict,
@@ -1334,6 +1365,7 @@ class CompanyBriefEngine(BaseResearchEngine):
                 semantic_override=semantic_assessment,
                 x2_judge_receipt=x2_judge_receipt,
                 source_register=source_register,
+                budget_repair=budget_repair,
             ),
             "targeting_brief_disposition": BriefStatus.SEALED.value,
             "targeting_brief_char_count": sealed.char_count,
@@ -1534,6 +1566,7 @@ class CompanyBriefEngine(BaseResearchEngine):
         semantic_override: Any | None = None,
         x2_judge_receipt: dict[str, Any] | None = None,
         source_register: list[dict[str, Any]] | None = None,
+        budget_repair: dict[str, Any] | None = None,
     ) -> Dict[str, Any]:
         """Build the structured sidecar carried from apps_research to apps_rg."""
         from apps_research.integrations.apps_rg_handoff import (  # noqa: PLC0415
@@ -1618,6 +1651,7 @@ class CompanyBriefEngine(BaseResearchEngine):
             "bullet_count": validation.bullet_count,
             "section_count": validation.section_count,
             "brief_text_sha256": digest,
+            "budget_repair": dict(budget_repair or {}),
         }
 
     def _run_apps_rg_handoff_x2_judge(

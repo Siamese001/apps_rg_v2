@@ -174,6 +174,18 @@ def test_x1d_preflight_and_l6_shadow_are_advisory_scoped(tmp_path: Path) -> None
     )
     (tmp_path / "x2_gate_outputs.json").write_text(json.dumps({"gates": []}), encoding="utf-8")
     (tmp_path / "x1d_llm_judge_outputs.json").write_text(json.dumps({"judges": []}), encoding="utf-8")
+    (tmp_path / "apps_rg_section_runtime_exhaust_bundle.json").write_text(
+        json.dumps(
+            {
+                "parent_run_id": "parent-1",
+                "child_run_id": "child-1",
+                "section_attempt_id": "headline:child-1:attempt:1",
+                "runtime_exhaust_bundle_id": "reb:headline-1",
+                "runtime_exhaust_bundle_digest": "sha256:" + "a" * 64,
+            }
+        ),
+        encoding="utf-8",
+    )
 
     with patch.dict("os.environ", {"APPS_RG_GOVERNED_L6_SHADOW_SKIP": "1"}):
         handoff = build_l6_shadow_handoff_dict(
@@ -187,6 +199,10 @@ def test_x1d_preflight_and_l6_shadow_are_advisory_scoped(tmp_path: Path) -> None
     assert handoff["authority_scope"] == L6_LEGACY_HANDOFF_AUTHORITY_SCOPE
     assert handoff["legacy_shadow_summary_only"] is True
     assert handoff["future_run_only"] is True
+    assert handoff["parent_run_id"] == "parent-1"
+    assert handoff["child_run_id"] == "child-1"
+    assert handoff["section_attempt_id"] == "headline:child-1:attempt:1"
+    assert handoff["runtime_exhaust_bundle_id"] == "reb:headline-1"
 
     learning = build_l6_shadow_learning_record(
         artifact_dir=tmp_path,

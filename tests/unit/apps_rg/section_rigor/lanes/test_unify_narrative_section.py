@@ -298,6 +298,60 @@ def test_unify_narrative_normalization_trims_live_reusable_capability_fourgram()
     assert "into reusable platform services" in normalized["narrative_sentence"].lower()
 
 
+def test_unify_narrative_normalization_rephrases_live_governed_agentic_copy() -> None:
+    """A narrative must not repeat the companion's four-word architecture fragment."""
+    narrative = (
+        "Owned Unify Consulting's mandate to industrialize a governed agentic AI capability, "
+        "aligning control-plane architecture and reusable IP with a commercial operating model "
+        "for durable enterprise adoption."
+    )
+    companion = (
+        "- Owned architecture for a governed agentic AI platform, establishing route-policy "
+        "dispatch and runtime proof lineage for enterprise workflows."
+    )
+    source_ids = [
+        "reb_unify_agentic_platform_architecture",
+        "reb_unify_platform_commercialization_leadership",
+    ]
+    parsed = {
+        "narrative_sentence": narrative,
+        "claim_ledger": [{"claim_text": narrative, "source_fact_ids": source_ids}],
+        "selected_fact_plan": {"facts": [{"fact_id": fid} for fid in source_ids]},
+        "change_log": [],
+        "self_check": {},
+    }
+
+    normalized = normalize_unify_narrative_parsed(
+        parsed,
+        {"selected_fact_plan": parsed["selected_fact_plan"], "allowed_fact_ids": source_ids},
+        companion_text=companion,
+    )
+
+    assert normalized is not None
+    repaired = normalized["narrative_sentence"]
+    assert "a governed agentic ai capability" not in repaired.lower()
+    assert "a policy-bound ai retrieval capability" in repaired.lower()
+    assert normalized["claim_ledger"][0]["claim_text"] == repaired
+    gates = run_unify_narrative_x2_gates(
+        narrative_sentence=repaired,
+        parsed_output=normalized,
+        claim_ledger=normalized["claim_ledger"],
+        jd_text="",
+        runtime_generation_status="REAL_LLM",
+        companion_bullet_texts=companion,
+        companion_bullets_status="ACCEPTED_FINALIZED",
+        companion_bullets_reason="ok",
+        provider_requested="external_claude",
+        provider_attempted="external_claude",
+        raw_output=json.dumps(normalized, ensure_ascii=False),
+        x1d_judges=[],
+        allowed_fact_ids=set(source_ids),
+    )
+    by_id = {gate.gate_id: gate for gate in gates}
+    assert by_id["x2_no_companion_ngram_copy"].pass_ is True
+    assert by_id["x2_narrative_technical_specificity_floor"].pass_ is True
+
+
 def test_retry32_unify_narrative_removes_repeatable_operating_model_copy_and_syncs_ledger() -> None:
     narrative = (
         "Owned Unify Consulting's mandate to transform governed agentic AI architecture into an "

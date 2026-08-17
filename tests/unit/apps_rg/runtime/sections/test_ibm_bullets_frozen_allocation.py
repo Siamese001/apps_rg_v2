@@ -59,6 +59,42 @@ def test_pnl_frozen_allocation_materialization_keeps_technical_mechanism() -> No
     assert result.passed is True
 
 
+def test_frozen_allocation_materialization_restores_a_provider_omitted_slot() -> None:
+    """A sealed graph allocation, not the provider, controls required slot presence."""
+    omitted = "bul_ibm_002"
+    parsed = {
+        "bullets": [
+            {
+                "bullet_id": bullet_id,
+                "bullet_text": "Provider draft.",
+                "source_fact_ids": [bullet_id],
+            }
+            for bullet_id in IBM_BULLET_IDS
+            if bullet_id != omitted
+        ]
+    }
+    assignments = [
+        {
+            "section_id": "ibm_bullets",
+            "claim_unit_id": f"ibm_bullets:{bullet_id}",
+            "root_id": "reb_ibm_data_modeling_bi_decision_support",
+            "skill_id": "skill_sr_cloud_data_platform_engineering",
+            "root_claim_text": "Built decision-support data models and BI views.",
+            "metric_text": "",
+        }
+        for bullet_id in IBM_BULLET_IDS
+    ]
+
+    assert _materialize_ibm_bullets_from_frozen_allocation(
+        parsed,
+        selected_fact_plan={"allocation_assignments": assignments},
+    )
+    restored = next(row for row in parsed["bullets"] if row["bullet_id"] == omitted)
+    assert restored["source_fact_ids"] == [omitted]
+    assert restored["bullet_text"] != "Provider draft."
+    assert len(parsed["claim_ledger"]) == len(IBM_BULLET_IDS)
+
+
 def test_frozen_allocation_materialization_keeps_revenue_slots_semantically_distinct() -> None:
     parsed = {
         "bullets": [

@@ -466,6 +466,47 @@ def test_post_boundary_eval_failure_vetoes_pipeline_completion(
     assert result["l6_shadow"]["current_run_mutated"] is False
 
 
+def test_advisory_l6_gap_does_not_block_completed_product_run(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    _seed_product(tmp_path)
+    _seed_section_l6(tmp_path)
+    events: list[str] = []
+    _install_fakes(tmp_path, monkeypatch, events, coverage_complete=True)
+    monkeypatch.setattr(
+        subject,
+        "_emit_l6_section_apps_eval_bindings",
+        lambda **kwargs: {
+            "l6_shadow_bridge_ref": "apps_eval/run/l6_shadow_bridge.json",
+            "l6_apps_eval_binding_closure_ref": "l6_apps_eval_binding_closure_receipt.json",
+            "grain_parity_status": "FAIL",
+            "apps_eval_rows_bound": False,
+            "future_run_only": True,
+            "current_run_mutated": False,
+        },
+    )
+
+    result = subject.complete_apps_rg_post_x3(
+        artifact_dir=tmp_path,
+        result={
+            "x3_disposition": "X3D",
+            "run_id": "run-1",
+            "request_id": "req-1",
+            "canonical_run_identity": _canonical_identity(),
+        },
+    )
+
+    assert events == ["uwg", "eval"]
+    assert result["status"] == "PASS_WITH_ADVISORY_L6_GAP"
+    assert result["pipeline_complete"] is True
+    assert result["observability_repair_required"] is False
+    assert result["advisory_observability_repair_required"] is True
+    assert result["advisory_observability_stage"] == "l6_binding_post_boundary"
+    assert result["failure_stage"] == ""
+    assert result["l6_shadow"]["observation_status"] == "ADVISORY_GAP"
+
+
 def test_post_boundary_exception_is_durable_reconciliation_not_revocation(
     tmp_path: Path,
     monkeypatch,

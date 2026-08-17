@@ -175,6 +175,8 @@ def test_runtime_exhaust_bundle_records_inventory_trace_refs_and_exit_x3(
 
     assert bundle["contract_type"] == "RuntimeExhaustBundle"
     assert bundle["run_id"] == "run-from-exit"
+    assert bundle["runtime_exhaust_bundle_id"].startswith("reb:")
+    assert bundle["runtime_exhaust_bundle_digest"].startswith("sha256:")
     assert bundle["sealed_l2_artifact_ref"] == "custom_sealed.json"
     assert bundle["x3_code"] == "X3_ALLOW"
     assert bundle["x3_disposition"] == {"x3_code": "X3_ALLOW", "pass": True}
@@ -231,6 +233,8 @@ def test_runtime_exhaust_binds_nested_lane_to_canonical_product_identity(
     assert bundle["parent_run_id"] == "product-run"
     assert bundle["child_run_id"] == "lane-run"
     assert bundle["section_attempt_id"] == "headline:lane-run:attempt:1"
+    assert bundle["runtime_exhaust_bundle_id"].startswith("reb:")
+    assert bundle["runtime_exhaust_bundle_digest"].startswith("sha256:")
     assert bundle["session_id"] == "research-run"
     assert bundle["tenant_id"] == "tenant-1"
     assert bundle["trace_root"] == "trace-1"
@@ -350,6 +354,9 @@ def test_emit_runtime_exhaust_artifacts_writes_payload_refs_and_guard_receipts(
     span_coverage = _read_json(artifact_dir / SPINE_SPAN_COVERAGE_RECEIPT)
 
     assert bundle["x3_code"] == "X3_ALLOW"
+    preferred_bundle = artifact_dir / "apps_rg_section_runtime_exhaust_bundle.json"
+    assert preferred_bundle.is_file()
+    assert _read_json(preferred_bundle) == bundle
     assert receipt["exhaust_spine_status"] == "PASS"
     assert handoff["observed_x3_code"] == "X3_ALLOW"
     assert eval_receipt["promotion_allowed"] is False

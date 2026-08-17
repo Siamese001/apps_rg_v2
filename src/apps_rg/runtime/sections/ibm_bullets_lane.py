@@ -435,8 +435,18 @@ def _materialize_ibm_bullets_from_frozen_allocation(
         for row in bullets
         if str(row.get("bullet_id") or "").strip() in allocation_by_bullet
     }
-    if set(by_bullet) != set(IBM_BULLET_IDS):
-        return False
+    # The provider is allowed to omit a slot; it is not allowed to decide
+    # whether that sealed slot disappears from the resume.  Recreate a missing
+    # row from the already-approved allocation below.  This keeps recovery
+    # evidence-bound rather than guessing from the base resume or a preset.
+    for bullet_id in IBM_BULLET_IDS:
+        by_bullet.setdefault(
+            bullet_id,
+            {
+                "bullet_id": bullet_id,
+                "source_fact_ids": [bullet_id],
+            },
+        )
 
     ordered: list[dict[str, Any]] = []
     for bullet_id in IBM_BULLET_IDS:

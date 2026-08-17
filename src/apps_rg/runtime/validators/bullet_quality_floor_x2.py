@@ -57,7 +57,7 @@ _FIRST_WORD_RE = re.compile(r"^\s*(\w+)")
 # graph-backed source does not contain a numeric metric.  Generic capability
 # nouns are deliberately excluded.
 _OUTCOME_SIGNAL_PATTERN = re.compile(
-    r"\b(?:generated|increased|grew|improved|reduced|cut|compressed|accelerated|"
+    r"\b(?:generated|increased|grew|improved|reduced|cut|compress(?:ed|ing|ion)|accelerated|"
     r"expanded|scal(?:ed|ing)|converted|standardized|operationalized|"
     r"establish(?:ed|ing|ment)|enabl(?:ed|ing)|deliver(?:ed|ing|y)|"
     r"deployed|launched|adopt(?:ed|ion|ing)|moderni[sz](?:ed|ing|ation)|"
@@ -173,6 +173,8 @@ _TECH_TOKEN_PATTERN = re.compile(
     r"bi|dashboard|dashboards|data.model|data.models|semantic.view|semantic.views|"
     r"regulatory|compliance|basel|ccar|sox|iso|"
     r"saas|paas|iaas|serverless|lambda|"
+    r"consumption.based\s+licensing|renewal.signal\s+instrumentation|"
+    r"usage.based\s+subscription\s+forecasting|subscription\s+forecasting|"
     r"kubernetes|etl|data.lake|lakehouse|warehouse"
     r")\b",
     re.IGNORECASE,

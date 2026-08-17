@@ -137,6 +137,16 @@ class TestExperienceBulletEvidenceDensity:
         )
         assert result.passed, result.failure_reason
 
+    def test_present_tense_efficiency_outcome_passes(self) -> None:
+        """Do not discard a concrete delivery result solely because it uses ``-ing`` tense."""
+        result = check_experience_bullet_evidence_density(
+            "bul_ibm_002",
+            "Directed cognitive decision-support engagements that connected HPC-driven risk "
+            "scenario analytics to executive operating workflows, compressing stress-test "
+            "cycles from weeks to hours for regulated financial-services portfolios.",
+        )
+        assert result.passed, result.failure_reason
+
     def test_graph_bound_qualitative_delivery_outcome_passes(self) -> None:
         result = check_experience_bullet_evidence_density(
             "bul_insurtech_001",

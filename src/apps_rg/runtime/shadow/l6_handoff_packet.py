@@ -280,6 +280,23 @@ def build_l6_shadow_handoff_dict(
 
     run_id = str(l2.get("run_id") or ad.name)
     rgs = str(l2.get("runtime_generation_status") or "")
+    native_exhaust_path = ad / "apps_rg_section_runtime_exhaust_bundle.json"
+    if not native_exhaust_path.is_file():
+        native_exhaust_path = ad / "runtime_exhaust_bundle.json"
+    native_exhaust = _load_json(native_exhaust_path)
+    native_exhaust = (
+        dict(native_exhaust) if isinstance(native_exhaust, Mapping) else {}
+    )
+    exhaust_digest = str(native_exhaust.get("runtime_exhaust_bundle_digest") or "")
+    if not exhaust_digest and native_exhaust:
+        exhaust_digest = "sha256:" + hashlib.sha256(
+            json.dumps(native_exhaust, sort_keys=True, separators=(",", ":")).encode(
+                "utf-8"
+            )
+        ).hexdigest()
+    exhaust_id = str(native_exhaust.get("runtime_exhaust_bundle_id") or "")
+    if not exhaust_id and exhaust_digest:
+        exhaust_id = "reb:" + exhaust_digest.removeprefix("sha256:")[:24]
 
     gen_meta = build_generator_metadata(
         provider_request=pr_blob or None,
@@ -307,6 +324,14 @@ def build_l6_shadow_handoff_dict(
         "future_run_only": True,
         "section_id": section_id,
         "run_id": run_id,
+        "parent_run_id": str(native_exhaust.get("parent_run_id") or ""),
+        "child_run_id": str(native_exhaust.get("child_run_id") or ""),
+        "section_attempt_id": str(native_exhaust.get("section_attempt_id") or ""),
+        "runtime_exhaust_bundle_id": exhaust_id,
+        "runtime_exhaust_bundle_digest": exhaust_digest,
+        "runtime_exhaust_bundle_ref": repo_rel(rr, native_exhaust_path)
+        if native_exhaust_path.is_file()
+        else None,
         "runtime_generation_status": rgs,
         "generated_at_utc": _iso_mtime(l2_path),
         # Bidirectional navigation vs lane runtime_proof run_manifest / latest_* pointers.
@@ -445,7 +470,7 @@ def build_l6_shadow_handoff_dict(
         pkt["promotion_request_candidate"] = False
         pkt["current_run_effect"] = "none"
 
-    exhaust_path = ad / "runtime_exhaust_bundle.json"
+    exhaust_path = native_exhaust_path
     edr_path = ad / "exit_disposition_receipt.json"
     if governed_l6_shadow_enabled() and exhaust_path.is_file():
         exhaust_doc = _load_json(exhaust_path)

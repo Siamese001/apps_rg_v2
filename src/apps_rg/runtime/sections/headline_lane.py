@@ -734,6 +734,16 @@ _MACHINE_HEADLINE_SEGMENT_REWRITES: dict[str, str] = {
     "partner alliance co-sell": "Co-Sell Channel Alliance",
     "partner alliance co sell": "Co-Sell Channel Alliance",
     "hyperscaler alliance revenue": "Hyperscaler Partner Ecosystem",
+    # Keep the three headline signals distinct but compact.  These rewrite
+    # only remove redundant words from already-grounded model phrasing; they
+    # introduce no new claim, employer, or metric surface.
+    "runtime governance telemetry controls": "Runtime Governance",
+    "enterprise solution portfolio expansion": "Enterprise Portfolio Expansion",
+    # The quota phrase is evidence-grounded, but it is an individual-sales
+    # label rather than an executive operating abstraction.  The selected IBM
+    # fact explicitly establishes enterprise portfolio leadership, so this
+    # preserves its grounded nouns while satisfying the headline's SVP scope.
+    "portfolio quota leadership": "Enterprise Portfolio Leadership",
     "policy administration migration": "Policy Administration Platforms",
     "policy administration modernization": "Policy Administration Platforms",
     "aws migration execution": "Policy Administration Platforms",

@@ -379,6 +379,22 @@ def test_role_episode_display_file_is_written_before_x2_and_x3_binding() -> None
     assert output_write_idx < x2_write_idx < x3_finalize_idx
 
 
+def test_role_episode_l6_handoff_is_built_after_sealed_runtime_exit() -> None:
+    """Shared role lanes must expose the same source identity as dedicated lanes."""
+    source = Path(role_episode_lane.__file__).read_text(encoding="utf-8")
+    main_idx = source.index("def run_role_episode_lane_execution")
+    l2_finalize_idx = source.index("finalize_section_l2_after_output(", main_idx)
+    exhaust_idx = source.index("finalize_section_runtime_exhaust_before_l6(", l2_finalize_idx)
+    l6_gate_idx = source.index("gate_section_l6_shadow_after_exhaust(", exhaust_idx)
+    l6_build_idx = source.index("build_l6_shadow_handoff_dict(", l6_gate_idx)
+    l6_write_idx = source.index(
+        'write_json(artifact_dir / "l6_shadow_eval_package.json", l6_package)',
+        l6_build_idx,
+    )
+
+    assert l2_finalize_idx < exhaust_idx < l6_gate_idx < l6_build_idx < l6_write_idx
+
+
 def test_ey_model_bullet_target_overwrite_is_discarded_before_display() -> None:
     cfg = role_episode_lane._ROLE_LANES["ey_bullets"]
     facts = [
@@ -452,6 +468,137 @@ def test_ey_model_bullet_target_overwrite_is_discarded_before_display() -> None:
 
     gate = _gate_by_id(gates)["x2_ey_bullets_display_text_proof_authorized"]
     assert gate["pass"] is True
+
+
+def test_ey_erm_model_surface_gets_graph_bound_outcome_completion_before_x2() -> None:
+    """A live-shaped ERM bullet cannot ship as a detail-only activity statement."""
+    cfg = role_episode_lane._ROLE_LANES["ey_bullets"]
+    facts = [
+        {
+            "fact_id": "bul_ey_001",
+            "claim_text": "Led capital and liquidity stress-testing work for regulated institutions.",
+        },
+        {
+            "fact_id": "bul_ey_002",
+            "claim_text": "Directed regulatory analytics modernization with traceable controls.",
+        },
+        {
+            "fact_id": "bul_ey_003",
+            "role_episode_bundle_id": "reb_ey_erm_risk_governance",
+            "claim_text": (
+                "Architected ERM operating models and BCBS 239-aligned risk-data aggregation "
+                "by defining three-lines-of-defense accountability, metadata standards, "
+                "and auditable risk metrics."
+            ),
+            "claim_scope": "Regulated banking and insurance clients.",
+            "allowed_graph_evidence_ids": [
+                "reb_ey_erm_risk_governance",
+                "metric_ey_risk_metric_definition_count",
+            ],
+        },
+    ]
+    parsed = {
+        "bullets": [
+            {
+                "bullet_id": "bul_ey_001",
+                "bullet_text": facts[0]["claim_text"],
+                "source_fact_ids": ["bul_ey_001"],
+            },
+            {
+                "bullet_id": "bul_ey_002",
+                "bullet_text": facts[1]["claim_text"],
+                "source_fact_ids": ["bul_ey_002"],
+            },
+            {
+                "bullet_id": "bul_ey_003",
+                "bullet_text": facts[2]["claim_text"],
+                "source_fact_ids": ["bul_ey_003"],
+            },
+        ]
+    }
+
+    bullets, receipt = role_episode_lane._materialize_bullet_generation(
+        cfg=cfg,
+        parsed=parsed,
+        parse_error="",
+        provider_runtime_generation_status="REAL_LLM",
+        facts=facts,
+        allowed=[str(fact["fact_id"]) for fact in facts],
+        graph_packet_digest="digest://ey-erm-outcome",
+    )
+
+    repaired = bullets[2]["bullet_text"]
+    assert "regulated banking and insurance clients" in repaired
+    assert "standardized risk-metric definitions" in repaired
+    assert check_experience_bullet_evidence_density("bul_ey_003", repaired).passed
+    assert receipt["graph_bound_evidence_density_repairs"] == [
+        {
+            "bullet_id": "bul_ey_003",
+            "role_episode_bundle_id": "reb_ey_erm_risk_governance",
+            "reason": "graph_bound_evidence_density_completion",
+        }
+    ]
+
+
+def test_ey_capital_model_surface_gets_graph_bound_outcome_completion_before_x2() -> None:
+    """A late reselected EY bullet cannot bypass the experience-evidence floor."""
+    cfg = role_episode_lane._ROLE_LANES["ey_bullets"]
+    facts = [
+        {
+            "fact_id": "bul_ey_001",
+            "role_episode_bundle_id": "reb_ey_capital_optimization_solvency",
+            "claim_text": (
+                "Led quantitative derivatives, variable-annuity hedging, and insurance-capital "
+                "work using exotic pricing, liability Greeks, higher-order stress testing, "
+                "and hedge design."
+            ),
+            "claim_scope": "Regulated insurance portfolios.",
+            "allowed_graph_evidence_ids": [
+                "reb_ey_capital_optimization_solvency",
+                "metric_ey_greek_cross_greek_scenario_count",
+            ],
+        },
+        {
+            "fact_id": "bul_ey_002",
+            "claim_text": "Led CCAR model-validation work, establishing audit-ready evidence.",
+        },
+        {
+            "fact_id": "bul_ey_003",
+            "claim_text": "Architected BCBS 239 risk-data aggregation, enabling auditable controls.",
+        },
+    ]
+    parsed = {
+        "bullets": [
+            {
+                "bullet_id": fact["fact_id"],
+                "bullet_text": fact["claim_text"],
+                "source_fact_ids": [fact["fact_id"]],
+            }
+            for fact in facts
+        ]
+    }
+
+    bullets, receipt = role_episode_lane._materialize_bullet_generation(
+        cfg=cfg,
+        parsed=parsed,
+        parse_error="",
+        provider_runtime_generation_status="REAL_LLM",
+        facts=facts,
+        allowed=[str(fact["fact_id"]) for fact in facts],
+        graph_packet_digest="digest://ey-capital-outcome",
+    )
+
+    repaired = bullets[0]["bullet_text"]
+    assert "higher-order stress scenarios" in repaired
+    assert "delivering risk visibility" in repaired
+    assert check_experience_bullet_evidence_density("bul_ey_001", repaired).passed
+    assert receipt["graph_bound_evidence_density_repairs"] == [
+        {
+            "bullet_id": "bul_ey_001",
+            "role_episode_bundle_id": "reb_ey_capital_optimization_solvency",
+            "reason": "graph_bound_evidence_density_completion",
+        }
+    ]
 
 
 def test_insurtech_graph_bound_model_surface_preserves_selected_outcome_detail() -> None:

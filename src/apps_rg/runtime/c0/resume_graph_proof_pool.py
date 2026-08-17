@@ -121,14 +121,23 @@ def load_frozen_whole_resume_source_plan(
         and str(row.get("section_id") or "") == section_id
         and str(row.get("root_id") or "").strip()
     }
-    source_roots = {
-        str(row.get("role_episode_bundle_id") or row.get("fact_id") or "").strip()
-        for row in source_plan.get("facts") or []
+    # ``facts`` is the compact selected projection.  The allocation may
+    # reserve another pre-authorized candidate from the C0.3 traversal
+    # universe, so checking assignments against only that compact list rejects
+    # valid sealed allocations.  Verify against the authority-bearing decision
+    # ledger instead; ``slice_section_plan_for_allocation`` subsequently
+    # verifies each exact root/skill/fact/metric path before using it.
+    source_authorized_roots = {
+        str(row.get("root_id") or row.get("candidate_id") or "").strip()
+        for row in source_plan.get("graph_candidate_decision_ledger") or []
         if isinstance(row, Mapping)
-        and str(row.get("role_episode_bundle_id") or row.get("fact_id") or "").strip()
+        and str(row.get("candidate_type") or "") == "role_episode_root"
+        and isinstance(row.get("authority"), Mapping)
+        and row["authority"].get("authority_pass") is True
+        and str(row.get("root_id") or row.get("candidate_id") or "").strip()
     }
-    if not assigned_roots or not assigned_roots.issubset(source_roots):
-        raise ValueError(f"{section_id}: frozen source plan root coverage mismatch")
+    if not assigned_roots or not assigned_roots.issubset(source_authorized_roots):
+        raise ValueError(f"{section_id}: frozen source-plan authority coverage mismatch")
     return source_plan
 
 

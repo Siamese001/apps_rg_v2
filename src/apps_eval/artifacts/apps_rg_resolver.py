@@ -288,6 +288,22 @@ def resolve_apps_rg_artifact(
                 expected_refs=expected_refs,
                 reason=payload_error,
             )
+        # The Apps RG live adapter verifies lane identity against separate,
+        # sealed RuntimeExhaust and L6 handoff receipts.  Preserve that
+        # verified binding while reopening the selected artifact bytes here;
+        # otherwise every lane payload loses its identity at this resolver
+        # boundary and coverage treats valid production evidence as anonymous.
+        if isinstance(first, dict):
+            indexed_payload = first.get("payload")
+            if (
+                isinstance(payload, dict)
+                and isinstance(indexed_payload, dict)
+                and isinstance(indexed_payload.get("source_identity"), dict)
+            ):
+                payload = {
+                    **payload,
+                    "source_identity": dict(indexed_payload["source_identity"]),
+                }
         return ResolvedAppsRgArtifact(
             artifact_role=role,
             artifact_ref=candidate.as_posix(),

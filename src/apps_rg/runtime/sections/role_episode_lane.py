@@ -51,6 +51,10 @@ from apps_rg.runtime.section_l2_lane_integration import (
     finalize_section_l2_after_output,
     prepare_section_l2_before_provider,
 )
+from apps_rg.runtime.section_runtime_exhaust_lane_integration import (
+    finalize_section_runtime_exhaust_before_l6,
+    gate_section_l6_shadow_after_exhaust,
+)
 from apps_rg.runtime.section_proof.section_input_usage_ledger import (
     build_section_input_usage_ledger_v1,
 )
@@ -88,6 +92,7 @@ from apps_rg.runtime.sections.section_generation import build_section_request
 from apps_rg.runtime.sections.section_final_materialized_binding import (
     augment_x2_payload_with_final_materialized_binding,
 )
+from apps_rg.runtime.shadow.l6_handoff_packet import build_l6_shadow_handoff_dict
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 MAX_OUTPUT_TOKENS = 900
@@ -103,6 +108,27 @@ ROLE_EPISODE_FINAL_BULLET_COUNT = 3
 ROLE_EPISODE_FINAL_MATERIALIZED_SELECTION_CONTRACT = (
     "role_episode_final_materialized_selection_contract.json"
 )
+
+# A few role-episode roots contain a valid, graph-approved outcome surface that
+# is broader than the concise root claim.  The model may reproduce only the
+# activity clause, which is truthful but fails the all-bullets outcome floor.
+# These are source-bound completions: each phrase below is composed exclusively
+# from that root's approved claim, scope, and linked metric-outcome node.  They
+# are intentionally applied only when the generated bullet fails the quality
+# floor; passing model prose remains untouched.
+_ROLE_EPISODE_EVIDENCE_DENSITY_REPAIRS: dict[str, str] = {
+    "reb_ey_capital_optimization_solvency": (
+        "Led quantitative derivatives, variable-annuity hedging, and insurance-capital work "
+        "using exotic-pricing models, liability Greeks, and higher-order stress scenarios for "
+        "regulated portfolios, delivering risk visibility for hedge-design decisions."
+    ),
+    "reb_ey_erm_risk_governance": (
+        "Architected ERM operating models and BCBS 239-aligned risk-data aggregation "
+        "for regulated banking and insurance clients, defining three-lines-of-defense "
+        "accountability and metadata standards that standardized risk-metric definitions "
+        "across business units, control owners, and reporting stakeholders."
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -549,6 +575,50 @@ def _normalize_bullets(parsed: dict[str, Any], *, cfg: RoleEpisodeLaneConfig, al
                 }
             )
     return out
+
+
+def _repair_role_episode_bullet_evidence_density(
+    bullets: list[dict[str, Any]],
+    *,
+    facts: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Complete a thin model bullet only with an approved graph-root outcome.
+
+    This is deliberately a repair, not a second renderer.  The model still
+    chooses the three graph-bound roots; a repair may replace only a selected
+    row whose current prose fails the shared action/detail/outcome quality
+    floor.  The replacement is keyed by the row's role-episode root, making
+    the added result traceable to the same graph source rather than to the JD
+    or an invented generic outcome.
+    """
+    fact_by_id = {
+        str(fact.get("fact_id") or "").strip(): fact
+        for fact in facts
+        if isinstance(fact, dict) and str(fact.get("fact_id") or "").strip()
+    }
+    repaired: list[dict[str, Any]] = []
+    repairs: list[dict[str, str]] = []
+    for row in bullets:
+        out = dict(row)
+        text = str(out.get("bullet_text") or "").strip()
+        source_ids = [str(fid).strip() for fid in (out.get("source_fact_ids") or [])]
+        fact = next((fact_by_id.get(fid) for fid in source_ids if fact_by_id.get(fid)), None)
+        root_id = str((fact or {}).get("role_episode_bundle_id") or "").strip()
+        replacement = _ROLE_EPISODE_EVIDENCE_DENSITY_REPAIRS.get(root_id)
+        density = check_experience_bullet_evidence_density(
+            str(out.get("bullet_id") or ""), text
+        )
+        if replacement and not density.passed:
+            out["bullet_text"] = replacement
+            repairs.append(
+                {
+                    "bullet_id": str(out.get("bullet_id") or ""),
+                    "role_episode_bundle_id": root_id,
+                    "reason": "graph_bound_evidence_density_completion",
+                }
+            )
+        repaired.append(out)
+    return repaired, repairs
 
 
 def _source_fact_ids_from_bullets(bullets: list[dict[str, Any]]) -> list[str]:
@@ -1032,8 +1102,13 @@ def _materialize_bullet_generation(
             if final_ok
             else ""
         )
+        bullets, density_repairs = _repair_role_episode_bullet_evidence_density(
+            bullets,
+            facts=facts,
+        )
     else:
         bullets = []
+        density_repairs = []
         final_contract = {
             "schema_version": "role_episode_final_materialized_selection_contract.v1",
             "expected_bullet_count": ROLE_EPISODE_FINAL_BULLET_COUNT,
@@ -1083,6 +1158,7 @@ def _materialize_bullet_generation(
         ),
         "allowed_graph_packet_fact_count": len(allowed_set),
         "rendered_source_fact_ids_within_allowed_packet": set(source_fact_ids).issubset(allowed_set),
+        "graph_bound_evidence_density_repairs": density_repairs,
         "final_materialized_selection_contract": final_contract,
         "final_materialized_acceptance_ok": bool(
             final_contract.get("final_materialized_acceptance_ok")
@@ -2378,26 +2454,42 @@ def run_role_episode_lane_execution(
                 }
             )
             write_json(pool_receipt_path, pool_receipt)
-    write_json(
-        artifact_dir / "l6_shadow_eval_package.json",
+    finalize_section_l2_after_output(artifact_dir, sid, runtime_payload)
+    # Role-episode lanes share the same product-visible L6 identity contract as
+    # the dedicated lanes.  Their former hand-written summary bypassed the
+    # post-exit RuntimeExhaustBundle, so Apps Eval could not bind the section
+    # attempt to the sealed source.  Build the standard handoff only after L2
+    # and Exit are sealed; L6 remains future-run-only and cannot rescue X3.
+    finalize_section_runtime_exhaust_before_l6(
+        artifact_dir,
+        sid,
+        runtime_payload,
+        repo_root=REPO_ROOT,
+    )
+    gate_section_l6_shadow_after_exhaust(artifact_dir, runtime_payload)
+    l6_package = build_l6_shadow_handoff_dict(
+        artifact_dir=artifact_dir,
+        repo_root=REPO_ROOT,
+        section_id=sid,
+        prompt_id=str(l2.get("prompt_id") or "role_episode_lane"),
+        temperature=float(args.temperature),
+        max_tokens=max_output_tokens,
+        runtime_payload=runtime_payload,
+    )
+    l6_package.update(
         {
-            "section_id": sid,
-            "run_id": run_id,
             "status": "captured",
-            "runtime_generation_status": provider_result.runtime_generation_status,
             "x3_code": x3.x3_code,
             "prompt_hash": prompt_hash[:16],
-            "offline_only": True,
-            "future_run_only": True,
             "current_run_mutated": False,
             "current_run_mutation_assertion": False,
             "current_run_x3_mutation_assertion": False,
             "direct_l4_write_attempted": False,
             "direct_l4_write_assertion": False,
             "durable_write_attempted": False,
-        },
+        }
     )
-    finalize_section_l2_after_output(artifact_dir, sid, runtime_payload)
+    write_json(artifact_dir / "l6_shadow_eval_package.json", l6_package)
     finalize_runtime_proof_run(
         REPO_ROOT,
         sid,

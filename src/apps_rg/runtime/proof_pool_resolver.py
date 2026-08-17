@@ -462,26 +462,37 @@ def _resolve_executive_summary_graph_only_proof_pool(
     graph_ref = str(graph_auth.get("graph_ref") or "")
     graph_digest = str(graph_auth.get("graph_digest") or "")
 
-    from apps_rg.runtime.sections.graph_role_episode_selector import (
-        build_selected_graph_evidence_plan_for_section,
+    from apps_rg.runtime.c0.resume_graph_proof_pool import (
+        load_frozen_whole_resume_source_plan,
     )
 
-    plan, ordered, allowed = build_selected_graph_evidence_plan_for_section(
-        repo_root=root,
-        section_id="executive_summary",
-        target_role=target_role,
-        jd_text=jd_text,
-        briefing_text=briefing_text,
-    )
-    plan = _sanitize_plan(plan)
-    plan = _maybe_apply_hybrid_informed_fact_plan_reorder(
-        plan,
-        section_id="executive_summary",
-        jd_text=jd_text,
-        briefing_text=briefing_text,
-        target_company=target_company,
-        target_role=target_role,
-    )
+    # C0.3 seals the source plan before phase-one dispatch.  Selection must
+    # not be repeated here: a repeat can change ranking or tie order and
+    # create a proof pool that no longer matches the frozen allocation.
+    frozen_plan = load_frozen_whole_resume_source_plan("executive_summary")
+    if frozen_plan is not None:
+        plan = _sanitize_plan(frozen_plan)
+    else:
+        from apps_rg.runtime.sections.graph_role_episode_selector import (
+            build_selected_graph_evidence_plan_for_section,
+        )
+
+        plan, _ordered, _allowed = build_selected_graph_evidence_plan_for_section(
+            repo_root=root,
+            section_id="executive_summary",
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+        )
+        plan = _sanitize_plan(plan)
+        plan = _maybe_apply_hybrid_informed_fact_plan_reorder(
+            plan,
+            section_id="executive_summary",
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+            target_company=target_company,
+            target_role=target_role,
+        )
     facts = list(plan.get("facts") or [])
     root_fact_ids = [str(f.get("fact_id") or "") for f in facts if f.get("fact_id")]
     ordered, allowed = build_allowed_fact_ids_for_plan_facts(facts)
@@ -704,6 +715,9 @@ def _resolve_generic_section_graph_skills_proof_pool(
 ) -> SectionProofPool:
     """Graph-skills product proof for headline / unify_* / ibm_* (P2 all-section)."""
     from apps_rg.runtime.c03_graphrag_bound import build_section_c03_graphrag_bound
+    from apps_rg.runtime.c0.resume_graph_proof_pool import (
+        load_frozen_whole_resume_source_plan,
+    )
     from apps_rg.runtime.section_graph_skills_proof_pool import (
         allocate_section_facts_from_graph_substrate,
         bind_selector_selected_skills_to_section_plan,
@@ -726,25 +740,32 @@ def _resolve_generic_section_graph_skills_proof_pool(
     graph_ref = str(graph_auth.get("graph_ref") or "")
     graph_digest = str(graph_auth.get("graph_digest") or "")
 
-    plan, ordered, allowed = allocate_section_facts_from_graph_substrate(
-        ledger=ledger,
-        taxonomy=taxonomy,
-        section_id=section_id,
-        target_company=target_company,
-        target_role=target_role,
-        jd_text=jd_text,
-        briefing_text=briefing_text,
-        ledger_path=ledger_path,
-        taxonomy_path=tax_path,
-    )
-    plan = bind_selector_selected_skills_to_section_plan(
-        plan,
-        repo_root=root,
-        section_id=section_id,
-        target_role=target_role,
-        jd_text=jd_text,
-        briefing_text=briefing_text,
-    )
+    # A whole-resume allocation has already selected and sealed this plan.
+    # Do not build an intermediate section plan and then replace it: that
+    # wastes a retrieval pass and still leaves room for a divergent selector.
+    frozen_plan = load_frozen_whole_resume_source_plan(section_id)
+    if frozen_plan is not None:
+        plan = _sanitize_plan(frozen_plan)
+    else:
+        plan, _ordered, _allowed = allocate_section_facts_from_graph_substrate(
+            ledger=ledger,
+            taxonomy=taxonomy,
+            section_id=section_id,
+            target_company=target_company,
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+            ledger_path=ledger_path,
+            taxonomy_path=tax_path,
+        )
+        plan = bind_selector_selected_skills_to_section_plan(
+            plan,
+            repo_root=root,
+            section_id=section_id,
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+        )
     facts = list(plan.get("facts") or [])
     ordered, allowed = build_allowed_fact_ids_for_plan_facts(facts)
     root_fact_ids = [str(f.get("fact_id") or "") for f in facts if f.get("fact_id")]
@@ -913,18 +934,29 @@ def _resolve_competencies_graph_skills_proof_pool(
         target_role=target_role,
         briefing_text=briefing_text,
     )
-    from apps_rg.runtime.sections.graph_role_episode_selector import (
-        build_selected_graph_evidence_plan_for_section,
+    from apps_rg.runtime.c0.resume_graph_proof_pool import (
+        load_frozen_whole_resume_source_plan,
     )
 
-    selected_graph_plan, _, _ = build_selected_graph_evidence_plan_for_section(
-        repo_root=root,
-        section_id="competencies",
-        target_role=target_role,
-        jd_text=jd_text,
-        briefing_text=briefing_text,
-    )
-    selected_graph_plan = _sanitize_plan(selected_graph_plan)
+    # As with Executive Summary, use the C0.3 plan sealed for this whole
+    # resume when one is active.  A standalone section has no frozen plan and
+    # continues to select normally.
+    frozen_plan = load_frozen_whole_resume_source_plan("competencies")
+    if frozen_plan is not None:
+        selected_graph_plan = _sanitize_plan(frozen_plan)
+    else:
+        from apps_rg.runtime.sections.graph_role_episode_selector import (
+            build_selected_graph_evidence_plan_for_section,
+        )
+
+        selected_graph_plan, _, _ = build_selected_graph_evidence_plan_for_section(
+            repo_root=root,
+            section_id="competencies",
+            target_role=target_role,
+            jd_text=jd_text,
+            briefing_text=briefing_text,
+        )
+        selected_graph_plan = _sanitize_plan(selected_graph_plan)
     plan = dict(selected_graph_plan)
     facts = list(plan.get("facts") or [])
     if not facts:

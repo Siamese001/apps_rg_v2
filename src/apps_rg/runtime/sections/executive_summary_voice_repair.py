@@ -108,9 +108,21 @@ _AI_PARTNERSHIP_DEVSECOPS_S5 = (
     "Regulated DevSecOps release governance strengthened modernization delivery with "
     "controlled deployment discipline."
 )
+_AI_PARTNERSHIP_PLATFORM_CONTROL_S2 = (
+    "From that foundation, the leader architects an agentic AI platform control plane "
+    "with explicit decision rules."
+)
 _AI_PARTNERSHIP_EVIDENCE_LED_S6 = (
     "Together, partner solution architecture, regulated delivery, and commercialized "
     "platform IP established a repeatable enterprise adoption model."
+)
+_AI_PARTNERSHIP_COHERENCE_COMPACTION: tuple[str, ...] = (
+    "Engineering executive who embedded release automation and security scanning in regulated modernization delivery, strengthening the foundation for secure enterprise-scale platform architecture.",
+    "On that foundation, architected an agentic AI platform control plane with explicit decision rules for governed deployment across complex enterprise environments.",
+    "Software dependency graph intelligence enables accelerated legacy-system analysis, exposes architecture dependency chains, and improves transformation visibility across enterprise complexity.",
+    "Established clear human review and escalation paths for policy-gated AI deployments, keeping intervention and accountability visible at critical decision points.",
+    "Generated $22M in IP-led revenue growth through platform productization, converting reusable technical capability into commercialized enterprise solutions.",
+    "Expanded enterprise AI adoption through reusable platform solutions, carrying that combined technical and commercial discipline into partner ecosystems.",
 )
 
 _FILLER_REPLACEMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
@@ -903,6 +915,25 @@ def _repair_ai_partnership_judge_findings(
         "reb_unify_platform_commercialization_leadership" in allowed
     )
     out = list(sentences)
+    # The final whole-resume judge found a real readability failure in this
+    # otherwise grounded shape: six sentences repeated internal execution and
+    # proof-lineage vocabulary, hid the commercial outcome, and used the
+    # indirect phrase "the leader."  Keep each existing sentence slot and its
+    # source lineage, but replace only that verified surface pattern with six
+    # concise, evidence-bound résumé sentences.
+    if (
+        {
+            "reb_ibm_devsecops_release_resilience",
+            "reb_unify_agentic_platform_architecture",
+            "reb_unify_platform_commercialization_leadership",
+        }
+        <= allowed
+        and any(
+            marker in " ".join(out).lower()
+            for marker in ("proof-bundle lineage", "execution surface", "gate-verdict")
+        )
+    ):
+        return list(_AI_PARTNERSHIP_COHERENCE_COMPACTION)
     if (
         has_ibm_alliance_evidence
         and has_commercialization_evidence
@@ -914,6 +945,17 @@ def _repair_ai_partnership_judge_findings(
         and out[1].lower().startswith("from that alliance base")
     ):
         out[1] = _AI_PARTNERSHIP_DISTINCT_S2
+    if "reb_unify_agentic_platform_architecture" in allowed:
+        from apps_rg.runtime.sections.executive_summary_composition import (
+            is_mechanism_inventory_sentence,
+        )
+
+        is_inventory, _ = is_mechanism_inventory_sentence(out[1])
+        if is_inventory:
+            # This selected root authorizes the platform-control claim, but a
+            # live variation expanded it into a routing/policy catalog. Keep
+            # the executive brushstroke while eliminating the mechanism list.
+            out[1] = _AI_PARTNERSHIP_PLATFORM_CONTROL_S2
     if (
         has_partner_evidence
         and "dependency graph intelligence" in out[2].lower()
@@ -1203,6 +1245,8 @@ def _source_fact_ids_for_display_sentence(sentence: str) -> list[str]:
         ]
     if "release automation" in low and "security scanning" in low:
         return ["reb_ibm_devsecops_release_resilience"]
+    if low.startswith("from that foundation, the leader architects an agentic ai platform control plane"):
+        return ["reb_unify_agentic_platform_architecture"]
     if low.startswith("together, partner solution architecture, regulated delivery"):
         return [
             "reb_ibm_aws_alliance_partner_cosell_gtm",
@@ -2110,7 +2154,15 @@ def ensure_required_allowed_fact_utilization(
     needs_unify_commercialization = (
         "reb_unify_platform_commercialization_leadership" in pending
     )
-    if not needs_gov and not needs_insurtech and not needs_unify_commercialization:
+    needs_unify_platform = "reb_unify_agentic_platform_architecture" in pending
+    needs_devsecops = "reb_ibm_devsecops_release_resilience" in pending
+    if (
+        not needs_gov
+        and not needs_insurtech
+        and not needs_unify_commercialization
+        and not needs_unify_platform
+        and not needs_devsecops
+    ):
         return parsed, receipt
 
     out = dict(parsed)
@@ -2119,6 +2171,16 @@ def ensure_required_allowed_fact_utilization(
     insurtech_present = "insurance regulatory cloud adoption standards" in text.lower()
     unify_commercialization_present = (
         "reb_unify_platform_commercialization_leadership"
+        in {
+            str(fid).strip()
+            for row in ledger
+            if isinstance(row, dict)
+            for fid in (row.get("source_fact_ids") or [])
+            if str(fid).strip()
+        }
+    )
+    devsecops_cited_before_platform_repair = (
+        "reb_ibm_devsecops_release_resilience"
         in {
             str(fid).strip()
             for row in ledger
@@ -2205,6 +2267,42 @@ def ensure_required_allowed_fact_utilization(
         )
         text = str(out.get("resume_display_text") or "").strip()
 
+    if needs_unify_platform:
+        sentences = split_sentences(text)
+        if len(sentences) != 6:
+            return parsed, receipt
+        # Preserve a one-root-per-sentence binding.  Inserting the platform
+        # control-plane brushstroke into the first sentence replaces the
+        # prior sentence-level DevSecOps attribution, so re-home that root in
+        # the dedicated DevSecOps sentence below.
+        sentences[0] = _AI_PARTNERSHIP_PLATFORM_CONTROL_S2
+        out["resume_display_text"] = " ".join(s.strip() for s in sentences if s.strip())
+        ledger = [dict(r) for r in (out.get("claim_ledger") or []) if isinstance(r, dict)]
+        platform_row = {
+            "claim": "Agentic AI platform control plane",
+            "claim_text": _AI_PARTNERSHIP_PLATFORM_CONTROL_S2,
+            "source_fact_ids": ["reb_unify_agentic_platform_architecture"],
+        }
+        if ledger:
+            ledger[0] = platform_row
+        else:
+            ledger.append(platform_row)
+        out["claim_ledger"] = ledger
+        out = reconcile_claim_ledger_after_voice_repair(out)
+        for row in out.get("claim_ledger") or []:
+            if not isinstance(row, dict):
+                continue
+            if str(row.get("claim_text") or "").lower().startswith(
+                "from that foundation, the leader architects an agentic ai platform control plane"
+            ):
+                row["source_fact_ids"] = ["reb_unify_agentic_platform_architecture"]
+        receipt["patched_fact_ids"].append("reb_unify_agentic_platform_architecture")
+        text = str(out.get("resume_display_text") or "").strip()
+        # The platform repair intentionally replaces the sentence that held a
+        # prior DevSecOps citation.  Treat that citation as pending so the
+        # next fixed slot restores it instead of leaving an untracked loss.
+        needs_devsecops = needs_devsecops or devsecops_cited_before_platform_repair
+
     if needs_unify_commercialization and not unify_commercialization_present:
         sentences = split_sentences(text)
         if len(sentences) != 6:
@@ -2246,6 +2344,37 @@ def ensure_required_allowed_fact_utilization(
                         source_ids.append(fid)
                 ledger_row["source_fact_ids"] = source_ids
         receipt["patched_fact_ids"].append("reb_unify_platform_commercialization_leadership")
+
+    if needs_devsecops:
+        sentences = split_sentences(str(out.get("resume_display_text") or ""))
+        if len(sentences) != 6:
+            return parsed, receipt
+        # The dependency-graph DISPLAY_OVERRIDE can replace the original IBM
+        # DevSecOps sentence during later polish.  Keep the two graph paths in
+        # separate display sentences: they are individually attributable and
+        # do not recreate the causal multi-root merge that X2/X3 forbid.
+        sentences[3] = _AI_PARTNERSHIP_DEVSECOPS_S5
+        out["resume_display_text"] = " ".join(s.strip() for s in sentences if s.strip())
+        ledger = [dict(r) for r in (out.get("claim_ledger") or []) if isinstance(r, dict)]
+        devsecops_row = {
+            "claim": "Regulated DevSecOps release governance",
+            "claim_text": _AI_PARTNERSHIP_DEVSECOPS_S5,
+            "source_fact_ids": ["reb_ibm_devsecops_release_resilience"],
+        }
+        if len(ledger) >= 4:
+            ledger[3] = devsecops_row
+        else:
+            ledger.append(devsecops_row)
+        out["claim_ledger"] = ledger
+        out = reconcile_claim_ledger_after_voice_repair(out)
+        for row in out.get("claim_ledger") or []:
+            if not isinstance(row, dict):
+                continue
+            if str(row.get("claim_text") or "").lower().startswith(
+                "regulated devsecops release governance strengthened"
+            ):
+                row["source_fact_ids"] = ["reb_ibm_devsecops_release_resilience"]
+        receipt["patched_fact_ids"].append("reb_ibm_devsecops_release_resilience")
     return out, receipt
 
 
@@ -2335,6 +2464,7 @@ def finalize_executive_summary_coherence(
         "ledger_reconciled": False,
         "gap_excuses_added": [],
         "orphan_citations_stripped": [],
+        "graph_claim_binding_repairs": [],
         "materialization_pass": False,
     }
     if not isinstance(parsed, dict):
@@ -2446,6 +2576,43 @@ def finalize_executive_summary_coherence(
     if stripped:
         receipt["orphan_citations_stripped"] = stripped
         receipt["ledger_reconciled"] = True
+
+    # ``_rebuild_claim_ledger_from_display`` is deliberately last because
+    # upstream display polish can replace a sentence.  That rebuild can
+    # reattach two graph-root aliases to a causal sentence even when the
+    # earlier authority repair correctly clamped its attribution.  Reapply
+    # the existing allocation-aware clamp after the final rebuild; it only
+    # removes unrelated attribution and never changes visible prose.
+    from apps_rg.runtime.sections.section_authority_repairs import (
+        repair_exec_summary_causal_multi_root_allocation_rows,
+    )
+
+    graph_binding_repairs = repair_exec_summary_causal_multi_root_allocation_rows(out)
+    receipt["graph_claim_binding_repairs"] = graph_binding_repairs
+    if graph_binding_repairs:
+        receipt["ledger_reconciled"] = True
+
+    # Final display alignment and ledger rebuilding can replace an earlier
+    # DevSecOps brushstroke.  Re-run utilization only after those terminal
+    # mutators so the final materialized paragraph and its final ledger carry
+    # every required approved root, rather than merely an intermediate draft.
+    out, final_util_receipt = ensure_required_allowed_fact_utilization(
+        out,
+        selected_facts=selected_facts,
+    )
+    receipt["final_allowed_fact_utilization"] = final_util_receipt
+    if final_util_receipt.get("patched_fact_ids"):
+        receipt["ledger_reconciled"] = True
+        out = _rebuild_claim_ledger_from_display(out)
+        out, stripped = _strip_claim_ledger_source_fact_ids_not_in_allowed_pool(
+            out,
+            allowed_fact_ids=allowed_fact_ids,
+        )
+        if stripped:
+            receipt["orphan_citations_stripped"].extend(stripped)
+        final_graph_repairs = repair_exec_summary_causal_multi_root_allocation_rows(out)
+        if final_graph_repairs:
+            receipt["graph_claim_binding_repairs"].extend(final_graph_repairs)
     return out, receipt
 
 

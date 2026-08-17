@@ -353,6 +353,9 @@ def _l1_schema_bound_verdict(payload: Any) -> tuple[str, str, Any, Any]:
     data = _dict_payload(payload)
     if data is None:
         return "UNKNOWN", "l1 profile exists but could not be parsed as an object", payload, "schema-bound L1 profile object"
+    plan_contract = data.get("plan_contract")
+    if isinstance(plan_contract, dict):
+        data = plan_contract
     explicit = _bool_field(data, "schema_bound", "profile_schema_bound", "l1_schema_bound")
     observed = {
         "schema_bound": explicit,
@@ -366,7 +369,7 @@ def _l1_schema_bound_verdict(payload: Any) -> tuple[str, str, Any, Any]:
     }
     if explicit is False:
         return "FAIL", "l1 profile explicitly reports schema_bound=false", observed, "schema_bound true"
-    if explicit is True or str(observed["schema_version"] or "").startswith("apps_rg."):
+    if explicit is True or str(observed["schema_version"] or "").startswith(("apps_rg.", "apps_rg_")):
         return "PASS", "l1 profile is schema-bound", observed, "schema version or schema_bound true"
     if observed["route_id_present"] and observed["task_spec_present"] and observed["query_spec_present"]:
         return "PASS", "l1 plan contract binds route, task, and query", observed, "schema-bound route/task/query contract"
@@ -398,6 +401,7 @@ def _c0_materiality_verdict(payload: Any) -> tuple[str, str, Any, Any]:
     data = _dict_payload(payload)
     if data is None:
         return "UNKNOWN", "c0 evidence manifest exists but could not be parsed as an object", payload, "material evidence manifest object"
+    signals = data.get("signals") if isinstance(data.get("signals"), dict) else {}
     explicit = _bool_field(data, "materiality_present", "evidence_materiality_present", "has_material_evidence")
     c0_required = _bool_field(data, "c0_required")
     bypass_reason = str(data.get("c0_bypass_reason") or "").strip()
@@ -409,7 +413,7 @@ def _c0_materiality_verdict(payload: Any) -> tuple[str, str, Any, Any]:
         + _count_nonempty(data.get("claims"))
         + _count_nonempty(data.get("facts"))
     )
-    materiality_count = data.get("materiality_count")
+    materiality_count = data.get("materiality_count") or signals.get("c0_evidence_item_count")
     try:
         support += int(materiality_count or 0)
     except (TypeError, ValueError):
@@ -424,7 +428,7 @@ def _c0_materiality_verdict(payload: Any) -> tuple[str, str, Any, Any]:
     }
     if explicit is False:
         return "FAIL", "c0 evidence manifest explicitly reports missing materiality", observed, "material support count > 0"
-    if explicit is True or support > 0:
+    if explicit is True or support > 0 or signals.get("c0_support_status") == "PASS":
         return "PASS", "c0 evidence materiality is present", observed, "material support count > 0"
     if c0_required is False and bypass_reason and deterministic_digest:
         return "PASS", "c0 receipt explicitly records deterministic preloaded-context bypass", observed, "material evidence or explicit deterministic bypass"
@@ -435,6 +439,7 @@ def _pa_evidence_as_data_verdict(payload: Any) -> tuple[str, str, Any, Any]:
     data = _dict_payload(payload)
     if data is None:
         return "UNKNOWN", "compiled prompt artifact exists but could not be parsed as an object", payload, "prompt assembly receipt object"
+    signals = data.get("signals") if isinstance(data.get("signals"), dict) else {}
     explicit = _bool_field(data, "evidence_as_data", "evidence_as_data_bound", "pa_evidence_as_data")
     wrong_slot = _bool_field(data, "evidence_in_instruction_slot", "evidence_in_system_slot", "evidence_as_instruction")
     prompt_required = _bool_field(data, "prompt_assembly_required")
@@ -456,6 +461,12 @@ def _pa_evidence_as_data_verdict(payload: Any) -> tuple[str, str, Any, Any]:
         return "FAIL", "prompt assembly places evidence in an authority/instruction slot", observed, "evidence bound as data"
     if explicit is True or observed["evidence_slot_present"]:
         return "PASS", "prompt assembly binds evidence as data", observed, "evidence bound as data"
+    if (
+        signals.get("pa_consumed_c0") is True
+        and signals.get("pa_evidence_data_only") is True
+        and signals.get("pa_schema_bound") is True
+    ):
+        return "PASS", "whole-run evidence confirms every section prompt binds C0 as data", observed, "evidence bound as data"
     if prompt_required is False and bypass_reason and deterministic_digest:
         return "PASS", "prompt assembly receipt explicitly records deterministic no-model bypass", observed, "evidence bound as data or explicit deterministic bypass"
     return "FAIL", "prompt assembly is missing evidence-as-data binding fields", observed, "evidence bound as data"
