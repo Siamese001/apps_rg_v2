@@ -138,6 +138,26 @@ def test_deterministic_mode_runs_full_contract_without_live_hooks(monkeypatch, t
     }
 
 
+def test_run_inline_outputs_are_mandatory_when_a_run_fails_before_artifacts(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        "apps_rg.__main__.run_canonical_apps_rg_from_cli_primitives",
+        lambda **_kwargs: {
+            "exit_status": "error",
+            "outcome_authorized": False,
+            "artifact_dir": "C:/not-a-real-run",
+            "error": "injected failure",
+        },
+    )
+
+    assert main(["run"]) == 1
+    captured = capsys.readouterr()
+    assert "FULL_RESUME\n```markdown\nUNAVAILABLE: run artifact directory is unavailable" in captured.out
+    assert "EVALS\n```json" in captured.out
+    assert '"status": "UNAVAILABLE"' in captured.out
+    assert "RUNTIME_DETAILS\n```json" in captured.out
+    assert "APPS_RG_ERROR injected failure" in captured.err
+
+
 def test_live_provider_timeout_is_recorded_as_a_failed_attempt(monkeypatch, tmp_path: Path) -> None:
     """A dispatched provider call must remain observable when it raises."""
     monkeypatch.setenv("OPENAI_API_KEY", "test-openai-key")
@@ -411,6 +431,20 @@ def test_internal_eval_and_show_helpers_use_completed_artifacts_without_provider
 
     assert bare_pipeline.evaluate_bare_run(run_dir)["status"] == "PASS"
     assert bare_pipeline.read_bare_artifact(run_dir, "resume") == expected_resume
+
+
+def test_zero_argument_cli_routes_to_the_canonical_live_run(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    def fake_run(**kwargs):
+        captured.update(kwargs)
+        return {"exit_status": "success", "outcome_authorized": True, "artifact_dir": ""}
+
+    monkeypatch.setattr("apps_rg.__main__.run_canonical_apps_rg_from_cli_primitives", fake_run)
+
+    assert main([]) == 0
+    assert captured["target_company"] == bare_pipeline.DEFAULT_TARGET_COMPANY
+    assert captured["target_role"] == bare_pipeline.DEFAULT_TARGET_ROLE
 
 
 def test_replay_detects_tampered_resume_artifact(tmp_path: Path) -> None:

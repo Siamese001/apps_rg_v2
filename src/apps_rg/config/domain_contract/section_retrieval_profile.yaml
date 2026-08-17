@@ -41,7 +41,9 @@ source_authority_defaults:
 # Phase 2 sparse/exact lane — mandatory for apps_rg when APPS_RG_C0_DENSE_SPARSE_MANDATORY=1 (default).
 sparse_lane_defaults:
   sparse_enabled: true
-  sparse_top_k: 5
+  # Keep the candidate fan-out aligned with the retrieval evaluation gate.
+  # Visible resume-section limits are applied later by the graph selector.
+  sparse_top_k: 10
   sparse_lane_id: ""
   sparse_collection_ref: fact_vectors
   sparse_index_ref: fact_vectors
@@ -63,8 +65,8 @@ sections:
       - jd_payload.jd_text
     exact_match_fields:
       - jd_payload.jd_text
-    dense_top_k: 3
-    max_k: 3
+    dense_top_k: 10
+    max_k: 10
     support_target: high
     allowed_collections: [fact_vectors]
     required_metadata_filters:
@@ -105,8 +107,8 @@ sections:
       - jd_payload.jd_text
     exact_match_fields:
       - jd_payload.jd_text
-    dense_top_k: 3
-    max_k: 3
+    dense_top_k: 10
+    max_k: 10
     support_target: high
     allowed_collections: [fact_vectors]
     required_metadata_filters:
@@ -146,8 +148,8 @@ sections:
       - jd_payload.jd_text
     exact_match_fields:
       - jd_payload.jd_text
-    dense_top_k: 3
-    max_k: 3
+    dense_top_k: 10
+    max_k: 10
     support_target: high
     allowed_collections: [fact_vectors]
     required_metadata_filters:
@@ -187,8 +189,8 @@ sections:
       - resume_payload.unify_bullets
       - resume_payload.experience
       - jd_payload.jd_text
-    dense_top_k: 3
-    max_k: 3
+    dense_top_k: 10
+    max_k: 10
     support_target: high
     allowed_collections: [fact_vectors]
     required_metadata_filters:
@@ -230,8 +232,8 @@ sections:
       - jd_payload.jd_text
     exact_match_fields:
       - jd_payload.jd_text
-    dense_top_k: 3
-    max_k: 3
+    dense_top_k: 10
+    max_k: 10
     support_target: high
     allowed_collections: [fact_vectors]
     required_metadata_filters:
@@ -271,8 +273,8 @@ sections:
       - resume_payload.ibm_bullets
       - resume_payload.experience
       - jd_payload.jd_text
-    dense_top_k: 3
-    max_k: 3
+    dense_top_k: 10
+    max_k: 10
     support_target: high
     allowed_collections: [fact_vectors]
     required_metadata_filters:
@@ -314,8 +316,8 @@ sections:
       - jd_payload.jd_text
     exact_match_fields:
       - jd_payload.jd_text
-    dense_top_k: 3
-    max_k: 3
+    dense_top_k: 10
+    max_k: 10
     support_target: high
     allowed_collections: [fact_vectors]
     required_metadata_filters:

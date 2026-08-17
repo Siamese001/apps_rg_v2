@@ -27,6 +27,9 @@ from apps_rg.runtime.providers.anthropic_prompt_cache import (
 )
 from apps_rg.runtime.reasoning.bullet_lane_self_consistency import SelfConsistencyPath
 from apps_rg.runtime.judges.employment_bullet_judge_rubric import pool_selector_scoring_instruction
+from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+    check_experience_bullet_evidence_density,
+)
 from apps_rg.runtime.reasoning.competencies_graph_pool import (
     COMPETENCIES_CANDIDATE_CATEGORY_COUNT,
     COMPETENCIES_FINAL_CATEGORY_COUNT,
@@ -429,6 +432,20 @@ def _selector_valid_bullet_paths(
                         "bullet_id": bid,
                         "reason": "source_fact_id_not_allowed",
                         "source_fact_ids": blocked,
+                    }
+                )
+                continue
+            density = check_experience_bullet_evidence_density(
+                bid,
+                str(bullet.get("bullet_text") or ""),
+            )
+            if not density.passed:
+                path_row["rejections"].append(
+                    {
+                        "bullet_id": bid,
+                        "reason": "experience_bullet_evidence_density_required",
+                        "failure_reason": density.failure_reason,
+                        "signals": list(density.signals),
                     }
                 )
                 continue

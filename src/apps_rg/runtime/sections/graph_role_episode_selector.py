@@ -88,6 +88,25 @@ _ROLE_EMPLOYER_WEIGHTS: dict[str, dict[str, float]] = {
     "balanced_enterprise_ai": {"unify": 0.75, "ibm": 0.70, "insurtech": 0.55, "ey": 0.45},
 }
 
+# A role episode is always admitted by graph authority before it reaches this
+# selector.  These requirement ids therefore describe *targeting coverage*,
+# never claim authority.  They deliberately use stable ids rather than the
+# varied phrases emitted by job descriptions and graph bundles.
+_CANONICAL_REQUIREMENT_PATTERNS: dict[str, tuple[str, ...]] = {
+    "partner_cosell": ("co-sell", "co sell", "co-selling", "joint gtm", "joint go to market"),
+    "hyperscaler_alliance": ("hyperscaler", "aws alliance", "cloud alliance", "strategic alliance"),
+    "si_enablement": ("systems integrator", "system integrator", " si ", "sis", "isv", "partner enablement"),
+    "solution_architecture": ("solution architecture", "reference architecture", "applied ai architecture"),
+    "deployment_adoption": ("deployment", "adoption", "production rollout", "go live"),
+    "partner_gtm": ("partner gtm", "partner motion", "channel", "ecosystem", "partner-led"),
+}
+
+# Employer history remains useful when two candidates offer materially the
+# same evidence.  It is intentionally too small to reserve a root slot ahead
+# of a stronger candidate from another employer.
+_EMPLOYER_TIEBREAK_WEIGHT = 0.05
+_REQUIREMENT_COVERAGE_BONUS = 1.25
+
 _CAPS_BY_BAND: dict[str, dict[str, tuple[int, int]]] = {
     "executive_summary": {
         "primary": (5, 3),
@@ -358,6 +377,158 @@ def _allocate_employer_root_budgets(
 
 def _normalized_text(value: str) -> str:
     return " ".join(_WORD_RE.findall(str(value or "").casefold().replace("_", " ")))
+
+
+def _canonical_requirement_ids(value: str) -> tuple[str, ...]:
+    """Return the stable target-requirement ids evidenced by ``value``.
+
+    This is deliberately a small, deterministic normalizer.  It makes the JD
+    requirement -> selected graph-path mapping inspectable without granting a
+    JD phrase any claim authority.
+    """
+
+    normalized = f" {_normalized_text(value)} "
+    return tuple(
+        requirement_id
+        for requirement_id, patterns in _CANONICAL_REQUIREMENT_PATTERNS.items()
+        if any(f" {_normalized_text(pattern)} " in normalized for pattern in patterns)
+    )
+
+
+def _root_requirement_ids(root: dict[str, Any]) -> tuple[str, ...]:
+    """Extract targetable requirement ids from an already-authorized root."""
+
+    bundle = root["bundle"]
+    parts = [
+        str(bundle.get("role_episode_bundle_id") or ""),
+        str(bundle.get("bundle_theme") or ""),
+        str(bundle.get("claim_text") or ""),
+        str(bundle.get("claim_action") or ""),
+        str(bundle.get("claim_scope") or ""),
+        str(bundle.get("claim_outcome") or ""),
+    ]
+    for skill in root.get("skills") or []:
+        if not skill.get("authority", {}).get("authority_pass"):
+            continue
+        row = skill.get("row") or {}
+        parts.extend(
+            [
+                str(skill.get("candidate_id") or ""),
+                str(row.get("label") or row.get("name") or ""),
+                " ".join(str(value) for value in row.get("allowed_phrases") or []),
+            ]
+        )
+    for metric in root.get("metrics") or []:
+        if not metric.get("authority", {}).get("authority_pass"):
+            continue
+        node = metric.get("node") or {}
+        parts.extend(
+            [
+                str(metric.get("candidate_id") or ""),
+                str(node.get("metric") or node.get("claim_text") or ""),
+                " ".join(str(value) for value in node.get("surface_tokens") or []),
+            ]
+        )
+    return _canonical_requirement_ids("\n".join(parts))
+
+
+def _select_shared_roots_with_requirement_coverage(
+    *,
+    eligible_roots: list[dict[str, Any]],
+    required_requirement_ids: tuple[str, ...],
+    employer_weights: dict[str, float],
+    max_items: int,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Select shared-section root slots globally, not by employer quota.
+
+    All rows are already graph-authorized.  The selector first rewards a root
+    that covers an unmet JD requirement, then uses the existing job-fit score
+    and a deliberately small employer tie-break.  This keeps an employer from
+    reserving a slot for a weaker root while retaining useful career diversity.
+    """
+
+    required = set(required_requirement_ids)
+    remaining = list(eligible_roots)
+    selected: list[dict[str, Any]] = []
+    covered: set[str] = set()
+    trace: list[dict[str, Any]] = []
+
+    ranked_by_fit = sorted(
+        eligible_roots,
+        key=lambda row: (
+            -float(row.get("ranking_score") or 0.0),
+            str(row["bundle"].get("role_episode_bundle_id") or ""),
+        ),
+    )
+    for index, root in enumerate(ranked_by_fit, start=1):
+        root["job_fit_rank"] = index
+
+    while remaining and len(selected) < max_items:
+        scored: list[tuple[float, float, float, str, dict[str, Any], set[str]]] = []
+        for root in remaining:
+            requirement_ids = set(root.get("canonical_requirement_ids") or ())
+            new_requirement_ids = (requirement_ids & required) - covered
+            job_fit_score = float(root.get("ranking_score") or 0.0)
+            employer_tiebreak = float(employer_weights.get(root["employer_lane"], 0.0)) * _EMPLOYER_TIEBREAK_WEIGHT
+            selection_score = round(
+                job_fit_score
+                + (len(new_requirement_ids) * _REQUIREMENT_COVERAGE_BONUS)
+                + employer_tiebreak,
+                6,
+            )
+            scored.append(
+                (
+                    selection_score,
+                    job_fit_score,
+                    employer_tiebreak,
+                    str(root["bundle"].get("role_episode_bundle_id") or ""),
+                    root,
+                    new_requirement_ids,
+                )
+            )
+        selection_score, job_fit_score, employer_tiebreak, bundle_id, root, gained = sorted(
+            scored,
+            key=lambda item: (-item[0], -item[1], -item[2], item[3]),
+        )[0]
+        root["slot_selection_score"] = selection_score
+        root["slot_requirement_gain"] = sorted(gained)
+        root["slot_employer_tiebreak"] = round(employer_tiebreak, 6)
+        selected.append(root)
+        remaining.remove(root)
+        covered.update(gained)
+        trace.append(
+            {
+                "slot_index": len(selected),
+                "role_episode_bundle_id": bundle_id,
+                "job_fit_rank": root["job_fit_rank"],
+                "job_fit_score": round(job_fit_score, 6),
+                "requirement_gain": sorted(gained),
+                "employer_tiebreak": round(employer_tiebreak, 6),
+                "slot_selection_score": selection_score,
+            }
+        )
+
+    selected_ids = {
+        str(root["bundle"].get("role_episode_bundle_id") or "") for root in selected
+    }
+    for root in remaining:
+        root["slot_selection_score"] = round(float(root.get("ranking_score") or 0.0), 6)
+        root["slot_requirement_gain"] = []
+        root["slot_employer_tiebreak"] = round(
+            float(employer_weights.get(root["employer_lane"], 0.0)) * _EMPLOYER_TIEBREAK_WEIGHT,
+            6,
+        )
+        root["slot_rejection_reason"] = "global_root_budget_not_selected"
+
+    return selected, {
+        "strategy": "global_requirement_coverage_v1",
+        "max_root_slots": max_items,
+        "required_requirement_ids": sorted(required),
+        "covered_requirement_ids": sorted(covered),
+        "missing_requirement_ids": sorted(required - covered),
+        "selected_root_ids": sorted(selected_ids),
+        "slot_decisions": trace,
+    }
 
 
 def _alignment_score(target_blob: str, candidate_blob: str) -> float:
@@ -763,6 +934,7 @@ def build_selected_graph_evidence_plan_for_section(
             if str(root_id).strip()
         }
     target_blob = f"{target_role}\n{jd_text}\n{briefing_text}"
+    required_requirement_ids = _canonical_requirement_ids(target_blob)
     briefing_signal_packet = {
         **extract_briefing_signal_packet(briefing_text),
         "role_family_key": target_role_profile,
@@ -799,9 +971,11 @@ def build_selected_graph_evidence_plan_for_section(
             briefing_signal_packet=briefing_signal_packet,
         )
         root["target_alignment_score"] = root_alignment
-        root["ranking_score"] = round(
-            root_alignment + employer_weights.get(root["employer_lane"], 0.0), 6
-        )
+        # Employer affinity must never reserve a root slot ahead of a more
+        # relevant graph-approved candidate.  Keep it as a small deterministic
+        # tie-break only during shared-section slot selection.
+        root["ranking_score"] = round(root_alignment, 6)
+        root["canonical_requirement_ids"] = _root_requirement_ids(root)
         for skill in authorized_skills:
             proof = _skill_proof_strength(skill["row"])
             alignment = _skill_target_score(skill["row"], skill["candidate_id"], target_blob)
@@ -820,12 +994,6 @@ def build_selected_graph_evidence_plan_for_section(
 
     if not eligible_roots:
         raise ValueError(f"selected graph evidence plan has no authority-passing roots for {section_id!r}")
-
-    by_employer: dict[str, list[dict[str, Any]]] = {}
-    for root in eligible_roots:
-        by_employer.setdefault(root["employer_lane"], []).append(root)
-    for rows in by_employer.values():
-        rows.sort(key=lambda row: (-float(row["ranking_score"]), str(row["bundle"].get("role_episode_bundle_id") or "")))
 
     max_items = int(
         limit
@@ -874,21 +1042,11 @@ def build_selected_graph_evidence_plan_for_section(
             "ranked_remainder": max_items - len(required_unify_root_ids),
         }
     elif section_id in _SHARED_SECTION_LIMITS:
-        budgets = _allocate_employer_root_budgets(
-            candidates_by_employer=by_employer,
+        selected_roots, budgets = _select_shared_roots_with_requirement_coverage(
+            eligible_roots=eligible_roots,
+            required_requirement_ids=required_requirement_ids,
             employer_weights=employer_weights,
             max_items=max_items,
-        )
-        selected_roots: list[dict[str, Any]] = []
-        for employer in sorted(budgets, key=lambda value: (-employer_weights.get(value, 0.0), value)):
-            selected_roots.extend(by_employer[employer][: budgets[employer]])
-        selected_roots.sort(
-            key=lambda row: (
-                -employer_weights.get(row["employer_lane"], 0.0),
-                -float(row["ranking_score"]),
-                row["employer_lane"],
-                str(row["bundle"].get("role_episode_bundle_id") or ""),
-            )
         )
     else:
         budgets = {}
@@ -959,10 +1117,18 @@ def build_selected_graph_evidence_plan_for_section(
             root_reason = [
                 "selected_by_required_unify_slot_bundle_map"
                 if bundle_id in required_unify_root_ids
-                else "selected_by_authority_then_rank"
+                else (
+                    "selected_by_global_requirement_coverage"
+                    if section_id in _SHARED_SECTION_LIMITS
+                    else "selected_by_authority_then_rank"
+                )
             ]
         else:
-            root_reason = ["root_budget_not_selected"]
+            root_reason = [
+                "global_root_budget_not_selected"
+                if section_id in _SHARED_SECTION_LIMITS
+                else "root_budget_not_selected"
+            ]
         root_decision = build_candidate_decision(
             section_id=section_id,
             candidate_id=bundle_id,
@@ -995,6 +1161,11 @@ def build_selected_graph_evidence_plan_for_section(
                 ],
                 "graph_skill_node_ids": [row["candidate_id"] for row in root["skills"]],
                 "metric_outcome_ids": [row["candidate_id"] for row in root["metrics"]],
+                "job_fit_rank": root.get("job_fit_rank"),
+                "canonical_requirement_ids": list(root.get("canonical_requirement_ids") or []),
+                "slot_requirement_gain": list(root.get("slot_requirement_gain") or []),
+                "slot_employer_tiebreak": root.get("slot_employer_tiebreak"),
+                "slot_selection_score": root.get("slot_selection_score"),
             },
         )
         decisions.append(root_decision)
@@ -1381,8 +1552,20 @@ def build_selected_graph_evidence_plan_for_section(
         "graph_weight_profile": {
             "profile": target_role_profile,
             "employer_weights": employer_weights,
-            "selection_model": "authority_first_full_sibling_ranking_v2",
+            "selection_model": "authority_first_global_requirement_coverage_v1",
         },
+        "canonical_jd_requirement_ids": list(required_requirement_ids),
+        "requirement_coverage": (
+            budgets
+            if section_id in _SHARED_SECTION_LIMITS
+            else {
+                "strategy": "section_local_ranking",
+                "required_requirement_ids": list(required_requirement_ids),
+                "covered_requirement_ids": [],
+                "missing_requirement_ids": list(required_requirement_ids),
+                "slot_decisions": [],
+            }
+        ),
         "selected_employer_roots": selected_employer_roots,
         "employer_root_weights": employer_root_weights,
         "root_weight_bands": root_weight_bands,
@@ -1414,10 +1597,11 @@ def build_selected_graph_evidence_plan_for_section(
             "selected_skill_counts_by_employer": dict(selected_skill_counts_by_employer),
             "selected_metric_counts_by_employer_before_floor": dict(selected_metric_counts_by_employer_before_floor),
             "selected_metric_counts_by_employer": dict(selected_metric_counts_by_employer),
-            "employer_root_budgets": budgets,
+            "root_slot_selection": budgets,
             "max_raw_skill_count_employer": raw_max_emp,
             "max_selected_skill_count_employer": selected_max_emp,
-            "selection_normalized_by_employer_root_cap": section_id in _SHARED_SECTION_LIMITS,
+            "selection_normalized_by_employer_root_cap": False,
+            "selection_uses_global_requirement_coverage": section_id in _SHARED_SECTION_LIMITS,
             "metric_caps_by_root_before_floor": metric_caps_by_root_before_floor,
             "metric_caps_by_root_after_floor": metric_caps_by_root,
             "thin_item_ids_before_floor": pre_depth_report.get("thin_item_ids") or [],

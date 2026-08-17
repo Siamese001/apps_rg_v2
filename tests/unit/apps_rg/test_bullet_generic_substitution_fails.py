@@ -7,10 +7,9 @@ W5 acceptance test (Bullet Proof Bundle Redesign):
 """
 from __future__ import annotations
 
-import pytest
-
 from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
     GENERIC_CONSULTING_SUBSTITUTIONS,
+    check_experience_bullet_evidence_density,
     check_bullet_no_generic_consulting_substitution,
     check_bullet_technical_specificity_floor,
     run_bullet_quality_floor_gates,
@@ -119,6 +118,46 @@ class TestTechnicalSpecificityFloor:
             mechanism_vocab=["lineage", "ingestion", "observability"],
         )
         assert r.passed, "Expected pass when mechanism_vocab term present in bullet text"
+
+
+class TestExperienceBulletEvidenceDensity:
+    def test_capability_only_bullet_fails_even_when_jd_aligned(self) -> None:
+        result = check_experience_bullet_evidence_density(
+            "bul_unify_001",
+            "Forged co-selling frameworks with SIs and ISVs around reusable AI platform services.",
+        )
+        assert not result.passed
+        assert "business_or_delivery_outcome" in (result.failure_reason or "")
+        assert "capability_only_statement" in (result.failure_reason or "")
+
+    def test_specific_delivery_with_outcome_passes(self) -> None:
+        result = check_experience_bullet_evidence_density(
+            "bul_ibm_001",
+            "Led IBM-AWS account planning and solution architecture for financial-services pursuits, improving joint revenue by 20%.",
+        )
+        assert result.passed, result.failure_reason
+
+    def test_graph_bound_qualitative_delivery_outcome_passes(self) -> None:
+        result = check_experience_bullet_evidence_density(
+            "bul_insurtech_001",
+            "Implemented SOC 2-aligned AWS controls, enabling regulated insurers to adopt analytics and ML.",
+        )
+        assert result.passed, result.failure_reason
+
+    def test_current_role_strong_verb_with_bound_outcome_passes(self) -> None:
+        result = check_experience_bullet_evidence_density(
+            "bul_unify_006",
+            "Lead AI platform commercialization that scaled the engineering team from 8 to 28.",
+        )
+        assert result.passed, result.failure_reason
+
+    def test_delivery_detail_without_result_still_fails(self) -> None:
+        result = check_experience_bullet_evidence_density(
+            "bul_ibm_003",
+            "Led AWS solution architecture mapping for enterprise financial-services pursuits.",
+        )
+        assert not result.passed
+        assert "business_or_delivery_outcome" in (result.failure_reason or "")
 
 
 class TestBulletQualityFloorRunner:

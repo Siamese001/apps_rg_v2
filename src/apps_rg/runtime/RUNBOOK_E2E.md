@@ -6,9 +6,7 @@ The sole public, end-to-end resume command is:
 python -m apps_rg run [--target-company <company>] [--target-role <role>] [--jd <path-or-text>] [--resume <path>]
 ```
 
-With no arguments, `python -m apps_rg` runs the same canonical workflow. It
-uses the canonical Anthropic partnership JD and base resume unless an override
-is supplied.
+The command uses the canonical Anthropic partnership JD and base resume.
 
 ## Supported actions
 

@@ -35,7 +35,6 @@ stored artifact.
 Every `run` emits the same three inline outputs, in order: `FULL_RESUME`,
 `EVALS`, and `RUNTIME_DETAILS`. They are mandatory even on failure; an
 unavailable final resume is represented explicitly rather than omitted.
-
 ## Explicitly not resume-pipeline entrypoints
 
 The following may remain as internal libraries, maintenance tools, or
@@ -58,6 +57,5 @@ command. They must not be added back to its parser.
 ## Enforcement
 
 The public parser exposes only `run`, `eval`, and `show`. Focused tests verify
-that deterministic mode cannot call the live credentials, retrieval, OpenAI,
-or Gemini hooks; that the complete stage contract is present; and that `eval`
-and `show` operate only on completed artifacts.
+the complete stage contract and that `eval` and `show` operate only on
+completed artifacts.

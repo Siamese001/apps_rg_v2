@@ -690,6 +690,7 @@ def run_modular_resume_generation(
         resume_graph_allocation_digest = str(
             resume_graph_bundle["allocation_plan"].get("allocation_plan_digest") or ""
         )
+        from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
         if graph_skill_embedding_candidates is not None:
             lane_embedding_allowlists = build_lane_embedding_allowlists(
                 allocation_plan=resume_graph_bundle["allocation_plan"],

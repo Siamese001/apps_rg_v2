@@ -72,3 +72,39 @@ def test_commit_brief_record_supplies_l5_certification_ref() -> None:
         clearance_proof_id=request.clearance_proof_id,
         registry_digest_set=request.registry_digest_set,
     )
+
+
+def test_commit_brief_record_uses_default_gateway_snapshot_contract() -> None:
+    from apps_rg.runtime.local_state import DurableWriteGateway
+    from apps_research.integrations.governed_research_run import GovernedE2ERunRecord
+    from apps_research.integrations.research_brief_uwg_writer import commit_brief_record
+
+    run_record = GovernedE2ERunRecord(
+        run_id="research-run-default-gateway",
+        topic="Anthropic",
+        l1_sub_queries=("Anthropic",),
+        l1_fallback=False,
+        l0_intent="research",
+        l0_target="research_assembly",
+        l0_confidence=0.9,
+        l0_fallback=False,
+        c0_raw_count=3,
+        c0_shaped_count=3,
+        c0_collection="process_docs",
+        disposition="proceed",
+        gate_disposition="allow_response",
+        grounded=True,
+        citation_count=3,
+        support_coverage=0.9,
+        l6_ingested=True,
+        error="",
+        research_depth_profile="COMPANY_BRIEF_STANDARD",
+        fec_run_context={"company_brief": {"company_brief_text": "brief"}},
+    )
+    gateway = DurableWriteGateway()
+    before_snapshot = gateway.last_snapshot_id
+
+    brief = commit_brief_record(run_record, gateway=gateway)
+
+    assert brief.commit_receipt_ref.startswith("ucr:")
+    assert gateway.last_snapshot_id != before_snapshot

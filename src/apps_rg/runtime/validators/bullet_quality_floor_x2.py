@@ -4,6 +4,8 @@ Implements deterministic proxy gates (no LLM required):
 - x2_bullet_seniority_floor: strong action verb + scale signal required
 - x2_bullet_technical_specificity_floor: named mechanism, technology, or domain term required
 - x2_no_generic_consulting_substitution: extended GENERIC_FILLER blocklist for consulting-speak
+- x2_experience_bullet_evidence_density_required: concrete delivery detail plus a
+  business, adoption, efficiency, risk, or delivery result required
 
 These gates catch low-quality bullets that passed structural gates but lack the depth
 of an SVP Engineering-level candidate narrative.
@@ -12,20 +14,24 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Seniority floor: strong action verbs and organizational scale signals
 # ---------------------------------------------------------------------------
 
 STRONG_ACTION_VERBS: frozenset[str] = frozenset({
-    "architected", "engineered", "operationalized", "directed", "structured",
-    "converted", "deployed", "designed", "established", "led", "built",
-    "launched", "modernized", "forged", "drove", "productized", "standardized",
-    "unified", "accelerated", "scaled", "transformed", "generated", "delivered",
-    "created", "implemented", "developed", "oversaw", "managed", "steered",
-    "pioneered", "defined", "spearheaded", "owned", "headed", "championed",
-    "commercialized",
+    "architected", "architect", "engineered", "engineer", "operationalized", "operationalize",
+    "directed", "direct", "structured", "converted", "convert", "deployed", "designed",
+    "established", "establish", "led", "lead", "built", "build", "launched", "launch",
+    "modernized", "modernize", "forged", "forge", "drove", "drive", "productized",
+    "productize", "standardized", "standardize", "unified", "unify", "accelerated",
+    "accelerate", "cut", "scaled", "scale", "transformed", "transform", "generated",
+    "generate", "delivered", "deliver", "created", "create", "implemented", "implement",
+    "developed", "develop", "oversaw", "oversee", "managed", "manage", "steered", "steer",
+    "instituted", "institute", "commercialized", "commercialize", "pioneered", "pioneer",
+    "defined", "define", "spearheaded", "spearhead", "owned", "own", "headed", "head",
+    "championed", "champion", "governed", "govern",
 })
 
 WEAK_ACTION_VERBS: frozenset[str] = frozenset({
@@ -40,10 +46,43 @@ SCALE_SIGNALS: frozenset[str] = frozenset({
 })
 
 _NUMERIC_SIGNAL_PATTERN = re.compile(
-    r"\$\d+[mk]?\b|\b\d+[\.,]\d+%|\b\d+%|\b\d+x\b|\b\d+\s*(?:percent|million|billion)\b",
+    r"\$\d+[mk]?\b|\b\d+[\.,]\d+%|\b\d+%|\b\d+x\b|\b\d+\s+to\s+\d+\b|"
+    r"\b\d+\s*(?:percent|million|billion)\b",
     re.IGNORECASE,
 )
 _FIRST_WORD_RE = re.compile(r"^\s*(\w+)")
+
+# A result does not have to be a number.  Production, adoption, control,
+# reliability, and delivery results are legitimate résumé outcomes when the
+# graph-backed source does not contain a numeric metric.  Generic capability
+# nouns are deliberately excluded.
+_OUTCOME_SIGNAL_PATTERN = re.compile(
+    r"\b(?:generated|increased|grew|improved|reduced|cut|compressed|accelerated|"
+    r"expanded|scal(?:ed|ing)|converted|standardized|operationalized|"
+    r"establish(?:ed|ing|ment)|enabl(?:ed|ing)|deliver(?:ed|ing|y)|"
+    r"deployed|launched|adopt(?:ed|ion|ing)|moderni[sz](?:ed|ing|ation)|"
+    r"migrat(?:ed|ing|ion)|replatform(?:ed|ing)|remediat(?:ed|ing|ion)|"
+    r"production|uptime|reliability|coverage|audit(?:-ready|-grade)?|"
+    r"risk\s+(?:reduction|remediation|control|visibility)|"
+    r"compliance\s+(?:readiness|evidence|coverage)|renewal|revenue|margin|pipeline|"
+    r"cycle\s+time|latency|throughput|sponsorship|opportunity\s+progression)\b",
+    re.IGNORECASE,
+)
+_CONCRETE_DELIVERY_PATTERN = re.compile(
+    r"\b(?:aws|azure|gcp|databricks|kafka|kubernetes|api|microservices|"
+    r"route[- ]policy|control plane|runtime|observability|lineage|retrieval|"
+    r"solution architecture|reference architecture|account planning|"
+    r"subscription forecasting|proof bundle|policy[- ]gated|soc ?2|"
+    r"shared responsibility|financial-services|financial services|"
+    r"regulated|enterprise|production|deployment|integration)\b",
+    re.IGNORECASE,
+)
+_CAPABILITY_ONLY_PATTERN = re.compile(
+    r"^\s*(?:built|developed|forged|created|delivered)\s+(?:a\s+|an\s+)?"
+    r"(?:(?:[\w/-]+)\s+){0,3}"
+    r"(?:framework|frameworks|asset|assets|capability|capabilities|service|services|solution|solutions)\b",
+    re.IGNORECASE,
+)
 
 SENIORITY_FLOOR_SCORE = 1  # Minimum score to pass the seniority gate
 
@@ -237,6 +276,65 @@ def check_bullet_no_generic_consulting_substitution(
     )
 
 
+def check_experience_bullet_evidence_density(
+    bullet_id: str,
+    bullet_text: str,
+    *,
+    mechanism_vocab: list[str] | None = None,
+) -> QualityFloorResult:
+    """Reject capability-only experience bullets that lack detail or a result.
+
+    This is intentionally content-only.  The lane's existing proof-pool and
+    metric-lineage gates remain responsible for proving that any asserted
+    outcome belongs to the cited graph path.
+    """
+
+    text = str(bullet_text or "").strip()
+    first_match = _FIRST_WORD_RE.match(text.lower())
+    action = first_match.group(1) if first_match else ""
+    has_action = action in STRONG_ACTION_VERBS
+    has_delivery_detail = bool(_CONCRETE_DELIVERY_PATTERN.search(text)) or _has_technical_specificity(
+        text,
+        mechanism_vocab=mechanism_vocab,
+    )
+    has_outcome = bool(_NUMERIC_SIGNAL_PATTERN.search(text) or _OUTCOME_SIGNAL_PATTERN.search(text))
+    capability_only = bool(_CAPABILITY_ONLY_PATTERN.search(text)) and not has_outcome
+    signals = [
+        signal
+        for signal, present in (
+            (f"strong_verb:{action}", has_action),
+            ("concrete_delivery_detail", has_delivery_detail),
+            ("outcome_signal", has_outcome),
+            ("capability_only", capability_only),
+        )
+        if present
+    ]
+    passed = has_action and has_delivery_detail and has_outcome and not capability_only
+    missing = [
+        label
+        for label, present in (
+            ("specific_action", has_action),
+            ("concrete_delivery_detail", has_delivery_detail),
+            ("business_or_delivery_outcome", has_outcome),
+        )
+        if not present
+    ]
+    if capability_only:
+        missing.append("capability_only_statement")
+    return QualityFloorResult(
+        gate_id="x2_experience_bullet_evidence_density_required",
+        passed=passed,
+        bullet_id=bullet_id,
+        score=int(has_action) + int(has_delivery_detail) + int(has_outcome) - int(capability_only),
+        signals=signals,
+        failure_reason=(
+            f"{bullet_id}: insufficient experience-bullet evidence density; missing={missing}"
+            if not passed
+            else None
+        ),
+    )
+
+
 def run_bullet_quality_floor_gates(
     bullets: list[dict[str, Any]],
     *,
@@ -294,5 +392,6 @@ __all__ = [
     "check_bullet_no_generic_consulting_substitution",
     "check_bullet_seniority_floor",
     "check_bullet_technical_specificity_floor",
+    "check_experience_bullet_evidence_density",
     "run_bullet_quality_floor_gates",
 ]

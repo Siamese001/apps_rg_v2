@@ -80,16 +80,18 @@ def test_genuine_u0_receipt_round_trips_losslessly(tmp_path: Path) -> None:
     _validate_u0_authority_receipt_binding(loaded)
 
 
+@pytest.mark.parametrize("sections_relative", ("modular_r4/sections", "lanes"))
 def test_whole_run_section_front_reuses_canonical_u0_without_minting(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    sections_relative: str,
 ) -> None:
     original = _validated_request()
     # The public full-resume runner stores section lanes directly beneath the
     # active run directory.  The canonical U0 contract must be resolved from
     # that same run, not its shared runtime-proofs parent.
     run_root = tmp_path / "runtime_proofs" / "full_resume_live"
-    sections_root = run_root / "lanes"
+    sections_root = run_root / Path(sections_relative)
     sections_root.mkdir(parents=True)
     write_validated_request_contract(
         run_root / CANONICAL_APPS_RG_VALIDATED_REQUEST_FILENAME,

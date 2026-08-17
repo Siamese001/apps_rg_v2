@@ -68,22 +68,33 @@ class BulletAggregation:
         }
 
 
-def _best_model_backed_composite(
+def _final_quality_judges(
     composite_judges: Sequence[Mapping[str, Any]],
+) -> list[Mapping[str, Any]]:
+    """Return final-prose quality judges, excluding advisory pool selectors."""
+
+    return [
+        judge
+        for judge in composite_judges
+        if str(judge.get("evaluator_mode") or "") == "MODEL_BACKED"
+        and not bool(judge.get("advisory_only"))
+    ]
+
+
+def _normalized_score(judge: Mapping[str, Any]) -> float:
+    value = judge.get("normalized_score", judge.get("score"))
+    try:
+        return float(value) if value is not None else -1.0
+    except (TypeError, ValueError):
+        return -1.0
+
+
+def _lowest_quality_judge(
+    judges: Sequence[Mapping[str, Any]],
 ) -> Mapping[str, Any] | None:
-    """Pick the highest normalized-score MODEL_BACKED composite row (the section's judge verdict)."""
-    model_rows = [j for j in composite_judges if str(j.get("evaluator_mode") or "") == "MODEL_BACKED"]
-    if not model_rows:
-        return None
+    """Choose the weakest final-prose verdict for a conservative receipt."""
 
-    def _ns(j: Mapping[str, Any]) -> float:
-        v = j.get("normalized_score", j.get("score"))
-        try:
-            return float(v) if v is not None else -1.0
-        except (TypeError, ValueError):
-            return -1.0
-
-    return max(model_rows, key=_ns)
+    return min(judges, key=_normalized_score) if judges else None
 
 
 def aggregate_bullet_section(
@@ -107,7 +118,8 @@ def aggregate_bullet_section(
     reasons: list[str] = []
     detail: dict[str, Any] = {"section_id": section_id}
 
-    composite = _best_model_backed_composite(composite_judges)
+    quality_judges = _final_quality_judges(composite_judges)
+    composite = _lowest_quality_judge(quality_judges)
     cs: float | None = None
     ct: float | None = None
     margin: float | None = None
@@ -122,6 +134,9 @@ def aggregate_bullet_section(
         if cs is not None and ct is not None:
             margin = cs - ct
         detail["composite_provider_key"] = composite.get("provider_key")
+        detail["final_quality_provider_keys"] = [
+            str(judge.get("provider_key") or "") for judge in quality_judges
+        ]
         detail["composite_decisive_failure"] = bool(composite.get("decisive_failure"))
 
     # 1. Hard X2 failure dominates.
@@ -141,9 +156,11 @@ def aggregate_bullet_section(
             detail=detail,
         )
 
-    # 2/3. Judge decisive failure or below the pass floor => not an accept.
+    # 2/3. Every final-prose quality judge must pass its own declared floor.
+    # A strong score from another provider cannot hide a weak or failing final
+    # bullet-quality verdict.  Advisory selectors are intentionally excluded.
     if composite is None:
-        reasons.append("no_model_backed_composite_judge")
+        reasons.append("no_final_quality_model_backed_judge")
         return BulletAggregation(
             decision=AGG_REJECT_JUDGE,
             accepted=False,
@@ -157,8 +174,19 @@ def aggregate_bullet_section(
             reasons=tuple(reasons),
             detail=detail,
         )
-    if bool(composite.get("decisive_failure")):
-        reasons.append("judge_decisive_failure")
+    failing_quality_judges = [
+        judge
+        for judge in quality_judges
+        if bool(judge.get("decisive_failure"))
+        or judge.get("pass") is False
+        or _normalized_score(judge)
+        < float(judge.get("normalized_threshold", judge.get("threshold", pass_threshold)) or pass_threshold)
+    ]
+    if failing_quality_judges:
+        reasons.append(
+            "final_quality_judge_failed:"
+            + ",".join(str(judge.get("provider_key") or "") for judge in failing_quality_judges)
+        )
         return BulletAggregation(
             decision=AGG_REJECT_JUDGE,
             accepted=False,

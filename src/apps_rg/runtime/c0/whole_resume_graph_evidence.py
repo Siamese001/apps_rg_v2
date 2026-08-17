@@ -279,7 +279,7 @@ def build_whole_resume_graph_evidence_contract(
         "unknown_is_pass": False,
         "promotion_eligible": release_pass,
         "failure_codes": failures,
-        "release_failure_codes": release_failures,
+        "release_failure_codes": failures,
         "durable_graph_state_mutated": False,
     }
     body["contract_digest"] = stable_digest(body)

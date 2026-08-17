@@ -931,6 +931,7 @@ def run_unify_bullets_x2_gates(
 
     # W4: Quality floor gates (seniority proxy, technical specificity, generic consulting blocklist)
     from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+        check_experience_bullet_evidence_density,
         run_bullet_quality_floor_gates,
     )
 
@@ -963,6 +964,27 @@ def run_unify_bullets_x2_gates(
         cons_failures_u or "all_pass",
         "zero consulting-speak substitution phrases per bullet",
         "; ".join(cons_failures_u) if cons_failures_u else None,
+    )
+    evidence_density_results_u = [
+        check_experience_bullet_evidence_density(
+            str(bullet.get("bullet_id") or ""),
+            str(bullet.get("bullet_text") or ""),
+        )
+        for bullet in bullets
+        if isinstance(bullet, dict)
+        and str(bullet.get("bullet_id") or "").startswith("bul_unify_")
+    ]
+    evidence_density_failures_u = [
+        result.failure_reason
+        for result in evidence_density_results_u
+        if result.failure_reason
+    ]
+    add(
+        "x2_experience_bullet_evidence_density_required",
+        not evidence_density_failures_u,
+        evidence_density_failures_u or "all_pass",
+        "every experience bullet has a specific action, concrete delivery detail, and bound outcome",
+        "; ".join(evidence_density_failures_u) if evidence_density_failures_u else None,
     )
 
     # W3: N-gram overlap anti-leakage gates (WARN mode — calibrate before hard-fail activation)

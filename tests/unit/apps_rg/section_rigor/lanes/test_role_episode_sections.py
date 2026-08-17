@@ -18,6 +18,7 @@ ROLE_EPISODE_CRITICAL_GATES: dict[str, tuple[str, ...]] = {
         "x2_insurtech_bullets_bullet_count_3",
         "x2_insurtech_bullets_bullet_single_thought",
         "x2_insurtech_bullets_bullet_no_embedded_newline",
+        "x2_insurtech_bullets_bullet_evidence_density_required",
     ),
     "ey_bullets": (
         "x2_ey_bullets_allowed_fact_ids_non_empty",
@@ -29,6 +30,7 @@ ROLE_EPISODE_CRITICAL_GATES: dict[str, tuple[str, ...]] = {
         "x2_ey_bullets_bullet_count_3",
         "x2_ey_bullets_bullet_single_thought",
         "x2_ey_bullets_bullet_no_embedded_newline",
+        "x2_ey_bullets_bullet_evidence_density_required",
     ),
     "insurtech_narrative": (
         "x2_insurtech_narrative_allowed_fact_ids_non_empty",
@@ -142,6 +144,17 @@ def test_role_episode_bullet_lanes_fail_wrong_bullet_count(section_id: str) -> N
     gates = _gates(section_id, l2)
 
     assert gates[f"x2_{section_id}_bullet_count_3"]["pass"] is False
+
+
+@pytest.mark.parametrize("section_id", ("insurtech_bullets", "ey_bullets"))
+def test_role_episode_bullet_lanes_reject_generic_capability_only_bullet(section_id: str) -> None:
+    l2 = _passing_l2(section_id)
+    l2["bullets"][0]["bullet_text"] = "Forged co-selling frameworks with SIs and ISVs around reusable AI platform services."
+    l2["claim_ledger"][0]["claim_text"] = l2["bullets"][0]["bullet_text"]
+
+    gates = _gates(section_id, l2)
+
+    assert gates[f"x2_{section_id}_bullet_evidence_density_required"]["pass"] is False
 
 
 @pytest.mark.parametrize("section_id", ("insurtech_narrative", "ey_narrative"))

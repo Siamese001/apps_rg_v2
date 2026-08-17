@@ -203,7 +203,7 @@ def test_run_cross_section_x2_gates_includes_graph_coherence_gate(tmp_path: Path
     assert by_id["x2_cross_section_graph_coherence"].observed["active_section_count"] == 1
 
 
-def test_whole_resume_graph_engineering_completion_is_a_product_gate(
+def test_graph_evidence_engineering_completion_has_no_w6_observation_gate(
     tmp_path: Path,
 ) -> None:
     pointers = [
@@ -242,3 +242,4 @@ def test_whole_resume_graph_engineering_completion_is_a_product_gate(
     assert cross_section_gates_all_pass(
         [by_id["x2_whole_resume_graph_evidence_engineering"]]
     ) is True
+    assert "x2_whole_resume_graph_release_authority_observed" not in by_id

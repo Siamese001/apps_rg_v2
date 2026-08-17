@@ -22,6 +22,9 @@ from apps_rg.runtime.sections.section_product_shape_ssot import (
     NARRATIVE_MAX_WORDS,
     product_shape_gate_ids_for_lane,
 )
+from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+    check_experience_bullet_evidence_density,
+)
 
 
 def _gate_map(gates: list[dict]) -> dict[str, bool]:
@@ -449,6 +452,81 @@ def test_ey_model_bullet_target_overwrite_is_discarded_before_display() -> None:
 
     gate = _gate_by_id(gates)["x2_ey_bullets_display_text_proof_authorized"]
     assert gate["pass"] is True
+
+
+def test_insurtech_graph_bound_model_surface_preserves_selected_outcome_detail() -> None:
+    cfg = role_episode_lane._ROLE_LANES["insurtech_bullets"]
+    facts = [
+        {
+            "fact_id": "bul_insurtech_001",
+            "claim_text": "Implemented SOC 2-aligned AWS controls for regulated insurers adopting analytics and ML.",
+        },
+        {
+            "fact_id": "bul_insurtech_002",
+            "claim_text": "Built safety operating-model framing around AWS shared responsibility and insurer-owned controls.",
+        },
+        {
+            "fact_id": "bul_insurtech_003",
+            "claim_text": "Led AWS modernization execution for monolithic policy administration and insurance platform workloads.",
+        },
+    ]
+    allowed = [str(fact["fact_id"]) for fact in facts]
+    parsed = {
+        "bullets": [
+            {
+                "bullet_text": "Implemented SOC 2-aligned AWS controls for regulated insurers, establishing an auditable baseline for production adoption.",
+                "source_fact_ids": ["bul_insurtech_001"],
+            },
+            {
+                "bullet_text": "Built an AWS shared-responsibility operating model for insurer-owned controls, establishing repeatable governance for regulated cloud adoption.",
+                "source_fact_ids": ["bul_insurtech_002"],
+            },
+            {
+                "bullet_text": "Led AWS modernization of monolithic policy administration workloads, converting insurance platforms into scalable cloud architectures.",
+                "source_fact_ids": ["bul_insurtech_003"],
+            },
+        ]
+    }
+
+    bullets, receipt = role_episode_lane._materialize_bullet_generation(
+        cfg=cfg,
+        parsed=parsed,
+        parse_error="",
+        provider_runtime_generation_status="REAL_LLM",
+        facts=facts,
+        allowed=allowed,
+        graph_packet_digest="digest://insurtech-proof",
+    )
+
+    assert receipt["generation_method"] == "llm_selected_graph_bound_surface"
+    assert receipt["llm_output_used"] is True
+    assert receipt["model_display_text_discarded"] is False
+    assert [row["bullet_text"] for row in bullets] == [
+        row["bullet_text"] for row in parsed["bullets"]
+    ]
+    assert all(
+        check_experience_bullet_evidence_density(row["bullet_id"], row["bullet_text"]).passed
+        for row in bullets
+    )
+
+    l2 = {
+        "bullets": bullets,
+        "claim_ledger": [
+            {"claim_text": row["bullet_text"], "source_fact_ids": row["source_fact_ids"]}
+            for row in bullets
+        ],
+        "selected_fact_plan": {"facts": facts},
+        "role_episode_bundle_consumed": True,
+        **receipt,
+    }
+    display_gate = _gate_by_id(
+        run_insurtech_bullets_x2_gates(
+            l2=l2,
+            allowed=allowed,
+            runtime_generation_status="REAL_LLM",
+        )
+    )["x2_insurtech_bullets_display_text_proof_authorized"]
+    assert display_gate["pass"] is True
 
 
 def test_ey_duplicate_selected_source_fact_reselects_unique_proof_fact_before_display() -> None:

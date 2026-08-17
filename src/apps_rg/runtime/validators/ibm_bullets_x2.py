@@ -867,6 +867,7 @@ def run_ibm_bullets_x2_gates(
 
     # W4: Quality floor gates (seniority proxy, technical specificity, generic consulting blocklist)
     from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+        check_experience_bullet_evidence_density,
         run_bullet_quality_floor_gates,
     )
     from apps_rg.runtime.sections.ibm_bullets_graph_evidence import IBM_BULLET_MECHANISM_VOCAB
@@ -901,6 +902,30 @@ def run_ibm_bullets_x2_gates(
         cons_failures or "all_pass",
         "zero consulting-speak substitution phrases per bullet",
         "; ".join(cons_failures) if cons_failures else None,
+    )
+    evidence_density_results = [
+        check_experience_bullet_evidence_density(
+            str(bullet.get("bullet_id") or ""),
+            str(bullet.get("bullet_text") or ""),
+            mechanism_vocab=IBM_BULLET_MECHANISM_VOCAB.get(
+                str(bullet.get("bullet_id") or "")
+            ),
+        )
+        for bullet in bullets
+        if isinstance(bullet, dict)
+        and str(bullet.get("bullet_id") or "").startswith("bul_ibm_")
+    ]
+    evidence_density_failures = [
+        result.failure_reason
+        for result in evidence_density_results
+        if result.failure_reason
+    ]
+    add(
+        "x2_experience_bullet_evidence_density_required",
+        not evidence_density_failures,
+        evidence_density_failures or "all_pass",
+        "every experience bullet has a specific action, concrete delivery detail, and bound outcome",
+        "; ".join(evidence_density_failures) if evidence_density_failures else None,
     )
 
     from apps_rg.runtime.validators.proof_pool_source_fact_validation import (

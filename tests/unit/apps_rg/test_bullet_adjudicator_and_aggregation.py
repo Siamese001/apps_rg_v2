@@ -83,12 +83,39 @@ def test_adjudicator_does_not_escalate_when_risk_finding_is_confident_pass() -> 
 def test_adjudicator_escalates_when_x2_passes_and_risk_is_borderline() -> None:
     d = evaluate_bullet_adjudicator_trigger(
         section_id="unify_bullets",
-        composite_judges=[_judge(0.81, findings=["vague ai strategy fluff"])],
+        composite_judges=[
+            _judge(0.81, findings=[{"severity": "warning", "code": "generic_prose"}])
+        ],
         x2_failed_gate_ids=[],
         bullets=[],
     )
     assert d.should_escalate is True
     assert TRIGGER_X2_PASS_JUDGE_RISK in d.triggers
+
+
+def test_adjudicator_does_not_treat_informational_findings_as_material_risk() -> None:
+    d = evaluate_bullet_adjudicator_trigger(
+        section_id="unify_bullets",
+        composite_judges=[_judge(0.81, findings=["selector completed; gate_ok=True"])],
+        x2_failed_gate_ids=[],
+        bullets=[],
+    )
+    assert d.should_escalate is True
+    assert TRIGGER_JUDGE_CONFIDENCE_LOW in d.triggers
+    assert TRIGGER_X2_PASS_JUDGE_RISK not in d.triggers
+
+
+def test_adjudicator_ignores_advisory_pool_selector_scores() -> None:
+    d = evaluate_bullet_adjudicator_trigger(
+        section_id="unify_bullets",
+        composite_judges=[
+            _judge(0.78, advisory_only=True, findings=[{"severity": "warning"}]),
+            _judge(0.95, provider_key="gemini_pro"),
+        ],
+        x2_failed_gate_ids=[],
+        bullets=[],
+    )
+    assert d.should_escalate is False
 
 
 def test_adjudicator_metric_bullet_borderline_trigger_is_ibm_only() -> None:
@@ -192,6 +219,32 @@ def test_aggregation_rejects_below_pass_threshold() -> None:
     )
     assert a.decision == AGG_REJECT_JUDGE
     assert a.accepted is False
+
+
+def test_aggregation_rejects_when_any_final_quality_judge_fails() -> None:
+    a = aggregate_bullet_section(
+        section_id="ibm_bullets",
+        composite_judges=[
+            _judge(1.0, threshold=0.8, provider_key="gemini_pro"),
+            _judge(0.75, threshold=0.8, provider_key="openai_chatgpt", pass_=False),
+        ],
+        x2_failed_gate_ids=[],
+    )
+    assert a.decision == AGG_REJECT_JUDGE
+    assert a.accepted is False
+
+
+def test_aggregation_ignores_advisory_selector_when_scoring_final_prose() -> None:
+    a = aggregate_bullet_section(
+        section_id="unify_bullets",
+        composite_judges=[
+            _judge(0.78, threshold=0.72, advisory_only=True),
+            _judge(0.95, threshold=0.8, provider_key="gemini_pro"),
+        ],
+        x2_failed_gate_ids=[],
+    )
+    assert a.decision == AGG_ACCEPT
+    assert a.detail["final_quality_provider_keys"] == ["gemini_pro"]
 
 
 # --------------------------------------------------------------- competencies category count (adaptive 6-8)

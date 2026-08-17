@@ -14,6 +14,10 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from apps_rg.runtime.orchestration.canonical_dispatch import (
+    run_canonical_apps_rg_from_cli_primitives,
+)
+
 
 DEFAULT_TARGET_COMPANY = "Anthropic"
 DEFAULT_TARGET_ROLE = "Manager of Applied AI Architecture, Partnerships"
@@ -399,10 +403,14 @@ def _print_run_result(result: Mapping[str, Any], evaluation: Mapping[str, Any]) 
         except OSError as exc:
             resume_text = f"UNAVAILABLE: cannot read final resume artifact ({type(exc).__name__})"
     print("FULL_RESUME", flush=True)
+    print("```markdown", flush=True)
     print(resume_text, flush=True)
+    print("```", flush=True)
 
     print("EVALS", flush=True)
+    print("```json", flush=True)
     print(json.dumps(evaluation, ensure_ascii=False, indent=2, sort_keys=True), flush=True)
+    print("```", flush=True)
 
     detail_keys = (
         "exit_status",
@@ -422,7 +430,9 @@ def _print_run_result(result: Mapping[str, Any], evaluation: Mapping[str, Any]) 
         "mandatory_run_output_json",
     )
     print("RUNTIME_DETAILS", flush=True)
+    print("```json", flush=True)
     print(json.dumps({key: result[key] for key in detail_keys if key in result}, indent=2, sort_keys=True), flush=True)
+    print("```", flush=True)
     if not succeeded:
         print(
             "APPS_RG_ERROR " + str(result.get("fault") or "FULL_E2E_OR_APPS_EVAL_INCOMPLETE"),
@@ -447,10 +457,6 @@ def main(argv: list[str] | None = None) -> int:
     action = args.action or "run"
     try:
         if action == "run":
-            from apps_rg.runtime.orchestration.canonical_dispatch import (
-                run_canonical_apps_rg_from_cli_primitives,
-            )
-
             result = run_canonical_apps_rg_from_cli_primitives(
                 target_company=args.target_company,
                 target_role=args.target_role,

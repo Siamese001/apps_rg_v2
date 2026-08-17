@@ -9,6 +9,7 @@ write authority.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
@@ -202,7 +203,18 @@ class GoogleJudge:
 
     def _parse_response(self, _dimension: Dimension, raw_text: str) -> JudgeResponse:
         try:
-            payload = json.loads(raw_text)
+            # Gemini may wrap an otherwise valid requested JSON object in one
+            # Markdown fence.  Accept only that unambiguous wrapper; arbitrary
+            # prose around JSON remains a fail-closed contract violation.
+            normalized = str(raw_text or "").strip()
+            fenced = re.fullmatch(
+                r"```(?:json)?\s*(\{.*\})\s*```",
+                normalized,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+            payload = json.loads(fenced.group(1) if fenced else normalized)
+            if not isinstance(payload, dict):
+                raise TypeError("judge response must be a JSON object")
             score = float(payload["score"])
             reasoning = str(payload.get("reasoning") or "")
             verdict = str(payload.get("verdict") or "").upper()

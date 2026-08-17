@@ -1635,6 +1635,14 @@ def run_unify_bullets_execution(
         x1d = list(x1d) + _panel_rows
         _adjudication_record["escalated"] = True
         _adjudication_record["panel_provider_keys"] = list(_panel_keys)
+        # The final decision must include the second opinion.  A strong
+        # initial score cannot override a failed final-prose panel verdict.
+        _agg = aggregate_bullet_section(
+            section_id="unify_bullets",
+            composite_judges=x1d,
+            x2_failed_gate_ids=_x2_failed_ids,
+        )
+        _adjudication_record["aggregation"] = _agg.to_dict()
     write_json(artifact_dir / "x1d_llm_judge_outputs.json", {"judges": x1d})
     write_json(artifact_dir / "bullet_adjudication.json", _adjudication_record)
     write_json(artifact_dir / "bullet_x2_aggregation.json", _agg.to_dict())

@@ -98,6 +98,20 @@ def _apps_rg_handoff_x2_max_attempts() -> int:
         return APPS_RG_HANDOFF_X2_MAX_ATTEMPTS
 
 
+def _resolve_google_api_key() -> str:
+    """Resolve the Gemini credential used by the Apps RG handoff judge.
+
+    ``GoogleJudge`` requires the key as an explicit transport argument.  The
+    broader Apps RG runtime already treats ``GOOGLE_API_KEY`` as canonical and
+    ``GEMINI_API_KEY`` as its legacy fallback, so the research handoff must use
+    the same resolution order rather than constructing an invalid judge.
+    """
+    return (
+        os.environ.get("GOOGLE_API_KEY", "").strip()
+        or os.environ.get("GEMINI_API_KEY", "").strip()
+    )
+
+
 _APPS_RG_TARGETING_X2_PROMPT_VERSION = "apps_research.apps_rg_targeting_x2.v2"
 _TARGETING_BRIEF_ADVERSARIAL_DIRECTIVE_PATTERNS = (
     re.compile(
@@ -490,6 +504,7 @@ class _AppsRgTargetingBriefGoogleJudge(GoogleJudge):
         generation_config["thinkingConfig"] = {
             "thinkingLevel": APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL
         }
+        generation_config["responseMimeType"] = "application/json"
         return dataclasses.replace(
             request,
             body=json.dumps(payload, separators=(",", ":")).encode("utf-8"),
@@ -598,10 +613,7 @@ def run_apps_rg_handoff_x2_judge(
     }
     resolved_judge = judge or _AppsRgTargetingBriefGoogleJudge(
         model=APPS_RG_HANDOFF_JUDGE_MODEL,
-        api_key=(
-            os.environ.get("GOOGLE_API_KEY", "").strip()
-            or os.environ.get("GEMINI_API_KEY", "").strip()
-        ),
+        api_key=_resolve_google_api_key(),
         timeout=30.0,
         max_tokens=APPS_RG_HANDOFF_JUDGE_MAX_TOKENS,
         usage_artifact_dir=usage_artifact_dir,

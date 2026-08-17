@@ -23,7 +23,7 @@ FORBIDDEN_EXEC_SUMMARY_DIMENSION_IDS: Final[frozenset[str]] = frozenset(
     }
 )
 
-EMPLOYMENT_BULLET_RUBRIC_VERSION: Final[str] = "employment_bullet_judge_v1"
+EMPLOYMENT_BULLET_RUBRIC_VERSION: Final[str] = "employment_bullet_judge_v2"
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +48,10 @@ SHARED_EMPLOYMENT_BULLET_DIMENSIONS: Final[tuple[BulletJudgeDimension, ...]] = (
     BulletJudgeDimension(
         "bullet_line_discipline",
         "one high-impact resume bullet per slot — concise line, no narrative paragraph or multi-sentence block.",
+    ),
+    BulletJudgeDimension(
+        "evidence_density",
+        "every bullet has a specific action, named delivery detail, and a source-backed business, adoption, risk, or delivery result; a capability-only statement fails.",
     ),
     BulletJudgeDimension(
         "jd_briefing_targeting_discipline",
@@ -118,6 +122,7 @@ def pool_selector_dimension_ids(section_id: str) -> tuple[str, ...]:
         return (
             "claim_ledger_grounding",
             "bullet_line_discipline",
+            "evidence_density",
             "jd_briefing_targeting_discipline",
             "keyword_discipline_without_stuffing",
             "cross_bullet_outcome_diversity",
@@ -128,6 +133,7 @@ def pool_selector_dimension_ids(section_id: str) -> tuple[str, ...]:
         return (
             "claim_ledger_grounding",
             "bullet_line_discipline",
+            "evidence_density",
             "jd_briefing_targeting_discipline",
             "keyword_discipline_without_stuffing",
             "cross_bullet_outcome_diversity",
@@ -163,7 +169,8 @@ def grade_only_rubric_text(section_id: str, *, bullet_count: int, bullet_id_rang
             f"- wrong bullet count (expected {bullet_count})\n"
             "- a metric outcome explicitly assigned to bul_unify_006 is missing or split incorrectly\n"
             "- JD phrase copied as proof (>4 consecutive words)\n"
-            "- generic filler that loses Unify-specific mechanisms or protected metrics"
+            "- generic filler that loses Unify-specific mechanisms or protected metrics\n"
+            "- a bullet with no specific action, delivery detail, and evidence-backed result"
         )
     elif lane == "ibm_bullets":
         extra = (
@@ -172,7 +179,8 @@ def grade_only_rubric_text(section_id: str, *, bullet_count: int, bullet_id_rang
             "- first-person language\n"
             f"- wrong bullet count (expected {bullet_count})\n"
             "- JD phrase copied as proof (>4 consecutive words)\n"
-            "- Unify runtime vocabulary in bullet text"
+            "- Unify runtime vocabulary in bullet text\n"
+            "- a bullet with no specific action, delivery detail, and evidence-backed result"
         )
     return (
         f"You are evaluating exactly {bullet_count} employment bullets ({bullet_id_range}).\n"

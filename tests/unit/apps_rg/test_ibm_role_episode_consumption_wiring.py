@@ -436,8 +436,8 @@ def test_current_ibm_presales_and_deal_support_allocations_surface_mechanisms() 
         parsed, selected_fact_plan={"allocation_assignments": allocations}
     )
     by_id = {row["bullet_id"]: row["bullet_text"] for row in parsed["bullets"]}
-    assert "solution architecture mapping" in by_id["bul_ibm_003"]
-    assert "pipeline governance" in by_id["bul_ibm_004"]
+    assert "delivery-ready solution handoffs" in by_id["bul_ibm_003"]
+    assert "pipeline discipline" in by_id["bul_ibm_004"]
     _, _, technical_pass, technical_rows, _, _ = run_bullet_quality_floor_gates(
         parsed["bullets"],
         section_id="ibm_bullets",

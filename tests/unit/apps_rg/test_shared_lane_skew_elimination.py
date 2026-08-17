@@ -15,6 +15,7 @@ from apps_rg.runtime.sections.competency_capability_evidence import (
     format_competency_capability_evidence_pack,
 )
 from apps_rg.runtime.sections.graph_role_episode_selector import (
+    _select_shared_roots_with_requirement_coverage,
     build_selected_graph_evidence_plan_for_section,
 )
 from apps_rg.runtime.sections.headline_positioning_evidence import (
@@ -58,7 +59,7 @@ def _build_plan(section_id: str, *, target_role: str, jd_text: str, briefing_tex
     return plan
 
 
-def test_agentic_shared_lane_selection_caps_raw_insurtech_density() -> None:
+def test_agentic_shared_lane_selection_does_not_reserve_a_weak_ey_slot() -> None:
     plan = _build_plan(
         "competencies",
         target_role="SVP Agentic Engineering",
@@ -71,7 +72,12 @@ def test_agentic_shared_lane_selection_caps_raw_insurtech_density() -> None:
     assert diag["max_raw_skill_count_employer"] == "insurtech"
     assert diag["max_selected_skill_count_employer"] == "unify"
     assert diag["selected_skill_counts_by_employer"]["unify"] > diag["selected_skill_counts_by_employer"]["insurtech"]
-    assert set(plan["selected_employer_roots"]) == {"unify", "ibm", "insurtech", "ey"}
+    assert set(plan["selected_employer_roots"]) == {"unify", "ibm", "insurtech"}
+    assert diag["selection_normalized_by_employer_root_cap"] is False
+    assert (
+        plan["requirement_coverage"]["strategy"]
+        == "global_requirement_coverage_v1"
+    )
 
     selected_skill_ids = set(plan["selected_skill_ids"])
     allowed_graph_ids = set(plan["allowed_graph_evidence_ids"])
@@ -108,6 +114,62 @@ def test_competencies_shared_lane_depth_floor_eliminates_thin_ey_node_for_anthro
     assert comparison["status_transition"] == "insufficient_depth->judge_grade"
     assert comparison["delta"]["thin_item_count"] == -1
     assert comparison["delta"]["semantic_coverage_pp"] > 0.0
+
+
+def test_shared_lane_uses_global_requirement_coverage_slots_for_anthropic_jd() -> None:
+    jd_text = ANTHROPIC_JD.read_text(encoding="utf-8")
+    brief_text = ANTHROPIC_BRIEF.read_text(encoding="utf-8")
+    plan = _build_plan(
+        "competencies",
+        target_role=jd_text.split("\n", 1)[0],
+        jd_text=jd_text,
+        briefing_text=brief_text,
+    )
+
+    coverage = plan["requirement_coverage"]
+    diag = plan["skew_diagnostics"]
+    root_decisions = [
+        row
+        for row in plan["graph_candidate_decision_ledger"]
+        if row["candidate_type"] == "role_episode_root" and row["authority_pass"]
+    ]
+
+    assert coverage["strategy"] == "global_requirement_coverage_v1"
+    assert coverage["max_root_slots"] == 8
+    assert "partner_cosell" in coverage["required_requirement_ids"]
+    assert diag["selection_normalized_by_employer_root_cap"] is False
+    assert diag["selection_uses_global_requirement_coverage"] is True
+    assert len(coverage["slot_decisions"]) == 8
+    assert all("job_fit_rank" in row for row in root_decisions)
+    assert all("canonical_requirement_ids" in row for row in root_decisions)
+
+
+def test_global_slots_do_not_reserve_a_place_for_lower_fit_employer() -> None:
+    def root(bundle_id: str, employer: str, score: float, requirements: tuple[str, ...]) -> dict:
+        return {
+            "bundle": {"role_episode_bundle_id": bundle_id},
+            "employer_lane": employer,
+            "ranking_score": score,
+            "canonical_requirement_ids": requirements,
+        }
+
+    selected, receipt = _select_shared_roots_with_requirement_coverage(
+        eligible_roots=[
+            root("unify_generic", "unify", 4.8, ()),
+            root("ibm_generic", "ibm", 5.0, ()),
+            root("insurtech_si_enablement", "insurtech", 8.1, ("si_enablement",)),
+            root("ey_generic", "ey", 4.6, ()),
+        ],
+        required_requirement_ids=("si_enablement",),
+        employer_weights={"unify": 0.95, "ibm": 0.90, "insurtech": 0.35, "ey": 0.10},
+        max_items=2,
+    )
+
+    assert [row["bundle"]["role_episode_bundle_id"] for row in selected] == [
+        "insurtech_si_enablement",
+        "ibm_generic",
+    ]
+    assert receipt["covered_requirement_ids"] == ["si_enablement"]
 
 
 def test_competencies_proof_pool_exposes_pre_and_post_depth_reports() -> None:

@@ -134,8 +134,8 @@ def _whole_resume_graph_rollup_authority(
     Restoring process environment is sufficient for re-dispatched lanes, but the
     final W7 reconciliation reads the generated rollup. A patch aggregation must
     therefore carry the same frozen plan digest and artifact references that the
-    original full-run aggregator emits. Existing W6 authority is preserved only
-    when it was already present; this function never creates release authority.
+    original full-run aggregator emits. This restores graph identity only; it
+    does not create delivery authorization.
     """
     from apps_rg.runtime.c0.resume_graph_allocation import (
         ALLOCATION_PLAN_ENV,
@@ -1577,11 +1577,10 @@ def execute_patch_run(
 
     graph_env = _whole_resume_graph_env_for_patch(plan.run_dir)
 
-    # Validate a mandatory whole-resume release receipt before this process
-    # enters _dispatch_patch_lanes.  The same helper also supplies the
-    # aggregation rollup binding below; calling it here is deliberately early
-    # so an absent human/offline W6 authority cannot spend a replacement lane
-    # or aggregate-judge request.
+    # Validate the mandatory whole-resume graph rollup before this process
+    # enters _dispatch_patch_lanes. The same helper supplies the aggregation
+    # binding below; calling it early prevents a replacement lane or aggregate
+    # judge from running against an unreadable or mismatched graph plan.
     from apps_rg.runtime.product_output_policy import product_fail_closed_runtime
 
     if product_fail_closed_runtime() and _whole_resume_graph_digest_for_run(plan.run_dir):

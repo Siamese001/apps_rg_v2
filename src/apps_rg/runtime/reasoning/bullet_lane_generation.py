@@ -172,8 +172,8 @@ def empty_selection_min_bullets() -> int:
         return 1
 
 
-def _count_validity_rejections(artifact_dir: Path | None) -> int:
-    """source_fact_id_not_allowed rejections from bullet_pool_candidate_validity.json (fail-soft)."""
+def _count_validity_rejections(artifact_dir: Path | None, *, reason: str) -> int:
+    """Count one typed candidate rejection from the validity receipt (fail-soft)."""
     if artifact_dir is None:
         return 0
     path = artifact_dir / "bullet_pool_candidate_validity.json"
@@ -188,7 +188,7 @@ def _count_validity_rejections(artifact_dir: Path | None) -> int:
         if not isinstance(path_row, dict):
             continue
         for rej in path_row.get("rejections") or []:
-            if isinstance(rej, dict) and str(rej.get("reason") or "") == "source_fact_id_not_allowed":
+            if isinstance(rej, dict) and str(rej.get("reason") or "") == reason:
                 count += 1
     return count
 
@@ -257,7 +257,8 @@ def should_short_circuit_empty_selection(
         f"paths={int(meta.get('total_paths_executed') or 0)} "
         f"selections={int(meta.get('claude_selection_count') or 0)} "
         f"merged={merged_count}; "
-        f"excluded_by=[source_fact_id_not_allowed:{_count_validity_rejections(artifact_dir)}, "
+        f"excluded_by=[source_fact_id_not_allowed:{_count_validity_rejections(artifact_dir, reason='source_fact_id_not_allowed')}, "
+        f"experience_bullet_evidence_density_required:{_count_validity_rejections(artifact_dir, reason='experience_bullet_evidence_density_required')}, "
         f"numeric_token_not_entailed:{_count_entailment_exclusions(artifact_dir)}, "
         f"below_min_score:{below_min_score}]; "
         f"slots_missing=[{', '.join(slots_missing)}]"

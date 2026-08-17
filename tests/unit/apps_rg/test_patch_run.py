@@ -789,6 +789,7 @@ def test_patch_run_restores_persisted_whole_resume_graph_bindings(tmp_path: Path
             "run/modular_r4/resume_graph_allocation/c03_section_graph_plans.json"
         ),
     }
+    assert "resume_graph_w6_release_evidence" not in authority
     assert Path(bindings["APPS_RG_SECTION_GRAPH_SOURCE_PLANS"]).name == (
         "c03_section_graph_plans.json"
     )

@@ -289,6 +289,18 @@ class DurableWriteGateway:
         self._blocked: dict[str, BlockedCommitReceipt] = {}
         self._direct_blocks: list[BlockedCommitReceipt] = []
 
+    @property
+    def last_snapshot_id(self) -> str:
+        """Return the deterministic pre-write snapshot expected by UWG clients.
+
+        The in-process gateway does not persist a materialized state snapshot,
+        but a write client still needs an auditable before-reference.  Bind it
+        to the committed-request set so it changes only after an accepted
+        commit and is stable across equivalent gateway state.
+        """
+        committed = tuple(sorted(self._commits))
+        return "snapshot:uwg:" + compute_deterministic_digest(committed)[:24]
+
     def _validate(
         self,
         commit_request: CommitRequest,

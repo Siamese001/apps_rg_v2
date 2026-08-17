@@ -112,6 +112,7 @@ def test_short_circuit_fires_on_real_llm_employment_pool_empty_merge() -> None:
     assert "selections=0" in reason
     assert "merged=0" in reason
     assert "source_fact_id_not_allowed:0" in reason
+    assert "experience_bullet_evidence_density_required:0" in reason
     assert "numeric_token_not_entailed:0" in reason
     assert "below_min_score:2" in reason
     assert "slots_missing=[bul_unify_001, bul_unify_002]" in reason
@@ -189,6 +190,7 @@ def test_short_circuit_reason_folds_in_validity_and_entailment_receipt_counts(
     )
     assert fire is True
     assert "source_fact_id_not_allowed:2" in reason
+    assert "experience_bullet_evidence_density_required:0" in reason
     assert "numeric_token_not_entailed:3" in reason
 
 

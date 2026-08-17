@@ -80,19 +80,33 @@ def _normalized_score_and_threshold(judge: Mapping[str, Any]) -> tuple[float | N
 
 
 def _judge_is_model_backed(judge: Mapping[str, Any]) -> bool:
-    return str(judge.get("evaluator_mode") or "") == "MODEL_BACKED"
+    return (
+        str(judge.get("evaluator_mode") or "") == "MODEL_BACKED"
+        and not bool(judge.get("advisory_only"))
+    )
 
 
 def _judge_flags_material_risk(judge: Mapping[str, Any]) -> bool:
-    """True when the judge surfaced risk despite not being a hard X2 failure."""
+    """True only for structured warning/failure evidence, not ordinary notes."""
     if judge.get("decisive_failure"):
         return True
     if judge.get("pass") is False:
         return True
-    for key in ("findings", "quality_flags", "fail_reasons", "unsupported_claims"):
+    # Unsupported claims and explicit fail reasons are material by definition.
+    for key in ("fail_reasons", "unsupported_claims"):
         val = judge.get(key)
         if isinstance(val, (list, tuple)) and len(val) > 0:
             return True
+    for key in ("findings", "quality_flags"):
+        values = judge.get(key)
+        if not isinstance(values, (list, tuple)):
+            continue
+        for value in values:
+            if not isinstance(value, Mapping):
+                continue
+            severity = str(value.get("severity") or "").strip().lower()
+            if severity in {"warning", "warn", "failure", "fail", "error", "critical"}:
+                return True
     return False
 
 
@@ -167,7 +181,10 @@ def evaluate_bullet_adjudicator_trigger(
         border_details.append(info)
         if bl:
             borderline_any = True
-    detail["borderline"] = border_details
+    # Keep diagnostics for every final-quality judge.  Callers must use the
+    # trigger itself, not list membership, to determine which judge was
+    # actually borderline.
+    detail["judge_score_diagnostics"] = border_details
     if borderline_any:
         triggers.append(TRIGGER_JUDGE_CONFIDENCE_LOW)
 

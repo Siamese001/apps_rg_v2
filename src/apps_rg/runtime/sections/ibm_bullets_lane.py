@@ -351,31 +351,43 @@ _IBM_FROZEN_ALLOCATION_DISPLAY_COMPOSITIONS: dict[tuple[str, str], str] = {
         "reb_ibm_revenue_sales_target_execution",
         "skill_partner_pnl_oversight",
     ): (
-        "Owned P&L oversight and quota-aligned solution leadership across enterprise pursuits, "
-        "applying pipeline discipline to client portfolio expansion motions."
+        "Owned P&L oversight across the enterprise client portfolio, establishing account-level pipeline operating views "
+        "to steer expansion motions."
     ),
     (
         "reb_ibm_data_modeling_bi_decision_support",
         "skill_p2_tech_reference_architecture",
-    ): "Architected industry-specific AI, analytics, and cloud modernization reference architectures for financial-services decision support.",
+    ): (
+        "Architected industry-specific AI, analytics, and cloud modernization reference architectures, "
+        "establishing governed portfolio views and executive operating cadence for financial-services decision support."
+    ),
     (
         "reb_ibm_data_modeling_bi_decision_support",
         "skill_sr_cloud_data_platform_engineering",
-    ): "Built decision-support data models and BI views that connected modernization programs to executive operating decisions.",
+    ): (
+        "Built decision-support data models and BI views, establishing governed portfolio transparency "
+        "and executive operating cadence across modernization programs."
+    ),
     (
         "reb_ibm_presales_solution_engineering",
         "skill_p2_gtm_solution_mapping",
-    ): "Led technical discovery and solution architecture mapping for enterprise financial-services pursuits.",
+    ): (
+        "Led technical discovery and solution mapping for enterprise financial-services pursuits, "
+        "creating delivery-ready solution handoffs through buyer-specific architecture decisions."
+    ),
     (
         "reb_ibm_presales_solution_engineering",
         "skill_p2_gtm_executive_buyer_alignment",
-    ): "Led technical discovery and solution mapping for enterprise financial-services pursuits, aligning architecture choices with executive buying criteria.",
+    ): (
+        "Led technical discovery and solution mapping for enterprise financial-services pursuits, "
+        "aligning architecture choices with buyer criteria and delivery-ready solution handoffs."
+    ),
     (
         "reb_ibm_revenue_sales_target_execution",
         "skill_p2_gtm_enterprise_deal_support",
     ): (
-        "Prioritized enterprise pursuits using solution-architecture feasibility reviews, account context, "
-        "and buyer readiness, connecting technical validation to executive deal support."
+        "Owned quota-aligned solution leadership across enterprise pursuits, establishing pipeline discipline "
+        "and an executive deal-support cadence for client portfolio expansion motions."
     ),
 }
 
@@ -1566,6 +1578,15 @@ def run_ibm_bullets_execution(
         x1d = list(x1d) + _panel_rows
         _adjudication_record["escalated"] = True
         _adjudication_record["panel_provider_keys"] = list(_panel_keys)
+        # Re-aggregate after the panel.  The final-prose quality verdict is
+        # conservative: a lower/failing panel score cannot be hidden by the
+        # initial composite judge's higher score.
+        _agg = aggregate_bullet_section(
+            section_id="ibm_bullets",
+            composite_judges=x1d,
+            x2_failed_gate_ids=_x2_failed_ids,
+        )
+        _adjudication_record["aggregation"] = _agg.to_dict()
     write_json(artifact_dir / "x1d_llm_judge_outputs.json", {"judges": x1d})
     write_json(artifact_dir / "bullet_adjudication.json", _adjudication_record)
     write_json(artifact_dir / "bullet_x2_aggregation.json", _agg.to_dict())

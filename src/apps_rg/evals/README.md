@@ -238,7 +238,7 @@ The deterministic rubrics live in
 and
 [`contracts/retrieval_coverage_rubric.v1.yaml`](contracts/retrieval_coverage_rubric.v1.yaml).
 They are future-run-only measurement rules; they do not promote thresholds or
-change W6 release authority.
+change runtime delivery authorization.
 
 ## Section quality benchmark
 

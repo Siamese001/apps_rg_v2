@@ -5,6 +5,7 @@ from apps_rg.runtime.sections.ibm_bullets_lane import (
     _materialize_ibm_bullets_from_frozen_allocation,
 )
 from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+    check_experience_bullet_evidence_density,
     check_bullet_technical_specificity_floor,
 )
 from apps_rg.runtime.validators.ibm_bullets_x2 import (
@@ -50,7 +51,7 @@ def test_pnl_frozen_allocation_materialization_keeps_technical_mechanism() -> No
 
     assert applied is True
     bullet = next(row for row in parsed["bullets"] if row["bullet_id"] == "bul_ibm_002")
-    assert "pipeline discipline" in bullet["bullet_text"].lower()
+    assert "account-level pipeline operating views" in bullet["bullet_text"].lower()
     result = check_bullet_technical_specificity_floor(
         bullet["bullet_id"],
         bullet["bullet_text"],
@@ -124,8 +125,8 @@ def test_frozen_allocation_materialization_keeps_revenue_slots_semantically_dist
 
     by_id = {row["bullet_id"]: row["bullet_text"] for row in parsed["bullets"]}
     assert "P&L oversight" in by_id["bul_ibm_002"]
-    assert "buyer readiness" in by_id["bul_ibm_004"]
-    assert "solution-architecture" in by_id["bul_ibm_004"]
+    assert "pipeline discipline" in by_id["bul_ibm_004"]
+    assert "deal-support cadence" in by_id["bul_ibm_004"]
     assert check_bullet_technical_specificity_floor(
         "bul_ibm_004", by_id["bul_ibm_004"]
     ).passed is True
@@ -156,3 +157,61 @@ def test_semantic_overlap_gate_detects_retry15_quota_pipeline_duplicate() -> Non
 
     assert violations[0]["bullet_ids"] == ["bul_ibm_002", "bul_ibm_004"]
     assert violations[0]["token_jaccard"] >= 0.60
+
+
+def test_frozen_allocation_materialization_preserves_evidence_density_for_every_bullet() -> None:
+    """A post-selection graph projection must not erase the selected outcome."""
+    parsed = {
+        "bullets": [
+            {"bullet_id": bullet_id, "bullet_text": "Provider draft."}
+            for bullet_id in IBM_BULLET_IDS
+        ]
+    }
+    assignments = [
+        {
+            "section_id": "ibm_bullets",
+            "claim_unit_id": "ibm_bullets:bul_ibm_001",
+            "root_id": "reb_ibm_aws_alliance_partner_cosell_gtm",
+            "skill_id": "skill_partner_alliance_gtm_execution",
+            "root_claim_text": "Led IBM-AWS alliance co-sell motions for financial-services modernization opportunities",
+            "metric_text": "20% joint revenue growth",
+        },
+        {
+            "section_id": "ibm_bullets",
+            "claim_unit_id": "ibm_bullets:bul_ibm_002",
+            "root_id": "reb_ibm_data_modeling_bi_decision_support",
+            "skill_id": "skill_sr_cloud_data_platform_engineering",
+            "root_claim_text": "Built decision-support data models and BI views",
+        },
+        {
+            "section_id": "ibm_bullets",
+            "claim_unit_id": "ibm_bullets:bul_ibm_003",
+            "root_id": "reb_ibm_presales_solution_engineering",
+            "skill_id": "skill_p2_gtm_solution_mapping",
+            "root_claim_text": "Led technical discovery and solution mapping for enterprise pursuits",
+        },
+        {
+            "section_id": "ibm_bullets",
+            "claim_unit_id": "ibm_bullets:bul_ibm_004",
+            "root_id": "reb_ibm_revenue_sales_target_execution",
+            "skill_id": "skill_p2_gtm_enterprise_deal_support",
+            "root_claim_text": "Owned quota-aligned solution leadership across enterprise pursuits",
+        },
+        {
+            "section_id": "ibm_bullets",
+            "claim_unit_id": "ibm_bullets:bul_ibm_005",
+            "root_id": "reb_ibm_data_modeling_bi_decision_support",
+            "skill_id": "skill_p2_tech_reference_architecture",
+            "root_claim_text": "Built decision-support data models and BI views",
+        },
+    ]
+
+    assert _materialize_ibm_bullets_from_frozen_allocation(
+        parsed,
+        selected_fact_plan={"allocation_assignments": assignments},
+    )
+    failures = [
+        check_experience_bullet_evidence_density(row["bullet_id"], row["bullet_text"])
+        for row in parsed["bullets"]
+    ]
+    assert all(row.passed for row in failures), [row.failure_reason for row in failures]

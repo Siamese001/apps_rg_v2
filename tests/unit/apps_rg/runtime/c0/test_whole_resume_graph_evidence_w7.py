@@ -105,6 +105,7 @@ def test_engineering_contract_authorizes_release_without_external_w6_receipt(
         rollup_blob=rollup,
     )
     assert result["engineering_pass"] is True
+    assert "official_w6_status" not in result
     assert result["release_pass"] is True
     assert result["promotion_eligible"] is True
     assert result["unknown_is_pass"] is False

@@ -611,7 +611,7 @@ def test_selector_filters_candidates_outside_allowed_fact_set(tmp_path) -> None:
                 "bullets": [
                     {
                         "bullet_id": "bul_unify_001",
-                        "bullet_text": "Source-backed good candidate.",
+                        "bullet_text": "Led AWS deployment planning, improving delivery throughput by 20%.",
                         "source_fact_ids": ["fact_good"],
                     },
                     {
@@ -650,6 +650,64 @@ def test_selector_filters_candidates_outside_allowed_fact_set(tmp_path) -> None:
     assert any(r["reason"] == "source_fact_id_not_allowed" for r in receipt["paths"][0]["rejections"])
 
 
+def test_selector_excludes_capability_only_candidate_before_pool_scoring(tmp_path) -> None:
+    paths = [
+        SelfConsistencyPath(
+            0,
+            0.38,
+            "REAL_LLM",
+            "",
+            {
+                "bullets": [
+                    {
+                        "bullet_id": "bul_unify_001",
+                        "bullet_text": "Forged co-selling frameworks with SIs and ISVs around reusable AI platform services.",
+                        "source_fact_ids": ["fact_good"],
+                    }
+                ],
+                "claim_ledger": [{"claim_text": "good", "source_fact_ids": ["fact_good"]}],
+            },
+            "",
+            None,
+        ),
+        SelfConsistencyPath(
+            1,
+            0.42,
+            "REAL_LLM",
+            "",
+            {
+                "bullets": [
+                    {
+                        "bullet_id": "bul_unify_001",
+                        "bullet_text": "Led SI co-sell enablement through reusable AI platform services, accelerating partner opportunity progression.",
+                        "source_fact_ids": ["fact_good"],
+                    }
+                ],
+                "claim_ledger": [{"claim_text": "good", "source_fact_ids": ["fact_good"]}],
+            },
+            "",
+            None,
+        ),
+    ]
+    pool = run_claude_bullet_pool_selection(
+        section_id="unify_bullets",
+        slot_kind="bullets",
+        paths=paths,
+        required_bullet_ids=("bul_unify_001",),
+        targeting_context={"allowed_fact_ids": ["fact_good"], "selector_requires_valid_candidates": True},
+        artifact_dir=tmp_path,
+        mode="mocked",
+    )
+    assert [b["bullet_text"] for b in pool.merged_parsed["bullets"]] == [
+        "Led SI co-sell enablement through reusable AI platform services, accelerating partner opportunity progression."
+    ]
+    receipt = json.loads((tmp_path / "bullet_pool_candidate_validity.json").read_text(encoding="utf-8"))
+    assert any(
+        r["reason"] == "experience_bullet_evidence_density_required"
+        for r in receipt["paths"][0]["rejections"]
+    )
+
+
 def _entailment_path(idx: int, temperature: float, bullets: list[dict]) -> SelfConsistencyPath:
     return SelfConsistencyPath(
         idx,
@@ -666,7 +724,7 @@ _ENTAILMENT_CTX = {
     "allowed_fact_ids": ["bul_unify_001"],
     "selector_requires_valid_candidates": True,
     "slot_entailment_corpus": {
-        "bul_unify_001": "Cut bespoke delivery from six months to three weeks via platform reuse."
+        "bul_unify_001": "Cut AWS platform delivery from six months to three weeks via platform reuse."
     },
 }
 
@@ -692,7 +750,7 @@ def test_selector_excludes_non_entailed_candidate_and_entailed_alternate_wins(tm
             [
                 {
                     "bullet_id": "bul_unify_001",
-                    "bullet_text": "Cut delivery time from six months to three weeks.",
+                    "bullet_text": "Cut AWS platform delivery time from six months to three weeks.",
                     "source_fact_ids": ["bul_unify_001"],
                 }
             ],
@@ -708,7 +766,7 @@ def test_selector_excludes_non_entailed_candidate_and_entailed_alternate_wins(tm
         mode="mocked",
     )
     bullets = pool.merged_parsed.get("bullets") or []
-    assert [b["bullet_text"] for b in bullets] == ["Cut delivery time from six months to three weeks."]
+    assert [b["bullet_text"] for b in bullets] == ["Cut AWS platform delivery time from six months to three weeks."]
     assert pool.source_path_by_slot == {"bul_unify_001": 1}
 
     receipt = json.loads((tmp_path / "bullet_pool_fact_entailment.json").read_text(encoding="utf-8"))
@@ -927,6 +985,7 @@ def test_employment_bullet_rubric_not_exec_summary_dimensions() -> None:
     assert not unify_ids & FORBIDDEN_EXEC_SUMMARY_DIMENSION_IDS
     assert not ibm_ids & FORBIDDEN_EXEC_SUMMARY_DIMENSION_IDS
     assert "bullet_line_discipline" in unify_ids
+    assert "evidence_density" in unify_ids
     assert "foundation_enterprise_credibility" in ibm_ids
     assert "executive_signal" not in UNIFY_RUBRIC
     assert "synthesis_quality" not in IBM_RUBRIC

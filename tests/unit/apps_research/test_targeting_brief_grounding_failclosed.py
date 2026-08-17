@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
-import re
 import json
+import re
 
 import pytest
 
-from apps_rg.runtime.apps_runtime_compat import GraderError, JudgeResponse
+import apps_research.integrations.apps_rg_handoff as apps_rg_handoff
+from apps_rg.runtime.apps_runtime_compat import (
+    Dimension,
+    GraderClass,
+    GraderError,
+    JudgeResponse,
+)
 from apps_research.engines.company_brief_engine import (
     CompanyBriefEngine,
     CompanyBriefUnavailableError,
@@ -324,6 +330,38 @@ def test_apps_rg_x2_judge_does_not_retry_semantic_fail() -> None:
     assert not x2_judge_receipt_passes(receipt)
 
 
+def test_apps_rg_x2_judge_passes_resolved_google_key_to_the_transport(monkeypatch) -> None:
+    observed: dict[str, object] = {}
+
+    class _CapturedJudge:
+        observed_model = _JUDGE_PIN.model
+        model_usage_attempts: list[dict[str, object]] = []
+        provider_evidence: dict[str, object] = {}
+
+        def __init__(self, **kwargs: object) -> None:
+            observed.update(kwargs)
+
+        def judge(self, _dimension, _context):
+            return JudgeResponse(score=0.91, abstain=False, reasoning="supported")
+
+    monkeypatch.setenv("GOOGLE_API_KEY", "canonical-test-key")
+    monkeypatch.setenv("GEMINI_API_KEY", "legacy-test-key")
+    monkeypatch.setattr(
+        apps_rg_handoff,
+        "_AppsRgTargetingBriefGoogleJudge",
+        _CapturedJudge,
+    )
+
+    receipt = run_apps_rg_handoff_x2_judge(
+        brief_text=_VALID_MD,
+        jd_text="Lead partner architecture.",
+        research_notes="Acme has verified partner motion.",
+    )
+
+    assert observed["api_key"] == "canonical-test-key"
+    assert receipt["status"] == "PASS"
+
+
 def test_apps_rg_x2_prompt_treats_required_evidence_boundary_as_content() -> None:
     system, user = build_apps_rg_targeting_brief_x2_prompt(
         brief_text=(
@@ -362,6 +400,27 @@ def test_apps_rg_x2_google_request_uses_high_thinking_without_temperature() -> N
     }
     assert APPS_RG_HANDOFF_JUDGE_THINKING_LEVEL == "high"
     assert "temperature" not in generation_config
+    assert generation_config["responseMimeType"] == "application/json"
+
+
+def test_apps_rg_x2_google_judge_accepts_one_fenced_json_object() -> None:
+    judge = _AppsRgTargetingBriefGoogleJudge(
+        model=_JUDGE_PIN.model,
+        api_key="test-key",
+    )
+    response = judge._parse_response(
+        Dimension(
+            name="faithfulness",
+            grader_class=GraderClass.MODEL_BASED,
+            threshold=0.75,
+            is_hard_gate=True,
+            abstain_allowed=True,
+        ),
+        '```json\n{"verdict":"PASS","score":0.91,"reasoning":"grounded"}\n```',
+    )
+
+    assert response.score == 0.91
+    assert response.abstain is False
 
 
 class _NeverCalledJudge:

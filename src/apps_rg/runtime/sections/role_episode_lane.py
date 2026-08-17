@@ -10,7 +10,7 @@ import json
 import os
 import re
 import uuid
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Mapping
@@ -26,6 +26,9 @@ from apps_rg.runtime.claim_ledger.canonical_exec_summary_v2 import (
 from apps_rg.runtime.exit.executive_summary_x3 import aggregate_x3
 from apps_rg.runtime.spine.section_x3_finalize import finalize_section_lane_x3
 from apps_rg.runtime.validators.bullet_line_discipline_x2 import check_bullet_single_thought
+from apps_rg.runtime.validators.bullet_quality_floor_x2 import (
+    check_experience_bullet_evidence_density,
+)
 from apps_rg.runtime.validators.narrative_mechanical_x2 import check_narrative_exactly_one_sentence
 from apps_rg.runtime.providers import (
     ExternalProvider,
@@ -607,6 +610,39 @@ _PROOF_FACT_SURFACE_COMPOSITIONS: Mapping[tuple[str, str], str] = {
     ): "Led legacy cloud modernization for AWS insurance platforms",
 }
 _PROOF_FACT_COMPOSITION_CONNECTIVES = frozenset({"and", "for", "of", "the", "to"})
+_MODEL_SURFACE_NON_ANCHOR_TOKENS = frozenset(
+    {
+        "a",
+        "an",
+        "and",
+        "as",
+        "at",
+        "by",
+        "for",
+        "from",
+        "in",
+        "into",
+        "of",
+        "on",
+        "that",
+        "the",
+        "their",
+        "to",
+        "with",
+        "across",
+        "built",
+        "created",
+        "delivered",
+        "designed",
+        "directed",
+        "drove",
+        "implemented",
+        "led",
+        "managed",
+        "owned",
+        "scaled",
+    }
+)
 
 
 def _proof_fact_surface_tokens(fact: Mapping[str, Any]) -> set[str]:
@@ -637,6 +673,31 @@ def _proof_fact_composition_is_bound(phrase: str, fact: Mapping[str, Any]) -> bo
             continue
         return False
     return True
+
+
+def _model_bullet_surface_binding(
+    text: str,
+    fact: Mapping[str, Any],
+) -> tuple[bool, list[str]]:
+    """Require a model surface to retain several meaningful graph anchors.
+
+    The model may improve readable phrasing, but it cannot turn an approved
+    source id into an ungrounded target-role claim.  A rejected model surface
+    is rendered from the graph's exact claim text instead.
+    """
+    source_tokens = {
+        token
+        for token in _proof_fact_surface_tokens(fact)
+        if len(token) > 2 and token not in _MODEL_SURFACE_NON_ANCHOR_TOKENS
+    }
+    text_tokens = {
+        token
+        for token in re.findall(r"[a-z0-9]+", str(text or "").casefold())
+        if len(token) > 2 and token not in _MODEL_SURFACE_NON_ANCHOR_TOKENS
+    }
+    anchors = sorted(source_tokens & text_tokens)
+    required_anchor_count = min(3, len(source_tokens))
+    return len(anchors) >= required_anchor_count, anchors
 
 
 def _proof_fact_text(fact: dict[str, Any]) -> str:
@@ -792,12 +853,41 @@ def _proof_authorized_bullets_from_selection_with_contract(
         else list(selected_ids)
     )
 
+    model_surface_by_fact_id: dict[str, dict[str, Any]] = {}
+    for row in model_bullets:
+        text = _sentence(str(row.get("bullet_text") or ""))
+        if not text:
+            continue
+        for raw_source_id in row.get("source_fact_ids") or []:
+            source_id = str(raw_source_id or "").strip()
+            if source_id and source_id not in model_surface_by_fact_id:
+                model_surface_by_fact_id[source_id] = row
+
     out: list[dict[str, Any]] = []
+    model_surface_binding_rows: list[dict[str, Any]] = []
+    model_surface_bullet_ids: list[str] = []
+    proof_text_fallback_bullet_ids: list[str] = []
     for fid in render_ids:
         fact = proof_by_id.get(fid)
         if not fact:
             continue
-        text = _proof_fact_text(fact)
+        candidate = model_surface_by_fact_id.get(fid)
+        candidate_text = _sentence(str((candidate or {}).get("bullet_text") or ""))
+        candidate_bound, anchors = _model_bullet_surface_binding(candidate_text, fact)
+        model_surface_binding_rows.append(
+            {
+                "bullet_id": fid,
+                "candidate_present": candidate is not None,
+                "candidate_graph_bound": candidate_bound,
+                "anchor_tokens": anchors,
+            }
+        )
+        if candidate and candidate_bound:
+            text = candidate_text
+            model_surface_bullet_ids.append(fid)
+        else:
+            text = _proof_fact_text(fact)
+            proof_text_fallback_bullet_ids.append(fid)
         if not text:
             continue
         idx = len(out)
@@ -816,6 +906,9 @@ def _proof_authorized_bullets_from_selection_with_contract(
             "rendered_bullet_count": len(out),
             "rendered_source_fact_ids": rendered_source_fact_ids,
             "slot_bound_ordering_applied": slot_bound_ordering_applied,
+            "model_surface_binding_rows": model_surface_binding_rows,
+            "model_surface_bullet_ids": model_surface_bullet_ids,
+            "proof_text_fallback_bullet_ids": proof_text_fallback_bullet_ids,
             "final_materialized_acceptance_ok": (
                 len(out) == ROLE_EPISODE_FINAL_BULLET_COUNT
                 and len(set(rendered_source_fact_ids)) == ROLE_EPISODE_FINAL_BULLET_COUNT
@@ -923,9 +1016,22 @@ def _materialize_bullet_generation(
             allowed=allowed,
         )
         final_ok = bool(final_contract.get("final_materialized_acceptance_ok"))
-        generation_method = "llm_selected_proof_render" if final_ok else "model_output_invalid"
-        llm_output_used = False
-        renderer_version = ROLE_EPISODE_PROOF_TEXT_RENDERER_VERSION if final_ok else ""
+        model_surface_used = bool(final_contract.get("model_surface_bullet_ids"))
+        generation_method = (
+            "llm_selected_graph_bound_surface"
+            if final_ok and model_surface_used
+            else "llm_selected_proof_render"
+            if final_ok
+            else "model_output_invalid"
+        )
+        llm_output_used = bool(final_ok and model_surface_used)
+        renderer_version = (
+            "model_selected_graph_bound_surface.v1"
+            if final_ok and model_surface_used
+            else ROLE_EPISODE_PROOF_TEXT_RENDERER_VERSION
+            if final_ok
+            else ""
+        )
     else:
         bullets = []
         final_contract = {
@@ -957,9 +1063,14 @@ def _materialize_bullet_generation(
         "llm_generation_status": llm_status,
         "llm_output_used": llm_output_used,
         "llm_selection_used": bool(model_bullets and final_contract.get("final_materialized_acceptance_ok")),
-        "model_display_text_discarded": bool(model_bullets),
+        "model_display_text_discarded": bool(
+            model_bullets and not final_contract.get("model_surface_bullet_ids")
+        ),
         "display_text_authority": (
-            "selected_fact_plan_claim_text"
+            "model_selected_graph_bound_surface"
+            if final_contract.get("final_materialized_acceptance_ok")
+            and final_contract.get("model_surface_bullet_ids")
+            else "selected_fact_plan_claim_text"
             if final_contract.get("final_materialized_acceptance_ok")
             else ""
         ),
@@ -1137,6 +1248,9 @@ def _compiled_prompt(cfg: RoleEpisodeLaneConfig, runtime_payload: dict[str, Any]
         "METHODOLOGY:\n"
         "- Bullets do the hard proof work: each bullet must carry one evidence-bound achievement, "
         "cite only allowed source_fact_ids, and avoid generic substitution.\n"
+        "- Quality floor for every bullet: state a specific action, a named delivery detail, and an "
+        "evidence-backed business, adoption, risk, or delivery result. A capability-only statement "
+        "such as a framework, service, or platform with no result is invalid.\n"
         "- Narratives are the lightweight synthesis step above finalized bullets: turn accepted "
         "bullet themes into one higher-level role thesis. The narrative states why the role mattered; "
         "the bullets prove what was delivered.\n"
@@ -1149,7 +1263,8 @@ def _compiled_prompt(cfg: RoleEpisodeLaneConfig, runtime_payload: dict[str, Any]
         "Return JSON with exactly 3 bullets: "
         "{bullets:[{bullet_id, bullet_text, source_fact_ids}], claim_ledger:[{claim_text, source_fact_ids}], "
         "jd_alignment:{targeting_only:true,jd_used_as_proof:false}}. Each bullet is a single "
-        "proof-bearing achievement; do not write a role summary or narrative sentence in bullet form."
+        "proof-bearing achievement with action, delivery detail, and result; do not write a role summary "
+        "or narrative sentence in bullet form."
         if cfg.is_bullet_lane
         else "Return JSON with narrative_sentence, claim_ledger:[{claim_text, source_fact_ids}], "
         "jd_alignment:{targeting_only:true,jd_used_as_proof:false}. The narrative is exactly one sentence "
@@ -1300,6 +1415,11 @@ def _display_text_is_proof_authorized(
 ) -> tuple[bool, dict[str, Any]]:
     authority = str(l2.get("display_text_authority") or "").strip()
     authorized_by_id = _selected_fact_plan_authorized_texts(l2)
+    authorized_facts_by_id = {
+        fid: fact
+        for fact in _facts_from_plan(l2.get("selected_fact_plan") or {})
+        if (fid := _fact_id_from_row(fact))
+    }
     if not authority and not authorized_by_id:
         return True, {"status": "not_evaluated_legacy_payload"}
     allowed_set = {str(x).strip() for x in allowed if str(x).strip()}
@@ -1318,18 +1438,34 @@ def _display_text_is_proof_authorized(
                 [sid for row in (l2.get("claim_ledger") or []) if isinstance(row, dict) for sid in row.get("source_fact_ids") or []],
             )
         ]
-    ok = authority == "selected_fact_plan_claim_text"
+    graph_bound_model_surface = authority == "model_selected_graph_bound_surface"
+    ok = authority == "selected_fact_plan_claim_text" or graph_bound_model_surface
     for row_id, text, source_ids in display_rows:
         normalized_text = _sentence(text)
         normalized_ids = [str(sid).strip() for sid in source_ids if str(sid).strip()]
         source_ok = bool(normalized_ids) and all(sid in allowed_set for sid in normalized_ids)
-        text_ok = any(authorized_by_id.get(sid) == normalized_text for sid in normalized_ids)
+        binding_rows = []
+        if graph_bound_model_surface:
+            for source_id in normalized_ids:
+                fact = authorized_facts_by_id.get(source_id)
+                bound, anchors = _model_bullet_surface_binding(normalized_text, fact or {})
+                binding_rows.append(
+                    {
+                        "source_fact_id": source_id,
+                        "candidate_graph_bound": bound,
+                        "anchor_tokens": anchors,
+                    }
+                )
+            text_ok = any(row["candidate_graph_bound"] for row in binding_rows)
+        else:
+            text_ok = any(authorized_by_id.get(sid) == normalized_text for sid in normalized_ids)
         rows.append(
             {
                 "row_id": row_id,
                 "source_fact_ids": normalized_ids,
                 "source_fact_ids_allowed": source_ok,
                 "text_matches_selected_fact_claim_text": text_ok,
+                "model_surface_binding": binding_rows,
             }
         )
         ok = ok and source_ok and text_ok
@@ -1443,6 +1579,29 @@ def _x2_gates(
                     f"x2_{cfg.section_id}_bullet_no_embedded_newline",
                     all("\n" not in str(b.get("bullet_text") or "") for b in bullets if isinstance(b, dict)),
                     "bullet contains embedded newline",
+                ),
+                _x2_gate(
+                    f"x2_{cfg.section_id}_bullet_evidence_density_required",
+                    bool(bullets)
+                    and all(
+                        check_experience_bullet_evidence_density(
+                            str(b.get("bullet_id") or ""),
+                            str(b.get("bullet_text") or ""),
+                        ).passed
+                        for b in bullets
+                        if isinstance(b, dict)
+                    ),
+                    "each experience bullet needs an action, concrete delivery detail, and a graph-bound outcome",
+                    [
+                        asdict(
+                            check_experience_bullet_evidence_density(
+                                str(b.get("bullet_id") or ""),
+                                str(b.get("bullet_text") or ""),
+                            )
+                        )
+                        for b in bullets
+                        if isinstance(b, dict)
+                    ],
                 ),
             ]
         )
