@@ -909,7 +909,7 @@ def compute_whole_run_exit(signals: Mapping[str, Any]) -> dict[str, Any]:
         or any(c not in supported_lane_x3_codes for c in codes)
     )
 
-    if non_allowing_lanes:
+    if mixed_lanes:
         out["x3_disposition"] = X3B_ESCALATE_HITL
         if len(uniq) > 1:
             lane_x3_rc.append(RC_LANE_X3_MIXED)

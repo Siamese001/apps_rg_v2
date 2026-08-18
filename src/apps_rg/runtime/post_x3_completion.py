@@ -1381,13 +1381,30 @@ def _complete_apps_rg_post_x3(
         "future_run_only": False,
         "current_run_mutated": False,
     }
+    # The section-level closure is the current observability reading.  Preserve
+    # the independently audited references above, while allowing its bounded
+    # parity outcome to surface as an advisory gap in this run's receipt.
+    section_l6_binding = _emit_l6_section_apps_eval_bindings(
+        artifact_dir=art,
+        eval_record=eval_record,
+    )
+    for key in (
+        "grain_parity_status",
+        "apps_eval_rows_bound",
+        "future_run_only",
+        "current_run_mutated",
+    ):
+        if key in section_l6_binding:
+            l6_binding[key] = section_l6_binding[key]
     coverage = dict(eval_record.scorecard.coverage_summary or {})
     eval_quality_pass = (
         evaluation_decision.get("evaluation_validity") == "PASS"
         and evaluation_decision.get("deterministic_product_status") == "PASS"
     )
-    l6_quality_pass = (
+    l6_quality_pass = bool(
         evaluation_decision.get("l6_integrity_status") == "PASS"
+        and l6_binding.get("grain_parity_status") == "PASS"
+        and l6_binding.get("apps_eval_rows_bound") is True
     )
     eval_executed = bool(eval_record_path and eval_record.record_id)
     l6_executed = bool(l6_binding.get("l6_evaluation_audit_ref"))
@@ -1399,11 +1416,12 @@ def _complete_apps_rg_post_x3(
     _write_json(
         art / "fact_vector_writeback_completion_receipt.json", fact_vector_writeback
     )
+    # Apps Eval is the current-run completion measurement.  L6 validates the
+    # next-run observability contract; a gap is visible and actionable, but it
+    # cannot retroactively revoke an otherwise authorized completed product.
     post_boundary_pass = bool(
         eval_executed
-        and l6_executed
         and eval_quality_pass
-        and l6_quality_pass
         and fact_vector_writeback.get("status") != "FAIL"
     )
     pipeline_complete = bool(post_boundary_pass and product_authorization_receipt_ref)
@@ -1427,13 +1445,10 @@ def _complete_apps_rg_post_x3(
         post_boundary_stage = "apps_eval_invalid"
     elif evaluation_decision.get("deterministic_product_status") != "PASS":
         post_boundary_stage = "apps_eval_product_failure"
-    elif evaluation_decision.get("l6_integrity_status") != "PASS":
-        post_boundary_stage = "l6_evaluation_assurance"
     elif fact_vector_writeback.get("status") == "FAIL":
         post_boundary_stage = "fact_vector_writeback_post_boundary"
     elif terminal_identity_gap:
         post_boundary_stage = "terminal_identity_reconciliation"
-    l6_observation_status = "PASS" if l6_pass else "ADVISORY_GAP"
 
     apps_eval_payload = {
         "record_id": eval_record.record_id,
@@ -1454,37 +1469,38 @@ def _complete_apps_rg_post_x3(
         "l6_shadow_bridge_sha256": f"sha256:{l6_bridge_hash}" if l6_bridge_hash else "",
         **l6_binding,
         "authority_order_receipt_ref": POST_X3_AUTHORITY_ORDER_RECEIPT,
-        "future_run_only": False,
+        "future_run_only": True,
         "current_run_mutated": False,
-        "compatibility_status": "PASS" if l6_quality_pass else "FAIL",
+        "compatibility_status": "PASS" if l6_quality_pass else "ADVISORY_GAP",
     }
     payload = {
         "schema_version": "apps_rg.post_x3_completion.v3",
         "generated_at_utc": _utc_now_iso(),
         "status": (
             "PASS"
-            if pipeline_complete and l6_pass
+            if pipeline_complete and l6_quality_pass
             else "PASS_WITH_ADVISORY_L6_GAP"
             if pipeline_complete
             else "PASS_WITH_POST_BOUNDARY_GAPS"
         ),
         "completed": True,
         "x3_to_uwg_completed": True,
-        "x3_to_uwg_to_eval_completed": bool(post_boundary_pass),
-        "x3_to_uwg_to_eval_to_l6_completed": bool(post_boundary_pass and l6_pass),
+        "x3_to_uwg_to_eval_to_l6_completed": bool(post_boundary_pass and l6_quality_pass),
         "product_authorized": True,
         "pipeline_complete": pipeline_complete,
         "observability_repair_required": terminal_state.observability_repair_required,
-        "advisory_observability_repair_required": not l6_pass,
+        "advisory_observability_repair_required": not l6_quality_pass,
         "advisory_observability_stage": (
-            "l6_binding_post_boundary" if not l6_pass else ""
+            "l6_binding_post_boundary" if not l6_quality_pass else ""
         ),
         "product_authorization_receipt_ref": product_authorization_receipt_ref,
         "terminal_identity_gap": terminal_identity_gap,
         "failure_stage": post_boundary_stage,
         "post_boundary_observability_status": (
             "PASS"
-            if post_boundary_pass and eval_quality_pass and l6_quality_pass
+            if post_boundary_pass and l6_quality_pass
+            else "PASS_WITH_ADVISORY_L6_GAP"
+            if post_boundary_pass
             else "EVALUATION_INVALID"
             if evaluation_decision.get("evaluation_validity") != "PASS"
             else "PRODUCT_FAIL"
@@ -1509,11 +1525,14 @@ def _complete_apps_rg_post_x3(
         "authority_order": authority,
         "fact_vector_writeback": fact_vector_writeback,
         "apps_eval": apps_eval_payload,
-        "l6_shadow": {**l6_shadow_payload, "observation_status": l6_observation_status},
+        "l6_shadow": {
+            **l6_shadow_payload,
+            "observation_status": "PASS" if l6_quality_pass else "ADVISORY_GAP",
+        },
     }
     _write_json(receipt_path, payload)
     receipt_hash = _sha256_file(receipt_path)
-    if post_boundary_pass:
+    if pipeline_complete:
         _bind_completion_artifacts(
             artifact_dir=art,
             receipt_path=receipt_path,

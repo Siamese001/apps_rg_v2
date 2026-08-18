@@ -995,9 +995,13 @@ def test_post_boundary_authority_reopens_eval_seal_and_rejects_tamper(
     )
 
     candidate_manifest = tmp_path / "candidate_evaluation_manifest.v2.json"
+    l6_bridge = tmp_path / "l6_shadow_bridge.json"
+    parity = tmp_path / "l6_apps_eval_binding_closure.json"
     l6_audit = tmp_path / "l6_evaluation_audit.v2.json"
     promotion = tmp_path / "fact_vector_writeback_completion_receipt.json"
     _write_json(candidate_manifest, {"schema_version": "test.candidate.v1"})
+    _write_json(l6_bridge, {"status": "PASS"})
+    _write_json(parity, {"binding_closure_status": "PASS"})
     _write_json(
         l6_audit,
         {

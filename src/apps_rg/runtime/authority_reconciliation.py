@@ -425,8 +425,8 @@ def derive_lane_authority(source_run: Path | str, lane: str) -> dict[str, Any]:
         "source_bindings": [
             *[_binding(root, path) for path in paths.values()],
             *(
-                [_binding(root, core_authority_path)]
-                if core_authority_path.is_file()
+                [_binding(root, legacy_core_authority_path)]
+                if legacy_core_authority_path.is_file()
                 else []
             ),
         ],

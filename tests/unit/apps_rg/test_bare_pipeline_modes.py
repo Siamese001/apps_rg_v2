@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 import apps_rg.bare_pipeline as bare_pipeline
+from apps_rg.__main__ import main
 
 
 def _run_deterministic(tmp_path: Path, name: str) -> dict[str, object]:
@@ -442,7 +443,9 @@ def test_zero_argument_cli_routes_to_the_canonical_live_run(monkeypatch) -> None
 
     monkeypatch.setattr("apps_rg.__main__.run_canonical_apps_rg_from_cli_primitives", fake_run)
 
-    assert main([]) == 0
+    # The dispatch transport summary is not itself product authority; without
+    # a completed run directory the public CLI must fail closed.
+    assert main([]) == 1
     assert captured["target_company"] == bare_pipeline.DEFAULT_TARGET_COMPANY
     assert captured["target_role"] == bare_pipeline.DEFAULT_TARGET_ROLE
 

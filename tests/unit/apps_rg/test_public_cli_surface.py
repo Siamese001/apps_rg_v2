@@ -34,7 +34,7 @@ def test_only_public_module_cli_invokes_the_whole_resume_runner() -> None:
     text = PUBLIC_CLI_MODULE.read_text(encoding="utf-8")
     assert "run_canonical_apps_rg_from_cli_primitives(" in text
     assert "run_bare_e2e(" not in text
-    assert "evaluate_full_run(" in text
+    assert "_evaluate_product_run(" in text
 
 
 def test_apps_rg_has_one_executable_module_cli() -> None:
